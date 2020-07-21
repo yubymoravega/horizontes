@@ -41,7 +41,7 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
 
         // line 1
         echo "
-  <div class=\"page-loader page-loader-variant-1\">
+     <div class=\"page-loader page-loader-variant-1\">
       <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='300' height='100' src=\" ";
         // line 3
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo_grupo_horizontes.png"), "html", null, true);
@@ -51,8 +51,8 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
         </div>
       </div>
     </div>
-
- <!-- Page Head-->
+  
+  <!-- Page Head-->
       <header class=\"page-head\">
         <!-- RD Navbar Transparent-->
         <div class=\"rd-navbar-wrap\">
@@ -68,10 +68,7 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
                   <div class=\"rd-navbar-mobile-scroll-holder\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='225' height='125' src=\" ";
-        // line 26
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo_grupo_horizontes.png"), "html", null, true);
-        echo " \" alt=''/></a></div>
+                      
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
                         <form class=\"form-search rd-search\" action=\"search-results.html\" method=\"GET\">
@@ -718,11 +715,7 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
             </div>
           </nav>
         </div>
-      </header>
-  
-
-
-";
+      </header>";
         
         $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e->leave($__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e_prof);
 
@@ -743,21 +736,21 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
 
     public function getDebugInfo()
     {
-        return array (  73 => 26,  47 => 3,  43 => 1,);
+        return array (  47 => 3,  43 => 1,);
     }
 
     public function getSourceContext()
     {
         return new Source("
-  <div class=\"page-loader page-loader-variant-1\">
+     <div class=\"page-loader page-loader-variant-1\">
       <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='300' height='100' src=\" {{ asset('images/logo_grupo_horizontes.png') }} \" alt=''/>
         <div class=\"offset-top-41 text-center\">
           <div class=\"spinner\"></div>
         </div>
       </div>
     </div>
-
- <!-- Page Head-->
+  
+  <!-- Page Head-->
       <header class=\"page-head\">
         <!-- RD Navbar Transparent-->
         <div class=\"rd-navbar-wrap\">
@@ -773,7 +766,7 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
                   <div class=\"rd-navbar-mobile-scroll-holder\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='225' height='125' src=\" {{ asset('images/logo_grupo_horizontes.png') }} \" alt=''/></a></div>
+                      
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
                         <form class=\"form-search rd-search\" action=\"search-results.html\" method=\"GET\">
@@ -1420,10 +1413,6 @@ class __TwigTemplate_450a75c8be891e83f0c8748230f637a2a6d1409b1cde98d7aad3850effa
             </div>
           </nav>
         </div>
-      </header>
-  
-
-
-", "layout/menu.html.twig", "/var/www/html/horizontes/templates/layout/menu.html.twig");
+      </header>", "layout/menu.html.twig", "/var/www/html/horizontes/templates/layout/menu.html.twig");
     }
 }
