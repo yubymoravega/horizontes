@@ -25,7 +25,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $this->source = $this->getSourceContext();
 
         $this->blocks = [
-            'title' => [$this, 'block_title'],
             'stylesheets' => [$this, 'block_stylesheets'],
             'javascripts' => [$this, 'block_javascripts'],
             'body' => [$this, 'block_body'],
@@ -58,34 +57,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
     }
 
     // line 3
-    public function block_title($context, array $blocks = [])
-    {
-        $macros = $this->macros;
-        $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e = $this->extensions["Symfony\\Bundle\\WebProfilerBundle\\Twig\\WebProfilerExtension"];
-        $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e->enter($__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
-
-        $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
-        $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "title"));
-
-        echo "Grupo Horizontes
-
- <meta charset=\"utf-8\">
-    <meta name=\"format-detection\" content=\"telephone=no\">
-    <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0\">
-    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\">
-    <meta name=\"keywords\" content=\"intense web design multipurpose template html\">
-    <meta name=\"date\" content=\"Dec 26\">
-
- ";
-        
-        $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->leave($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof);
-
-        
-        $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e->leave($__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e_prof);
-
-    }
-
-    // line 14
     public function block_stylesheets($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -95,24 +66,24 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "stylesheets"));
 
-        // line 15
+        // line 4
         echo "        <link href=\"";
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/favicon.ico"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"icon\" />
         <link href=\"";
-        // line 16
+        // line 5
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/carousel.css"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
         <link href=\"";
-        // line 17
+        // line 6
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/style.css"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
         <link href=\"";
-        // line 18
+        // line 7
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/style-sunset.css"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
         <link href=\"";
-        // line 19
+        // line 8
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
 ";
@@ -124,7 +95,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     }
 
-    // line 22
+    // line 11
     public function block_javascripts($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -134,20 +105,20 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
 
-        // line 23
+        // line 12
         echo "        <script src=\"";
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core.min.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
          <script src=\"";
-        // line 24
+        // line 13
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/script.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
           <script src=\"";
-        // line 25
+        // line 14
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/revolution.min.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
            <script src=\"";
-        // line 26
+        // line 15
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/carousel.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
     ";
@@ -159,7 +130,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     }
 
-    // line 29
+    // line 18
     public function block_body($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -169,9 +140,25 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 30
-        echo "   
- <body>
+        // line 19
+        echo "<!DOCTYPE html>
+<html class=\"wide wow-animation scrollTo\" lang=\"en\">
+  <head>
+    <title>Services</title>
+    <meta charset=\"utf-8\">
+    <meta name=\"format-detection\" content=\"telephone=no\">
+    <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0\">
+    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\">
+    <meta name=\"keywords\" content=\"intense web design multipurpose template html\">
+    <meta name=\"date\" content=\"Dec 26\">
+    <link rel=\"icon\" href=\"images/favicon.ico\" type=\"image/x-icon\">
+   
+\t\t<!--[if lt IE 10]>
+    <div style=\"background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index:1;\"><a href=\"http://windows.microsoft.com/en-US/internet-explorer/\"><img src=\"images/ie8-panel/warning_bar_0000_us.jpg\" border=\"0\" height=\"42\" width=\"820\" alt=\"You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today.\"></a></div>
+    <script src=\"js/html5shiv.min.js\"></script>
+\t\t<![endif]-->
+  </head>
+  <body>
     <div class=\"page-loader page-loader-variant-1\">
       <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src='images/intense/logo-big.png' alt=''/>
         <div class=\"offset-top-41 text-center\">
@@ -184,7 +171,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       <header class=\"page-head\">
         <!-- RD Navbar Transparent-->
         <div class=\"rd-navbar-wrap\">
-          <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\">
+          <!--  <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\"> -->
+           <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\">
+          
             <div class=\"rd-navbar-inner\">
               <!-- RD Navbar Panel-->
               <div class=\"rd-navbar-panel\">
@@ -889,6 +878,34 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </header>
       <!-- Classic Breadcrumbs-->
+      <section class=\"section novi-background breadcrumb-classic\">
+        <div class=\"container section-34 section-sm-50\">
+          <div class=\"row align-items-xl-center\">
+            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">
+              <h2><span class=\"big\">Services</span></h2>
+            </div>
+            <div class=\"col-xl-2 d-none d-md-block\"><span class=\"icon icon-white mdi mdi-folder-outline\"></span></div>
+            <div class=\"offset-top-0 offset-md-top-10 col-xl-5 offset-xl-top-0 small text-xl-right\">
+              <ul class=\"list-inline list-inline-dashed p\">
+                <li class=\"list-inline-item\"><a href=\"index.html\">Home</a></li>
+                <li class=\"list-inline-item\"><a href=\"#\">Pages</a></li>
+                <li class=\"list-inline-item\">Services
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <svg class=\"svg-triangle-bottom\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">
+          <defs>
+            <lineargradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">
+              <stop offset=\"0%\" style=\"stop-color:rgb(110,192,161);stop-opacity:1\"></stop>
+              <stop offset=\"100%\" style=\"stop-color:rgb(111,193,156);stop-opacity:1\"></stop>
+            </lineargradient>
+          </defs>
+          <polyline points=\"0,0 60,0 29,29\" fill=\"url(#grad1)\"></polyline>
+        </svg>
+      </section>
+      <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
         <div class=\"container section-34 section-sm-20\">
           <div class=\"row align-items-xl-center\">
@@ -927,8 +944,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
           <hr class=\"hr bg-gray\">
         
       </section>
-
-
       <!-- What we do-->
       <section class=\"section novi-background section-98 section-sm-110 carousel1\">
         <div class=\"container\">
@@ -971,8 +986,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
     </div>
         </div>
       </section>
-
-<!-- Page Footers-->
       <!-- Default footer-->
       <footer class=\"section novi-background section-relative section-top-20 section-bottom-20 page-footer bg-black context-dark\">
        
@@ -982,13 +995,15 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </footer>
     </div>
+    </div>
     <!-- Global RD Mailform Output-->
     <div class=\"snackbars\" id=\"form-output-global\"></div>
     <script src=\"js/core.min.js\"></script>
     <script src=\"js/script.js\"></script>
     <script src=\"js/revolution.min.js\"></script>
   </body>
-      
+</html>
+
 ";
         
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->leave($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof);
@@ -1010,23 +1025,12 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     public function getDebugInfo()
     {
-        return array (  173 => 30,  163 => 29,  151 => 26,  147 => 25,  143 => 24,  138 => 23,  128 => 22,  116 => 19,  112 => 18,  108 => 17,  104 => 16,  99 => 15,  89 => 14,  61 => 3,  38 => 1,);
+        return array (  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
     {
         return new Source("{% extends 'base.html.twig' %}
-
-{% block title %}Grupo Horizontes
-
- <meta charset=\"utf-8\">
-    <meta name=\"format-detection\" content=\"telephone=no\">
-    <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0\">
-    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\">
-    <meta name=\"keywords\" content=\"intense web design multipurpose template html\">
-    <meta name=\"date\" content=\"Dec 26\">
-
- {% endblock %}
 
 {% block stylesheets %}
         <link href=\"{{ asset('images/favicon.ico') }}\" type=\"text/css\" rel=\"icon\" />
@@ -1044,8 +1048,24 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
     {% endblock %}
 
 {% block body %}
+<!DOCTYPE html>
+<html class=\"wide wow-animation scrollTo\" lang=\"en\">
+  <head>
+    <title>Services</title>
+    <meta charset=\"utf-8\">
+    <meta name=\"format-detection\" content=\"telephone=no\">
+    <meta name=\"viewport\" content=\"width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0\">
+    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\">
+    <meta name=\"keywords\" content=\"intense web design multipurpose template html\">
+    <meta name=\"date\" content=\"Dec 26\">
+    <link rel=\"icon\" href=\"images/favicon.ico\" type=\"image/x-icon\">
    
- <body>
+\t\t<!--[if lt IE 10]>
+    <div style=\"background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index:1;\"><a href=\"http://windows.microsoft.com/en-US/internet-explorer/\"><img src=\"images/ie8-panel/warning_bar_0000_us.jpg\" border=\"0\" height=\"42\" width=\"820\" alt=\"You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today.\"></a></div>
+    <script src=\"js/html5shiv.min.js\"></script>
+\t\t<![endif]-->
+  </head>
+  <body>
     <div class=\"page-loader page-loader-variant-1\">
       <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src='images/intense/logo-big.png' alt=''/>
         <div class=\"offset-top-41 text-center\">
@@ -1058,7 +1078,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       <header class=\"page-head\">
         <!-- RD Navbar Transparent-->
         <div class=\"rd-navbar-wrap\">
-          <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\">
+          <!--  <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\"> -->
+           <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\">
+          
             <div class=\"rd-navbar-inner\">
               <!-- RD Navbar Panel-->
               <div class=\"rd-navbar-panel\">
@@ -1763,6 +1785,34 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </header>
       <!-- Classic Breadcrumbs-->
+      <section class=\"section novi-background breadcrumb-classic\">
+        <div class=\"container section-34 section-sm-50\">
+          <div class=\"row align-items-xl-center\">
+            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">
+              <h2><span class=\"big\">Services</span></h2>
+            </div>
+            <div class=\"col-xl-2 d-none d-md-block\"><span class=\"icon icon-white mdi mdi-folder-outline\"></span></div>
+            <div class=\"offset-top-0 offset-md-top-10 col-xl-5 offset-xl-top-0 small text-xl-right\">
+              <ul class=\"list-inline list-inline-dashed p\">
+                <li class=\"list-inline-item\"><a href=\"index.html\">Home</a></li>
+                <li class=\"list-inline-item\"><a href=\"#\">Pages</a></li>
+                <li class=\"list-inline-item\">Services
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <svg class=\"svg-triangle-bottom\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">
+          <defs>
+            <lineargradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">
+              <stop offset=\"0%\" style=\"stop-color:rgb(110,192,161);stop-opacity:1\"></stop>
+              <stop offset=\"100%\" style=\"stop-color:rgb(111,193,156);stop-opacity:1\"></stop>
+            </lineargradient>
+          </defs>
+          <polyline points=\"0,0 60,0 29,29\" fill=\"url(#grad1)\"></polyline>
+        </svg>
+      </section>
+      <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
         <div class=\"container section-34 section-sm-20\">
           <div class=\"row align-items-xl-center\">
@@ -1801,8 +1851,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
           <hr class=\"hr bg-gray\">
         
       </section>
-
-
       <!-- What we do-->
       <section class=\"section novi-background section-98 section-sm-110 carousel1\">
         <div class=\"container\">
@@ -1845,8 +1893,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
     </div>
         </div>
       </section>
-
-<!-- Page Footers-->
       <!-- Default footer-->
       <footer class=\"section novi-background section-relative section-top-20 section-bottom-20 page-footer bg-black context-dark\">
        
@@ -1856,13 +1902,15 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </footer>
     </div>
+    </div>
     <!-- Global RD Mailform Output-->
     <div class=\"snackbars\" id=\"form-output-global\"></div>
     <script src=\"js/core.min.js\"></script>
     <script src=\"js/script.js\"></script>
     <script src=\"js/revolution.min.js\"></script>
   </body>
-      
+</html>
+
 {% endblock %}", "home/index.html.twig", "/var/www/html/horizontes/templates/home/index.html.twig");
     }
 }
