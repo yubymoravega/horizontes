@@ -877,34 +877,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
           </nav>
         </div>
       </header>
-      <!-- Classic Breadcrumbs-->
-      <section class=\"section novi-background breadcrumb-classic\">
-        <div class=\"container section-34 section-sm-50\">
-          <div class=\"row align-items-xl-center\">
-            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">
-              <h2><span class=\"big\">Services</span></h2>
-            </div>
-            <div class=\"col-xl-2 d-none d-md-block\"><span class=\"icon icon-white mdi mdi-folder-outline\"></span></div>
-            <div class=\"offset-top-0 offset-md-top-10 col-xl-5 offset-xl-top-0 small text-xl-right\">
-              <ul class=\"list-inline list-inline-dashed p\">
-                <li class=\"list-inline-item\"><a href=\"index.html\">Home</a></li>
-                <li class=\"list-inline-item\"><a href=\"#\">Pages</a></li>
-                <li class=\"list-inline-item\">Services
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <svg class=\"svg-triangle-bottom\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">
-          <defs>
-            <lineargradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">
-              <stop offset=\"0%\" style=\"stop-color:rgb(110,192,161);stop-opacity:1\"></stop>
-              <stop offset=\"100%\" style=\"stop-color:rgb(111,193,156);stop-opacity:1\"></stop>
-            </lineargradient>
-          </defs>
-          <polyline points=\"0,0 60,0 29,29\" fill=\"url(#grad1)\"></polyline>
-        </svg>
-      </section>
+    
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
         <div class=\"container section-34 section-sm-20\">
@@ -924,7 +897,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
           </div>
         </div>
 
-         <div class=\"row justify-content-md-center text-left\" style=\"margin-top: 0px;\">
+         <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
               <form class=\"rd-mailform\" data-form-output=\"components-form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"#\" novalidate=\"novalidate\">
                 <div class=\"form-group\">
@@ -1784,34 +1757,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
           </nav>
         </div>
       </header>
-      <!-- Classic Breadcrumbs-->
-      <section class=\"section novi-background breadcrumb-classic\">
-        <div class=\"container section-34 section-sm-50\">
-          <div class=\"row align-items-xl-center\">
-            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">
-              <h2><span class=\"big\">Services</span></h2>
-            </div>
-            <div class=\"col-xl-2 d-none d-md-block\"><span class=\"icon icon-white mdi mdi-folder-outline\"></span></div>
-            <div class=\"offset-top-0 offset-md-top-10 col-xl-5 offset-xl-top-0 small text-xl-right\">
-              <ul class=\"list-inline list-inline-dashed p\">
-                <li class=\"list-inline-item\"><a href=\"index.html\">Home</a></li>
-                <li class=\"list-inline-item\"><a href=\"#\">Pages</a></li>
-                <li class=\"list-inline-item\">Services
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <svg class=\"svg-triangle-bottom\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">
-          <defs>
-            <lineargradient id=\"grad1\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">
-              <stop offset=\"0%\" style=\"stop-color:rgb(110,192,161);stop-opacity:1\"></stop>
-              <stop offset=\"100%\" style=\"stop-color:rgb(111,193,156);stop-opacity:1\"></stop>
-            </lineargradient>
-          </defs>
-          <polyline points=\"0,0 60,0 29,29\" fill=\"url(#grad1)\"></polyline>
-        </svg>
-      </section>
+    
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
         <div class=\"container section-34 section-sm-20\">
@@ -1831,7 +1777,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
           </div>
         </div>
 
-         <div class=\"row justify-content-md-center text-left\" style=\"margin-top: 0px;\">
+         <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
               <form class=\"rd-mailform\" data-form-output=\"components-form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"#\" novalidate=\"novalidate\">
                 <div class=\"form-group\">

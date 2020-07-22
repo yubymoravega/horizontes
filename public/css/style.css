@@ -57426,3 +57426,12 @@ html:not(.ie-11):not(.ios) .parallax-disabled {
 
 
 }
+
+
+
+@media only screen and (max-width: 768px) {
+    .row.justify-content-md-center.text-left.form {
+        padding-right: 10px;
+        padding-left: 10px;
+  }
+}
