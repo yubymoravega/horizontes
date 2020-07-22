@@ -66,8 +66,7 @@ class __TwigTemplate_644bbdaecc62fd363bbe048169bddf8884103dc339576297567da78e415
         $this->displayBlock('javascripts', $context, $blocks);
         // line 11
         echo "    </body>
-</html>
-";
+</html>";
         
         $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e->leave($__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e_prof);
 
@@ -156,7 +155,7 @@ class __TwigTemplate_644bbdaecc62fd363bbe048169bddf8884103dc339576297567da78e415
 
     public function getDebugInfo()
     {
-        return array (  135 => 10,  117 => 9,  99 => 6,  80 => 5,  68 => 11,  65 => 10,  63 => 9,  59 => 7,  57 => 6,  53 => 5,  47 => 1,);
+        return array (  134 => 10,  116 => 9,  98 => 6,  79 => 5,  68 => 11,  65 => 10,  63 => 9,  59 => 7,  57 => 6,  53 => 5,  47 => 1,);
     }
 
     public function getSourceContext()
@@ -172,7 +171,6 @@ class __TwigTemplate_644bbdaecc62fd363bbe048169bddf8884103dc339576297567da78e415
         {% block body %}{% endblock %}
         {% block javascripts %}{% endblock %}
     </body>
-</html>
-", "base.html.twig", "/var/www/html/horizontes/templates/base.html.twig");
+</html>", "base.html.twig", "/var/www/html/horizontes/templates/base.html.twig");
     }
 }
