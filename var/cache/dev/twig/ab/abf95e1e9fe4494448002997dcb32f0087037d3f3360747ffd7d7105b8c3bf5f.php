@@ -191,7 +191,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                 <!-- RD Navbar Toggle-->
                 <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                 <!--Navbar Brand-->
-                <div class=\"rd-navbar-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='31' src='images/intense/logo-dark.png' alt=''/></a></div>
+                <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-top: -10px;margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
               </div>
               <div class=\"rd-navbar-menu-wrap\">
                 <div class=\"rd-navbar-nav-wrap\">
@@ -850,7 +850,16 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                   </form>
                 </div>
                 <!--RD Navbar shop-->
-                <div class=\"rd-navbar-cart-wrap\"><a class=\"rd-navbar-cart mdi\" href=\"#\" data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\"><span></span></a>
+                <div class=\"rd-navbar-cart-wrap\">
+                <a class=\"rd-navbar-cart mdi icon-user \" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi icon-notification\" style=\"right: 60px;\" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi icon-ventas\" style=\"right: 120px;\" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi \" style=\"right: 170px;\" data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi icon-texto\" style=\"right: 220px;\" href=\"#\" ><span>50.00</span></a>
+               
+                
+                
+                
                   <div class=\"rd-navbar-cart-dropdown\">
                     <ul class=\"rd-navbar-list-products\">
                       <li>
@@ -881,20 +890,12 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       </header>
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
-        <div class=\"container section-34 section-sm-50\">
+        <div class=\"container section-34 section-sm-20\">
           <div class=\"row align-items-xl-center\">
-            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">
-             
-             
-              
-            
-            
+            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">     
             </div>
-            <div class=\"col-xl-2 d-none d-md-block\">
-            
+            <div class=\"col-xl-2 d-none d-md-block\">       
             </div>
-
-
             <div class=\"offset-top-0 offset-md-top-10 col-xl-5 offset-xl-top-0 small text-xl-right\">
               <ul class=\"list-inline list-inline-dashed p\">
                 <li class=\"list-inline-item\"><a href=\"index.html\">Home</a></li>
@@ -905,316 +906,78 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
             </div>
           </div>
         </div>
+
+         <div class=\"row justify-content-md-center text-left\" style=\"margin-top: 0px;\">
+            <div class=\"col-md-7 col-lg-4\">
+              <form class=\"rd-mailform\" data-form-output=\"components-form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"#\" novalidate=\"novalidate\">
+                <div class=\"form-group\">
+                  <div class=\"input-group input-group-sm \">
+                  <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
+                  <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
+                    <input class=\"form-control\" placeholder=\"No. De Telefono\" type=\"text\" name=\"number\" id=\"regula-generated-367333\">
+                    
+                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Buscar</button></span>
+                  </div>
+                </div>
+                <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
+              </form>
+            </div>
+          </div>
+
+          <hr class=\"hr bg-gray\">
         
       </section>
+
+
       <!-- What we do-->
-      <section class=\"section novi-background section-98 section-sm-110\">
+      <section class=\"section novi-background section-98 section-sm-110 carousel1\">
         <div class=\"container\">
-          <h1>What we do</h1>
-          <hr class=\"divider bg-mantis\">
-          <p class=\"inset-left-11p inset-right-11p\">We will take care of your web design project regardless of its level of complexity. We are not afraid of difficult tasks – hundreds of our satisfied clients can prove that.</p>
-          <div class=\"row offset-top-66\">
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-cellphone-link\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Fully Responsive Design</h4>
-                      <p>
-                        Intense looks perfect on any modern device, be it a laptop, a smartphone, or a tablet.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-chart-line\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Social Integration</h4>
-                      <p>
-                        Intense is integrated with such popular social networks as Facebook, Twitter, Instagram and Flickr.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-pen\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">150+ Predesigned Pages</h4>
-                      <p>
-                        Intense is a paradise for developers. Its initial release version comes shipped with 150+ responsive pages for any taste.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"row-spacer d-none d-lg-inline-block offset-top-41 offset-lg-top-66\"></div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-timetable\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Regular Content Updates</h4>
-                      <p>
-                        New child themes, skins and predesigned pages are being released 2-3 times per month. Intense owners get them for free.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-verified\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Lots of Child Themes</h4>
-                      <p>
-                        A variety of niche-specific designs, which expand the possibilities of this template.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-video\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">200+ PSD Files</h4>
-                      <p>
-                        An impressive UI kit comprising 200+ layered PSD source files will be a useful addition to every designer’s toolbox.
-                        
-                      </p>
-                    </div>
-            </div>
-          </div>
-          <hr class=\"bg-lightest offset-top-66\">
-          <div class=\"row align-items-sm-center text-lg-left\">
-            <div class=\"col-lg-6\"><img class=\"img-fluid\" src=\"images/moqups/moqup-home-both.jpg\" width=\"570\" height=\"368\" alt=\"\"></div>
-            <div class=\"col-lg-6\">
-              <h1>Why choose us?</h1>
-              <hr class=\"divider bg-mantis hr-lg-left-0\">
-              <p>We're dedicated to giving you the best service possible by keeping our solutions friendly, simple and effective. If you don’t trust our word for it, just ask the people who have successfully launched their websites designed by us.</p>
-              <p>Our core principle is absolute transparency in everything. Come any time to check how your project is doing – our specialists will inform you about the progress.</p><a class=\"btn btn-primary offset-top-14\" href=\"about-us.html\">Read More</a>
-            </div>
-          </div>
+        
+        <div id=\"carousel\">
+
+       <div class=\"hideLeft\">
+        <img src=\"https://i1.sndcdn.com/artworks-000165384395-rhrjdn-t500x500.jpg\">
+      </div>
+
+      <div class=\"prevLeftSecond\">
+        <img src=\"https://i1.sndcdn.com/artworks-000185743981-tuesoj-t500x500.jpg\">
+      </div>
+
+      <div class=\"prev\">
+        <img src=\"https://i1.sndcdn.com/artworks-000158708482-k160g1-t500x500.jpg\">
+      </div>
+
+      <div class=\"selected\">
+        <img src=\"https://i1.sndcdn.com/artworks-000062423439-lf7ll2-t500x500.jpg\">
+      </div>
+
+      <div class=\"next\">
+        <img src=\"https://i1.sndcdn.com/artworks-000028787381-1vad7y-t500x500.jpg\">
+      </div>
+
+      <div class=\"nextRightSecond\">
+        <img src=\"https://i1.sndcdn.com/artworks-000108468163-dp0b6y-t500x500.jpg\">
+      </div>
+
+      <div class=\"hideRight\">
+        <img src=\"https://i1.sndcdn.com/artworks-000064920701-xrez5z-t500x500.jpg\">
+      </div>
+
+    </div>
+
+    <div class=\"buttons\">
+      <button class=\"btn-aqil-effect-mod-1 btn-default btn btn-aqil-effect\" id=\"prev\">Anterior</button>
+      <button class=\"btn-aqil-effect-mod-1 btn-default btn btn-aqil-effect\" id=\"next\">Siguiente</button>
+    </div>
         </div>
       </section>
-      <section class=\"section novi-background shadow-drop-ambient\">
-        <div class=\"bg-overlay-white\">
-          <div class=\"container section-66\">
-            <div class=\"row\">
-              <div class=\"col-xl-4 text-xl-left\">
-                <h3>Our Clients</h3>
-              </div>
-            </div>
-            <div class=\"row align-items-sm-center justify-content-sm-center offset-top-20\">
-              <div class=\"col-xl-4 text-xl-left\">
-                <p>Among our clients there are many world-renowned industry leaders. Their websites are modern looking and reliable – thanks to us.</p>
-                <!-- Custom Pagination-->
-                <div class=\"owl-custom-navigation owl-customer-navigation offset-top-14\">
-                  <div class=\"owl-nav\">
-                    <div class=\"owl-prev mdi mdi-chevron-left\" data-owl-prev></div>
-                    <div class=\"owl-next mdi mdi-chevron-right\" data-owl-next></div>
-                  </div>
-                </div>
-              </div>
-              <div class=\"col-xl-8 offset-top-41 offset-xl-top-0\">
-                      <!-- Customer Slider-->
-                      <div class=\"owl-carousel owl-carousel-testimonials-2\" data-mouse-drag=\"false\" data-items=\"1\" data-sm-items=\"2\" data-md-items=\"3\" data-lg-items=\"4\" data-nav-custom=\".owl-custom-navigation\" data-dots=\"false\" data-nav=\"false\"><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-01-169x68.png\" width=\"169\" height=\"68\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-02-126x68.png\" width=\"126\" height=\"68\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-03-126x100.png\" width=\"126\" height=\"100\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-04-95x101.png\" width=\"95\" height=\"101\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-05-149x102.png\" width=\"149\" height=\"102\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-06-141x88.png\" width=\"141\" height=\"88\" alt=\"\"></a>
-                      </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Choose Your Plan-->
-      <section class=\"section novi-background section-98 section-sm-110\">
-        <div class=\"container\">
-          <h1>Choose Your Plan</h1>
-          <div class=\"divider bg-mantis\"></div>
-          <div class=\"row align-items-sm-end offset-top-41 justify-content-md-center\">
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4\">
-                      <div class=\"box-planning-header context-dark bg-mantis\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Free</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">1GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">5</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">5GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">No Support</span></li>
-                          <li><span class=\"font-weight-bold\">1</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4\">
-                      <div class=\"box-planning-header context-dark bg-malibu\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Starter</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">5GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">20</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">10GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">No Support</span></li>
-                          <li><span class=\"font-weight-bold\">1</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4 active\">
-                      <div class=\"box-planning-header context-dark bg-saffron\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Business</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">10GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">Unlimited</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">30GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">Free Support</span></li>
-                          <li><span class=\"font-weight-bold\">20</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4\">
-                      <div class=\"box-planning-header context-dark bg-red\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Ultimate</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">100GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">Unlimited</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">60GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">Free support</span></li>
-                          <li><span class=\"font-weight-bold\">Unlimited</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Buy Now-->
-            <!-- Call to action type 2-->
-            <section class=\"section novi-background section-66 context-dark bg-blue-gray\">
-              <div class=\"container\">
-                <div class=\"row justify-content-sm-center align-items-sm-center no-gutters grid-group-md\">
-                  <div class=\"col-lg-7 col-xxl-9 text-center text-lg-left\">
-                    <h2><span class=\"big\">Intense - exactly what you need</span></h2>
-                  </div>
-                  <div class=\"col-lg-4 col-xl-3\"><a class=\"btn btn-icon btn-lg btn-default btn-anis-effect btn-icon-left\" href=\"//documentation.zemez.io/html/bootstrap/intense/\" target=\"_blank\"><span class=\"icon novi-icon mdi mdi-cart-outline\"></span>Buy intense now</a>
-                  </div>
-                </div>
-              </div>
-            </section>
-      <!-- Page Footers-->
+
+<!-- Page Footers-->
       <!-- Default footer-->
-      <footer class=\"section novi-background section-relative section-top-66 section-bottom-34 page-footer bg-black context-dark\">
-        <div class=\"container\">
-          <div class=\"row justify-content-sm-center text-xl-left grid-group-md\">
-            <div class=\"col-sm-12 col-xl-3\">
-              <!-- Footer brand-->
-              <div class=\"footer-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='31' src='images/intense/logo-light.png' alt=''/></a></div>
-              <p class=\"text-darker offset-top-4\">Feel the power of future</p>
-                    <ul class=\"list-inline\">
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-facebook icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-twitter icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-google-plus icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-linkedin icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                    </ul>
-            </div>
-            <div class=\"col-sm-12 col-md-8 col-lg-5 col-xl-4 text-lg-left\">
-              <h6 class=\"text-uppercase text-spacing-60\">Newsletter</h6>
-              <p>Keep up with our always upcoming  product features  and technologies. Enter your e-mail and subscribe to  our newsletter.</p>
-              <div class=\"offset-top-30\">
-                      <form class=\"rd-mailform\" data-form-output=\"form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"bat/rd-mailform.php\">
-                        <div class=\"form-group\">
-                          <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-email\"></span></span></span>
-                            <input class=\"form-control\" placeholder=\"Type your E-Mail\" type=\"email\" name=\"email\" data-constraints=\"@Required @Email\"><span class=\"input-group-append\">
-                              <button class=\"btn btn-sm btn-primary\" type=\"submit\">Subscribe</button></span>
-                          </div>
-                        </div>
-                        <div class=\"form-output\" id=\"form-subscribe-footer\"></div>
-                      </form>
-              </div>
-            </div>
-            <div class=\"col-sm-5 col-lg-3 col-xl-2 text-sm-left\">
-              <h6 class=\"text-uppercase text-spacing-60\">Useful Links</h6>
-              <div class=\"d-block\">
-                <div class=\"d-inline-block\">
-                  <ul class=\"list list-marked\">
-                    <li><a href=\"about-us.html\">About Us</a></li>
-                    <li><a href=\"contact-us.html\">Contact Us</a></li>
-                    <li><a href=\"services.html\">Services</a></li>
-                    <li><a href=\"pricing.html\">Pricing</a></li>
-                    <li><a href=\"clients.html\">Clients</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class=\"col-sm-7 text-sm-left col-lg-4 col-xl-3\">
-              <h6 class=\"text-uppercase text-spacing-60\">Latest news</h6>
-                    <!-- Post Widget-->
-                    <article class=\"post widget-post text-left text-picton-blue\"><a class=\"d-block\" href=\"blog-classic-single-post.html\">
-                        <div class=\"unit flex-row unit-spacing-xs align-items-center\">
-                          <div class=\"unit-body\">
-                            <div class=\"post-meta\"><span class=\"novi-icon icon-xxs mdi mdi-arrow-right\"></span>
-                              <time class=\"text-dark\" datetime=\"2019-01-01\">05/14/2018</time>
-                            </div>
-                            <div class=\"post-title\">
-                              <h6 class=\"text-regular\">Let’s Change the world</h6>
-                            </div>
-                          </div>
-                        </div></a></article>
-                    <!-- Post Widget-->
-                    <article class=\"post widget-post text-left text-picton-blue\"><a class=\"d-block\" href=\"blog-classic-single-post.html\">
-                        <div class=\"unit flex-row unit-spacing-xs align-items-center\">
-                          <div class=\"unit-body\">
-                            <div class=\"post-meta\"><span class=\"novi-icon icon-xxs mdi mdi-arrow-right\"></span>
-                              <time class=\"text-dark\" datetime=\"2019-01-01\">05/14/2018</time>
-                            </div>
-                            <div class=\"post-title\">
-                              <h6 class=\"text-regular\">The meaning of Web Design</h6>
-                            </div>
-                          </div>
-                        </div></a></article>
-                    <!-- Post Widget-->
-                    <article class=\"post widget-post text-left text-picton-blue\"><a class=\"d-block\" href=\"blog-classic-single-post.html\">
-                        <div class=\"unit flex-row unit-spacing-xs align-items-center\">
-                          <div class=\"unit-body\">
-                            <div class=\"post-meta\"><span class=\"novi-icon icon-xxs mdi mdi-arrow-right\"></span>
-                              <time class=\"text-dark\" datetime=\"2019-01-01\">05/14/2018</time>
-                            </div>
-                            <div class=\"post-title\">
-                              <h6 class=\"text-regular\">Get Started with TemplateMonster</h6>
-                            </div>
-                          </div>
-                        </div></a></article>
-            </div>
-          </div>
-        </div>
-        <div class=\"container offset-top-50\">
-          <p class=\"small text-darker\">Intense &copy; <span class=\"copyright-year\"></span> . <a href=\"privacy.html\">Privacy Policy</a>
-            . Design&nbsp;by&nbsp;<a href=\"https://zemez.io/\">Zemez</a>
+      <footer class=\"section novi-background section-relative section-top-20 section-bottom-20 page-footer bg-black context-dark\">
+       
+        <div class=\"container \">
+          <p class=\"small text-light\">Grupo SOLYAG &copy; <span class=\"copyright-year\"></span> . Todos los derechos reservados.
           </p>
         </div>
       </footer>
@@ -1302,7 +1065,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                 <!-- RD Navbar Toggle-->
                 <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                 <!--Navbar Brand-->
-                <div class=\"rd-navbar-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='31' src='images/intense/logo-dark.png' alt=''/></a></div>
+                <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-top: -10px;margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
               </div>
               <div class=\"rd-navbar-menu-wrap\">
                 <div class=\"rd-navbar-nav-wrap\">
@@ -1961,7 +1724,16 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                   </form>
                 </div>
                 <!--RD Navbar shop-->
-                <div class=\"rd-navbar-cart-wrap\"><a class=\"rd-navbar-cart mdi\" href=\"#\" data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\"><span></span></a>
+                <div class=\"rd-navbar-cart-wrap\">
+                <a class=\"rd-navbar-cart mdi icon-user \" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi icon-notification\" style=\"right: 60px;\" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi icon-ventas\" style=\"right: 120px;\" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi \" style=\"right: 170px;\" data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span></a>
+                <a class=\"rd-navbar-cart mdi icon-texto\" style=\"right: 220px;\" href=\"#\" ><span>50.00</span></a>
+               
+                
+                
+                
                   <div class=\"rd-navbar-cart-dropdown\">
                     <ul class=\"rd-navbar-list-products\">
                       <li>
@@ -1992,20 +1764,12 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       </header>
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
-        <div class=\"container section-34 section-sm-50\">
+        <div class=\"container section-34 section-sm-20\">
           <div class=\"row align-items-xl-center\">
-            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">
-             
-             
-              
-            
-            
+            <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">     
             </div>
-            <div class=\"col-xl-2 d-none d-md-block\">
-            
+            <div class=\"col-xl-2 d-none d-md-block\">       
             </div>
-
-
             <div class=\"offset-top-0 offset-md-top-10 col-xl-5 offset-xl-top-0 small text-xl-right\">
               <ul class=\"list-inline list-inline-dashed p\">
                 <li class=\"list-inline-item\"><a href=\"index.html\">Home</a></li>
@@ -2016,316 +1780,78 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
             </div>
           </div>
         </div>
+
+         <div class=\"row justify-content-md-center text-left\" style=\"margin-top: 0px;\">
+            <div class=\"col-md-7 col-lg-4\">
+              <form class=\"rd-mailform\" data-form-output=\"components-form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"#\" novalidate=\"novalidate\">
+                <div class=\"form-group\">
+                  <div class=\"input-group input-group-sm \">
+                  <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
+                  <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
+                    <input class=\"form-control\" placeholder=\"No. De Telefono\" type=\"text\" name=\"number\" id=\"regula-generated-367333\">
+                    
+                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Buscar</button></span>
+                  </div>
+                </div>
+                <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
+              </form>
+            </div>
+          </div>
+
+          <hr class=\"hr bg-gray\">
         
       </section>
+
+
       <!-- What we do-->
-      <section class=\"section novi-background section-98 section-sm-110\">
+      <section class=\"section novi-background section-98 section-sm-110 carousel1\">
         <div class=\"container\">
-          <h1>What we do</h1>
-          <hr class=\"divider bg-mantis\">
-          <p class=\"inset-left-11p inset-right-11p\">We will take care of your web design project regardless of its level of complexity. We are not afraid of difficult tasks – hundreds of our satisfied clients can prove that.</p>
-          <div class=\"row offset-top-66\">
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-cellphone-link\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Fully Responsive Design</h4>
-                      <p>
-                        Intense looks perfect on any modern device, be it a laptop, a smartphone, or a tablet.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-chart-line\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Social Integration</h4>
-                      <p>
-                        Intense is integrated with such popular social networks as Facebook, Twitter, Instagram and Flickr.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-pen\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">150+ Predesigned Pages</h4>
-                      <p>
-                        Intense is a paradise for developers. Its initial release version comes shipped with 150+ responsive pages for any taste.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"row-spacer d-none d-lg-inline-block offset-top-41 offset-lg-top-66\"></div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-timetable\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Regular Content Updates</h4>
-                      <p>
-                        New child themes, skins and predesigned pages are being released 2-3 times per month. Intense owners get them for free.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-verified\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">Lots of Child Themes</h4>
-                      <p>
-                        A variety of niche-specific designs, which expand the possibilities of this template.
-                        
-                      </p>
-                    </div>
-            </div>
-            <div class=\"col-md-8 offset-md-2 col-lg-4 offset-lg-0 offset-top-66 offset-lg-top-0\">
-                    <!-- Icon Box Type 4--><span class=\"icon novi-icon icon-circle icon-bordered icon-lg icon-default icon-filled mdi mdi-video\"></span>
-                    <div>
-                      <h4 class=\"font-weight-bold offset-top-20\">200+ PSD Files</h4>
-                      <p>
-                        An impressive UI kit comprising 200+ layered PSD source files will be a useful addition to every designer’s toolbox.
-                        
-                      </p>
-                    </div>
-            </div>
-          </div>
-          <hr class=\"bg-lightest offset-top-66\">
-          <div class=\"row align-items-sm-center text-lg-left\">
-            <div class=\"col-lg-6\"><img class=\"img-fluid\" src=\"images/moqups/moqup-home-both.jpg\" width=\"570\" height=\"368\" alt=\"\"></div>
-            <div class=\"col-lg-6\">
-              <h1>Why choose us?</h1>
-              <hr class=\"divider bg-mantis hr-lg-left-0\">
-              <p>We're dedicated to giving you the best service possible by keeping our solutions friendly, simple and effective. If you don’t trust our word for it, just ask the people who have successfully launched their websites designed by us.</p>
-              <p>Our core principle is absolute transparency in everything. Come any time to check how your project is doing – our specialists will inform you about the progress.</p><a class=\"btn btn-primary offset-top-14\" href=\"about-us.html\">Read More</a>
-            </div>
-          </div>
+        
+        <div id=\"carousel\">
+
+       <div class=\"hideLeft\">
+        <img src=\"https://i1.sndcdn.com/artworks-000165384395-rhrjdn-t500x500.jpg\">
+      </div>
+
+      <div class=\"prevLeftSecond\">
+        <img src=\"https://i1.sndcdn.com/artworks-000185743981-tuesoj-t500x500.jpg\">
+      </div>
+
+      <div class=\"prev\">
+        <img src=\"https://i1.sndcdn.com/artworks-000158708482-k160g1-t500x500.jpg\">
+      </div>
+
+      <div class=\"selected\">
+        <img src=\"https://i1.sndcdn.com/artworks-000062423439-lf7ll2-t500x500.jpg\">
+      </div>
+
+      <div class=\"next\">
+        <img src=\"https://i1.sndcdn.com/artworks-000028787381-1vad7y-t500x500.jpg\">
+      </div>
+
+      <div class=\"nextRightSecond\">
+        <img src=\"https://i1.sndcdn.com/artworks-000108468163-dp0b6y-t500x500.jpg\">
+      </div>
+
+      <div class=\"hideRight\">
+        <img src=\"https://i1.sndcdn.com/artworks-000064920701-xrez5z-t500x500.jpg\">
+      </div>
+
+    </div>
+
+    <div class=\"buttons\">
+      <button class=\"btn-aqil-effect-mod-1 btn-default btn btn-aqil-effect\" id=\"prev\">Anterior</button>
+      <button class=\"btn-aqil-effect-mod-1 btn-default btn btn-aqil-effect\" id=\"next\">Siguiente</button>
+    </div>
         </div>
       </section>
-      <section class=\"section novi-background shadow-drop-ambient\">
-        <div class=\"bg-overlay-white\">
-          <div class=\"container section-66\">
-            <div class=\"row\">
-              <div class=\"col-xl-4 text-xl-left\">
-                <h3>Our Clients</h3>
-              </div>
-            </div>
-            <div class=\"row align-items-sm-center justify-content-sm-center offset-top-20\">
-              <div class=\"col-xl-4 text-xl-left\">
-                <p>Among our clients there are many world-renowned industry leaders. Their websites are modern looking and reliable – thanks to us.</p>
-                <!-- Custom Pagination-->
-                <div class=\"owl-custom-navigation owl-customer-navigation offset-top-14\">
-                  <div class=\"owl-nav\">
-                    <div class=\"owl-prev mdi mdi-chevron-left\" data-owl-prev></div>
-                    <div class=\"owl-next mdi mdi-chevron-right\" data-owl-next></div>
-                  </div>
-                </div>
-              </div>
-              <div class=\"col-xl-8 offset-top-41 offset-xl-top-0\">
-                      <!-- Customer Slider-->
-                      <div class=\"owl-carousel owl-carousel-testimonials-2\" data-mouse-drag=\"false\" data-items=\"1\" data-sm-items=\"2\" data-md-items=\"3\" data-lg-items=\"4\" data-nav-custom=\".owl-custom-navigation\" data-dots=\"false\" data-nav=\"false\"><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-01-169x68.png\" width=\"169\" height=\"68\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-02-126x68.png\" width=\"126\" height=\"68\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-03-126x100.png\" width=\"126\" height=\"100\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-04-95x101.png\" width=\"95\" height=\"101\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-05-149x102.png\" width=\"149\" height=\"102\" alt=\"\"></a><a href=\"clients.html\"><img class=\"img-semi-transparent\" src=\"images/clients/client-06-141x88.png\" width=\"141\" height=\"88\" alt=\"\"></a>
-                      </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Choose Your Plan-->
-      <section class=\"section novi-background section-98 section-sm-110\">
-        <div class=\"container\">
-          <h1>Choose Your Plan</h1>
-          <div class=\"divider bg-mantis\"></div>
-          <div class=\"row align-items-sm-end offset-top-41 justify-content-md-center\">
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4\">
-                      <div class=\"box-planning-header context-dark bg-mantis\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Free</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">1GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">5</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">5GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">No Support</span></li>
-                          <li><span class=\"font-weight-bold\">1</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4\">
-                      <div class=\"box-planning-header context-dark bg-malibu\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Starter</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">5GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">20</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">10GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">No Support</span></li>
-                          <li><span class=\"font-weight-bold\">1</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4 active\">
-                      <div class=\"box-planning-header context-dark bg-saffron\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Business</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">10GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">Unlimited</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">30GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">Free Support</span></li>
-                          <li><span class=\"font-weight-bold\">20</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-            <div class=\"col-lg-3\">
-                    <!-- Planning Box type 4-->
-                    <div class=\"box-planning box-planning-type-4\">
-                      <div class=\"box-planning-header context-dark bg-red\">
-                        <div class=\"box-planning-label\">
-                          <p class=\"big font-weight-bold\">Most Popular</p>
-                        </div>
-                        <h3>Ultimate</h3>
-                        <p class=\"h2 plan-price\"><sup class=\"big\">\$</sup>59<sub class=\"text-white\">/month</sub>
-                        </p>
-                      </div>
-                      <div class=\"box-planning-body\">
-                        <ul class=\"list-separated list-unstyled\">
-                          <li><span class=\"font-weight-bold\">100GB</span><span class=\"text-dark\">Space amount</span></li>
-                          <li><span class=\"font-weight-bold\">Unlimited</span><span class=\"text-dark\">users</span></li>
-                          <li><span class=\"font-weight-bold\">60GB</span><span class=\"text-dark\">Bandwidth</span></li>
-                          <li><span class=\"text-dark\">Free support</span></li>
-                          <li><span class=\"font-weight-bold\">Unlimited</span><span class=\"text-dark\">Databases</span></li>
-                        </ul><a class=\"btn btn-block btn-default btn-rect\" href=\"register.html\">Sign up</a>
-                      </div>
-                    </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Buy Now-->
-            <!-- Call to action type 2-->
-            <section class=\"section novi-background section-66 context-dark bg-blue-gray\">
-              <div class=\"container\">
-                <div class=\"row justify-content-sm-center align-items-sm-center no-gutters grid-group-md\">
-                  <div class=\"col-lg-7 col-xxl-9 text-center text-lg-left\">
-                    <h2><span class=\"big\">Intense - exactly what you need</span></h2>
-                  </div>
-                  <div class=\"col-lg-4 col-xl-3\"><a class=\"btn btn-icon btn-lg btn-default btn-anis-effect btn-icon-left\" href=\"//documentation.zemez.io/html/bootstrap/intense/\" target=\"_blank\"><span class=\"icon novi-icon mdi mdi-cart-outline\"></span>Buy intense now</a>
-                  </div>
-                </div>
-              </div>
-            </section>
-      <!-- Page Footers-->
+
+<!-- Page Footers-->
       <!-- Default footer-->
-      <footer class=\"section novi-background section-relative section-top-66 section-bottom-34 page-footer bg-black context-dark\">
-        <div class=\"container\">
-          <div class=\"row justify-content-sm-center text-xl-left grid-group-md\">
-            <div class=\"col-sm-12 col-xl-3\">
-              <!-- Footer brand-->
-              <div class=\"footer-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='31' src='images/intense/logo-light.png' alt=''/></a></div>
-              <p class=\"text-darker offset-top-4\">Feel the power of future</p>
-                    <ul class=\"list-inline\">
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-facebook icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-twitter icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-google-plus icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                      <li class=\"list-inline-item\"><a class=\"icon novi-icon fa fa-linkedin icon-xxs icon-circle icon-darkest-filled\" href=\"#\"></a></li>
-                    </ul>
-            </div>
-            <div class=\"col-sm-12 col-md-8 col-lg-5 col-xl-4 text-lg-left\">
-              <h6 class=\"text-uppercase text-spacing-60\">Newsletter</h6>
-              <p>Keep up with our always upcoming  product features  and technologies. Enter your e-mail and subscribe to  our newsletter.</p>
-              <div class=\"offset-top-30\">
-                      <form class=\"rd-mailform\" data-form-output=\"form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"bat/rd-mailform.php\">
-                        <div class=\"form-group\">
-                          <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-email\"></span></span></span>
-                            <input class=\"form-control\" placeholder=\"Type your E-Mail\" type=\"email\" name=\"email\" data-constraints=\"@Required @Email\"><span class=\"input-group-append\">
-                              <button class=\"btn btn-sm btn-primary\" type=\"submit\">Subscribe</button></span>
-                          </div>
-                        </div>
-                        <div class=\"form-output\" id=\"form-subscribe-footer\"></div>
-                      </form>
-              </div>
-            </div>
-            <div class=\"col-sm-5 col-lg-3 col-xl-2 text-sm-left\">
-              <h6 class=\"text-uppercase text-spacing-60\">Useful Links</h6>
-              <div class=\"d-block\">
-                <div class=\"d-inline-block\">
-                  <ul class=\"list list-marked\">
-                    <li><a href=\"about-us.html\">About Us</a></li>
-                    <li><a href=\"contact-us.html\">Contact Us</a></li>
-                    <li><a href=\"services.html\">Services</a></li>
-                    <li><a href=\"pricing.html\">Pricing</a></li>
-                    <li><a href=\"clients.html\">Clients</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class=\"col-sm-7 text-sm-left col-lg-4 col-xl-3\">
-              <h6 class=\"text-uppercase text-spacing-60\">Latest news</h6>
-                    <!-- Post Widget-->
-                    <article class=\"post widget-post text-left text-picton-blue\"><a class=\"d-block\" href=\"blog-classic-single-post.html\">
-                        <div class=\"unit flex-row unit-spacing-xs align-items-center\">
-                          <div class=\"unit-body\">
-                            <div class=\"post-meta\"><span class=\"novi-icon icon-xxs mdi mdi-arrow-right\"></span>
-                              <time class=\"text-dark\" datetime=\"2019-01-01\">05/14/2018</time>
-                            </div>
-                            <div class=\"post-title\">
-                              <h6 class=\"text-regular\">Let’s Change the world</h6>
-                            </div>
-                          </div>
-                        </div></a></article>
-                    <!-- Post Widget-->
-                    <article class=\"post widget-post text-left text-picton-blue\"><a class=\"d-block\" href=\"blog-classic-single-post.html\">
-                        <div class=\"unit flex-row unit-spacing-xs align-items-center\">
-                          <div class=\"unit-body\">
-                            <div class=\"post-meta\"><span class=\"novi-icon icon-xxs mdi mdi-arrow-right\"></span>
-                              <time class=\"text-dark\" datetime=\"2019-01-01\">05/14/2018</time>
-                            </div>
-                            <div class=\"post-title\">
-                              <h6 class=\"text-regular\">The meaning of Web Design</h6>
-                            </div>
-                          </div>
-                        </div></a></article>
-                    <!-- Post Widget-->
-                    <article class=\"post widget-post text-left text-picton-blue\"><a class=\"d-block\" href=\"blog-classic-single-post.html\">
-                        <div class=\"unit flex-row unit-spacing-xs align-items-center\">
-                          <div class=\"unit-body\">
-                            <div class=\"post-meta\"><span class=\"novi-icon icon-xxs mdi mdi-arrow-right\"></span>
-                              <time class=\"text-dark\" datetime=\"2019-01-01\">05/14/2018</time>
-                            </div>
-                            <div class=\"post-title\">
-                              <h6 class=\"text-regular\">Get Started with TemplateMonster</h6>
-                            </div>
-                          </div>
-                        </div></a></article>
-            </div>
-          </div>
-        </div>
-        <div class=\"container offset-top-50\">
-          <p class=\"small text-darker\">Intense &copy; <span class=\"copyright-year\"></span> . <a href=\"privacy.html\">Privacy Policy</a>
-            . Design&nbsp;by&nbsp;<a href=\"https://zemez.io/\">Zemez</a>
+      <footer class=\"section novi-background section-relative section-top-20 section-bottom-20 page-footer bg-black context-dark\">
+       
+        <div class=\"container \">
+          <p class=\"small text-light\">Grupo SOLYAG &copy; <span class=\"copyright-year\"></span> . Todos los derechos reservados.
           </p>
         </div>
       </footer>

@@ -57421,7 +57421,7 @@ html:not(.ie-11):not(.ios) .parallax-disabled {
 .logo-azul{
 
 
-	color: #007cb9;
+	color: #007cb9 !important;
    
 
 

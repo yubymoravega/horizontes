@@ -9,7 +9,7 @@ html, body, main {
     position: relative;
     height: 400px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(0%);
     overflow: hidden;
   }
   #carousel div {
@@ -78,9 +78,15 @@ html, body, main {
   }
   
   .buttons {
-    position: fixed;
+    position: relative;
     left: 50%;
     transform: translateX(-50%);
     bottom: 10px;
+    top : 20px;
   }
-  
+  @media (min-width: 480px){
+.carousel1 {
+    padding-top: 30px !important;
+    padding-bottom: 110px;
+}
+  }
