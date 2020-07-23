@@ -77,7 +77,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-top: -10px;margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
@@ -737,11 +737,11 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   </div>
                   <!--RD Navbar shop-->
                   <div class=\"rd-navbar-cart-wrap\">
-                  <a class=\"rd-navbar-cart mdi icon-user \" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi icon-notification\" style=\"right: 60px;\" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi icon-ventas\" style=\"right: 120px;\" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi \" style=\"right: 170px;\" data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi icon-texto\" style=\"right: 220px;\" href=\"#\" ><span>50.00</span></a>
+                  <a class=\"rd-navbar-cart mdi icon-user \"  href=\"#\" ><span></span><br> <p class=\"p-text\">Usuario</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-notification\" href=\"#\" ><span></span> <br> <p class=\"p-text\">Notificacion</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-ventas\"  href=\"#\" ><span></span><br> <p class=\"p-text\">Servicio</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-carrito \"  data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span></a>
+                  <a class=\"rd-navbar-cart mdi icon-texto\"  href=\"#\" ><span class=\"span-text\" style=\"width: 115px;\" >\$ 00.00</span><br> <p class=\"p-text\">Total</p></a>
                  
                     <div class=\"rd-navbar-cart-dropdown\">
                       <ul class=\"rd-navbar-list-products\">
@@ -772,7 +772,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
           </div>
         </header>
 
-        <div class=\"container section-34 section-sm-20\">
+        <div class=\"container section-34 section-sm-34\">
           <div class=\"row align-items-xl-center\">
             <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">     
             </div>
@@ -847,7 +847,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-top: -10px;margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
@@ -1507,11 +1507,11 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   </div>
                   <!--RD Navbar shop-->
                   <div class=\"rd-navbar-cart-wrap\">
-                  <a class=\"rd-navbar-cart mdi icon-user \" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi icon-notification\" style=\"right: 60px;\" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi icon-ventas\" style=\"right: 120px;\" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi \" style=\"right: 170px;\" data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span></a>
-                  <a class=\"rd-navbar-cart mdi icon-texto\" style=\"right: 220px;\" href=\"#\" ><span>50.00</span></a>
+                  <a class=\"rd-navbar-cart mdi icon-user \"  href=\"#\" ><span></span><br> <p class=\"p-text\">Usuario</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-notification\" href=\"#\" ><span></span> <br> <p class=\"p-text\">Notificacion</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-ventas\"  href=\"#\" ><span></span><br> <p class=\"p-text\">Servicio</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-carrito \"  data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span></a>
+                  <a class=\"rd-navbar-cart mdi icon-texto\"  href=\"#\" ><span class=\"span-text\" style=\"width: 115px;\" >\$ 00.00</span><br> <p class=\"p-text\">Total</p></a>
                  
                     <div class=\"rd-navbar-cart-dropdown\">
                       <ul class=\"rd-navbar-list-products\">
@@ -1542,7 +1542,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
           </div>
         </header>
 
-        <div class=\"container section-34 section-sm-20\">
+        <div class=\"container section-34 section-sm-34\">
           <div class=\"row align-items-xl-center\">
             <div class=\"col-xl-5 d-none d-xl-block text-xl-left\">     
             </div>

@@ -57419,19 +57419,54 @@ html:not(.ie-11):not(.ios) .parallax-disabled {
 /**  clases Personalizadas **/
 
 .logo-azul{
-
-
 	color: #007cb9 !important;
-   
+}
+
+.p-text {
+    margin-top: -5px;
+	font-size: 12px;
+	text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+    .row.justify-content-md-center.text-left.form {
+        padding-right: 10px;
+		padding-left: 10px;
+		
+  }
+  .p-text{
+	  display: none;
+
+  }
+    a.rd-navbar-cart.mdi.icon-notification{right: 50px;}
+	a.rd-navbar-cart.mdi.icon-ventas{right: 100px;}
+	a.rd-navbar-cart.mdi.icon-carrito{right: 150px; }
+	a.rd-navbar-cart.mdi.icon-texto{right: 200px;}
+	a.rd-navbar-cart.mdi.span-text{width: 250px}
+	a.rd-navbar-cart.mdi.p-text{margin-top: 2px;}
+
+	.rd-navbar-default.rd-navbar-fixed, .rd-navbar-floated.rd-navbar-fixed, .rd-navbar-top-panel.rd-navbar-fixed, .rd-navbar-logo-center.rd-navbar-fixed, .rd-navbar-default.rd-navbar-fixed .rd-navbar-panel, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-panel, .rd-navbar-top-panel.rd-navbar-fixed .rd-navbar-panel, .rd-navbar-logo-center.rd-navbar-fixed .rd-navbar-panel
+	{
+		height: 56px !important;
+	}
+
+	.rd-navbar-default.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-top-panel.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-logo-center.rd-navbar-fixed .rd-navbar-toggle
+	{
+		top: 4px !important;
+	}
+
 
 
 }
 
 
+@media only screen and (min-width: 768px) {
+   
+    a.rd-navbar-cart.mdi.icon-notification{right: 100px;}
+	a.rd-navbar-cart.mdi.icon-ventas{right: 200px;}
+	a.rd-navbar-cart.mdi.icon-carrito{right: 310px; margin-top: 14px;}
+	a.rd-navbar-cart.mdi.icon-texto{right: 350px;}
+	a.rd-navbar-cart.mdi.p-text{margin-top: 2px;}
 
-@media only screen and (max-width: 768px) {
-    .row.justify-content-md-center.text-left.form {
-        padding-right: 10px;
-        padding-left: 10px;
-  }
+
 }

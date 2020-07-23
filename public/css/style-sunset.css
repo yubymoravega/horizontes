@@ -34655,13 +34655,13 @@ html .wrapper {
 }
 
 .rd-navbar-default.rd-navbar-fixed, .rd-navbar-floated.rd-navbar-fixed, .rd-navbar-top-panel.rd-navbar-fixed, .rd-navbar-logo-center.rd-navbar-fixed, .rd-navbar-default.rd-navbar-fixed .rd-navbar-panel, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-panel, .rd-navbar-top-panel.rd-navbar-fixed .rd-navbar-panel, .rd-navbar-logo-center.rd-navbar-fixed .rd-navbar-panel {
-	height: 56px;
+	height: 75px;
 }
 
 .rd-navbar-default.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-top-panel.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-logo-center.rd-navbar-fixed .rd-navbar-toggle {
 	position: fixed;
 	z-index: 17;
-	top: 4px;
+	top: 12px;
 	left: 4px;
 	display: inline-block;
 	position: relative;

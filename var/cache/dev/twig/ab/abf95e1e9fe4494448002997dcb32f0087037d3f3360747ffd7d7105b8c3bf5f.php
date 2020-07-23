@@ -149,7 +149,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $this->loadTemplate("layout/header.html", "home/index.html.twig", 22)->display($context);
         // line 23
         echo "
-
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
@@ -215,9 +214,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </section>
      ";
+        // line 88
+        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 88)->display($context);
         // line 89
-        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 89)->display($context);
-        // line 90
         echo "  </body>
 </html>
 
@@ -242,7 +241,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     public function getDebugInfo()
     {
-        return array (  221 => 90,  219 => 89,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  220 => 89,  218 => 88,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
@@ -269,7 +268,6 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 <html class=\"wide wow-animation scrollTo\" lang=\"en\">
 
 {% include 'layout/header.html' %}
-
 
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
