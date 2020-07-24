@@ -57423,7 +57423,7 @@ html:not(.ie-11):not(.ios) .parallax-disabled {
 }
 
 .p-text {
-    margin-top: -5px;
+    margin-top: -10px;
 	font-size: 12px;
 	text-align: center;
 }
@@ -57459,14 +57459,21 @@ html:not(.ie-11):not(.ios) .parallax-disabled {
 
 }
 
+a{font-family: "Raleway", Helvetica, Arial, sans-serif !important;}
 
 @media only screen and (min-width: 768px) {
    
     a.rd-navbar-cart.mdi.icon-notification{right: 100px;}
 	a.rd-navbar-cart.mdi.icon-ventas{right: 200px;}
-	a.rd-navbar-cart.mdi.icon-carrito{right: 310px; margin-top: 14px;}
+	a.rd-navbar-cart.mdi.icon-carrito{right: 300px; margin-top: 0px;}
 	a.rd-navbar-cart.mdi.icon-texto{right: 350px;}
-	a.rd-navbar-cart.mdi.p-text{margin-top: 2px;}
+	.rd-navbar-cart-dropdown.toggle-original-elements.active{ margin-top: 40px;}
+
 
 
 }
+
+@media screen and (min-width: 1500px) {
+    section.section.novi-background.section-98.section-sm-110.carousel1 {
+        min-height: 720px;
+  }

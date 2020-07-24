@@ -565,7 +565,9 @@ class ComposerStaticInit351a04db1b614301fec684f96cd13ba7
     public static $classMap = array (
         'App\\Controller\\HomeController' => __DIR__ . '/../..' . '/src/Controller/HomeController.php',
         'App\\Controller\\TextController' => __DIR__ . '/../..' . '/src/Controller/TextController.php',
+        'App\\Entity\\Cliente' => __DIR__ . '/../..' . '/src/Entity/Cliente.php',
         'App\\Kernel' => __DIR__ . '/../..' . '/src/Kernel.php',
+        'App\\Repository\\ClienteRepository' => __DIR__ . '/../..' . '/src/Repository/ClienteRepository.php',
         'Collator' => __DIR__ . '/..' . '/symfony/intl/Resources/stubs/Collator.php',
         'Doctrine\\Bundle\\DoctrineBundle\\Command\\CreateDatabaseDoctrineCommand' => __DIR__ . '/..' . '/doctrine/doctrine-bundle/Command/CreateDatabaseDoctrineCommand.php',
         'Doctrine\\Bundle\\DoctrineBundle\\Command\\DoctrineCommand' => __DIR__ . '/..' . '/doctrine/doctrine-bundle/Command/DoctrineCommand.php',

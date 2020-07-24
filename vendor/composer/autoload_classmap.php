@@ -8,7 +8,9 @@ $baseDir = dirname($vendorDir);
 return array(
     'App\\Controller\\HomeController' => $baseDir . '/src/Controller/HomeController.php',
     'App\\Controller\\TextController' => $baseDir . '/src/Controller/TextController.php',
+    'App\\Entity\\Cliente' => $baseDir . '/src/Entity/Cliente.php',
     'App\\Kernel' => $baseDir . '/src/Kernel.php',
+    'App\\Repository\\ClienteRepository' => $baseDir . '/src/Repository/ClienteRepository.php',
     'Collator' => $vendorDir . '/symfony/intl/Resources/stubs/Collator.php',
     'Doctrine\\Bundle\\DoctrineBundle\\Command\\CreateDatabaseDoctrineCommand' => $vendorDir . '/doctrine/doctrine-bundle/Command/CreateDatabaseDoctrineCommand.php',
     'Doctrine\\Bundle\\DoctrineBundle\\Command\\DoctrineCommand' => $vendorDir . '/doctrine/doctrine-bundle/Command/DoctrineCommand.php',

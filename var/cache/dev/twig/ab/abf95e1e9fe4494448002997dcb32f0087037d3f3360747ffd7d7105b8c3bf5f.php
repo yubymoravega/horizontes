@@ -178,31 +178,24 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         <div id=\"carousel\">
 
        <div class=\"hideLeft\">
-        <img src=\"https://i1.sndcdn.com/artworks-000165384395-rhrjdn-t500x500.jpg\">
+        <img src=\"";
+        // line 53
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/combo-carne.jpg"), "html", null, true);
+        echo "\">
       </div>
 
       <div class=\"prevLeftSecond\">
-        <img src=\"https://i1.sndcdn.com/artworks-000185743981-tuesoj-t500x500.jpg\">
+        <img src=\"";
+        // line 57
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/cubacel.jpg"), "html", null, true);
+        echo "\">
       </div>
 
       <div class=\"prev\">
-        <img src=\"https://i1.sndcdn.com/artworks-000158708482-k160g1-t500x500.jpg\">
-      </div>
-
-      <div class=\"selected\">
-        <img src=\"https://i1.sndcdn.com/artworks-000062423439-lf7ll2-t500x500.jpg\">
-      </div>
-
-      <div class=\"next\">
-        <img src=\"https://i1.sndcdn.com/artworks-000028787381-1vad7y-t500x500.jpg\">
-      </div>
-
-      <div class=\"nextRightSecond\">
-        <img src=\"https://i1.sndcdn.com/artworks-000108468163-dp0b6y-t500x500.jpg\">
-      </div>
-
-      <div class=\"hideRight\">
-        <img src=\"https://i1.sndcdn.com/artworks-000064920701-xrez5z-t500x500.jpg\">
+        <img src=\"";
+        // line 61
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/promocion.jpg"), "html", null, true);
+        echo "\">
       </div>
 
     </div>
@@ -214,9 +207,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </section>
      ";
-        // line 88
-        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 88)->display($context);
-        // line 89
+        // line 72
+        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 72)->display($context);
+        // line 73
         echo "  </body>
 </html>
 
@@ -241,7 +234,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     public function getDebugInfo()
     {
-        return array (  220 => 89,  218 => 88,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  213 => 73,  211 => 72,  197 => 61,  190 => 57,  183 => 53,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
@@ -298,31 +291,15 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         <div id=\"carousel\">
 
        <div class=\"hideLeft\">
-        <img src=\"https://i1.sndcdn.com/artworks-000165384395-rhrjdn-t500x500.jpg\">
+        <img src=\"{{ asset('images/combo-carne.jpg') }}\">
       </div>
 
       <div class=\"prevLeftSecond\">
-        <img src=\"https://i1.sndcdn.com/artworks-000185743981-tuesoj-t500x500.jpg\">
+        <img src=\"{{ asset('images/cubacel.jpg') }}\">
       </div>
 
       <div class=\"prev\">
-        <img src=\"https://i1.sndcdn.com/artworks-000158708482-k160g1-t500x500.jpg\">
-      </div>
-
-      <div class=\"selected\">
-        <img src=\"https://i1.sndcdn.com/artworks-000062423439-lf7ll2-t500x500.jpg\">
-      </div>
-
-      <div class=\"next\">
-        <img src=\"https://i1.sndcdn.com/artworks-000028787381-1vad7y-t500x500.jpg\">
-      </div>
-
-      <div class=\"nextRightSecond\">
-        <img src=\"https://i1.sndcdn.com/artworks-000108468163-dp0b6y-t500x500.jpg\">
-      </div>
-
-      <div class=\"hideRight\">
-        <img src=\"https://i1.sndcdn.com/artworks-000064920701-xrez5z-t500x500.jpg\">
+        <img src=\"{{ asset('images/promocion.jpg') }}\">
       </div>
 
     </div>
