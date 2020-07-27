@@ -57,7 +57,10 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
   </head>
     <body>
       <div class=\"page-loader page-loader-variant-1\">
-        <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src='images/logo_grupo_horizontes.png' alt=''/>
+        <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src=\"";
+        // line 18
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-solyag.png"), "html", null, true);
+        echo "\" alt=''/>
           <div class=\"offset-top-41 text-center\">
             <div class=\"spinner\"></div>
           </div>
@@ -77,13 +80,19 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src=\"";
+        // line 38
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-chico.png"), "html", null, true);
+        echo "\"  alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src='images/logo-chico.png' alt=''/></a></div>
+                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"";
+        // line 44
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-chico.png"), "html", null, true);
+        echo "\" alt=''/></a></div>
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
                         <form class=\"form-search rd-search\" action=\"search-results.html\" method=\"GET\">
@@ -973,9 +982,14 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
         return "layout/header.html";
     }
 
+    public function isTraitable()
+    {
+        return false;
+    }
+
     public function getDebugInfo()
     {
-        return array (  43 => 1,);
+        return array (  94 => 44,  85 => 38,  62 => 18,  43 => 1,);
     }
 
     public function getSourceContext()
@@ -997,7 +1011,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
   </head>
     <body>
       <div class=\"page-loader page-loader-variant-1\">
-        <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src='images/logo_grupo_horizontes.png' alt=''/>
+        <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src=\"{{ asset('images/logo-solyag.png') }}\" alt=''/>
           <div class=\"offset-top-41 text-center\">
             <div class=\"spinner\"></div>
           </div>
@@ -1017,13 +1031,13 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src='images/logo-chico.png' alt=''/></a></div>
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src=\"{{ asset('images/logo-chico.png') }}\"  alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src='images/logo-chico.png' alt=''/></a></div>
+                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"{{ asset('images/logo-chico.png') }}\" alt=''/></a></div>
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
                         <form class=\"form-search rd-search\" action=\"search-results.html\" method=\"GET\">

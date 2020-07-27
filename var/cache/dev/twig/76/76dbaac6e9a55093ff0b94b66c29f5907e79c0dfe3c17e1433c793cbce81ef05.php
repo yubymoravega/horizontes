@@ -52,9 +52,18 @@ class __TwigTemplate_35684ca9fd425d0732ae66f503c6e79bc6bf5ce67582eaa0d9c2268a18e
 </div>
 <!-- Global RD Mailform Output-->
 <div class=\"snackbars\" id=\"form-output-global\"></div>
-<script src=\"js/core.min.js\"></script>
-<script src=\"js/script.js\"></script>
-<script src=\"js/revolution.min.js\"></script>";
+<script src=\"";
+        // line 13
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core.min.js"), "html", null, true);
+        echo "\"></script>
+<script src=\"";
+        // line 14
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/script.js"), "html", null, true);
+        echo "\"></script>
+<script src=\"";
+        // line 15
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/revolution.min.js"), "html", null, true);
+        echo "\"></script>";
         
         $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e->leave($__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e_prof);
 
@@ -68,9 +77,14 @@ class __TwigTemplate_35684ca9fd425d0732ae66f503c6e79bc6bf5ce67582eaa0d9c2268a18e
         return "layout/footer.html";
     }
 
+    public function isTraitable()
+    {
+        return false;
+    }
+
     public function getDebugInfo()
     {
-        return array (  43 => 1,);
+        return array (  65 => 15,  61 => 14,  57 => 13,  43 => 1,);
     }
 
     public function getSourceContext()
@@ -87,8 +101,8 @@ class __TwigTemplate_35684ca9fd425d0732ae66f503c6e79bc6bf5ce67582eaa0d9c2268a18e
 </div>
 <!-- Global RD Mailform Output-->
 <div class=\"snackbars\" id=\"form-output-global\"></div>
-<script src=\"js/core.min.js\"></script>
-<script src=\"js/script.js\"></script>
-<script src=\"js/revolution.min.js\"></script>", "layout/footer.html", "/var/www/html/horizontes/templates/layout/footer.html");
+<script src=\"{{ asset('js/core.min.js') }}\"></script>
+<script src=\"{{ asset('js/script.js')}}\"></script>
+<script src=\"{{ asset('js/revolution.min.js' )}}\"></script>", "layout/footer.html", "/var/www/html/horizontes/templates/layout/footer.html");
     }
 }

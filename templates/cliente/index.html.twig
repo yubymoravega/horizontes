@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+        <link href="{{ asset('images/favicon.ico') }}" type="text/css" rel="icon" />
+        <link href="{{ asset('css/carousel.css') }}" type="text/css" rel="stylesheet" />
+        <link href="{{ asset('css/style.css') }}" type="text/css" rel="stylesheet" />
+        <link href="{{ asset('css/style-sunset.css') }}" type="text/css" rel="stylesheet" />
+        <link href="{{ asset('//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear') }}" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+   {% block javascripts %}
+        <script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+         <script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+          <script src="{{ asset('js/revolution.min.js') }}" type="text/javascript"></script>
+           <script src="{{ asset('js/carousel.js') }}" type="text/javascript"></script>
+    {% endblock %}
+
+{% block body %}
+<!DOCTYPE html>
+<html class="wide wow-animation scrollTo" lang="en">
+
+{% include 'layout/header.html' %}
+
+          <!-- Section Input Groups-->
+      <section class="section novi-background section-20">
+        <div class="container">
+          <h1>Registro Del Cliente</h1>
+          <hr class="divider divider-sm bg-mantis">
+          <div class="row justify-content-md-center text-left">
+            <div class="col-md-7 col-lg-4">
+              <form class="rd-mailform" data-form-output="components-form-subscribe-footer" data-form-type="subscribe" method="post" action="bat/rd-mailform.php">
+                <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
+                    <input class="form-control" placeholder="Telefono" type="email" name="email" /><span class="input-group-append">
+                      
+                  </div>
+                </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-user-plus"></span></span></span>
+                  <input class="form-control" placeholder="Nombre" type="email" name="email" /><span class="input-group-append">                    
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-users"></span></span></span>
+                  <input class="form-control" placeholder="Apellido" type="email" name="email" /><span class="input-group-append">                    
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-email"></span></span></span>
+                  <input class="form-control" placeholder="Correo Electronico" type="email" name="email" /><span class="input-group-append">                    
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-map-marker"></span></span></span>
+                  <input class="form-control" placeholder="Direccion" type="email" name="email" /><span class="input-group-append">                    
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-book"></span></span></span>
+                  <input class="form-control" placeholder="Comentario" type="email" name="email" /><span class="input-group-append">                    
+                  </div>
+             </div>
+
+
+                <div class="form-output" id="components-form-subscribe-footer"></div>
+
+                <div class=" row justify-content-md-center group offset-top-34">
+           
+           <button class="btn btn-sm btn-default btn-icon btn-icon-left btn-nuka-effect"> <span class="icon novi-icon fa fa-plus" ></span>Editar</button>
+            <button class="btn btn-sm btn-default btn-icon btn-icon-left btn-nuka-effect"> <span class="icon novi-icon fa fa-plus" ></span>Continuar</button>
+            
+            
+          </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+     {% include 'layout/footer.html' %}
+  </body>
+</html>
+
+{% endblock %}
+

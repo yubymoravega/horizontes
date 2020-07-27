@@ -160,7 +160,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
                     <input class=\"form-control\" placeholder=\"No. De Telefono\" type=\"text\" name=\"number\" id=\"regula-generated-367333\">
                     
-                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Buscar</button></span>
+                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Continuar</button></span>
                   </div>
                 </div>
                 <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
@@ -273,7 +273,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
                     <input class=\"form-control\" placeholder=\"No. De Telefono\" type=\"text\" name=\"number\" id=\"regula-generated-367333\">
                     
-                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Buscar</button></span>
+                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Continuar</button></span>
                   </div>
                 </div>
                 <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>

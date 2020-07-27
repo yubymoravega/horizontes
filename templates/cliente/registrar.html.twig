@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+        <link href="{{ asset('images/favicon.ico') }}" type="text/css" rel="icon" />
+        <link href="{{ asset('css/carousel.css') }}" type="text/css" rel="stylesheet" />
+        <link href="{{ asset('css/style.css') }}" type="text/css" rel="stylesheet" />
+        <link href="{{ asset('css/style-sunset.css') }}" type="text/css" rel="stylesheet" />
+        <link href="{{ asset('//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear') }}" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+   {% block javascripts %}
+        <script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+         <script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+          <script src="{{ asset('js/revolution.min.js') }}" type="text/javascript"></script>
+           <script src="{{ asset('js/carousel.js') }}" type="text/javascript"></script>
+    {% endblock %}
+
+{% block body %}
+<!DOCTYPE html>
+<html class="wide wow-animation scrollTo" lang="en">
+
+{% include 'layout/header.html' %}
+
+  {% for message in app.flashes('mensaje') %}
+             <div class="alert alert-danger row justify-content-md-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+          <!-- Section Input Groups-->
+      <section class="section novi-background section-20">
+        <div class="container">
+          <h1>Registro Del Cliente</h1>
+          <hr class="divider divider-sm bg-mantis">
+          <div class="row justify-content-md-center text-left">
+            <div class="col-md-7 col-lg-4">
+
+            {{ form_start(formulario,{'attr': {'class': 'rd-mailform'}}) }}
+       
+                <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
+                
+                  {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'Telefono'}}) }}
+ 
+                    <span class="input-group-append">
+                      
+                  </div>
+                </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-user-plus"></span></span></span>
+                 
+                 {{ form_widget(formulario.nombre, {'attr': {'class': 'form-control','placeholder': 'Nombre'}}) }}
+
+                <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-users"></span></span></span>
+                  
+                   {{ form_widget(formulario.apellidos, {'attr': {'class': 'form-control','placeholder': 'Apellido'}}) }}
+                 
+                  <span class="input-group-append">                    
+                
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-email"></span></span></span>
+                 
+                 {{ form_widget(formulario.correo, {'attr': {'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
+                    
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-map-marker"></span></span></span>
+                 
+                   {{ form_widget(formulario.direccion, {'attr': {'class': 'form-control','placeholder': 'Direccion'}}) }}
+         
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-book"></span></span></span>
+                      
+
+                  {{ form_widget(formulario.comentario, {'attr': {'class': 'form-control','placeholder': 'Comentario'}}) }}
+                  
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+
+                <div class="form-output" id="components-form-subscribe-footer"></div>
+
+                <div class=" row justify-content-md-center group offset-top-34">
+                 
+           {{ form_row(formulario.continuar) }}
+            
+        
+          </div>
+
+              {{ form_end(formulario) }}
+
+
+            </div>
+          </div>
+        </div>
+      </section>
+     {% include 'layout/footer.html' %}
+  </body>
+</html>
+
+<script>
+
+// A $( document ).ready() block.
+$( document ).ready(function() {
+ $( "#cliente_continuar" ).append( "<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>" );
+});
+</script>
+
+
+{% endblock %}
+
