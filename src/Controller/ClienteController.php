@@ -13,16 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ClienteController extends AbstractController
 {
-    /**
-     * @Route("/cliente", name="cliente")
-     */
-    public function index()
-    {
-        return $this->render('cliente/index.html.twig', [
-            'controller_name' => 'ClienteController',
-        ]);
-    }
-
+    
 
     /**
      * @Route("/registrar-cliente", name="registrar-cliente")
@@ -34,17 +25,12 @@ class ClienteController extends AbstractController
         $formulario = $this->createForm(ClienteType::class, $cliente);
         $formulario->handleRequest($request);
 
-        
-
-        if($request->query->get("telefono") != null )
+        if( $formulario->isSubmitted() && $formulario->isValid())
         {
             $dataBase = $this->getDoctrine()->getManager();
             $dataBase->persist($cliente);
+            $dataBase->flush();
 
-            $this->addFlash(
-                'mensaje', 'Invalid name entered'
-            );
-            
             return $this->redirectToRoute("registrar-cliente");
 
         }else{
@@ -55,6 +41,16 @@ class ClienteController extends AbstractController
 
         }
 
+       
+    }
+
+    /**
+     * @Route("/buscar-cliente", name="buscar-cliente")
+     */
+    public function buscarCliente(Request $request)
+    {
+        
+        
        
     }
 

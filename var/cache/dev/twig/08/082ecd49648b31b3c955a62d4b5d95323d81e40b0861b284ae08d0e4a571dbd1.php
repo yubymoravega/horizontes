@@ -149,27 +149,12 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         $this->loadTemplate("layout/header.html", "cliente/registrar.html.twig", 22)->display($context);
         // line 23
         echo "
-  ";
-        // line 24
-        $context['_parent'] = $context;
-        $context['_seq'] = twig_ensure_traversable(twig_get_attribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 24, $this->source); })()), "flashes", [0 => "mensaje"], "method", false, false, false, 24));
-        foreach ($context['_seq'] as $context["_key"] => $context["message"]) {
-            // line 25
-            echo "             <div class=\"alert alert-danger row justify-content-md-center\">
-                ";
-            // line 26
-            echo twig_escape_filter($this->env, $context["message"], "html", null, true);
-            echo "
-            </div>
-        ";
-        }
-        $_parent = $context['_parent'];
-        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['message'], $context['_parent'], $context['loop']);
-        $context = array_intersect_key($context, $_parent) + $_parent;
-        // line 29
-        echo "
+<div id='error' class=\"alert alert-danger row justify-content-md-center text-center\" role=\"alert\" style=\"display: none;\">
+<p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
+</div>
+
           <!-- Section Input Groups-->
-      <section class=\"section novi-background section-20\">
+      <section class=\"section novi-background section-20\" id='seccion-principal'>
         <div class=\"container\">
           <h1>Registro Del Cliente</h1>
           <hr class=\"divider divider-sm bg-mantis\">
@@ -177,16 +162,16 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
             <div class=\"col-md-7 col-lg-4\">
 
             ";
-        // line 38
-        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 38, $this->source); })()), 'form_start', ["attr" => ["class" => "rd-mailform"]]);
+        // line 36
+        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 36, $this->source); })()), 'form_start', ["attr" => ["class" => "rd-mailform", "id" => "form_cliente"]]);
         echo "
        
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-cellphone-iphone\"></span></span></span>
                 
                   ";
-        // line 43
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 43, $this->source); })()), "telefono", [], "any", false, false, false, 43), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Telefono"]]);
+        // line 41
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 41, $this->source); })()), "telefono", [], "any", false, false, false, 41), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Telefono"]]);
         echo "
  
                     <span class=\"input-group-append\">
@@ -198,8 +183,8 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon fa fa-user-plus\"></span></span></span>
                  
                  ";
-        // line 53
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 53, $this->source); })()), "nombre", [], "any", false, false, false, 53), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Nombre"]]);
+        // line 51
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 51, $this->source); })()), "nombre", [], "any", false, false, false, 51), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Nombre"]]);
         echo "
 
                 <span class=\"input-group-append\">                    
@@ -211,8 +196,8 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon fa fa-users\"></span></span></span>
                   
                    ";
-        // line 63
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 63, $this->source); })()), "apellidos", [], "any", false, false, false, 63), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Apellido"]]);
+        // line 61
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 61, $this->source); })()), "apellidos", [], "any", false, false, false, 61), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Apellido"]]);
         echo "
                  
                   <span class=\"input-group-append\">                    
@@ -224,8 +209,8 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-email\"></span></span></span>
                  
                  ";
-        // line 73
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 73, $this->source); })()), "correo", [], "any", false, false, false, 73), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Correo Electronico"]]);
+        // line 71
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 71, $this->source); })()), "correo", [], "any", false, false, false, 71), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Correo Electronico"]]);
         echo "
                     
                   <span class=\"input-group-append\">                    
@@ -237,8 +222,8 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon fa fa-map-marker\"></span></span></span>
                  
                    ";
-        // line 83
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 83, $this->source); })()), "direccion", [], "any", false, false, false, 83), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Direccion"]]);
+        // line 81
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 81, $this->source); })()), "direccion", [], "any", false, false, false, 81), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Direccion"]]);
         echo "
          
                   <span class=\"input-group-append\">                    
@@ -251,8 +236,8 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
                       
 
                   ";
-        // line 94
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 94, $this->source); })()), "comentario", [], "any", false, false, false, 94), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Comentario"]]);
+        // line 92
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 92, $this->source); })()), "comentario", [], "any", false, false, false, 92), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "Comentario"]]);
         echo "
                   
                   <span class=\"input-group-append\">                    
@@ -266,16 +251,16 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
                 <div class=\" row justify-content-md-center group offset-top-34\">
                  
            ";
-        // line 106
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 106, $this->source); })()), "continuar", [], "any", false, false, false, 106), 'row');
+        // line 104
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 104, $this->source); })()), "continuar", [], "any", false, false, false, 104), 'row');
         echo "
             
         
           </div>
 
               ";
-        // line 111
-        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 111, $this->source); })()), 'form_end');
+        // line 109
+        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 109, $this->source); })()), 'form_end');
         echo "
 
 
@@ -284,20 +269,70 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         </div>
       </section>
      ";
-        // line 118
-        $this->loadTemplate("layout/footer.html", "cliente/registrar.html.twig", 118)->display($context);
-        // line 119
+        // line 116
+        $this->loadTemplate("layout/footer.html", "cliente/registrar.html.twig", 116)->display($context);
+        // line 117
         echo "  </body>
 </html>
 
 <script>
 
+\$(\"#form_cliente\").submit(function(e){
+
+     e.preventDefault();// cancela el submit
+});
+
+var id = false;
+
+if(id == true){
+
+  \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+}
+
+\$( \"#cliente_continuar\" ).click(function() {
+  
+    var telefono = \$.trim(\$(\"#cliente_telefono\").val());
+     var nombre = \$.trim(\$(\"#cliente_nombre\").val());
+
+     if(telefono.length < 8){
+
+       \$(\"#cliente_telefono\").css(\"border-color\", \"red\");
+
+       \$(\"#error\").css(\"display\", \"\");
+
+      }else if(nombre.length < 1){
+
+        \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+        \$(\"#cliente_nombre\").css(\"border-color\", \"red\");
+       \$(\"#mensaje\").text('El Cliente Debe Tener Un Nonmbre!');
+
+     }else{
+
+       \$(\"#cliente_nombre\").css(\"border-color\", \"\");
+        \$(\"#error\").css(\"display\", \"none\");
+       \t\$(\"#error\").removeClass(\"alert-danger\");
+        \$(\"#error\").addClass(\"alert-success\");
+        \$(\"#mensaje\").text('Cliente Guardado!');
+         \$(\"#error\").css(\"display\", \"\");
+
+          id = true;
+        \$( \"#form_cliente\" ).submit();
+
+     }
+
+});
+
+
 // A \$( document ).ready() block.
 \$( document ).ready(function() {
  \$( \"#cliente_continuar\" ).append( \"<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>\" );
+
+\$('#cliente_telefono').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});
+
 });
 </script>
-
 
 ";
         
@@ -320,7 +355,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
     public function getDebugInfo()
     {
-        return array (  290 => 119,  288 => 118,  278 => 111,  270 => 106,  255 => 94,  241 => 83,  228 => 73,  215 => 63,  202 => 53,  189 => 43,  181 => 38,  170 => 29,  161 => 26,  158 => 25,  154 => 24,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  275 => 117,  273 => 116,  263 => 109,  255 => 104,  240 => 92,  226 => 81,  213 => 71,  200 => 61,  187 => 51,  174 => 41,  166 => 36,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
@@ -348,21 +383,19 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
 {% include 'layout/header.html' %}
 
-  {% for message in app.flashes('mensaje') %}
-             <div class=\"alert alert-danger row justify-content-md-center\">
-                {{ message }}
-            </div>
-        {% endfor %}
+<div id='error' class=\"alert alert-danger row justify-content-md-center text-center\" role=\"alert\" style=\"display: none;\">
+<p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
+</div>
 
           <!-- Section Input Groups-->
-      <section class=\"section novi-background section-20\">
+      <section class=\"section novi-background section-20\" id='seccion-principal'>
         <div class=\"container\">
           <h1>Registro Del Cliente</h1>
           <hr class=\"divider divider-sm bg-mantis\">
           <div class=\"row justify-content-md-center text-left\">
             <div class=\"col-md-7 col-lg-4\">
 
-            {{ form_start(formulario,{'attr': {'class': 'rd-mailform'}}) }}
+            {{ form_start(formulario,{'attr': {'class': 'rd-mailform', 'id': 'form_cliente'}}) }}
        
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-cellphone-iphone\"></span></span></span>
@@ -448,12 +481,62 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
 <script>
 
+\$(\"#form_cliente\").submit(function(e){
+
+     e.preventDefault();// cancela el submit
+});
+
+var id = false;
+
+if(id == true){
+
+  \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+}
+
+\$( \"#cliente_continuar\" ).click(function() {
+  
+    var telefono = \$.trim(\$(\"#cliente_telefono\").val());
+     var nombre = \$.trim(\$(\"#cliente_nombre\").val());
+
+     if(telefono.length < 8){
+
+       \$(\"#cliente_telefono\").css(\"border-color\", \"red\");
+
+       \$(\"#error\").css(\"display\", \"\");
+
+      }else if(nombre.length < 1){
+
+        \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+        \$(\"#cliente_nombre\").css(\"border-color\", \"red\");
+       \$(\"#mensaje\").text('El Cliente Debe Tener Un Nonmbre!');
+
+     }else{
+
+       \$(\"#cliente_nombre\").css(\"border-color\", \"\");
+        \$(\"#error\").css(\"display\", \"none\");
+       \t\$(\"#error\").removeClass(\"alert-danger\");
+        \$(\"#error\").addClass(\"alert-success\");
+        \$(\"#mensaje\").text('Cliente Guardado!');
+         \$(\"#error\").css(\"display\", \"\");
+
+          id = true;
+        \$( \"#form_cliente\" ).submit();
+
+     }
+
+});
+
+
 // A \$( document ).ready() block.
 \$( document ).ready(function() {
  \$( \"#cliente_continuar\" ).append( \"<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>\" );
+
+\$('#cliente_telefono').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});
+
 });
 </script>
-
 
 {% endblock %}
 

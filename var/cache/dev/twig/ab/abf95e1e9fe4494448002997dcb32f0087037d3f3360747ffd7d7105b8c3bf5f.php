@@ -153,18 +153,28 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       <section class=\"section novi-background \">
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
-              <form class=\"rd-mailform\" data-form-output=\"components-form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"#\" novalidate=\"novalidate\">
+                ";
+        // line 28
+        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 28, $this->source); })()), 'form_start', ["attr" => ["class" => "rd-mailform", "id" => "form_cliente"]]);
+        echo "
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm \">
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
-                    <input class=\"form-control\" placeholder=\"No. De Telefono\" type=\"text\" name=\"number\" id=\"regula-generated-367333\">
                     
-                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Continuar</button></span>
+                     ";
+        // line 34
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 34, $this->source); })()), "telefono", [], "any", false, false, false, 34), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "No. De Telefono"]]);
+        echo "
+                     ";
+        // line 35
+        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 35, $this->source); })()), "continuar", [], "any", false, false, false, 35), 'widget');
+        echo "  </span>
+                     
                   </div>
                 </div>
                 <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
-              </form>
+           
             </div>
           </div>
 
@@ -179,21 +189,21 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
        <div class=\"hideLeft\">
         <img src=\"";
-        // line 53
+        // line 54
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/combo-carne.jpg"), "html", null, true);
         echo "\">
       </div>
 
       <div class=\"prevLeftSecond\">
         <img src=\"";
-        // line 57
+        // line 58
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/cubacel.jpg"), "html", null, true);
         echo "\">
       </div>
 
       <div class=\"prev\">
         <img src=\"";
-        // line 61
+        // line 62
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/promocion.jpg"), "html", null, true);
         echo "\">
       </div>
@@ -207,9 +217,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </section>
      ";
-        // line 72
-        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 72)->display($context);
         // line 73
+        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 73)->display($context);
+        // line 74
         echo "  </body>
 </html>
 
@@ -234,7 +244,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     public function getDebugInfo()
     {
-        return array (  213 => 73,  211 => 72,  197 => 61,  190 => 57,  183 => 53,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  223 => 74,  221 => 73,  207 => 62,  200 => 58,  193 => 54,  171 => 35,  167 => 34,  158 => 28,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
@@ -266,18 +276,19 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       <section class=\"section novi-background \">
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
-              <form class=\"rd-mailform\" data-form-output=\"components-form-subscribe-footer\" data-form-type=\"subscribe\" method=\"post\" action=\"#\" novalidate=\"novalidate\">
+                {{ form_start(formulario,{'attr': {'class': 'rd-mailform', 'id': 'form_cliente'}}) }}
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm \">
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
-                    <input class=\"form-control\" placeholder=\"No. De Telefono\" type=\"text\" name=\"number\" id=\"regula-generated-367333\">
                     
-                      <button class=\"btn btn-sm btn-primary\" style=\"background-color: black; border-color: black;\" type=\"submit\">Continuar</button></span>
+                     {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'No. De Telefono'}}) }}
+                     {{ form_widget(formulario.continuar) }}  </span>
+                     
                   </div>
                 </div>
                 <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
-              </form>
+           
             </div>
           </div>
 

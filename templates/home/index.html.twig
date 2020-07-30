@@ -25,18 +25,19 @@
       <section class="section novi-background ">
          <div class="row form justify-content-md-center text-left" style="margin-top: 0px;">
             <div class="col-md-7 col-lg-4">
-              <form class="rd-mailform" data-form-output="components-form-subscribe-footer" data-form-type="subscribe" method="post" action="#" novalidate="novalidate">
+                {{ form_start(formulario,{'attr': {'class': 'rd-mailform', 'id': 'form_cliente'}}) }}
                 <div class="form-group">
                   <div class="input-group input-group-sm ">
                   <span class="input-group-prepend"><span class="input-group-text input-group-icon">
                   <span class="novi-icon mdi mdi-phone"></span></span></span>
-                    <input class="form-control" placeholder="No. De Telefono" type="text" name="number" id="regula-generated-367333">
                     
-                      <button class="btn btn-sm btn-primary" style="background-color: black; border-color: black;" type="submit">Continuar</button></span>
+                     {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'No. De Telefono'}}) }}
+                     {{ form_widget(formulario.continuar) }}  </span>
+                     
                   </div>
                 </div>
                 <div class="form-output" id="components-form-subscribe-footer"></div>
-              </form>
+           
             </div>
           </div>
 
