@@ -16,6 +16,6 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerLtasxTb\App_KernelDevDebugContainer([
     'container.build_hash' => 'LtasxTb',
-    'container.build_id' => 'abcbca74',
-    'container.build_time' => 1596139632,
+    'container.build_id' => '6536e7dc',
+    'container.build_time' => 1596572903,
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerLtasxTb');

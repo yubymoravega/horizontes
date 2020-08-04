@@ -2,9 +2,13 @@
 //Sign in to see examples pre-filled with your key.
 var stripe = Stripe("pk_test_51GqMhfF2pLNIoJ5OZOn2hPgISbzCyX390U4JNhGqREy0ROZ7LYYZI6fWc2GX8afffee5RRiHkaob2siID4oBqgqA00YhsncFkb");
 // The items the customer wants to buy
+var customerID = null ;
+var tel = null ;
+
+var split = window.location.pathname.split('\/');
 
 var purchase = {
-  items: [{ id: "xl-tshirt"}]
+  items: [{ id: "xl-tshirt" , tel : split[3], monto: split[4]}]
 };
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
@@ -49,7 +53,9 @@ fetch("http://127.0.0.1/index.php/api.create", {
     form.addEventListener("submit", function(event) {
       event.preventDefault();
       // Complete payment when the submit button is clicked
-
+      customerID = data.customer
+      tel = data.tel;
+     
       payWithCard(stripe, card, data.clientSecret);
     });
   });
@@ -61,8 +67,10 @@ var payWithCard = function(stripe, card, clientSecret) {
   stripe
     .confirmCardPayment(clientSecret, {
       payment_method: {
-        card: card
-      }
+        card: card,
+        
+      },
+      setup_future_usage: 'off_session'
     })
     .then(function(result) {
       if (result.error) {
@@ -72,7 +80,8 @@ var payWithCard = function(stripe, card, clientSecret) {
 
         // The payment succeeded!
           orderComplete(result.paymentIntent.id);
-       $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',data:{"status":result}});
+       $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',
+       data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel}});
        
       }
     });
@@ -96,9 +105,6 @@ var showError = function(errorMsgText) {
   loading(false);
   var errorMsg = document.querySelector("#card-error");
   errorMsg.textContent = errorMsgText;
-  setTimeout(function() {
-    errorMsg.textContent = "";
-  }, 4000);
 };
 // Show a spinner on payment submission
 var loading = function(isLoading) {

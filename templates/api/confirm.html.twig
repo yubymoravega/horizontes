@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Accept a card payment</title>
+    <meta name="description" content="A demo of a card payment on Stripe" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('css/tarjetas.css') }}"  />
+     <script src="https://js.stripe.com/v3/"></script>
+    <script src="{{ asset('js/script.security.js') }}" defer></script>
+   
+   
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+
+  <body style="background-color: black;">
+<style>
+    body {
+        background: #6609f2;
+    }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
+
+<div style='margin: auto; width: 400px; max-width: 95vw; font-family: "Helvetica Neue", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
+    <h1 style="font-weight: 500; text-align: center;    color: green; ">Pago Confirmado</h1><hr/>
+
+  
+  </body>
+</html>
+
+
+{% endblock %}

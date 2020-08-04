@@ -1,3 +1,4 @@
+
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
@@ -24,7 +25,6 @@
 <div id='error' class="alert alert-danger row justify-content-md-center text-center" role="alert" style="display: none;">
 <p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
 </div>
-
           <!-- Section Input Groups-->
       <section class="section novi-background section-20" id='seccion-principal'>
         <div class="container">
@@ -33,7 +33,7 @@
           <div class="row justify-content-md-center text-left">
             <div class="col-md-7 col-lg-4">
 
-            {{ form_start(formulario,{'attr': {'class': 'rd-mailform', 'id': 'form_cliente'}}) }}
+            {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
        
                 <div class="form-group">
                   <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
@@ -119,21 +119,21 @@
 
 <script>
 
-$("#form_cliente").submit(function(e){
 
+$("#form_cliente").submit(function(e){
      e.preventDefault();// cancela el submit
 });
 
 var id = false;
 
 if(id == true){
-
   $("#cliente_telefono").css("border-color", "");
 }
 
 $( "#cliente_continuar" ).click(function() {
   
     var telefono = $.trim($("#cliente_telefono").val());
+
      var nombre = $.trim($("#cliente_nombre").val());
 
      if(telefono.length < 8){
@@ -141,40 +141,46 @@ $( "#cliente_continuar" ).click(function() {
        $("#cliente_telefono").css("border-color", "red");
 
        $("#error").css("display", "");
-
+    
       }else if(nombre.length < 1){
 
         $("#cliente_telefono").css("border-color", "");
+
         $("#cliente_nombre").css("border-color", "red");
+
        $("#mensaje").text('El Cliente Debe Tener Un Nonmbre!');
 
      }else{
 
        $("#cliente_nombre").css("border-color", "");
+
         $("#error").css("display", "none");
+
        	$("#error").removeClass("alert-danger");
+
         $("#error").addClass("alert-success");
+
         $("#mensaje").text('Cliente Guardado!');
+
          $("#error").css("display", "");
 
           id = true;
+
         $( "#form_cliente" ).submit();
-
      }
-
 });
 
-
 // A $( document ).ready() block.
+
 $( document ).ready(function() {
+
  $( "#cliente_continuar" ).append( "<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>" );
 
 $('#cliente_telefono').on('input', function () { 
+
     this.value = this.value.replace(/[^0-9]/g,'');
 });
-
 });
 </script>
 
 {% endblock %}
-

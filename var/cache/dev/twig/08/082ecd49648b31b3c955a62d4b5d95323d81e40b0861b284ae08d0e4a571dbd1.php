@@ -33,7 +33,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
     protected function doGetParent(array $context)
     {
-        // line 1
+        // line 2
         return "base.html.twig";
     }
 
@@ -46,7 +46,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "template", "cliente/registrar.html.twig"));
 
-        $this->parent = $this->loadTemplate("base.html.twig", "cliente/registrar.html.twig", 1);
+        $this->parent = $this->loadTemplate("base.html.twig", "cliente/registrar.html.twig", 2);
         $this->parent->display($context, array_merge($this->blocks, $blocks));
         
         $__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e->leave($__internal_085b0142806202599c7fe3b329164a92397d8978207a37e79d70b8c52599e33e_prof);
@@ -56,7 +56,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
     }
 
-    // line 3
+    // line 4
     public function block_stylesheets($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -66,24 +66,24 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "stylesheets"));
 
-        // line 4
+        // line 5
         echo "        <link href=\"";
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/favicon.ico"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"icon\" />
         <link href=\"";
-        // line 5
+        // line 6
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/carousel.css"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
         <link href=\"";
-        // line 6
+        // line 7
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/style.css"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
         <link href=\"";
-        // line 7
+        // line 8
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("css/style-sunset.css"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
         <link href=\"";
-        // line 8
+        // line 9
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear"), "html", null, true);
         echo "\" type=\"text/css\" rel=\"stylesheet\" />
 ";
@@ -95,7 +95,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
     }
 
-    // line 11
+    // line 12
     public function block_javascripts($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -105,20 +105,20 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
 
-        // line 12
+        // line 13
         echo "        <script src=\"";
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core.min.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
          <script src=\"";
-        // line 13
+        // line 14
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/script.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
           <script src=\"";
-        // line 14
+        // line 15
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/revolution.min.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
            <script src=\"";
-        // line 15
+        // line 16
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/carousel.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
     ";
@@ -130,7 +130,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
     }
 
-    // line 18
+    // line 19
     public function block_body($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -140,19 +140,18 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 19
+        // line 20
         echo "<!DOCTYPE html>
 <html class=\"wide wow-animation scrollTo\" lang=\"en\">
 
 ";
-        // line 22
-        $this->loadTemplate("layout/header.html", "cliente/registrar.html.twig", 22)->display($context);
         // line 23
+        $this->loadTemplate("layout/header.html", "cliente/registrar.html.twig", 23)->display($context);
+        // line 24
         echo "
 <div id='error' class=\"alert alert-danger row justify-content-md-center text-center\" role=\"alert\" style=\"display: none;\">
 <p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
 </div>
-
           <!-- Section Input Groups-->
       <section class=\"section novi-background section-20\" id='seccion-principal'>
         <div class=\"container\">
@@ -163,7 +162,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
             ";
         // line 36
-        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 36, $this->source); })()), 'form_start', ["attr" => ["class" => "rd-mailform", "id" => "form_cliente"]]);
+        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 36, $this->source); })()), 'form_start', ["attr" => ["id" => "form_cliente"]]);
         echo "
        
                 <div class=\"form-group\">
@@ -277,21 +276,21 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
 
 <script>
 
-\$(\"#form_cliente\").submit(function(e){
 
+\$(\"#form_cliente\").submit(function(e){
      e.preventDefault();// cancela el submit
 });
 
 var id = false;
 
 if(id == true){
-
   \$(\"#cliente_telefono\").css(\"border-color\", \"\");
 }
 
 \$( \"#cliente_continuar\" ).click(function() {
   
     var telefono = \$.trim(\$(\"#cliente_telefono\").val());
+
      var nombre = \$.trim(\$(\"#cliente_nombre\").val());
 
      if(telefono.length < 8){
@@ -299,38 +298,45 @@ if(id == true){
        \$(\"#cliente_telefono\").css(\"border-color\", \"red\");
 
        \$(\"#error\").css(\"display\", \"\");
-
+    
       }else if(nombre.length < 1){
 
         \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+
         \$(\"#cliente_nombre\").css(\"border-color\", \"red\");
+
        \$(\"#mensaje\").text('El Cliente Debe Tener Un Nonmbre!');
 
      }else{
 
        \$(\"#cliente_nombre\").css(\"border-color\", \"\");
+
         \$(\"#error\").css(\"display\", \"none\");
+
        \t\$(\"#error\").removeClass(\"alert-danger\");
+
         \$(\"#error\").addClass(\"alert-success\");
+
         \$(\"#mensaje\").text('Cliente Guardado!');
+
          \$(\"#error\").css(\"display\", \"\");
 
           id = true;
+
         \$( \"#form_cliente\" ).submit();
-
      }
-
 });
 
-
 // A \$( document ).ready() block.
+
 \$( document ).ready(function() {
+
  \$( \"#cliente_continuar\" ).append( \"<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>\" );
 
 \$('#cliente_telefono').on('input', function () { 
+
     this.value = this.value.replace(/[^0-9]/g,'');
 });
-
 });
 </script>
 
@@ -355,12 +361,13 @@ if(id == true){
 
     public function getDebugInfo()
     {
-        return array (  275 => 117,  273 => 116,  263 => 109,  255 => 104,  240 => 92,  226 => 81,  213 => 71,  200 => 61,  187 => 51,  174 => 41,  166 => 36,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  274 => 117,  272 => 116,  262 => 109,  254 => 104,  239 => 92,  225 => 81,  212 => 71,  199 => 61,  186 => 51,  173 => 41,  165 => 36,  151 => 24,  149 => 23,  144 => 20,  134 => 19,  122 => 16,  118 => 15,  114 => 14,  109 => 13,  99 => 12,  87 => 9,  83 => 8,  79 => 7,  75 => 6,  70 => 5,  60 => 4,  37 => 2,);
     }
 
     public function getSourceContext()
     {
-        return new Source("{% extends 'base.html.twig' %}
+        return new Source("
+{% extends 'base.html.twig' %}
 
 {% block stylesheets %}
         <link href=\"{{ asset('images/favicon.ico') }}\" type=\"text/css\" rel=\"icon\" />
@@ -386,7 +393,6 @@ if(id == true){
 <div id='error' class=\"alert alert-danger row justify-content-md-center text-center\" role=\"alert\" style=\"display: none;\">
 <p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
 </div>
-
           <!-- Section Input Groups-->
       <section class=\"section novi-background section-20\" id='seccion-principal'>
         <div class=\"container\">
@@ -395,7 +401,7 @@ if(id == true){
           <div class=\"row justify-content-md-center text-left\">
             <div class=\"col-md-7 col-lg-4\">
 
-            {{ form_start(formulario,{'attr': {'class': 'rd-mailform', 'id': 'form_cliente'}}) }}
+            {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
        
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-cellphone-iphone\"></span></span></span>
@@ -481,21 +487,21 @@ if(id == true){
 
 <script>
 
-\$(\"#form_cliente\").submit(function(e){
 
+\$(\"#form_cliente\").submit(function(e){
      e.preventDefault();// cancela el submit
 });
 
 var id = false;
 
 if(id == true){
-
   \$(\"#cliente_telefono\").css(\"border-color\", \"\");
 }
 
 \$( \"#cliente_continuar\" ).click(function() {
   
     var telefono = \$.trim(\$(\"#cliente_telefono\").val());
+
      var nombre = \$.trim(\$(\"#cliente_nombre\").val());
 
      if(telefono.length < 8){
@@ -503,43 +509,48 @@ if(id == true){
        \$(\"#cliente_telefono\").css(\"border-color\", \"red\");
 
        \$(\"#error\").css(\"display\", \"\");
-
+    
       }else if(nombre.length < 1){
 
         \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+
         \$(\"#cliente_nombre\").css(\"border-color\", \"red\");
+
        \$(\"#mensaje\").text('El Cliente Debe Tener Un Nonmbre!');
 
      }else{
 
        \$(\"#cliente_nombre\").css(\"border-color\", \"\");
+
         \$(\"#error\").css(\"display\", \"none\");
+
        \t\$(\"#error\").removeClass(\"alert-danger\");
+
         \$(\"#error\").addClass(\"alert-success\");
+
         \$(\"#mensaje\").text('Cliente Guardado!');
+
          \$(\"#error\").css(\"display\", \"\");
 
           id = true;
+
         \$( \"#form_cliente\" ).submit();
-
      }
-
 });
 
-
 // A \$( document ).ready() block.
+
 \$( document ).ready(function() {
+
  \$( \"#cliente_continuar\" ).append( \"<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>\" );
 
 \$('#cliente_telefono').on('input', function () { 
+
     this.value = this.value.replace(/[^0-9]/g,'');
 });
-
 });
 </script>
 
-{% endblock %}
-
-", "cliente/registrar.html.twig", "/var/www/html/horizontes/templates/cliente/registrar.html.twig");
+{% endblock %}", "cliente/registrar.html.twig", "/var/www/html/horizontes/templates/cliente/registrar.html.twig");
     }
 }

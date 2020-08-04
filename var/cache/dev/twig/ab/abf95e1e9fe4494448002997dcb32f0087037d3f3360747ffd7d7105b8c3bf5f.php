@@ -106,19 +106,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "javascripts"));
 
         // line 12
-        echo "        <script src=\"";
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/core.min.js"), "html", null, true);
-        echo "\" type=\"text/javascript\"></script>
-         <script src=\"";
-        // line 13
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/script.js"), "html", null, true);
-        echo "\" type=\"text/javascript\"></script>
-          <script src=\"";
-        // line 14
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/revolution.min.js"), "html", null, true);
-        echo "\" type=\"text/javascript\"></script>
+        echo "   
            <script src=\"";
-        // line 15
+        // line 13
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/carousel.js"), "html", null, true);
         echo "\" type=\"text/javascript\"></script>
     ";
@@ -130,7 +120,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     }
 
-    // line 18
+    // line 16
     public function block_body($context, array $blocks = [])
     {
         $macros = $this->macros;
@@ -140,47 +130,41 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02 = $this->extensions["Symfony\\Bridge\\Twig\\Extension\\ProfilerExtension"];
         $__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02->enter($__internal_319393461309892924ff6e74d6d6e64287df64b63545b994e100d4ab223aed02_prof = new \Twig\Profiler\Profile($this->getTemplateName(), "block", "body"));
 
-        // line 19
+        // line 17
         echo "<!DOCTYPE html>
 <html class=\"wide wow-animation scrollTo\" lang=\"en\">
 
 ";
-        // line 22
-        $this->loadTemplate("layout/header.html", "home/index.html.twig", 22)->display($context);
-        // line 23
+        // line 20
+        $this->loadTemplate("layout/header.html", "home/index.html.twig", 20)->display($context);
+        // line 21
         echo "
       <!-- Classic Breadcrumbs-->
       <section class=\"section novi-background \">
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
-                ";
-        // line 28
-        echo         $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->renderBlock((isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 28, $this->source); })()), 'form_start', ["attr" => ["class" => "rd-mailform", "id" => "form_cliente"]]);
-        echo "
+              <form name=\"form-telefono\" method=\"POST\"  id=\"form-telefono\" action=\"cliente-index\" >
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm \">
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
                     
-                     ";
-        // line 34
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 34, $this->source); })()), "telefono", [], "any", false, false, false, 34), 'widget', ["attr" => ["class" => "form-control", "placeholder" => "No. De Telefono"]]);
-        echo "
-                     ";
-        // line 35
-        echo $this->env->getRuntime('Symfony\Component\Form\FormRenderer')->searchAndRenderBlock(twig_get_attribute($this->env, $this->source, (isset($context["formulario"]) || array_key_exists("formulario", $context) ? $context["formulario"] : (function () { throw new RuntimeError('Variable "formulario" does not exist.', 35, $this->source); })()), "continuar", [], "any", false, false, false, 35), 'widget');
-        echo "  </span>
+                     <input type=\"text\" id=\"tel\" name=\"tel\" class=\"form-control\" placeholder=\"No. De Telefono\" autocomplete=\"off\" required/>
+                     <button id=\"submit\" type=\"submit\" class=\"btn-sm btn-default btn \">Continuar</button>  
                      
-                  </div>
                 </div>
-                <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
-           
+                </div>
+         
+            </form>
+       
             </div>
           </div>
 
           <hr class=\"hr bg-gray\">
         
       </section>
+
+
       <!-- What we do-->
       <section class=\"section novi-background section-98 section-sm-110 carousel1\">
         <div class=\"container\">
@@ -189,21 +173,21 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
        <div class=\"hideLeft\">
         <img src=\"";
-        // line 54
+        // line 55
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/combo-carne.jpg"), "html", null, true);
         echo "\">
       </div>
 
       <div class=\"prevLeftSecond\">
         <img src=\"";
-        // line 58
+        // line 59
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/cubacel.jpg"), "html", null, true);
         echo "\">
       </div>
 
       <div class=\"prev\">
         <img src=\"";
-        // line 62
+        // line 63
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/promocion.jpg"), "html", null, true);
         echo "\">
       </div>
@@ -217,11 +201,34 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </section>
      ";
-        // line 73
-        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 73)->display($context);
         // line 74
+        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 74)->display($context);
+        // line 75
         echo "  </body>
 </html>
+
+<script>
+
+\$('#tel').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});
+
+document.addEventListener(\"DOMContentLoaded\", function() {
+    var elements = document.getElementsByTagName(\"INPUT\");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].oninvalid = function(e) {
+            e.target.setCustomValidity(\"\");
+            if (!e.target.validity.valid) {
+                e.target.setCustomValidity(\"Numero De Telefono!\");
+            }
+        };
+        elements[i].oninput = function(e) {
+            e.target.setCustomValidity(\"\");
+        };
+    }
+})
+
+</script>
 
 ";
         
@@ -244,7 +251,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 
     public function getDebugInfo()
     {
-        return array (  223 => 74,  221 => 73,  207 => 62,  200 => 58,  193 => 54,  171 => 35,  167 => 34,  158 => 28,  151 => 23,  149 => 22,  144 => 19,  134 => 18,  122 => 15,  118 => 14,  114 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  207 => 75,  205 => 74,  191 => 63,  184 => 59,  177 => 55,  141 => 21,  139 => 20,  134 => 17,  124 => 16,  112 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
@@ -260,9 +267,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
 {% endblock %}
 
    {% block javascripts %}
-        <script src=\"{{ asset('js/core.min.js') }}\" type=\"text/javascript\"></script>
-         <script src=\"{{ asset('js/script.js') }}\" type=\"text/javascript\"></script>
-          <script src=\"{{ asset('js/revolution.min.js') }}\" type=\"text/javascript\"></script>
+   
            <script src=\"{{ asset('js/carousel.js') }}\" type=\"text/javascript\"></script>
     {% endblock %}
 
@@ -276,25 +281,28 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
       <section class=\"section novi-background \">
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
-                {{ form_start(formulario,{'attr': {'class': 'rd-mailform', 'id': 'form_cliente'}}) }}
+              <form name=\"form-telefono\" method=\"POST\"  id=\"form-telefono\" action=\"cliente-index\" >
                 <div class=\"form-group\">
                   <div class=\"input-group input-group-sm \">
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
                     
-                     {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'No. De Telefono'}}) }}
-                     {{ form_widget(formulario.continuar) }}  </span>
+                     <input type=\"text\" id=\"tel\" name=\"tel\" class=\"form-control\" placeholder=\"No. De Telefono\" autocomplete=\"off\" required/>
+                     <button id=\"submit\" type=\"submit\" class=\"btn-sm btn-default btn \">Continuar</button>  
                      
-                  </div>
                 </div>
-                <div class=\"form-output\" id=\"components-form-subscribe-footer\"></div>
-           
+                </div>
+         
+            </form>
+       
             </div>
           </div>
 
           <hr class=\"hr bg-gray\">
         
       </section>
+
+
       <!-- What we do-->
       <section class=\"section novi-background section-98 section-sm-110 carousel1\">
         <div class=\"container\">
@@ -324,6 +332,29 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
      {% include 'layout/footer.html' %}
   </body>
 </html>
+
+<script>
+
+\$('#tel').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});
+
+document.addEventListener(\"DOMContentLoaded\", function() {
+    var elements = document.getElementsByTagName(\"INPUT\");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].oninvalid = function(e) {
+            e.target.setCustomValidity(\"\");
+            if (!e.target.validity.valid) {
+                e.target.setCustomValidity(\"Numero De Telefono!\");
+            }
+        };
+        elements[i].oninput = function(e) {
+            e.target.setCustomValidity(\"\");
+        };
+    }
+})
+
+</script>
 
 {% endblock %}
 

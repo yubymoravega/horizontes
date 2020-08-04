@@ -16,9 +16,10 @@
   </head>
 
   <body>
+
     <!-- Display a payment form -->
     <form id="payment-form">
-      <input type="number" id="monto" style="border-color: green; text-align: center;" disabled name='monto'placeholder="Monto a cobrar $ 0.00" />
+      <input type="number" id="monto" style="border-color: green; text-align: center;" disabled name='monto'placeholder="Monto a cobrar ${{monto}}" />
       <div id="card-element"><!--Stripe.js injects the Card Element--></div>
       
       <label style="margin-top: 20px;float: left; margin-left: 30px;">Confirmar Pago</label>
@@ -29,8 +30,8 @@
         <span id="button-text">Pagar</span>
       </button>
  
-      <p id="card-error" role="alert"></p>
-      <p class="result-message hidden" style="line-height: 22px; font-size: 16px; float: left; width: 100%; color: green;">
+      <p id="card-error" style="text-align: center; line-height: 30px; font-size: 16px; float: left; width: 100%; color: red;" role="alert"></p>
+      <p class="result-message hidden" style="text-align: center; line-height: 30px; font-size: 16px; float: left; width: 100%; color: green;">
         Pago Completado
         <a href="" target="_blank"></a> 
       </p>
@@ -46,12 +47,8 @@
 <script>
 
 $( "#cancelar" ).click(function() {
-  window.location.href = "monto.html";
+  window.location.href = "";
    
-});
-
-$('#monto').on('input', function () { 
-    this.value = this.value.replace(/[^0-9-.]/g,'');
 });
 
 document.addEventListener("DOMContentLoaded", function() {

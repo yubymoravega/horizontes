@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Accept a card payment</title>
+    <meta name="description" content="A demo of a card payment on Stripe" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}"  />
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+
+  <body style="background-color: black;">
+    <!-- Display a payment form -->
+    <form id="payment-form" name='payment-form' action="{{ path('select', {'tel': tel}) }}" method="POST" style="border: 1px solid #fff;  box-shadow: 0px 0px 11px 11px #ffffff36;">
+      <label style="float: left; margin-top: 4px; color: white; padding-bottom: 10px;">Monto A Cobrar A {{nombre}}</label>
+      <input autocomplete="off" name='monto' type="text" id="monto" placeholder="0.00" required/>
+
+      <button id="submit" type="submit" style="margin-left: 70px; margin-top: 11px; width: 65%;">
+        <div class="spinner hidden" id="spinner"></div>
+        <span id="button-text">Pagar</span>
+      </button>
+     
+    </form>
+  </body>
+</html>
+
+<script>
+
+$('#monto').on('input', function () { 
+    this.value = this.value.replace(/[^0-9-.]/g,'');
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    var elements = document.getElementsByTagName("INPUT");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].oninvalid = function(e) {
+            e.target.setCustomValidity("");
+            if (!e.target.validity.valid) {
+                e.target.setCustomValidity("Introduce Una Cantidad Exacta!");
+            }
+        };
+        elements[i].oninput = function(e) {
+            e.target.setCustomValidity("");
+        };
+    }
+})
+
+</script>
+
+{% endblock %}

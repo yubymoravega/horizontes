@@ -8,7 +8,7 @@ return [PHP_INT_MAX, static function () { return \Symfony\Component\VarExporter\
     [
         'Symfony\\Component\\Routing\\Annotation\\Route' => [
             'path' => [
-                '/api.get-user',
+                '/api.get-user/{tel}/{monto}',
             ],
             'name' => [
                 'api.get-user',
