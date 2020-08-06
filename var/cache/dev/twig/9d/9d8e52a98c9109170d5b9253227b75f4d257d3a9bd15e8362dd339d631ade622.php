@@ -87,9 +87,11 @@ class __TwigTemplate_4b5949e99f42aeff291a94a1a89e2211d95a7df4751d33dbe8ede66e956
         // line 19
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("select", ["tel" => (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 19, $this->source); })())]), "html", null, true);
         echo "\" method=\"POST\" style=\"border: 1px solid #fff;  box-shadow: 0px 0px 11px 11px #ffffff36;\">
-      <label style=\"float: left; margin-top: 4px; color: white; padding-bottom: 10px;\">Monto A Cobrar A ";
+      <label style=\"float: left; margin-top: 4px; color: white; padding-bottom: 10px;\">Monto a cobrar a : ";
         // line 20
         echo twig_escape_filter($this->env, (isset($context["nombre"]) || array_key_exists("nombre", $context) ? $context["nombre"] : (function () { throw new RuntimeError('Variable "nombre" does not exist.', 20, $this->source); })()), "html", null, true);
+        echo " ";
+        echo twig_escape_filter($this->env, (isset($context["apellido"]) || array_key_exists("apellido", $context) ? $context["apellido"] : (function () { throw new RuntimeError('Variable "apellido" does not exist.', 20, $this->source); })()), "html", null, true);
         echo "</label>
       <input autocomplete=\"off\" name='monto' type=\"text\" id=\"monto\" placeholder=\"0.00\" required/>
 
@@ -114,7 +116,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
         elements[i].oninvalid = function(e) {
             e.target.setCustomValidity(\"\");
             if (!e.target.validity.valid) {
-                e.target.setCustomValidity(\"Introduce Una Cantidad Exacta!\");
+                e.target.setCustomValidity(\"Introduce una cantidad!\");
             }
         };
         elements[i].oninput = function(e) {
@@ -170,7 +172,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
   <body style=\"background-color: black;\">
     <!-- Display a payment form -->
     <form id=\"payment-form\" name='payment-form' action=\"{{ path('select', {'tel': tel}) }}\" method=\"POST\" style=\"border: 1px solid #fff;  box-shadow: 0px 0px 11px 11px #ffffff36;\">
-      <label style=\"float: left; margin-top: 4px; color: white; padding-bottom: 10px;\">Monto A Cobrar A {{nombre}}</label>
+      <label style=\"float: left; margin-top: 4px; color: white; padding-bottom: 10px;\">Monto a cobrar a : {{nombre}} {{apellido}}</label>
       <input autocomplete=\"off\" name='monto' type=\"text\" id=\"monto\" placeholder=\"0.00\" required/>
 
       <button id=\"submit\" type=\"submit\" style=\"margin-left: 70px; margin-top: 11px; width: 65%;\">
@@ -194,7 +196,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
         elements[i].oninvalid = function(e) {
             e.target.setCustomValidity(\"\");
             if (!e.target.validity.valid) {
-                e.target.setCustomValidity(\"Introduce Una Cantidad Exacta!\");
+                e.target.setCustomValidity(\"Introduce una cantidad!\");
             }
         };
         elements[i].oninput = function(e) {

@@ -31,30 +31,43 @@ INFO: The selectable class adds a pointer and shadow animations on hover.
 -->
 
     <!-- Cards -->
-
-    <!-- Visa - selectable -->
-    <div id='credit' class="credit-card visa selectable">
+	
+     {% for tarjetas in tarjeta %}
+      <a style="text-decoration: none;" href="api.form{{tel}}/{{monto}}/{{tarjetas.last4}}">
+       <div  id='credit' class="credit-card {{tarjetas.brand}} selectable">
         <div class="credit-card-last4">
-           {{last4}}
+           {{tarjetas.last4}}
         </div>
         <div class="credit-card-expiry">
-            {{exp_month}}/{{exp_year}}
+            {{tarjetas.exp_month}}/{{tarjetas.exp_year}}
+            
         </div>
-    </div>
- 
- 
+    </div> </a>
+    {% endfor %}
+
+    <!-- Visa - selectable -->
+    
   </body>
 </html>
 
-<script>
+   <a class='pagar' href="{{ path('api.get-user', {'tel': tel, 'monto': monto}) }}">
+        Agregar Tarjeta
+    </a>
+    
+  <style>
+  
+  .pagar {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 33%;
+}
+  </style>
 
-
-$( ".credit-card" ).click(function() {
-  $(location).attr('href','api.form{{tel}}/{{monto}}');
-});
-
-
-
-</script>
 
 {% endblock %}

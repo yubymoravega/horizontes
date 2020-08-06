@@ -30,7 +30,7 @@ class ApiController extends AbstractController
         $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
 
       return $this->render('api/monto.html.twig',[ 'tel' => $tel, 
-      'nombre'=> $data[0]->getNombre() ]);
+      'nombre'=> $data[0]->getNombre(), 'apellido' =>$data[0]->getApellidos()  ]);
     }  
 
 
@@ -61,18 +61,32 @@ class ApiController extends AbstractController
   $json_str = file_get_contents('php://input');
   $json_obj = json_decode($json_str);
  
-  $customer  = \Stripe\Customer::create();
+  $dataBase = $this->getDoctrine()->getManager();
+  $cliente = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $json_obj->items[0]->tel]);  
+
+   if($cliente[0]->getToken() == null){
+
+    $customer  = \Stripe\Customer::create(['name' => $cliente[0]->getNombre()] );
+    $customer  = $customer->id;
+
+   }else{
+
+    $customer = $cliente[0]->getToken();
+
+   }   
+
+  
 
   $paymentIntent = \Stripe\PaymentIntent::create([
     'amount' =>  $json_obj->items[0]->monto *100,
     'currency' => 'usd',
     "metadata" => ["telefono" => $json_obj->items[0]->tel],
-    'customer' => $customer->id
+    'customer' => $customer
   ]);
 
   $output = [
     'clientSecret' => $paymentIntent->client_secret,
-    'customer' => $customer->id,
+    'customer' => $customer,
     'tel' => $json_obj->items[0]->tel];
 
   echo json_encode($output); 
@@ -131,28 +145,30 @@ class ApiController extends AbstractController
           'type' => 'card',
         ]);
 
-        $id = json_encode($tarjetas['data'][0]->id);
-        $brand = json_encode($tarjetas['data'][0]->card['brand']);
-        $last4 = json_encode($tarjetas['data'][0]->card->last4);
-        $exp_month = json_encode($tarjetas['data'][0]->card->exp_month);
-        $exp_year = json_encode($tarjetas['data'][0]->card->exp_year);
+        $cantidadTarjetas = json_encode(sizeof($tarjetas['data']));
+        $con = 0;
 
-        $id = str_replace('"',' ', $id );
-        $brand = str_replace('"',' ', $brand );
-        $last4 = str_replace('"',' ', $last4 );
-        $exp_month = str_replace('"',' ',  $exp_month );
-        $exp_year = str_replace('"',' ',   $exp_year );
+        $credit = array();
 
-        $exp_year = $exp_year[2].$exp_year[3];
+        while ($con < $cantidadTarjetas) {
+          $credit[$con]['id'] = str_replace('"', '', json_encode($tarjetas['data'][$con]->id));
+          $credit[$con]['brand'] = str_replace('"', '',json_encode($tarjetas['data'][$con]->card['brand']));
+          $credit[$con]['last4'] = str_replace('"', '',json_encode($tarjetas['data'][$con]->card->last4)); 
+          $credit[$con]['exp_month'] = str_replace('"', '',json_encode($tarjetas['data'][$con]->card->exp_month));
+          $credit[$con]['exp_year'] = str_replace('"', '',json_encode($tarjetas['data'][$con]->card->exp_year));
+          $year = $credit[$con]['exp_year'];
+          $credit[$con]['exp_year'] = $year[2].$year[3];
 
-        if($exp_month < 10){$exp_month = '0'.$exp_month;}
+          if($credit[$con]['exp_month']  < 10){$credit[$con]['exp_month'] = '0'.$credit[$con]['exp_month'];}
+          $con++;
+        }
 
-        //return new Response(json_encode($tarjetas));
+
+        //return new Response(); 
 
         return $this->render('api/select.html.twig',
         ['tel'=> $tel,'monto'=>  $request->get('monto'), 'nombre' => $data[0]->getNombre(),
-        'brand' => $brand, 'last4' => $last4, 'exp_month' => $exp_month , 
-        'exp_year' => $exp_year ]);
+        'tarjeta'=> $credit]);
 
       }else{
           
@@ -185,16 +201,37 @@ class ApiController extends AbstractController
         'type' => 'card',
       ]);
 
+      $cantidadTarjetas = json_encode(sizeof( $pay['data']));
+      $con = 0;
+
+      $credit = array();
+
+      while ($con < $cantidadTarjetas) {
+       
+        $diferenteCard = str_replace('"', '',json_encode($pay['data'][$con]->card->last4)); 
+       
+        if( $diferenteCard ==  $json_obj->items[0]->last4)
+        {
+          $credit = $pay['data'][$con];
+        }
+
+        $con++;
+      }
+
 try {
-  \Stripe\PaymentIntent::create([
+  
+ $status = \Stripe\PaymentIntent::create([
     'amount' => $json_obj->items[0]->monto *100,
     'currency' => 'usd',
     "metadata" => ["telefono" => $json_obj->items[0]->tel],
     'customer' => $data[0]->getToken(),
-    'payment_method' =>$pay['data'][0]->id,
+    'payment_method' =>$credit->id,
     'off_session' => true,
     'confirm' => true,
   ]);
+
+  return new Response(\json_encode($status));
+
 } catch (\Stripe\Exception\CardException $err) {
   $error_code = $err->getError()->code;
 
@@ -204,7 +241,7 @@ try {
     // the off-session purchase failed
     // Use the PM ID and client_secret to authenticate the purchase
     // without asking your customers to re-enter their details
-     echo (json_encode(array(
+    return new Response (json_encode(array(
       'error' => 'authentication_required', 
       'amount' => 1*100, 
       'card'=> $err->getError()->payment_method->card, 
@@ -214,15 +251,15 @@ try {
     )));
 
   } 
+    } 
 
-   return new Response('');
-  
-    }  } 
+   
+  } 
 
      /**
-     * @Route("/api.form{tel}/{monto}", name="api.form")
+     * @Route("/api.form{tel}/{monto}/{last4}", name="api.form")
      */
-    public function apiForm($tel, $monto)
+    public function apiForm($tel, $monto,$last4)
     {
 
       $stripe = new \Stripe\StripeClient(
@@ -236,35 +273,45 @@ try {
      $tarjetas = $stripe->paymentMethods->all([
         'customer' => $data[0]->getToken(),
         'type' => 'card',
-      ]);
+      ]); 
 
-      $id = json_encode($tarjetas['data'][0]->id);
-      $brand = json_encode($tarjetas['data'][0]->card['brand']);
-      $last4 = json_encode($tarjetas['data'][0]->card->last4);
-      $exp_month = json_encode($tarjetas['data'][0]->card->exp_month);
-      $exp_year = json_encode($tarjetas['data'][0]->card->exp_year);
+      $cantidadTarjetas = json_encode(sizeof($tarjetas['data']));
+      $con = 0;
 
-      $id = str_replace('"',' ', $id );
-      $brand = str_replace('"',' ', $brand );
-      $last4 = str_replace('"',' ', $last4 );
-      $exp_month = str_replace('"',' ',  $exp_month );
-      $exp_year = str_replace('"',' ',   $exp_year );
+      $credit = array();
 
-      $exp_year = $exp_year[2].$exp_year[3];
+      while ($con < $cantidadTarjetas) {
 
-      if($exp_month < 10){$exp_month = '0'.$exp_month;}
+       $diferenteCard = str_replace('"','',json_encode($tarjetas['data'][$con]->card->last4));
+
+        if( $diferenteCard == $last4){
+
+          $credit['id'] = str_replace('"','', json_encode($tarjetas['data'][$con]->id));
+          $credit['brand'] = str_replace('"','',json_encode($tarjetas['data'][$con]->card['brand']));
+          $credit['last4'] = str_replace('"','',json_encode($tarjetas['data'][$con]->card->last4)); 
+          $credit['exp_month'] = str_replace('"','',json_encode($tarjetas['data'][$con]->card->exp_month));
+          $credit['exp_year'] = str_replace('"','',json_encode($tarjetas['data'][$con]->card->exp_year));
+          $year = $credit['exp_year'];
+          $credit['exp_year'] = $year[2].$year[3];
+  
+          if($credit['exp_month']  < 10){$credit['exp_month'] = '0'.$credit['exp_month'];}
+         
+
+        }  $con++;
+       
+      } 
+      
+      //return new Response($last4 );
     
       return $this->render('api/security.html.twig',
-      ['tel'=> $tel,'monto'=>  $monto, 'nombre' => $data[0]->getNombre(),
-      'brand' => $brand, 'last4' => $last4, 'exp_month' => $exp_month , 
-      'exp_year' => $exp_year ]);
+      ['tel'=> $tel,'monto'=>  $monto, 'nombre' => $data[0]->getNombre(),'apellido' => $data[0]->getApellidos()  , 'tarjeta'=> $credit]);
     } 
 
 
     /**
-     * @Route("/confirm/{tel}/{monto}", name="confirm")
+     * @Route("/confirm/{tel}/{monto}/{last4}", name="confirm")
      */
-    public function confirm($tel,$monto)
+    public function confirm($tel,$monto,$last4)
     {
 
       return $this->render('api/confirm.html.twig');

@@ -18,6 +18,8 @@ return [
         '/api.security' => [[['_route' => 'api.security', '_controller' => 'App\\Controller\\ApiController::apiSecurity'], null, null, null, false, false, null]],
         '/cliente-index' => [[['_route' => 'cliente-index', '_controller' => 'App\\Controller\\ClienteController::clienteIndex'], null, null, null, false, false, null]],
         '/home' => [[['_route' => 'home', '_controller' => 'App\\Controller\\HomeController::home'], null, null, null, false, false, null]],
+        '/' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\SecurityController::login'], null, null, null, false, false, null]],
+        '/logout' => [[['_route' => 'app_logout', '_controller' => 'App\\Controller\\SecurityController::logout'], null, null, null, false, false, null]],
     ],
     [ // $regexpList
         0 => '{^(?'
@@ -41,15 +43,15 @@ return [
                         .'|monto([^/]++)(*:198)'
                         .'|edit([^/]++)(*:218)'
                     .')'
-                    .'|onfirm/([^/]++)/([^/]++)(*:251)'
+                    .'|onfirm/([^/]++)/([^/]++)/([^/]++)(*:260)'
                 .')'
                 .'|/api\\.(?'
-                    .'|get\\-user/([^/]++)/([^/]++)(*:296)'
-                    .'|form([^/]++)/([^/]++)(*:325)'
+                    .'|get\\-user/([^/]++)/([^/]++)(*:305)'
+                    .'|form([^/]++)/([^/]++)/([^/]++)(*:343)'
                 .')'
-                .'|/select([^/]++)(*:349)'
-                .'|/registrar\\-cliente([^/]++)(*:384)'
-                .'|/edit\\-save([^/]++)(*:411)'
+                .'|/select([^/]++)(*:367)'
+                .'|/registrar\\-cliente([^/]++)(*:402)'
+                .'|/edit\\-save([^/]++)(*:429)'
             .')/?$}sDu',
     ],
     [ // $dynamicRoutes
@@ -62,12 +64,12 @@ return [
         159 => [[['_route' => '_profiler', '_controller' => 'web_profiler.controller.profiler::panelAction'], ['token'], null, null, false, true, null]],
         198 => [[['_route' => 'cliente-monto', '_controller' => 'App\\Controller\\ApiController::clienteMonto'], ['tel'], null, null, false, true, null]],
         218 => [[['_route' => 'cliente-edit', '_controller' => 'App\\Controller\\ClienteController::clienteEdit'], ['tel'], null, null, false, true, null]],
-        251 => [[['_route' => 'confirm', '_controller' => 'App\\Controller\\ApiController::confirm'], ['tel', 'monto'], null, null, false, true, null]],
-        296 => [[['_route' => 'api.get-user', '_controller' => 'App\\Controller\\ApiController::apiGetUser'], ['tel', 'monto'], null, null, false, true, null]],
-        325 => [[['_route' => 'api.form', '_controller' => 'App\\Controller\\ApiController::apiForm'], ['tel', 'monto'], null, null, false, true, null]],
-        349 => [[['_route' => 'select', '_controller' => 'App\\Controller\\ApiController::select'], ['tel'], null, null, false, true, null]],
-        384 => [[['_route' => 'registrar-cliente', '_controller' => 'App\\Controller\\ClienteController::registrarCliente'], ['tel'], null, null, false, true, null]],
-        411 => [
+        260 => [[['_route' => 'confirm', '_controller' => 'App\\Controller\\ApiController::confirm'], ['tel', 'monto', 'last4'], null, null, false, true, null]],
+        305 => [[['_route' => 'api.get-user', '_controller' => 'App\\Controller\\ApiController::apiGetUser'], ['tel', 'monto'], null, null, false, true, null]],
+        343 => [[['_route' => 'api.form', '_controller' => 'App\\Controller\\ApiController::apiForm'], ['tel', 'monto', 'last4'], null, null, false, true, null]],
+        367 => [[['_route' => 'select', '_controller' => 'App\\Controller\\ApiController::select'], ['tel'], null, null, false, true, null]],
+        402 => [[['_route' => 'registrar-cliente', '_controller' => 'App\\Controller\\ClienteController::registrarCliente'], ['tel'], null, null, false, true, null]],
+        429 => [
             [['_route' => 'edit-save', '_controller' => 'App\\Controller\\ClienteController::editSave'], ['tel'], null, null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],

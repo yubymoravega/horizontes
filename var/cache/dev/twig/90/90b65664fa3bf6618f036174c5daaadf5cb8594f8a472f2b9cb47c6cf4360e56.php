@@ -277,8 +277,8 @@ class __TwigTemplate_317ae95e3d82f8b5ddb5b2aaf8d6aac9260ba1d9150a4c62393c4187850
 
 \$(\"#cliente_continuar\").click(function(){ 
  
-   \$(\"#error\").css(\"display\", \"\");
-  // setTimeout(\$(\"#cliente_continuar\").attr('disabled','disabled'), 2000);
+  // \$(\"#error\").css(\"display\", \"\");
+ 
   });
 
 \$(\"#edit-nombre\").click(function(){ 
@@ -497,8 +497,8 @@ class __TwigTemplate_317ae95e3d82f8b5ddb5b2aaf8d6aac9260ba1d9150a4c62393c4187850
 
 \$(\"#cliente_continuar\").click(function(){ 
  
-   \$(\"#error\").css(\"display\", \"\");
-  // setTimeout(\$(\"#cliente_continuar\").attr('disabled','disabled'), 2000);
+  // \$(\"#error\").css(\"display\", \"\");
+ 
   });
 
 \$(\"#edit-nombre\").click(function(){ 

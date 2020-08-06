@@ -568,10 +568,10 @@ class ComposerStaticInit351a04db1b614301fec684f96cd13ba7
     );
 
     public static $classMap = array (
+        'App\\Controller\\ApiController' => __DIR__ . '/../..' . '/src/Controller/ApiController.php',
         'App\\Controller\\ClienteController' => __DIR__ . '/../..' . '/src/Controller/ClienteController.php',
         'App\\Controller\\HomeController' => __DIR__ . '/../..' . '/src/Controller/HomeController.php',
-        'App\\Controller\\StripeController' => __DIR__ . '/../..' . '/src/Controller/StripeController.php',
-        'App\\Controller\\TextController' => __DIR__ . '/../..' . '/src/Controller/TextController.php',
+        'App\\Controller\\LoginController' => __DIR__ . '/../..' . '/src/Controller/LoginController.php',
         'App\\Entity\\Cliente' => __DIR__ . '/../..' . '/src/Entity/Cliente.php',
         'App\\Form\\ClienteType' => __DIR__ . '/../..' . '/src/Form/ClienteType.php',
         'App\\Kernel' => __DIR__ . '/../..' . '/src/Kernel.php',
@@ -2879,6 +2879,7 @@ class ComposerStaticInit351a04db1b614301fec684f96cd13ba7
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\AddSessionDomainConstraintPass' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Compiler/AddSessionDomainConstraintPass.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterCsrfFeaturesPass' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterCsrfFeaturesPass.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterCsrfTokenClearingLogoutHandlerPass' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterCsrfTokenClearingLogoutHandlerPass.php',
+        'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterGlobalSecurityEventListenersPass' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterGlobalSecurityEventListenersPass.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterLdapLocatorPass' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterLdapLocatorPass.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterTokenUsageTrackingPass' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterTokenUsageTrackingPass.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\MainConfiguration' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/MainConfiguration.php',
@@ -2903,7 +2904,6 @@ class ComposerStaticInit351a04db1b614301fec684f96cd13ba7
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Security\\UserProvider\\InMemoryFactory' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Security/UserProvider/InMemoryFactory.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Security\\UserProvider\\LdapFactory' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Security/UserProvider/LdapFactory.php',
         'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Security\\UserProvider\\UserProviderFactoryInterface' => __DIR__ . '/..' . '/symfony/security-bundle/DependencyInjection/Security/UserProvider/UserProviderFactoryInterface.php',
-        'Symfony\\Bundle\\SecurityBundle\\EventListener\\FirewallEventBubblingListener' => __DIR__ . '/..' . '/symfony/security-bundle/EventListener/FirewallEventBubblingListener.php',
         'Symfony\\Bundle\\SecurityBundle\\EventListener\\FirewallListener' => __DIR__ . '/..' . '/symfony/security-bundle/EventListener/FirewallListener.php',
         'Symfony\\Bundle\\SecurityBundle\\EventListener\\VoteListener' => __DIR__ . '/..' . '/symfony/security-bundle/EventListener/VoteListener.php',
         'Symfony\\Bundle\\SecurityBundle\\SecurityBundle' => __DIR__ . '/..' . '/symfony/security-bundle/SecurityBundle.php',

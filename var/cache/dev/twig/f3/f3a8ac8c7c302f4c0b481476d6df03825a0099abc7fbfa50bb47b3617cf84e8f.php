@@ -82,9 +82,6 @@ class __TwigTemplate_8c3eb471b5b11cf4ad7a64a98ba1f5737497da73be3cfd165b88218b3a1
         // line 14
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("js/script.security.js"), "html", null, true);
         echo "\" defer></script>
-   
-   
-
     <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>
   </head>
 
@@ -96,13 +93,37 @@ class __TwigTemplate_8c3eb471b5b11cf4ad7a64a98ba1f5737497da73be3cfd165b88218b3a1
 </style>
 <link href=\"https://fonts.googleapis.com/css2?family=PT+Mono&display=swap\" rel=\"stylesheet\">
 
-<div style='margin: auto; width: 400px; max-width: 95vw; font-family: \"Helvetica Neue\", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
-    <h1 style=\"font-weight: 500; text-align: center;    color: green; \">Pago Confirmado</h1><hr/>
+<div style='margin: auto; width: 100%; font-family: \"Helvetica Neue\", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
+    <h1 id='mensaje' style=\"font-weight: 500; text-align: center;  \">Espere Por Favor</h1><hr/>
+   
 
   
   </body>
 </html>
+     <a class='home' id='home' style='display: none;' href=\"";
+        // line 33
+        echo $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("home");
+        echo "\">
+       Ir a Inicio
+    </a>
+    
+  
 
+  <style>
+  
+  .home {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 47%;
+}
+  
+  </style>
 
 ";
         
@@ -125,7 +146,7 @@ class __TwigTemplate_8c3eb471b5b11cf4ad7a64a98ba1f5737497da73be3cfd165b88218b3a1
 
     public function getDebugInfo()
     {
-        return array (  83 => 14,  78 => 12,  68 => 4,  58 => 3,  35 => 1,);
+        return array (  105 => 33,  83 => 14,  78 => 12,  68 => 4,  58 => 3,  35 => 1,);
     }
 
     public function getSourceContext()
@@ -144,9 +165,6 @@ class __TwigTemplate_8c3eb471b5b11cf4ad7a64a98ba1f5737497da73be3cfd165b88218b3a1
     <link rel=\"stylesheet\" href=\"{{ asset('css/tarjetas.css') }}\"  />
      <script src=\"https://js.stripe.com/v3/\"></script>
     <script src=\"{{ asset('js/script.security.js') }}\" defer></script>
-   
-   
-
     <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>
   </head>
 
@@ -158,13 +176,34 @@ class __TwigTemplate_8c3eb471b5b11cf4ad7a64a98ba1f5737497da73be3cfd165b88218b3a1
 </style>
 <link href=\"https://fonts.googleapis.com/css2?family=PT+Mono&display=swap\" rel=\"stylesheet\">
 
-<div style='margin: auto; width: 400px; max-width: 95vw; font-family: \"Helvetica Neue\", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
-    <h1 style=\"font-weight: 500; text-align: center;    color: green; \">Pago Confirmado</h1><hr/>
+<div style='margin: auto; width: 100%; font-family: \"Helvetica Neue\", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
+    <h1 id='mensaje' style=\"font-weight: 500; text-align: center;  \">Espere Por Favor</h1><hr/>
+   
 
   
   </body>
 </html>
+     <a class='home' id='home' style='display: none;' href=\"{{ path('home')}}\">
+       Ir a Inicio
+    </a>
+    
+  
 
+  <style>
+  
+  .home {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 47%;
+}
+  
+  </style>
 
 {% endblock %}", "api/confirm.html.twig", "/var/www/html/horizontes/templates/api/confirm.html.twig");
     }

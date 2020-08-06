@@ -91,44 +91,67 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
 <link href=\"https://fonts.googleapis.com/css2?family=PT+Mono&display=swap\" rel=\"stylesheet\">
 
 <div style='margin: auto; width: 400px; max-width: 95vw; font-family: \"Helvetica Neue\", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
-    <h1 style=\"font-weight: 500; text-align: center; \">Confirmar Pago</h1><hr/>
-
+  
     <div> 
      <h2 style=\"font-weight: 500; text-align: center; \"> Cliente: ";
-        // line 30
-        echo twig_escape_filter($this->env, (isset($context["nombre"]) || array_key_exists("nombre", $context) ? $context["nombre"] : (function () { throw new RuntimeError('Variable "nombre" does not exist.', 30, $this->source); })()), "html", null, true);
+        // line 29
+        echo twig_escape_filter($this->env, (isset($context["nombre"]) || array_key_exists("nombre", $context) ? $context["nombre"] : (function () { throw new RuntimeError('Variable "nombre" does not exist.', 29, $this->source); })()), "html", null, true);
+        echo " ";
+        echo twig_escape_filter($this->env, (isset($context["apellido"]) || array_key_exists("apellido", $context) ? $context["apellido"] : (function () { throw new RuntimeError('Variable "apellido" does not exist.', 29, $this->source); })()), "html", null, true);
         echo "</h2> 
     <h2 style=\"font-weight: 500; text-align: center; \">Monto: \$";
-        // line 31
-        echo twig_escape_filter($this->env, (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 31, $this->source); })()), "html", null, true);
+        // line 30
+        echo twig_escape_filter($this->env, (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 30, $this->source); })()), "html", null, true);
         echo "</h2> 
     
     </div>
-    <div id='credit' class=\"credit-card visa selectable\">
+    <div id='credit' class=\"credit-card ";
+        // line 33
+        echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 33, $this->source); })()), "brand", [], "any", false, false, false, 33), "html", null, true);
+        echo " selectable\">
         <div class=\"credit-card-last4\">
            ";
-        // line 36
-        echo twig_escape_filter($this->env, (isset($context["last4"]) || array_key_exists("last4", $context) ? $context["last4"] : (function () { throw new RuntimeError('Variable "last4" does not exist.', 36, $this->source); })()), "html", null, true);
+        // line 35
+        echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 35, $this->source); })()), "last4", [], "any", false, false, false, 35), "html", null, true);
         echo "
         </div>
         <div class=\"credit-card-expiry\">
             ";
-        // line 39
-        echo twig_escape_filter($this->env, (isset($context["exp_month"]) || array_key_exists("exp_month", $context) ? $context["exp_month"] : (function () { throw new RuntimeError('Variable "exp_month" does not exist.', 39, $this->source); })()), "html", null, true);
+        // line 38
+        echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 38, $this->source); })()), "exp_month", [], "any", false, false, false, 38), "html", null, true);
         echo "/";
-        echo twig_escape_filter($this->env, (isset($context["exp_year"]) || array_key_exists("exp_year", $context) ? $context["exp_year"] : (function () { throw new RuntimeError('Variable "exp_year" does not exist.', 39, $this->source); })()), "html", null, true);
+        echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, (isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 38, $this->source); })()), "exp_year", [], "any", false, false, false, 38), "html", null, true);
         echo "
         </div>
     </div>
  
-    <div>
+    <div> <hr/>
+     <h1 style=\"font-weight: 500; text-align: center; \">Confirmar Pago</h1>
     
-   <a href=\"";
+     <a class='pagar' href=\"";
         // line 45
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("confirm", ["tel" => (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 45, $this->source); })()), "monto" => (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 45, $this->source); })())]), "html", null, true);
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("confirm", ["tel" => (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 45, $this->source); })()), "monto" => (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 45, $this->source); })()), "last4" => twig_get_attribute($this->env, $this->source, (isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 45, $this->source); })()), "last4", [], "any", false, false, false, 45)]), "html", null, true);
         echo "\">
         Pagar
     </a>
+  
+
+  <style>
+  
+  .pagar {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 40%;
+}
+  
+  </style>
+
  </div>
  
   </body>
@@ -156,7 +179,7 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
 
     public function getDebugInfo()
     {
-        return array (  128 => 45,  117 => 39,  111 => 36,  103 => 31,  99 => 30,  78 => 12,  68 => 4,  58 => 3,  35 => 1,);
+        return array (  133 => 45,  121 => 38,  115 => 35,  110 => 33,  104 => 30,  98 => 29,  78 => 12,  68 => 4,  58 => 3,  35 => 1,);
     }
 
     public function getSourceContext()
@@ -187,27 +210,45 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
 <link href=\"https://fonts.googleapis.com/css2?family=PT+Mono&display=swap\" rel=\"stylesheet\">
 
 <div style='margin: auto; width: 400px; max-width: 95vw; font-family: \"Helvetica Neue\", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
-    <h1 style=\"font-weight: 500; text-align: center; \">Confirmar Pago</h1><hr/>
-
+  
     <div> 
-     <h2 style=\"font-weight: 500; text-align: center; \"> Cliente: {{nombre}}</h2> 
+     <h2 style=\"font-weight: 500; text-align: center; \"> Cliente: {{nombre}} {{apellido}}</h2> 
     <h2 style=\"font-weight: 500; text-align: center; \">Monto: \${{monto}}</h2> 
     
     </div>
-    <div id='credit' class=\"credit-card visa selectable\">
+    <div id='credit' class=\"credit-card {{tarjeta.brand}} selectable\">
         <div class=\"credit-card-last4\">
-           {{last4}}
+           {{tarjeta.last4}}
         </div>
         <div class=\"credit-card-expiry\">
-            {{exp_month}}/{{exp_year}}
+            {{tarjeta.exp_month}}/{{tarjeta.exp_year}}
         </div>
     </div>
  
-    <div>
+    <div> <hr/>
+     <h1 style=\"font-weight: 500; text-align: center; \">Confirmar Pago</h1>
     
-   <a href=\"{{ path('confirm', {'tel': tel, 'monto': monto}) }}\">
+     <a class='pagar' href=\"{{ path('confirm', {'tel': tel, 'monto': monto, 'last4':tarjeta.last4 })}}\">
         Pagar
     </a>
+  
+
+  <style>
+  
+  .pagar {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 40%;
+}
+  
+  </style>
+
  </div>
  
   </body>

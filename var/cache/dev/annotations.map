@@ -1,9 +1,9 @@
 <?php return array (
   0 => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',
-  1 => 'App\\Controller\\ClienteController',
-  2 => 'App\\Controller\\HomeController',
-  3 => 'App\\Controller\\StripeController',
-  4 => 'App\\Controller\\TextController',
+  1 => 'App\\Controller\\ApiController',
+  2 => 'App\\Controller\\ClienteController',
+  3 => 'App\\Controller\\HomeController',
+  4 => 'App\\Controller\\LoginController',
   5 => 'App\\Entity\\Cliente',
   6 => 'Doctrine\\Bundle\\DoctrineBundle\\Controller\\ProfilerController',
   7 => 'Doctrine\\ORM\\Cache\\Persister\\Entity\\AbstractEntityPersister',

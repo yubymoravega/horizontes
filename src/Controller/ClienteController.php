@@ -61,10 +61,11 @@ class ClienteController extends AbstractController
         if( $formulario->isSubmitted() && $formulario->isValid())
         {
             $dataBase = $this->getDoctrine()->getManager();
+
             $dataBase->persist($cliente);
             $dataBase->flush();
 
-            sleep ( 2 ) ;
+            sleep ( 1 ) ;
             
             return $this->redirectToRoute('cliente-monto', ['tel' => $tel]);
 

@@ -6,10 +6,10 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Controller\\ApiController' => $baseDir . '/src/Controller/ApiController.php',
     'App\\Controller\\ClienteController' => $baseDir . '/src/Controller/ClienteController.php',
     'App\\Controller\\HomeController' => $baseDir . '/src/Controller/HomeController.php',
-    'App\\Controller\\StripeController' => $baseDir . '/src/Controller/StripeController.php',
-    'App\\Controller\\TextController' => $baseDir . '/src/Controller/TextController.php',
+    'App\\Controller\\LoginController' => $baseDir . '/src/Controller/LoginController.php',
     'App\\Entity\\Cliente' => $baseDir . '/src/Entity/Cliente.php',
     'App\\Form\\ClienteType' => $baseDir . '/src/Form/ClienteType.php',
     'App\\Kernel' => $baseDir . '/src/Kernel.php',
@@ -2317,6 +2317,7 @@ return array(
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\AddSessionDomainConstraintPass' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Compiler/AddSessionDomainConstraintPass.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterCsrfFeaturesPass' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterCsrfFeaturesPass.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterCsrfTokenClearingLogoutHandlerPass' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterCsrfTokenClearingLogoutHandlerPass.php',
+    'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterGlobalSecurityEventListenersPass' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterGlobalSecurityEventListenersPass.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterLdapLocatorPass' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterLdapLocatorPass.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Compiler\\RegisterTokenUsageTrackingPass' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Compiler/RegisterTokenUsageTrackingPass.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\MainConfiguration' => $vendorDir . '/symfony/security-bundle/DependencyInjection/MainConfiguration.php',
@@ -2341,7 +2342,6 @@ return array(
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Security\\UserProvider\\InMemoryFactory' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Security/UserProvider/InMemoryFactory.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Security\\UserProvider\\LdapFactory' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Security/UserProvider/LdapFactory.php',
     'Symfony\\Bundle\\SecurityBundle\\DependencyInjection\\Security\\UserProvider\\UserProviderFactoryInterface' => $vendorDir . '/symfony/security-bundle/DependencyInjection/Security/UserProvider/UserProviderFactoryInterface.php',
-    'Symfony\\Bundle\\SecurityBundle\\EventListener\\FirewallEventBubblingListener' => $vendorDir . '/symfony/security-bundle/EventListener/FirewallEventBubblingListener.php',
     'Symfony\\Bundle\\SecurityBundle\\EventListener\\FirewallListener' => $vendorDir . '/symfony/security-bundle/EventListener/FirewallListener.php',
     'Symfony\\Bundle\\SecurityBundle\\EventListener\\VoteListener' => $vendorDir . '/symfony/security-bundle/EventListener/VoteListener.php',
     'Symfony\\Bundle\\SecurityBundle\\SecurityBundle' => $vendorDir . '/symfony/security-bundle/SecurityBundle.php',

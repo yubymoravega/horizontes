@@ -80,7 +80,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src=\"";
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"/\"><img style='margin-left: -15px;' width='184' height='54' src=\"";
         // line 38
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-chico.png"), "html", null, true);
         echo "\"  alt=''/></a></div>
@@ -89,7 +89,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <div class=\"rd-navbar-nav-wrap\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"";
+                      <div class=\"rd-navbar-mobile-brand\"><a href=\"/\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"";
         // line 44
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-chico.png"), "html", null, true);
         echo "\" alt=''/></a></div>
@@ -1031,13 +1031,13 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"index.html\"><img style='margin-left: -15px;' width='184' height='54' src=\"{{ asset('images/logo-chico.png') }}\"  alt=''/></a></div>
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"/\"><img style='margin-left: -15px;' width='184' height='54' src=\"{{ asset('images/logo-chico.png') }}\"  alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"index.html\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"{{ asset('images/logo-chico.png') }}\" alt=''/></a></div>
+                      <div class=\"rd-navbar-mobile-brand\"><a href=\"/\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"{{ asset('images/logo-chico.png') }}\" alt=''/></a></div>
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
                         <form class=\"form-search rd-search\" action=\"search-results.html\" method=\"GET\">

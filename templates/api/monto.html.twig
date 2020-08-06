@@ -17,7 +17,7 @@
   <body style="background-color: black;">
     <!-- Display a payment form -->
     <form id="payment-form" name='payment-form' action="{{ path('select', {'tel': tel}) }}" method="POST" style="border: 1px solid #fff;  box-shadow: 0px 0px 11px 11px #ffffff36;">
-      <label style="float: left; margin-top: 4px; color: white; padding-bottom: 10px;">Monto A Cobrar A {{nombre}}</label>
+      <label style="float: left; margin-top: 4px; color: white; padding-bottom: 10px;">Monto a cobrar a : {{nombre}} {{apellido}}</label>
       <input autocomplete="off" name='monto' type="text" id="monto" placeholder="0.00" required/>
 
       <button id="submit" type="submit" style="margin-left: 70px; margin-top: 11px; width: 65%;">
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
         elements[i].oninvalid = function(e) {
             e.target.setCustomValidity("");
             if (!e.target.validity.valid) {
-                e.target.setCustomValidity("Introduce Una Cantidad Exacta!");
+                e.target.setCustomValidity("Introduce una cantidad!");
             }
         };
         elements[i].oninput = function(e) {

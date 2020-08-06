@@ -24,27 +24,45 @@
 <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
 
 <div style='margin: auto; width: 400px; max-width: 95vw; font-family: "Helvetica Neue", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
-    <h1 style="font-weight: 500; text-align: center; ">Confirmar Pago</h1><hr/>
-
+  
     <div> 
-     <h2 style="font-weight: 500; text-align: center; "> Cliente: {{nombre}}</h2> 
+     <h2 style="font-weight: 500; text-align: center; "> Cliente: {{nombre}} {{apellido}}</h2> 
     <h2 style="font-weight: 500; text-align: center; ">Monto: ${{monto}}</h2> 
     
     </div>
-    <div id='credit' class="credit-card visa selectable">
+    <div id='credit' class="credit-card {{tarjeta.brand}} selectable">
         <div class="credit-card-last4">
-           {{last4}}
+           {{tarjeta.last4}}
         </div>
         <div class="credit-card-expiry">
-            {{exp_month}}/{{exp_year}}
+            {{tarjeta.exp_month}}/{{tarjeta.exp_year}}
         </div>
     </div>
  
-    <div>
+    <div> <hr/>
+     <h1 style="font-weight: 500; text-align: center; ">Confirmar Pago</h1>
     
-   <a href="{{ path('confirm', {'tel': tel, 'monto': monto}) }}">
+     <a class='pagar' href="{{ path('confirm', {'tel': tel, 'monto': monto, 'last4':tarjeta.last4 })}}">
         Pagar
     </a>
+  
+
+  <style>
+  
+  .pagar {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 40%;
+}
+  
+  </style>
+
  </div>
  
   </body>

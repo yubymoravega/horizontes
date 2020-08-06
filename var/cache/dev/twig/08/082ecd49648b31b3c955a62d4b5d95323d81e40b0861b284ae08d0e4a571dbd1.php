@@ -150,7 +150,7 @@ class __TwigTemplate_2d1d2c9f012f2ec1d4bcac8fc899107ca735188994b9832917ab4042baa
         // line 24
         echo "
 <div id='error' class=\"alert alert-danger row justify-content-md-center text-center\" role=\"alert\" style=\"display: none;\">
-<p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
+<p id='mensaje'>El cliente debe tener un número de teléfono valido </p>
 </div>
           <!-- Section Input Groups-->
       <section class=\"section novi-background section-20\" id='seccion-principal'>
@@ -293,6 +293,10 @@ if(id == true){
 
      var nombre = \$.trim(\$(\"#cliente_nombre\").val());
 
+     var apellido =  \$.trim(\$(\"#cliente_apellidos\").val());
+
+      var email =  \$.trim(\$(\"#cliente_correo\").val());
+
      if(telefono.length < 8){
 
        \$(\"#cliente_telefono\").css(\"border-color\", \"red\");
@@ -301,17 +305,39 @@ if(id == true){
     
       }else if(nombre.length < 1){
 
-        \$(\"#cliente_telefono\").css(\"border-color\", \"\");
-
         \$(\"#cliente_nombre\").css(\"border-color\", \"red\");
 
-       \$(\"#mensaje\").text('El Cliente Debe Tener Un Nonmbre!');
+       \$(\"#mensaje\").text('El cliente debe tener un nombre');
 
+     }else if(apellido.length < 2){
+
+        \$(\"#cliente_apellidos\").css(\"border-color\", \"red\");
+
+       \$(\"#mensaje\").text('El cliente debe tener un apellido');
+       
+     }else if(email.length > 0){
+
+        \$(\"#cliente_correo\").css(\"border-color\", \"red\");
+        \$(\"#mensaje\").text('El cliente debe tener un email valido');
+       
+  var validador = /^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+\$/;
+ 
+  if(!validador.test(email)) {
+
+  \$(\"#mensaje\").text('Email no valido');    
+
+  }
      }else{
+
+        \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+
+       \$(\"#cliente_apellidos\").css(\"border-color\", \"\");
 
        \$(\"#cliente_nombre\").css(\"border-color\", \"\");
 
         \$(\"#error\").css(\"display\", \"none\");
+
+         \$(\"#cliente_correo\").css(\"border-color\", \"\");
 
        \t\$(\"#error\").removeClass(\"alert-danger\");
 
@@ -324,6 +350,7 @@ if(id == true){
           id = true;
 
         \$( \"#form_cliente\" ).submit();
+
      }
 });
 
@@ -391,7 +418,7 @@ if(id == true){
 {% include 'layout/header.html' %}
 
 <div id='error' class=\"alert alert-danger row justify-content-md-center text-center\" role=\"alert\" style=\"display: none;\">
-<p id='mensaje'>El Cliente Debe Tener Un Telefono ! </p>
+<p id='mensaje'>El cliente debe tener un número de teléfono valido </p>
 </div>
           <!-- Section Input Groups-->
       <section class=\"section novi-background section-20\" id='seccion-principal'>
@@ -436,7 +463,7 @@ if(id == true){
              <div class=\"form-group\">
                   <div class=\"input-group input-group-sm\"><span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\"><span class=\"novi-icon mdi mdi-email\"></span></span></span>
                  
-                 {{ form_widget(formulario.correo, {'attr': {'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
+                 {{ form_widget(formulario.correo, {'attr': { 'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
                     
                   <span class=\"input-group-append\">                    
                  
@@ -504,6 +531,10 @@ if(id == true){
 
      var nombre = \$.trim(\$(\"#cliente_nombre\").val());
 
+     var apellido =  \$.trim(\$(\"#cliente_apellidos\").val());
+
+      var email =  \$.trim(\$(\"#cliente_correo\").val());
+
      if(telefono.length < 8){
 
        \$(\"#cliente_telefono\").css(\"border-color\", \"red\");
@@ -512,17 +543,39 @@ if(id == true){
     
       }else if(nombre.length < 1){
 
-        \$(\"#cliente_telefono\").css(\"border-color\", \"\");
-
         \$(\"#cliente_nombre\").css(\"border-color\", \"red\");
 
-       \$(\"#mensaje\").text('El Cliente Debe Tener Un Nonmbre!');
+       \$(\"#mensaje\").text('El cliente debe tener un nombre');
 
+     }else if(apellido.length < 2){
+
+        \$(\"#cliente_apellidos\").css(\"border-color\", \"red\");
+
+       \$(\"#mensaje\").text('El cliente debe tener un apellido');
+       
+     }else if(email.length > 0){
+
+        \$(\"#cliente_correo\").css(\"border-color\", \"red\");
+        \$(\"#mensaje\").text('El cliente debe tener un email valido');
+       
+  var validador = /^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+\$/;
+ 
+  if(!validador.test(email)) {
+
+  \$(\"#mensaje\").text('Email no valido');    
+
+  }
      }else{
+
+        \$(\"#cliente_telefono\").css(\"border-color\", \"\");
+
+       \$(\"#cliente_apellidos\").css(\"border-color\", \"\");
 
        \$(\"#cliente_nombre\").css(\"border-color\", \"\");
 
         \$(\"#error\").css(\"display\", \"none\");
+
+         \$(\"#cliente_correo\").css(\"border-color\", \"\");
 
        \t\$(\"#error\").removeClass(\"alert-danger\");
 
@@ -535,6 +588,7 @@ if(id == true){
           id = true;
 
         \$( \"#form_cliente\" ).submit();
+
      }
 });
 

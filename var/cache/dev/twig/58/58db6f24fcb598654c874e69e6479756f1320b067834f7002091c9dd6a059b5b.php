@@ -98,44 +98,74 @@ INFO: The selectable class adds a pointer and shadow animations on hover.
 -->
 
     <!-- Cards -->
-
-    <!-- Visa - selectable -->
-    <div id='credit' class=\"credit-card visa selectable\">
+\t
+     ";
+        // line 35
+        $context['_parent'] = $context;
+        $context['_seq'] = twig_ensure_traversable((isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 35, $this->source); })()));
+        foreach ($context['_seq'] as $context["_key"] => $context["tarjetas"]) {
+            // line 36
+            echo "      <a style=\"text-decoration: none;\" href=\"api.form";
+            echo twig_escape_filter($this->env, (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 36, $this->source); })()), "html", null, true);
+            echo "/";
+            echo twig_escape_filter($this->env, (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 36, $this->source); })()), "html", null, true);
+            echo "/";
+            echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, $context["tarjetas"], "last4", [], "any", false, false, false, 36), "html", null, true);
+            echo "\">
+       <div  id='credit' class=\"credit-card ";
+            // line 37
+            echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, $context["tarjetas"], "brand", [], "any", false, false, false, 37), "html", null, true);
+            echo " selectable\">
         <div class=\"credit-card-last4\">
            ";
-        // line 38
-        echo twig_escape_filter($this->env, (isset($context["last4"]) || array_key_exists("last4", $context) ? $context["last4"] : (function () { throw new RuntimeError('Variable "last4" does not exist.', 38, $this->source); })()), "html", null, true);
-        echo "
+            // line 39
+            echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, $context["tarjetas"], "last4", [], "any", false, false, false, 39), "html", null, true);
+            echo "
         </div>
         <div class=\"credit-card-expiry\">
             ";
-        // line 41
-        echo twig_escape_filter($this->env, (isset($context["exp_month"]) || array_key_exists("exp_month", $context) ? $context["exp_month"] : (function () { throw new RuntimeError('Variable "exp_month" does not exist.', 41, $this->source); })()), "html", null, true);
-        echo "/";
-        echo twig_escape_filter($this->env, (isset($context["exp_year"]) || array_key_exists("exp_year", $context) ? $context["exp_year"] : (function () { throw new RuntimeError('Variable "exp_year" does not exist.', 41, $this->source); })()), "html", null, true);
-        echo "
+            // line 42
+            echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, $context["tarjetas"], "exp_month", [], "any", false, false, false, 42), "html", null, true);
+            echo "/";
+            echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, $context["tarjetas"], "exp_year", [], "any", false, false, false, 42), "html", null, true);
+            echo "
+            
         </div>
-    </div>
- 
- 
+    </div> </a>
+    ";
+        }
+        $_parent = $context['_parent'];
+        unset($context['_seq'], $context['_iterated'], $context['_key'], $context['tarjetas'], $context['_parent'], $context['loop']);
+        $context = array_intersect_key($context, $_parent) + $_parent;
+        // line 47
+        echo "
+    <!-- Visa - selectable -->
+    
   </body>
 </html>
 
-<script>
-
-
-\$( \".credit-card\" ).click(function() {
-  \$(location).attr('href','api.form";
+   <a class='pagar' href=\"";
         // line 53
-        echo twig_escape_filter($this->env, (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 53, $this->source); })()), "html", null, true);
-        echo "/";
-        echo twig_escape_filter($this->env, (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 53, $this->source); })()), "html", null, true);
-        echo "');
-});
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("api.get-user", ["tel" => (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 53, $this->source); })()), "monto" => (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 53, $this->source); })())]), "html", null, true);
+        echo "\">
+        Agregar Tarjeta
+    </a>
+    
+  <style>
+  
+  .pagar {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 33%;
+}
+  </style>
 
-
-
-</script>
 
 ";
         
@@ -158,7 +188,7 @@ INFO: The selectable class adds a pointer and shadow animations on hover.
 
     public function getDebugInfo()
     {
-        return array (  130 => 53,  113 => 41,  107 => 38,  78 => 12,  68 => 4,  58 => 3,  35 => 1,);
+        return array (  149 => 53,  141 => 47,  128 => 42,  122 => 39,  117 => 37,  108 => 36,  104 => 35,  78 => 12,  68 => 4,  58 => 3,  35 => 1,);
     }
 
     public function getSourceContext()
@@ -196,31 +226,44 @@ INFO: The selectable class adds a pointer and shadow animations on hover.
 -->
 
     <!-- Cards -->
-
-    <!-- Visa - selectable -->
-    <div id='credit' class=\"credit-card visa selectable\">
+\t
+     {% for tarjetas in tarjeta %}
+      <a style=\"text-decoration: none;\" href=\"api.form{{tel}}/{{monto}}/{{tarjetas.last4}}\">
+       <div  id='credit' class=\"credit-card {{tarjetas.brand}} selectable\">
         <div class=\"credit-card-last4\">
-           {{last4}}
+           {{tarjetas.last4}}
         </div>
         <div class=\"credit-card-expiry\">
-            {{exp_month}}/{{exp_year}}
+            {{tarjetas.exp_month}}/{{tarjetas.exp_year}}
+            
         </div>
-    </div>
- 
- 
+    </div> </a>
+    {% endfor %}
+
+    <!-- Visa - selectable -->
+    
   </body>
 </html>
 
-<script>
+   <a class='pagar' href=\"{{ path('api.get-user', {'tel': tel, 'monto': monto}) }}\">
+        Agregar Tarjeta
+    </a>
+    
+  <style>
+  
+  .pagar {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 33%;
+}
+  </style>
 
-
-\$( \".credit-card\" ).click(function() {
-  \$(location).attr('href','api.form{{tel}}/{{monto}}');
-});
-
-
-
-</script>
 
 {% endblock %}", "api/select.html.twig", "/var/www/html/horizontes/templates/api/select.html.twig");
     }
