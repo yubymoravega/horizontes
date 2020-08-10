@@ -74,7 +74,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
             <!--  <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\"> -->
              <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\">
             
-              <div class=\"rd-navbar-inner\" style=\"display: none;\">
+              <div class=\"rd-navbar-inner\" >
                 <!-- RD Navbar Panel-->
                 <div class=\"rd-navbar-panel\">
                   <!-- RD Navbar Toggle-->
@@ -82,8 +82,8 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   <!--Navbar Brand-->
                   <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"/\"><img style='margin-left: -15px;' width='184' height='54' src=\"";
         // line 38
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-chico.png"), "html", null, true);
-        echo "\"  alt=''/></a></div>
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/LOGO-AGENCIAS-HORIZONTES.png"), "html", null, true);
+        echo "\"\"  alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
@@ -91,7 +91,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                       <!--Navbar Brand Mobile-->
                       <div class=\"rd-navbar-mobile-brand\"><a href=\"/\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"";
         // line 44
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/logo-chico.png"), "html", null, true);
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/LOGO-AGENCIAS-HORIZONTES.png"), "html", null, true);
         echo "\" alt=''/></a></div>
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
@@ -1025,19 +1025,19 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
             <!--  <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\"> -->
              <nav class=\"rd-navbar rd-navbar-default rd-navbar-dark\" data-md-device-layout=\"rd-navbar-fixed\" data-lg-device-layout=\"rd-navbar-fixed\" data-lg-auto-height=\"true\" data-md-layout=\"rd-navbar-fixed\" data-lg-layout=\"rd-navbar-fixed\" data-lg-stick-up=\"true\">
             
-              <div class=\"rd-navbar-inner\" style=\"display: none;\">
+              <div class=\"rd-navbar-inner\" >
                 <!-- RD Navbar Panel-->
                 <div class=\"rd-navbar-panel\">
                   <!-- RD Navbar Toggle-->
                   <button class=\"rd-navbar-toggle\" data-rd-navbar-toggle=\".rd-navbar, .rd-navbar-nav-wrap\"><span></span></button>
                   <!--Navbar Brand-->
-                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"/\"><img style='margin-left: -15px;' width='184' height='54' src=\"{{ asset('images/logo-chico.png') }}\"  alt=''/></a></div>
+                  <div class=\"rd-navbar-brand\" style=\"left: 30%;\" ><a href=\"/\"><img style='margin-left: -15px;' width='184' height='54' src=\"{{ asset('images/slider-img/LOGO-AGENCIAS-HORIZONTES.png') }}\"\"  alt=''/></a></div>
                 </div>
                 <div class=\"rd-navbar-menu-wrap\">
                   <div class=\"rd-navbar-nav-wrap\">
                     <div class=\"rd-navbar-mobile-scroll\">
                       <!--Navbar Brand Mobile-->
-                      <div class=\"rd-navbar-mobile-brand\"><a href=\"/\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"{{ asset('images/logo-chico.png') }}\" alt=''/></a></div>
+                      <div class=\"rd-navbar-mobile-brand\"><a href=\"/\"><img style='margin-top: -5px;margin-left: -15px;' width='138' height='40' src=\"{{ asset('images/slider-img/LOGO-AGENCIAS-HORIZONTES.png') }}\" alt=''/></a></div>
                       <div class=\"form-search-wrap\">
                         <!-- RD Search Form-->
                         <form class=\"form-search rd-search\" action=\"search-results.html\" method=\"GET\">

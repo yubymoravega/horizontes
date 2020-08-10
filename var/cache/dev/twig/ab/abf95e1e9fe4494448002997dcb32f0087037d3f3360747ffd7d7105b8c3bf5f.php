@@ -171,25 +171,53 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         
         <div id=\"carousel\">
 
-       <div class=\"hideLeft\">
+        <div class=\"hideLeft\">
         <img src=\"";
         // line 55
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/combo-carne.jpg"), "html", null, true);
-        echo "\">
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-COMBO-CARNES.jpg"), "html", null, true);
+        echo "\"> 
       </div>
 
       <div class=\"prevLeftSecond\">
         <img src=\"";
         // line 59
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/cubacel.jpg"), "html", null, true);
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-PROMO.jpg"), "html", null, true);
         echo "\">
       </div>
 
       <div class=\"prev\">
         <img src=\"";
         // line 63
-        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/promocion.jpg"), "html", null, true);
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-COMBO-MEDICAMENTOS.jpg"), "html", null, true);
         echo "\">
+      </div>
+
+      <div class=\"selected\">
+        <img src=\"";
+        // line 67
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-COMBO-DE-ASE.jpg"), "html", null, true);
+        echo "\">
+      </div>
+
+      <div class=\"next\">
+        <img src=\"";
+        // line 71
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-COMBO-COMIDA.jpg"), "html", null, true);
+        echo "\">
+      </div>
+
+      <div class=\"nextRightSecond\">
+        <img src=\"";
+        // line 75
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-ARTICULOS.jpg"), "html", null, true);
+        echo "\">
+      </div>
+
+      <div class=\"hideRight\">
+        <img src=\"";
+        // line 79
+        echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\AssetExtension']->getAssetUrl("images/slider-img/400X400-PAQUETERIA.jpg"), "html", null, true);
+        echo "\"> 
       </div>
 
     </div>
@@ -201,9 +229,9 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
         </div>
       </section>
      ";
-        // line 74
-        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 74)->display($context);
-        // line 75
+        // line 90
+        $this->loadTemplate("layout/footer.html", "home/index.html.twig", 90)->display($context);
+        // line 91
         echo "  </body>
 </html>
 
@@ -251,7 +279,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
 
     public function getDebugInfo()
     {
-        return array (  207 => 75,  205 => 74,  191 => 63,  184 => 59,  177 => 55,  141 => 21,  139 => 20,  134 => 17,  124 => 16,  112 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
+        return array (  235 => 91,  233 => 90,  219 => 79,  212 => 75,  205 => 71,  198 => 67,  191 => 63,  184 => 59,  177 => 55,  141 => 21,  139 => 20,  134 => 17,  124 => 16,  112 => 13,  109 => 12,  99 => 11,  87 => 8,  83 => 7,  79 => 6,  75 => 5,  70 => 4,  60 => 3,  37 => 1,);
     }
 
     public function getSourceContext()
@@ -309,16 +337,32 @@ document.addEventListener(\"DOMContentLoaded\", function() {
         
         <div id=\"carousel\">
 
-       <div class=\"hideLeft\">
-        <img src=\"{{ asset('images/combo-carne.jpg') }}\">
+        <div class=\"hideLeft\">
+        <img src=\"{{ asset('images/slider-img/400X400-COMBO-CARNES.jpg') }}\"> 
       </div>
 
       <div class=\"prevLeftSecond\">
-        <img src=\"{{ asset('images/cubacel.jpg') }}\">
+        <img src=\"{{ asset('images/slider-img/400X400-PROMO.jpg') }}\">
       </div>
 
       <div class=\"prev\">
-        <img src=\"{{ asset('images/promocion.jpg') }}\">
+        <img src=\"{{ asset('images/slider-img/400X400-COMBO-MEDICAMENTOS.jpg') }}\">
+      </div>
+
+      <div class=\"selected\">
+        <img src=\"{{ asset('images/slider-img/400X400-COMBO-DE-ASE.jpg') }}\">
+      </div>
+
+      <div class=\"next\">
+        <img src=\"{{ asset('images/slider-img/400X400-COMBO-COMIDA.jpg') }}\">
+      </div>
+
+      <div class=\"nextRightSecond\">
+        <img src=\"{{ asset('images/slider-img/400X400-ARTICULOS.jpg') }}\">
+      </div>
+
+      <div class=\"hideRight\">
+        <img src=\"{{ asset('images/slider-img/400X400-PAQUETERIA.jpg') }}\"> 
       </div>
 
     </div>
