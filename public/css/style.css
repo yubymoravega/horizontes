@@ -34535,6 +34535,11 @@ html .wrapper {
 	transition: 0.3s all cubic-bezier(0.785, 0.135, 0.15, 0.86);
 }
 
+.rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-toggle, .rd-navbar-default.rd-navbar-fixed .rd-navbar-nav-wrap, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-nav-wrap, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-nav-wrap, .rd-navbar-top-panel.rd-navbar-fixed .rd-navbar-nav-wrap, .rd-navbar-logo-center.rd-navbar-fixed .rd-navbar-nav-wrap, .rd-navbar-default.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-sidebar-fixed .rd-navbar-toggle, .rd-navbar-sidebar-fixed .rd-navbar-nav-wrap, .rd-navbar-sidebar-fixed .rd-navbar-nav li, .rd-navbar-default, .rd-navbar-floated.rd-navbar-static, .rd-navbar-top-panel.rd-navbar-static, .rd-navbar-logo-center.rd-navbar-static {
+	transition: 0.3s all cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+
 .rd-navbar-default.rd-navbar-fixed .rd-navbar-nav li a, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-nav li a, .rd-navbar-sidebar-fixed .rd-navbar-nav li a, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-nav li a, .rd-navbar-top-panel.rd-navbar-fixed .rd-navbar-nav li a, .rd-navbar-logo-center.rd-navbar-fixed .rd-navbar-nav li a, .rd-navbar-default.rd-navbar-fixed .responsive-tabs .resp-accordion, .rd-navbar-sidebar-toggle.rd-navbar-fixed .responsive-tabs .resp-accordion, .rd-navbar-sidebar-fixed .responsive-tabs .resp-accordion, .rd-navbar-floated.rd-navbar-fixed .responsive-tabs .resp-accordion, .rd-navbar-top-panel.rd-navbar-fixed .responsive-tabs .resp-accordion, .rd-navbar-logo-center.rd-navbar-fixed .responsive-tabs .resp-accordion, .rd-navbar-default.rd-navbar-static .rd-navbar-nav > li > a, .rd-navbar-floated.rd-navbar-static .rd-navbar-nav > li > a, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-nav > li > a, .rd-navbar-default.rd-navbar-static .rd-navbar-dropdown li > a, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown li > a, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown li > a, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown li > a, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu li > a, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu li > a, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu li > a, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu li > a, .rd-navbar-static.rd-navbar-logo-center .rd-navbar-nav > li > a {
 	font-size: 13px;
 	font-weight: 900;
@@ -35161,6 +35166,11 @@ html .wrapper {
 	background: #151515;
 }
 
+.rd-navbar-default.rd-navbar-transparent .rd-navbar-usuario-dropdown, .rd-navbar-default.rd-navbar-dark .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-dark .rd-navbar-usuario-dropdown, .rd-navbar-logo-center.rd-navbar-dark .rd-navbar-usuario-dropdown {
+	background: #151515;
+}
+
+
 .rd-navbar-default.rd-navbar-light .rd-navbar-product-remove, .rd-navbar-floated.rd-navbar-light .rd-navbar-product-remove, .rd-navbar-logo-center.rd-navbar-light .rd-navbar-product-remove {
 	color: #9b9b9b;
 }
@@ -35186,6 +35196,9 @@ html .wrapper {
 }
 
 .rd-navbar-default.rd-navbar-light .rd-navbar-cart-dropdown, .rd-navbar-floated.rd-navbar-light .rd-navbar-cart-dropdown, .rd-navbar-logo-center.rd-navbar-light .rd-navbar-cart-dropdown {
+	background: #ffffff;
+}
+.rd-navbar-default.rd-navbar-light .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-light .rd-navbar-usuario-dropdown, .rd-navbar-logo-center.rd-navbar-light .rd-navbar-usuario-dropdown {
 	background: #ffffff;
 }
 
@@ -35465,11 +35478,25 @@ html .wrapper {
 	overflow-y: auto;
 }
 
+.rd-navbar-default.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-usuario-dropdown {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 280px;
+	bottom: 0;
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+	z-index: 15;
+	transform: translateX(105%);
+	padding: 70px 15px 0;
+	max-height: 100%;
+	overflow-y: auto;
+}
+
 .rd-navbar-default.rd-navbar-fixed .rd-navbar-cart-dropdown.active, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-cart-dropdown.active, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-cart-dropdown.active {
 	transform: translateX(0);
 }
 
-.rd-navbar-default.rd-navbar-fixed .rd-navbar-cart-dropdown.active, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-cart-dropdown.active, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-cart-dropdown.active {
+.rd-navbar-default.rd-navbar-fixed .rd-navbar-usuario-dropdown.active, .rd-navbar-sidebar-toggle.rd-navbar-fixed .rd-navbar-usuario-dropdown.active, .rd-navbar-floated.rd-navbar-fixed .rd-navbar-usuario-dropdown.active {
 	transform: translateX(0);
 }
 
@@ -35478,7 +35505,17 @@ html .wrapper {
 	background: #191919;
 }
 
+.rd-navbar-default.rd-navbar-transparent.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-default.rd-navbar-dark.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-sidebar-toggle.rd-navbar-dark.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-dark.rd-navbar-fixed .rd-navbar-usuario-dropdown {
+	color: #ffffff;
+	background: #191919;
+}
+
 .rd-navbar-default.rd-navbar-light.rd-navbar-fixed .rd-navbar-cart-dropdown, .rd-navbar-sidebar-toggle.rd-navbar-light.rd-navbar-fixed .rd-navbar-cart-dropdown, .rd-navbar-floated.rd-navbar-light.rd-navbar-fixed .rd-navbar-cart-dropdown {
+	color: #212121;
+	background: #ffffff;
+}
+
+.rd-navbar-default.rd-navbar-light.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-sidebar-toggle.rd-navbar-light.rd-navbar-fixed .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-light.rd-navbar-fixed .rd-navbar-usuario-dropdown {
 	color: #212121;
 	background: #ffffff;
 }
@@ -35596,7 +35633,29 @@ html .wrapper {
 	border-top: 1px solid #42b574;
 }
 
+.rd-navbar-default.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu, .rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1;
+	width: 270px;
+	padding: 0;
+	visibility: hidden;
+	transition: .3s all ease;
+	text-align: left;
+	opacity: 0;
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+	border-top: 1px solid #42b574;
+}
+
 .rd-navbar-default.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-cart-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-cart-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-cart-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-cart-dropdown .rd-navbar-dropdown {
+	left: 100%;
+	top: -1px;
+	margin: 0;
+	z-index: 2;
+}
+
+.rd-navbar-default.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown {
 	left: 100%;
 	top: -1px;
 	margin: 0;
@@ -35607,7 +35666,17 @@ html .wrapper {
 	z-index: 3;
 }
 
+.rd-navbar-default.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown .rd-navbar-dropdown .rd-navbar-dropdown {
+	z-index: 3;
+}
+
+
 .rd-navbar-default.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-default.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left, .rd-navbar-floated.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left, .rd-navbar-default.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-cart-dropdown.rd-navbar-open-left .rd-navbar-dropdown {
+	right: 100%;
+	left: auto;
+}
+
+.rd-navbar-default.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left, .rd-navbar-default.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left, .rd-navbar-default.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-megamenu.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left, .rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown.rd-navbar-open-left .rd-navbar-dropdown {
 	right: 100%;
 	left: auto;
 }
@@ -35627,6 +35696,10 @@ html .wrapper {
 }
 
 .rd-navbar-default.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-cart-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-cart-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-cart-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-cart-dropdown {
+	margin-top: 49px;
+}
+
+.rd-navbar-default.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-dropdown, .rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-top-panel.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown {
 	margin-top: 49px;
 }
 
@@ -35856,7 +35929,28 @@ html .wrapper {
 	box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15);
 }
 
+.rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown {
+	position: absolute;
+	top: 100%;
+	left: auto;
+	right: 0;
+	width: 240px;
+	padding: 13px 15px 15px;
+	text-align: left;
+	border-top: 1px solid #42b574;
+	opacity: 0;
+	visibility: hidden;
+	transition: .3s all ease;
+	z-index: 1;
+	box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15);
+}
+
 .rd-navbar-default.rd-navbar-static .rd-navbar-cart-dropdown.active, .rd-navbar-floated.rd-navbar-static .rd-navbar-cart-dropdown.active {
+	opacity: 1;
+	visibility: visible;
+}
+
+.rd-navbar-default.rd-navbar-static .rd-navbar-usuario-dropdown.active, .rd-navbar-floated.rd-navbar-static .rd-navbar-usuario-dropdown.active {
 	opacity: 1;
 	visibility: visible;
 }
@@ -37951,6 +38045,9 @@ html .wrapper {
 }
 
 .rd-navbar-logo-center.rd-navbar-static .rd-navbar-cart-dropdown {
+	padding: 13px 15px 15px;
+}
+.rd-navbar-logo-center.rd-navbar-static .rd-navbar-usuario-dropdown {
 	padding: 13px 15px 15px;
 }
 
@@ -57468,10 +57565,11 @@ a{font-family: "Raleway", Helvetica, Arial, sans-serif !important;}
 	a.rd-navbar-cart.mdi.icon-carrito{right: 300px; margin-top: 0px;}
 	a.rd-navbar-cart.mdi.icon-texto{right: 350px;}
 	.rd-navbar-cart-dropdown.toggle-original-elements.active{ margin-top: 40px;}
-
-
+	.rd-navbar-usuario-dropdown.toggle-original-elements.active{ margin-top: 40px;}
 
 }
+
+
 
 @media screen and (min-width: 1500px) {
     section.section.novi-background.section-98.section-sm-110.carousel1 {

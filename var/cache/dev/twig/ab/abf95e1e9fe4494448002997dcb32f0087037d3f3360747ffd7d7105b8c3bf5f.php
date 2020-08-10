@@ -144,7 +144,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
               <form name=\"form-telefono\" method=\"POST\"  id=\"form-telefono\" action=\"cliente-index\" >
-                <div class=\"form-group\">
+                <div class=\"form-group\">  
                   <div class=\"input-group input-group-sm \">
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
@@ -310,7 +310,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
          <div class=\"row form justify-content-md-center text-left\" style=\"margin-top: 0px;\">
             <div class=\"col-md-7 col-lg-4\">
               <form name=\"form-telefono\" method=\"POST\"  id=\"form-telefono\" action=\"cliente-index\" >
-                <div class=\"form-group\">
+                <div class=\"form-group\">  
                   <div class=\"input-group input-group-sm \">
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>

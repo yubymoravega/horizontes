@@ -916,7 +916,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   </div>
                   <!--RD Navbar shop-->
                   <div class=\"rd-navbar-cart-wrap\">
-                  <a class=\"rd-navbar-cart mdi icon-user \"  href=\"#\" ><span></span><br> <p class=\"p-text\">Usuario</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-user \" data-rd-navbar-toggle=\".rd-navbar-usuario-dropdown\" href=\"#\" ><span></span><br> <p class=\"p-text\">Usuario</p></a>
                   <a class=\"rd-navbar-cart mdi icon-notification\" href=\"#\" ><span></span> <br> <p class=\"p-text\">Atender</p></a>
                   <a class=\"rd-navbar-cart mdi icon-ventas\"  href=\"#\" ><span></span><br> <p class=\"p-text\">Ventas</p></a>
                   <a class=\"rd-navbar-cart mdi icon-carrito \"  data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span><br> <p class=\"p-text\">Factura</p></a>
@@ -944,6 +944,19 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                       </div>
                       <div class=\"text-center\"><a class=\"btn btn-rect btn-sm btn-primary btn-icon btn-icon-left\" href=\"shop-cart.html\"><span class=\"icon novi-icon mdi mdi-lock\"></span>Go to checkout</a></div>
                     </div>
+
+                    <div class=\"rd-navbar-usuario-dropdown\">
+                    
+                      <div class=\" text-center\">
+                        <h6 class=\"rd-navbar-cart-total-title\">";
+        // line 900
+        echo twig_escape_filter($this->env, twig_get_attribute($this->env, $this->source, twig_get_attribute($this->env, $this->source, (isset($context["app"]) || array_key_exists("app", $context) ? $context["app"] : (function () { throw new RuntimeError('Variable "app" does not exist.', 900, $this->source); })()), "session", [], "any", false, false, false, 900), "get", [0 => "_security.last_username"], "method", false, false, false, 900), "html", null, true);
+        echo "</h6>
+                      </div>
+                      <div class=\"text-center\"><a class=\"btn btn-rect btn-sm btn-primary btn-icon btn-icon-left\" href=\"/index.php/logout\"><span class=\"icon novi-icon mdi mdi-lock\"></span>Cerrar Secion</a></div><br/>
+                      <div class=\"text-center\"><a class=\"btn btn-rect btn-sm btn-primary btn-icon btn-icon-left\" href=\"/index.php/logout\"><span class=\"icon novi-icon mdi mdi-lock\"></span>Panel De Control</a></div><br/>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -989,7 +1002,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
 
     public function getDebugInfo()
     {
-        return array (  94 => 44,  85 => 38,  62 => 18,  43 => 1,);
+        return array (  953 => 900,  94 => 44,  85 => 38,  62 => 18,  43 => 1,);
     }
 
     public function getSourceContext()
@@ -1861,7 +1874,7 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                   </div>
                   <!--RD Navbar shop-->
                   <div class=\"rd-navbar-cart-wrap\">
-                  <a class=\"rd-navbar-cart mdi icon-user \"  href=\"#\" ><span></span><br> <p class=\"p-text\">Usuario</p></a>
+                  <a class=\"rd-navbar-cart mdi icon-user \" data-rd-navbar-toggle=\".rd-navbar-usuario-dropdown\" href=\"#\" ><span></span><br> <p class=\"p-text\">Usuario</p></a>
                   <a class=\"rd-navbar-cart mdi icon-notification\" href=\"#\" ><span></span> <br> <p class=\"p-text\">Atender</p></a>
                   <a class=\"rd-navbar-cart mdi icon-ventas\"  href=\"#\" ><span></span><br> <p class=\"p-text\">Ventas</p></a>
                   <a class=\"rd-navbar-cart mdi icon-carrito \"  data-rd-navbar-toggle=\".rd-navbar-cart-dropdown\" href=\"#\" ><span></span><br> <p class=\"p-text\">Factura</p></a>
@@ -1889,6 +1902,16 @@ class __TwigTemplate_bdf8d89afa1d89d9ee118da13f2f7b5495ddb10cd2233b6e04f2c7597b9
                       </div>
                       <div class=\"text-center\"><a class=\"btn btn-rect btn-sm btn-primary btn-icon btn-icon-left\" href=\"shop-cart.html\"><span class=\"icon novi-icon mdi mdi-lock\"></span>Go to checkout</a></div>
                     </div>
+
+                    <div class=\"rd-navbar-usuario-dropdown\">
+                    
+                      <div class=\" text-center\">
+                        <h6 class=\"rd-navbar-cart-total-title\">{{ app.session.get('_security.last_username') }}</h6>
+                      </div>
+                      <div class=\"text-center\"><a class=\"btn btn-rect btn-sm btn-primary btn-icon btn-icon-left\" href=\"/index.php/logout\"><span class=\"icon novi-icon mdi mdi-lock\"></span>Cerrar Secion</a></div><br/>
+                      <div class=\"text-center\"><a class=\"btn btn-rect btn-sm btn-primary btn-icon btn-icon-left\" href=\"/index.php/logout\"><span class=\"icon novi-icon mdi mdi-lock\"></span>Panel De Control</a></div><br/>
+                    </div>
+
                   </div>
                 </div>
               </div>
