@@ -246,7 +246,7 @@ try {
       'amount' => 1*100, 
       'card'=> $err->getError()->payment_method->card, 
       'paymentMethod' => $err->getError()->payment_method->id, 
-      'publicKey' => 'pk_test_51GqMhfF2pLNIoJ5OZOn2hPgISbzCyX390U4JNhGqREy0ROZ7LYYZI6fWc2GX8afffee5RRiHkaob2siID4oBqgqA00YhsncFkb', 
+      'publicKey' => $this->apiKey, 
       'clientSecret' => $err->getError()->payment_intent->client_secret
     )));
 

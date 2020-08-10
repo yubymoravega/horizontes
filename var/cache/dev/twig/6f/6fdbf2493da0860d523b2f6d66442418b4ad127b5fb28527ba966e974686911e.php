@@ -99,7 +99,7 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
         echo " ";
         echo twig_escape_filter($this->env, (isset($context["apellido"]) || array_key_exists("apellido", $context) ? $context["apellido"] : (function () { throw new RuntimeError('Variable "apellido" does not exist.', 29, $this->source); })()), "html", null, true);
         echo "</h2> 
-    <h2 style=\"font-weight: 500; text-align: center; \">Monto: \$";
+    <h2 style=\"font-weight: 500; text-align: center; \">A cobrar: \$";
         // line 30
         echo twig_escape_filter($this->env, (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 30, $this->source); })()), "html", null, true);
         echo "</h2> 
@@ -126,13 +126,13 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
     </div>
  
     <div> <hr/>
-     <h1 style=\"font-weight: 500; text-align: center; \">Confirmar Pago</h1>
+     <h1 style=\"font-weight: 500; text-align: center; \">Procesar Cobro</h1>
     
      <a class='pagar' href=\"";
         // line 45
         echo twig_escape_filter($this->env, $this->extensions['Symfony\Bridge\Twig\Extension\RoutingExtension']->getPath("confirm", ["tel" => (isset($context["tel"]) || array_key_exists("tel", $context) ? $context["tel"] : (function () { throw new RuntimeError('Variable "tel" does not exist.', 45, $this->source); })()), "monto" => (isset($context["monto"]) || array_key_exists("monto", $context) ? $context["monto"] : (function () { throw new RuntimeError('Variable "monto" does not exist.', 45, $this->source); })()), "last4" => twig_get_attribute($this->env, $this->source, (isset($context["tarjeta"]) || array_key_exists("tarjeta", $context) ? $context["tarjeta"] : (function () { throw new RuntimeError('Variable "tarjeta" does not exist.', 45, $this->source); })()), "last4", [], "any", false, false, false, 45)]), "html", null, true);
         echo "\">
-        Pagar
+        Confirmar
     </a>
   
 
@@ -213,7 +213,7 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
   
     <div> 
      <h2 style=\"font-weight: 500; text-align: center; \"> Cliente: {{nombre}} {{apellido}}</h2> 
-    <h2 style=\"font-weight: 500; text-align: center; \">Monto: \${{monto}}</h2> 
+    <h2 style=\"font-weight: 500; text-align: center; \">A cobrar: \${{monto}}</h2> 
     
     </div>
     <div id='credit' class=\"credit-card {{tarjeta.brand}} selectable\">
@@ -226,10 +226,10 @@ class __TwigTemplate_f56a009204d66e7017dd896b8cad7b086627ac349f2d317bf7542ac33b5
     </div>
  
     <div> <hr/>
-     <h1 style=\"font-weight: 500; text-align: center; \">Confirmar Pago</h1>
+     <h1 style=\"font-weight: 500; text-align: center; \">Procesar Cobro</h1>
     
      <a class='pagar' href=\"{{ path('confirm', {'tel': tel, 'monto': monto, 'last4':tarjeta.last4 })}}\">
-        Pagar
+        Confirmar
     </a>
   
 

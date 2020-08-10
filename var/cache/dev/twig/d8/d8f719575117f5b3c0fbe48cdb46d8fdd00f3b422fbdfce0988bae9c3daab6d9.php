@@ -120,7 +120,7 @@ class __TwigTemplate_b92a28fe8a59640881660d5f67d849c89bf3c96d0efc3170bfd06b182b3
 <script>
 
 \$( \"#cancelar\" ).click(function() {
-  window.location.href = \"\";
+  window.location.href = \"/\";
    
 });
 
@@ -217,7 +217,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
 <script>
 
 \$( \"#cancelar\" ).click(function() {
-  window.location.href = \"\";
+  window.location.href = \"/\";
    
 });
 

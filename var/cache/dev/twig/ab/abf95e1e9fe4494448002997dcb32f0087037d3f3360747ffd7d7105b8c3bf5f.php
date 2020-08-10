@@ -149,7 +149,7 @@ class __TwigTemplate_5feee9be8590f57bb7316c4de817d23c8645242b55518d4a40cc65d0333
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
                     
-                     <input type=\"text\" id=\"tel\" name=\"tel\" class=\"form-control\" placeholder=\"No. De Telefono\" autocomplete=\"off\" required/>
+                     <input  type=\"text\" id=\"tel\" name=\"tel\" class=\"form-control\" placeholder=\"No. De Telefono\" autocomplete=\"off\" required />
                      <button id=\"submit\" type=\"submit\" class=\"btn-sm btn-default btn \">Continuar</button>  
                      
                 </div>
@@ -287,7 +287,7 @@ document.addEventListener(\"DOMContentLoaded\", function() {
                   <span class=\"input-group-prepend\"><span class=\"input-group-text input-group-icon\">
                   <span class=\"novi-icon mdi mdi-phone\"></span></span></span>
                     
-                     <input type=\"text\" id=\"tel\" name=\"tel\" class=\"form-control\" placeholder=\"No. De Telefono\" autocomplete=\"off\" required/>
+                     <input  type=\"text\" id=\"tel\" name=\"tel\" class=\"form-control\" placeholder=\"No. De Telefono\" autocomplete=\"off\" required />
                      <button id=\"submit\" type=\"submit\" class=\"btn-sm btn-default btn \">Continuar</button>  
                      
                 </div>

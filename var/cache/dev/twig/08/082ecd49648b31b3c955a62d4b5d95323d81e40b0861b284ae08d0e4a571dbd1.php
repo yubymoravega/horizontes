@@ -317,17 +317,32 @@ if(id == true){
        
      }else if(email.length > 0){
 
-        \$(\"#cliente_correo\").css(\"border-color\", \"red\");
-        \$(\"#mensaje\").text('El cliente debe tener un email valido');
-       
-  var validador = /^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+\$/;
- 
-  if(!validador.test(email)) {
+    var regex = /[\\w-\\.]{2,}@([\\w-]{2,}\\.)*([\\w-]{2,}\\.)[\\w-]{2,4}/;
 
-  \$(\"#mensaje\").text('Email no valido');    
+    if (regex.test(\$(\"#cliente_correo\").val().trim())) {
+        envio();
 
-  }
+    } else {
+
+      \$(\"#error\").css(\"display\", \"\");
+
+           \$(\"#cliente_correo\").css(\"border-color\", \"red\");
+
+       \$(\"#mensaje\").text('Email no valido!');
+
+    }
+
+
      }else{
+
+         envio();   
+
+     }
+
+      function envio() {
+  
+
+        \$(\"#cliente_correo\").css(\"border-color\", \"\");
 
         \$(\"#cliente_telefono\").css(\"border-color\", \"\");
 
@@ -351,7 +366,9 @@ if(id == true){
 
         \$( \"#form_cliente\" ).submit();
 
-     }
+            }
+
+
 });
 
 // A \$( document ).ready() block.
@@ -555,17 +572,32 @@ if(id == true){
        
      }else if(email.length > 0){
 
-        \$(\"#cliente_correo\").css(\"border-color\", \"red\");
-        \$(\"#mensaje\").text('El cliente debe tener un email valido');
-       
-  var validador = /^([a-zA-Z0-9_\\.\\-\\+])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+\$/;
- 
-  if(!validador.test(email)) {
+    var regex = /[\\w-\\.]{2,}@([\\w-]{2,}\\.)*([\\w-]{2,}\\.)[\\w-]{2,4}/;
 
-  \$(\"#mensaje\").text('Email no valido');    
+    if (regex.test(\$(\"#cliente_correo\").val().trim())) {
+        envio();
 
-  }
+    } else {
+
+      \$(\"#error\").css(\"display\", \"\");
+
+           \$(\"#cliente_correo\").css(\"border-color\", \"red\");
+
+       \$(\"#mensaje\").text('Email no valido!');
+
+    }
+
+
      }else{
+
+         envio();   
+
+     }
+
+      function envio() {
+  
+
+        \$(\"#cliente_correo\").css(\"border-color\", \"\");
 
         \$(\"#cliente_telefono\").css(\"border-color\", \"\");
 
@@ -589,7 +621,9 @@ if(id == true){
 
         \$( \"#form_cliente\" ).submit();
 
-     }
+            }
+
+
 });
 
 // A \$( document ).ready() block.
