@@ -98,7 +98,7 @@ var payWithCard = function(stripe, card, clientSecret) {
       
       });
 
-      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
+      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post', dataType : 'json',
        data:{'data': sendVirtual}});
        
       }
