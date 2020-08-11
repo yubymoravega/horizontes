@@ -38,8 +38,10 @@ fetch("http://127.0.0.1/index.php/api.security", {
   
     if(intent.mStatus){ 
 
-     /*$.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
-       data:{'data': intent}});*/
+     $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
+     dataType : 'json', data:{'data': intent}});
+
+       console.log(intent);
 
       if(intent.mStatus === 'succeeded'){
 
@@ -90,7 +92,7 @@ fetch("http://127.0.0.1/index.php/api.security", {
   }
 
    $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
-       data:{'data': intent.json}});
+   dataType : 'json', data:{'data': intent.json}});
 
 });}
 

@@ -146,7 +146,6 @@ class ApiController extends AbstractController
       $json['mCard4'] =  $paymentIntent->card->last4 ;
       $json['mExpDate'] = $year; 
       $json['mProfileClientID'] = $request->get('customer');
-      $json['mProfileCardID'] = $paymentIntent->card->brand;
       $json['mAmount'] = $request->get('monto');
       $json['mStatus'] = $request->get('status');
 
@@ -334,7 +333,6 @@ try {
     $json['mCard4'] =  $paymentIntent->card->last4 ;
     $json['mExpDate'] = $year; 
     $json['mProfileClientID'] = $data[0]->getToken();
-    $json['mProfileCardID'] = $paymentIntent->card->brand;
     $json['mAmount'] = $json_obj->items[0]->monto;
     $json['mStatus'] = '';
 
