@@ -4,6 +4,7 @@ var stripe = Stripe("pk_test_51GqMhfF2pLNIoJ5OZOn2hPgISbzCyX390U4JNhGqREy0ROZ7LY
 // The items the customer wants to buy
 var customerID = null ;
 var tel = null ;
+var sendVirtual = null;
 
 var split = window.location.pathname.split('\/');
 
@@ -75,13 +76,30 @@ var payWithCard = function(stripe, card, clientSecret) {
     .then(function(result) {
       if (result.error) {
         // Show error to your customer
+
+        $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',
+        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]},
+        success: function(data) {
+         sendVirtual = data;
+             },
+       
+       });
+
         showError(result.error.message);
       } else {
 
         // The payment succeeded!
           orderComplete(result.paymentIntent.id);
        $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',
-       data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel}});
+       data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]},
+       success: function(data) {
+        sendVirtual = data;
+            },
+      
+      });
+
+      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
+       data:{'data': sendVirtual}});
        
       }
     });

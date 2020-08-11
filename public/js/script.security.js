@@ -35,11 +35,15 @@ fetch("http://127.0.0.1/index.php/api.security", {
 })
 
 .then(function(intent) {
+  
+    if(intent.mStatus){ 
 
-    if(intent.status){
+     /*$.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
+       data:{'data': intent}});*/
 
-      if(intent.status === 'succeeded'){
-        $("#mensaje").text("Cobro Exitoso");
+      if(intent.mStatus === 'succeeded'){
+
+      $("#mensaje").text("Cobro Exitoso");
       $("#mensaje").css({'color':'green'}); 
       $("#home").css({'display':''}); 
       history.pushState({}, null, 'token123456qwer');
@@ -59,7 +63,12 @@ fetch("http://127.0.0.1/index.php/api.security", {
  stripe.confirmCardPayment(intent.clientSecret, {
   payment_method: intent.paymentMethod
 }).then(function(result) {
+
+
   if (result.error) {
+
+    intent.json.mStatus = result.error.code;
+
     // Show error to your customer
     $("#mensaje").text(result.error.message);
     $("#mensaje").css({'color':'red'});
@@ -68,6 +77,9 @@ fetch("http://127.0.0.1/index.php/api.security", {
 
   } else {
     if (result.paymentIntent.status === 'succeeded') {
+
+      intent.json.mStatus = result.paymentIntent.status;
+
       // The payment is complete!
       $("#mensaje").text("Cobro Exitoso");
       $("#mensaje").css({'color':'green'});
@@ -76,6 +88,10 @@ fetch("http://127.0.0.1/index.php/api.security", {
 
     }
   }
+
+   $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
+       data:{'data': intent.json}});
+
 });}
 
 

@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 
+use Symfony\Component\Security\Core\Security;
 use App\Entity\Cliente;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security as ConfigurationSecurity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Stripe\Stripe;
@@ -115,10 +118,40 @@ class ApiController extends AbstractController
       $dataBase->flush();
 
       }
+
+      // integracion con el virtual
+
+     $stripe = new \Stripe\StripeClient(
+        $this->apiKey
+      );
+
+     $paymentIntent = $stripe->paymentMethods->retrieve(
+        $request->get('metodoPago'),
+        []
+      );
      
+      $json = array();
+
+      $user =  $this->getUser();
+
+      //concatenando fecha de la tarjeta mmyy
+      $year = $paymentIntent->card->exp_year; 
+      $year = $year - 2000;
+     if($paymentIntent->card->exp_month  < 10){$year = '0'.$paymentIntent->card->exp_month.$year;}
+
+      $json['mApikey'] = 'xAe45cc95dgvz94cm';
+      $json['mEmployeeID'] =  $user->getUsername();
+      $json['mPhoneNo'] = $request->get('tel');
+      $json['mCardTypeID'] = $paymentIntent->card->brand;
+      $json['mCard4'] =  $paymentIntent->card->last4 ;
+      $json['mExpDate'] = $year; 
+      $json['mProfileClientID'] = $request->get('customer');
+      $json['mProfileCardID'] = $paymentIntent->card->brand;
+      $json['mAmount'] = $request->get('monto');
+      $json['mStatus'] = $request->get('status');
+
       
-          
-      return new Response('');
+      return new Response(json_encode( $json));
 
     }
     
@@ -230,7 +263,38 @@ try {
     'confirm' => true,
   ]);
 
-  return new Response(\json_encode($status));
+   // integracion con el virtual
+
+   $stripe = new \Stripe\StripeClient(
+    $this->apiKey
+  );
+
+ $paymentIntent = $stripe->paymentMethods->retrieve(
+  $credit->id,
+    []
+  );
+ 
+  $json = array();
+
+  $user =  $this->getUser();
+
+  //concatenando fecha de la tarjeta mmyy
+  $year = $paymentIntent->card->exp_year; 
+  $year = $year - 2000;
+ if($paymentIntent->card->exp_month  < 10){$year = '0'.$paymentIntent->card->exp_month.$year;}
+
+  $json['mApikey'] = 'xAe45cc95dgvz94cm';
+  $json['mEmployeeID'] =  $user->getUsername();
+  $json['mPhoneNo'] = $json_obj->items[0]->tel;
+  $json['mCardTypeID'] = $paymentIntent->card->brand;
+  $json['mCard4'] =  $paymentIntent->card->last4 ;
+  $json['mExpDate'] = $year; 
+  $json['mProfileClientID'] = $data[0]->getToken();
+  $json['mProfileCardID'] = $paymentIntent->card->brand;
+  $json['mAmount'] = $json_obj->items[0]->monto;
+  $json['mStatus'] = $status->status;
+
+  return new Response(\json_encode($json));
 
 } catch (\Stripe\Exception\CardException $err) {
   $error_code = $err->getError()->code;
@@ -241,13 +305,47 @@ try {
     // the off-session purchase failed
     // Use the PM ID and client_secret to authenticate the purchase
     // without asking your customers to re-enter their details
+
+
+      // integracion con el virtual
+
+   $stripe = new \Stripe\StripeClient(
+    $this->apiKey
+  );
+
+ $paymentIntent = $stripe->paymentMethods->retrieve(
+  $credit->id,
+    []
+  );
+
+    $json = array();
+
+    $user =  $this->getUser();
+  
+    //concatenando fecha de la tarjeta mmyy
+    $year = $paymentIntent->card->exp_year; 
+    $year = $year - 2000;
+   if($paymentIntent->card->exp_month  < 10){$year = '0'.$paymentIntent->card->exp_month.$year;}
+  
+    $json['mApikey'] = 'xAe45cc95dgvz94cm';
+    $json['mEmployeeID'] =  $user->getUsername();
+    $json['mPhoneNo'] = $json_obj->items[0]->tel;
+    $json['mCardTypeID'] = $paymentIntent->card->brand;
+    $json['mCard4'] =  $paymentIntent->card->last4 ;
+    $json['mExpDate'] = $year; 
+    $json['mProfileClientID'] = $data[0]->getToken();
+    $json['mProfileCardID'] = $paymentIntent->card->brand;
+    $json['mAmount'] = $json_obj->items[0]->monto;
+    $json['mStatus'] = '';
+
     return new Response (json_encode(array(
       'error' => 'authentication_required', 
       'amount' => 1*100, 
       'card'=> $err->getError()->payment_method->card, 
       'paymentMethod' => $err->getError()->payment_method->id, 
       'publicKey' => $this->apiKey, 
-      'clientSecret' => $err->getError()->payment_intent->client_secret
+      'clientSecret' => $err->getError()->payment_intent->client_secret,
+      'json' =>  $json
     )));
 
   } 
