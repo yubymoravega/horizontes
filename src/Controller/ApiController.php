@@ -289,9 +289,9 @@ try {
   $json['mCard4'] =  $paymentIntent->card->last4 ;
   $json['mExpDate'] = $year; 
   $json['mProfileClientID'] = $data[0]->getToken();
-  $json['mProfileCardID'] = $paymentIntent->card->brand;
   $json['mAmount'] = $json_obj->items[0]->monto;
-  $json['mStatus'] = $status->status;
+  if($status->status == 'succeeded'){$json['mStatus'] = 'succeed';}else{$json['mStatus'] = $status->status;}
+  
 
   return new Response(\json_encode($json));
 
