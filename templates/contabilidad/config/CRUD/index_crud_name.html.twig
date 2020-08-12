@@ -1,0 +1,12 @@
+{% extends 'contabilidad/config/CRUD/base_crud_name.html.twig' %}
+{% block formulario %}
+    {{ form_start(form,{'attr': {'class': 'd-flex'}}) }}
+    {% if label == 'nombre' %}
+        {{ form_widget(form.nombre, {'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}
+    {% else %}
+        {{ form_widget(form.descripcion, {'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}
+    {% endif %}
+    {{ form_widget(form.adicionar) }}
+
+    {{ form_end(form) }}
+{% endblock %}

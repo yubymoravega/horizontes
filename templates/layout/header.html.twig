@@ -1,0 +1,170 @@
+<head>
+    <title>Services</title>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="keywords" content="intense web design multipurpose template html">
+    <meta name="date" content="Dec 26">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+
+    <!--[if lt IE 10]>
+    <div style="background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index:1;">
+        <a href="http://windows.microsoft.com/en-US/internet-explorer/"><img
+                src="images/ie8-panel/warning_bar_0000_us.jpg" border="0" height="42" width="820"
+                alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a>
+    </div>
+    <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="page-loader page-loader-variant-1">
+    <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67'
+              src="{{ asset('images/logo-solyag.png') }}" alt=''/>
+        <div class="offset-top-41 text-center">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+<div class="page text-center">
+    <!-- Page Header-->
+    <header class="page-head">
+        <!-- RD Navbar Transparent-->
+        <div class="rd-navbar-wrap">
+            <!--  <nav class="rd-navbar rd-navbar-default rd-navbar-dark" data-md-device-layout="rd-navbar-fixed" data-lg-device-layout="rd-navbar-fixed" data-lg-auto-height="true" data-md-layout="rd-navbar-fixed" data-lg-layout="rd-navbar-fixed" data-lg-stick-up="true"> -->
+            <nav class="rd-navbar rd-navbar-default rd-navbar-dark" data-md-device-layout="rd-navbar-fixed"
+                 data-lg-device-layout="rd-navbar-fixed" data-lg-auto-height="true" data-md-layout="rd-navbar-fixed"
+                 data-lg-layout="rd-navbar-fixed" data-lg-stick-up="true">
+
+                <div class="rd-navbar-inner">
+                    <!-- RD Navbar Panel-->
+                    <div class="rd-navbar-panel">
+                        <!-- RD Navbar Toggle-->
+                        <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar, .rd-navbar-nav-wrap">
+                            <span></span></button>
+                        <!--Navbar Brand-->
+                        <div class="rd-navbar-brand" style="left: 30%;"><a href="/"><img style='margin-left: -15px;'
+                                                                                         width='150' height='57'
+                                                                                         src="{{ asset('images/slider-img/LOGO-AGENCIAS.png') }}""
+                                alt=''/></a></div>
+                    </div>
+                    <div class="rd-navbar-menu-wrap">
+                        <div class="rd-navbar-nav-wrap">
+                            <div class="rd-navbar-mobile-scroll">
+                                <!--Navbar Brand Mobile-->
+                                <div class="rd-navbar-mobile-brand"><a href="/"><img
+                                                style='margin-top: -5px;margin-left: -15px;' width='138' height='40'
+                                                src="{{ asset('images/slider-img/LOGO-AGENCIAS.png') }}" alt=''/></a>
+                                </div>
+                                <div class="form-search-wrap">
+                                    <!-- RD Search Form-->
+                                    <form class="form-search rd-search" action="search-results.html" method="GET">
+                                        <div class="form-group">
+                                            <label class="form-label form-search-label form-label-sm"
+                                                   for="rd-navbar-form-search-widget">Search</label>
+                                            <input class="form-search-input input-sm form-control form-control-gray-lightest input-sm"
+                                                   id="rd-navbar-form-search-widget" type="text" name="s"
+                                                   autocomplete="off"/>
+                                        </div>
+                                        <button class="form-search-submit" type="submit"><span
+                                                    class="novi-icon mdi mdi-magnify"></span></button>
+                                    </form>
+                                </div>
+                                <!-- RD Navbar Nav-->
+                                <ul class="rd-navbar-nav">
+                                    {# ------------ contabilidad ------------------- #}
+                                    {% include 'layout/contabilidad.html.twig' %}
+
+                                </ul>
+                            </div>
+                        </div>
+                        <!--RD Navbar Search-->
+                        <div class="rd-navbar-search"><a class="rd-navbar-search-toggle mdi"
+                                                         data-rd-navbar-toggle=".rd-navbar-inner,.rd-navbar-search"
+                                                         href="#"><span></span></a>
+                            <form class="rd-navbar-search-form search-form-icon-right rd-search"
+                                  action="search-results.html" method="GET">
+                                <div class="form-group">
+                                    <label class="form-label" for="rd-navbar-search-form-control">Type and hit
+                                        enter...</label>
+                                    <input class="rd-navbar-search-form-control form-control form-control-gray-lightest"
+                                           id="rd-navbar-search-form-control" type="text" name="s" autocomplete="off"/>
+                                </div>
+                            </form>
+                        </div>
+                        <!--RD Navbar shop-->
+                        <div class="rd-navbar-cart-wrap">
+                            <a class="rd-navbar-cart mdi icon-user " data-rd-navbar-toggle=".rd-navbar-usuario-dropdown"
+                               href="#"><span></span><br>
+                                <p class="p-text">Usuario</p></a>
+                            <a class="rd-navbar-cart mdi icon-notification" href="#"><span></span> <br>
+                                <p class="p-text">Atender</p></a>
+                            <a class="rd-navbar-cart mdi icon-ventas" href="#"><span></span><br>
+                                <p class="p-text">Ventas</p></a>
+                            <a class="rd-navbar-cart mdi icon-carrito " data-rd-navbar-toggle=".rd-navbar-cart-dropdown"
+                               href="#"><span></span><br>
+                                <p class="p-text">Factura</p></a>
+                            <a class="rd-navbar-cart mdi icon-texto" href="#"><span class="span-text"
+                                                                                    style="width: 115px;">$ 00.00</span><br>
+                                <p style="margin-top: -3px;" class="p-text">Valor Total</p></a>
+
+                            <div class="rd-navbar-cart-dropdown">
+                                <ul class="rd-navbar-list-products">
+                                    <li>
+                                        <div class="rd-navbar-product-image"><img src="images/shop/product-01-60x60.png"
+                                                                                  alt=""/></div>
+                                        <div class="rd-navbar-product-caption">
+                                            <h6 class="rd-navbar-product-title"><a
+                                                        href="shop-single-product-left-sidebar.html">Fashion model
+                                                    new</a></h6>
+                                            <p class="rd-navbar-product-price">$129.99</p>
+                                        </div>
+                                        <a class="mdi mdi-window-close rd-navbar-product-remove" href="#"></a>
+                                    </li>
+                                    <li>
+                                        <div class="rd-navbar-product-image"><img
+                                                    src="images/shop/product-01-60x60-3.png" alt=""/></div>
+                                        <div class="rd-navbar-product-caption">
+                                            <h6 class="rd-navbar-product-title"><a
+                                                        href="shop-single-product-left-sidebar.html">Fashion model new
+                                                    2</a></h6>
+                                            <p class="rd-navbar-product-price">$69.99</p>
+                                        </div>
+                                        <a class="mdi mdi-window-close rd-navbar-product-remove" href="#"></a>
+                                    </li>
+                                </ul>
+                                <div class="rd-navbar-cart-total">
+                                    <h6 class="rd-navbar-cart-total-title">Cart subtotal</h6><span
+                                            class="rd-navbar-cart-total-price">$199.98</span>
+                                </div>
+                                <div class="text-center"><a
+                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
+                                            href="shop-cart.html"><span class="icon novi-icon mdi mdi-lock"></span>Go to
+                                        checkout</a></div>
+                            </div>
+
+                            <div class="rd-navbar-usuario-dropdown">
+
+                                <div class=" text-center">
+                                    <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                </div>
+                                <div class="text-center"><a
+                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
+                                            href="/index.php/logout"><span class="icon novi-icon mdi mdi-lock"></span>Cerrar
+                                        Secion</a></div>
+                                <br/>
+                                <div class="text-center"><a
+                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
+                                            href="/index.php/logout"><span class="icon novi-icon mdi mdi-lock"></span>Panel
+                                        De Control</a></div>
+                                <br/>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+</div>

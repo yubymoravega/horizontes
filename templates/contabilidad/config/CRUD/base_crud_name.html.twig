@@ -1,0 +1,64 @@
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# .............. header ............... #}
+
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                {{ title }}
+            </h4>
+            {% block formulario %}
+            {% endblock %}
+        </div>
+
+        {# ................ list .............. #}
+
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-10">{{ label }}</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in list %}
+                <tr>
+                    {% if label == 'nombre' %}
+                        <td style="font-weight:400;">{{ item.nombre }}</td>
+                    {% else %}
+                        <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    {% endif %}
+                    <td>
+                        <a href="{{ path(paths.edit,{id: item.id}) }}" type="button"
+                           class="btn btn-outline-dark btn-sm" data-toggle="tooltip"
+                           data-placement="bottom" title="Editar">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar {{ title }}: {{ label == 'nombre' ? item.nombre: item.descripcion }}?',
+                                        url:'{{ path(paths.delete,{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#descripcion_field').keypress(function (event) {
+                $(event.target).removeClass('is-invalid')
+                $('.alert').alert('close')
+            })
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Tasa de cambio
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarUnidadModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarUnidadModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarUnidadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarUnidadModalLabel">Adicionar unidad</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
+                    <div class="modal-body">
+                        <label for="tasa_cambio_anno" class="font-weight-bold">Año</label>
+                        {{ form_widget(form.anno,{'attr': {'class': 'form-control'}}) }}
+                        <label for="tasa_cambio_mes" class="font-weight-bold">Mes</label>
+                        {{ form_widget(form.mes,{'attr': {'class': 'form-control'}}) }}
+                        <label for="tasa_cambio_valor" class="font-weight-bold">Valor</label>
+                        {{ form_widget(form.valor,{'attr': {'class': 'form-control'}}) }}
+                        <label for="tasa_cambio_id_moneda_origen" class="font-weight-bold">Moneda origen</label>
+                        {{ form_widget(form.id_moneda_origen,{'attr': {'class': 'form-control'}}) }}
+                        <label for="tasa_cambio_id_moneda_destino" class="font-weight-bold">Moneda destino</label>
+                        {{ form_widget(form.id_moneda_destino,{'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-2">Nombre de unidad</th>
+            <th scope="col-3">Subordinada a</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in tasa_cambio %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.anno }}</td>
+                    <td style="font-weight:400;">{{ item.mes }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onUpdate({
+                                {#id_padre: '{{ item.id_padre }}',#}
+                                        {#padre_nombre:'{{ item.padre_nombre }}',#}
+                                        {#nombre:'{{ item.nombre }}' ,#}
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar la tasa de cambio seleccionada ?',
+                                        url:'{{ path('contabilidad_config_tasa_cambio_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            resetField()
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+
+            // const {nombre = '', id = '', id_padre = '', padre_nombre = ''} = config
+            // $('#gestionarUnidadModal').modal('show')
+            // if (id_padre == '') {
+            //     $('#select2-unidad_id_padre-container').val(0)
+            //     $('#select2-unidad_id_padre-container')[0].textContent = 'Seleccione unidad a la que se subordina'
+            // } else {
+            //     $('#select2-unidad_id_padre-container')[0].textContent = padre_nombre
+            //     $('#select2-unidad_id_padre-container').val(id_padre)
+            //     $('#unidad_id_padre').val(id_padre)
+            // }
+            // $('#gestionarUnidadModalLabel').html("Modificar " + nombre)
+            // $('#unidad_nombre').val(nombre)
+            // $('#id_unidad').val(id)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            // let id_padre = $('#unidad_id_padre').val()
+            // let nombre = $('#unidad_nombre').val()
+            // $.ajax({
+            //     url: '/contabilidad/config/tasa-cambio-add',
+            //     method: "POST",
+            //     data: {'id_padre': id_padre, 'nombre': nombre}
+            // }).then(res => {
+            //     window.location.replace('/contabilidad/config/tasa-cambio');
+            // })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            // let id_padre = $('#unidad_id_padre').val()
+            // let nombre = $('#unidad_nombre').val()
+            // let id_unidad = $('#id_unidad').val()
+            // $.ajax({
+            //     url: '/contabilidad/config/tasa-cambio-upd',
+            //     method: "POST",
+            //     data: {'id_padre': id_padre, 'nombre': nombre, 'id': id_unidad}
+            // }).then(res => {
+            //     window.location.replace('/contabilidad/config/unidad');
+            // })
+        })
+
+
+        $('#gestionarUnidadModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            // $('#unidad_nombre').val('')
+            // $('#select2-unidad_id_padre-container').val(0)
+            // $('#select2-unidad_id_padre-container')[0].textContent = 'Seleccione unidad a la que se subordina'
+            modal.find('.modal-title').text('Adicionar unidad')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+        }
+
+        function resetField() {
+            // $('#unidad_id_padre').prepend('<option selected = "true" value = "0">Seleccione la unidad a la que se subordina</option>');
+            // $('#select2-unidad_id_padre-container')[0].textContent = 'Seleccione unidad a la que se subordina'
+        }
+    </script>
+{% endblock %}
+

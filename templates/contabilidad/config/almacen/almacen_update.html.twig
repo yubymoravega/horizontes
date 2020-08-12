@@ -1,0 +1,14 @@
+{% extends 'contabilidad/config/almacen/base.html.twig' %}
+{% block formulario %}
+    {{ form_start(form,{'attr': {'class': 'd-flex py-3'}}) }}
+    <div class="position-relative">
+        <small><em class="position-absolute" style="left: 8px; bottom: -17px"> <span
+                        class="">{{ descrip }}</span></em>
+            {{ form_widget(form.descripcion, {'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}</small>
+    </div>
+
+    {{ form_widget(form.editar,{ 'attr':{ 'class': 'btn btn-warning' }}) }}
+    {#    {{ form_widget(form.cancelar,{ 'attr':{ 'class': 'btn ml-2 btn-outline-dark' }}) }}#}
+    <a class="btn btn-outline-dark ml-2" href="{{ path('contabilidad_config_almacen') }}">Cancelar</a>
+    {{ form_end(form) }}
+{% endblock %}

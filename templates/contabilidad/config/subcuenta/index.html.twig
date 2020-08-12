@@ -1,0 +1,208 @@
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block content %}
+    <div class="container-fluid">
+        {# header #}
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <h5 class="display-4 mb-0 mr-auto title-table pb-0">
+                    Subcuentas
+                </h5>
+                <a href="{{ path('contabilidad_config_cuenta') }}">
+                    <h6 class="mb-2 pl-2 text-left">
+                        <i class="ml-2 mt-1 fa fa-arrow-circle-left text-drak"></i>
+                        {{ subtitle }}
+                    </h6>
+                </a>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                        data-target="#gestionarUnidadModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarUnidadModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarUnidadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarUnidadModalLabel">Adicionar unidad</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(form,{'attr': {'class': 'rd-mailform'}}) }}
+                        <div class="form-group input-group input-group-sm">
+                            <label for="nombre_field" class="font-weight-bold">Nro. Subcuenta</label>
+                            <div class="container-fluid p-0">
+                                {{ form_widget(form.nro_subcuenta,{'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                        <div class="form-group input-group input-group-sm">
+                            <label for="id_padre_field" class="font-weight-bold">Descripción</label>
+                            <div class="container-fluid p-0">
+                            {{ form_widget(form.descripcion,{'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                        <div class="form-group input-group input-group-sm">
+                            <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
+                            <select name="naturaleza" id="naturaleza_cuenta" class="form-control">
+                                <option value="1">Deudora</option>
+                                <option value="0">Acreedora</option>
+                            </select>
+                        </div>
+                        <input type="text" id="id_subcuenta" hidden>
+                        <input type="text" id="id_cuenta" hidden value="{{ id_cuenta }}">
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-2">Nro. subcuenta</th>
+            <th scope="col-3">Descripción</th>
+            <th scope="col-3" width="120px">Naturaleza</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in subcuentas %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nro_subcuenta }}</td>
+                    <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;">{{ item.deudora }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onUpdate({
+                                        nro_subcuenta: '{{ item.nro_subcuenta }}',
+                                        descripcion:'{{ item.descripcion }}',
+                                        deudora:'{{ item.deudora }}' ,
+                                        id_subcuenta: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar la subcuenta {{ item.nro_subcuenta }} ?',
+                                        url:'{{ path('contabilidad_config_subcuenta_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+
+            const {nro_subcuenta = '', descripcion = '', deudora = '', id_subcuenta = ''} = config
+
+            $('#gestionarUnidadModal').modal('show')
+            $('#gestionarUnidadModalLabel').html("Modificar " + nro_subcuenta)
+
+            $('#subcuenta_nro_subcuenta').val(nro_subcuenta)
+            $('#subcuenta_descripcion').val(descripcion)
+            $('#id_subcuenta').val(id_subcuenta)
+
+            //tengo q hacer lo del select
+            if(deudora == 'Deudora'){
+                $('#select2-naturaleza_cuenta-container')[0].textContent = 'Deudora'
+                $('#select2-naturaleza_cuenta-container').val(1)
+                $('#naturaleza_cuenta').val(1)
+            }
+            else{
+                $('#select2-naturaleza_cuenta-container')[0].textContent = 'Acreedora'
+                $('#select2-naturaleza_cuenta-container').val(0)
+                $('#naturaleza_cuenta').val(0)
+            }
+
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let id_cuenta = $('#id_cuenta').val()
+            let params = {
+                nro_subcuenta: $('#subcuenta_nro_subcuenta').val(),
+                descripcion: $('#subcuenta_descripcion').val(),
+                deudora: $('#naturaleza_cuenta').val(),
+                id_cuenta: id_cuenta
+            }
+            $.ajax({
+                url: '/contabilidad/config/subcuenta-add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/config/subcuenta/' + id_cuenta);
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let id_cuenta = $('#id_cuenta').val()
+            let params = {
+                nro_subcuenta: $('#subcuenta_nro_subcuenta').val(),
+                descripcion: $('#subcuenta_descripcion').val(),
+                deudora: $('#naturaleza_cuenta').val(),
+                id_subcuenta: $('#id_subcuenta').val()
+            }
+            $.ajax({
+                url: '/contabilidad/config/subcuenta-upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+               window.location.replace('/contabilidad/config/subcuenta/' + id_cuenta);
+            })
+        })
+
+
+        $('#gestionarUnidadModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar unidad')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+
+            $('#subcuenta_nro_subcuenta').val('')
+            $('#subcuenta_descripcion').val('')
+            $('#id_subcuenta').val('')
+
+        }
+    </script>
+{% endblock %}
+

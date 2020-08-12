@@ -1,0 +1,84 @@
+{% extends 'contabilidad/config/index.html.twig' %}
+
+{% block content %}
+  <div class="container-fluid">
+    {# header #}
+
+    <div class="d-flex align-items-center">
+      <h4 class="mr-auto display-4 mb-0 mr-auto">
+        Almacenes
+      </h4>
+      <div class="col-4 mt-0">
+        <input class="form-control" type="text" placeholder="Descripción" />
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary">
+          <i class="fa fa-edit">Adicionar</i>
+        </button>
+      </div>
+    </div>
+
+    {# list #}
+
+    <table class="table table-hover">
+      <thead>
+        <th scope="col-10">Descripción</th>
+        <th scope="col-1" width="150px">Acciones</th>
+      </thead>
+      <tbody>
+      {% for item in range(1,6) %}          
+        <tr>      
+          <td>Dollar</td>
+          <td>
+            <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="tooltip" data-placement="bottom" title="Editar">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Eliminar">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">
+            Adicionar moneda
+          </h5>
+          <button type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Nombre:</label>
+              <input type="text" class="form-control" id="recipient-name" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cerrar
+          </button>
+          <button type="button" class="btn btn-primary">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

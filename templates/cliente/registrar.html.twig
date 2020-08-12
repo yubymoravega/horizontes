@@ -1,230 +1,219 @@
-
 {% extends 'base.html.twig' %}
+{% block content %}
 
-{% block stylesheets %}
-        <link href="{{ asset('images/favicon.ico') }}" type="text/css" rel="icon" />
-        <link href="{{ asset('css/carousel.css') }}" type="text/css" rel="stylesheet" />
-        <link href="{{ asset('css/style.css') }}" type="text/css" rel="stylesheet" />
-        <link href="{{ asset('css/style-sunset.css') }}" type="text/css" rel="stylesheet" />
-        <link href="{{ asset('//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear') }}" type="text/css" rel="stylesheet" />
-{% endblock %}
-
-   {% block javascripts %}
-        <script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
-         <script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
-          <script src="{{ asset('js/revolution.min.js') }}" type="text/javascript"></script>
-           <script src="{{ asset('js/carousel.js') }}" type="text/javascript"></script>
-    {% endblock %}
-
-{% block body %}
-<!DOCTYPE html>
-<html class="wide wow-animation scrollTo" lang="en">
-
-{% include 'layout/header.html' %}
-
-<div id='error' class="alert alert-danger row justify-content-md-center text-center" role="alert" style="display: none;">
-<p id='mensaje'>El cliente debe tener un número de teléfono valido </p>
-</div>
-          <!-- Section Input Groups-->
-      <section class="section novi-background section-20" id='seccion-principal'>
+    <div id='error' class="alert alert-danger row justify-content-md-center text-center" role="alert"
+         style="display: none;">
+        <p id='mensaje'>El cliente debe tener un número de teléfono valido </p>
+    </div>
+    <!-- Section Input Groups-->
+    <section class="section novi-background section-20" id='seccion-principal'>
         <div class="container">
-          <h1>Registro Del Cliente</h1>
-          <hr class="divider divider-sm bg-mantis">
-          <div class="row justify-content-md-center text-left">
-            <div class="col-md-7 col-lg-4">
+            <h1>Registro Del Cliente</h1>
+            <hr class="divider divider-sm bg-mantis">
+            <div class="row justify-content-md-center text-left">
+                <div class="col-md-7 col-lg-4">
 
-            {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
-       
-                <div class="form-group">
-                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
-                
-                  {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'Telefono'}}) }}
- 
-                    <span class="input-group-append">
-                      
-                  </div>
+                    {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
+
+                    <div class="form-group">
+                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                        class="input-group-text input-group-icon"><span
+                                            class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
+
+                            {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'Telefono'}}) }}
+
+                            <span class="input-group-append">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                        class="input-group-text input-group-icon"><span
+                                            class="novi-icon fa fa-user-plus"></span></span></span>
+
+                            {{ form_widget(formulario.nombre, {'attr': {'class': 'form-control','placeholder': 'Nombre'}}) }}
+
+                            <span class="input-group-append">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                        class="input-group-text input-group-icon"><span
+                                            class="novi-icon fa fa-users"></span></span></span>
+
+                            {{ form_widget(formulario.apellidos, {'attr': {'class': 'form-control','placeholder': 'Apellido'}}) }}
+
+                            <span class="input-group-append">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                        class="input-group-text input-group-icon"><span
+                                            class="novi-icon mdi mdi-email"></span></span></span>
+
+                            {{ form_widget(formulario.correo, {'attr': { 'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
+
+                            <span class="input-group-append">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                        class="input-group-text input-group-icon"><span
+                                            class="novi-icon fa fa-map-marker"></span></span></span>
+
+                            {{ form_widget(formulario.direccion, {'attr': {'class': 'form-control','placeholder': 'Direccion'}}) }}
+
+                            <span class="input-group-append">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                        class="input-group-text input-group-icon"><span
+                                            class="novi-icon fa fa-book"></span></span></span>
+
+
+                            {{ form_widget(formulario.comentario, {'attr': {'class': 'form-control','placeholder': 'Comentario'}}) }}
+
+                            <span class="input-group-append">
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-output" id="components-form-subscribe-footer"></div>
+
+                    <div class=" row justify-content-md-center group offset-top-34">
+
+                        {{ form_row(formulario.continuar) }}
+
+
+                    </div>
+
+                    {{ form_end(formulario) }}
+
+
                 </div>
-
-             <div class="form-group">
-                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-user-plus"></span></span></span>
-                 
-                 {{ form_widget(formulario.nombre, {'attr': {'class': 'form-control','placeholder': 'Nombre'}}) }}
-
-                <span class="input-group-append">                    
-                 
-                  </div>
-             </div>
-
-             <div class="form-group">
-                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-users"></span></span></span>
-                  
-                   {{ form_widget(formulario.apellidos, {'attr': {'class': 'form-control','placeholder': 'Apellido'}}) }}
-                 
-                  <span class="input-group-append">                    
-                
-                  </div>
-             </div>
-
-             <div class="form-group">
-                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-email"></span></span></span>
-                 
-                 {{ form_widget(formulario.correo, {'attr': { 'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
-                    
-                  <span class="input-group-append">                    
-                 
-                  </div>
-             </div>
-
-             <div class="form-group">
-                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-map-marker"></span></span></span>
-                 
-                   {{ form_widget(formulario.direccion, {'attr': {'class': 'form-control','placeholder': 'Direccion'}}) }}
-         
-                  <span class="input-group-append">                    
-                 
-                  </div>
-             </div>
-
-             <div class="form-group">
-                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-book"></span></span></span>
-                      
-
-                  {{ form_widget(formulario.comentario, {'attr': {'class': 'form-control','placeholder': 'Comentario'}}) }}
-                  
-                  <span class="input-group-append">                    
-                 
-                  </div>
-             </div>
-
-
-                <div class="form-output" id="components-form-subscribe-footer"></div>
-
-                <div class=" row justify-content-md-center group offset-top-34">
-                 
-           {{ form_row(formulario.continuar) }}
-            
-        
-          </div>
-
-              {{ form_end(formulario) }}
-
-
             </div>
-          </div>
         </div>
-      </section>
-     {% include 'layout/footer.html' %}
-  </body>
-</html>
+    </section>
 
-<script>
+    <script>
 
 
-$("#form_cliente").submit(function(e){
-     e.preventDefault();// cancela el submit
-});
+        $("#form_cliente").submit(function (e) {
+            e.preventDefault();// cancela el submit
+        });
 
-var id = false;
+        var id = false;
 
-if(id == true){
-  $("#cliente_telefono").css("border-color", "");
-}
+        if (id == true) {
+            $("#cliente_telefono").css("border-color", "");
+        }
 
-$( "#cliente_continuar" ).click(function() {
-  
-    var telefono = $.trim($("#cliente_telefono").val());
+        $("#cliente_continuar").click(function () {
 
-     var nombre = $.trim($("#cliente_nombre").val());
+            var telefono = $.trim($("#cliente_telefono").val());
 
-     var apellido =  $.trim($("#cliente_apellidos").val());
+            var nombre = $.trim($("#cliente_nombre").val());
 
-      var email =  $.trim($("#cliente_correo").val());
+            var apellido = $.trim($("#cliente_apellidos").val());
 
-     if(telefono.length < 8){
+            var email = $.trim($("#cliente_correo").val());
 
-       $("#cliente_telefono").css("border-color", "red");
+            if (telefono.length < 8) {
 
-       $("#error").css("display", "");
-    
-      }else if(nombre.length < 1){
+                $("#cliente_telefono").css("border-color", "red");
 
-        $("#cliente_nombre").css("border-color", "red");
+                $("#error").css("display", "");
 
-       $("#mensaje").text('El cliente debe tener un nombre');
+            } else if (nombre.length < 1) {
 
-     }else if(apellido.length < 2){
+                $("#cliente_nombre").css("border-color", "red");
 
-        $("#cliente_apellidos").css("border-color", "red");
+                $("#mensaje").text('El cliente debe tener un nombre');
 
-       $("#mensaje").text('El cliente debe tener un apellido');
-       
-     }else if(email.length > 0){
+            } else if (apellido.length < 2) {
 
-    var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+                $("#cliente_apellidos").css("border-color", "red");
 
-    if (regex.test($("#cliente_correo").val().trim())) {
-        envio();
+                $("#mensaje").text('El cliente debe tener un apellido');
 
-    } else {
+            } else if (email.length > 0) {
 
-      $("#error").css("display", "");
+                var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
 
-           $("#cliente_correo").css("border-color", "red");
+                if (regex.test($("#cliente_correo").val().trim())) {
+                    envio();
 
-       $("#mensaje").text('Email no valido!');
+                } else {
 
-    }
+                    $("#error").css("display", "");
+
+                    $("#cliente_correo").css("border-color", "red");
+
+                    $("#mensaje").text('Email no valido!');
+
+                }
 
 
-     }else{
+            } else {
 
-         envio();   
+                envio();
 
-     }
+            }
 
-      function envio() {
-  
+            function envio() {
 
-        $("#cliente_correo").css("border-color", "");
 
-        $("#cliente_telefono").css("border-color", "");
+                $("#cliente_correo").css("border-color", "");
 
-       $("#cliente_apellidos").css("border-color", "");
+                $("#cliente_telefono").css("border-color", "");
 
-       $("#cliente_nombre").css("border-color", "");
+                $("#cliente_apellidos").css("border-color", "");
 
-        $("#error").css("display", "none");
+                $("#cliente_nombre").css("border-color", "");
 
-         $("#cliente_correo").css("border-color", "");
+                $("#error").css("display", "none");
 
-       	$("#error").removeClass("alert-danger");
+                $("#cliente_correo").css("border-color", "");
 
-        $("#error").addClass("alert-success");
+                $("#error").removeClass("alert-danger");
 
-        $("#mensaje").text('Cliente Guardado!');
+                $("#error").addClass("alert-success");
 
-         $("#error").css("display", "");
+                $("#mensaje").text('Cliente Guardado!');
 
-          id = true;
+                $("#error").css("display", "");
 
-        $( "#form_cliente" ).submit();
+                id = true;
+
+                $("#form_cliente").submit();
 
             }
 
 
-});
+        });
 
-// A $( document ).ready() block.
+        // A $( document ).ready() block.
 
-$( document ).ready(function() {
+        $(document).ready(function () {
 
- $( "#cliente_continuar" ).append( "<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>" );
+            $("#cliente_continuar").append("<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>");
 
-$('#cliente_telefono').on('input', function () { 
+            $('#cliente_telefono').on('input', function () {
 
-    this.value = this.value.replace(/[^0-9]/g,'');
-});
-});
-</script>
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    </script>
 
 {% endblock %}

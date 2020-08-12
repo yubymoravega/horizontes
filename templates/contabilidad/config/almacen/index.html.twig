@@ -1,0 +1,9 @@
+{% extends 'contabilidad/config/almacen/base.html.twig' %}
+{% block formulario %}
+    {{ form_start(form,{'attr': {'class': 'd-flex'}}) }}
+    {{ form_widget(form.descripcion,{'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}
+
+    {{ form_widget(form.adicionar) }}
+
+    {{ form_end(form) }}
+{% endblock %}

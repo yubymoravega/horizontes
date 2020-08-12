@@ -1,0 +1,17 @@
+{% extends 'contabilidad/config/CRUD/base_crud_name.html.twig' %}
+{% block formulario %}
+    {{ form_start(form,{'attr': {'class': 'd-flex py-3'}}) }}
+    <div class="position-relative">
+        <small><em class="position-absolute" style="left: 8px; bottom: -17px">
+                <span class="">{{ descrip }}</span></em>
+            {% if label == 'nombre' %}
+            {{ form_widget(form.nombre, {'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}</small>
+        {% else %}
+            {{ form_widget(form.descripcion, {'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}</small>
+        {% endif %}
+    </div>
+
+    {{ form_widget(form.editar,{ 'attr':{ 'class': 'btn btn-warning' }}) }}
+    <a class="btn btn-outline-dark ml-2" href="{{ path(paths.index) }}">Cancelar</a>
+    {{ form_end(form) }}
+{% endblock %}
