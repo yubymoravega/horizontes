@@ -12,8 +12,21 @@ class AdmController extends AbstractController
      */
     public function index()
     {
+
+        $formulario = $this->createForm(UserType::class,
+        array('action'=> $this->generateUrl('adm-registrar'), 'method'=> 'POST'));
+       
         return $this->render('adm/index.html.twig', [
-            'controller_name' => 'AdmController',
+            'formulario' => $formulario->createView()
         ]);
+    }
+
+     /**
+     * @Route("/adm-registrar", name="adm-registrar")
+     */
+    public function admRegistrar()
+    {
+
+       
     }
 }

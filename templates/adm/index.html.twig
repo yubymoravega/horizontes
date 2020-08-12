@@ -1,33 +1,9 @@
 {% extends 'base.html.twig' %}
+ {% block content %}
+     {#<html class="wide wow-animation scrollTo" lang="en">#}
 
-{% block title %}Hello AdmController!{% endblock %}
-
-{% block content %}
-    <style>
-        .example-wrapper {
-            margin: 1em auto;
-            max-width: 800px;
-            width: 95%;
-            font: 18px/1.5 sans-serif;
-        }
-
-        .example-wrapper code {
-            background: #F5F5F5;
-            padding: 2px 6px;
-        }
-    </style>
-
-    <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
-
-        This friendly message is coming from:
-        <ul>
-            <li>Your controller at <code><a
-                            href="{{ '/var/www/html/horizontes/src/Controller/AdmController.php'|file_link(0) }}">src/Controller/AdmController.php</a></code>
-            </li>
-            <li>Your template at <code><a
-                            href="{{ '/var/www/html/horizontes/templates/adm/index.html.twig'|file_link(0) }}">templates/adm/index.html.twig</a></code>
-            </li>
-        </ul>
-    </div>
-{% endblock %}
+     <div id='error' class="alert alert-danger row justify-content-md-center text-center" role="alert"
+          style="display: none;">
+         <p id='mensaje'>El cliente debe tener un número de teléfono valido </p>
+     </div>
+ {% endblock %}

@@ -1,0 +1,43 @@
+
+
+.rd-navbar-default .rd-navbar-cart-total-title, .rd-navbar-floated .rd-navbar-cart-total-title, .rd-navbar-logo-center .rd-navbar-cart-total-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    padding-right: 0px;
+    margin-bottom: 24px;
+}
+
+/* Agregar clase usuario al boton */
+.btn-primary .usuario {
+    color: #ffffff;
+    background-color: #f1481400;
+    border-color: #f1481400;
+}
+
+.btn-primary:focus, .btn-primary.focus, .btn-primary:hover, .btn-primary:active, .btn-primary.active, .open > .btn-primary.dropdown-toggle {
+    color: #ffffff;
+    background-color: #007bb9;
+    border-color: #007bb9;
+}
+
+
+button.rd-navbar-toggle.toggle-original {
+    display: none !important;
+}
+
+a.rd-navbar-cart.mdi.icon-texto {
+    display: none !important;
+}
+
+a.rd-navbar-cart.mdi.icon-carrito.toggle-original {
+    display: none !important;
+}
+
+
+a.rd-navbar-cart.mdi.icon-ventas {
+    display: none !important;
+}
+
+a.rd-navbar-cart.mdi.icon-notification {
+    display: none !important;
+}

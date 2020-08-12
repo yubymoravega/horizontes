@@ -78,11 +78,7 @@ var payWithCard = function(stripe, card, clientSecret) {
         // Show error to your customer
 
         $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',
-        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]},
-        success: function(data) {
-         sendVirtual = data;
-             },
-       
+        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]}
        });
 
         showError(result.error.message);
@@ -98,9 +94,10 @@ var payWithCard = function(stripe, card, clientSecret) {
       
       });
 
-      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post', dataType : 'json',
-       data:{'data': sendVirtual}});
-       
+      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post', 
+      crossDomain: true,
+      dataType : "jsonp",
+      data:{'data': sendVirtual}});     
       }
     });
 };
