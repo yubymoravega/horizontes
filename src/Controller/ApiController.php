@@ -290,7 +290,7 @@ try {
   $json['mExpDate'] = $year; 
   $json['mProfileClientID'] = $data[0]->getToken();
   $json['mAmount'] = $json_obj->items[0]->monto;
-  if($status->status == 'succeeded'){$json['mStatus'] = 'succeed';}else{$json['mStatus'] = $status->status;}
+  $json['mStatus'] = $status->status;
   
 
   return new Response(\json_encode($json));
