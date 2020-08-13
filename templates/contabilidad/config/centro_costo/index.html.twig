@@ -1,20 +1,236 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello CentroCostoController!{% endblock %}
-
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/xampp/htdocs/app/src/Controller/Contabilidad/Config/CentroCostoController.php'|file_link(0) }}">src/Controller/Contabilidad/Config/CentroCostoController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/app/templates/contabilidad/config/centro_costo/index.html.twig'|file_link(0) }}">templates/contabilidad/config/centro_costo/index.html.twig</a></code></li>
-    </ul>
-</div>
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
 {% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Centro de Costo
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarCentro_costoModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarCentro_costoModal" tabindex="-1" role="dialog"
+             data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarCentro_costoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarCentro_costoModalLabel">Adicionar Centro de
+                            Costo</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(form,{'attr': {'class': 'text-left','id':'form_centro_costo'}}) }}
+
+                        <div class="form-group">
+                            <label for="nombre_field" class="font-weight-bold">Nombre</label>
+                            {{ form_widget(form.nombre,{'attr': {'class': 'form-control','id':'nombre_field'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_field" class="font-weight-bold">Código</label>
+                            {{ form_widget(form.codigo,{'attr': {'class': 'form-control','id':'codigo_field'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group input-group-sm">
+                                <label for="id_cuenta_field" class="font-weight-bold">Cuenta</label>
+                                {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control','id':'id_cuenta_field'}}) }}
+                                <span class="input-group-append"></span>
+                            </div>
+                        </div>
+                        <div class="form-group input-group input-group-sm">
+                            <label for="id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
+                            <select name="centro_costo[id_sub_cuenta]" id="subcuenta_id" class="form-control">
+                            </select>
+                        </div>
+                        <input type="text" id="id_centro_costo" hidden>
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-6">Descripción</th>
+            <th scope="col-1">Código</th>
+            <th scope="col-2">Cuenta</th>
+            <th scope="col-2">Sub Cuenta</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in centro_costo %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.cuenta }}</td>
+                    <td style="font-weight:400;">{{ item.sub_cuenta }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Editar"
+                                onclick="onUpdate({
+                                        id_cuenta: '{{ item.id_cuenta }}',
+                                        id_sub_cuenta: '{{ item.id_sub_cuenta }}',
+                                        cuenta:'{{ item.cuenta }}' ,
+                                        sub_cuenta:'{{ item.sub_cuenta }}' ,
+                                        codigo:'{{ item.codigo }}',
+                                        nombre:'{{ item.nombre }}' ,
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el Centro de costo: {{ item.nombre }} ?',
+                                        url:'{{ path('contabilidad_config_centro_costo_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            resetField()
+            $('#btnActualizar').hide()
+
+            var subcuenta = $('#subcuenta_id');
+            subcuenta.prop('disabled', true);
+            $('#centro_costo_id_cuenta').change(function (evernt) {
+                subcuenta.find('option').remove();
+                if (typeof ($(this).val()) != 'object') {
+                    getValues($(this).val(), subcuenta)
+                } else {
+                    subcuenta.prop('disabled', true);
+                }
+            })
+        })
+
+        function getValues(id, subcuenta) {
+            $.ajax({
+                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    subcuenta.find('option').remove();
+                    subcuenta.append('<option selected = "true" value = "0"> Seleccione la subcuenta</option>');
+                    $(result.subcuentas).each(function (pos, valor) {
+                        subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
+                    })
+                    subcuenta.prop('disabled', false);
+                },
+                error: function () {
+                    alert('Ha ocurrido un error en el servidor');
+                    subcuenta.prop('disabled', true);
+                }
+            })
+        }
+
+        const TEXT_SELECT = 'Seleccione la cuenta...';
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+
+            const {
+                id = '',
+                codigo = '',
+                nombre = '',
+                id_cuenta = '',
+                id_sub_cuenta = '',
+                cuenta = '',
+                sub_cuenta = ''
+            } = config
+            $('#gestionarCentro_costoModal').modal('show')
+
+            $('#select2-centro_costo_id_cuenta-container')[0].textContent = cuenta
+            $('#select2-centro_costo_id_cuenta-container').val(id_cuenta)
+            $('#select2-centro_costo_id_sub_cuenta-container')[0].textContent = sub_cuenta
+            $('#select2-centro_costo_id_sub_cuenta-container').val(id_sub_cuenta)
+            $('#centro_costo_id_cuenta').val(id_cuenta)
+            $('#centro_costo_id_sub_cuenta').val(id_sub_cuenta)
+
+            $('#gestionarCentro_costoModalLabel').html("Modificar " + nombre)
+            $('#centro_costo_nombre').val(nombre)
+            $('#centro_costo_codigo').val(codigo)
+            $('#id_centro_costo').val(id)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            const formulario = $('#form_centro_costo')
+            formulario.attr('action', `/contabilidad/config/centro-costo-add`)
+            formulario.submit()
+        })
+
+        $('#btnActualizar').on('click', function () {
+            const id_centro_costo = $('#id_centro_costo').val()
+
+            const formulario = $('#form_centro_costo')
+            formulario.attr('action', `/contabilidad/config/centro-costo-upd/${id_centro_costo}`)
+            formulario.submit()
+        })
+
+
+        $('#gestionarCentro_costoModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedAddress)
+            var modal = $(this)
+            $('#centro_costo_nombre').val('')
+            $('#select2-centro_costo_id_cuenta-container').val(0)
+            $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
+            modal.find('.modal-title').text('Adicionar Centro de Costo')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+        }
+
+        function resetField() {
+            $('#centro_costo_id_cuenta').prepend('<option selected = "true" value = "0">' + TEXT_SELECT + '</option>');
+            $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
+        }
+    </script>
+{% endblock %}
+
+

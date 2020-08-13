@@ -2,8 +2,11 @@
 
 namespace App\Controller\Contabilidad;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class ConfigController extends AbstractController
 {
@@ -30,11 +33,29 @@ class ConfigController extends AbstractController
                 //['title' => 'Tasa Cambio', 'descrip' => 'Descripcion de prueba....'],
                 ['title' => 'Tipo Documento', 'descrip' => 'Descripcion de prueba....'],
                 ['title' => 'Tipo Documento Activo Fijo', 'descrip' => 'Descripcion de prueba....'],
-                ['title' =>  'Tipo Movimiento', 'descrip' => 'Descripcion de prueba....'],
+                ['title' => 'Tipo Movimiento', 'descrip' => 'Descripcion de prueba....'],
                 ['title' => 'Unidad', 'descrip' => 'Descripcion de prueba....'],
                 ['title' => 'Unidad Medida', 'descrip' => 'Descripcion de prueba....'])
 
         ]);
+    }
+
+    /**
+     * @Route("/register-dev-rootuser",name="register-dev-rootuser")
+     */
+    public function UserRoot(EntityManagerInterface $em, UserPasswordEncoderInterface $passEncoder)
+    {
+        try {
+            $user = new User();
+            $user->setRoles(['ROLE_ADMIN'])
+                ->setUsername('root')
+                ->setPassword($passEncoder->encodePassword($user, '123'));
+            $em->persist($user);
+            $em->flush();
+        } catch (\Exception $err) {
+            return $err;
+        }
+
     }
 }
 

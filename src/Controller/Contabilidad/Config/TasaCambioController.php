@@ -2,12 +2,15 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TasaCambio;
 use App\Form\Contabilidad\Config\CuentaType;
 use App\Form\Contabilidad\Config\TasaCambioType;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,15 +27,20 @@ class TasaCambioController extends AbstractController
     {
         $form = $this->createForm(TasaCambioType::class);
 
-        $cuentas_arr = $em->getRepository(TasaCambio::class)->findByActivo(true);
+        $tasa_cambio_arr = $em->getRepository(TasaCambio::class)->findByActivo(true);
         $row = [];
-        foreach ($cuentas_arr as $item) {
+        foreach ($tasa_cambio_arr as $item) {
             /**@var $item TasaCambio** */
             $row [] = array(
                 'id' => $item->getId(),
                 'anno' => $item->getAnno(),
                 'mes' => $item->getMes(),
-                'valor' => $item->getValor()
+                'nombre_mes' => AuxFunctions::getNombreMes($item->getMes()),
+                'valor' => $item->getValor(),
+                'id_moneda_origen'=>$item->getIdMonedaOrigen()->getId(),
+                'nombre_moneda_origen'=>$item->getIdMonedaOrigen()->getNombre(),
+                'id_moneda_destino'=>$item->getIdMonedaDestino()->getId(),
+                'nombre_moneda_destino'=>$item->getIdMonedaDestino()->getNombre(),
             );
         }
         return $this->render('contabilidad/config/tasa_cambio/index.html.twig',  [
@@ -43,128 +51,107 @@ class TasaCambioController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/cuenta-add", name="contabilidad_config_cuenta_add")
+     * @Route("/contabilidad/config/tasa-cambio-add", name="contabilidad_config_tasa-cambio_add")
      */
-    public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function addTasaCambio(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'add')) {
-            /**@var $obj_cuenta Cuenta** */
-
-            $obj_cuenta = new Cuenta();
-            $obj_cuenta
-                ->setNroCuenta($request->get('nro_cuenta'))
-                ->setDescripcion($request->get('descripcion'))
-                ->setDeudora($request->get('deudora'))
-                ->setPatrimonio($request->get('patrimonio'))
-                ->setProduccion($request->get('produccion'))
-                ->setElementoGasto($request->get('elemento_gasto'))
+        $entity_repository = $em->getRepository(TasaCambio::class);
+        $params = array(
+            'id_moneda_origen'=>$request->get('id_moneda_origen'),
+            'id_moneda_destino'=>$request->get('id_moneda_destino'),
+            'mes'=>$request->get('mes'),
+            'anno'=>$request->get('anno'),
+            'activo'=>true
+        );
+        if (!AuxFunctions::isDuplicate($entity_repository, $params, 'add')) {
+            /**@var $obj_tazaCambio TasaCambio** */
+            $obj_tazaCambio = new TasaCambio();
+            $obj_tazaCambio
+                ->setAnno(intval($request->get('anno')))
+                ->setMes($request->get('mes'))
+                ->setValor(floatval($request->get('valor')))
+                ->setIdMonedaOrigen($em->getRepository(Moneda::class)->find($request->get('id_moneda_origen')))
+                ->setIdMonedaDestino($em->getRepository(Moneda::class)->find($request->get('id_moneda_destino')))
                 ->setActivo(true);
             try {
-                $em->persist($obj_cuenta);
+                $em->persist($obj_tazaCambio);
                 $em->flush();
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Cuenta adicionada satisfactoriamente");
+            $this->addFlash('success', "Tasa de cambio adicionada satisfactoriamente");
             return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
+        $this->addFlash('error', "La tasa de cambio ya se encuentra registrada");
         return new JsonResponse(['success' => false]);
     }
 
     /**
-     * @Route("/contabilidad/config/cuenta-upd", name="contabilidad_config_cuenta_upd")
+     * @Route("/contabilidad/config/tasa-cambio-upd", name="contabilidad_config_tasa-cambio_upd")
      */
-    public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function updTasaCambio(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'upd',$request->get('id_cuenta'))) {
-            /**@var $obj_cuenta Cuenta** */
-            $obj_cuenta = $em->getRepository(Cuenta::class)->find($request->get('id_cuenta'));
-            if(!$obj_cuenta){
-                $this->addFlash('error', "La cuenta solicitada no se encuentra en la base de datos");
+        $entity_repository = $em->getRepository(TasaCambio::class);
+        $params = array(
+            'id_moneda_origen'=>$request->get('id_moneda_origen'),
+            'id_moneda_destino'=>$request->get('id_moneda_destino'),
+            'mes'=>$request->get('mes'),
+            'anno'=>$request->get('anno'),
+            'activo'=>true
+        );
+        if (! AuxFunctions::isDuplicate($entity_repository, $params, 'upd',$request->get('id_tasa_cambio'))) {
+            /**@var $obj_tasa_cambio TasaCambio***/
+            $obj_tasa_cambio = $em->getRepository(TasaCambio::class)->find($request->get('id_tasa_cambio'));
+            if(!$obj_tasa_cambio){
+                $this->addFlash('error', "La tasa de cambio solicitada no se encuentra en la base de datos");
                 return new JsonResponse(['success' => true]);
             }
-            $obj_cuenta
-                ->setNroCuenta($request->get('nro_cuenta'))
-                ->setDescripcion($request->get('descripcion'))
-                ->setDeudora($request->get('deudora'))
-                ->setPatrimonio($request->get('patrimonio'))
-                ->setProduccion($request->get('produccion'))
-                ->setElementoGasto($request->get('elemento_gasto'))
+            $obj_tasa_cambio
+                ->setAnno(intval($request->get('anno')))
+                ->setMes($request->get('mes'))
+                ->setValor(floatval($request->get('valor')))
+                ->setIdMonedaOrigen($em->getRepository(Moneda::class)->find($request->get('id_moneda_origen')))
+                ->setIdMonedaDestino($em->getRepository(Moneda::class)->find($request->get('id_moneda_destino')))
                 ->setActivo(true);
             try {
-                $em->persist($obj_cuenta);
+                $em->persist($obj_tasa_cambio);
                 $em->flush();
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
+            $this->addFlash('success', "Tasa de cambio actualizada satisfactoriamente");
             return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
+        $this->addFlash('error', "La tasa de cambio ya se encuentra registrada");
         return new JsonResponse(['success' => false]);
     }
 
     /**
-     * @Route("/contabilidad/config/cuenta-delete/{id}", name="contabilidad_config_cuenta_delete")
+     * @Route("/contabilidad/config/tasa-cambio-delete/{id}", name="contabilidad_config_tasa_cambio_delete")
      */
     public function Delete($id)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy(array(
-            'id_cuenta' => $id,
-            'activo' => true
-        ));
-        if (empty($arr_subcuentas)) {
-            $cuenta_er = $em->getRepository(Cuenta::class);
-            $cuenta_obj = $cuenta_er->find($id);
-            $msg = 'No se pudo eliminar la cuenta seleccionada';
+            $tasa_cambio_er = $em->getRepository(TasaCambio::class);
+            $tasa_cambio_obj = $tasa_cambio_er->find($id);
+            $msg = 'No se pudo eliminar la tasa de cambio seleccionada';
             $success = 'error';
-            if ($cuenta_obj) {
-                /**@var $cuenta_obj Cuenta** */
-                $cuenta_obj->setActivo(false);
+            if ($tasa_cambio_obj) {
+                /**@var $tasa_cambio_obj TasaCambio** */
+                $tasa_cambio_obj->setActivo(false);
                 try {
-                    $em->persist($cuenta_obj);
+                    $em->persist($tasa_cambio_obj);
                     $em->flush();
                     $success = 'success';
-                    $msg = 'Cuenta eliminada satisfactoriamente';
+                    $msg = 'Tasa de cambio eliminada satisfactoriamente';
 
                 } catch
                 (FileException $exception) {
                     return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
                 }
             }
-        }
-        else{
-            $msg = "No se puede eliminar la cuenta seleccionada,porque tiene subcuentas asociadas";
-            $success = "error";
-        }
         $this->addFlash($success, $msg);
-        return $this->redirectToRoute('contabilidad_config_cuenta');
-    }
-
-
-    /**************-Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar-****************/
-    public function isDuplicate($em, $nro_cuenta, $action, $id = null)
-    {
-        $cuenta_er = $em->getRepository(Cuenta::class);
-
-        $arr_obj = $cuenta_er->findBy(array(
-            'nro_cuenta' => $nro_cuenta,
-            'activo' => true
-        ));
-
-        if ($action == 'upd') {
-            foreach ($arr_obj as $obj) {
-                /**@var $obj Cuenta* */
-                if ($obj->getId() != $id)
-                    return true;
-            }
-        } elseif ($action == 'add') {
-            if (!empty($arr_obj))
-                return true;
-        }
-        return false;
+        return $this->redirectToRoute('contabilidad_config_tasa_cambio');
     }
 }

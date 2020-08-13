@@ -90,7 +90,10 @@
                     $(result.subcuentas).each(function (pos, valor) {
                         subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
                     })
-                    subcuenta.prop('disabled', false);
+                    if (result.subcuentas.length > 0)
+                        subcuenta.prop('disabled', false);
+                    else
+                        subcuenta.prop('disabled', true);
                 },
                 error: function () {
                     alert('Ha ocurrido un error en el servidor');

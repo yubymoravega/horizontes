@@ -2,8 +2,12 @@
 
 namespace App\Form\Contabilidad\Config;
 
+use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\GrupoActivos;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,10 +17,17 @@ class GrupoActivosType extends AbstractType
     {
         $builder
             ->add('porciento_deprecia_anno')
-            ->add('descripcion')
-            ->add('activo')
-            ->add('id_cuenta')
-            ->add('id_subcuenta')
+            ->add('descripcion',TextareaType::class)
+            ->add('id_cuenta', EntityType::class,[
+                'mapped'=>false,
+                'class'=>Cuenta::class,
+                'choice_label'=>'nro_cuenta',
+                'query_builder'=>function(EntityRepository $er){
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nro_cuenta','ASC');
+                }
+            ])
         ;
     }
 
