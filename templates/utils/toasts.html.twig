@@ -1,0 +1,23 @@
+{% for message in app.flashes('success') %}
+    <div class="toasts-alert alert alert-success alert-dismissible fade show" role="alert"
+         id="alert__success">
+        <i class="fa fa-check-circle-o pr-2"></i>
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+
+{# ............. Toasts error ...............#}
+
+{% for message in app.flashes('error') %}
+    <div class="toasts-alert alert alert-danger alert-dismissible fade show" role="alert"
+         id="alert__success">
+        <i class="fa fa-close pr-2"></i>
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}

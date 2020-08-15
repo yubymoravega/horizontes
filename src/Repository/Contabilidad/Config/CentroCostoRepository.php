@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\CentroCosto;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method CentroCosto|null find($id, $lockMode = null, $lockVersion = null)
- * @method CentroCosto|null findOneBy(array $criteria, array $orderBy = null)
- * @method CentroCosto[]    findAll()
- * @method CentroCosto[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method CentroCosto|null find($id, $paranoid = true)
+ * @method CentroCosto|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method CentroCosto[]    findAll($paranoid = true)
+ * @method CentroCosto[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class CentroCostoRepository extends ServiceEntityRepository
+class CentroCostoRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, CentroCosto::class);
+        $this->setEntityClass(CentroCosto::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**

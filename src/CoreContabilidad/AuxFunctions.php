@@ -46,7 +46,11 @@ class AuxFunctions
         return false;
     }
 
-    public static function getNombreMes($mes){
+    /**
+     * @param int $mes numero que representa el mes (1-12)
+     * @return string Nombre del mes
+     */
+    public static function getNombreMes(int $mes){
         switch ($mes){
             case 1:
                 return 'Enero';
@@ -74,6 +78,7 @@ class AuxFunctions
                 return 'Diciembre';
         }
     }
+
      /**
      * Comprovar si la Entity existe como LLave foranea en otra tabla
      */

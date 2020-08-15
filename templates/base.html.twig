@@ -20,56 +20,10 @@
 <body class="overflow-hidden-x-content">
 
 {# ............ Toasts success ............#}
-
-{% for message in app.flashes('success') %}
-    <div class="toasts-alert alert alert-success alert-dismissible fade show" role="alert"
-         id="alert__success">
-        <i class="fa fa-check-circle-o pr-2"></i>
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-{% endfor %}
-
-{# ............. Toasts error ...............#}
-
-{% for message in app.flashes('error') %}
-    <div class="toasts-alert alert alert-danger alert-dismissible fade show" role="alert"
-         id="alert__success">
-        <i class="fa fa-close pr-2"></i>
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-{% endfor %}
-
+{{ include('utils/toasts.html.twig') }}
 
 {# ............... Modal Confirm ............. #}
-
-<div class="modal fade" id="confirm__modal" data-backdrop="static" data-keyboard="false"
-     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-dark">
-                <h5 class="modal-title text-light" id="confirm__modal__title"><i class="fa fa-trash text-light"></i> Eliminar...</h5>
-                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="confirm__modal__body">
-                Seguro que desea eliminar ?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="my-0 btn btn-danger" id="confirm__modal__btn_ok"><i
-                            class="fa fa-trash"></i>Aceptar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+{{ include('utils/modal_confirm.html.twig') }}
 
 {# ................... Site Structure .................. #}
 

@@ -23,12 +23,16 @@ $(document).ready(function () {
  * }
  */
 const onDeleteConfirm = function (config) {
-    const {title = '', message = '', url, data = []} = config
+    const {title = '', message = '', url, _token} = config
     $('#confirm__modal').modal('show')
     if (title !== '') $('#confirm__modal__title').html(title)
     if (message !== '') $('#confirm__modal__body').text(message)
 
+    $('#_token__confirm__modal').val(_token)
+
     $('#confirm__modal__btn_ok').click(function () {
-        window.location.replace(url);
+        const form = $('#form__confirm__modal')
+        form.attr('action', url)
+        form.submit()
     })
 }

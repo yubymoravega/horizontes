@@ -3,28 +3,32 @@
 - [x] Crear las Entidadesde
 - [ ] CRUD por cada Entidad
     - [x] Config inicial 
-    - [x] Almacén
+    - [x] Almacén `u`
     - [ ] Centro Costo ---leo 
     - [x] Cuenta 
     - [x] Elemento de Gasto
     - [ ] Grupo Activo ---camilo
-    - [x] Instrumento Cobro
-    - [x] Modulo
-    - [x] Moneda
+    - [x] Instrumento Cobro `u`
+    - [x] Modulo `u`
+    - [x] Moneda `u`
     - [x] Subcuenta
     - [x] Tasa Cambio---camilo
-    - [x] Tipo Documento
-    - [x] Tipo Documento Activo Fijo
-    - [x] Tipo Movimiento
+    - [x] Tipo Documento `u`
+    - [x] Tipo Documento Activo Fijo `u`
+    - [x] Tipo Movimiento `u`
     - [x] Unidad
-    - [x] Unidad Medida
+    - [x] Unidad Medida `u`
+- Refactorizacion el CODIGO
+   - Crear clase Unica para CRUD como la de (descrip/nombre)
+   - Ajustar el codigo al estilo `php bin/console make:crud` del ejemplo TestCrd
+   - `php bin/console debug:Route` -> Revisar los metodos q acceden a las controladoras 
 - hacer q al borrar el formulario se limpie la opcion de 
 validar si esta requerido y al escribir tambien, ponerle un id al
 `input`
 - paginacion instalando el modulo de paginacion
 - los campos eliminados(activo=false) de la base de datos
-que se reactiven(activo=true) cuado se add nuevamente
-
+que se reactiven(activo=true) cuado se add nuevamente en nomencladores de (Descripcion/nombre)
+- `AuxFunctions::existWidthFK()` -> para validar las llaves foraneas antes de eliminar
 # Pendiente
 ### Investigar
 - activar modo **Paranoid** como en Sequalize para evitar tener que estar
