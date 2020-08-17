@@ -6,6 +6,8 @@ namespace App\CoreContabilidad;
 
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use phpDocumentor\Reflection\Types\Boolean;
+use Twig\Environment;
+
 
 class AuxFunctions
 {
@@ -74,10 +76,35 @@ class AuxFunctions
                 return 'Diciembre';
         }
     }
-     /**
+
+    /**
      * Comprovar si la Entity existe como LLave foranea en otra tabla
      */
     public static function existWidthFK(){
 
+    }
+
+    /**
+     * Send email
+     */
+    public static function sendEmail($asunto, $destinatario, $alias, $msg){
+        $transport = (new \Swift_SmtpTransport('192.168.40.90', 25))
+            ->setUsername('informatizacion@pinar.geocuba.cu')
+            ->setPassword('Lady5*Everald03')
+        ;
+        $mailer = new \Swift_Mailer($transport);
+        $message = (new \Swift_Message($asunto))
+            ->setFrom(['informatizacion@pinar.geocuba.cu' => 'Admin Site'])
+            ->setTo([$destinatario => $alias])
+            ->setBody($msg)
+        ;
+        $result = $mailer->send($message);
+    }
+
+    /**
+     * Generar contrasenna
+     */
+    public static function generateRandomPassword($length = 6) {
+        return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
     }
 }

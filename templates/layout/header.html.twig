@@ -147,19 +147,37 @@
 
                             <div class="rd-navbar-usuario-dropdown">
 
-                                <div class=" text-center">
-                                    <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                <div class="row text-center">
+                                    <div class="col-2 mb-5">
+                                        <span class="icon novi-icon fa-user"></span>
+                                    </div>
+                                    <div class="col-10">
+                                        <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                    </div>
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="/index.php/logout"><span class="icon novi-icon mdi mdi-lock"></span>Cerrar
-                                        Secion</a></div>
+                                            href="/index.php/logout" style="width: 100%"><span
+                                                class="icon novi-icon mdi mdi-exit-to-app"></span>Cerrar
+                                        Seción</a></div>
                                 <br/>
-                                <div class="text-center"><a
-                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="/index.php/logout"><span class="icon novi-icon mdi mdi-lock"></span>Panel
-                                        De Control</a></div>
+                                <div class="text-center">
+                                    <button class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
+                                            style="width: 100%" id="btn_cambiar_contrasenna"><span
+                                                class="icon novi-icon mdi mdi-key"></span>Cambiar Contraseña
+                                    </button>
+                                </div>
                                 <br/>
+                                <div class="container-fluid p-0">
+                                    <input type="password" class="form form-control" style="width: 100%"
+                                           name="new_password" id="new_password" placeholder="Introduzca la contraseña">
+                                    <input type="password" class="form form-control mt-2" style="width: 100%"
+                                           name="repeat_new_password" id="repeat_new_password"
+                                           placeholder="Repita la contraseña">
+                                    <label class="text-danger text-center" id="invalid_password">Las contraseñas no coinciden</label>
+                                    <input type="submit" class="btn btn-outline-primary text-light mt-2"
+                                           id="btn_change_password" value="Aceptar">
+                                </div>
                             </div>
 
                         </div>

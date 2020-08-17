@@ -29,6 +29,12 @@ class User implements UserInterface
     private $roles = [];
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $status;
+
+
+    /**
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
@@ -105,5 +111,17 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function isStatus(): ?bool
+    {
+        return $this->status;
+    }
+
+    public function setStatus(bool $status): self
+    {
+        $this->status = $status;
+
+        return $this;
     }
 }

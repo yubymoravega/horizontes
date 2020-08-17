@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class HomeController extends AbstractController
 {
@@ -16,6 +21,4 @@ class HomeController extends AbstractController
         return $this->render('home/index.html.twig');
   
     }
-
-    
 }
