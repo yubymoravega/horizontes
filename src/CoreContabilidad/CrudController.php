@@ -3,6 +3,8 @@
 
 namespace App\CoreContabilidad;
 
+use App\Form\Contabilidad\Config\CrudAddDescripcionType;
+use App\Form\Contabilidad\Config\CrudAddNameType;
 use App\Form\Contabilidad\Config\CrudEditDescripcionType;
 use App\Form\Contabilidad\Config\CrudEditNameType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -151,7 +153,12 @@ class CrudController extends AbstractController
 
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $form = $this->createForm($this->class_type_name);
+        $form = $this->createForm(
+            $this->label === 'nombre' ?
+                CrudAddNameType::class :
+                CrudAddDescripcionType::class,
+            null, ['data_class' => $this->class_entity]);
+
         $form->handleRequest($request);
         $errors = null;
         if ($form->isSubmitted()) {
@@ -174,7 +181,10 @@ class CrudController extends AbstractController
                 }
                 $em->flush();
                 $this->addFlash('success', $this->messages['add']);
-                $form = $this->createForm($this->class_type_name);
+                $form = $this->createForm(
+                    $this->label === 'nombre' ?
+                        CrudAddNameType::class :
+                        CrudAddDescripcionType::class);
             }
         }
 
@@ -253,16 +263,20 @@ class CrudController extends AbstractController
         ]);
     }
 
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        $instance = $em->getRepository($this->class_entity)->find($id);
-        if ($instance) {
-            $instance->setActivo(false);
-            $em->persist($instance);
-            $em->flush();
-            $this->addFlash('success', $this->messages['delete']);
-        } else
-            $this->addFlash('error', 'El Almacén no pudo ser eliminado');
+        // seguridad mediante _token
+//        dd($request);
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $instance = $em->getRepository($this->class_entity)->find($id);
+            if ($instance) {
+                $instance->setActivo(false);
+                $em->persist($instance);
+                $em->flush();
+                $this->addFlash('success', $this->messages['delete']);
+            } else
+                $this->addFlash('error', 'El Almacén no pudo ser eliminado');
+        }
         return $this->redirectToRoute($this->paths['index']);
     }
 }

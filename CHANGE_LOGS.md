@@ -1,15 +1,5 @@
-## Bugs y Otros detalles de la plantilla
-- en el fichero **layout\header.html.twig** se le incorporo el estilo
-`style="z-index: 1000"` porque la clase `rd-navbar` tiene un z-index= 1998 y sobrepasa los Modals de boostrap dando algunos conflictos 
-```css
- <nav class="rd-navbar 
-     style="z-index: 1000" >
-```
-- los inputs no tienen un funcionamiento correcto, no permiten desplacamientos con las 
-arrow ni seleccion mediante el teclado... algun problema con las librerias incorporadas al parecer
-- el filtrar de los `choices` combos creados por los formType algunos no permiten filtrar
-
-## Changes
+# Changes
+## Semana #2 (10-08-2020)
 #### Integrando Paranoid
 1. hacer que todas las clases `EntityNameRepositorys` extiendan de `ParanoidEntityRepository.php`
 y el contructor asigne el `entityClass` y `registry` ejemplo:
@@ -35,3 +25,23 @@ Ejemplo con descripción de Almacén:
     private $descripcion;
 
 ```
+#### Bugs y Otros detalles de la plantilla
+- en el fichero **layout\header.html.twig** se le incorporo el estilo
+`style="z-index: 1000"` porque la clase `rd-navbar` tiene un z-index= 1998 y sobrepasa los Modals de boostrap dando algunos conflictos 
+```css
+ <nav class="rd-navbar 
+     style="z-index: 1000" >
+```
+
+## Semana #1 (04-08-2020)
+- base.html.twig
+1. Modificar el color de la barra de titulo del modal, para buscar uniformidad con el estilo de la plantilla
+2. Modificar el boton de cancelar para seguir estandar de nosotros, btn cancelar en la ezquina izquierda y en la parte derecha los btn de aplicar y aceptar, para las vista que asi lo requieran
+3. Revisar la vista de almacen que hice unos detalles que leandro tiene que revisar 
+
+#### Configuracion inicial
+revisar los sms de confirmacion de las acciones que no salen.<br>
+**Unidad**
+1. Asi es como trabajaremos con los formularios de 2 a 4 campos, para que se vean de una forma agradable, desde el JQuery se realiza todo
+ > Debemos applicar el estandar visual para que las vistas sean compatibles con la plantilla****
+     

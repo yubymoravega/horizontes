@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class TipoDocumentoActivoFijoController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/tipo-doc-activo-fijo")
+ */
 class TipoDocumentoActivoFijoController extends CrudController
 {
 
@@ -33,7 +38,7 @@ class TipoDocumentoActivoFijoController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/tipo-doc-activo-fijo", name="contabilidad_config_tipo_documento_activo_fijo")
+     * @Route("/", name="contabilidad_config_tipo_documento_activo_fijo", methods={"GET", "POST"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -41,7 +46,7 @@ class TipoDocumentoActivoFijoController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/tipo-doc-activo-fijo-edit/{id}",name="contabilidad_config_tipo_documento_activo_fijo_edit")
+     * @Route("/{id}/edit",name="contabilidad_config_tipo_documento_activo_fijo_edit", methods={"GET", "POST"})
      */
     public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
@@ -49,10 +54,10 @@ class TipoDocumentoActivoFijoController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/tipo-doc-activo-fijo-delete/{id}",name="contabilidad_config_tipo_documento_activo_fijo_delete")
+     * @Route("/{id}",name="contabilidad_config_tipo_documento_activo_fijo_delete", methods={"DELETE"})
      */
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        return parent::Delete($em, $id);
+        return parent::Delete($em,$request, $id);
     }
 }

@@ -5,7 +5,7 @@ namespace App\Controller\Contabilidad\Config;
 use App\CoreContabilidad\CrudController;
 use App\Entity\Contabilidad\Config\Almacen;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\Contabilidad\Config\AlmacenType;
+use App\Form\Contabilidad\Config\CrudAddDescripcionType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -21,7 +21,7 @@ class AlmacenController extends CrudController
     {
         $this->setTitle('Almacén');
         $this->setLabel('descripcion');
-        $this->setClassTypeName(AlmacenType::class);
+        $this->setClassTypeName(CrudAddDescripcionType::class);
         $this->setClassEntity(Almacen::class);
         $this->setMessages([
             'add' => 'Datos guardados satisfactoriamente',
@@ -55,8 +55,8 @@ class AlmacenController extends CrudController
     /**
      * @Route("/{id}", name="contabilidad_config_almacen_delete", methods={"DELETE"})
      */
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        return parent::Delete($em, $id);
+        return parent::Delete($em,$request, $id);
     }
 }

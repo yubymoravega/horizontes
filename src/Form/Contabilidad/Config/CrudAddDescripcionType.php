@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AlmacenType extends AbstractType
+class CrudAddDescripcionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -17,12 +17,5 @@ class AlmacenType extends AbstractType
             ->add('descripcion', TextType::class)
             ->add('adicionar', SubmitType::class)
         ;
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'data_class' => Almacen::class,
-        ]);
     }
 }

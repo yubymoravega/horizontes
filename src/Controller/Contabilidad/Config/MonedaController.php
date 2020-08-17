@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class MonedaController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/moneda")
+ */
 class MonedaController extends CrudController
 {
 
@@ -33,7 +38,7 @@ class MonedaController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/moneda", name="contabilidad_config_moneda")
+     * @Route("/", name="contabilidad_config_moneda", methods={"GET", "POST"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -41,7 +46,7 @@ class MonedaController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/moneda-edit/{id}",name="contabilidad_config_moneda_edit")
+     * @Route("/{id}/edit",name="contabilidad_config_moneda_edit", methods={"GET", "POST"})
      */
     public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
@@ -49,10 +54,10 @@ class MonedaController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/moneda-delete/{id}",name="contabilidad_config_moneda_delete")
+     * @Route("/{id}",name="contabilidad_config_moneda_delete", methods={"DELETE"})
      */
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        return parent::Delete($em, $id);
+        return parent::Delete($em, $request, $id);
     }
 }

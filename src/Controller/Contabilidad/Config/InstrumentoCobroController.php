@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class InstrumentoCobroController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/instrumento-cobro")
+ */
 class InstrumentoCobroController extends CrudController
 {
 
@@ -33,7 +38,7 @@ class InstrumentoCobroController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/instrumento-cobro", name="contabilidad_config_instrumento_cobro")
+     * @Route("/", name="contabilidad_config_instrumento_cobro", methods={"GET", "POST"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -41,7 +46,7 @@ class InstrumentoCobroController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/instrumento-cobro-edit/{id}",name="contabilidad_config_instrumento_cobro_edit")
+     * @Route("/{id}/edit",name="contabilidad_config_instrumento_cobro_edit", methods={"GET", "POST"})
      */
     public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
@@ -49,10 +54,10 @@ class InstrumentoCobroController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/instrumento-cobro-delete/{id}",name="contabilidad_config_instrumento_cobro_delete")
+     * @Route("/{id}",name="contabilidad_config_instrumento_cobro_delete", methods={"DELETE"})
      */
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        return parent::Delete($em, $id);
+        return parent::Delete($em,$request, $id);
     }
 }
