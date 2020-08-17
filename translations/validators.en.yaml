@@ -1,0 +1,6 @@
+# translations/validators.en.yaml
+#author.name.not_blank: Please enter an author name.
+contabilidad:
+  config:
+    descripcion_not_blank: El campo descripción está vacio !
+    descripcion_unique: El nombre ya está en uso !

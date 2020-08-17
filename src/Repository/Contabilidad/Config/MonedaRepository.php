@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\Moneda;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Moneda|null find($id, $lockMode = null, $lockVersion = null)
- * @method Moneda|null findOneBy(array $criteria, array $orderBy = null)
- * @method Moneda[]    findAll()
- * @method Moneda[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method Moneda|null find($id, $paranoid = true)
+ * @method Moneda|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method Moneda[]    findAll($paranoid = true)
+ * @method Moneda[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class MonedaRepository extends ServiceEntityRepository
+class MonedaRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Moneda::class);
+        $this->setEntityClass(Moneda::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**

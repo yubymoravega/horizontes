@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method ConfiguracionInicial|null find($id, $lockMode = null, $lockVersion = null)
- * @method ConfiguracionInicial|null findOneBy(array $criteria, array $orderBy = null)
- * @method ConfiguracionInicial[]    findAll()
- * @method ConfiguracionInicial[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method ConfiguracionInicial|null find($id, $paranoid = true)
+ * @method ConfiguracionInicial|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method ConfiguracionInicial[]    findAll($paranoid = true)
+ * @method ConfiguracionInicial[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class ConfiguracionInicialRepository extends ServiceEntityRepository
+class ConfiguracionInicialRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ConfiguracionInicial::class);
+        $this->setEntityClass(ConfiguracionInicial::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**

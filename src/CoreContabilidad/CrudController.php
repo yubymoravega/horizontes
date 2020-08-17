@@ -3,6 +3,8 @@
 
 namespace App\CoreContabilidad;
 
+use App\Form\Contabilidad\Config\CrudAddDescripcionType;
+use App\Form\Contabilidad\Config\CrudAddNameType;
 use App\Form\Contabilidad\Config\CrudEditDescripcionType;
 use App\Form\Contabilidad\Config\CrudEditNameType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,13 +15,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class CrudController
- * @package App\CoreContabilidad
  * Steps
- * 1- validar en la Entity  @UniqueEntity("nombre" | "descripcion")
- *                          @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
- * 2- crear el controlador con los metodos CRUD eredeadaos e inisializados
- * 3- actualizar las configuraciones del __constructor del NameController
- * 4- crear el 'adicionar', SubmitType::class -- en el formulario NameType
+ * 1. validar en la Entity
+ * UniqueEntity("nombre" | "descripcion")
+ * Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
+ * 2. crear el controlador con los metodos CRUD eredeadaos e inisializados
+ * 3. actualizar las configuraciones del __constructor del NameController
+ * 4. crear el 'adicionar', SubmitType::class -- en el formulario NameType
+ *
+ * @package App\CoreContabilidad
  */
 class CrudController extends AbstractController
 {
@@ -149,21 +153,38 @@ class CrudController extends AbstractController
 
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $form = $this->createForm($this->class_type_name);
+        $form = $this->createForm(
+            $this->label === 'nombre' ?
+                CrudAddNameType::class :
+                CrudAddDescripcionType::class,
+            null, ['data_class' => $this->class_entity]);
+
         $form->handleRequest($request);
         $errors = null;
-
         if ($form->isSubmitted()) {
-
             $instance = $form->getData();
             $errors = $validator->validate($instance);
 
             if ($form->isValid()) {
-                $instance->setActivo(true);
-                $em->persist($instance);
+                // si esta utilizando paranoid reactivarlo (activo=false) ponelro en (true)
+                // o se crea la nueva instancia si no esta en BD
+                $criteria = $this->label === 'nombre'
+                    ? ['nombre' => $instance->getNombre()]
+                    : ['descripcion' => $instance->getDescripcion()];
+                $instance_not_paranoid = $em->getRepository($this->class_entity)->findOneBy($criteria, null, false);
+                if ($instance_not_paranoid) {
+                    $instance_not_paranoid->setActivo(true);
+                    $em->persist($instance_not_paranoid);
+                } else {
+                    $instance->setActivo(true);
+                    $em->persist($instance);
+                }
                 $em->flush();
                 $this->addFlash('success', $this->messages['add']);
-                $form = $this->createForm($this->class_type_name);
+                $form = $this->createForm(
+                    $this->label === 'nombre' ?
+                        CrudAddNameType::class :
+                        CrudAddDescripcionType::class);
             }
         }
 
@@ -175,7 +196,7 @@ class CrudController extends AbstractController
         }
 
         //list
-        $arr_list = $em->getRepository($this->class_entity)->findByActivo(true);
+        $arr_list = $em->getRepository($this->class_entity)->findAll();
         return $this->render('contabilidad/config/CRUD/index_crud_name.html.twig', [
             'title' => $this->title,
             'label' => $this->label,
@@ -193,13 +214,14 @@ class CrudController extends AbstractController
             return $this->redirectToRoute($this->paths['index']);
         }
 
+        // en caso que sea recargada la paqina
         if ($request->isMethod(Request::METHOD_GET))
             $form = $this->createForm(
                 $this->label === 'nombre' ?
                     CrudEditNameType::class :
                     CrudEditDescripcionType::class,
                 $current_instance, ['data_class' => $this->class_entity]);
-        else
+        else // en caso de un submit
             $form = $this->createForm(
                 $this->label === 'nombre' ?
                     CrudEditNameType::class :
@@ -230,7 +252,7 @@ class CrudController extends AbstractController
         }
 
         //list
-        $arr_list = $em->getRepository($this->class_entity)->findByActivo(true);
+        $arr_list = $em->getRepository($this->class_entity)->findAll();
         return $this->render('contabilidad/config/CRUD/update_crud_name.html.twig', [
             'title' => $this->title,
             'descrip' => $this->label === 'nombre' ? $current_instance->getNombre() : $current_instance->getDescripcion(),
@@ -241,16 +263,20 @@ class CrudController extends AbstractController
         ]);
     }
 
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        $instance = $em->getRepository($this->class_entity)->find($id);
-        if ($instance) {
-            $instance->setActivo(false);
-            $em->persist($instance);
-            $em->flush();
-            $this->addFlash('success', $this->messages['delete']);
-        } else
-            $this->addFlash('error', 'El Almacén no pudo ser eliminado');
+        // seguridad mediante _token
+//        dd($request);
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $instance = $em->getRepository($this->class_entity)->find($id);
+            if ($instance) {
+                $instance->setActivo(false);
+                $em->persist($instance);
+                $em->flush();
+                $this->addFlash('success', $this->messages['delete']);
+            } else
+                $this->addFlash('error', 'El Almacén no pudo ser eliminado');
+        }
         return $this->redirectToRoute($this->paths['index']);
     }
 }

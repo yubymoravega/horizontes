@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class UnidadMedidaController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/unidad-medida")
+ */
 class UnidadMedidaController extends CrudController
 {
 
@@ -33,7 +38,7 @@ class UnidadMedidaController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/unidad-medida", name="contabilidad_config_unidad_medida")
+     * @Route("/", name="contabilidad_config_unidad_medida", methods={"GET", "POST"})
      */
     public
     function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
@@ -42,7 +47,7 @@ class UnidadMedidaController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/unidad-medida-edit/{id}",name="contabilidad_config_unidad_medida_edit")
+     * @Route("/{id}/edit",name="contabilidad_config_unidad_medida_edit", methods={"GET", "POST"})
      */
     public
     function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
@@ -51,11 +56,11 @@ class UnidadMedidaController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/unidad-medida-delete/{id}",name="contabilidad_config_unidad_medida_delete")
+     * @Route("/{id}",name="contabilidad_config_unidad_medida_delete", methods={"DELETE"})
      */
     public
-    function Delete(EntityManagerInterface $em, $id)
+    function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        return parent::Delete($em, $id);
+        return parent::Delete($em, $request, $id);
     }
 }

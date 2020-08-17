@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method TipoDocumentoActivoFijo|null find($id, $lockMode = null, $lockVersion = null)
- * @method TipoDocumentoActivoFijo|null findOneBy(array $criteria, array $orderBy = null)
- * @method TipoDocumentoActivoFijo[]    findAll()
- * @method TipoDocumentoActivoFijo[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method TipoDocumentoActivoFijo|null find($id, $paranoid = true)
+ * @method TipoDocumentoActivoFijo|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method TipoDocumentoActivoFijo[]    findAll($paranoid = true)
+ * @method TipoDocumentoActivoFijo[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class TipoDocumentoActivoFijoRepository extends ServiceEntityRepository
+class TipoDocumentoActivoFijoRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TipoDocumentoActivoFijo::class);
+        $this->setEntityClass(TipoDocumentoActivoFijo::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**
