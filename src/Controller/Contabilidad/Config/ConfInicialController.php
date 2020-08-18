@@ -9,21 +9,25 @@ use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Form\Contabilidad\Config\ConfiguracionInicialType;
 use App\Form\Contabilidad\Config\ConfiguracionInicialUpdateType;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class ConfInicialController
+ * CRUD DE CONFIGURACION INICIAL
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/conf-inicial")
+ */
 class ConfInicialController extends AbstractController
 {
-    /***************-CRUD DE CONFIGURACION INICIAL-*******************/
     /**
-     * @Route("/contabilidad/config/conf-inicial", name="contabilidad_config_conf_inicial")
+     * @Route("/", name="contabilidad_config_conf_inicial",methods={"GET"})
      */
     public function index()
     {
@@ -36,22 +40,16 @@ class ConfInicialController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/conf-inicial/form-add", name="contabilidad_config_conf_inicial_form")
+     * @Route("/form-add", name="contabilidad_config_conf_inicial_form", methods={"GET","POST"})
      */
     public function addConfInicial(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-
         $conf_new_obj = new ConfiguracionInicial();
         $form = $this->createForm(ConfiguracionInicialType::class, $conf_new_obj);
         $error = null;
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-
-            /**@var $conf_inicial_form ConfiguracionInicial** */
-            $conf_inicial_form = $form->getData();
-
-            $error = $validator->validate($conf_inicial_form);
 
             if ($form->isValid()) {
                 $deudora = $request->get('naturaleza') == '1' ? true : false;
@@ -86,82 +84,39 @@ class ConfInicialController extends AbstractController
     }
 
     /**
-     * @Route("contabilidad/config/conf-inicial/form-edit/{id}", name="contabilidad_config_conf_inicial_form_edit")
+     * @Route("/{id}", name="contabilidad_config_conf_inicial_delete", methods={"DELETE"})
      */
-    public function UpdateConfInicial(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
+    public function DeleteConfInicial(Request $request, $id)
     {
-        $obj_Conf = $em->getRepository(ConfiguracionInicial::class)->find($id);
-        $form_Conf = $this->createForm(ConfiguracionInicialUpdateType::class, $obj_Conf);
-        $error = null;
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $em = $this->getDoctrine()->getManager();
+            $configuracion_er = $em->getRepository(ConfiguracionInicial::class);
+            $configuracion_obj = $configuracion_er->find($id);
+            $msg = 'No se pudo eliminar la configuración seleccionada';
+            $success = 'error';
+            if ($configuracion_obj) {
 
-        $form_Conf->handleRequest($request);
-        if ($form_Conf->isSubmitted()) {
+                /**@var $configuracion_obj ConfiguracionInicial** */
+                $configuracion_obj->setActivo(false);
+                try {
+                    $em->persist($configuracion_obj);
+                    $em->flush();
+                    $success = 'success';
+                    $msg = 'Configuración eliminada satisfactoriamente';
 
-            /**@var $conf_inicial_form ConfiguracionInicial** */
-            $conf_inicial_form = $form_Conf->getData();
-
-            $error = $validator->validate($conf_inicial_form);
-
-            if ($form_Conf->isValid()) {
-                $deudora = $request->get('naturaleza') == '1' ? true : false;
-                $subcuenta_id = $request->get('subcuenta_id') ? $request->get('subcuenta_id') : null;
-
-                $arr_form = $request->get('configuracion_inicial_update');
-                $arr_extra_form = ['deudora' => $deudora, 'id_subcuenta' => $subcuenta_id];
-                $arr_result = array_merge($arr_form, $arr_extra_form);
-                if (!$this->isDuplicate($em, $arr_result, 'upd',$id)) {
-                    if ($this->saveDataConf($em, $arr_result, $obj_Conf)) {
-                        $this->addFlash('success', 'Configuración modificada satisfactoriamente.');
-                        return $this->redirectToRoute('contabilidad_config_conf_inicial');
-
-                    } else {
-                        $this->addFlash('failed', 'La acción solicitada ha presentado errores, por favor contacte a su proveedor de software.');
-                        return $this->redirectToRoute('contabilidad_config_conf_inicial_form_edit');
-                    }
-                } else {
-                    $this->addFlash('failed', 'Ya existe una configuración con esos parámetros.');
-                    return $this->redirectToRoute('contabilidad_config_conf_inicial_form_edit');
+                } catch
+                (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
                 }
             }
+            $this->addFlash($success, $msg);
         }
-        return $this->render('contabilidad/config/conf_inicial/form_update.html.twig', [
-            'controller_name' => 'ConfInicialController',
-            'formulario' => $form_Conf->createView()
-        ]);
-    }
-
-    /**
-     * @Route("/contabilidad/config/conf-inicial-delete/{id}", name="contabilidad_config_conf_inicial_delete")
-     */
-    public function DeleteConfInicial($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $configuracion_er = $em->getRepository(ConfiguracionInicial::class);
-        $configuracion_obj = $configuracion_er->find($id);
-        $msg = 'No se pudo eliminar la configuración seleccionada';
-        $success = 'error';
-        if ($configuracion_obj) {
-
-            /**@var $configuracion_obj ConfiguracionInicial** */
-            $configuracion_obj->setActivo(false);
-            try {
-                $em->persist($configuracion_obj);
-                $em->flush();
-                $success = 'success';
-                $msg = 'Configuración eliminada satisfactoriamente';
-
-            } catch
-            (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-            }
-        }
-        $this->addFlash($success, $msg);
         return $this->redirectToRoute('contabilidad_config_conf_inicial');
     }
 
-    /*************-METODOS AUXILIARES EMPLEADOS TANTO EL EL FRONT COMO INTERNAMENTE EN EL CONTROLLER-***************/
-
-    /*************-Salva los datos en la base de datos, tanto para adicionar como para modificar-**********/
+    /**
+     * Salva los datos en la base de datos, tanto para adicionar como para modificar
+     */
     public function saveDataConf($em, $fiels, $obj)
     {
         if ($obj == null) {
@@ -188,7 +143,9 @@ class ConfInicialController extends AbstractController
         return true;
     }
 
-    /*****Obtener el listado de configuraciones iniciales del sistema******/
+    /**
+     * Obtener el listado de configuraciones iniciales del sistema
+     */
     public function getDataConf($em)
     {
         $confInicial_er = $em->getRepository(ConfiguracionInicial::class);
@@ -214,7 +171,7 @@ class ConfInicialController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/conf-inicial/form-getsubcuenta/{idcuenta}", name="contabilidad_config_conf_inicial_form_getsubcuenta")
+     * @Route("/form-getsubcuenta/{idcuenta}", name="contabilidad_config_conf_inicial_form_getsubcuenta")
      */
     public function getSubcuentas($idcuenta)
     {
@@ -236,8 +193,10 @@ class ConfInicialController extends AbstractController
         return new JsonResponse(['subcuentas' => $row]);
     }
 
-    /**************-Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar-****************/
-    public function isDuplicate($em, $fiels, $action,$id= null)
+    /**
+     * Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar
+     */
+    public function isDuplicate($em, $fiels, $action, $id = null)
     {
         $conf_inicial_er = $em->getRepository(ConfiguracionInicial::class);
 
@@ -245,7 +204,7 @@ class ConfInicialController extends AbstractController
             'id_modulo' => $fiels['id_modulo'],
             'id_tipo_documento' => $fiels['id_tipo_documento'],
             'id_cuenta' => $fiels['id_cuenta'],
-            'activo'=>true
+            'activo' => true
         ));
 
         if ($action == 'upd') {

@@ -13,10 +13,15 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\CoreContabilidad\AuxFunctions;
 
+/**
+ * Class CentroCostoController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/centro-costo")
+ */
 class CentroCostoController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/config/centro-costo", name="contabilidad_config_centro_costo")
+     * @Route("/", name="contabilidad_config_centro_costo", methods={"GET"})
      */
     public function index(EntityManagerInterface $em)
     {
@@ -45,12 +50,11 @@ class CentroCostoController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/centro-costo-add", name="contabilidad_config_centro_costo_add")
+     * @Route("/add", name="contabilidad_config_centro_costo_add",methods={"POST"})
      */
     public function addElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
         $arr_request = $request->get('centro_costo');
-        dd($request);
         if (!AuxFunctions::isDuplicate(
             $em->getRepository(CentroCosto::class),
             array('nombre' => $arr_request['nombre']),
@@ -74,5 +78,13 @@ class CentroCostoController extends AbstractController
         } else
             $this->addFlash('error', "Centro de Costo ya se encuentra registrado");
         return $this->redirectToRoute('contabilidad_config_centro_costo');
+    }
+
+    /**
+     * @Route("/{id}", name="contabilidad_config_centro_costo_delete",methods={"DELETE"})
+     */
+    public function delete($id)
+    {
+
     }
 }
