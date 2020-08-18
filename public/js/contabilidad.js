@@ -11,6 +11,19 @@ $(document).ready(function () {
 
 });
 
+/**
+ * Object Msg
+ */
+const CONTAB_MSG = {
+    REQUIRED_MODULO: 'seleccione un módulo',
+    REQUIRED_TIPO_DOC: 'seleccione un tipo de documento',
+    REQUIRED_NATURALEZA: 'seleccione una naturaleza',
+    REQUIRED_CUENTA: 'seleccione una cuenta',
+    REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
+
+    REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
+}
+
 
 /**
  * Modal para confirmar la eliminación de algún registro

@@ -1,8 +1,11 @@
+# Revisar siempre
+- `ParanoidEntityRepository` hacer que los EntityRepositorys hereden de esta clas que implementa el modo
+paranoid como en Nodejs
 # TODO - Contabilidad
 ### Configuración
 - [x] Crear las Entidadesde
 - [x] CRUD por cada Entidad -- REVISION
-    - [ ] Config inicial 
+    - [x] Config inicial 
     - [x] Almacén `u`
     - [ ] Centro Costo ---leo 
     - [ ] Cuenta 
@@ -18,18 +21,12 @@
     - [x] Tipo Movimiento `u`
     - [ ] Unidad
     - [x] Unidad Medida `u`
-- [x] Probar cambiar el jqyery de **core.js** --- `NO SE PUEDE TOCAR!!!`
--[x] `ParanoidEntityRepository` hacer que los EntityRepositorys hereden de esta clas que implementa el modo
-paranoid como en Nodejs
-- [x]  los campos eliminados(activo=false) de la base de datos
-que se reactiven(activo=true) cuado se add nuevamente en nomencladores de (Descripcion/nombre)
 - [ ] Refactorizacion el CODIGO   
-   - [ ] Ajustar el codigo al estilo `php bin/console make:crud` del ejemplo TestCrd
-   , Las Rutas definir el metodo que esperan ("GET","POST") "DELETE" como en `AlmacenCOntroller.php`
-   - [ ] `php bin/console debug:Route` -> Revisar los metodos q acceden a las controladoras
-   - [ ] form_error(unknown?) -- como utilizar para mostrar los errores en el frontend o Jquery 
-- [ ] validar formulario con boostrap
-    - [ ] hacer q al borrar el formulario se limpie la opcion de 
+   - [ ] Ajustar controladores `php bin/console make:crud` del ejemplo TestCrd
+   , Las Rutas definir el metodo que esperan  como en `AlmacenCOntroller.php`
+   - [ ] `php bin/console debug:Route` -> Revisar los metodos q acceden a las controladoras ("GET","POST") "DELETE"
+   - [ ] validar formulario en el frontend o Jquery 
+   - [ ] hacer q al borrar el formulario se limpie la opcion de 
 validar si esta requerido y al escribir tambien, ponerle un id al
 `input`
 - [ ]  paginacion instalando el modulo de paginacion

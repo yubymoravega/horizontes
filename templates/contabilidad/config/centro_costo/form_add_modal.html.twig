@@ -1,0 +1,57 @@
+{# Modal de adicionar#}
+<div class="modal fade" id="gestionarCentro_costoModal" tabindex="-1" role="dialog"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-labelledby="gestionarCentro_costoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark">
+                <h4 class="modal-title text-light" id="gestionarCentro_costoModalLabel">Adicionar Centro de
+                    Costo</h4>
+                <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(form,{'attr': {'class': 'text-left','id':'form_centro_costo','method':'POST'}}) }}
+
+                <div class="form-group">
+                    <label for="centro_costo_nombre" class="font-weight-bold">Nombre</label>
+                    {{ form_widget(form.nombre,{'attr': {'class': 'form-control','id':'nombre_field'}}) }}
+                </div>
+                <div class="form-group">
+                    <label for="centro_costo_codigo" class="font-weight-bold">Código</label>
+                    {{ form_widget(form.codigo,{'attr': {'class': 'form-control','id':'codigo_field'}}) }}
+                </div>
+                <div class="form-group">
+                    <div class="input-group input-group-sm">
+                        <label for="centro_costo_id_cuenta" class="font-weight-bold">Cuenta</label>
+                        {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control','id':'id_cuenta_field'}}) }}
+                        <span class="input-group-append"></span>
+                    </div>
+                </div>
+                <div class="form-group input-group input-group-sm">
+                    <label for="centro_costo_id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
+                    <select name="centro_costo[id_sub_cuenta]" id="subcuenta_id" class="form-control">
+                    </select>
+                </div>
+                <input type="text" id="id_centro_costo" hidden>
+            </div>
+            {{ form_end(form) }}
+            <div class="modal-footer d-flex">
+                <div class="mr-auto">
+                    <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                            aria-label="Cerrar">
+                        <span aria-hidden="true">Cancelar</span>
+                    </button>
+                </div>
+                <div class="ml-2">
+                    <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                </div>
+                <div class="ml-2">
+                    <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

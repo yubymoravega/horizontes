@@ -24,63 +24,7 @@
         </div>
         {# end header #}
 
-        {# Modal de adicionar#}
-        <div class="modal fade" id="gestionarCentro_costoModal" tabindex="-1" role="dialog"
-             data-backdrop="static"
-             data-keyboard="false"
-             aria-labelledby="gestionarCentro_costoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarCentro_costoModalLabel">Adicionar Centro de
-                            Costo</h4>
-                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        {{ form_start(form,{'attr': {'class': 'text-left','id':'form_centro_costo'}}) }}
-
-                        <div class="form-group">
-                            <label for="nombre_field" class="font-weight-bold">Nombre</label>
-                            {{ form_widget(form.nombre,{'attr': {'class': 'form-control','id':'nombre_field'}}) }}
-                        </div>
-                        <div class="form-group">
-                            <label for="codigo_field" class="font-weight-bold">Código</label>
-                            {{ form_widget(form.codigo,{'attr': {'class': 'form-control','id':'codigo_field'}}) }}
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group input-group-sm">
-                                <label for="id_cuenta_field" class="font-weight-bold">Cuenta</label>
-                                {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control','id':'id_cuenta_field'}}) }}
-                                <span class="input-group-append"></span>
-                            </div>
-                        </div>
-                        <div class="form-group input-group input-group-sm">
-                            <label for="id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
-                            <select name="centro_costo[id_sub_cuenta]" id="subcuenta_id" class="form-control">
-                            </select>
-                        </div>
-                        <input type="text" id="id_centro_costo" hidden>
-                    </div>
-                    {{ form_end(form) }}
-                    <div class="modal-footer d-flex">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ include('contabilidad/config/centro_costo/form_add_modal.html.twig') }}
 
         {# list #}
         <table class="table table-hover">
@@ -132,43 +76,13 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-            resetField()
+        const TEXT_SELECT = 'Seleccione la cuenta...';
+
+        function mostrarBtn() {
             $('#btnActualizar').hide()
-
-            var subcuenta = $('#subcuenta_id');
-            subcuenta.prop('disabled', true);
-            $('#centro_costo_id_cuenta').change(function (evernt) {
-                subcuenta.find('option').remove();
-                if (typeof ($(this).val()) != 'object') {
-                    getValues($(this).val(), subcuenta)
-                } else {
-                    subcuenta.prop('disabled', true);
-                }
-            })
-        })
-
-        function getValues(id, subcuenta) {
-            $.ajax({
-                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    subcuenta.find('option').remove();
-                    subcuenta.append('<option selected = "true" value = "0"> Seleccione la subcuenta</option>');
-                    $(result.subcuentas).each(function (pos, valor) {
-                        subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
-                    })
-                    subcuenta.prop('disabled', false);
-                },
-                error: function () {
-                    alert('Ha ocurrido un error en el servidor');
-                    subcuenta.prop('disabled', true);
-                }
-            })
+            $('#btnAceptar').show()
         }
 
-        const TEXT_SELECT = 'Seleccione la cuenta...';
         const onUpdate = function (config) {
             $('#btnActualizar').show()
             $('#btnAceptar').hide()
@@ -197,39 +111,103 @@
             $('#id_centro_costo').val(id)
         }
 
-        $('#btnAceptar').on('click', function () {
-            const formulario = $('#form_centro_costo')
-            formulario.attr('action', `/contabilidad/config/centro-costo-add`)
-            formulario.submit()
-        })
-
-        $('#btnActualizar').on('click', function () {
-            const id_centro_costo = $('#id_centro_costo').val()
-
-            const formulario = $('#form_centro_costo')
-            formulario.attr('action', `/contabilidad/config/centro-costo-upd/${id_centro_costo}`)
-            formulario.submit()
-        })
-
-
-        $('#gestionarCentro_costoModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedAddress)
-            var modal = $(this)
-            $('#centro_costo_nombre').val('')
-            $('#select2-centro_costo_id_cuenta-container').val(0)
-            $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
-            modal.find('.modal-title').text('Adicionar Centro de Costo')
-        })
-
-        function mostrarBtn() {
+        $(document).ready(function () {
+            resetField()
             $('#btnActualizar').hide()
-            $('#btnAceptar').show()
-        }
 
-        function resetField() {
-            $('#centro_costo_id_cuenta').prepend('<option selected = "true" value = "0">' + TEXT_SELECT + '</option>');
-            $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
-        }
+            var subcuenta = $('#subcuenta_id');
+            subcuenta.prop('disabled', true);
+            $('#centro_costo_id_cuenta').change(function (evernt) {
+                subcuenta.find('option').remove();
+                if (typeof ($(this).val()) != 'object') {
+                    getValues($(this).val(), subcuenta)
+                } else {
+                    subcuenta.prop('disabled', true);
+                }
+            })
+
+            $('#form_centro_costo').validate({
+                //errorClass: 'invalid-label',
+                errorClass: 'invalid-label',
+                errorPlacement: function (error, element) {
+                    // Append error within linked label
+                    console.log("label[for='" + element.attr("id") + "']")
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+                },
+                //errorElement: "span",
+                success: function (label) {
+                    label.removeClass('invalid-label').text("")
+                    // ELIMINAR
+                },
+                rules: {
+                    'centro_costo[nombre]': "required",
+                    'centro_costo[codigo]': "required",
+                    'centro_costo[id_cuenta]': "required",
+                    'centro_costo[id_sub_cuenta]': "required",
+                },
+                messages: {
+                    'centro_costo[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'centro_costo[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'centro_costo[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
+                    'centro_costo[id_sub_cuenta]': CONTAB_MSG.REQUIRED_SUBCUENTA,
+                }
+            })
+
+            $('#btnAceptar').on('click', function () {
+
+                const formulario = $('#form_centro_costo')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/centro-costo/add`)
+                formulario.submit()
+            })
+
+            $('#btnActualizar').on('click', function () {
+                const id_centro_costo = $('#id_centro_costo').val()
+
+                const formulario = $('#form_centro_costo')
+                formulario.attr('action', `/contabilidad/config/centro-costo-upd/${id_centro_costo}`)
+                formulario.submit()
+            })
+
+
+            $('#gestionarCentro_costoModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedAddress)
+                var modal = $(this)
+                $('#centro_costo_nombre').val('')
+                $('#select2-centro_costo_id_cuenta-container').val(0)
+                $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
+                modal.find('.modal-title').text('Adicionar Centro de Costo')
+            })
+
+            function resetField() {
+                $('#centro_costo_id_cuenta').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
+                $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
+            }
+
+            function getValues(id, subcuenta) {
+                $.ajax({
+                    url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        subcuenta.find('option').remove();
+                        subcuenta.append('<option selected = "true" value = "0"> Seleccione la subcuenta</option>');
+                        $(result.subcuentas).each(function (pos, valor) {
+                            subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
+                        })
+                        subcuenta.prop('disabled', false);
+                    },
+                    error: function () {
+                        alert('Ha ocurrido un error en el servidor');
+                        subcuenta.prop('disabled', true);
+                    }
+                })
+            }
+        })
+
     </script>
 {% endblock %}
 

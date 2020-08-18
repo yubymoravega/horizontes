@@ -266,7 +266,6 @@ class CrudController extends AbstractController
     public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
         // seguridad mediante _token
-//        dd($request);
         if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
             $instance = $em->getRepository($this->class_entity)->find($id);
             if ($instance) {

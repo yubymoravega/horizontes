@@ -9,7 +9,7 @@
             </div>
 
             <div class="card-body">
-                {{ form_start(formulario) }}
+                {{ form_start(formulario, {'attr':{'id':'form_add_configinicial'}}) }}
                 <div class="form-group pa-2">
                     <div class="input-group input-group-sm">
                         <label for="id_modulo" class="font-weight-bold">Módulo</label>
@@ -77,6 +77,34 @@
                     subcuenta.prop('disabled', true);
                 }
             })
+
+            // validacion del formulario
+            /*$.validator.methods.selectChoice = function (value, element) {
+                console.log(value, element)
+                return value
+            }*/
+            $('#form_add_configinicial').validate({
+                //focusCleanup: true,
+                errorClass: 'invalid-label',
+                success: function(label) {
+                    label.removeClass('invalid-label').text("")
+                },
+                rules: {
+                    'configuracion_inicial[id_modulo]': "required",
+                    'configuracion_inicial[id_tipo_documento]': "required",
+                    'naturaleza': "required",
+                    'subcuenta_id': "required",
+                    'configuracion_inicial[id_cuenta]': "required",
+                },
+                messages: {
+                    'configuracion_inicial[id_modulo]': CONTAB_MSG.REQUIRED_MODULO,
+                    'configuracion_inicial[id_tipo_documento]': CONTAB_MSG.REQUIRED_TIPO_DOC,
+                    'naturaleza': CONTAB_MSG.REQUIRED_NATURALEZA,
+                    'subcuenta_id': CONTAB_MSG.REQUIRED_SUBCUENTA,
+                    'configuracion_inicial[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
+                }
+            })
+
         })
 
         function getValues(id, subcuenta) {
