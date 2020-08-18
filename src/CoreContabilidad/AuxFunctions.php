@@ -6,6 +6,7 @@ namespace App\CoreContabilidad;
 
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Environment;
 
 
@@ -93,15 +94,21 @@ class AuxFunctions
     /**
      * Send email
      */
-    public static function sendEmail($asunto, $destinatario, $alias, $msg)
+    public static function sendEmail($asunto, $destinatario, $alias_destinatario, $msg)
     {
-        $transport = (new \Swift_SmtpTransport('192.168.40.90', 25))
-            ->setUsername('informatizacion@pinar.geocuba.cu')
-            ->setPassword('Lady5*Everald03');
+        $config = Yaml::parse(file_get_contents( '../config/email_config.yaml'));
+        $host = $config['config']['host'];
+        $port = $config['config']['port'];
+        $user = $config['config']['user'];
+        $alias = $config['config']['alias'];
+        $password = $config['config']['password'];
+        $transport = (new \Swift_SmtpTransport($host, $port))
+            ->setUsername($user)
+            ->setPassword($password);
         $mailer = new \Swift_Mailer($transport);
         $message = (new \Swift_Message($asunto))
-            ->setFrom(['informatizacion@pinar.geocuba.cu' => 'Admin Site'])
-            ->setTo([$destinatario => $alias])
+            ->setFrom([$user => $alias])
+            ->setTo([$destinatario => $alias_destinatario])
             ->setBody($msg);
         $result = $mailer->send($message);
     }

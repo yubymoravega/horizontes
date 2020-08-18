@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class SecurityController extends AbstractController
 {
@@ -98,6 +99,13 @@ class SecurityController extends AbstractController
             $user->setPassword($passEncoder->encodePassword($user, $new_password));
             $em->persist($user);
             $em->flush();
+        }
+        else{
+            $config = Yaml::parse(file_get_contents( '../config/email_config.yaml'));
+            $user = $config['config']['user'];
+            $alias = $config['config']['alias'];
+
+            AuxFunctions::sendEmail('Intento Violacion de seguridad', $user, $alias, 'Intento de acceso al sitio por: '.$correo);
         }
         AuxFunctions::sendEmail($asunto, $correo, $nombre, $msg);
 

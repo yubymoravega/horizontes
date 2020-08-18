@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ValeSalidaController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/inventario/vale/salida", name="contabilidad_inventario_vale_salida")
+     * @Route("/contabilidad/inventario/vale_salida", name="contabilidad_inventario_vale_salida")
      */
     public function index()
     {

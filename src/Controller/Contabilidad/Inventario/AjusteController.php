@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AjusteController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/inventario/ajuste", name="contabilidad_inventario_ajuste")
+     * @Route("/contabilidad/inventario_ajuste", name="contabilidad_inventario_ajuste")
      */
     public function index()
     {

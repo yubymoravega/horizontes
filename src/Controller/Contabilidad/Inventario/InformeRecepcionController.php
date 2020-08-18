@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class InformeRecepcionController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/inventario/informe/recepcion", name="contabilidad_inventario_informe_recepcion")
+     * @Route("/contabilidad/inventario/informe_recepcion", name="contabilidad_inventario_informe_recepcion")
      */
     public function index()
     {

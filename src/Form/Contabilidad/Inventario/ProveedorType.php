@@ -14,7 +14,6 @@ class ProveedorType extends AbstractType
         $builder
             ->add('nombre')
             ->add('codigo')
-            ->add('activo')
         ;
     }
 
