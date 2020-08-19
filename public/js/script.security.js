@@ -7,9 +7,9 @@ var monto = null ;
 var tel = null ;
 
 var split = window.location.pathname.split('\/');
-
+console.log(split);
 var purchase = {
-  items: [{ id: "xl-tshirt" , tel : split[3], monto: split[4], last4: split[5]}]
+  items: [{ id: "xl-tshirt" , tel : split[2], monto: split[3], last4: split[4]}]
 };
 // Disable the button until we have Stripe set up on the page
 
@@ -22,7 +22,7 @@ if(split[5] === 'token123456qwer'){
 
 }
 
-fetch("http://127.0.0.1/index.php/api.security", {
+fetch("http://10.0.0.20:8000/index.php/api.security", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -38,24 +38,32 @@ fetch("http://127.0.0.1/index.php/api.security", {
 
     if(intent){ 
    
-      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
-      crossDomain: true,
-      dataType : "jsonp", data:{'data': intent.json}});
+      if(!intent.error){
 
       if(intent.mStatus === 'succeeded'){
 
       $("#mensaje").text("Cobro Exitoso");
-      $("#mensaje").css({'color':'green'}); 
+      $("#mensaje").css({'color':'white'}); 
+      $("#mensaje").css({'font-size':'25px'});
       $("#home").css({'display':''}); 
+      $("#espere").css({"display": "none"});
+      $("#aprobada").css({"display": ""});
       history.pushState({}, null, 'token123456qwer');
 
-    }else{
+      $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+      data:{'data': intent}, 
+      success: function(){}});
 
+      }else{
       $("#mensaje").text("Tarjeta Declinada");
-      $("#mensaje").css({'color':'red'}); 
+      $("#mensaje").css({'font-size':'25px'});
+      $("#espere").css({"display": "none"});
+      $("#diclinada").css({"display": ""});
+      $("#mensaje").css({'color':'white'}); 
       $("#home").css({'display':''}); 
       history.pushState({}, null, 'token123456qwer');
-    }  
+
+    }   }
     }
 
   if(intent.error === 'authentication_required'){
@@ -65,35 +73,40 @@ fetch("http://127.0.0.1/index.php/api.security", {
   payment_method: intent.paymentMethod
 }).then(function(result) {
 
-  intent.json.mStatus = result.paymentIntent.status;
-
-  $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post',
-  crossDomain: true,
-  dataType : "jsonp", data:{'data': intent.json}});
-
   if (result.error) {
-
+    intent.json.pi = result.error.payment_intent.id;
+    intent.json.mStatus = result.error.message;
     // Show error to your customer
     $("#mensaje").text(result.error.message);
-    $("#mensaje").css({'color':'red'});
+    $("#mensaje").css({'color':'white'}); 
+    $("#mensaje").css({'font-size':'25px'});
     $("#home").css({'display':''}); 
+    $("#espere").css({"display": "none"});
+    $("#diclinada").css({"display": ""});
     history.pushState({}, null, 'token=123456qwer');
-
+    console.log(result);
   } else {
 
+    intent.json.mStatus = result.paymentIntent.status;
+    intent.json.pi = result.paymentIntent.id;
     
     if (result.paymentIntent.status === 'succeeded') {
 
       // The payment is complete!
       $("#mensaje").text("Cobro Exitoso");
-      $("#mensaje").css({'color':'green'});
+      $("#mensaje").css({'font-size':'25px'});
+      $("#mensaje").css({'color':'white'});
       $("#home").css({'display':''}); 
+      $("#espere").css({"display": "none"});
+      $("#aprobada").css({"display": ""});
       history.pushState({}, null, 'token=123456qwer');    
 
     }
-  }
+  } 
 
-  
+  $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+  data:{'data': intent.json}, 
+  success: function(){}});
 
 });}
 

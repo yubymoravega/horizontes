@@ -1,22 +1,22 @@
 [
     {
         "name": "composer/package-versions-deprecated",
-        "version": "1.10.99",
-        "version_normalized": "1.10.99.0",
+        "version": "1.10.99.1",
+        "version_normalized": "1.10.99.1",
         "source": {
             "type": "git",
             "url": "https://github.com/composer/package-versions-deprecated.git",
-            "reference": "dd51b4443d58b34b6d9344cf4c288e621c9a826f"
+            "reference": "68c9b502036e820c33445ff4d174327f6bb87486"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/dd51b4443d58b34b6d9344cf4c288e621c9a826f",
-            "reference": "dd51b4443d58b34b6d9344cf4c288e621c9a826f",
+            "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/68c9b502036e820c33445ff4d174327f6bb87486",
+            "reference": "68c9b502036e820c33445ff4d174327f6bb87486",
             "shasum": ""
         },
         "require": {
             "composer-plugin-api": "^1.1.0 || ^2.0",
-            "php": "^7"
+            "php": "^7 || ^8"
         },
         "replace": {
             "ocramius/package-versions": "1.10.99"
@@ -26,7 +26,7 @@
             "ext-zip": "^1.13",
             "phpunit/phpunit": "^6.5 || ^7"
         },
-        "time": "2020-07-15T08:39:18+00:00",
+        "time": "2020-08-13T12:55:41+00:00",
         "type": "composer-plugin",
         "extra": {
             "class": "PackageVersions\\Installer",
@@ -72,17 +72,17 @@
     },
     {
         "name": "doctrine/annotations",
-        "version": "1.10.3",
-        "version_normalized": "1.10.3.0",
+        "version": "1.10.4",
+        "version_normalized": "1.10.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/doctrine/annotations.git",
-            "reference": "5db60a4969eba0e0c197a19c077780aadbc43c5d"
+            "reference": "bfe91e31984e2ba76df1c1339681770401ec262f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/doctrine/annotations/zipball/5db60a4969eba0e0c197a19c077780aadbc43c5d",
-            "reference": "5db60a4969eba0e0c197a19c077780aadbc43c5d",
+            "url": "https://api.github.com/repos/doctrine/annotations/zipball/bfe91e31984e2ba76df1c1339681770401ec262f",
+            "reference": "bfe91e31984e2ba76df1c1339681770401ec262f",
             "shasum": ""
         },
         "require": {
@@ -92,9 +92,10 @@
         },
         "require-dev": {
             "doctrine/cache": "1.*",
-            "phpunit/phpunit": "^7.5"
+            "phpstan/phpstan": "^0.12.20",
+            "phpunit/phpunit": "^7.5 || ^9.1.5"
         },
-        "time": "2020-05-25T17:24:27+00:00",
+        "time": "2020-08-10T19:35:50+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1546,6 +1547,155 @@
         ]
     },
     {
+        "name": "knplabs/knp-components",
+        "version": "v2.4.2",
+        "version_normalized": "2.4.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/KnpLabs/knp-components.git",
+            "reference": "8486446af9591c9c3decaae6c234739288c80a5f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/KnpLabs/knp-components/zipball/8486446af9591c9c3decaae6c234739288c80a5f",
+            "reference": "8486446af9591c9c3decaae6c234739288c80a5f",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^7.2",
+            "symfony/deprecation-contracts": "^2.1",
+            "symfony/event-dispatcher": "^3.4 || ^4.0 || ^5.0",
+            "symfony/http-foundation": "^3.4 || ^4.0 || ^5.0"
+        },
+        "require-dev": {
+            "doctrine/mongodb-odm": "^2.0",
+            "doctrine/orm": "^2.5",
+            "doctrine/phpcr-odm": "^1.2",
+            "jackalope/jackalope-doctrine-dbal": "^1.2",
+            "phpunit/phpunit": "^8.5 || ^9.5",
+            "ruflin/elastica": "^1.0",
+            "symfony/http-kernel": "^3.4 || ^4.0 || ^5.0",
+            "symfony/property-access": "^3.4 || ^4.0 || ^5.0"
+        },
+        "suggest": {
+            "doctrine/common": "to allow usage pagination with Doctrine ArrayCollection",
+            "doctrine/mongodb-odm": "to allow usage pagination with Doctrine ODM MongoDB",
+            "doctrine/orm": "to allow usage pagination with Doctrine ORM",
+            "doctrine/phpcr-odm": "to allow usage pagination with Doctrine ODM PHPCR",
+            "propel/propel1": "to allow usage pagination with Propel ORM",
+            "ruflin/elastica": "to allow usage pagination with ElasticSearch Client",
+            "solarium/solarium": "to allow usage pagination with Solarium Client",
+            "symfony/property-access": "To allow sorting arrays"
+        },
+        "time": "2020-07-22T07:39:34+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.5.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Knp\\Component\\": "src/Knp/Component"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "KnpLabs Team",
+                "homepage": "https://knplabs.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://github.com/KnpLabs/knp-components/contributors"
+            }
+        ],
+        "description": "Knplabs component library",
+        "homepage": "http://github.com/KnpLabs/knp-components",
+        "keywords": [
+            "components",
+            "knp",
+            "knplabs",
+            "pager",
+            "paginator"
+        ]
+    },
+    {
+        "name": "knplabs/knp-paginator-bundle",
+        "version": "v5.3.0",
+        "version_normalized": "5.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/KnpLabs/KnpPaginatorBundle.git",
+            "reference": "87ca999b6ac886e3f20a1e3abc07523140509ca4"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/KnpLabs/KnpPaginatorBundle/zipball/87ca999b6ac886e3f20a1e3abc07523140509ca4",
+            "reference": "87ca999b6ac886e3f20a1e3abc07523140509ca4",
+            "shasum": ""
+        },
+        "require": {
+            "knplabs/knp-components": "^2.4",
+            "php": "^7.2",
+            "symfony/config": "^4.4 || ^5.0",
+            "symfony/dependency-injection": "^4.4 || ^5.0",
+            "symfony/event-dispatcher": "^4.4 || ^5.0",
+            "symfony/http-foundation": "^4.4 || ^5.0",
+            "symfony/http-kernel": "^4.4 || ^5.0",
+            "symfony/routing": "^4.4 || ^5.0",
+            "symfony/translation": "^4.4 || ^5.0",
+            "twig/twig": "^2.0 || ^3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^7.5 || ^8.5 || ^9.2",
+            "symfony/expression-language": "^4.4 || ^5.0",
+            "symfony/templating": "^4.4 || ^5.0"
+        },
+        "time": "2020-07-21T07:55:12+00:00",
+        "type": "symfony-bundle",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "5.3.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Knp\\Bundle\\PaginatorBundle\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "KnpLabs Team",
+                "homepage": "http://knplabs.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://github.com/KnpLabs/KnpPaginatorBundle/contributors"
+            }
+        ],
+        "description": "Paginator bundle for Symfony to automate pagination and simplify sorting and other features",
+        "homepage": "http://github.com/KnpLabs/KnpPaginatorBundle",
+        "keywords": [
+            "bundle",
+            "knp",
+            "knplabs",
+            "pager",
+            "pagination",
+            "paginator",
+            "symfony"
+        ]
+    },
+    {
         "name": "laminas/laminas-code",
         "version": "3.4.1",
         "version_normalized": "3.4.1.0",
@@ -2015,17 +2165,17 @@
     },
     {
         "name": "phpdocumentor/reflection-docblock",
-        "version": "5.2.0",
-        "version_normalized": "5.2.0.0",
+        "version": "5.2.1",
+        "version_normalized": "5.2.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-            "reference": "3170448f5769fe19f456173d833734e0ff1b84df"
+            "reference": "d870572532cd70bc3fab58f2e23ad423c8404c44"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/3170448f5769fe19f456173d833734e0ff1b84df",
-            "reference": "3170448f5769fe19f456173d833734e0ff1b84df",
+            "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/d870572532cd70bc3fab58f2e23ad423c8404c44",
+            "reference": "d870572532cd70bc3fab58f2e23ad423c8404c44",
             "shasum": ""
         },
         "require": {
@@ -2038,7 +2188,7 @@
         "require-dev": {
             "mockery/mockery": "~1.3.2"
         },
-        "time": "2020-07-20T20:05:34+00:00",
+        "time": "2020-08-15T11:14:08+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2438,17 +2588,17 @@
     },
     {
         "name": "stripe/stripe-php",
-        "version": "v7.46.1",
-        "version_normalized": "7.46.1.0",
+        "version": "v7.47.0",
+        "version_normalized": "7.47.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/stripe/stripe-php.git",
-            "reference": "fd57205d3e3a1dccab80538654128d5c46a1f5ac"
+            "reference": "b51656cb398d081fcee53a76f6edb8fd5c1a5306"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/fd57205d3e3a1dccab80538654128d5c46a1f5ac",
-            "reference": "fd57205d3e3a1dccab80538654128d5c46a1f5ac",
+            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/b51656cb398d081fcee53a76f6edb8fd5c1a5306",
+            "reference": "b51656cb398d081fcee53a76f6edb8fd5c1a5306",
             "shasum": ""
         },
         "require": {
@@ -2464,7 +2614,7 @@
             "squizlabs/php_codesniffer": "^3.3",
             "symfony/process": "~3.4"
         },
-        "time": "2020-08-07T22:11:58+00:00",
+        "time": "2020-08-13T22:35:56+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
