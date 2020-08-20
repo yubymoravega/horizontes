@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Controller;
-
-
-
 use App\Entity\Cliente;
 use App\Form\ClienteType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,7 +41,7 @@ class ClienteController extends AbstractController
 
 
     /**
-     * @Route("/registrar-cliente{tel}", name="registrar-cliente")
+     * @Route("/registrar-cliente/{tel}", name="registrar-cliente")
      */
     public function registrarCliente(Request $request, $tel)
     {  
@@ -80,7 +77,7 @@ class ClienteController extends AbstractController
     }
 
     /**
-     * @Route("/cliente-edit{tel}", name="cliente-edit")
+     * @Route("/cliente-edit/{tel}", name="cliente-edit")
      */
     public function clienteEdit(Request $request ,$tel)
     {
@@ -97,7 +94,7 @@ class ClienteController extends AbstractController
     }
 
     /**
-     * @Route("/edit-save{tel}", name="edit-save")
+     * @Route("/edit-save/{tel}", name="edit-save")
      */
     public function editSave($tel,Request $request )
     {
@@ -147,8 +144,6 @@ class ClienteController extends AbstractController
             $dataBase->flush();
 
         }
-
-        sleep ( 2 ) ;
 
         return $this->redirectToRoute('cliente-monto', ['tel' => $tel]);
 

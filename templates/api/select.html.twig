@@ -1,38 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Accept a card payment</title>
-    <meta name="description" content="A demo of a card payment on Stripe" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="{{ asset('css/tarjetas.css') }}"  />
    
+<div class="select-tarjetas" style='margin: auto; padding: 10px; margin-top: 50px; margin-bottom: 50px;'>
+<img class="imagen-tarjetas-guardadas" src="{{ asset('images/iconos/wallet.svg') }}" >    
+<h1 class="tarjetas-guardadas">Tarjetas guardadas</h1>
+<hr class="divider bg-mantis">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  </head>
-
-  <body style="background-color: black;">
-<style>
-    body {
-        background: #6609f2;
-    }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
-
-<div style='margin: auto; width: 400px; max-width: 95vw; font-family: "Helvetica Neue", Helvetica, sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); padding: 10px; margin-top: 50px; margin-bottom: 50px; border-radius: 15px; background: #f9fcff;'>
-    <h1 style="font-weight: 500; text-align: center; ">Tarjetas Guardadas</h1>
-
-    <!--
-INFO: The selectable class adds a pointer and shadow animations on hover.
--->
-
-    <!-- Cards -->
-	
      {% for tarjetas in tarjeta %}
-      <a style="text-decoration: none;" href="api.form{{tel}}/{{monto}}/{{tarjetas.last4}}">
+      <a style="text-decoration: none;" href="{{ path('api.form', {'tel': tel, 'monto': monto,'last4': tarjetas.last4}) }}">
        <div  id='credit' class="credit-card {{tarjetas.brand}} selectable">
         <div class="credit-card-last4">
            {{tarjetas.last4}}
@@ -44,29 +20,8 @@ INFO: The selectable class adds a pointer and shadow animations on hover.
     </div> </a>
     {% endfor %}
 
-    <!-- Visa - selectable -->
-    
-  </body>
-</html>
-
-   <a class='pagar' href="{{ path('api.get-user', {'tel': tel, 'monto': monto}) }}">
+   <a class='boton-agregar-tarjeta' style="text-decoration: none;" href="{{ path('api.get-user', {'tel': tel, 'monto': monto}) }}">
         Agregar Tarjeta
     </a>
-    
-  <style>
   
-  .pagar {
-    background-color: #4CAF50; /* Green */
-    border: none;
-    color: white;
-    padding: 10px 18px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-left: 33%;
-}
-  </style>
-
-
 {% endblock %}

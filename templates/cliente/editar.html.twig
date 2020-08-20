@@ -1,191 +1,202 @@
 {% extends 'base.html.twig' %}
+
 {% block content %}
 
-    <div id='error' class="alert alert-success row justify-content-md-center text-center" role="alert"
-         style="display: none;">
-        <p id='mensaje'>Cliente Editado! </p>
-    </div>
+<div id='error' class="alert alert-success row justify-content-md-center text-center" role="alert" style="display: none;">
+<p id='mensaje'>Cliente Editado! </p>
+</div>
 
-    <!-- Section Input Groups-->
-    <section class="section novi-background section-20" id='seccion-principal'>
+          <!-- Section Input Groups-->
+      <section class="section novi-background section-20" id='seccion-principal'>
         <div class="container">
-            <h1>Datos Del Cliente</h1>
-            <hr class="divider divider-sm bg-mantis">
-            <div class="row justify-content-md-center text-left">
-                <div class="col-md-7 col-lg-4">
+          <div class="container card">
+          <img class="imagen-cliente" src="{{ asset('images/iconos/user.svg') }}" >
+             <div class="card-header text-center"><h1>Datos del cliente</h1></div>
+        
+          <div class="row justify-content-md-center text-left">
+            <div class="col-md-7 col-lg-4">
+            <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger" role="alert"></div>
 
-                    {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
-
-                            {{ form_widget(formulario.telefono, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Telefono'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-user-plus"></span></span></span>
-
-                            {{ form_widget(formulario.nombre, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Nombre'}}) }}
-                            <span id='edit-nombre' style='cursor: pointer;'
-                                  class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-users"></span></span></span>
-
-                            {{ form_widget(formulario.apellidos, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Apellido'}}) }}
-                            <span id='edit-apellidos' style='cursor: pointer;'
-                                  class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon mdi mdi-email"></span></span></span>
-
-                            {{ form_widget(formulario.correo, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
-                            <span id='edit-correo' style='cursor: pointer;'
-                                  class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-map-marker"></span></span></span>
-
-                            {{ form_widget(formulario.direccion, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Direccion'}}) }}
-                            <span id='edit-direccion' style='cursor: pointer;'
-                                  class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-book"></span></span></span>
-
-
-                            {{ form_widget(formulario.comentario, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Comentario'}}) }}
-                            <span id='edit-comentario' style='cursor: pointer;'
-                                  class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-
-                    <div class="form-output" id="components-form-subscribe-footer"></div>
-
-                    <div class=" row justify-content-md-center group offset-top-34">
-
-                        {{ form_row(formulario.continuar) }}
-
-
-                    </div>
-
-                    {{ form_end(formulario) }}
-
-
+            {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
+       
+                <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
+                
+                  {{ form_widget(formulario.telefono, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Telefono'}}) }}
+                 
+                    <span class="input-group-append">
+                      
+                  </div>
                 </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-user-plus"></span></span></span>
+                 
+                 {{ form_widget(formulario.nombre, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Nombre'}}) }}
+                 <span id='edit-nombre' style='cursor: pointer;' class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
+                <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-users"></span></span></span>
+                  
+                   {{ form_widget(formulario.apellidos, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Apellido'}}) }}
+                  <span id='edit-apellidos' style='cursor: pointer;' class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
+                  <span class="input-group-append">                    
+                
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-email"></span></span></span>
+                 
+                 {{ form_widget(formulario.correo, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
+                    <span id='edit-correo' style='cursor: pointer;' class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-map-marker"></span></span></span>
+                 
+                   {{ form_widget(formulario.direccion, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Direccion'}}) }}
+                  <span id='edit-direccion' style='cursor: pointer;' class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-book"></span></span></span>
+                      
+
+                  {{ form_widget(formulario.comentario, {'attr': {'disabled': disabled,'class': 'form-control','placeholder': 'Comentario'}}) }}
+                  <span id='edit-comentario' style='cursor: pointer;' class='novi-icon fa fa-edit mdi icon icon-xxs'></span>
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+
+                <div class="form-output" id="components-form-subscribe-footer"></div>
+
+                <div class=" row justify-content-md-center group offset-top-34 row-continuar">
+                 
+           {{ form_row(formulario.continuar) }}
+            
+        
+          </div>
+
+              {{ form_end(formulario) }}
+
+
             </div>
+          </div>
         </div>
-    </section>
-
-    <script>
-
-        $("#cliente_continuar").click(function () {
-
-            // $("#error").css("display", "");
-
-        });
-
-        $("#edit-nombre").click(function () {
-            $('#cliente_nombre').prop("disabled", false);
-            $('#cliente_nombre').css('background-color', 'white');
-        });
-
-        $("#edit-apellidos").click(function () {
-            $('#cliente_apellidos').prop("disabled", false);
-            $('#cliente_apellidos').css('background-color', 'white');
-        });
-
-        $("#edit-correo").click(function () {
-            $('#cliente_correo').prop("disabled", false);
-            $('#cliente_correo').css('background-color', 'white');
-        });
-
-        $("#edit-direccion").click(function () {
-            $('#cliente_direccion').prop("disabled", false);
-            $('#cliente_direccion').css('background-color', 'white');
-        });
-
-        $("#edit-comentario").click(function () {
-            $('#cliente_comentario').prop("disabled", false);
-            $('#cliente_comentario').css('background-color', 'white');
-        });
+      </section>
+    
+  </body>
+</html>
 
 
-        // A $( document ).ready() block.
-        $(document).ready(function () {
-            $("#cliente_continuar").append("<span class ='novi-icon fa fa-arrow-circle-right btn icon-xxs btn-icon-right' ></span>");
+{% endblock %}
 
-            if ($('#cliente_telefono').is(':disabled')) {
+{% block javascripts %} 
+{{parent()}}
 
-                $('#cliente_telefono').css('background-color', '#00000052');
-            }
+<script>
 
-            if ($('#cliente_nombre').is(':disabled')) {
+$("#form_cliente").validate({
+   errorLabelContainer: "#messageBox",
+    wrapper: "li",
+    rules: {
+      'cliente[telefono]': {
+      required: true, minlength: 3},
+      'cliente[nombre]': {
+      required: true, minlength: 3},
+      'cliente[apellidos]': {
+      required: true, minlength: 3
+    },
+    'cliente[correo]': {
+        email: true
+      },
+    },
+    messages: {
+      'cliente[nombre]': {required: "Nombre Requerido", minlength: "Minimo 3 Caracteres" },
+      'cliente[apellidos]': {required: "Apellido Requerido", minlength: "Minimo 3 Caracteres" },
+      'cliente[correo]': {email: "Formato de Email no Valido"},
+      'cliente[telefono]': {required: "Telefono Requerido", minlength: "Minimo 8 Caracteres" }},
+ 
+ });
 
-                $('#cliente_nombre').css('background-color', '#00000052');
-            }
 
-            if ($('#cliente_apellidos').is(':disabled')) {
 
-                $('#cliente_apellidos').css('background-color', '#00000052');
-            }
+$("#edit-nombre").click(function(){ 
+  $('#cliente_nombre').prop("disabled", false);
+  $('#cliente_nombre').css('background-color', 'white');
+  });
 
-            if ($('#cliente_correo').is(':disabled')) {
+$("#edit-apellidos").click(function(){ 
+  $('#cliente_apellidos').prop("disabled", false);
+  $('#cliente_apellidos').css('background-color', 'white');
+  });
 
-                $('#cliente_correo').css('background-color', '#00000052');
-            }
+$("#edit-correo").click(function(){ 
+  $('#cliente_correo').prop("disabled", false);
+  $('#cliente_correo').css('background-color', 'white');
+  });
 
-            if ($('#cliente_direccion').is(':disabled')) {
+  $("#edit-direccion").click(function(){ 
+  $('#cliente_direccion').prop("disabled", false);
+  $('#cliente_direccion').css('background-color', 'white');
+  });
 
-                $('#cliente_direccion').css('background-color', '#00000052');
-            }
+  $("#edit-comentario").click(function(){ 
+  $('#cliente_comentario').prop("disabled", false);
+  $('#cliente_comentario').css('background-color', 'white');
+  });
 
-            if ($('#cliente_comentario').is(':disabled')) {
 
-                $('#cliente_comentario').css('background-color', '#00000052');
-            }
+// A $( document ).ready() block.
+$( document ).ready(function() {
+ $( "#cliente_continuar" ).append( "<span class ='novi-icon fa fa-arrow-circle-right btn icon-xxs btn-icon-right' ></span>" );
 
-            $('#cliente_telefono').on('input', function () {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
+  if($('#cliente_telefono').is(':disabled')){
 
-        });
-    </script>
+    $('#cliente_telefono').css('background-color', '#b3b3b3');
+  }
+
+   if($('#cliente_nombre').is(':disabled')){
+
+    $('#cliente_nombre').css('background-color', '#b3b3b3');
+  }
+
+ if($('#cliente_apellidos').is(':disabled')){
+
+    $('#cliente_apellidos').css('background-color', '#b3b3b3' );
+  }
+
+ if($('#cliente_correo').is(':disabled')){
+
+    $('#cliente_correo').css('background-color', '#b3b3b3');
+  }
+
+ if($('#cliente_direccion').is(':disabled')){
+
+    $('#cliente_direccion').css('background-color', '#b3b3b3 ');
+  }
+
+ if($('#cliente_comentario').is(':disabled')){
+
+    $('#cliente_comentario').css('background-color', '#b3b3b3');
+  }
+
+});
+
+ </script>
 
 {% endblock %}
 

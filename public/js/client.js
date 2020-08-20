@@ -4,16 +4,16 @@ var stripe = Stripe("pk_test_51GqMhfF2pLNIoJ5OZOn2hPgISbzCyX390U4JNhGqREy0ROZ7LY
 // The items the customer wants to buy
 var customerID = null ;
 var tel = null ;
-var sendVirtual = null;
+var send = null;
 
 var split = window.location.pathname.split('\/');
 
 var purchase = {
-  items: [{ id: "xl-tshirt" , tel : split[3], monto: split[4]}]
+  items: [{ id: "xl-tshirt" , tel : split[2], monto: split[3]}]
 };
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
-fetch("http://127.0.0.1/index.php/api.create", {
+fetch("http://10.0.0.20:8000/index.php/api.create", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -76,28 +76,35 @@ var payWithCard = function(stripe, card, clientSecret) {
     .then(function(result) {
       if (result.error) {
         // Show error to your customer
+      
+        var json = {};
+        json['mPhoneNo'] = tel;
+        json['mCardTypeID'] = result.error.payment_method.card.brand;
+        json['mCard4'] =  result.error.payment_method.card.last4;
+        json['mAmount'] = result.error.payment_intent.amount/100;
+        json['mStatus'] = result.error.code
+        json['pi'] = result.error.payment_intent.id;
 
-        $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',
-        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]}
-       });
+        $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+        data:{'data': json}, 
+        success: function(){}});
 
+      
         showError(result.error.message);
       } else {
 
         // The payment succeeded!
           orderComplete(result.paymentIntent.id);
-       $.ajax({url:'http://127.0.0.1/index.php/api.status',method:'post',
+       $.ajax({url:'http://10.0.0.20:8000/index.php/api.status',method:'post',
        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]},
-       success: function(data) {
-        sendVirtual = data;
-            },
-      
-      });
+       success: function(data) { data = JSON.parse(data); data.pi = result.paymentIntent.id;
 
-      $.ajax({url:'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',method:'post', 
-      crossDomain: true,
-      dataType : "jsonp",
-      data:{'data': sendVirtual}});     
+        $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+        data:{'data': data}, 
+        success: function(){}});
+            },    
+      });
+      
       }
     });
 };
