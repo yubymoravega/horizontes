@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\GrupoActivos;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method GrupoActivos|null find($id, $lockMode = null, $lockVersion = null)
- * @method GrupoActivos|null findOneBy(array $criteria, array $orderBy = null)
- * @method GrupoActivos[]    findAll()
- * @method GrupoActivos[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method GrupoActivos|null find($id, $paranoid = true)
+ * @method GrupoActivos|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method GrupoActivos[]    findAll($paranoid = true)
+ * @method GrupoActivos[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class GrupoActivosRepository extends ServiceEntityRepository
+class GrupoActivosRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, GrupoActivos::class);
+        $this->setRegistry($registry);
+        $this->setEntityClass(GrupoActivos::class);
+        parent::__construct();
     }
 
     // /**

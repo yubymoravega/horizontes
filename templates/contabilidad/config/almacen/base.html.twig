@@ -35,7 +35,8 @@
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar el almacén {{ item.descripcion }} ?',
-                                        url:'{{ path('contabilidad_config_almacen_delete',{id: item.id}) }}'
+                                        url:'{{ path('contabilidad_config_almacen_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>

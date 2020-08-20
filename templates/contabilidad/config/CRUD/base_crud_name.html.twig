@@ -39,7 +39,8 @@
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar {{ title }}: {{ label == 'nombre' ? item.nombre: item.descripcion }}?',
-                                        url:'{{ path(paths.delete,{id: item.id}) }}'
+                                        url:'{{ path(paths.delete,{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -49,16 +50,4 @@
             </tbody>
         </table>
     </div>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script>
-        $(document).ready(function () {
-            $('#descripcion_field').keypress(function (event) {
-                $(event.target).removeClass('is-invalid')
-                $('.alert').alert('close')
-            })
-        })
-    </script>
 {% endblock %}

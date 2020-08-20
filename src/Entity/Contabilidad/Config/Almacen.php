@@ -11,7 +11,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=AlmacenRepository::class)
- * @UniqueEntity("descripcion", message="contabilidad.config.almacen.descripcion_unique")
+ * @UniqueEntity("descripcion", message="contabilidad.config.descripcion_unique")
  */
 class Almacen
 {
@@ -23,8 +23,8 @@ class Almacen
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     * @Assert\NotBlank(message="contabilidad.config.almacen.descripcion_not_blank")
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $descripcion;
 

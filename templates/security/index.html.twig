@@ -1,98 +1,217 @@
 <!DOCTYPE html>
 
 <html class="wide wow-animation scrollTo" lang="en">
-  <head>
+<head>
     <title>Login - Solyag</title>
     <meta charset="utf-8">
     <meta name="format-detection" content="telephone=no">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="keywords" content="intense web design multipurpose template html">
     <meta name="date" content="Dec 26">
-    <link rel="icon" href="{{ asset('images/favicon.ico') }}"  type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}"> 
-  </head>
-  <body>
-    <div class="page-loader page-loader-variant-1">
-      <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67' src="{{ asset('images/logo-solyag.png') }}" alt=''/>
+    <link rel="icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css"
+          href="//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        .toasts-alert {
+            position: fixed;
+            width: fit-content;
+            transition: .5s;
+            z-index: 1080;
+            top: 1rem;
+            right: 2rem;
+            border-width: 1px;
+            border-color: currentColor;
+        }
+
+        .transition-right {
+            right: -5000px;
+        }
+    </style>
+</head>
+<body>
+<div class="toasts-alert alert alert-danger alert-dismissible fade" role="alert"
+     id="alert__success">
+    <i class="fa fa-close pr-2"></i>
+    <span id="text_"></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="page-loader page-loader-variant-1">
+    <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67'
+              src="{{ asset('images/logo-solyag.png') }}" alt=''/>
+
         <div class="offset-top-41 text-center">
-          <div class="spinner"></div>
+            <div class="spinner"></div>
         </div>
-      </div>
     </div>
-    <div class="page text-center">
-      <section class="section novi-background one-page bg-shark-radio">
+</div>
+<div class="page text-center">
+    <section class="section novi-background one-page bg-shark-radio">
         <div class="one-page-header">
-          <!--Navbar Brand-->
-          <div class="rd-navbar-brand"><a href="index.html"><img style='margin-top: 80px;margin-left: -15px;' width='200' height='200' src="{{ asset('images/logo-solyag.png') }}" alt=''/></a></div>
+            <!--Navbar Brand-->
+            <div class="rd-navbar-brand"><a href="index.html"><img style='margin-top: 80px;margin-left: -15px;'
+                                                                   width='200' height='200'
+                                                                   src="{{ asset('images/logo-solyag.png') }}" alt=''/></a>
+            </div>
         </div>
         <!-- Login-->
         <section>
-          <div class="container">
-            <div class="section-350 section-cover row justify-content-sm-center align-items-sm-center">
-              <div class="col-sm-8 col-md-6 col-lg-4">
-                <div style="background: rgba(0, 0, 0, 0); box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);" class="card text-center section-34 section-sm-41 inset-left-20 inset-right-20 inset-md-left-20 inset-md-right-20 inset-xl-left-30 inset-xl-right-30 bg-default shadow-drop-md">
-                 
-                  
-                  <form method="post" class="text-left offset-top-30" >
-                    <div class="form-group">
-                      <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon input-group-addon-inverse"><span class="novi-icon mdi mdi-account-outline"></span></span></span>
-                       
-                       <input autocomplete="off" type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" placeholder="Usuario"  required autofocus>          
-                      </div>
+            <div class="container">
+                <div class="section-350 section-cover row justify-content-sm-center align-items-sm-center">
+                    <div class="col-sm-8 col-md-6 col-lg-4">
+                        <div style="background: rgba(0, 0, 0, 0); box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);"
+                             class="card text-center section-34 section-sm-41 inset-left-20 inset-right-20 inset-md-left-20 inset-md-right-20 inset-xl-left-30 inset-xl-right-30 bg-default shadow-drop-md">
+
+                            <!-- RD Mailform-->
+                            <form method="post" class="text-left offset-top-30">
+                                <div class="form-group">
+                                    <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                                    class="input-group-text input-group-icon input-group-addon-inverse"><span
+                                                        class="novi-icon mdi mdi-account-outline"></span></span></span>
+
+                                        <input autocomplete="off" type="text" value="{{ last_username }}"
+                                               name="username" id="inputUsername" class="form-control"
+                                               placeholder="Usuario" required autofocus>
+                                    </div>
+                                </div>
+                                <div class="form-group offset-top-20">
+                                    <div class="input-group input-group-sm"><span class="input-group-prepend"><span
+                                                    class="input-group-text input-group-icon input-group-addon-inverse"><span
+                                                        class="novi-icon mdi mdi-lock-open-outline"></span></span></span>
+
+                                        <input autocomplete="off" type="password" name="password" id="inputPassword"
+                                               class="form-control" placeholder="Clave" required>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                <button class="btn btn-login btn-sm btn-icon btn-block  offset-top-20" type="submit">
+                                    Entrar <span class="icon novi-icon mdi mdi-arrow-right-bold-circle-outline"></span>
+                                </button>
+
+                            </form>
+                            <p class="text-white">¿Ha olvidado su contraseña? <br> Introduzca su usuario en el
+                                formulario y presione click <a onclick="ValidarForm()" class="text-blue-gray">aqui</a>
+                                .</p>
+
+
+                            {% if error %}
+                                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            {% endif %}
+
+                        </div>
                     </div>
-                    <div class="form-group offset-top-20">
-                      <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon input-group-addon-inverse"><span class="novi-icon mdi mdi-lock-open-outline"></span></span></span>
-                       
-                         <input autocomplete="off" type="password" name="password" id="inputPassword" class="form-control" placeholder="Clave" required>
-                      </div>
-                    </div>
-
-                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                    <button class="btn btn-login btn-sm btn-icon btn-block  offset-top-20" type="submit">Entrar <span class="icon novi-icon mdi mdi-arrow-right-bold-circle-outline"></span></button>
-                  </form>
-                 
-
-                       {% if error %}
-                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                      {% endif %}
-
                 </div>
-              </div>
             </div>
-          </div>
         </section>
         <div class="one-page-footer">
-          <p class="small" style="color: rgba(255,255,255, 0.3)">Solyag  &copy; copyright  .</p>
+            <p class="small" style="color: rgba(255,255,255, 0.3)">Solyag &copy; <span class="copyright-year"></span> .
+            </p>
         </div>
-      </section>
-    </div>
-    <!-- Global RD Mailform Output-->
-    <div class="snackbars" id="form-output-global"></div>
-    <script src="{{ asset('js/core.min.js') }}"></script>
-    <script src="{{ asset('js/script.js') }}"></script>
-    
-  </body>
+
+        <div class="modal fade" id="confirm__modal" data-backdrop="static" data-keyboard="false"
+             tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h5 class="modal-title text-white" id="confirm__modal__title"><i
+                                    class="fa fa-key text-white"></i>
+                            Resetera contraseña</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="confirm__modal__body">
+                        ¿Está seguro que desea resetear la contraseña? Esta acción le enviará un correo a la dirección
+                        especificada, con la nueva contraseña del sistema.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="button" class="my-0 btn btn-outline-info" id="confirm__modal__btn_ok"
+                                onclick="ResetearContrasenna()">
+                            <i class="fa fa-key text-blue-gray"></i> Aceptar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="load__modal" data-backdrop="static" data-keyboard="false"
+             tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="offset-top-41 text-center text-white">
+                    <div class="spinner text-white"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<!-- Global RD Mailform Output-->
+<div class="snackbars" id="form-output-global"></div>
+<script src="{{ asset('js/core.min.js') }}"></script>
+<script src="{{ asset('js/script.js') }}"></script>
+{#<script src="{ asset('js/revolution.min.js') }}"></script>#}
+</body>
 </html>
 
 <script>
 
-  document.addEventListener("DOMContentLoaded", function() {
-      var elements = document.getElementsByTagName("INPUT");
-      for (var i = 0; i < elements.length; i++) {
-          elements[i].oninvalid = function(e) {
-              e.target.setCustomValidity("");
-              if (!e.target.validity.valid) {
-                  e.target.setCustomValidity("Campo Obligatorio!");
-              }
-          };
-          elements[i].oninput = function(e) {
-              e.target.setCustomValidity("");
-          };
-      }
-  })
-  
-  
-  </script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var elements = document.getElementsByTagName("INPUT");
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].oninvalid = function (e) {
+                e.target.setCustomValidity("");
+                if (!e.target.validity.valid) {
+                    e.target.setCustomValidity("Campo Obligatorio!");
+                }
+            };
+            elements[i].oninput = function (e) {
+                e.target.setCustomValidity("");
+            };
+        }
+    })
+
+    function ValidarForm() {
+        if ($('#inputUsername').val() == '') {
+            $('#alert__success').addClass('show')
+            $('#text_').text('Debe introducir su usuario y le enviaremos por correo las instrucciones para establecer una nueva contraseña.')
+            $('#alert__success').removeClass('transition-right alert-info text-dark')
+            $('#alert__success').addClass('toasts-alert alert-danger text-white')
+            $('#alert__success').show()
+            setTimeout(function () {
+                $('#alert__success').addClass('transition-right')
+            }, 3000)
+            $('#alert__success').hide(5000)
+        } else {
+            $('#confirm__modal').modal('show')
+        }
+    }
+
+    function ResetearContrasenna() {
+        let username = $('#inputUsername').val()
+        $('#confirm__modal').modal('hide')
+        $('#load__modal').modal('show')
+        $.ajax({
+            url: '/nuevo-password/' + username,
+            method: "GET",
+            data: {username: username}
+        }).then(res => {
+            $('#load__modal').modal('hide')
+            $('#alert__success').removeClass('transition-right alert-danger text-white')
+            $('#alert__success').addClass('show')
+            $('#text_').text('Contraseña reseteada satisfactoriamente.')
+            $('#alert__success').addClass('toasts-alert alert-info text-dark')
+            $('#alert__success').show()
+            setTimeout(function () {
+                $('#alert__success').addClass('transition-right')
+            }, 3000)
+            $('#alert__success').hide(5000)
+        })
+    }
+</script>

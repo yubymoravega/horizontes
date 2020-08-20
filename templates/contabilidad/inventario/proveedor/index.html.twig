@@ -1,0 +1,168 @@
+{% extends 'contabilidad/inventario/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Proveedores
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarProveedoresModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarProveedoresModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarProveedoresModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarProveedoresModalLabel">Adicionar Proveedor</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
+                    <div class="modal-body">
+                        <label for="grupo_activos_porciento_deprecia_anno" class="font-weight-bold">Nombre</label>
+                        {{ form_widget(form.nombre,{'attr': {'class': 'form-control'}}) }}
+                        <label for="grupo_activos_id_cuenta" class="font-weight-bold">Código</label>
+                        {{ form_widget(form.codigo,{'attr': {'class': 'form-control'}}) }}
+                        <input type="text" id="id_proveedor" hidden>
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-2">Nombre</th>
+            <th scope="col-1">Código</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in proveedores %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        nombre: '{{ item.nombre }}',
+                                        codigo: '{{ item.codigo }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar proveedor seleccionado ?',
+                                        url:'{{ path('contabilidad_inventario_proveedor_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+            const {nombre = '', id = '', codigo = ''} = config
+            $('#gestionarProveedoresModal').modal('show')
+
+            $('#proveedor_nombre').val(nombre)
+            $('#proveedor_codigo').val(codigo)
+            $('#id_proveedor').val(id)
+            $('#gestionarProveedoresModalLabel').html("Modificar "+nombre)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let params = {
+                nombre: $('#proveedor_nombre').val(),
+                codigo: $('#proveedor_codigo').val()
+            }
+            $.ajax({
+                url: '/contabilidad/inventario/proveedor-add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/inventario/proveedor');
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let params = {
+                nombre: $('#proveedor_nombre').val(),
+                codigo: $('#proveedor_codigo').val(),
+                id_proveedor: $('#id_proveedor').val()
+            }
+            $.ajax({
+                url: '/contabilidad/inventario/proveedor-upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/inventario/proveedor');
+            })
+        })
+
+        $('#gestionarProveedoresModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar proveedor')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+
+            $('#id_proveedor').val('')
+            $('#proveedor_nombre').val('')
+            $('#proveedor_codigo').val('')
+        }
+    </script>
+{% endblock %}

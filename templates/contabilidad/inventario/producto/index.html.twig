@@ -1,0 +1,177 @@
+{% extends 'contabilidad/inventario/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Productos
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarProductosModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarProductosModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarProductosModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarProductosModalLabel">Adicionar Producto</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
+                    <div class="modal-body">
+                        <label class="font-weight-bold">Código</label>
+                        {{ form_widget(form.codigo,{'attr': {'class': 'form-control'}}) }}
+                        <label class="font-weight-bold">Precio de costo</label>
+                        {{ form_widget(form.precio_costo,{'attr': {'class': 'form-control'}}) }}
+                        <label class="font-weight-bold">Descripción</label>
+                        {{ form_widget(form.descripcion,{'attr': {'class': 'form-control'}}) }}
+                        <input type="text" id="id_producto" hidden>
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-1">Código</th>
+            <th scope="col-1">Descripción</th>
+            <th scope="col-1">Precio costo</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in productos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;">{{ item.precio_costo }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        descripcion: '{{ item.descripcion }}',
+                                        codigo: '{{ item.codigo }}',
+                                        precio_costo: '{{ item.precio_costo }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar producto seleccionado ?',
+                                        url:'{{ path('contabilidad_inventario_producto_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+            const {descripcion = '',precio_costo = '', id = '', codigo = ''} = config
+            $('#gestionarProductosModal').modal('show')
+
+            $('#producto_precio_costo').val(precio_costo)
+            $('#producto_descripcion').val(descripcion)
+            $('#producto_codigo').val(codigo)
+            $('#id_producto').val(id)
+            $('#gestionarProductosModalLabel').html("Modificar "+codigo)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let params = {
+                descripcion: $('#producto_descripcion').val(),
+                precio_costo: $('#producto_precio_costo').val(),
+                codigo: $('#producto_codigo').val()
+            }
+            $.ajax({
+                url: '/contabilidad/inventario/producto-add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/inventario/producto');
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let params = {
+                descripcion: $('#producto_descripcion').val(),
+                precio_costo: $('#producto_precio_costo').val(),
+                codigo: $('#producto_codigo').val(),
+                id_producto:$('#id_producto').val()
+            }
+            $.ajax({
+                url: '/contabilidad/inventario/producto-upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/inventario/producto');
+            })
+        })
+
+        $('#gestionarProductosModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar producto')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+
+            $('#id_producto').val('')
+            $('#producto_descripcion').val('')
+            $('#producto_precio_costo').val('')
+            $('#producto_codigo').val('')
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Cargos
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarCargosModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarCargosModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarCargosModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarCargosModalLabel">Adicionar Cargo</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
+                    <div class="modal-body">
+                        <label for="grupo_activos_porciento_deprecia_anno" class="font-weight-bold">Nombre</label>
+                        {{ form_widget(form.nombre,{'attr': {'class': 'form-control'}}) }}
+                        <label for="grupo_activos_id_cuenta" class="font-weight-bold">Salario base</label>
+                        {{ form_widget(form.salario_base,{'attr': {'class': 'form-control'}}) }}
+                        <input type="text" id="id_cargo" hidden>
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-2">Nombre</th>
+            <th scope="col-1">Salario base</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in cargos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.salario_base }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        nombre: '{{ item.nombre }}',
+                                        salario_base: '{{ item.salario_base }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar cargo seleccionado ?',
+                                        url:'{{ path('contabilidad_capital_humano_cargo_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+            const {nombre = '', id = '', salario_base = ''} = config
+            $('#gestionarCargosModal').modal('show')
+
+            $('#cargo_nombre').val(nombre)
+            $('#cargo_salario_base').val(salario_base)
+            $('#id_cargo').val(id)
+            $('#gestionarCargosModalLabel').html("Modificar "+nombre)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let params = {
+                nombre: $('#cargo_nombre').val(),
+                salario_base: $('#cargo_salario_base').val()
+            }
+            $.ajax({
+                url: '/contabilidad/capital-humano/cargo-add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/capital-humano/cargo');
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let params = {
+                nombre: $('#cargo_nombre').val(),
+                salario_base: $('#cargo_salario_base').val(),
+                id_cargo: $('#id_cargo').val()
+            }
+            $.ajax({
+                url: '/contabilidad/capital-humano/cargo-upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/capital-humano/cargo');
+            })
+        })
+
+        $('#gestionarCargosModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar cargo')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+
+            $('#id_cargo').val('')
+            $('#cargo_nombre').val('')
+            $('#cargo_salario_base').val('')
+        }
+    </script>
+{% endblock %}

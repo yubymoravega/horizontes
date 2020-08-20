@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\TasaCambio;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method TasaCambio|null find($id, $lockMode = null, $lockVersion = null)
- * @method TasaCambio|null findOneBy(array $criteria, array $orderBy = null)
- * @method TasaCambio[]    findAll()
- * @method TasaCambio[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method TasaCambio|null find($id, $paranoid = true)
+ * @method TasaCambio|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method TasaCambio[]    findAll($paranoid = true)
+ * @method TasaCambio[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class TasaCambioRepository extends ServiceEntityRepository
+class TasaCambioRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TasaCambio::class);
+        $this->setEntityClass(TasaCambio::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**

@@ -16,7 +16,7 @@
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
-                        data-target="#gestionarUnidadModal" data-placement="bottom" title="Adicionar"
+                        data-target="#gestionarTasaCambioModal" data-placement="bottom" title="Adicionar"
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
@@ -25,13 +25,13 @@
         {# end header #}
 
         {# Modal de adicionar#}
-        <div class="modal fade" id="gestionarUnidadModal" tabindex="-1" role="dialog" data-backdrop="static"
+        <div class="modal fade" id="gestionarTasaCambioModal" tabindex="-1" role="dialog" data-backdrop="static"
              data-keyboard="false"
-             aria-labelledby="gestionarUnidadModalLabel" aria-hidden="true">
+             aria-labelledby="gestionarTasaCambioModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarUnidadModalLabel">Adicionar unidad</h4>
+                        <h4 class="modal-title text-light" id="gestionarTasaCambioModalLabel">Adicionar tasa de cambio</h4>
                         <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -71,23 +71,34 @@
         {# list #}
         <table class="table table-hover">
             <thead class="thead-dark">
-            <th scope="col-2">Nombre de unidad</th>
-            <th scope="col-3">Subordinada a</th>
+            <th scope="col-2">Año</th>
+            <th scope="col-1">Mes</th>
+            <th scope="col-3">Moneda Origen</th>
+            <th scope="col-3">Moneda Destino</th>
+            <th scope="col-2">Valor</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in tasa_cambio %}
                 <tr>
                     <td style="font-weight:400;">{{ item.anno }}</td>
-                    <td style="font-weight:400;">{{ item.mes }}</td>
+                    <td style="font-weight:400;">{{ item.nombre_mes }}</td>
+                    <td style="font-weight:400;">{{ item.nombre_moneda_origen }}</td>
+                    <td style="font-weight:400;">{{ item.nombre_moneda_destino }}</td>
+                    <td style="font-weight:400;">{{ item.valor }}</td>
                     <td>
                         <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
-                                {#id_padre: '{{ item.id_padre }}',#}
-                                        {#padre_nombre:'{{ item.padre_nombre }}',#}
-                                        {#nombre:'{{ item.nombre }}' ,#}
-                                        id: '{{ item.id }}'
+                                        id: '{{ item.id }}',
+                                        anno: '{{ item.anno }}',
+                                        mes: '{{ item.mes }}',
+                                        nombre_mes: '{{ item.nombre_mes }}',
+                                        valor: '{{ item.valor }}',
+                                        nombre_moneda_origen: '{{ item.nombre_moneda_origen }}',
+                                        id_moneda_origen: '{{ item.id_moneda_origen }}',
+                                        nombre_moneda_destino: '{{ item.nombre_moneda_destino }}',
+                                        id_moneda_destino: '{{ item.id_moneda_destino }}',
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
@@ -120,64 +131,73 @@
         const onUpdate = function (config) {
             $('#btnActualizar').show()
             $('#btnAceptar').hide()
-
-            // const {nombre = '', id = '', id_padre = '', padre_nombre = ''} = config
-            // $('#gestionarUnidadModal').modal('show')
-            // if (id_padre == '') {
-            //     $('#select2-unidad_id_padre-container').val(0)
-            //     $('#select2-unidad_id_padre-container')[0].textContent = 'Seleccione unidad a la que se subordina'
-            // } else {
-            //     $('#select2-unidad_id_padre-container')[0].textContent = padre_nombre
-            //     $('#select2-unidad_id_padre-container').val(id_padre)
-            //     $('#unidad_id_padre').val(id_padre)
-            // }
-            // $('#gestionarUnidadModalLabel').html("Modificar " + nombre)
-            // $('#unidad_nombre').val(nombre)
-            // $('#id_unidad').val(id)
+            const {anno = '', id = '', mes = '', nombre_mes = '', valor = '', nombre_moneda_origen = '', id_moneda_origen = '', nombre_moneda_destino = '', id_moneda_destino = ''} = config
+            $('#gestionarTasaCambioModal').modal('show')
+            $('#select2-tasa_cambio_id_moneda_destino-container')[0].textContent = nombre_moneda_destino
+            $('#select2-tasa_cambio_id_moneda_origen-container')[0].textContent = nombre_moneda_origen
+            $('#tasa_cambio_id_moneda_origen').val(id_moneda_origen)
+            $('#tasa_cambio_id_moneda_destino').val(id_moneda_destino)
+            $('#tasa_cambio_mes').val(mes)
+            $('#select2-tasa_cambio_mes-container')[0].textContent = nombre_mes
+            $('#id_tasa_cambio').val(id)
+            $('#tasa_cambio_anno').val(anno)
+            $('#tasa_cambio_valor').val(valor)
+            $('#gestionarTasaCambioModalLabel').html("Modificar tasa de cambio")
         }
 
         $('#btnAceptar').on('click', function () {
-            // let id_padre = $('#unidad_id_padre').val()
-            // let nombre = $('#unidad_nombre').val()
-            // $.ajax({
-            //     url: '/contabilidad/config/tasa-cambio-add',
-            //     method: "POST",
-            //     data: {'id_padre': id_padre, 'nombre': nombre}
-            // }).then(res => {
-            //     window.location.replace('/contabilidad/config/tasa-cambio');
-            // })
+            let params = {
+                anno: $('#tasa_cambio_anno').val(),
+                mes: $('#tasa_cambio_mes').val(),
+                valor: $('#tasa_cambio_valor').val(),
+                id_moneda_origen: $('#tasa_cambio_id_moneda_origen').val(),
+                id_moneda_destino: $('#tasa_cambio_id_moneda_destino').val()
+            }
+            $.ajax({
+                url: '/contabilidad/config/tasa-cambio-add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/config/tasa-cambio');
+            })
         })
 
         $('#btnActualizar').on('click', function () {
-            // let id_padre = $('#unidad_id_padre').val()
-            // let nombre = $('#unidad_nombre').val()
-            // let id_unidad = $('#id_unidad').val()
-            // $.ajax({
-            //     url: '/contabilidad/config/tasa-cambio-upd',
-            //     method: "POST",
-            //     data: {'id_padre': id_padre, 'nombre': nombre, 'id': id_unidad}
-            // }).then(res => {
-            //     window.location.replace('/contabilidad/config/unidad');
-            // })
+            let params = {
+                anno: $('#tasa_cambio_anno').val(),
+                mes: $('#tasa_cambio_mes').val(),
+                valor: $('#tasa_cambio_valor').val(),
+                id_moneda_origen: $('#tasa_cambio_id_moneda_origen').val(),
+                id_moneda_destino: $('#tasa_cambio_id_moneda_destino').val(),
+                id_tasa_cambio: $('#id_tasa_cambio').val()
+            }
+            $.ajax({
+                url: '/contabilidad/config/tasa-cambio-upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/config/tasa-cambio');
+            })
         })
 
 
-        $('#gestionarUnidadModal').on('show.bs.modal', function (event) {
+        $('#gestionarTasaCambioModal').on('show.bs.modal', function (event) {
             var modal = $(this)
-            // $('#unidad_nombre').val('')
-            // $('#select2-unidad_id_padre-container').val(0)
-            // $('#select2-unidad_id_padre-container')[0].textContent = 'Seleccione unidad a la que se subordina'
-            modal.find('.modal-title').text('Adicionar unidad')
+            modal.find('.modal-title').text('Adicionar tasa de cambio')
         })
 
         function mostrarBtn() {
             $('#btnActualizar').hide()
             $('#btnAceptar').show()
+            resetField()
         }
 
         function resetField() {
-            // $('#unidad_id_padre').prepend('<option selected = "true" value = "0">Seleccione la unidad a la que se subordina</option>');
-            // $('#select2-unidad_id_padre-container')[0].textContent = 'Seleccione unidad a la que se subordina'
+            $('#tasa_cambio_mes').val(1)
+            $('#select2-tasa_cambio_mes-container')[0].textContent = 'Enero'
+            $('#id_tasa_cambio').val('')
+            $('#tasa_cambio_anno').val(new Date().getFullYear())
+            $('#tasa_cambio_valor').val(0)
         }
     </script>
 {% endblock %}

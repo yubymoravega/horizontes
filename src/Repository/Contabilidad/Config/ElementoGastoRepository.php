@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\ElementoGasto;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method ElementoGasto|null find($id, $lockMode = null, $lockVersion = null)
- * @method ElementoGasto|null findOneBy(array $criteria, array $orderBy = null)
- * @method ElementoGasto[]    findAll()
- * @method ElementoGasto[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method ElementoGasto|null find($id, $paranoid = true)
+ * @method ElementoGasto|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method ElementoGasto[]    findAll($paranoid = true)
+ * @method ElementoGasto[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class ElementoGastoRepository extends ServiceEntityRepository
+class ElementoGastoRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ElementoGasto::class);
+        $this->setRegistry($registry);
+        $this->setEntityClass(ElementoGasto::class);
+        parent::__construct();
     }
 
     // /**

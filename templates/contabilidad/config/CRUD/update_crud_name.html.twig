@@ -1,6 +1,6 @@
 {% extends 'contabilidad/config/CRUD/base_crud_name.html.twig' %}
 {% block formulario %}
-    {{ form_start(form,{'attr': {'class': 'd-flex py-3'}}) }}
+    {{ form_start(form,{'attr': {'class': 'd-flex py-3','id':'form_crud_edit_name'}}) }}
     <div class="position-relative">
         <small><em class="position-absolute" style="left: 8px; bottom: -17px">
                 <span class="">{{ descrip }}</span></em>
@@ -14,4 +14,45 @@
     {{ form_widget(form.editar,{ 'attr':{ 'class': 'btn btn-warning' }}) }}
     <a class="btn btn-outline-dark ml-2" href="{{ path(paths.index) }}">Cancelar</a>
     {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+
+            const text_form_name = $('#crud_edit_name_nombre')
+            const text_form_desc = $('#crud_edit_descripcion_descripcion')
+            const text_form = text_form_name.length > 0 ? text_form_name : text_form_desc
+
+            text_form.keypress(function (event) {
+                $(event.target).removeClass('is-invalid')
+                    .popover('hide')
+            })
+
+            const fn_edit = function (event) {
+                event.preventDefault();
+                if (text_form.val().trim() == '') {
+                    text_form.addClass('is-invalid')
+                    text_form.popover({
+                        content: 'valor requerido!',
+                        placement: 'bottom',
+                        trigger: 'manual'
+                    })
+                        .popover('show')
+                        .on('shown.bs.popover', function () {
+                            setTimeout(function (time) {
+                                text_form.popover('hide')
+                                    .removeClass('is-invalid')
+                            }, 3000)
+                        })
+                } else {
+                    $('#form_crud_edit_name').submit()
+                }
+
+            }
+            $('#crud_edit_descripcion_editar').click(fn_edit)
+            $('#crud_edit_name_editar').click(fn_edit)
+        })
+    </script>
 {% endblock %}

@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\Almacen;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Almacen|null find($id, $lockMode = null, $lockVersion = null)
- * @method Almacen|null findOneBy(array $criteria, array $orderBy = null)
- * @method Almacen[]    findAll()
- * @method Almacen[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method Almacen|null find($id, $paranoid = true)
+ * @method Almacen|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method Almacen[]    findAll($paranoid = true)
+ * @method Almacen[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class AlmacenRepository extends ServiceEntityRepository
+class AlmacenRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Almacen::class);
+        $this->setEntityClass(Almacen::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**

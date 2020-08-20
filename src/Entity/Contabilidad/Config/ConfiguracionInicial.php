@@ -4,6 +4,7 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\ConfiguracionInicialRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ConfiguracionInicialRepository::class)

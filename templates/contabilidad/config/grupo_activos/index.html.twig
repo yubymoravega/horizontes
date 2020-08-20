@@ -1,20 +1,236 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello GrupoActivosController!{% endblock %}
-
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/xampp/htdocs/app/src/Controller/Contabilidad/Config/GrupoActivosController.php'|file_link(0) }}">src/Controller/Contabilidad/Config/GrupoActivosController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/app/templates/contabilidad/config/grupo_activos/index.html.twig'|file_link(0) }}">templates/contabilidad/config/grupo_activos/index.html.twig</a></code></li>
-    </ul>
-</div>
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
 {% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Grupos de activos
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarGrupoActivosModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarGrupoActivosModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarGrupoActivosModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarGrupoActivosModalLabel">Adicionar tasa de
+                            cambio</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
+                    <div class="modal-body">
+                        <label for="grupo_activos_porciento_deprecia_anno" class="font-weight-bold">% que deprecia al
+                            año</label>
+                        {{ form_widget(form.porciento_deprecia_anno,{'attr': {'class': 'form-control'}}) }}
+                        <label for="grupo_activos_id_cuenta" class="font-weight-bold">Cuenta</label>
+                        {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control'}}) }}
+                        <label for="id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
+                        <select name="subcuenta_id" id="subcuenta_id" class="form-control"></select>
+                        <label for="grupo_activos_descripcion" class="font-weight-bold">Descripción</label>
+                        {{ form_widget(form.descripcion,{'attr': {'class': 'form-control'}}) }}
+                        <input type="text" id="id_grupo_activos" hidden>
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-2">Descripción</th>
+            <th scope="col-1">% deprecia(año)</th>
+            <th scope="col-3">Cuenta</th>
+            <th scope="col-3">Subcuenta</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in grupo_activos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;">{{ item.por_ciento_deprecia_anno }}</td>
+                    <td style="font-weight:400;">{{ item.nro_cuenta }}</td>
+                    <td style="font-weight:400;">{{ item.nro_subcuenta }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        descripcion: '{{ item.descripcion }}',
+                                        por_ciento_deprecia_anno: '{{ item.por_ciento_deprecia_anno }}',
+                                        id_cuenta: '{{ item.id_cuenta }}',
+                                        id_subcuenta: '{{ item.id_subcuenta }}',
+                                        nro_cuenta: '{{ item.nro_cuenta }}',
+                                        nro_subcuenta: '{{ item.nro_subcuenta }}',
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar grupo de activos seleccionado ?',
+                                        url:'{{ path('contabilidad_config_grupo_activos_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            resetField()
+            $('#btnActualizar').hide()
+            var subcuenta = $('#subcuenta_id');
+            subcuenta.prop('disabled', true);
+            $('#grupo_activos_id_cuenta').change(function (evernt) {
+                subcuenta.find('option').remove();
+                $('#select2-subcuenta_id-container')[0].textContent = ''
+                if (typeof ($(this).val()) != 'object') {
+                    getValues($(this).val(), subcuenta)
+                } else {
+                    subcuenta.prop('disabled', true);
+                }
+            })
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+            const {descripcion = '', id = '', por_ciento_deprecia_anno = '', nro_cuenta = '', id_cuenta = '', nro_subcuenta = '', id_subcuenta = ''} = config
+            $('#gestionarGrupoActivosModal').modal('show')
+
+            $('#select2-grupo_activos_id_cuenta-container')[0].textContent = nro_cuenta
+            $('#grupo_activos_id_cuenta').val(id_cuenta)
+            $('#select2-subcuenta_id-container')[0].textContent = nro_subcuenta
+            $('#subcuenta_id').val(id_subcuenta)
+            $('#grupo_activos_porciento_deprecia_anno').val(por_ciento_deprecia_anno)
+            $('#grupo_activos_descripcion').val(descripcion)
+            $('#id_grupo_activos').val(id)
+            $('#gestionarGrupoActivosModalLabel').html("Modificar grupo de activos")
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let params = {
+                por_ciento_deprecia_anno: $('#grupo_activos_porciento_deprecia_anno').val(),
+                id_cuenta: $('#grupo_activos_id_cuenta').val(),
+                id_subcuenta: $('#subcuenta_id').val(),
+                descripcion: $('#grupo_activos_descripcion').val()
+            }
+            $.ajax({
+                url: '/contabilidad/config/grupo-activos-add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/config/grupo-activos');
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let params = {
+                por_ciento_deprecia_anno: $('#grupo_activos_porciento_deprecia_anno').val(),
+                id_cuenta: $('#grupo_activos_id_cuenta').val(),
+                id_subcuenta: $('#subcuenta_id').val(),
+                descripcion: $('#grupo_activos_descripcion').val(),
+                id_grupo_activos: $('#id_grupo_activos').val()
+            }
+            $.ajax({
+                url: '/contabilidad/config/grupo-activos-upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/contabilidad/config/grupo-activos');
+            })
+        })
+
+
+        $('#gestionarGrupoActivosModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar grupo de activos')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+
+            $('#select2-grupo_activos_id_cuenta-container')[0].textContent = 'Seleccione la cuenta'
+            $('#grupo_activos_id_cuenta').val(0)
+            $('#grupo_activos_porciento_deprecia_anno').val('')
+            $('#grupo_activos_descripcion').val('')
+            $('#id_grupo_activos').val('')
+            $('#subcuenta_id').find('option').remove();
+        }
+
+        function getValues(id, subcuenta) {
+            $.ajax({
+                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    subcuenta.find('option').remove();
+                    subcuenta.append('<option selected = "true" value = "0"> Seleccione la subcuenta</option>');
+                    $(result.subcuentas).each(function (pos, valor) {
+                        subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
+                    })
+                    if (result.subcuentas.length > 0)
+                        subcuenta.prop('disabled', false);
+                    else
+                        subcuenta.prop('disabled', true);
+                },
+                error: function () {
+                    alert('Ha ocurrido un error en el servidor');
+                    subcuenta.prop('disabled', true);
+                }
+            })
+        }
+
+        function resetField() {
+            const cuenta = $('#grupo_activos_id_cuenta');
+            cuenta.prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
+            $('#select2-grupo_activos_id_cuenta-container')[0].textContent = 'Seleccione la cuenta'
+        }
+    </script>
+{% endblock %}
+

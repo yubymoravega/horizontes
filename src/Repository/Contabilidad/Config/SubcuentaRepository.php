@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\Subcuenta;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Subcuenta|null find($id, $lockMode = null, $lockVersion = null)
- * @method Subcuenta|null findOneBy(array $criteria, array $orderBy = null)
- * @method Subcuenta[]    findAll()
- * @method Subcuenta[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method Subcuenta|null find($id, $paranoid = true)
+ * @method Subcuenta|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method Subcuenta[]    findAll($paranoid = true)
+ * @method Subcuenta[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class SubcuentaRepository extends ServiceEntityRepository
+class SubcuentaRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Subcuenta::class);
+        $this->setEntityClass(Subcuenta::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**

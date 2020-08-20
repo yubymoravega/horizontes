@@ -26,6 +26,11 @@
     overflow-x: hidden;
 }
 
+.invalid-label{
+    padding-left: 1rem;
+    color: red;
+}
+
 @media (max-width: 480px) {
     .overflow-hidden-x-content {
         overflow-x: auto;

@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\Cuenta;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Cuenta|null find($id, $lockMode = null, $lockVersion = null)
- * @method Cuenta|null findOneBy(array $criteria, array $orderBy = null)
- * @method Cuenta[]    findAll()
- * @method Cuenta[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method Cuenta|null find($id, $paranoid = true)
+ * @method Cuenta|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method Cuenta[]    findAll($paranoid = true)
+ * @method Cuenta[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class CuentaRepository extends ServiceEntityRepository
+class CuentaRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Cuenta::class);
+        $this->setEntityClass(Cuenta::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\TasaCambioRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TasaCambioRepository::class)
@@ -38,13 +39,13 @@ class TasaCambio
     private $activo;
 
     /**
-     * @ORM\ManyToOne(targetEntity=TasaCambio::class)
+     * @ORM\ManyToOne(targetEntity=Moneda::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_moneda_origen;
 
     /**
-     * @ORM\ManyToOne(targetEntity=TasaCambio::class)
+     * @ORM\ManyToOne(targetEntity=Moneda::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_moneda_destino;
@@ -102,25 +103,26 @@ class TasaCambio
         return $this;
     }
 
-    public function getIdMonedaOrigen(): ?self
+    public function getIdMonedaOrigen(): ?Moneda
     {
         return $this->id_moneda_origen;
     }
 
-    public function setIdMonedaOrigen(?self $id_moneda_origen): self
+    public function setIdMonedaOrigen(?Moneda $id_moneda_origen): self
     {
         $this->id_moneda_origen = $id_moneda_origen;
 
         return $this;
     }
-    public function getIdMonedaDestino(): ?self
+
+    public function getIdMonedaDestino(): ?Moneda
     {
-        return $this->id_moneda_origen;
+        return $this->id_moneda_destino;
     }
 
-    public function setIdMonedaDestino(?self $id_moneda_origen): self
+    public function setIdMonedaDestino(?Moneda $id_moneda_destino): self
     {
-        $this->id_moneda_origen = $id_moneda_origen;
+        $this->id_moneda_destino = $id_moneda_destino;
 
         return $this;
     }

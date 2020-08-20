@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class TipoDocumentoController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/tipo-documento")
+ */
 class TipoDocumentoController extends CrudController
 {
 
@@ -33,7 +38,7 @@ class TipoDocumentoController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/tipo-documento", name="contabilidad_config_tipo_documento")
+     * @Route("/", name="contabilidad_config_tipo_documento", methods={"GET", "POST"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -41,7 +46,7 @@ class TipoDocumentoController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/tipo-documento-edit/{id}",name="contabilidad_config_tipo_documento_edit")
+     * @Route("/{id}/edit",name="contabilidad_config_tipo_documento_edit", methods={"GET", "POST"})
      */
     public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
@@ -49,10 +54,10 @@ class TipoDocumentoController extends CrudController
     }
 
     /**
-     * @Route("/contabilidad/config/tipo-documento-delete/{id}",name="contabilidad_config_tipo_documento_delete")
+     * @Route("/{id}",name="contabilidad_config_tipo_documento_delete", methods={"DELETE"})
      */
-    public function Delete(EntityManagerInterface $em, $id)
+    public function Delete(EntityManagerInterface $em, Request $request, $id)
     {
-        return parent::Delete($em, $id);
+        return parent::Delete($em, $request, $id);
     }
 }

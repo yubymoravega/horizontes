@@ -1,20 +1,182 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello ElementoGastoController!{% endblock %}
-
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/xampp/htdocs/app/src/Controller/Contabilidad/Config/ElementoGastoController.php'|file_link(0) }}">src/Controller/Contabilidad/Config/ElementoGastoController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/app/templates/contabilidad/config/elemento_gasto/index.html.twig'|file_link(0) }}">templates/contabilidad/config/elemento_gasto/index.html.twig</a></code></li>
-    </ul>
-</div>
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
 {% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+                Elementos de Gastos
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarElemento_gastoModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarElemento_gastoModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarElemento_gastoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarElemento_gastoModalLabel">Adicionar Elemento de
+                            Gasto</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(form,{'attr': {'class': 'text-left','id':'form_elemto_gasto','action':'/contabilidad/config/elemento-gasto-add'}}) }}
+
+                        <div class="form-group">
+                            <label for="descripcion_field" class="font-weight-bold">Descripción</label>
+                            {{ form_widget(form.descripcion,{'attr': {'class': 'form-control','id':'descripcion_field'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_field" class="font-weight-bold">Código</label>
+                            {{ form_widget(form.codigo,{'attr': {'class': 'form-control','id':'codigo_field'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group input-group-sm">
+                                <label for="id_cuenta_field" class="font-weight-bold">Cuenta</label>
+                                {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control','id':'id_cuenta_field'}}) }}
+                                <span class="input-group-append"></span>
+                            </div>
+                        </div>
+                        <input type="text" id="id_elemento_gasto" hidden>
+                    </div>
+                    {{ form_end(form) }}
+                    <div class="modal-footer d-flex">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <th scope="col-2">Descripción</th>
+            <th scope="col-3">Código</th>
+            <th scope="col-3">Cuenta</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in elemento_gasto %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.cuenta }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Editar"
+                                onclick="onUpdate({
+                                        id_cuenta: '{{ item.id_cuenta }}',
+                                        cuenta:'{{ item.cuenta }}' ,
+                                        codigo:'{{ item.codigo }}',
+                                        descripcion:'{{ item.descripcion }}' ,
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el elemento de gasto: {{ item.descripcion }} ?',
+                                        url:'{{ path('contabilidad_config_elemento_gasto_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            resetField()
+            $('#btnActualizar').hide()
+        })
+        const TEXT_SELECT = 'Seleccione la cuenta...';
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+
+            const {id = '', codigo = '', descripcion = '', id_cuenta = '', cuenta = ''} = config
+            $('#gestionarElemento_gastoModal').modal('show')
+
+            $('#select2-elemento_gasto_id_cuenta-container')[0].textContent = cuenta
+            $('#select2-elemento_gasto_id_cuenta-container').val(id_cuenta)
+            $('#elemento_gasto_id_cuenta').val(id_cuenta)
+
+            $('#gestionarElemento_gastoModalLabel').html("Modificar " + descripcion)
+            $('#elemento_gasto_descripcion').val(descripcion)
+            $('#elemento_gasto_codigo').val(codigo)
+            $('#id_elemento_gasto').val(id)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            const formulario = $('#form_elemto_gasto')
+            formulario.attr('action', `/contabilidad/config/elemento-gasto-add`)
+            formulario.submit()
+        })
+
+        $('#btnActualizar').on('click', function () {
+            const id_elemento_gasto = $('#id_elemento_gasto').val()
+
+            const formulario = $('#form_elemto_gasto')
+            formulario.attr('action', `/contabilidad/config/elemento-gasto-upd/${id_elemento_gasto}`)
+            formulario.submit()
+        })
+
+
+        $('#gestionarElemento_gastoModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedAddress)
+            var modal = $(this)
+            $('#elemento_gasto_descripcion').val('')
+            $('#select2-elemento_gasto_id_cuenta-container').val(0)
+            $('#select2-elemento_gasto_id_cuenta-container')[0].textContent = TEXT_SELECT
+            modal.find('.modal-title').text('Adicionar elemento de gasto')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#btnAceptar').show()
+        }
+
+        function resetField() {
+            $('#elemento_gasto_id_cuenta').prepend('<option selected = "true" value = "0">' + TEXT_SELECT + '</option>');
+            $('#select2-elemento_gasto_id_cuenta-container')[0].textContent = TEXT_SELECT
+        }
+    </script>
+{% endblock %}
+

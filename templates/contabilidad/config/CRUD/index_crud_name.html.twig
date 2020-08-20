@@ -1,6 +1,6 @@
 {% extends 'contabilidad/config/CRUD/base_crud_name.html.twig' %}
 {% block formulario %}
-    {{ form_start(form,{'attr': {'class': 'd-flex'}}) }}
+    {{ form_start(form,{'attr': {'class': 'd-flex','id':'form_crud_add_name'}}) }}
     {% if label == 'nombre' %}
         {{ form_widget(form.nombre, {'attr': {'class': 'mr-2', 'style': 'width: 300px;'}}) }}
     {% else %}
@@ -9,4 +9,41 @@
     {{ form_widget(form.adicionar) }}
 
     {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+
+            $('#form_crud_add_name').validate({
+                rules: {
+                    'crud_add_descripcion[descripcion]': "required",
+                    'crud_add_name[nombre]': "required"
+                },
+                messages : {
+                    'crud_add_descripcion[descripcion]': "",
+                    'crud_add_name[nombre]': ""
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass("is-invalid");
+                    $(element).popover({
+                        content: 'valor requerido!',
+                        placement: 'bottom',
+                        trigger: 'manual'
+                    })
+                        .popover('show')
+                        .on('shown.bs.popover', function () {
+                            setTimeout(function (time) {
+                                $(element).popover('hide')
+                                    .removeClass('is-invalid')
+                            }, 3000)
+                        })
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass("is-invalid");
+                }
+            })
+        })
+    </script>
 {% endblock %}

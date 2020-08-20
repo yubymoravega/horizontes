@@ -32,8 +32,8 @@
     <header class="page-head">
         <!-- RD Navbar Transparent-->
         <div class="rd-navbar-wrap">
-            <!--  <nav class="rd-navbar rd-navbar-default rd-navbar-dark" data-md-device-layout="rd-navbar-fixed" data-lg-device-layout="rd-navbar-fixed" data-lg-auto-height="true" data-md-layout="rd-navbar-fixed" data-lg-layout="rd-navbar-fixed" data-lg-stick-up="true"> -->
             <nav class="rd-navbar rd-navbar-default rd-navbar-dark" data-md-device-layout="rd-navbar-fixed"
+                 style="z-index: 1000"
                  data-lg-device-layout="rd-navbar-fixed" data-lg-auto-height="true" data-md-layout="rd-navbar-fixed"
                  data-lg-layout="rd-navbar-fixed" data-lg-stick-up="true">
 
@@ -41,13 +41,13 @@
                     <!-- RD Navbar Panel-->
                     <div class="rd-navbar-panel">
                         <!-- RD Navbar Toggle-->
-                        <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar, .rd-navbar-nav-wrap">
+                        <button class="rd-navbar-toggle" style="display: block !important;" data-rd-navbar-toggle=".rd-navbar, .rd-navbar-nav-wrap">
                             <span></span></button>
                         <!--Navbar Brand-->
                         <div class="rd-navbar-brand" style="left: 30%;"><a href="/"><img style='margin-left: -15px;'
                                                                                          width='150' height='57'
                                                                                          src="{{ asset('images/slider-img/LOGO-AGENCIAS.png') }}"
-                                alt=''/></a></div>
+                                                                                         alt=''/></a></div>
                     </div>
                     <div class="rd-navbar-menu-wrap">
                         <div class="rd-navbar-nav-wrap">
@@ -55,7 +55,8 @@
                                 <!--Navbar Brand Mobile-->
                                 <div class="rd-navbar-mobile-brand"><a href="/"><img
                                                 style='margin-top: -5px;margin-left: -15px;' width='138' height='40'
-                                                src="{{ asset('images/slider-img/LOGO-AGENCIAS.png') }}" alt=''/></a>
+                                                src="{{ asset('images/slider-img/LOGO-AGENCIAS.png') }}"
+                                                alt=''/></a>
                                 </div>
                                 <div class="form-search-wrap">
                                     <!-- RD Search Form-->
@@ -89,20 +90,23 @@
                                     <label class="form-label" for="rd-navbar-search-form-control">Type and hit
                                         enter...</label>
                                     <input class="rd-navbar-search-form-control form-control form-control-gray-lightest"
-                                           id="rd-navbar-search-form-control" type="text" name="s" autocomplete="off"/>
+                                           id="rd-navbar-search-form-control" type="text" name="s"
+                                           autocomplete="off"/>
                                 </div>
                             </form>
                         </div>
                         <!--RD Navbar shop-->
                         <div class="rd-navbar-cart-wrap">
-                            <a class="rd-navbar-cart mdi icon-user " data-rd-navbar-toggle=".rd-navbar-usuario-dropdown"
+                            <a class="rd-navbar-cart mdi icon-user "
+                               data-rd-navbar-toggle=".rd-navbar-usuario-dropdown"
                                href="#"><span></span><br>
                                 <p class="p-text">Usuario</p></a>
                             <a class="rd-navbar-cart mdi icon-notification" href="#"><span></span> <br>
                                 <p class="p-text">Atender</p></a>
                             <a class="rd-navbar-cart mdi icon-ventas" href="#"><span></span><br>
                                 <p class="p-text">Ventas</p></a>
-                            <a class="rd-navbar-cart mdi icon-carrito " data-rd-navbar-toggle=".rd-navbar-cart-dropdown"
+                            <a class="rd-navbar-cart mdi icon-carrito "
+                               data-rd-navbar-toggle=".rd-navbar-cart-dropdown"
                                href="#"><span></span><br>
                                 <p class="p-text">Factura</p></a>
                             <a class="rd-navbar-cart mdi icon-texto" href="#"><span class="span-text"
@@ -112,8 +116,9 @@
                             <div class="rd-navbar-cart-dropdown">
                                 <ul class="rd-navbar-list-products">
                                     <li>
-                                        <div class="rd-navbar-product-image"><img src="images/shop/product-01-60x60.png"
-                                                                                  alt=""/></div>
+                                        <div class="rd-navbar-product-image"><img
+                                                    src="images/shop/product-01-60x60.png"
+                                                    alt=""/></div>
                                         <div class="rd-navbar-product-caption">
                                             <h6 class="rd-navbar-product-title"><a
                                                         href="shop-single-product-left-sidebar.html">Fashion model
@@ -127,7 +132,8 @@
                                                     src="images/shop/product-01-60x60-3.png" alt=""/></div>
                                         <div class="rd-navbar-product-caption">
                                             <h6 class="rd-navbar-product-title"><a
-                                                        href="shop-single-product-left-sidebar.html">Fashion model new
+                                                        href="shop-single-product-left-sidebar.html">Fashion model
+                                                    new
                                                     2</a></h6>
                                             <p class="rd-navbar-product-price">$69.99</p>
                                         </div>
@@ -140,25 +146,46 @@
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="shop-cart.html"><span class="icon novi-icon mdi mdi-lock"></span>Go to
+                                            href="shop-cart.html"><span class="icon novi-icon mdi mdi-lock"></span>Go
+                                        to
                                         checkout</a></div>
                             </div>
 
                             <div class="rd-navbar-usuario-dropdown">
 
-                                <div class=" text-center">
-                                    <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                <div class="row text-center">
+                                    <div class="col-2 mb-5">
+                                        <span class="icon novi-icon fa-user"></span>
+                                    </div>
+                                    <div class="col-10">
+                                        <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                    </div>
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="/index.php/logout"><span class="icon novi-icon mdi mdi-lock"></span>Cerrar
-                                        Secion</a></div>
+                                            href="/index.php/logout" style="width: 100%"><span
+                                                class="icon novi-icon mdi mdi-exit-to-app"></span>Cerrar
+                                        Seción</a></div>
                                 <br/>
-                                <div class="text-center"><a
-                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="/index.php/logout"><span class="icon novi-icon mdi mdi-lock"></span>Panel
-                                        De Control</a></div>
+                                <div class="text-center">
+                                    <button class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
+                                            style="width: 100%" id="btn_cambiar_contrasenna"><span
+                                                class="icon novi-icon mdi mdi-key"></span>Cambiar Contraseña
+                                    </button>
+                                </div>
                                 <br/>
+                                <div class="container-fluid p-0">
+                                    <input type="password" class="form form-control" style="width: 100%"
+                                           name="new_password" id="new_password"
+                                           placeholder="Introduzca la contraseña">
+                                    <input type="password" class="form form-control mt-2" style="width: 100%"
+                                           name="repeat_new_password" id="repeat_new_password"
+                                           placeholder="Repita la contraseña">
+                                    <label class="text-danger text-center" id="invalid_password">Las contraseñas no
+                                        coinciden</label>
+                                    <input type="submit" class="btn btn-outline-primary text-light mt-2"
+                                           id="btn_change_password" value="Aceptar">
+                                </div>
                             </div>
 
                         </div>

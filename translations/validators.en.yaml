@@ -1,0 +1,11 @@
+# translations/validators.en.yaml
+#author.name.not_blank: Please enter an author name.
+contabilidad:
+  config:
+    descripcion_not_blank: El campo descripción está vacio !
+    descripcion_unique: El nombre ya está en uso !
+    modulo_not_blank: Debe seleccionar el módulo !
+    tipo_doc_not_blank: Debe seleccionar el tipo de documento !
+    cuenta_not_blank: Debe seleccionar la cuenta !
+    sub_cuenta_not_blank: Debe seleccionar la subcuenta !
+    naturaleza_not_blank: Debe seleccionar la naturaleza !

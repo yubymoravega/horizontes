@@ -2,21 +2,24 @@
 
 namespace App\Repository\Contabilidad\Config;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method TipoMovimiento|null find($id, $lockMode = null, $lockVersion = null)
- * @method TipoMovimiento|null findOneBy(array $criteria, array $orderBy = null)
- * @method TipoMovimiento[]    findAll()
- * @method TipoMovimiento[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method TipoMovimiento|null find($id, $paranoid = true)
+ * @method TipoMovimiento|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method TipoMovimiento[]    findAll($paranoid = true)
+ * @method TipoMovimiento[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class TipoMovimientoRepository extends ServiceEntityRepository
+class TipoMovimientoRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TipoMovimiento::class);
+        $this->setEntityClass(TipoMovimiento::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
 
     // /**
