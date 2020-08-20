@@ -1,6 +1,6 @@
 config:
-  host: '192.168.40.90'
-  port: '25'
-  user: 'informatizacion@pinar.geocuba.cu'
-  password: 'Lady5*Everald03'
-  alias: 'Admin site'
+  host: 'smtp.gmail.com'
+  port: '465'
+  user: 'info@solyag.online'
+  password: 'solyag*2020'
+  alias: 'Solyag Sistema'
