@@ -11,7 +11,7 @@
 
         {# header #}
         <div class="d-flex align-items-center">
-            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Centro de Costo
             </h4>
             <div>
@@ -27,7 +27,7 @@
         {{ include('contabilidad/config/centro_costo/form_add_modal.html.twig') }}
 
         {# list #}
-        <table class="table table-hover">
+        <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-6">Descripción</th>
             <th scope="col-1">Código</th>
@@ -43,7 +43,7 @@
                     <td style="font-weight:400;">{{ item.cuenta }}</td>
                     <td style="font-weight:400;">{{ item.sub_cuenta }}</td>
                     <td>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
                                         id_cuenta: '{{ item.id_cuenta }}',
@@ -56,7 +56,7 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar el Centro de costo: {{ item.nombre }} ?',

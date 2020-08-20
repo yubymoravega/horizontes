@@ -21,7 +21,7 @@ class UnidadMedidaController extends CrudController
     public function __construct()
     {
         $this->setTitle('Unidad de Medida');
-        $this->setLabel('nombre');
+        $this->setLabel('Nombre');
         $this->setClassTypeName(UnidadMedidaType::class);
         $this->setClassEntity(UnidadMedida::class);
         $this->setMessages([
