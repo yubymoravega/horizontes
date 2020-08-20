@@ -22,7 +22,7 @@ if(split[5] === 'token123456qwer'){
 
 }
 
-fetch("http://10.0.0.20:8000/index.php/api.security", {
+fetch(location.hostname+"/index.php/api.security", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -50,7 +50,7 @@ fetch("http://10.0.0.20:8000/index.php/api.security", {
       $("#aprobada").css({"display": ""});
       history.pushState({}, null, 'token123456qwer');
 
-      $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+      $.ajax({url:location.hostname+'/index.php/api.rep',method:'post',dataType : 'json',
       data:{'data': intent}, 
       success: function(){}});
 
@@ -104,7 +104,7 @@ fetch("http://10.0.0.20:8000/index.php/api.security", {
     }
   } 
 
-  $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+  $.ajax({url:location.hostname+'/index.php/api.rep',method:'post',dataType : 'json',
   data:{'data': intent.json}, 
   success: function(){}});
 

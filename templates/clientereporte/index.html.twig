@@ -44,7 +44,7 @@
 
   
   </div>
-  <input name='telefono' id='telefono' placeholder="Telefono" type="text" class="form-control" >
+  <input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text" class="form-control" >
   <button class="btn btn-sm btn-outline-dark" type="submit">Filtrar</button></span>
  
 </div></form>
@@ -164,6 +164,11 @@
       return date;
     }
   } );
+
+ $('#telefono').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});   
+
   </script>
  
 

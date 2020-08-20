@@ -13,7 +13,7 @@ var purchase = {
 };
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
-fetch("http://10.0.0.20:8000/index.php/api.create", {
+fetch(location.hostname+"/index.php/api.create", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -85,7 +85,7 @@ var payWithCard = function(stripe, card, clientSecret) {
         json['mStatus'] = result.error.code
         json['pi'] = result.error.payment_intent.id;
 
-        $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+        $.ajax({url:location.hostname+'/index.php/api.rep',method:'post',dataType : 'json',
         data:{'data': json}, 
         success: function(){}});
 
@@ -95,11 +95,11 @@ var payWithCard = function(stripe, card, clientSecret) {
 
         // The payment succeeded!
           orderComplete(result.paymentIntent.id);
-       $.ajax({url:'http://10.0.0.20:8000/index.php/api.status',method:'post',
+       $.ajax({url:location.hostname+'/index.php/api.status',method:'post',
        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]},
        success: function(data) { data = JSON.parse(data); data.pi = result.paymentIntent.id;
 
-        $.ajax({url:'http://10.0.0.20:8000/index.php/api.rep',method:'post',dataType : 'json',
+        $.ajax({url:location.hostname+'/index.php/api.rep',method:'post',dataType : 'json',
         data:{'data': data}, 
         success: function(){}});
             },    

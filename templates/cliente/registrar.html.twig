@@ -16,7 +16,7 @@
                 <div class="form-group">
                   <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
                 
-                  {{ form_widget(formulario.telefono, {'attr': {'disabled': false,'class': 'form-control','placeholder': 'Telefono'}}) }}
+                  {{ form_widget(formulario.telefono, {'attr': {'readonly': true,'class': 'form-control','placeholder': 'Telefono'}}) }}
  
                     <span class="input-group-append">
                       
@@ -122,12 +122,13 @@ $("#form_cliente").validate({
       'cliente[apellidos]': {required: "Apellido Requerido", minlength: "Minimo 3 Caracteres" },
       'cliente[correo]': {email: "Formato de Email no Valido"},
       'cliente[telefono]': {required: "Telefono Requerido", minlength: "Minimo 8 Caracteres" }},
- 
  });
      
  $('#cliente_telefono').on('input', function () { 
     this.value = this.value.replace(/[^0-9]/g,'');
 });    
+
+
  </script>
 
 {% endblock %}
