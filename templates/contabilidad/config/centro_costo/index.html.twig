@@ -60,7 +60,8 @@
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar el Centro de costo: {{ item.nombre }} ?',
-                                        url:'{{ path('contabilidad_config_centro_costo_delete',{id: item.id}) }}'
+                                        url:'{{ path('contabilidad_config_centro_costo_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -76,7 +77,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const TEXT_SELECT = 'Seleccione la cuenta...';
+        const TEXT_SELECT = '... seleccione ...';
 
         function mostrarBtn() {
             $('#btnActualizar').hide()
@@ -98,27 +99,36 @@
             } = config
             $('#gestionarCentro_costoModal').modal('show')
 
-            $('#select2-centro_costo_id_cuenta-container')[0].textContent = cuenta
-            $('#select2-centro_costo_id_cuenta-container').val(id_cuenta)
-            $('#select2-centro_costo_id_sub_cuenta-container')[0].textContent = sub_cuenta
-            $('#select2-centro_costo_id_sub_cuenta-container').val(id_sub_cuenta)
+            // cuenta
+            $('#select2-centro_costo_id_cuenta-container').text(cuenta)
             $('#centro_costo_id_cuenta').val(id_cuenta)
-            $('#centro_costo_id_sub_cuenta').val(id_sub_cuenta)
 
-            $('#gestionarCentro_costoModalLabel').html("Modificar " + nombre)
+            //sub cuenta
+            const subcuenta = $('#subcuenta_id')
+            subcuenta.removeAttr('disabled')
+            getValues(id_cuenta, subcuenta, id_sub_cuenta)
+            $('#select2-subcuenta_id-container').text(sub_cuenta)
+
+
+            // nombre, codigo, id
+            $('.modal-title').text("Modificar " + nombre)
             $('#centro_costo_nombre').val(nombre)
             $('#centro_costo_codigo').val(codigo)
             $('#id_centro_costo').val(id)
         }
 
         $(document).ready(function () {
-            resetField()
+
+            // init
+            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
             $('#btnActualizar').hide()
 
+            // cargar subcuenta por la cuenta seleccionada
             var subcuenta = $('#subcuenta_id');
             subcuenta.prop('disabled', true);
             $('#centro_costo_id_cuenta').change(function (evernt) {
                 subcuenta.find('option').remove();
+                $("#select2-subcuenta_id-container").text('')
                 if (typeof ($(this).val()) != 'object') {
                     getValues($(this).val(), subcuenta)
                 } else {
@@ -126,21 +136,19 @@
                 }
             })
 
-            $('#form_centro_costo').validate({
-                //errorClass: 'invalid-label',
+            // validacion del formulario
+            const validateForm = $('#form_centro_costo').validate({
                 errorClass: 'invalid-label',
                 errorPlacement: function (error, element) {
-                    // Append error within linked label
-                    console.log("label[for='" + element.attr("id") + "']")
-                    $(element)
-                        .closest("form")
-                        .find("label[for='" + element.attr("id") + "']")
-                        .append(error);
-                },
-                //errorElement: "span",
-                success: function (label) {
-                    label.removeClass('invalid-label').text("")
-                    // ELIMINAR
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
                 },
                 rules: {
                     'centro_costo[nombre]': "required",
@@ -157,7 +165,6 @@
             })
 
             $('#btnAceptar').on('click', function () {
-
                 const formulario = $('#form_centro_costo')
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/add`)
@@ -166,47 +173,44 @@
 
             $('#btnActualizar').on('click', function () {
                 const id_centro_costo = $('#id_centro_costo').val()
-
                 const formulario = $('#form_centro_costo')
-                formulario.attr('action', `/contabilidad/config/centro-costo-upd/${id_centro_costo}`)
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/centro-costo/${id_centro_costo}`)
                 formulario.submit()
             })
 
 
             $('#gestionarCentro_costoModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedAddress)
-                var modal = $(this)
-                $('#centro_costo_nombre').val('')
-                $('#select2-centro_costo_id_cuenta-container').val(0)
-                $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
-                modal.find('.modal-title').text('Adicionar Centro de Costo')
+                validateForm.resetForm()
+                subcuenta.find('option').remove();
+                // reiniciar los -- <select> --
+                $("[class='select2-selection__rendered']").val(0)
+                $("[class='select2-selection__rendered']").text('')
+                $('.modal-title').text('Adicionar Centro de Costo')
             })
-
-            function resetField() {
-                $('#centro_costo_id_cuenta').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
-                $('#select2-centro_costo_id_cuenta-container')[0].textContent = TEXT_SELECT
-            }
-
-            function getValues(id, subcuenta) {
-                $.ajax({
-                    url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        subcuenta.find('option').remove();
-                        subcuenta.append('<option selected = "true" value = "0"> Seleccione la subcuenta</option>');
-                        $(result.subcuentas).each(function (pos, valor) {
-                            subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
-                        })
-                        subcuenta.prop('disabled', false);
-                    },
-                    error: function () {
-                        alert('Ha ocurrido un error en el servidor');
-                        subcuenta.prop('disabled', true);
-                    }
-                })
-            }
         })
+
+        // load sincrono de las subcuentas de la BD
+        function getValues(id, subcuenta, select = 0) {
+            $.ajax({
+                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    subcuenta.find('option').remove();
+                    subcuenta.append('<option selected = "false" value = "0" disabled> Seleccione la subcuenta</option>');
+                    $(result.subcuentas).each(function (pos, valor) {
+                        subcuenta.append('<option value="' + valor.id + '">' + valor.subcuenta + '</option>');
+                    })
+                    subcuenta.prop('disabled', false);
+                    subcuenta.val(select)
+                },
+                error: function () {
+                    alert('Ha ocurrido un error en el servidor');
+                    subcuenta.prop('disabled', true);
+                }
+            })
+        }
 
     </script>
 {% endblock %}
