@@ -95,7 +95,7 @@ var payWithCard = function(stripe, card, clientSecret) {
 
         // The payment succeeded!
           orderComplete(result.paymentIntent.id);
-       $.ajax({url:location.hostname+'/index.php/api.status',method:'post',
+       $.ajax({url:"https://"+location.hostname+'/index.php/api.status',method:'post',
        data:{"status":result.paymentIntent.status,"customer":customerID,'metodoPago':result.paymentIntent.payment_method,'tel':tel , 'monto':split[4]},
        success: function(data) { data = JSON.parse(data); data.pi = result.paymentIntent.id;
 
