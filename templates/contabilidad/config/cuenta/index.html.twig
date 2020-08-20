@@ -11,7 +11,7 @@
     <div class="container-fluid">
         {# header #}
         <div class="d-flex align-items-center">
-            <h5 class="mr-auto display-4 mb-0 mr-auto title-table">
+            <h5 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Cuentas
             </h5>
             <div>
@@ -20,7 +20,7 @@
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-placement="bottom" title="Imprimir">
+                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir">
                     <i class="fa fa-print"></i>
                 </button>
             </div>
@@ -96,7 +96,7 @@
         </div>
 
         {# list #}
-        <table class="table table-hover">
+        <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-1" width="112px">Nro. cuenta</th>
             <th scope="col-6">Descripción</th>
@@ -116,12 +116,12 @@
                     <td style="font-weight:400;">{{ item.patrimonio }}</td>
                     <td style="font-weight:400;">{{ item.elemento_gasto }}</td>
                     <td>
-                        <a type="button" class="btn btn-outline-info btn-sm" data-toggle="tooltip"
+                        <a type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
                            data-placement="bottom" title="Ver subcuentas"
                            href="{{ path('contabilidad_config_subcuenta',{id:item.id}) }}">
                             <i class="fa fa-eye"></i>
                         </a>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Modificar"
                                 onclick="onUpdate({
                                         nro_cuenta: '{{ item.nro_cuenta }}',
@@ -134,7 +134,7 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la cuenta {{ item.nro_cuenta }} ?',

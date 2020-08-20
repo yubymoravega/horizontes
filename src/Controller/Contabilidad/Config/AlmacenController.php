@@ -20,7 +20,7 @@ class AlmacenController extends CrudController
     public function __construct()
     {
         $this->setTitle('Almacén');
-        $this->setLabel('descripcion');
+        $this->setLabel('Descripción');
         $this->setClassTypeName(CrudAddDescripcionType::class);
         $this->setClassEntity(Almacen::class);
         $this->setMessages([

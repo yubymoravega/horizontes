@@ -86,7 +86,7 @@
             $('#form_add_configinicial').validate({
                 //focusCleanup: true,
                 errorClass: 'invalid-label',
-                success: function(label) {
+                success: function (label) {
                     label.removeClass('invalid-label').text("")
                 },
                 rules: {
@@ -134,17 +134,14 @@
             const cuenta = $('#configuracion_inicial_id_cuenta');
             const tipo_doc = $('#configuracion_inicial_id_tipo_documento');
             const modulo = $('#configuracion_inicial_id_modulo');
-            const naturaleza = $('#naturaleza_cuenta');
 
             cuenta.prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
             tipo_doc.prepend('<option selected = "true" value = "0" disabled>Seleccione el tipo de documento</option>');
-            modulo.prepend('<option selected = "true" value = "0" disabled>Seleccione el módulo</option>');
-            naturaleza.prepend('<option selected = "true" value = "0" disabled>Seleccione la naturaleza de la cuenta</option>');
+            modulo.prepend('<option selected = "true" value = "0" disabled>Seleccione el módulo</option>')
 
-            $('#select2-configuracion_inicial_id_tipo_documento-container')[0].textContent = 'Seleccione el tipo de documento'
-            $('#select2-configuracion_inicial_id_cuenta-container')[0].textContent = 'Seleccione la cuenta'
-            $('#select2-configuracion_inicial_id_modulo-container')[0].textContent = 'Seleccione el módulo'
-            $('#select2-naturaleza_cuenta-container')[0].textContent = 'Seleccione la naturaleza de la cuenta'
+            $('#select2-configuracion_inicial_id_tipo_documento-container')[0].textContent = ''
+            $('#select2-configuracion_inicial_id_cuenta-container')[0].textContent = ''
+            $('#select2-configuracion_inicial_id_modulo-container')[0].textContent = ''
         }
     </script>
 {% endblock %}

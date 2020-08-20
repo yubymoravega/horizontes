@@ -26,11 +26,35 @@
     overflow-x: hidden;
 }
 
-.invalid-label{
+.invalid-label {
     padding-left: 1rem;
     color: red;
 }
 
+body {
+    --bg-nabvar: #343a40
+}
+
+.nabvar-navegation {
+    background: var(--bg-nabvar) !important;
+}
+
+.nabvar-navegation > a {
+    color: white !important;
+}
+
+.nabvar-navegation li > a {
+    color: white !important;
+}
+
+/*********************** redefinicion de stilos ****************************/
+
+.table-hover tbody tr:hover {
+    color: var(--light);
+    background-color: rgba(0, 0, 0, .075);
+}
+
+/* ------ RWD -------- */
 @media (max-width: 480px) {
     .overflow-hidden-x-content {
         overflow-x: auto;

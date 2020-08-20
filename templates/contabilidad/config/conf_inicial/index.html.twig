@@ -11,7 +11,7 @@
         {# header #}
 
         <div class="d-flex align-items-center">
-            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
             Configuración inicial del sistema
             </h4>
             <div>
@@ -23,7 +23,7 @@
         {# end header #}
 
         {# list #}
-        <table class="table table-hover">
+        <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Módulo</th>
             <th scope="col-3">Tipo de Documento</th>
@@ -31,7 +31,7 @@
             <th scope="col-2">Subcuenta</th>
             <th scope="col-2">Naturaleza</th>
 {#            <th scope="col-1" width="150px">Acciones</th>#}
-            <th scope="col-1" width="150px">Eliminar</th>
+            <th scope="col-1" width="50px">Eliminar</th>
             </thead>
             <tbody>
             {% for item in configuraciones %}
@@ -42,7 +42,7 @@
                     <td style="font-weight:400;">{{ item['nro_cuenta'] }}</td>
                     <td style="font-weight:400;">{{ item['nro_subcuenta'] }}</td>
                     <td style="font-weight:400;">{{ item['naturaleza'] }}</td>
-                    <td>
+                    <td class="text-center">
 {#                        -----Esta asccion esta implementada pero no se publicara pues no deben cambiarse ---- #}
 {#                        -----los origenesteniendo acciones asociadas, eso desvirtua los reportes necesarion --#}
 
@@ -51,7 +51,7 @@
 {#                           data-placement="bottom" title="Editar">#}
 {#                            <i class="fa fa-edit"></i>#}
 {#                        </a>#}
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la configuración seleccionada ?',

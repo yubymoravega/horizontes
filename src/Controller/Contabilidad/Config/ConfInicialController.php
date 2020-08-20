@@ -58,7 +58,7 @@ class ConfInicialController extends AbstractController
                 $arr_form = $request->get('configuracion_inicial');
                 $arr_extra_form = ['deudora' => $deudora, 'id_subcuenta' => $subcuenta_id];
                 $arr_result = array_merge($arr_form, $arr_extra_form);
-                if (!$this->isDuplicate($em, $arr_result,'add')) {
+                if (!$this->isDuplicate($em, $arr_result, 'add')) {
                     if ($this->saveDataConf($em, $arr_result, null)) {
                         if (isset($arr_result['aplicar'])) {
                             $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aplicar).');
@@ -186,7 +186,8 @@ class ConfInicialController extends AbstractController
                 /**@var $item Subcuenta** */
                 $row[] = array(
                     'id' => $item->getId(),
-                    'nro_subcuenta' => $item->getNroSubcuenta()
+                    'nro_subcuenta' => $item->getNroSubcuenta(),
+                    'subcuenta' => $item->getDescripcion()
                 );
             }
         }
