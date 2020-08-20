@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+{% set total = null %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<section class="section novi-background section-66 section-sm-bottom-110">
+        <div class="container">
+          <h1 class="text-reporte">Reporte de cobros </h1>
+          <hr class="divider bg-mantis">
+  <form id="payment-form" name='payment-form' action="{{ path('paymentreport') }}" method="GET" >        
+  <div class="input-group input-group-sm mb-3">
+   
+  <div class="input-group-prepend">
+    
+  </div>
+  <input autocomplete="off" name="from" id='from' type="text"  placeholder="Desde" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-sm">
+  <input autocomplete="off" name="to" id='to'  type="text"  placeholder="Hasta" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+
+ <div class="input-group-prepend">
+  
+  </div>
+  <select name="estado" class="custom-select" id="estado">
+  <option value=0 selected>Estado</option>
+    <option value="succeeded">Exitoso</option>
+    <option value="declined">Declinado</option>
+   
+  </select>
+
+  <div class="input-group-prepend">
+ 
+  </div>
+
+ 
+
+  <select class="custom-select" name='empleado' id="empleado">
+  <option value=0 selected>Empleado</option>
+   {% for data in user %}
+        <option value="{{data.username}}">{{data.username}}</option> 
+    {% endfor %}  
+    
+  </select>
+
+   <div class="input-group-prepend">
+
+  
+  </div>
+  <input name='telefono' id='telefono' placeholder="Telefono" type="text" class="form-control" >
+  <button class="btn btn-sm btn-outline-dark" type="submit">Filtrar</button></span>
+ 
+</div></form>
+              <!-- Bootstrap Table-->
+              <div class="table-responsive clearfix">
+                <table class="table table-striped tabla-reporte">
+                  <tbody><tr>
+                  <th>Fecha</th> 
+                    <th>Teléfono</th>
+                    <th>Tarjeta</th>
+                    <th class = "th-monto">Monto</th>                  
+                    <th>Estado</th>
+                    <th>Empleado</th>
+                  </tr>
+                 {# table body #}
+    {% for data in pagination %}
+        <tr {% if loop.index is odd %}class="color"{% endif %}>
+            <td>{{ data.fecha | date('d-M-y') }} </br> {{ data.fecha | date('H:i a') }}</td>
+            <td> {{ data.idCliente }} </td>     
+            <td>{{ data.bram }} - {{ data.last4  }} </br>  </td>       
+            <td>{{ data.monto }} </td> {% set total = total + data.monto %}
+            <td><a  onClick="caja('{{ data.estado }}','{{ data.auth }}');" > 
+            {% if data.estado == 'succeeded' %}
+                Exitoso
+            {% else %}    
+              Declinado
+            {% endif %}
+            
+             </a></td>
+             <td>{{ data.user }}</td>
+        </tr>
+    {% endfor %}    
+                </tbody></table> <hr style="background-color: white; margin-top: 0px;">
+                {# display navigation #}
+                <div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+                 <div class="count contador">Transacciones: {{ pagination.getTotalItemCount }} </br> Total: ${{total}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+<div id="dialog"  title="Facturador Stripe">
+  <p>
+    <b>Auth:</b> <span id="Auth"></span>
+  </p>
+
+  <p>
+    <b>Estado:</b> <span id="Estado"></span>
+  </p>
+
+</div>
+
+       
+        
+    {% endblock %}
+
+  {% block javascripts %} 
+{{parent()}}
+
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+
+ 
+ 
+ function caja(estado,auth) {
+   $("#Estado").text(estado);
+   $("#Auth").text(auth); 
+   
+   $( "#dialog" ).dialog({width: 500});
+    $( "#dialog" ).dialog( "open" );
+  }; 
+
+
+ 
+    $( "#dialog" ).dialog({
+     show: {
+        effect: "drop",
+        duration: 500
+      },
+      hide: {
+        effect: "drop",
+        duration: 500
+      },
+      autoOpen: false,
+      
+    });
+  
+  $( function() {
+    var dateFormat = "mm/dd/yy",
+      from = $( "#from" )
+        .datepicker({
+          defaultDate: "+1w",
+          changeMonth: true,
+          numberOfMonths: 1
+        })
+        .on( "change", function() {
+          to.datepicker( "option", "minDate", getDate( this ) );
+        }),
+      to = $( "#to" ).datepicker({
+        defaultDate: "+1w",
+        changeMonth: true,
+        numberOfMonths: 1
+      })
+      .on( "change", function() {
+        from.datepicker( "option", "maxDate", getDate( this ) );
+      });
+ 
+    function getDate( element ) {
+      var date;
+      try {
+        date = $.datepicker.parseDate( dateFormat, element.value );
+      } catch( error ) {
+        date = null;
+      }
+ 
+      return date;
+    }
+  } );
+  </script>
+ 
+
+{% endblock %}

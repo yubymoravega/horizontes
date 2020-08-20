@@ -30,14 +30,6 @@
             right: -5000px;
         }
     </style>
-    <!--[if lt IE 10]>
-    <div style="background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index:1;">
-        <a href="http://windows.microsoft.com/en-US/internet-explorer/"><img
-                src="images/ie8-panel/warning_bar_0000_us.jpg" border="0" height="42" width="820"
-                alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a>
-    </div>
-    <script src="js/html5shiv.min.js"></script>
-    <![endif]-->
 </head>
 <body>
 <div class="toasts-alert alert alert-danger alert-dismissible fade" role="alert"
@@ -51,6 +43,7 @@
 <div class="page-loader page-loader-variant-1">
     <div><img class='img-fluid' style='margin-top: -20px;margin-left: -18px;' width='330' height='67'
               src="{{ asset('images/logo-solyag.png') }}" alt=''/>
+
         <div class="offset-top-41 text-center">
             <div class="spinner"></div>
         </div>
@@ -163,7 +156,7 @@
 <div class="snackbars" id="form-output-global"></div>
 <script src="{{ asset('js/core.min.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>
-<script src="{ asset('js/revolution.min.js') }}"></script>
+{#<script src="{ asset('js/revolution.min.js') }}"></script>#}
 </body>
 </html>
 

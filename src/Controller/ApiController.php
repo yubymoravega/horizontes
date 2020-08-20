@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
-
+use \Datetime;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Cliente;
+use App\Entity\ClienteReporte;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security as ConfigurationSecurity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +14,7 @@ use Stripe\Stripe;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
+use Bin\SoapClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +26,7 @@ class ApiController extends AbstractController
   public $apiKey='sk_test_51GqMhfF2pLNIoJ5O8g0MrVyCAe6UEcGo7x2PD9DWBeeDONKWwJMpO8CXY0tefeLHKAVctTdxkIXHl5Y6qy7tYpEx00IWD9yulx';
 
   /**
-     * @Route("/cliente-monto{tel}", name="cliente-monto")
+     * @Route("/cliente-monto/{tel}", name="cliente-monto")
      */
     public function clienteMonto($tel)
     {
@@ -78,8 +80,6 @@ class ApiController extends AbstractController
 
    }   
 
-  
-
   $paymentIntent = \Stripe\PaymentIntent::create([
     'amount' =>  $json_obj->items[0]->monto *100,
     'currency' => 'usd',
@@ -103,7 +103,7 @@ class ApiController extends AbstractController
      */
     public function apiStatus(Request $request)
     {
-      
+     
       $status = $request->getContent(); 
 
       $dataBase = $this->getDoctrine()->getManager();
@@ -119,7 +119,7 @@ class ApiController extends AbstractController
 
       }
 
-      // integracion con el virtual
+      // stripe formulario
 
      $stripe = new \Stripe\StripeClient(
         $this->apiKey
@@ -139,7 +139,7 @@ class ApiController extends AbstractController
       $year = $year - 2000;
      if($paymentIntent->card->exp_month  < 10){$year = '0'.$paymentIntent->card->exp_month.$year;}
 
-      $json['mApikey'] = 'xAe45cc95dgvz94cm';
+      $json['mApiKey'] = 'xAe45cc95dgvz94cm';
       $json['mEmployeeID'] =  $user->getUsername();
       $json['mPhoneNo'] = $request->get('tel');
       $json['mCardTypeID'] = $paymentIntent->card->brand;
@@ -148,6 +148,7 @@ class ApiController extends AbstractController
       $json['mProfileClientID'] = $request->get('customer');
       $json['mAmount'] = $request->get('monto');
       $json['mStatus'] = $request->get('status');
+      $json['pi'] = $paymentIntent->id;
 
       
       return new Response(json_encode( $json));
@@ -155,7 +156,7 @@ class ApiController extends AbstractController
     }
     
     /**
-     * @Route("/select{tel}", name="select")
+     * @Route("/select/{tel}", name="select")
      */
     public function select($tel , Request $request)
     {
@@ -220,6 +221,7 @@ class ApiController extends AbstractController
       \Stripe\Stripe::setApiKey($this->apiKey);
 
       header('Content-Type: application/json');
+      
 
       // retrieve JSON from POST body
       $json_str = file_get_contents('php://input');
@@ -282,7 +284,7 @@ try {
   $year = $year - 2000;
  if($paymentIntent->card->exp_month  < 10){$year = '0'.$paymentIntent->card->exp_month.$year;}
 
-  $json['mApikey'] = 'xAe45cc95dgvz94cm';
+  $json['mApiKey'] = 'xAe45cc95dgvz94cm';
   $json['mEmployeeID'] =  $user->getUsername();
   $json['mPhoneNo'] = $json_obj->items[0]->tel;
   $json['mCardTypeID'] = $paymentIntent->card->brand;
@@ -291,8 +293,8 @@ try {
   $json['mProfileClientID'] = $data[0]->getToken();
   $json['mAmount'] = $json_obj->items[0]->monto;
   $json['mStatus'] = $status->status;
+  $json['pi'] = $status->id;
   
-
   return new Response(\json_encode($json));
 
 } catch (\Stripe\Exception\CardException $err) {
@@ -326,7 +328,7 @@ try {
     $year = $year - 2000;
    if($paymentIntent->card->exp_month  < 10){$year = '0'.$paymentIntent->card->exp_month.$year;}
   
-    $json['mApikey'] = 'xAe45cc95dgvz94cm';
+    $json['mApiKey'] = 'xAe45cc95dgvz94cm';
     $json['mEmployeeID'] =  $user->getUsername();
     $json['mPhoneNo'] = $json_obj->items[0]->tel;
     $json['mCardTypeID'] = $paymentIntent->card->brand;
@@ -335,6 +337,7 @@ try {
     $json['mProfileClientID'] = $data[0]->getToken();
     $json['mAmount'] = $json_obj->items[0]->monto;
     $json['mStatus'] = '';
+    $json['pi'] = '';
 
     return new Response (json_encode(array(
       'error' => 'authentication_required', 
@@ -353,9 +356,9 @@ try {
   } 
 
      /**
-     * @Route("/api.form{tel}/{monto}/{last4}", name="api.form")
+     * @Route("/api.form/{tel}/{monto}/{last4}", name="api.form")
      */
-    public function apiForm($tel, $monto,$last4)
+    public function apiForm($tel,$monto,$last4)
     {
 
       $stripe = new \Stripe\StripeClient(
@@ -411,6 +414,39 @@ try {
     {
 
       return $this->render('api/confirm.html.twig');
+
+    } 
+
+    /**
+     * @Route("/api.rep", name="api.rep")
+     */
+    public function apiRep(Request $request)
+    {
+      $dataBase = $this->getDoctrine()->getManager();
+      
+      $clienteReporte = new ClienteReporte();
+
+      $user =  $this->getUser();
+
+      $date = new DateTime('NOW');
+
+     // return new Response();
+
+      $clienteReporte->setUser($user->getUsername());
+      $clienteReporte->setFecha($date);
+      $clienteReporte->setIdCliente($request->get('data')['mPhoneNo']);
+      $clienteReporte->setBram($request->get('data')['mCardTypeID']);
+      $clienteReporte->setLast4($request->get('data')['mCard4']);
+      $clienteReporte->setMonto($request->get('data')['mAmount']);
+      $clienteReporte->setComercio('Solyag');
+      $clienteReporte->setEstado($request->get('data')['mStatus']);
+      $clienteReporte->setAuth($request->get('data')['pi']); 
+
+      $dataBase->persist($clienteReporte);
+      $dataBase->flush();
+
+
+      return new Response('true');
 
     } 
 

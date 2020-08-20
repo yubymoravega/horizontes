@@ -1,33 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ asset('css/global.css') }}" />
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <title>Accept a card payment</title>
-    <meta name="description" content="A demo of a card payment on Stripe" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <link rel="stylesheet" href="{{ asset('css/global.css') }}" />
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="{{ asset('js/client.js') }}" defer></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  </head>
-
-  <body>
-
+<section class="section-lg-50 novi-background " id='seccion-principal'>
+<img class="imagen-tarjeta" src="{{ asset('images/iconos/pay.svg') }}" >
+      <div class="card-header text-center"><h2>Procesador de tarjetas</h2></div>
+      <hr class="divider bg-mantis">
+        <div class="container card">
     <!-- Display a payment form -->
     <form id="payment-form">
-      <input type="number" id="monto" style="border-color: green; text-align: center;" disabled name='monto'placeholder="Monto a cobrar ${{monto}}" />
+      <h2 class="texto-monto">Monto a cobrar $ {{monto}}</h2>
       <div id="card-element"><!--Stripe.js injects the Card Element--></div>
       
-      <label style="margin-top: 20px;float: left; margin-left: 30px;">Confirmar Pago</label>
+      <label style="margin-top: 17px; float: left; margin-left: 2px;margin-right: 10px;;">Confirme</label>
       <input style="width: 5%; float: left; margin-top: 7px;"  type="checkbox" required id="check" name="check" value="check">
       
-      <button id="submit" style="width: 35%; padding: 12px 0px; float: left; margin-top: 8px; margin-left: 70px;">
+      <button id="submit" class="boton-pagar">
         <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Pagar</span>
+        <span id="button-text">Procesar cobro</span>
       </button>
  
       <p id="card-error" style="text-align: center; line-height: 30px; font-size: 16px; float: left; width: 100%; color: red;" role="alert"></p>
@@ -40,10 +31,24 @@
         <div class="cancelar" id="cancelar"></div>
         <span id="cancelar-text">Cancelar</span>
       </button>
-    </form>
-  </body>
-</html>
+    </form> 
+    <div class="credit-cards" style="text-align: center; width: 100%">
+  <img height="50" src="{{ asset('images/iconos/visa.svg') }}" style="margin-right: 8px;"/>
+  <img height="50" src="{{ asset('images/iconos/mastercard.svg') }}" style="margin-right: 8px;"/>
+  <img height="50" src="{{ asset('images/iconos/amex.svg') }}" style="margin-right: 8px;"/>
+  <img height="50" src="{{ asset('images/iconos/discover.svg') }}" style="margin-right: 8px;"/>
+</div>
+<img class="imagen-stripe" src="{{ asset('images/iconos/stripe.png') }}" ></div>
+    </section>
 
+{% endblock %}
+
+
+{% block javascripts %} 
+{{parent()}}
+
+ <script src="{{ asset('js/client.js') }}" defer></script>
+ 
 <script>
 
 $( "#cancelar" ).click(function() {
@@ -65,8 +70,6 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
 })
-
-
 </script>
 
 {% endblock %}

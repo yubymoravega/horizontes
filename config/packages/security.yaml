@@ -39,10 +39,15 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-          - { path: '^/home', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] } 
-          - { path: '^/cliente', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] } 
-          - { path: '^/registrar', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] }
-          - { path: '^/edit', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] } 
-          - { path: '^/api', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] } 
-          - { path: '^/select', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] } 
-          - { path: '^/confirm', roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN] }
+          - { path: '^/home', roles: [ROLE_USER] } 
+          - { path: '^/cliente', roles: [ ROLE_USER] } 
+          - { path: '^/registrar', roles: [ ROLE_USER] }
+          - { path: '^/edit', roles: [ ROLE_USER] } 
+          - { path: '^/api', roles: [ ROLE_USER] } 
+          - { path: '^/select', roles: [ ROLE_USER] } 
+          - { path: '^/confirm', roles: [ ROLE_USER] }
+          - { path: '^/contabilidad', roles: [ ROLE_ADMIN] }
+          - { path: '^/contabilidad/config', roles: [ ROLE_ADMIN] }
+          - { path: '^/config', roles: [ ROLE_ADMIN] }
+
+          

@@ -1,219 +1,133 @@
+
 {% extends 'base.html.twig' %}
+
 {% block content %}
 
-    <div id='error' class="alert alert-danger row justify-content-md-center text-center" role="alert"
-         style="display: none;">
-        <p id='mensaje'>El cliente debe tener un número de teléfono valido </p>
-    </div>
-    <!-- Section Input Groups-->
-    <section class="section novi-background section-20" id='seccion-principal'>
-        <div class="container">
-            <h1>Registro Del Cliente</h1>
-            <hr class="divider divider-sm bg-mantis">
-            <div class="row justify-content-md-center text-left">
-                <div class="col-md-7 col-lg-4">
+          <!-- Section Input Groups-->
+      <section class="section novi-background section-20" id='seccion-principal'>
+        <div class="container card">
+             <div class="card-header text-center"><h1>Registro Del Cliente</h1></div>
+          <div class="row justify-content-md-center text-left">
+            <div class="col-md-7 col-lg-4">
+           <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger" role="alert"></div>
 
-                    {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
-
-                            {{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','placeholder': 'Telefono'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-user-plus"></span></span></span>
-
-                            {{ form_widget(formulario.nombre, {'attr': {'class': 'form-control','placeholder': 'Nombre'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-users"></span></span></span>
-
-                            {{ form_widget(formulario.apellidos, {'attr': {'class': 'form-control','placeholder': 'Apellido'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon mdi mdi-email"></span></span></span>
-
-                            {{ form_widget(formulario.correo, {'attr': { 'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-map-marker"></span></span></span>
-
-                            {{ form_widget(formulario.direccion, {'attr': {'class': 'form-control','placeholder': 'Direccion'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="input-group input-group-sm"><span class="input-group-prepend"><span
-                                        class="input-group-text input-group-icon"><span
-                                            class="novi-icon fa fa-book"></span></span></span>
-
-
-                            {{ form_widget(formulario.comentario, {'attr': {'class': 'form-control','placeholder': 'Comentario'}}) }}
-
-                            <span class="input-group-append">
-
-                        </div>
-                    </div>
-
-
-                    <div class="form-output" id="components-form-subscribe-footer"></div>
-
-                    <div class=" row justify-content-md-center group offset-top-34">
-
-                        {{ form_row(formulario.continuar) }}
-
-
-                    </div>
-
-                    {{ form_end(formulario) }}
-
-
+            {{ form_start(formulario,{'attr': { 'id': 'form_cliente'}}) }}
+       
+                <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-cellphone-iphone"></span></span></span>
+                
+                  {{ form_widget(formulario.telefono, {'attr': {'disabled': false,'class': 'form-control','placeholder': 'Telefono'}}) }}
+ 
+                    <span class="input-group-append">
+                      
+                  </div>
                 </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-user-plus"></span></span></span>
+                 
+                 {{ form_widget(formulario.nombre, {'attr': {'minlength':'3','class': 'form-control','placeholder': 'Nombre'}}) }}
+
+                <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-users"></span></span></span>
+                  
+                   {{ form_widget(formulario.apellidos, {'attr': {'minlength':'3','class': 'form-control','placeholder': 'Apellido'}}) }}
+                 
+                  <span class="input-group-append">                    
+                
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-email"></span></span></span>
+                 
+                 {{ form_widget(formulario.correo, {'attr': { 'class': 'form-control','placeholder': 'Correo Electronico'}}) }}
+                    
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-map-marker"></span></span></span>
+                 
+                   {{ form_widget(formulario.direccion, {'attr': {'class': 'form-control','placeholder': 'Direccion'}}) }}
+         
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+             <div class="form-group">
+                  <div class="input-group input-group-sm"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon fa fa-book"></span></span></span>
+                      
+
+                  {{ form_widget(formulario.comentario, {'attr': {'class': 'form-control','placeholder': 'Comentario'}}) }}
+                  
+                  <span class="input-group-append">                    
+                 
+                  </div>
+             </div>
+
+
+                <div class="form-output" id="components-form-subscribe-footer"></div>
+
+                <div class=" row justify-content-md-center group offset-top-34">
+                 
+           {{ form_row(formulario.continuar) }}
+            
+        
+          </div>
+
+              {{ form_end(formulario) }}
+
+
             </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    <script>
+  </body>
+</html>
 
+{% endblock %}
 
-        $("#form_cliente").submit(function (e) {
-            e.preventDefault();// cancela el submit
-        });
+{% block javascripts %} 
+{{parent()}}
 
-        var id = false;
+<script>
 
-        if (id == true) {
-            $("#cliente_telefono").css("border-color", "");
-        }
-
-        $("#cliente_continuar").click(function () {
-
-            var telefono = $.trim($("#cliente_telefono").val());
-
-            var nombre = $.trim($("#cliente_nombre").val());
-
-            var apellido = $.trim($("#cliente_apellidos").val());
-
-            var email = $.trim($("#cliente_correo").val());
-
-            if (telefono.length < 8) {
-
-                $("#cliente_telefono").css("border-color", "red");
-
-                $("#error").css("display", "");
-
-            } else if (nombre.length < 1) {
-
-                $("#cliente_nombre").css("border-color", "red");
-
-                $("#mensaje").text('El cliente debe tener un nombre');
-
-            } else if (apellido.length < 2) {
-
-                $("#cliente_apellidos").css("border-color", "red");
-
-                $("#mensaje").text('El cliente debe tener un apellido');
-
-            } else if (email.length > 0) {
-
-                var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
-
-                if (regex.test($("#cliente_correo").val().trim())) {
-                    envio();
-
-                } else {
-
-                    $("#error").css("display", "");
-
-                    $("#cliente_correo").css("border-color", "red");
-
-                    $("#mensaje").text('Email no valido!');
-
-                }
-
-
-            } else {
-
-                envio();
-
-            }
-
-            function envio() {
-
-
-                $("#cliente_correo").css("border-color", "");
-
-                $("#cliente_telefono").css("border-color", "");
-
-                $("#cliente_apellidos").css("border-color", "");
-
-                $("#cliente_nombre").css("border-color", "");
-
-                $("#error").css("display", "none");
-
-                $("#cliente_correo").css("border-color", "");
-
-                $("#error").removeClass("alert-danger");
-
-                $("#error").addClass("alert-success");
-
-                $("#mensaje").text('Cliente Guardado!');
-
-                $("#error").css("display", "");
-
-                id = true;
-
-                $("#form_cliente").submit();
-
-            }
-
-
-        });
-
-        // A $( document ).ready() block.
-
-        $(document).ready(function () {
-
-            $("#cliente_continuar").append("<span class ='icon novi-icon mdi mdi-emoticon btn-icon-right' ></span>");
-
-            $('#cliente_telefono').on('input', function () {
-
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
-        });
-    </script>
+$("#form_cliente").validate({
+   errorLabelContainer: "#messageBox",
+    wrapper: "li",
+    rules: {
+      'cliente[telefono]': {
+      required: true, minlength: 3},
+      'cliente[nombre]': {
+      required: true, minlength: 3},
+      'cliente[apellidos]': {
+      required: true, minlength: 3
+    },
+    'cliente[correo]': {
+        email: true
+      },
+    },
+    messages: {
+      'cliente[nombre]': {required: "Nombre Requerido", minlength: "Minimo 3 Caracteres" },
+      'cliente[apellidos]': {required: "Apellido Requerido", minlength: "Minimo 3 Caracteres" },
+      'cliente[correo]': {email: "Formato de Email no Valido"},
+      'cliente[telefono]': {required: "Telefono Requerido", minlength: "Minimo 8 Caracteres" }},
+ 
+ });
+     
+ $('#cliente_telefono').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});    
+ </script>
 
 {% endblock %}
