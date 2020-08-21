@@ -21,11 +21,12 @@
                     'crud_add_descripcion[descripcion]': "required",
                     'crud_add_name[nombre]': "required"
                 },
-                messages : {
+                messages: {
                     'crud_add_descripcion[descripcion]': "",
                     'crud_add_name[nombre]': ""
                 },
                 highlight: function (element, errorClass, validClass) {
+                    console.log(element)
                     $(element).addClass("is-invalid");
                     $(element).popover({
                         content: 'valor requerido!',
@@ -44,6 +45,9 @@
                     $(element).removeClass("is-invalid");
                 }
             })
+            /*$('#crud_add_descripcion_adicionar').click(function (event) {
+                event.preventDefault();
+            })*/
         })
     </script>
 {% endblock %}

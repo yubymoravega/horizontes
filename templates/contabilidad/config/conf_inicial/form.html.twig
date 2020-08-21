@@ -4,40 +4,38 @@
     {# Formulario de gestión de las configuraciones iniciales del sistema #}
     <div class="container d-flex justify-content-center">
         <div class="card mt-5" style="width: 50rem;">
-            <div class="card-header text-bold bg-dark">
-                <h3 class="text-light"> Adicionar Configuración</h3>
+            <div class="container">
+                <h1 class="text-reporte"> Adicionar Configuración</h1>
             </div>
-
             <div class="card-body">
                 {{ form_start(formulario, {'attr':{'id':'form_add_configinicial'}}) }}
-                <div class="form-group pa-2">
-                    <div class="input-group input-group-sm">
+                <div class="row">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
                         <label for="id_modulo" class="font-weight-bold">Módulo</label>
-                        {{ form_widget(formulario.id_modulo, {'attr': {'class': 'form-control','id': 'id_modulo','name':'id_modulo'}}) }}
+                        {{ form_widget(formulario.id_modulo, {'attr': {'class': 'form-control width-100','id': 'id_modulo','name':'id_modulo'}}) }}
                         <span class="input-group-append"></span>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="input-group input-group-sm">
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
                         <label for="id_tipo_documento" class="font-weight-bold">Tipo de documento</label>
-                        {{ form_widget(formulario.id_tipo_documento, {'attr': {'class': 'form-control','id': 'id_tipo_documento'}}) }}
+                        {{ form_widget(formulario.id_tipo_documento, {'attr': {'class': 'form-control width-100','id': 'id_tipo_documento'}}) }}
                         <span class="input-group-append"></span>
                     </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
+                        <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
+                        <select name="naturaleza" id="naturaleza_cuenta" class="form-control width-100">
+                            <option value="1">Deudora</option>
+                            <option value="0">Acreedora</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group input-group input-group-sm">
-                    <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
-                    <select name="naturaleza" id="naturaleza_cuenta" class="form-control" multiple>
-                        <option value="1">Deudora</option>
-                        <option value="0">Acreedora</option>
-                    </select>
-                </div>
-                <div class="form-group input-group input-group-sm">
+
+                <div class="form-group input-group input-group-sm d-block">
                     <label for="id_cuenta" class="font-weight-bold">Cuenta</label>
-                    {{ form_widget(formulario.id_cuenta, {'attr': {'class': 'form-control','id': 'id_cuenta'}}) }}
+                    {{ form_widget(formulario.id_cuenta, {'attr': {'class': 'form-control width-100','id': 'id_cuenta'}}) }}
                 </div>
-                <div class="form-group input-group input-group-sm">
+                <div class="form-group input-group input-group-sm d-block">
                     <label for="id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
-                    <select name="subcuenta_id" id="subcuenta_id" class="form-control">
+                    <select name="subcuenta_id" id="subcuenta_id" class="form-control width-100">
                     </select>
                 </div>
                 <div class="form-group">

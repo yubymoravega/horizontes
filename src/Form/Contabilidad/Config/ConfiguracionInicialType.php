@@ -52,8 +52,8 @@ class ConfiguracionInicialType extends AbstractType
                         ->orderBy('u.nro_cuenta','ASC');
                 }
             ])
-            ->add('aceptar', SubmitType::class, ['attr'=> ['class' => 'btn btn-primary']])
-            ->add('aplicar', SubmitType::class, ['attr'=> ['class' => 'btn btn-info']])
+            ->add('aceptar', SubmitType::class, ['attr'=> ['class' => 'btn btn-secondary']])
+            ->add('aplicar', SubmitType::class, ['attr'=> ['class' => 'btn btn-secondary']])
         ;
     }
 
