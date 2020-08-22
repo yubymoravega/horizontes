@@ -19,7 +19,7 @@
 }
 
 .transition-right {
-    right: -5000px;
+    right: -105vw;
 }
 
 .overflow-hidden-x-content {
@@ -62,10 +62,11 @@ input#from {
     margin-right: 10px;
 }
 
-input#to{
+input#to {
 
     margin-right: 10px;
 }
+
 select#estado {
     margin-right: 10px;
 }
@@ -86,15 +87,16 @@ input#telefono {
     border: 1px solid #ffffff80 !important;
 }
 
-.custom-select{
+.custom-select {
     color: #ffffff;
     background: #2f2f2f !important;
     border: 1px solid #ffffff80 !important;
 }
 
-.width-100{
+.width-100 {
     width: 100% !important;
 }
+
 .input-group .form-control {
     height: auto;
     color: #ffffff !important;

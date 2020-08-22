@@ -1,14 +1,12 @@
 $(document).ready(function () {
 
     /**
-     * ocultando la Alerta - app.flashes(success)
+     * ocultando la Alerta - app.flashes(success|error)
      */
     setTimeout(function () {
         $('#alert__success').addClass('transition-right')
-    }, 4000)
-    $('#alert__success').hide(5000)
-
-
+        // $('#alert__success').hide(9000)
+    }, 5000)
 });
 
 /**
@@ -20,7 +18,6 @@ const CONTAB_MSG = {
     REQUIRED_NATURALEZA: 'seleccione una naturaleza',
     REQUIRED_CUENTA: 'seleccione una cuenta',
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
-
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
 }
 

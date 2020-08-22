@@ -75,40 +75,42 @@ class SecurityController extends AbstractController
     /**
      * @Route("/nuevo-password/{correo}", name="nuevo_password")
      */
-    public function resetearMiPassword(Request $request, UserPasswordEncoderInterface $passEncoder,$correo)
+    public function resetearMiPassword(Request $request, UserPasswordEncoderInterface $passEncoder, $correo)
     {
-        $new_password = AuxFunctions::generateRandomPassword();
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->findOneBy(array(
-            'username' => $correo,
-            'status' => true
-        ));
-        $asunto = 'Alerta de seguridad';
-        $nombre = 'Usuario desconocido';
-        $msg = 'Usted no es un usuario del sistema.';
-        if ($user) {
-            /**@var $user User** */
-            $asunto = 'Cambio de contraseña';
-            $empleado = $em->getRepository(Empleado::class)->findOneBy(array(
-                'activo' => true,
-                'correo' => $correo
+        try {
+            $new_password = AuxFunctions::generateRandomPassword();
+            $em = $this->getDoctrine()->getManager();
+            $user = $em->getRepository(User::class)->findOneBy(array(
+                'username' => $correo,
+                'status' => true
             ));
-            $nombre = $empleado->getNombre();
-            $msg = 'Usted a restablecido la contraseña correctamente. Su nueva contraseña es: ' . $new_password;
+            $asunto = 'Alerta de seguridad';
+            $nombre = 'Usuario desconocido';
+            $msg = 'Usted no es un usuario del sistema.';
+            if ($user) {
+                /**@var $user User** */
+                $asunto = 'Cambio de contraseña';
+                $empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+                    'activo' => true,
+                    'correo' => $correo
+                ));
+                $nombre = $empleado->getNombre();
+                $msg = 'Usted a restablecido la contraseña correctamente. Su nueva contraseña es: ' . $new_password;
 
-            $user->setPassword($passEncoder->encodePassword($user, $new_password));
-            $em->persist($user);
-            $em->flush();
+                $user->setPassword($passEncoder->encodePassword($user, $new_password));
+                $em->persist($user);
+                $em->flush();
+            } else {
+                $config = Yaml::parse(file_get_contents('../config/email_config.yaml'));
+                $user = $config['config']['user'];
+                $alias = $config['config']['alias'];
+
+                AuxFunctions::sendEmail('Intento Violacion de seguridad', $user, $alias, 'Intento de acceso al sitio por: ' . $correo);
+            }
+            AuxFunctions::sendEmail($asunto, $correo, $nombre, $msg);
+        } catch (\Exception $exception) {
+            return new JsonResponse(['success' => false, 'error' => $exception]);
         }
-        else{
-            $config = Yaml::parse(file_get_contents( '../config/email_config.yaml'));
-            $user = $config['config']['user'];
-            $alias = $config['config']['alias'];
-
-            AuxFunctions::sendEmail('Intento Violacion de seguridad', $user, $alias, 'Intento de acceso al sitio por: '.$correo);
-        }
-        AuxFunctions::sendEmail($asunto, $correo, $nombre, $msg);
-
         return new JsonResponse(['success' => true]);
     }
 }
