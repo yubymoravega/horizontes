@@ -30,12 +30,13 @@
                         <td style="font-weight:400;">{{ item.descripcion }}</td>
                     {% endif %}
                     <td>
-                        <a href="{{ path(paths.edit,{id: item.id}) }}" type="button"
-                           class="btn btn-warning btn-sm" data-toggle="tooltip"
+                        <a href="{{ path(paths.edit,{id: item.id}) }}"
+                           type="button"
+                           class="btn btn-warning btn-sm px-1" data-toggle="tooltip" role="button"
                            data-placement="bottom" title="Editar">
                             <i class="fa fa-edit"></i>
                         </a>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm ml-2" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar {{ title }}: {{ label == 'Nombre' ? item.nombre: item.descripcion }}?',
