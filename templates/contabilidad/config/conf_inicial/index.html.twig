@@ -29,8 +29,9 @@
             <th scope="col-3">Tipo de Documento</th>
             <th scope="col-2">Cuenta</th>
             <th scope="col-2">Subcuenta</th>
+            <th scope="col-2">Cuenta Contrapartida</th>
+            <th scope="col-2">Subcuenta Contrapartida</th>
             <th scope="col-2">Naturaleza</th>
-{#            <th scope="col-1" width="150px">Acciones</th>#}
             <th scope="col-1" width="50px">Eliminar</th>
             </thead>
             <tbody>
@@ -39,8 +40,10 @@
                 <tr>
                     <td style="font-weight:400;">{{ item['nombre_modulo'] }}</td>
                     <td style="font-weight:400;">{{ item['nombre_tipo_docuemtno'] }}</td>
-                    <td style="font-weight:400;">{{ item['nro_cuenta'] }}</td>
-                    <td style="font-weight:400;">{{ item['nro_subcuenta'] }}</td>
+                    <td style="font-weight:400;">{{ item['str_cuentas'] }}</td>
+                    <td style="font-weight:400;">{{ item['str_subcuentas'] }}</td>
+                    <td style="font-weight:400;">{{ item['str_cuentas_contrapartidas'] }}</td>
+                    <td style="font-weight:400;">{{ item['str_subcuentas_contrapartidas'] }}</td>
                     <td style="font-weight:400;">{{ item['naturaleza'] }}</td>
                     <td class="text-center">
 {#                        -----Esta asccion esta implementada pero no se publicara pues no deben cambiarse ---- #}

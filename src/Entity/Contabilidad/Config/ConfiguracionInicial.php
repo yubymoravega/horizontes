@@ -4,7 +4,6 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\ConfiguracionInicialRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ConfiguracionInicialRepository::class)
@@ -31,16 +30,6 @@ class ConfiguracionInicial
     private $id_tipo_documento;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Cuenta::class)
-     */
-    private $id_cuenta;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Subcuenta::class)
-     */
-    private $id_subcuenta;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $deudora;
@@ -49,6 +38,26 @@ class ConfiguracionInicial
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $str_cuentas;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $str_subcuentas;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $str_cuentas_contrapartida;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $str_subcuentas_contrapartida;
 
 
     public function getId(): ?int
@@ -80,30 +89,6 @@ class ConfiguracionInicial
         return $this;
     }
 
-    public function getIdCuenta(): ?Cuenta
-    {
-        return $this->id_cuenta;
-    }
-
-    public function setIdCuenta(?Cuenta $id_cuenta): self
-    {
-        $this->id_cuenta = $id_cuenta;
-
-        return $this;
-    }
-
-    public function getIdSubcuenta(): ?Subcuenta
-    {
-        return $this->id_subcuenta;
-    }
-
-    public function setIdSubcuenta(?Subcuenta $id_subcuenta): self
-    {
-        $this->id_subcuenta = $id_subcuenta;
-
-        return $this;
-    }
-
     public function getDeudora(): ?bool
     {
         return $this->deudora;
@@ -124,6 +109,54 @@ class ConfiguracionInicial
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getStrCuentas(): ?string
+    {
+        return $this->str_cuentas;
+    }
+
+    public function setStrCuentas(string $str_cuentas): self
+    {
+        $this->str_cuentas = $str_cuentas;
+
+        return $this;
+    }
+
+    public function getStrSubcuentas(): ?string
+    {
+        return $this->str_subcuentas;
+    }
+
+    public function setStrSubcuentas(string $str_subcuentas): self
+    {
+        $this->str_subcuentas = $str_subcuentas;
+
+        return $this;
+    }
+
+    public function getStrCuentasContrapartida(): ?string
+    {
+        return $this->str_cuentas_contrapartida;
+    }
+
+    public function setStrCuentasContrapartida(string $str_cuentas_contrapartida): self
+    {
+        $this->str_cuentas_contrapartida = $str_cuentas_contrapartida;
+
+        return $this;
+    }
+
+    public function getStrSubcuentasContrapartida(): ?string
+    {
+        return $this->str_subcuentas_contrapartida;
+    }
+
+    public function setStrSubcuentasContrapartida(?string $str_subcuentas_contrapartida): self
+    {
+        $this->str_subcuentas_contrapartida = $str_subcuentas_contrapartida;
 
         return $this;
     }

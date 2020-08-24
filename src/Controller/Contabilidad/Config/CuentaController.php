@@ -47,6 +47,26 @@ class CuentaController extends AbstractController
     }
 
     /**
+     * @Route("/contabilidad/config/cuenta/getCuentas/{cuentas}", name="contabilidad_config_cuenta_get_cuentas")
+     */
+    public function getCuentas(EntityManagerInterface $em, Request $request, ValidatorInterface $validator,$cuentas)
+    {
+        $cuentas_arr = $em->getRepository(Cuenta::class)->findByActivo(true);
+        $row = [];
+        foreach ($cuentas_arr as $item) {
+            if(strpos($cuentas.' ',$item->getNroCuenta().' ') === false){
+                /**@var $item Cuenta** */
+                $row [] = array(
+                    'id' => $item->getId(),
+                    'nro_cuenta' => $item->getNroCuenta(),
+                    'descripcion' => $item->getDescripcion()
+                );
+            }
+        }
+        return new JsonResponse(['cuentas' => $row]);
+    }
+
+    /**
      * @Route("/contabilidad/config/cuenta-add", name="contabilidad_config_cuenta_add")
      */
     public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)

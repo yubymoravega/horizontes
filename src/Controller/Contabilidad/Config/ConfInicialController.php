@@ -47,29 +47,40 @@ class ConfInicialController extends AbstractController
         $conf_new_obj = new ConfiguracionInicial();
         $form = $this->createForm(ConfiguracionInicialType::class, $conf_new_obj);
         $error = null;
-
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-
             if ($form->isValid()) {
+                $id_modulo = $request->get('configuracion_inicial')['id_modulo'];
+                $id_tipo_documento = $request->get('configuracion_inicial')['id_tipo_documento'];
+                $configuracion_inicial_id_cuenta = $request->get('configuracion_inicial_id_cuenta');
+                $configuracion_inicial_id_subcuenta = $request->get('configuracion_inicial_id_subcuenta');
+                $configuracion_inicial_id_cuenta_contrapartida = $request->get('configuracion_inicial_id_cuenta_contrapartida');
+                $configuracion_inicial_id_subcuenta_contrapartida = $request->get('configuracion_inicial_id_subcuenta_contrapartida');
                 $deudora = $request->get('naturaleza') == '1' ? true : false;
-                $subcuenta_id = $request->get('subcuenta_id');
 
-                $arr_form = $request->get('configuracion_inicial');
-                $arr_extra_form = ['deudora' => $deudora, 'id_subcuenta' => $subcuenta_id];
-                $arr_result = array_merge($arr_form, $arr_extra_form);
-                if (!$this->isDuplicate($em, $arr_result, 'add')) {
-                    if ($this->saveDataConf($em, $arr_result, null)) {
-                        if (isset($arr_result['aplicar'])) {
-                            $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aplicar).');
-                            return $this->redirectToRoute('contabilidad_config_conf_inicial_form');
-                        } else {
-                            $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aceptar).');
-                            return $this->redirectToRoute('contabilidad_config_conf_inicial');
-                        }
-                    } else {
-                        $this->addFlash('error', 'La acción solicitada ha presentado errores, por favor contacte a su proveedor de software.');
+                if (!$this->isDuplicate($em, $id_modulo, $id_tipo_documento, 'add')) {
+                    $obj = new ConfiguracionInicial();
+                    $obj
+                        ->setDeudora($deudora)
+                        ->setIdTipoDocumento($em->getRepository(TipoDocumento::class)->find($id_tipo_documento))
+                        ->setIdModulo($em->getRepository(Modulo::class)->find($id_modulo))
+                        ->setStrCuentas($configuracion_inicial_id_cuenta)
+                        ->setStrSubcuentas($configuracion_inicial_id_subcuenta)
+                        ->setStrCuentasContrapartida($configuracion_inicial_id_cuenta_contrapartida)
+                        ->setStrSubcuentasContrapartida($configuracion_inicial_id_subcuenta_contrapartida)
+                        ->setActivo(true);
+                    try {
+                        $em->persist($obj);
+                        $em->flush();
+                    } catch (FileException $exception) {
+                        return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                    }
+                    if (isset($arr_result['aplicar'])) {
+                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aplicar).');
                         return $this->redirectToRoute('contabilidad_config_conf_inicial_form');
+                    } else {
+                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aceptar).');
+                        return $this->redirectToRoute('contabilidad_config_conf_inicial');
                     }
                 } else {
                     $this->addFlash('error', 'Ya existe una configuración con esos parámetros.');
@@ -125,15 +136,9 @@ class ConfInicialController extends AbstractController
         /**@var $obj ConfiguracionInicial* */
         $obj
             ->setDeudora($fiels['deudora'] == 1 ? true : false)
-            ->setIdCuenta($em->getRepository(Cuenta::class)->find($fiels['id_cuenta']))
             ->setIdTipoDocumento($em->getRepository(TipoDocumento::class)->find($fiels['id_tipo_documento']))
             ->setIdModulo($em->getRepository(Modulo::class)->find($fiels['id_modulo']))
             ->setActivo(true);
-        if ($fiels['id_subcuenta']) {
-            $obj->setIdSubcuenta($em->getRepository(Subcuenta::class)->find($fiels['id_subcuenta']));
-        } else {
-            $obj->setIdSubcuenta(null);
-        }
         try {
             $em->persist($obj);
             $em->flush();
@@ -156,10 +161,10 @@ class ConfInicialController extends AbstractController
             /**@var $obj ConfiguracionInicial* */
             $row [] = array(
                 'id' => $obj->getId(),
-                'id_cuenta' => $obj->getIdCuenta(),
-                'nro_cuenta' => $obj->getIdCuenta()->getNroCuenta(),
-                'id_subcuenta' => $obj->getIdSubcuenta() ? $obj->getIdSubcuenta() : null,
-                'nro_subcuenta' => $obj->getIdSubcuenta() ? $obj->getIdSubcuenta()->getNroSubcuenta() : "",
+                'str_cuentas'=>$obj->getStrCuentas(),
+                'str_subcuentas'=>$obj->getStrSubcuentas(),
+                'str_cuentas_contrapartidas'=>$obj->getStrCuentasContrapartida(),
+                'str_subcuentas_contrapartidas'=>$obj->getStrSubcuentasContrapartida(),
                 'id_tipo_documento' => $obj->getIdTipoDocumento(),
                 'nombre_tipo_docuemtno' => $obj->getIdTipoDocumento()->getNombre(),
                 'naturaleza' => $obj->getDeudora() == 1 ? 'Deudora' : 'Acreedora',
@@ -171,24 +176,37 @@ class ConfInicialController extends AbstractController
     }
 
     /**
-     * @Route("/form-getsubcuenta/{idcuenta}", name="contabilidad_config_conf_inicial_form_getsubcuenta")
+     * @Route("/form-getsubcuenta/{idcuentas}", name="contabilidad_config_conf_inicial_form_getsubcuenta")
      */
-    public function getSubcuentas($idcuenta)
+    public function getSubcuentas($idcuentas)
     {
-        $subcuenta_er = $this->getDoctrine()->getManager()->getRepository(Subcuenta::class);
-        $arr_subcuenta_obj = $subcuenta_er->findBy(array(
-            'id_cuenta' => $idcuenta,
-            'activo' => true
-        ));
+        $cuentas_str = explode(" ", $idcuentas);
+        $em = $this->getDoctrine()->getManager();
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
         $row = [];
-        if (!empty($arr_subcuenta_obj)) {
-            foreach ($arr_subcuenta_obj as $item) {
-                /**@var $item Subcuenta** */
-                $row[] = array(
-                    'id' => $item->getId(),
-                    'nro_subcuenta' => $item->getNroSubcuenta(),
-                    'subcuenta' => $item->getDescripcion()
-                );
+        foreach ($cuentas_str as $nro_cuenta) {
+            if (strlen($nro_cuenta) > 2) {
+                $idcuenta = $cuenta_er->findOneBy(array(
+                    'nro_cuenta' => $nro_cuenta,
+                    'activo' => true
+                ));
+                if ($idcuenta) {
+                    $arr_subcuenta_obj = $subcuenta_er->findBy(array(
+                        'id_cuenta' => $idcuenta,
+                        'activo' => true
+                    ));
+                    if (!empty($arr_subcuenta_obj)) {
+                        foreach ($arr_subcuenta_obj as $item) {
+                            /**@var $item Subcuenta** */
+                            $row[] = array(
+                                'id' => $item->getId(),
+                                'nro_subcuenta' => $item->getNroSubcuenta(),
+                                'descripcion' => $item->getDescripcion()
+                            );
+                        }
+                    }
+                }
             }
         }
         return new JsonResponse(['subcuentas' => $row]);
@@ -197,14 +215,13 @@ class ConfInicialController extends AbstractController
     /**
      * Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar
      */
-    public function isDuplicate($em, $fiels, $action, $id = null)
+    public function isDuplicate($em, $id_modulo, $id_tipo_documento, $action, $id = null)
     {
         $conf_inicial_er = $em->getRepository(ConfiguracionInicial::class);
 
         $arr_obj = $conf_inicial_er->findBy(array(
-            'id_modulo' => $fiels['id_modulo'],
-            'id_tipo_documento' => $fiels['id_tipo_documento'],
-            'id_cuenta' => $fiels['id_cuenta'],
+            'id_modulo' => $id_modulo,
+            'id_tipo_documento' => $id_tipo_documento,
             'activo' => true
         ));
 

@@ -1,5 +1,91 @@
 {% extends 'base.html.twig' %}
 {% block content %}
+    {# Modal de Cuentas#}
+    <div class="modal fade" id="listarCuentasModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarCuentasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarCuentasModalLabel">Listado de cuentas</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover text-light">
+                        <thead class="thead-dark">
+                        <th scope="col-1" style="width: 10px">Sel.</th>
+                        <th style="width: 160px">Nro. cuenta</th>
+                        <th scope="col-6">Descripción</th>
+                        </thead>
+                        <tbody class="bg-red" id="rows_table">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer d-flex">
+                    <div class="mr-auto">
+                        <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                aria-label="Cerrar">
+                            <span aria-hidden="true">Cancelar</span>
+                        </button>
+                    </div>
+                    <div class="ml-2">
+                        <button type="button" class="my-0 btn btn-primary" id="btnAceptar" onclick="AddCuentas()"
+                                data-dismiss="modal">Seleccionar
+                        </button>
+                        <button type="button" class="my-0 btn btn-outline-primary" id="btnAceptarCuentasContrapartida"
+                                onclick="AddCuentasContrapartida()" data-dismiss="modal">Seleccionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Modal de Subcuentas#}
+    <div class="modal fade" id="listarSubcuentasModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarSubcuentasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarSubcuentasModalLabel">Listado de subcuentas</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover text-light">
+                        <thead class="thead-dark">
+                        <th scope="col-1" style="width: 10px">Sel.</th>
+                        <th scope="col-1">Nro. subcuenta</th>
+                        <th scope="col-6">Descripción</th>
+                        </thead>
+                        <tbody class="bg-red" id="rows_table_subcuenta">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer d-flex">
+                    <div class="mr-auto">
+                        <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                aria-label="Cerrar">
+                            <span aria-hidden="true">Cancelar</span>
+                        </button>
+                    </div>
+                    <div class="ml-2">
+                        <button type="button" class="my-0 btn btn-primary" id="btnAceptarSubcuentas"
+                                onclick="AddSubcuentas()" data-dismiss="modal">Seleccionar
+                        </button>
+                        <button type="button" class="my-0 btn btn-outline-primary"
+                                id="btnAceptarSubcuentasContrapartida" onclick="AddSubcuentasContrapartida()"
+                                data-dismiss="modal">Seleccionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {# Formulario de gestión de las configuraciones iniciales del sistema #}
     <div class="container d-flex justify-content-center">
@@ -31,13 +117,32 @@
 
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="id_cuenta" class="font-weight-bold">Cuenta</label>
-                    {{ form_widget(formulario.id_cuenta, {'attr': {'class': 'form-control width-100','id': 'id_cuenta'}}) }}
+                    <input type="text" name="configuracion_inicial_id_cuenta" class="form-control width-100"
+                           id="configuracion_inicial_id_cuenta" data-toggle="modal"
+                           data-target="#listarCuentasModal">
                 </div>
                 <div class="form-group input-group input-group-sm d-block">
-                    <label for="id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
-                    <select name="subcuenta_id" id="subcuenta_id" class="form-control width-100">
-                    </select>
+                    <label for="configuracion_inicial_id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
+                    <input type="text" name="configuracion_inicial_id_subcuenta" id="configuracion_inicial_id_subcuenta"
+                           class="form-control width-100" data-toggle="modal" data-target="#listarSubcuentasModal">
                 </div>
+
+
+                <div class="form-group input-group input-group-sm d-block">
+                    <label for="id_cuenta_contrapartida" class="font-weight-bold">Cuenta Contrapartida</label>
+                    <input type="text" name="configuracion_inicial_id_cuenta_contrapartida"
+                           class="form-control width-100" id="configuracion_inicial_id_cuenta_contrapartida"
+                           data-toggle="modal"
+                           data-target="#listarCuentasModal">
+                </div>
+                <div class="form-group input-group input-group-sm d-block">
+                    <label for="configuracion_inicial_id_subcuenta_contrapartida" class="font-weight-bold" id="test">Subcuenta
+                        Contrapartida</label>
+                    <input type="text" name="configuracion_inicial_id_subcuenta_contrapartida"
+                           id="configuracion_inicial_id_subcuenta_contrapartida" class="form-control width-100"
+                           data-toggle="modal" data-target="#listarSubcuentasModal">
+                </div>
+
                 <div class="form-group">
                     <div id="lista" class="input-group input-group-sm"></div>
                 </div>
@@ -63,24 +168,14 @@
     {{ parent() }}
 
     <script>
+        let cuentas = [];
+        let subcuentas = [];
+        let cuentas_contrapartida = [];
+        let subcuentas_contrapartida = [];
         $(document).ready(function () {
+            $('#btnAceptarCuentasContrapartida').hide()
+            $('#btnAceptarSubcuentasContrapartida').hide()
             resetField()
-            var subcuenta = $('#subcuenta_id');
-            subcuenta.prop('disabled', true);
-            $('#configuracion_inicial_id_cuenta').change(function (evernt) {
-                subcuenta.find('option').remove();
-                if (typeof ($(this).val()) != 'object') {
-                    getValues($(this).val(), subcuenta)
-                } else {
-                    subcuenta.prop('disabled', true);
-                }
-            })
-
-            // validacion del formulario
-            /*$.validator.methods.selectChoice = function (value, element) {
-                console.log(value, element)
-                return value
-            }*/
             $('#form_add_configinicial').validate({
                 //focusCleanup: true,
                 errorClass: 'invalid-label',
@@ -88,45 +183,25 @@
                     label.removeClass('invalid-label').text("")
                 },
                 rules: {
-                    'configuracion_inicial[id_modulo]': "required",
-                    'configuracion_inicial[id_tipo_documento]': "required",
+                    'configuracion_inicial_id_modulo': "required",
+                    'configuracion_inicial_id_tipo_documento': "required",
                     'naturaleza': "required",
-                    'subcuenta_id': "required",
-                    'configuracion_inicial[id_cuenta]': "required",
+                    'configuracion_inicial_id_subcuenta': "required",
+                    'configuracion_inicial_id_subcuenta_contrapartida': "required",
+                    'configuracion_inicial_id_cuenta_contrapartida': "required",
+                    'configuracion_inicial_id_cuenta': "required",
                 },
                 messages: {
-                    'configuracion_inicial[id_modulo]': CONTAB_MSG.REQUIRED_MODULO,
-                    'configuracion_inicial[id_tipo_documento]': CONTAB_MSG.REQUIRED_TIPO_DOC,
+                    'configuracion_inicial_id_modulo': CONTAB_MSG.REQUIRED_MODULO,
+                    'configuracion_inicial_id_tipo_documento': CONTAB_MSG.REQUIRED_TIPO_DOC,
                     'naturaleza': CONTAB_MSG.REQUIRED_NATURALEZA,
-                    'subcuenta_id': CONTAB_MSG.REQUIRED_SUBCUENTA,
-                    'configuracion_inicial[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
+                    'configuracion_inicial_id_subcuenta': CONTAB_MSG.REQUIRED_SUBCUENTA,
+                    'configuracion_inicial_id_subcuenta_contrapartida': CONTAB_MSG.REQUIRED_SUBCUENTA,
+                    'configuracion_inicial_id_cuenta_contrapartida': CONTAB_MSG.REQUIRED_CUENTA,
+                    'configuracion_inicial_id_cuenta': CONTAB_MSG.REQUIRED_CUENTA,
                 }
             })
-
         })
-
-        function getValues(id, subcuenta) {
-            $.ajax({
-                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    subcuenta.find('option').remove();
-                    subcuenta.append('<option selected = "true" value = "0"> Seleccione la subcuenta</option>');
-                    $(result.subcuentas).each(function (pos, valor) {
-                        subcuenta.append('<option value="' + valor.id + '">' + valor.nro_subcuenta + '</option>');
-                    })
-                    if (result.subcuentas.length > 0)
-                        subcuenta.prop('disabled', false);
-                    else
-                        subcuenta.prop('disabled', true);
-                },
-                error: function () {
-                    alert('Ha ocurrido un error en el servidor');
-                    subcuenta.prop('disabled', true);
-                }
-            })
-        }
 
         function resetField() {
             const cuenta = $('#configuracion_inicial_id_cuenta');
@@ -136,10 +211,195 @@
             cuenta.prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
             tipo_doc.prepend('<option selected = "true" value = "0" disabled>Seleccione el tipo de documento</option>');
             modulo.prepend('<option selected = "true" value = "0" disabled>Seleccione el módulo</option>')
+        }
 
-            $('#select2-configuracion_inicial_id_tipo_documento-container')[0].textContent = ''
-            $('#select2-configuracion_inicial_id_cuenta-container')[0].textContent = ''
-            $('#select2-configuracion_inicial_id_modulo-container')[0].textContent = ''
+        /**Cargando las cuentas tanto deudoras como acreedoras(contrapartida)**/
+        $('#configuracion_inicial_id_cuenta').on('click', function () {
+            $('#btnAceptarCuentasContrapartida').hide()
+            $('#btnAceptar').show()
+            $('#rows_table').find('tr').remove();
+            let cuentas_contrapartidas = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+            $.ajax({
+                url: '/contabilidad/config/cuenta/getCuentas/' + cuentas_contrapartidas,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    cuentas = result.cuentas
+                    $(result.cuentas).each(function (pos, valor) {
+                        if ($('#configuracion_inicial_id_cuenta').val().includes(valor.nro_cuenta + ' '))
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '" checked>' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_cuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        else {
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_cuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        }
+                    })
+                },
+                error: function () {
+                }
+            })
+        })
+        $('#configuracion_inicial_id_cuenta_contrapartida').on('click', function () {
+            $('#btnAceptarCuentasContrapartida').show()
+            $('#btnAceptar').hide()
+            $('#rows_table').find('tr').remove();
+            let cuentas = $('#configuracion_inicial_id_cuenta').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta').val()
+            $.ajax({
+                url: '/contabilidad/config/cuenta/getCuentas/' + cuentas,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    cuentas_contrapartida = result.cuentas
+                    $(result.cuentas).each(function (pos, valor) {
+                        if ($('#configuracion_inicial_id_cuenta_contrapartida').val().includes(valor.nro_cuenta + ' '))
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '" checked>' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_cuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        else {
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_cuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        }
+                    })
+                },
+                error: function () {
+                }
+            })
+        })
+
+        /**Cargando las subcuentas dado las cuentas, tanto deudoras como acreedoras(contrapartida)**/
+        $('#configuracion_inicial_id_subcuenta').on('click', function () {
+            $('#btnAceptarSubcuentasContrapartida').hide()
+            $('#btnAceptarSubcuentas').show()
+            $('#rows_table_subcuenta').find('tr').remove();
+            let cuentas_str = $('#configuracion_inicial_id_cuenta').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta').val()
+            $.ajax({
+                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + cuentas_str,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    subcuentas = result.subcuentas
+                    $(result.subcuentas).each(function (pos, valor) {
+                        if ($('#configuracion_inicial_id_subcuenta').val().includes(valor.nro_subcuenta + ' '))
+                            $('#rows_table_subcuenta').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '" checked>' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_subcuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        else {
+                            $('#rows_table_subcuenta').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_subcuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        }
+                    })
+                },
+                error: function () {
+                }
+            })
+        })
+        $('#configuracion_inicial_id_subcuenta_contrapartida').on('click', function () {
+            $('#btnAceptarSubcuentasContrapartida').show()
+            $('#btnAceptarSubcuentas').hide()
+            $('#rows_table_subcuenta').find('tr').remove();
+            let cuentas_contrapartida_str = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+            $.ajax({
+                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + cuentas_contrapartida_str,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    subcuentas_contrapartida = result.subcuentas
+                    $(result.subcuentas).each(function (pos, valor) {
+                        if ($('#configuracion_inicial_id_subcuenta_contrapartida').val().includes(valor.nro_subcuenta + ' '))
+                            $('#rows_table_subcuenta').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '" checked>' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_subcuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        else {
+                            $('#rows_table_subcuenta').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.nro_subcuenta + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        }
+                    })
+                },
+                error: function () {
+                }
+            })
+        })
+
+        /**Acciones de asignar los valores seleccionados a los input especificados**/
+        function AddCuentas() {
+            let str_cuentas = ''
+            for (var i = 0; i < cuentas.length; i++) {
+                let id = '#' + cuentas[i]['nro_cuenta']
+                if ($(id).prop('checked') == true) {
+                    str_cuentas = str_cuentas + cuentas[i]['nro_cuenta'] + ' - '
+                }
+            }
+            $('#configuracion_inicial_id_cuenta').val(str_cuentas.substr(0, str_cuentas.length - 2))
+        }
+
+        function AddCuentasContrapartida() {
+            let str_cuentas = ''
+            for (var i = 0; i < cuentas_contrapartida.length; i++) {
+                let id = '#' + cuentas_contrapartida[i]['nro_cuenta']
+                if ($(id).prop('checked') == true) {
+                    str_cuentas = str_cuentas + cuentas_contrapartida[i]['nro_cuenta'] + ' - '
+                }
+            }
+            $('#configuracion_inicial_id_cuenta_contrapartida').val(str_cuentas.substr(0, str_cuentas.length - 2))
+        }
+
+        function AddSubcuentas() {
+            let str_subcuentas = ''
+            for (var i = 0; i < subcuentas.length; i++) {
+                let id = '#' + subcuentas[i]['nro_subcuenta']
+                if ($(id).prop('checked') == true) {
+                    str_subcuentas = str_subcuentas + subcuentas[i]['nro_subcuenta'] + ' - '
+                }
+            }
+            $('#configuracion_inicial_id_subcuenta').val(str_subcuentas.substr(0, str_subcuentas.length - 2))
+        }
+
+        function AddSubcuentasContrapartida() {
+            let str_subcuentas = ''
+            for (var i = 0; i < subcuentas_contrapartida.length; i++) {
+                let id = '#' + subcuentas_contrapartida[i]['nro_subcuenta']
+                if ($(id).prop('checked') == true) {
+                    str_subcuentas = str_subcuentas + subcuentas_contrapartida[i]['nro_subcuenta'] + ' - '
+                }
+            }
+            $('#configuracion_inicial_id_subcuenta_contrapartida').val(str_subcuentas.substr(0, str_subcuentas.length - 2))
         }
     </script>
 {% endblock %}
