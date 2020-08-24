@@ -80,26 +80,21 @@
 	{{parent()}}
 
 	<script>
-		$("#form-telefono").validate({
 
-errorLabelContainer: "#messageBox",
-wrapper: "li",
-rules: {
-required: true,
-minlength: 8
+		var json = [];
+        json['mApikey'] = "xAe45cc95dgvz94cm";
+
+
+$.ajax({
+url: 'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction',
+method: "post",
+dataType: "json",
+data: {
+data: JSON.stringify(json)
 },
-messages: {
-tel: {
-required: "Telefono Requerido",
-minlength: "Minimo 8 Caracteres"
-}
-}
-
+success: function () {}
 });
 
-$('#tel').on('input', function () {
-this.value = this.value.replace(/[^0-9]/g, '');
-});
 	</script>
 
 {% endblock %}

@@ -23,7 +23,7 @@ class ClienteReporte
     private $user;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $fecha;
 

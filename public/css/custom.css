@@ -337,6 +337,16 @@ h1.tarjetas-guardadas {
     font-weight: 100;
 }
 
+.select-tarjetas {
+    min-height: 75vh !important;
+}
+
+h2.tarjetas-guardadas {
+    color: #fff;
+    text-align: center;
+    font-weight: 100;
+}
+
 div#credit {
     margin-bottom: 20px;
 }
@@ -454,6 +464,7 @@ a{
     margin-top: 50px; 
     margin-bottom: 50px; 
     border-radius: 15px;
+    min-height: 75vh;
 
 }
 
@@ -535,4 +546,15 @@ a#home {
     color: #ffffff;
     padding-left: 10px;
     padding-right: 20px;
+}
+
+.boton-inicio {
+    background-color: #fff;
+}
+
+.finalizar-boton{
+    display: none !important;
+
+
+
 }

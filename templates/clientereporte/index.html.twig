@@ -27,10 +27,7 @@
   </select>
 
   <div class="input-group-prepend">
- 
   </div>
-
- 
 
   <select class="custom-select" name='empleado' id="empleado">
   <option value=0 selected>Empleado</option>
@@ -64,7 +61,7 @@
         <tr {% if loop.index is odd %}class="color"{% endif %}>
             <td>{{ data.fecha | date('d-M-y') }} </br> {{ data.fecha | date('H:i a') }}</td>
             <td> {{ data.idCliente }} </td>     
-            <td>{{ data.bram }} - {{ data.last4  }} </br>  </td>       
+            <td><img height="40" src="/images/iconos/{{ data.bram }}.svg" > - {{ data.last4  }} </br>  </td>       
             <td>{{ data.monto }} </td> {% set total = total + data.monto %}
             <td><a  onClick="caja('{{ data.estado }}','{{ data.auth }}');" > 
             {% if data.estado == 'succeeded' %}
@@ -72,7 +69,6 @@
             {% else %}    
               Declinado
             {% endif %}
-            
              </a></td>
              <td>{{ data.user }}</td>
         </tr>
