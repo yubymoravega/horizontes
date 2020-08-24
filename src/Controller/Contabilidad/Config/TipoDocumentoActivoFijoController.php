@@ -21,7 +21,7 @@ class TipoDocumentoActivoFijoController extends CrudController
     public function __construct()
     {
         $this->setTitle('Tipo Doc. Activo Fijo');
-        $this->setLabel('descripcion');
+        $this->setLabel('Descripción');
         $this->setClassTypeName(TipoDocumentoActivoFijoType::class);
         $this->setClassEntity(TipoDocumentoActivoFijo::class);
         $this->setMessages([

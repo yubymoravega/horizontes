@@ -21,7 +21,7 @@ class TipoMovimientoController extends CrudController
     public function __construct()
     {
         $this->setTitle('Tipo de Movimiento');
-        $this->setLabel('descripcion');
+        $this->setLabel('Descripción');
         $this->setClassTypeName(TipoMovimientoType::class);
         $this->setClassEntity(TipoMovimiento::class);
         $this->setMessages([

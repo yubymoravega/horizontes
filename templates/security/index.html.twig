@@ -27,7 +27,7 @@
     </style>
 </head>
 <body>
-<div class="toasts-alert alert alert-danger alert-dismissible fade" role="alert"
+<div class="toasts-alert alert alert-danger fade" role="alert"
      id="alert__success">
     <i class="fa fa-close pr-2"></i>
     <span id="text_"></span>
@@ -62,7 +62,7 @@
                              class="card text-center section-34 section-sm-41 inset-left-20 inset-right-20 inset-md-left-20 inset-md-right-20 inset-xl-left-30 inset-xl-right-30 bg-default shadow-drop-md">
 
                             <!-- RD Mailform-->
-                            <form method="post" id="form" class="text-left offset-top-30">
+                            <form method="post" class="text-left offset-top-30" id="login_id">
                                 <div class="form-group">
                                     <div class="input-group input-group-sm"><span class="input-group-prepend"><span
                                                     class="input-group-text input-group-icon input-group-addon-inverse"><span
@@ -150,14 +150,14 @@
 <div class="snackbars" id="form-output-global"></div>
 <script src="{{ asset('js/core.min.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>
-{#<script src="{ asset('js/revolution.min.js') }}"></script>#}
+<script src="{{ asset('js/bootstrap.min.js') }}" type="text/javascript"></script>
 </body>
 </html>
 
 <script>
 
 $( "#submit-login" ).click(function() {
-  $( "#form" ).submit();
+  $( "#login_id" ).submit();
 });
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -176,6 +176,7 @@ $( "#submit-login" ).click(function() {
     })
 
     function ValidarForm() {
+        const exp_correo = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
         if ($('#inputUsername').val() == '') {
             $('#alert__success').addClass('show')
             $('#text_').text('Debe introducir su usuario y le enviaremos por correo las instrucciones para establecer una nueva contraseña.')
@@ -184,8 +185,18 @@ $( "#submit-login" ).click(function() {
             $('#alert__success').show()
             setTimeout(function () {
                 $('#alert__success').addClass('transition-right')
+                $('#alert__success').hide(1000)
             }, 3000)
-            $('#alert__success').hide(5000)
+        } else if (!exp_correo.test($('#inputUsername').val())) {
+            $('#alert__success').addClass('show')
+            $('#text_').text('Formato de correo invalido.')
+            $('#alert__success').removeClass('transition-right alert-info text-dark')
+            $('#alert__success').addClass('toasts-alert alert-danger text-white')
+            $('#alert__success').show()
+            setTimeout(function () {
+                $('#alert__success').addClass('transition-right')
+                $('#alert__success').hide(1000)
+            }, 3000)
         } else {
             $('#confirm__modal').modal('show')
         }
@@ -208,8 +219,8 @@ $( "#submit-login" ).click(function() {
             $('#alert__success').show()
             setTimeout(function () {
                 $('#alert__success').addClass('transition-right')
+                $('#alert__success').hide(5000)
             }, 3000)
-            $('#alert__success').hide(5000)
         })
     }
 </script>

@@ -4,11 +4,11 @@
         {# header #}
         <div class="d-flex align-items-center">
             <div class="mr-auto">
-                <h5 class="display-4 mb-0 mr-auto title-table pb-0">
+                <h5 class="display-4 mb-0 mr-auto title-table pb-0 text-light">
                     Subcuentas
                 </h5>
                 <a href="{{ path('contabilidad_config_cuenta') }}">
-                    <h6 class="mb-2 pl-2 text-left">
+                    <h6 class="mb-2 pl-2 text-left text-light">
                         <i class="ml-2 mt-1 fa fa-arrow-circle-left text-drak"></i>
                         {{ subtitle }}
                     </h6>
@@ -79,7 +79,7 @@
         </div>
 
         {# list #}
-        <table class="table table-hover">
+        <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Nro. subcuenta</th>
             <th scope="col-3">Descripción</th>
@@ -93,7 +93,7 @@
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td style="font-weight:400;">{{ item.deudora }}</td>
                     <td>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
                                         nro_subcuenta: '{{ item.nro_subcuenta }}',
@@ -103,7 +103,7 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la subcuenta {{ item.nro_subcuenta }} ?',

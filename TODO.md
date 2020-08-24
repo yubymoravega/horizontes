@@ -7,7 +7,7 @@ paranoid como en Nodejs
 - [x] CRUD por cada Entidad -- REVISION
     - [x] Config inicial 
     - [x] Almacén `u`
-    - [ ] Centro Costo ---leo 
+    - [x] Centro Costo --- `GUIA para validaciones` 
     - [ ] Cuenta 
     - [ ] Elemento de Gasto
     - [ ] Grupo Activo ---camilo

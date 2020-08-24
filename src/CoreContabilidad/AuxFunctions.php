@@ -14,6 +14,8 @@ class AuxFunctions
 {
 
     //private static $em = new Doctri
+    public static $ACTION_ADD = 'add';
+    public static $ACTION_UPD = 'upd';
 
     /**
      * Si es padre no puede eliminarse sin reuvicar las undades hijas, retorna true/false en el caso que se cumpla
@@ -37,12 +39,12 @@ class AuxFunctions
     public static function isDuplicate($entity, $fields, $action, $id = null)
     {
         $arr_obj = $entity->findBy($fields);
-        if ($action == 'upd') {
+        if ($action == AuxFunctions::$ACTION_UPD) {
             foreach ($arr_obj as $obj) {
                 if ($obj->getId() != $id)
                     return true;
             }
-        } elseif ($action == 'add') {
+        } elseif ($action == AuxFunctions::$ACTION_ADD) {
             if (!empty($arr_obj))
                 return true;
         }
@@ -96,7 +98,7 @@ class AuxFunctions
      */
     public static function sendEmail($asunto, $destinatario, $alias_destinatario, $msg)
     {
-        $config = Yaml::parse(file_get_contents( '../config/email_config.yaml'));
+        $config = Yaml::parse(file_get_contents('../config/email_config.yaml'));
         $host = $config['config']['host'];
         $port = $config['config']['port'];
         $user = $config['config']['user'];

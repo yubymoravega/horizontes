@@ -11,7 +11,7 @@
 
         {# header #}
         <div class="d-flex align-items-center">
-            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Empleados
             </h4>
             <div>
@@ -94,7 +94,7 @@
         </div>
 
         {# list #}
-        <table class="table table-hover">
+        <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Nombre</th>
             <th scope="col-1">Correo</th>
@@ -114,7 +114,7 @@
                     <td style="font-weight:400;">{{ item.salario_x_hora }}</td>
                     <td style="font-weight:400;">{{ item.telefono }}</td>
                     <td>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Actualizar"
                                 onclick="onUpdate({
                                         id: '{{ item.id }}',
@@ -133,7 +133,7 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Dar baja"
                                 onclick="onDeleteConfirm({
                                         title:'Dar baja',

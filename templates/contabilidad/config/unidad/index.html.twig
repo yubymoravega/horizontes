@@ -11,7 +11,7 @@
 
         {# header #}
         <div class="d-flex align-items-center">
-            <h4 class="mr-auto display-4 mb-0 mr-auto title-table">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Organigrama de la empresa
             </h4>
             <div>
@@ -71,7 +71,7 @@
         </div>
 
         {# list #}
-        <table class="table table-hover">
+        <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Nombre de unidad</th>
             <th scope="col-3">Subordinada a</th>
@@ -83,7 +83,7 @@
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.padre_nombre }}</td>
                     <td>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
                                         id_padre: '{{ item.id_padre }}',
@@ -93,7 +93,7 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la unidad {{ item.nombre }} ?',
