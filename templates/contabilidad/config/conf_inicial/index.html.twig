@@ -43,14 +43,6 @@
                     <td style="font-weight:400;">{{ item['nro_subcuenta'] }}</td>
                     <td style="font-weight:400;">{{ item['naturaleza'] }}</td>
                     <td class="text-center">
-{#                        -----Esta asccion esta implementada pero no se publicara pues no deben cambiarse ---- #}
-{#                        -----los origenesteniendo acciones asociadas, eso desvirtua los reportes necesarion --#}
-
-{#                        <a href="{{ path('contabilidad_config_conf_inicial_form_edit',{id: item.id}) }}" type="button"#}
-{#                           class="btn btn-outline-dark btn-sm" data-toggle="tooltip"#}
-{#                           data-placement="bottom" title="Editar">#}
-{#                            <i class="fa fa-edit"></i>#}
-{#                        </a>#}
                         <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({

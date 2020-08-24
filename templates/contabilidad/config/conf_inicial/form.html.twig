@@ -12,17 +12,17 @@
                 <div class="row">
                     <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
                         <label for="id_modulo" class="font-weight-bold">Módulo</label>
-                        {{ form_widget(formulario.id_modulo, {'attr': {'class': 'form-control width-100','id': 'id_modulo','name':'id_modulo'}}) }}
+                        {{ form_widget(formulario.id_modulo, {'attr': {'class': 'form-control w-100','id': 'id_modulo','name':'id_modulo'}}) }}
                         <span class="input-group-append"></span>
                     </div>
                     <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
                         <label for="id_tipo_documento" class="font-weight-bold">Tipo de documento</label>
-                        {{ form_widget(formulario.id_tipo_documento, {'attr': {'class': 'form-control width-100','id': 'id_tipo_documento'}}) }}
+                        {{ form_widget(formulario.id_tipo_documento, {'attr': {'class': 'form-control w-100','id': 'id_tipo_documento'}}) }}
                         <span class="input-group-append"></span>
                     </div>
                     <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
                         <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
-                        <select name="naturaleza" id="naturaleza_cuenta" class="form-control width-100">
+                        <select name="naturaleza" id="naturaleza_cuenta" class="form-control w-100">
                             <option value="1">Deudora</option>
                             <option value="0">Acreedora</option>
                         </select>
@@ -31,11 +31,11 @@
 
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="id_cuenta" class="font-weight-bold">Cuenta</label>
-                    {{ form_widget(formulario.id_cuenta, {'attr': {'class': 'form-control width-100','id': 'id_cuenta'}}) }}
+                    {{ form_widget(formulario.id_cuenta, {'attr': {'class': 'form-control w-100','id': 'id_cuenta'}}) }}
                 </div>
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
-                    <select name="subcuenta_id" id="subcuenta_id" class="form-control width-100">
+                    <select name="subcuenta_id" id="subcuenta_id" class="form-control w-100">
                     </select>
                 </div>
                 <div class="form-group">

@@ -47,7 +47,22 @@ body {
     color: white !important;
 }
 
-/*********************** redefinicion de stilos ****************************/
+/*********************** MY redefinicion de stilos ****************************/
+
+.bg-dark-app {
+    background: #2f2f2f
+}
+
+.bg-dark-app label {
+    color: white;
+}
+
+/* estilo impuesto por espesificidad */
+.bg-dark-app label .invalid-label {
+    color: darkorange;
+}
+
+/*********************** Importadaos redefinicion de stilos ****************************/
 
 .table-hover tbody tr:hover {
     color: var(--light);
@@ -91,10 +106,6 @@ input#telefono {
     color: #ffffff;
     background: #2f2f2f !important;
     border: 1px solid #ffffff80 !important;
-}
-
-.width-100 {
-    width: 100% !important;
 }
 
 .input-group .form-control {

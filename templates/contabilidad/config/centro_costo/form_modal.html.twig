@@ -1,0 +1,25 @@
+{% extends 'utils/modal_form.html.twig' %}
+
+{% block modalbody %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="centro_costo_nombre" class="font-weight-bold">Nombre</label>
+        {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100','id':'nombre_field'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="centro_costo_codigo" class="font-weight-bold">Código</label>
+        {{ form_widget(form.codigo,{'attr': {'class': 'form-control w-100','id':'codigo_field'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="centro_costo_id_cuenta" class="font-weight-bold">Cuenta</label>
+        {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control w-100','id':'id_cuenta_field'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="subcuenta_id" class="font-weight-bold">Subcuenta</label>
+        <select name="centro_costo[id_sub_cuenta]" id="subcuenta_id" class="form-control w-100">
+        </select>
+    </div>
+    <input type="text" id="id_centro_costo" hidden>
+    {{ form_end(form) }}
+{% endblock %}

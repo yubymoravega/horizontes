@@ -16,7 +16,7 @@
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
-                        data-target="#gestionarCentro_costoModal" data-placement="bottom" title="Adicionar"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
@@ -24,7 +24,7 @@
         </div>
         {# end header #}
 
-        {{ include('contabilidad/config/centro_costo/form_add_modal.html.twig') }}
+        {{ include('contabilidad/config/centro_costo/form_modal.html.twig', {title: 'Adicionar Centro de Costo'}) }}
 
         {# list #}
         <table class="table table-hover text-light">
@@ -43,7 +43,7 @@
                     <td style="font-weight:400;">{{ item.cuenta }}</td>
                     <td style="font-weight:400;">{{ item.sub_cuenta }}</td>
                     <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
                                         id_cuenta: '{{ item.id_cuenta }}',
@@ -56,7 +56,7 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm ml-2" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar el Centro de costo: {{ item.nombre }} ?',
@@ -80,66 +80,53 @@
         const TEXT_SELECT = '... seleccione ...';
 
         function mostrarBtn() {
-            $('#btnActualizar').hide()
-            $('#btnAceptar').show()
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
         }
 
         const onUpdate = function (config) {
-            $('#btnActualizar').show()
-            $('#btnAceptar').hide()
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
 
-            const {
-                id = '',
-                codigo = '',
-                nombre = '',
-                id_cuenta = '',
-                id_sub_cuenta = '',
-                cuenta = '',
-                sub_cuenta = ''
-            } = config
-            $('#gestionarCentro_costoModal').modal('show')
+            const {id = '', codigo = '', nombre = '', id_cuenta = '', id_sub_cuenta = ''} = config
 
-            // cuenta
-            $('#select2-centro_costo_id_cuenta-container').text(cuenta)
-            $('#centro_costo_id_cuenta').val(id_cuenta)
-
-            //sub cuenta
-            const subcuenta = $('#subcuenta_id')
-            subcuenta.removeAttr('disabled')
-            getValues(id_cuenta, subcuenta, id_sub_cuenta)
-            $('#select2-subcuenta_id-container').text(sub_cuenta)
-
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar " + nombre)
 
             // nombre, codigo, id
-            $('.modal-title').text("Modificar " + nombre)
             $('#centro_costo_nombre').val(nombre)
             $('#centro_costo_codigo').val(codigo)
             $('#id_centro_costo').val(id)
+
+            // cuenta
+            $('#centro_costo_id_cuenta').val(id_cuenta)
+
+            //sub cuenta
+            contableAsyncLoads.config.loadSubcuentaByCuenta(id_cuenta, $('#subcuenta_id'), id_sub_cuenta)
         }
 
         $(document).ready(function () {
 
             // init
             $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
-            $('#btnActualizar').hide()
+            $('#modal__btn__actualizar').hide()
 
             // cargar subcuenta por la cuenta seleccionada
             var subcuenta = $('#subcuenta_id');
-            subcuenta.prop('disabled', true);
             $('#centro_costo_id_cuenta').change(function (evernt) {
                 subcuenta.find('option').remove();
-                $("#select2-subcuenta_id-container").text('')
                 if (typeof ($(this).val()) != 'object') {
-                    getValues($(this).val(), subcuenta)
+                    contableAsyncLoads.config.loadSubcuentaByCuenta($(this).val(), subcuenta)
                 } else {
                     subcuenta.prop('disabled', true);
                 }
             })
 
             // validacion del formulario
-            const validateForm = $('#form_centro_costo').validate({
+            var validateForm = $('#form_modal_target').validate({
                 errorClass: 'invalid-label',
                 errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
                     const error_label = element.closest("form").find(element.attr('id') + "-error")
                     if (error_label.length) {
                         error_label.removeClass('hide')
@@ -164,54 +151,27 @@
                 }
             })
 
-            $('#btnAceptar').on('click', function () {
-                const formulario = $('#form_centro_costo')
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/add`)
                 formulario.submit()
             })
 
-            $('#btnActualizar').on('click', function () {
+            $('#modal__btn__actualizar').on('click', function () {
                 const id_centro_costo = $('#id_centro_costo').val()
-                const formulario = $('#form_centro_costo')
+                const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/${id_centro_costo}`)
                 formulario.submit()
             })
 
-
-            $('#gestionarCentro_costoModal').on('show.bs.modal', function (event) {
+            $('#modal__form__id').on('show.bs.modal', function (event) {
                 validateForm.resetForm()
                 subcuenta.find('option').remove();
-                // reiniciar los -- <select> --
-                $("[class='select2-selection__rendered']").val(0)
-                $("[class='select2-selection__rendered']").text('')
-                $('.modal-title').text('Adicionar Centro de Costo')
+                $('#modal__form__label__id').text('Adicionar Centro de Costo')
             })
         })
-
-        // load sincrono de las subcuentas de la BD
-        function getValues(id, subcuenta, select = 0) {
-            $.ajax({
-                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id,
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    subcuenta.find('option').remove();
-                    subcuenta.append('<option selected = "false" value = "0" disabled> Seleccione la subcuenta</option>');
-                    $(result.subcuentas).each(function (pos, valor) {
-                        subcuenta.append('<option value="' + valor.id + '">' + valor.subcuenta + '</option>');
-                    })
-                    subcuenta.prop('disabled', false);
-                    subcuenta.val(select)
-                },
-                error: function () {
-                    alert('Ha ocurrido un error en el servidor');
-                    subcuenta.prop('disabled', true);
-                }
-            })
-        }
-
     </script>
 {% endblock %}
 

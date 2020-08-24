@@ -36,34 +36,36 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body bg-dark-app">
                         {{ form_start(form,{'attr': {'class': 'rd-mailform'}}) }}
 
-                        <div class="form-group input-group input-group-sm">
-                            <label for="nombre_field" class="font-weight-bold">Nombre</label>
+                        <div class="form-group input-group input-group-sm d-block">
+                            <label for="nombre_field" class="font-weight-bold text-white">Nombre</label>
                             <div class="container-fluid p-0">
                                 {{ form_widget(form.nombre,{'attr': {'class': 'form-control','id':'nombre_field'}}) }}
                             </div>
                         </div>
-                        <div class="form-group input-group input-group-sm">
-                            <label for="id_padre_field" class="font-weight-bold">Subordinada a</label>
-                            {{ form_widget(form.id_padre,{'attr': {'class': 'form-control','id':'id_padre_field'}}) }}
+                        <div class="form-group input-group input-group-sm d-block">
+                            <label for="id_padre_field" class="font-weight-bold text-white">Subordinada a</label>
+                            {{ form_widget(form.id_padre,{'attr': {'class': 'form-control w-100','id':'id_padre_field'}}) }}
                         </div>
                         <input type="text" id="id_unidad" hidden>
-                    </div>
-                    {{ form_end(form) }}
-                    <div class="modal-footer d-flex">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
+                        {#                    </div>#}
+                        {{ form_end(form) }}
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                        aria-label="Cerrar">
+                                    <span aria-hidden="true">Cancelar</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,7 +85,7 @@
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.padre_nombre }}</td>
                     <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
                                         id_padre: '{{ item.id_padre }}',
@@ -93,11 +95,12 @@
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm ml-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la unidad {{ item.nombre }} ?',
-                                        url:'{{ path('contabilidad_config_unidad_delete',{id: item.id}) }}'
+                                        url:'{{ path('contabilidad_config_unidad_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delet' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>
