@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% block title %} Contabilidad | Inventario {% endblock %}
 {% block style %}
     <style>
         label {
@@ -8,8 +9,8 @@
 {% endblock %}
 
 {% block navBar %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url ('sel_alamacen_inventario') }}">Inventario</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a class="navbar-brand text-white" href="{{ url ('sel_alamacen_inventario') }}">Inventario</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -44,22 +45,4 @@
             </ul>
         </div>
     </nav>
-{% endblock %}
-
-{% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            {% for item in config %}
-                <div class="col-4">
-                    <div class="card">
-                        <h5 class="card-header">{{ item.title }}</h5>
-                        <div class="card-body">
-                            <p class="card-text">{{ item.descrip }}</p>
-                        </div>
-                    </div>
-                </div>
-
-            {% endfor %}
-        </div>
-    </div>
 {% endblock %}

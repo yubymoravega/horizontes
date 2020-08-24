@@ -19,7 +19,7 @@
 }
 
 .transition-right {
-    right: -5000px;
+    right: -105vw;
 }
 
 .overflow-hidden-x-content {
@@ -39,15 +39,35 @@ body {
     background: var(--bg-nabvar) !important;
 }
 
-.nabvar-navegation > a {
+.nabvar-navegation ul > a {
     color: white !important;
+
+}
+.nabvar-navegation ul > a:hover {
+    background: transparent;
 }
 
 .nabvar-navegation li > a {
     color: white !important;
 }
 
-/*********************** redefinicion de stilos ****************************/
+/*********************** MY redefinicion de stilos ****************************/
+
+.bg-dark-app {
+    background: #2f2f2f
+}
+
+.bg-dark-app label {
+    color: white;
+}
+
+/* estilo impuesto por espesificidad */
+.invalid-label-orange {
+    margin-left: 10px;
+    color: darkorange !important;
+}
+
+/*********************** Importadaos redefinicion de stilos ****************************/
 
 .table-hover tbody tr:hover {
     color: var(--light);
@@ -62,10 +82,11 @@ input#from {
     margin-right: 10px;
 }
 
-input#to{
+input#to {
 
     margin-right: 10px;
 }
+
 select#estado {
     margin-right: 10px;
 }
@@ -86,15 +107,12 @@ input#telefono {
     border: 1px solid #ffffff80 !important;
 }
 
-.custom-select{
+.custom-select {
     color: #ffffff;
     background: #2f2f2f !important;
     border: 1px solid #ffffff80 !important;
 }
 
-.width-100{
-    width: 100% !important;
-}
 .input-group .form-control {
     height: auto;
     color: #ffffff !important;

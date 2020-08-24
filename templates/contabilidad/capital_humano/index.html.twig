@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% block title %} Contabilidad | Capital Humano {% endblock %}
 {% block style %}
     <style>
         label {
@@ -8,47 +9,29 @@
 {% endblock %}
 
 {% block navBar %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url ('capital_humano') }}">Capital Humano</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a class="navbar-brand text-white" href="{{ url ('capital_humano') }}">Capital Humano</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Nomencladores
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Cargo</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Tipo de
-                            pago</a>
-                    </div>
-                </li>
-                <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_empleado') }}">Empleado</a>
-                <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Nomina</a>
-                <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Vacaciones</a>
-            </ul>
-        </div>
-    </nav>
-{% endblock %}
-
-{% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            {% for item in config %}
-                <div class="col-4">
-                    <div class="card">
-                        <h5 class="card-header">{{ item.title }}</h5>
-                        <div class="card-body">
-                            <p class="card-text">{{ item.descrip }}</p>
-                        </div>
-                    </div>
+        {#        <div class="collapse navbar-collapse" id="navbarSupportedContent">#}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Nomencladores
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Cargo</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Tipo de
+                        pago</a>
                 </div>
-
-            {% endfor %}
-        </div>
-    </div>
+            </li>
+            <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_empleado') }}">Empleado</a>
+            <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Nomina</a>
+            <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Vacaciones</a>
+        </ul>
+        {#        </div>#}
+    </nav>
 {% endblock %}

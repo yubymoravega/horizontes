@@ -16,7 +16,7 @@
             </h5>
             <div>
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                        data-target="#gestionarCuentaModal" data-placement="bottom" title="Adicionar"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
@@ -26,74 +26,10 @@
             </div>
         </div>
         {# end header #}
-        {# Modal de adicionar#}
-        <div class="modal fade" id="gestionarCuentaModal" tabindex="-1" role="dialog" data-backdrop="static"
-             data-keyboard="false"
-             aria-labelledby="gestionarUnidadModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarUnidadModalLabel">Adicionar unidad</h4>
-                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        {{ form_start(form) }}
-                        <div class="form-group input-group input-group-sm">
-                            <label for="nombre_field" class="font-weight-bold">Nro.Cuenta</label>
-                            <div class="container-fluid p-0">
-                                {{ form_widget(form.nro_cuenta,{'attr': {'class': 'form-control','id':'nombre_field'}}) }}
 
-                            </div>
-                        </div>
-                        <div class="form-group input-group input-group-sm">
-                            <label for="id_padre_field" class="font-weight-bold">Descripción</label>
-                            <div class="container-fluid p-0">
-                                {{ form_widget(form.descripcion,{'attr': {'class': 'form-control','id':'id_padre_field'}}) }}
-                            </div>
-                        </div>
-                        <div class="form-group input-group input-group-sm">
-                            <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
-                            <select name="naturaleza" id="naturaleza_cuenta" class="form-control">
-                                <option value="1">Deudora</option>
-                                <option value="0">Acreedora</option>
-                            </select>
-                        </div>
-                        <div class="form-check form-check-inline mr-auto">
-                            <input class="form-check-input" type="checkbox" id="produccion_check"
-                                   name="produccion_check">
-                            <label for="produccion_check" class="form-check-label">Producción</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="patrimonio_check"
-                                   name="patrimonio_check">
-                            <label for="patrimonio_check" class="form-check-label">Patrimonio</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="elemento_gasto_check">
-                            <label for="elemento_gasto_check" class="form-check-label">Elemento Gasto</label>
-                        </div>
-                        <input type="text" id="id_cuenta" hidden>
-                    </div>
-                    {{ form_end(form) }}
-                    <div class="modal-footer d-flex">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {# Modal de adicionar#}
+
+        {{ include('./contabilidad/config/cuenta/form_modal.html.twig', {title:'Crear Cuenta'}) }}
 
         {# list #}
         <table class="table table-hover text-light">
@@ -138,7 +74,8 @@
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la cuenta {{ item.nro_cuenta }} ?',
-                                        url:'{{ path('contabilidad_config_cuenta_delete',{id: item.id}) }}'
+                                        url:'{{ path('contabilidad_config_cuenta_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -155,16 +92,34 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-            $('#btnActualizar').hide()
-        })
+
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+
+            /*$('#id_cuenta').val('')
+            $('#cuenta_nro_cuenta').val('')
+            $('#cuenta_descripcion').val('')
+            $('#produccion_check').prop('checked', false)
+            $('#patrimonio_check').prop('checked', false)
+            $('#elemento_gasto_check').prop('checked', false)*/
+
+        }
+
+        function onViewSuncuentas(id) {
+            window.location.replace('/contabilidad/config/subcuenta/' + id);
+        }
 
         const onUpdate = function (config) {
-            $('#btnActualizar').show()
-            $('#btnAceptar').hide()
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
 
-            const {nro_cuenta = '', id = '',deudora ='', descripcion = '', produccion = '', patrimonio = '', elemento_gasto = ''} = config
-            $('#gestionarCuentaModal').modal('show')
+            const {
+                nro_cuenta = '', id = '', deudora = '', descripcion = '',
+                produccion = '', patrimonio = '', elemento_gasto = ''
+            } = config
+
+            $('#modal__form__id').modal('show')
             $('#gestionarUnidadModalLabel').html("Modificar " + nro_cuenta)
 
             $('#id_cuenta').val(id)
@@ -184,85 +139,102 @@
                 $('#elemento_gasto_check').prop('checked', false)
 
             //tengo q hacer lo del select
-            if(deudora == 'Deudora'){
+            if (deudora == 'Deudora') {
                 $('#select2-naturaleza_cuenta-container')[0].textContent = 'Deudora'
                 $('#select2-naturaleza_cuenta-container').val(1)
                 $('#naturaleza_cuenta').val(1)
-            }
-            else{
+            } else {
                 $('#select2-naturaleza_cuenta-container')[0].textContent = 'Acreedora'
                 $('#select2-naturaleza_cuenta-container').val(0)
                 $('#naturaleza_cuenta').val(0)
             }
         }
+        $(document).ready(function () {
+            $('#modal__btn__actualizar').hide()
 
-        $('#btnAceptar').on('click', function () {
-            let params = {
-                patrimonio: $('#patrimonio_check').prop('checked') == true ? 1 : 0,
-                produccion: $('#produccion_check').prop('checked') == true ? 1 : 0,
-                elemento_gasto: $('#elemento_gasto_check').prop('checked') == true ? 1 : 0,
-                deudora: $('#naturaleza_cuenta').val(),
-                nro_cuenta: $('#cuenta_nro_cuenta').val(),
-                descripcion: $('#cuenta_descripcion').val()
-            }
-            $.ajax({
-                url: '/contabilidad/config/cuenta-add',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/contabilidad/config/cuenta');
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'cuenta[nro_cuenta]': "required",
+                    'cuenta[descripcion]': "required",
+                },
+                messages: {
+                    'cuenta[nro_cuenta]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'cuenta[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                }
             })
-        })
-        $('#btnActualizar').on('click', function () {
-            let params = {
-                patrimonio: $('#patrimonio_check').prop('checked') == true ? 1 : 0,
-                produccion: $('#produccion_check').prop('checked') == true ? 1 : 0,
-                elemento_gasto: $('#elemento_gasto_check').prop('checked') == true ? 1 : 0,
-                deudora: $('#naturaleza_cuenta').val(),
-                nro_cuenta: $('#cuenta_nro_cuenta').val(),
-                descripcion: $('#cuenta_descripcion').val(),
-                id_cuenta: $('#id_cuenta').val()
-            }
-            $.ajax({
-                url: '/contabilidad/config/cuenta-upd',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/contabilidad/config/cuenta');
+
+            $('#modal__btn__aceptar').on('click', function () {
+                let params = {
+                    patrimonio: $('#patrimonio_check').prop('checked') == true ? 1 : 0,
+                    produccion: $('#produccion_check').prop('checked') == true ? 1 : 0,
+                    elemento_gasto: $('#elemento_gasto_check').prop('checked') == true ? 1 : 0,
+                    deudora: $('#naturaleza_cuenta').val(),
+                    nro_cuenta: $('#cuenta_nro_cuenta').val(),
+                    descripcion: $('#cuenta_descripcion').val()
+                }
+
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/cuenta/add`)
+                formulario.submit()
+
+
+                /*$.ajax({
+                    url: '/contabilidad/config/cuenta-add',
+                    method: "POST",
+                    data: params
+                }).then(res => {
+                    window.location.replace('/contabilidad/config/cuenta');
+                })*/
             })
+            $('#modal__btn__actualizar').on('click', function () {
+                let params = {
+                    patrimonio: $('#patrimonio_check').prop('checked') == true ? 1 : 0,
+                    produccion: $('#produccion_check').prop('checked') == true ? 1 : 0,
+                    elemento_gasto: $('#elemento_gasto_check').prop('checked') == true ? 1 : 0,
+                    deudora: $('#naturaleza_cuenta').val(),
+                    nro_cuenta: $('#cuenta_nro_cuenta').val(),
+                    descripcion: $('#cuenta_descripcion').val(),
+                    id_cuenta: $('#id_cuenta').val()
+                }
+                $.ajax({
+                    url: '/contabilidad/config/cuenta-upd',
+                    method: "POST",
+                    data: params
+                }).then(res => {
+                    window.location.replace('/contabilidad/config/cuenta');
+                })
+            })
+
+            $('#modal__form__id').on('show.bs.modal', function (event) {
+                $('#modal__form__label__id').text('Adicionar cuenta')
+            })
+
+            /****-Eventos para validar que no seleccione los dos tipos de cuentas(patrimonio y producción) a la vez-*****/
+            $('#patrimonio_check').on('change', function () {
+                if ($('#patrimonio_check').is(':checked'))
+                    $('#produccion_check').prop('checked', false)
+            })
+            $('#produccion_check').on('change', function () {
+                if ($('#produccion_check').is(':checked'))
+                    $('#patrimonio_check').prop('checked', false)
+            })
+
         })
-
-        $('#gestionarCuentaModal').on('show.bs.modal', function (event) {
-            var modal = $(this)
-            modal.find('.modal-title').text('Adicionar cuenta')
-        })
-
-        /****-Eventos para validar que no seleccione los dos tipos de cuentas(patrimonio y producción) a la vez-*****/
-        $('#patrimonio_check').on('change', function () {
-            if ($('#patrimonio_check').is(':checked'))
-                $('#produccion_check').prop('checked', false)
-        })
-        $('#produccion_check').on('change', function () {
-            if ($('#produccion_check').is(':checked'))
-                $('#patrimonio_check').prop('checked', false)
-        })
-
-        function mostrarBtn() {
-            $('#btnActualizar').hide()
-            $('#btnAceptar').show()
-
-            $('#id_cuenta').val('')
-            $('#cuenta_nro_cuenta').val('')
-            $('#cuenta_descripcion').val('')
-            $('#produccion_check').prop('checked', false)
-            $('#patrimonio_check').prop('checked', false)
-            $('#elemento_gasto_check').prop('checked', false)
-
-        }
-
-        function onViewSuncuentas(id) {
-            window.location.replace('/contabilidad/config/subcuenta/' + id);
-        }
     </script>
 {% endblock %}
 

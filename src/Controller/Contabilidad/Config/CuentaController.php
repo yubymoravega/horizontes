@@ -16,10 +16,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class CuentaController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/cuenta")
+ */
 class CuentaController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/config/cuenta", name="contabilidad_config_cuenta")
+     * @Route("/", name="contabilidad_config_cuenta")
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -47,14 +52,14 @@ class CuentaController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/cuenta/getCuentas/{cuentas}", name="contabilidad_config_cuenta_get_cuentas")
+     * @Route("/getCuentas/{cuentas}", name="contabilidad_config_cuenta_get_cuentas", methods={"POST"})
      */
-    public function getCuentas(EntityManagerInterface $em, Request $request, ValidatorInterface $validator,$cuentas)
+    public function getCuentas(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $cuentas)
     {
         $cuentas_arr = $em->getRepository(Cuenta::class)->findByActivo(true);
         $row = [];
         foreach ($cuentas_arr as $item) {
-            if(strpos($cuentas.' ',$item->getNroCuenta().' ') === false){
+            if (strpos($cuentas . ' ', $item->getNroCuenta() . ' ') === false) {
                 /**@var $item Cuenta** */
                 $row [] = array(
                     'id' => $item->getId(),
@@ -67,10 +72,11 @@ class CuentaController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/cuenta-add", name="contabilidad_config_cuenta_add")
+     * @Route("/add", name="contabilidad_config_cuenta_add", methods={"POST"})
      */
     public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
+        dd($request);
         if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'add')) {
             /**@var $obj_cuenta Cuenta** */
 
@@ -101,10 +107,10 @@ class CuentaController extends AbstractController
      */
     public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'upd',$request->get('id_cuenta'))) {
+        if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'upd', $request->get('id_cuenta'))) {
             /**@var $obj_cuenta Cuenta** */
             $obj_cuenta = $em->getRepository(Cuenta::class)->find($request->get('id_cuenta'));
-            if(!$obj_cuenta){
+            if (!$obj_cuenta) {
                 $this->addFlash('error', "La cuenta solicitada no se encuentra en la base de datos");
                 return new JsonResponse(['success' => true]);
             }
@@ -159,8 +165,7 @@ class CuentaController extends AbstractController
                     return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
                 }
             }
-        }
-        else{
+        } else {
             $msg = "No se puede eliminar la cuenta seleccionada,porque tiene subcuentas asociadas";
             $success = "error";
         }

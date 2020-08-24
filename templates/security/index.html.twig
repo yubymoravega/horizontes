@@ -27,17 +27,15 @@
         }
 
         .transition-right {
-            right: -5000px;
+            right: -105vw;
         }
     </style>
 </head>
 <body>
-<div class="toasts-alert alert alert-danger fade" role="alert"
-     id="alert__success">
-    <i class="fa fa-close pr-2"></i>
+<div class="toasts-alert alert alert-danger fade" role="alert" id="alert__success">
     <span id="text_"></span>
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true" class="ml-2 text-white">&times;</span>
     </button>
 </div>
 <div class="page-loader page-loader-variant-1">
@@ -179,27 +177,14 @@
 
     function ValidarForm() {
         const exp_correo = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
-        if ($('#inputUsername').val() == '') {
-            $('#alert__success').addClass('show')
-            $('#text_').text('Debe introducir su usuario y le enviaremos por correo las instrucciones para establecer una nueva contraseña.')
-            $('#alert__success').removeClass('transition-right alert-info text-dark')
-            $('#alert__success').addClass('toasts-alert alert-danger text-white')
-            $('#alert__success').show()
-            setTimeout(function () {
-                $('#alert__success').addClass('transition-right')
-                $('#alert__success').hide(1000)
-            }, 3000)
-        } else if (!exp_correo.test($('#inputUsername').val())) {
-            $('#alert__success').addClass('show')
-            $('#text_').text('Formato de correo invalido.')
-            $('#alert__success').removeClass('transition-right alert-info text-dark')
-            $('#alert__success').addClass('toasts-alert alert-danger text-white')
-            $('#alert__success').show()
-            setTimeout(function () {
-                $('#alert__success').addClass('transition-right')
-                $('#alert__success').hide(1000)
-            }, 3000)
-        } else {
+
+        // validar que no este vacio
+        if ($('#inputUsername').val() == '')
+            showAlert('Debe introducir su usuario y le enviaremos por correo las instrucciones para establecer una nueva contraseña.', 'error')
+        // validar que sea de formato correo
+        else if (!exp_correo.test($('#inputUsername').val()))
+            showAlert('El usuario debe ser un correo válido ej: user@dominio.com ', 'error')
+        else {
             $('#confirm__modal').modal('show')
         }
     }
@@ -214,15 +199,32 @@
             data: {username: username}
         }).then(res => {
             $('#load__modal').modal('hide')
-            $('#alert__success').removeClass('transition-right alert-danger text-white')
-            $('#alert__success').addClass('show')
-            $('#text_').text('Contraseña reseteada satisfactoriamente.')
-            $('#alert__success').addClass('toasts-alert alert-info text-dark')
-            $('#alert__success').show()
-            setTimeout(function () {
-                $('#alert__success').addClass('transition-right')
-                $('#alert__success').hide(5000)
-            }, 3000)
+            if (res.success)
+                showAlert('Contraseña reseteada satisfactoriamente.')
+            else
+                showAlert('Error interno, contacte al Administrador!', 'error')
         })
+    }
+
+    /**
+     * Mostar alertas para las acciones realizadas
+     * @param text
+     * @param type
+     */
+    function showAlert(text, type = 'success') {
+        $('#alert__success').addClass('show')
+        $('#text_').text(text)
+        $('#alert__success').removeClass('transition-right alert-info alert-danger text-dark')
+
+        // mostrar dependiento el tipo
+        if (type === 'success') $('#alert__success').addClass('toasts-alert alert-info text-white')
+        else $('#alert__success').addClass('toasts-alert alert-danger text-white')
+
+        // ocultar a los 3s
+        $('#alert__success').show()
+        setTimeout(function () {
+            $('#alert__success').addClass('transition-right')
+            $('#alert__success').hide(1000)
+        }, 4000)
     }
 </script>

@@ -42,16 +42,6 @@ class ConfiguracionInicialType extends AbstractType
                         ->orderBy('u.nombre','ASC');
                 }
             ])
-//            ->add('id_cuenta',EntityType::class,[
-//                'mapped'=>false,
-//                'class'=>Cuenta::class,
-//                'choice_label'=>'nro_cuenta',
-//                'query_builder'=>function(EntityRepository $er){
-//                    return $er->createQueryBuilder('u')
-//                        ->where('u.activo = true')
-//                        ->orderBy('u.nro_cuenta','ASC');
-//                }
-//            ])
             ->add('aceptar', SubmitType::class, ['attr'=> ['class' => 'btn btn-secondary']])
             ->add('aplicar', SubmitType::class, ['attr'=> ['class' => 'btn btn-secondary']])
         ;

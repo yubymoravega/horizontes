@@ -1,0 +1,38 @@
+{% extends 'utils/modal_form.html.twig' %}
+
+{% block modalbody %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="cuenta_nro_cuenta" class="font-weight-bold">No. Cuenta</label>
+        {{ form_widget(form.nro_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="cuenta_descripcion" class="font-weight-bold">Descripción</label>
+        {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
+        <select name="cuenta[naturaleza]" id="naturaleza_cuenta" class="form-control w-100">
+            <option value="1">Deudora</option>
+            <option value="0">Acreedora</option>
+        </select>
+    </div>
+    <div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="produccion_check" name="cuenta[produccion]">
+            <label for="produccion_check" class="form-check-label">Producción</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="patrimonio_check" name="cuenta[patrimonio]">
+            <label for="patrimonio_check" class="form-check-label">Patrimonio</label>
+        </div>
+        <div class="form-check form-check-inline ml-4">
+            <input class="form-check-input" type="checkbox" id="elemento_gasto_check" name="cuenta[elemento_gasto]">
+            <label for="elemento_gasto_check" class="form-check-label">Elemento Gasto</label>
+        </div>
+    </div>
+    <input type="text" id="id_cuenta" hidden>
+
+    {{ form_end(form) }}
+{% endblock %}

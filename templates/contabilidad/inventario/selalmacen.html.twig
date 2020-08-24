@@ -19,25 +19,24 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body bg-dark-app">
                     <div class="form-group input-group input-group-sm">
-                        <label for="almacenes_select" class="font-weight-bold">Almacén</label>
                         <select name="almacenes_select" id="almacenes_select" class="form-control">
                             {% for item in almacenes %}
                                 <option value="{{ item.id }}">{{ item.descripcion }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                </div>
-                <div class="modal-footer d-flex">
-                    <div class="mr-auto">
-                        <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                aria-label="Cerrar">
-                            <span aria-hidden="true">Cancelar</span>
-                        </button>
-                    </div>
-                    <div class="ml-2">
-                        <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,11 +51,11 @@
             $('#selecionarAlmacen').modal('show')
         })
 
-        $('#btnAceptar').on('click',function(){
+        $('#btnAceptar').on('click', function () {
             $.ajax({
                 url: '/contabilidad/inventario/seleccionarAlmacen',
                 method: "POST",
-                data: {id_almacen:$('#almacenes_select').val()}
+                data: {id_almacen: $('#almacenes_select').val()}
             }).then(res => {
                 window.location.replace('/contabilidad/inventario');
             })
