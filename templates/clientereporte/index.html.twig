@@ -59,7 +59,7 @@
                  {# table body #}
     {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ data.fecha | date('d-M-y') }} </br> {{ data.fecha | date('H:i a') }}</td>
+            <td>{{ data.fecha | date('d-M-y') }} </br> {{ data.fecha | date('h:i a') }}</td>
             <td> {{ data.idCliente }} </td>     
             <td><img height="40" src="/images/iconos/{{ data.bram }}.svg" > - {{ data.last4  }} </br>  </td>       
             <td>{{ data.monto }} </td> {% set total = total + data.monto %}

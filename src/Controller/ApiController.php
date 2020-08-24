@@ -439,8 +439,9 @@ class ApiController extends AbstractController
     $clienteReporte = new ClienteReporte();
 
     $user =  $this->getUser();
+    date_default_timezone_set('America/Santo_Domingo');
 
-    $date = new DateTime('NOW'); 
+    $date = new DateTime('NOW');  
     //return new Response($date->format('Y-m-d H:i'));
     
     // return new Response();
