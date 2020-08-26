@@ -77,9 +77,7 @@ class CuentaController extends AbstractController
      */
     public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-//        dd($request->get('cuenta'));
         $request_cuenta = $request->get('cuenta');
-//        dd($request_cuenta);
         if (!AuxFunctions::isDuplicate($em->getRepository(Cuenta::class),
             ['nro_cuenta' => $request_cuenta['nro_cuenta']],
             AuxFunctions::$ACTION_ADD)) {
@@ -87,9 +85,9 @@ class CuentaController extends AbstractController
 
             $obj_cuenta = new Cuenta();
             $obj_cuenta
-                ->setNroCuenta($request_cuenta['nro_cuenta'])
-                ->setDescripcion($request_cuenta['descripcion'])
-                ->setDeudora($request_cuenta['naturaleza'])
+                ->setNroCuenta(strtoupper($request_cuenta['nro_cuenta']))
+                ->setDescripcion(strtoupper($request_cuenta['descripcion']))
+                ->setDeudora(strtoupper($request_cuenta['naturaleza']))
                 ->setPatrimonio(array_key_exists('patrimonio', $request_cuenta))
                 ->setProduccion(array_key_exists('produccion', $request_cuenta))
                 ->setElementoGasto(array_key_exists('elemento_gasto', $request_cuenta))
@@ -107,24 +105,27 @@ class CuentaController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/cuenta-upd", name="contabilidad_config_cuenta_upd")
+     * @Route("/upd", name="contabilidad_config_cuenta_upd", methods={"POST"})
      */
     public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'upd', $request->get('id_cuenta'))) {
+        $request_cuenta = $request->get('cuenta');
+        if (!AuxFunctions::isDuplicate($em->getRepository(Cuenta::class),
+            ['nro_cuenta' => $request_cuenta['nro_cuenta']],
+            AuxFunctions::$ACTION_UPD, $request_cuenta['id_cuenta'])) {
+
             /**@var $obj_cuenta Cuenta** */
-            $obj_cuenta = $em->getRepository(Cuenta::class)->find($request->get('id_cuenta'));
+            $obj_cuenta = $em->getRepository(Cuenta::class)->find($request_cuenta['id_cuenta']);
             if (!$obj_cuenta) {
                 $this->addFlash('error', "La cuenta solicitada no se encuentra en la base de datos");
-                return new JsonResponse(['success' => true]);
             }
             $obj_cuenta
-                ->setNroCuenta($request->get('nro_cuenta'))
-                ->setDescripcion($request->get('descripcion'))
-                ->setDeudora($request->get('deudora'))
-                ->setPatrimonio($request->get('patrimonio'))
-                ->setProduccion($request->get('produccion'))
-                ->setElementoGasto($request->get('elemento_gasto'))
+                ->setNroCuenta(strtoupper($request_cuenta['nro_cuenta']))
+                ->setDescripcion(strtoupper($request_cuenta['descripcion']))
+                ->setDeudora(strtoupper($request_cuenta['naturaleza']))
+                ->setPatrimonio(array_key_exists('patrimonio', $request_cuenta))
+                ->setProduccion(array_key_exists('produccion', $request_cuenta))
+                ->setElementoGasto(array_key_exists('elemento_gasto', $request_cuenta))
                 ->setActivo(true);
             try {
                 $em->persist($obj_cuenta);
@@ -133,71 +134,44 @@ class CuentaController extends AbstractController
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
             $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
-        }
-        $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
-        return new JsonResponse(['success' => false]);
-    }
-
-    /**
-     * @Route("/contabilidad/config/cuenta-delete/{id}", name="contabilidad_config_cuenta_delete")
-     */
-    public function Delete($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy(array(
-            'id_cuenta' => $id,
-            'activo' => true
-        ));
-        if (empty($arr_subcuentas)) {
-            $cuenta_er = $em->getRepository(Cuenta::class);
-            $cuenta_obj = $cuenta_er->find($id);
-            $msg = 'No se pudo eliminar la cuenta seleccionada';
-            $success = 'error';
-            if ($cuenta_obj) {
-                /**@var $cuenta_obj Cuenta** */
-                $cuenta_obj->setActivo(false);
-                try {
-                    $em->persist($cuenta_obj);
-                    $em->flush();
-                    $success = 'success';
-                    $msg = 'Cuenta eliminada satisfactoriamente';
-
-                } catch
-                (FileException $exception) {
-                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-                }
-            }
-        } else {
-            $msg = "No se puede eliminar la cuenta seleccionada,porque tiene subcuentas asociadas";
-            $success = "error";
-        }
-        $this->addFlash($success, $msg);
+        } else
+            $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
         return $this->redirectToRoute('contabilidad_config_cuenta');
     }
 
-
-    /**************-Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar-****************/
-    public function isDuplicate($em, $nro_cuenta, $action, $id = null)
+    /**
+     * @Route("/delete/{id}", name="contabilidad_config_cuenta_delete")
+     */
+    public function Delete(Request $request, $id)
     {
-        $cuenta_er = $em->getRepository(Cuenta::class);
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $em = $this->getDoctrine()->getManager();
+            $arr_subcuentas = $em->getRepository(Subcuenta::class)->find($id);
+            if (empty($arr_subcuentas)) {
+                $cuenta_er = $em->getRepository(Cuenta::class);
+                $cuenta_obj = $cuenta_er->find($id);
+                $msg = 'No se pudo eliminar la cuenta seleccionada';
+                $success = 'error';
+                if ($cuenta_obj) {
+                    /**@var $cuenta_obj Cuenta** */
+                    $cuenta_obj->setActivo(false);
+                    try {
+                        $em->persist($cuenta_obj);
+                        $em->flush();
+                        $success = 'success';
+                        $msg = 'Cuenta eliminada satisfactoriamente';
 
-        $arr_obj = $cuenta_er->findBy(array(
-            'nro_cuenta' => $nro_cuenta,
-            'activo' => true
-        ));
-
-        if ($action == 'upd') {
-            foreach ($arr_obj as $obj) {
-                /**@var $obj Cuenta* */
-                if ($obj->getId() != $id)
-                    return true;
+                    } catch
+                    (FileException $exception) {
+                        return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                    }
+                }
+            } else {
+                $msg = "No se puede eliminar la cuenta seleccionada,porque tiene subcuentas asociadas";
+                $success = "error";
             }
-        } elseif ($action == 'add') {
-            if (!empty($arr_obj))
-                return true;
+            $this->addFlash($success, $msg);
         }
-        return false;
+        return $this->redirectToRoute('contabilidad_config_cuenta');
     }
 }
