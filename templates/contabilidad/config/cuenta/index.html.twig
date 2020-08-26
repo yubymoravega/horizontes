@@ -34,13 +34,13 @@
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-1" style="width: 160px">Nro. cuenta</th>
-            <th scope="col-6">Descripción</th>
-            <th scope="col-6" width="90px">Naturaleza</th>
-            <th scope="col-1" width="90px">Producción</th>
-            <th scope="col-1" width="85px">Patrimonio</th>
-            <th scope="col-1" width="130px">E. Gasto</th>
-            <th scope="col-1" style="width: 200px" width="200px">Acciones</th>
+            <th scope="row" style="width: 160px">Nro. cuenta</th>
+            <th scope="row">Descripción</th>
+            <th scope="row" style="width: 100px">Naturaleza</th>
+            <th scope="row" style="width: 100px">Producción</th>
+            <th scope="row" style="width: 100px">Patrimonio</th>
+            <th scope="row" style="width: 130px">E. Gasto</th>
+            <th scope="row" style="width: 200px">Acciones</th>
             </thead>
             <tbody>
             {% for item in cuentas %}
@@ -51,34 +51,37 @@
                     <td style="font-weight:400;">{{ item.produccion }}</td>
                     <td style="font-weight:400;">{{ item.patrimonio }}</td>
                     <td style="font-weight:400;">{{ item.elemento_gasto }}</td>
-                    <td style="width: 375px">
-                        <a type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
-                           data-placement="bottom" title="Ver subcuentas"
-                           href="{{ path('contabilidad_config_subcuenta',{id:item.id}) }}">
-                            <i class="fa fa-eye"></i>
-                        </a>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Modificar"
-                                onclick="onUpdate({
-                                        nro_cuenta: '{{ item.nro_cuenta }}',
-                                        descripcion:'{{ item.descripcion }}',
-                                        deudora:'{{ item.deudora }}' ,
-                                        patrimonio:'{{ item.patrimonio }}' ,
-                                        produccion:'{{ item.produccion }}' ,
-                                        elemento_gasto:'{{ item.elemento_gasto }}' ,
-                                        id: '{{ item.id }}'
-                                        })">
-                            <i class="fa fa-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Eliminar"
-                                onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar la cuenta {{ item.nro_cuenta }} ?',
-                                        url:'{{ path('contabilidad_config_cuenta_delete',{id: item.id}) }}',
-                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
-                                        })">
-                            <i class="fa fa-trash"></i>
-                        </button>
+                    <td>
+                        <div style="width: max-content;">
+                            <a type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
+                               data-placement="bottom" title="Ver subcuentas"
+                               href="{{ path('contabilidad_config_subcuenta',{id:item.id}) }}">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
+                                    data-placement="bottom" title="Modificar"
+                                    onclick="onUpdate({
+                                            nro_cuenta: '{{ item.nro_cuenta }}',
+                                            descripcion:'{{ item.descripcion }}',
+                                            deudora:'{{ item.deudora }}' ,
+                                            patrimonio:'{{ item.patrimonio }}' ,
+                                            produccion:'{{ item.produccion }}' ,
+                                            elemento_gasto:'{{ item.elemento_gasto }}' ,
+                                            id: '{{ item.id }}'
+                                            })">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Eliminar"
+                                    onclick="onDeleteConfirm({
+                                            message:'Está seguro que desea eliminar la cuenta {{ item.nro_cuenta }} ?',
+                                            url:'{{ path('contabilidad_config_cuenta_delete',{id: item.id}) }}',
+                                            _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                            })">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+
                     </td>
                 </tr>
             {% endfor %}
@@ -96,14 +99,6 @@
         function mostrarBtn() {
             $('#modal__btn__actualizar').hide()
             $('#modal__btn__aceptar').show()
-
-            /*$('#id_cuenta').val('')
-            $('#cuenta_nro_cuenta').val('')
-            $('#cuenta_descripcion').val('')
-            $('#produccion_check').prop('checked', false)
-            $('#patrimonio_check').prop('checked', false)
-            $('#elemento_gasto_check').prop('checked', false)*/
-
         }
 
         function onViewSuncuentas(id) {
@@ -120,7 +115,7 @@
             } = config
 
             $('#modal__form__id').modal('show')
-            $('#gestionarUnidadModalLabel').html("Modificar " + nro_cuenta)
+            $('#modal__form__label__id').html("Modificar " + nro_cuenta)
 
             $('#id_cuenta').val(id)
             $('#cuenta_nro_cuenta').val(nro_cuenta)
@@ -138,16 +133,9 @@
             else
                 $('#elemento_gasto_check').prop('checked', false)
 
-            //tengo q hacer lo del select
-            if (deudora == 'Deudora') {
-                $('#select2-naturaleza_cuenta-container')[0].textContent = 'Deudora'
-                $('#select2-naturaleza_cuenta-container').val(1)
-                $('#naturaleza_cuenta').val(1)
-            } else {
-                $('#select2-naturaleza_cuenta-container')[0].textContent = 'Acreedora'
-                $('#select2-naturaleza_cuenta-container').val(0)
-                $('#naturaleza_cuenta').val(0)
-            }
+            if (deudora == 'Deudora') $('#naturaleza_cuenta').val(1)
+            else $('#naturaleza_cuenta').val(0)
+
         }
         $(document).ready(function () {
             $('#modal__btn__actualizar').hide()
@@ -180,53 +168,26 @@
             })
 
             $('#modal__btn__aceptar').on('click', function () {
-                let params = {
-                    patrimonio: $('#patrimonio_check').prop('checked') == true ? 1 : 0,
-                    produccion: $('#produccion_check').prop('checked') == true ? 1 : 0,
-                    elemento_gasto: $('#elemento_gasto_check').prop('checked') == true ? 1 : 0,
-                    deudora: $('#naturaleza_cuenta').val(),
-                    nro_cuenta: $('#cuenta_nro_cuenta').val(),
-                    descripcion: $('#cuenta_descripcion').val()
-                }
-
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/cuenta/add`)
                 formulario.submit()
-
-
-                /*$.ajax({
-                    url: '/contabilidad/config/cuenta-add',
-                    method: "POST",
-                    data: params
-                }).then(res => {
-                    window.location.replace('/contabilidad/config/cuenta');
-                })*/
             })
             $('#modal__btn__actualizar').on('click', function () {
-                let params = {
-                    patrimonio: $('#patrimonio_check').prop('checked') == true ? 1 : 0,
-                    produccion: $('#produccion_check').prop('checked') == true ? 1 : 0,
-                    elemento_gasto: $('#elemento_gasto_check').prop('checked') == true ? 1 : 0,
-                    deudora: $('#naturaleza_cuenta').val(),
-                    nro_cuenta: $('#cuenta_nro_cuenta').val(),
-                    descripcion: $('#cuenta_descripcion').val(),
-                    id_cuenta: $('#id_cuenta').val()
-                }
-                $.ajax({
-                    url: '/contabilidad/config/cuenta-upd',
-                    method: "POST",
-                    data: params
-                }).then(res => {
-                    window.location.replace('/contabilidad/config/cuenta');
-                })
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/cuenta/upd`)
+                formulario.submit()
             })
 
             $('#modal__form__id').on('show.bs.modal', function (event) {
+                validateForm.resetForm()
                 $('#modal__form__label__id').text('Adicionar cuenta')
             })
 
-            /****-Eventos para validar que no seleccione los dos tipos de cuentas(patrimonio y producción) a la vez-*****/
+            /**
+             * Eventos para validar que no seleccione los dos tipos de cuentas(patrimonio y producción) a la vez
+             */
             $('#patrimonio_check').on('change', function () {
                 if ($('#patrimonio_check').is(':checked'))
                     $('#produccion_check').prop('checked', false)

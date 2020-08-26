@@ -24,10 +24,10 @@
             <tbody>
             {% for item in list %}
                 <tr>
-                    {% if label == 'Nombre' %}
-                        <td style="font-weight:400;">{{ item.nombre }}</td>
+                    {% if label == 'nombre' %}
+                        <td style="font-weight:400;">{{ item.nombre|capitalize }}</td>
                     {% else %}
-                        <td style="font-weight:400;">{{ item.descripcion }}</td>
+                        <td style="font-weight:400;">{{ item.descripcion|capitalize }}</td>
                     {% endif %}
                     <td>
                         <a href="{{ path(paths.edit,{id: item.id}) }}"

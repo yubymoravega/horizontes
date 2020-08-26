@@ -7,8 +7,8 @@
     - [x] Config inicial 
     - [x] Almacén `u`
     - [x] Centro Costo --- `GUIA para validaciones` 
-    - [ ] Cuenta 
-    - [ ] Subcuenta
+    - [x] Cuenta 
+    - [x] Subcuenta
     - [ ] Elemento de Gasto
     - [ ] Grupo Activo ---camilo
     - [x] Instrumento Cobro `u`

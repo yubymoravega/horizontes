@@ -2,10 +2,12 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\SubcuentaType;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,12 +15,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class SubcuentaController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/subcuenta")
+ */
 class SubcuentaController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/config/subcuenta/{id}", name="contabilidad_config_subcuenta")
+     * @Route("/{id}", name="contabilidad_config_subcuenta", methods={"GET"})
      */
-    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
+    public function index(EntityManagerInterface $em, $id)
     {
         $form = $this->createForm(SubcuentaType::class);
 
@@ -55,19 +62,21 @@ class SubcuentaController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/subcuenta-add", name="contabilidad_config_subcuenta_add")
+     * @Route("/add", name="contabilidad_config_subcuenta_add", methods={"POST"})
      */
-    public function addSubcuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function addSubcuenta(EntityManagerInterface $em, Request $request)
     {
-        if (!$this->isDuplicate($em, $request->get('nro_subcuenta'), 'add')) {
+        $obj_request = $request->get('subcuenta');
+        if (!AuxFunctions::isDuplicate($em->getRepository(Subcuenta::class),
+            ['nro_subcuenta' => $obj_request['nro_subcuenta']], AuxFunctions::$ACTION_ADD)) {
             /**@var $obj_subcuenta Subcuenta** */
 
             $obj_subcuenta = new Subcuenta();
             $obj_subcuenta
-                ->setNroSubcuenta($request->get('nro_subcuenta'))
-                ->setDescripcion($request->get('descripcion'))
-                ->setDeudora($request->get('deudora'))
-                ->setIdCuenta($em->getRepository(Cuenta::class)->find($request->get('id_cuenta')))
+                ->setNroSubcuenta($obj_request['nro_subcuenta'])
+                ->setDescripcion($obj_request['descripcion'])
+                ->setDeudora($obj_request['naturaleza'])
+                ->setIdCuenta($em->getRepository(Cuenta::class)->find($obj_request['id_cuenta']))
                 ->setActivo(true);
             try {
                 $em->persist($obj_subcuenta);
@@ -76,28 +85,31 @@ class SubcuentaController extends AbstractController
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
             $this->addFlash('success', "Subcuenta adicionada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
-        }
-        $this->addFlash('error', "El Nro de subcuenta ya se encuentra registrado");
-        return new JsonResponse(['success' => false]);
+        } else
+            $this->addFlash('error', "El Nro de subcuenta ya se encuentra registrado");
+        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id' => $obj_request['id_cuenta']]);
     }
 
     /**
-     * @Route("/contabilidad/config/subcuenta-upd", name="contabilidad_config_subcuenta_upd")
+     * @Route("/upd", name="contabilidad_config_subcuenta_upd", methods={"POST"})
      */
     public function updSubcuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        if (!$this->isDuplicate($em, $request->get('nro_subcuenta'), 'upd', $request->get('id_subcuenta'))) {
+        $obj_request = $request->get('subcuenta');
+        if (!AuxFunctions::isDuplicate($em->getRepository(Subcuenta::class),
+            ['nro_subcuenta' => $obj_request['nro_subcuenta']],
+            AuxFunctions::$ACTION_UPD, $obj_request['id_subcuenta'])) {
+
             /**@var $obj_subcuenta Subcuenta** */
-            $obj_subcuenta = $em->getRepository(Subcuenta::class)->find($request->get('id_subcuenta'));
+            $obj_subcuenta = $em->getRepository(Subcuenta::class)->find($obj_request['id_subcuenta']);
             if (!$obj_subcuenta) {
                 $this->addFlash('error', "La subcuenta solicitada no se encuentra en la base de datos");
                 return new JsonResponse(['success' => true]);
             }
             $obj_subcuenta
-                ->setNroSubcuenta($request->get('nro_subcuenta'))
-                ->setDescripcion($request->get('descripcion'))
-                ->setDeudora($request->get('deudora'))
+                ->setNroSubcuenta($obj_request['nro_subcuenta'])
+                ->setDescripcion($obj_request['descripcion'])
+                ->setDeudora($obj_request['naturaleza'])
                 ->setActivo(true);
             try {
                 $em->persist($obj_subcuenta);
@@ -106,64 +118,37 @@ class SubcuentaController extends AbstractController
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
             $this->addFlash('success', "Subcuenta actualizada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
-        }
-        $this->addFlash('error', "El Nro de subcuenta ya se encuentra registrado");
-        return new JsonResponse(['success' => false]);
+        } else $this->addFlash('error', "El Nro de subcuenta ya se encuentra registrado");
+        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id' => $obj_request['id_cuenta']]);
     }
 
     /**
-     * @Route("/contabilidad/config/subcuenta-delete/{id}", name="contabilidad_config_subcuenta_delete")
+     * @Route("/delete/{id}/{id_cuenta}", name="contabilidad_config_subcuenta_delete", methods={"DELETE"})
      */
-    public function Delete($id)
+    public function Delete(Request $request, $id, $id_cuenta)
     {
-        $em = $this->getDoctrine()->getManager();
-        $subcuenta_er = $em->getRepository(Subcuenta::class);
-        $subcuenta_obj = $subcuenta_er->find($id);
-        $msg = 'No se pudo eliminar la subcuenta seleccionada';
-        $success = 'error';
-        $id_cuenta = 0;
-        if ($subcuenta_obj) {
-            /**@var $subcuenta_obj Subcuenta** */
-            $id_cuenta = $subcuenta_obj->getIdCuenta()->getId();
-            $subcuenta_obj->setActivo(false);
-            try {
-                $em->persist($subcuenta_obj);
-                $em->flush();
-                $success = 'success';
-                $msg = 'Subcuenta eliminada satisfactoriamente';
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $em = $this->getDoctrine()->getManager();
+            $subcuenta_er = $em->getRepository(Subcuenta::class);
+            $subcuenta_obj = $subcuenta_er->find($id);
+            $msg = 'No se pudo eliminar la subcuenta seleccionada';
+            $success = 'error';
+            if ($subcuenta_obj) {
+                /**@var $subcuenta_obj Subcuenta** */
+                $subcuenta_obj->setActivo(false);
+                try {
+                    $em->persist($subcuenta_obj);
+                    $em->flush();
+                    $success = 'success';
+                    $msg = 'Subcuenta eliminada satisfactoriamente';
 
-            } catch
-            (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                } catch
+                (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                }
             }
+            $this->addFlash($success, $msg);
         }
-        $this->addFlash($success, $msg);
         return $this->redirectToRoute('contabilidad_config_subcuenta', ['id' => $id_cuenta]);
     }
-
-
-    /**************-Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar-****************/
-    public function isDuplicate($em, $nro_subcuenta, $action, $id = null)
-    {
-        $subcuenta_er = $em->getRepository(Subcuenta::class);
-
-        $arr_obj = $subcuenta_er->findBy(array(
-            'nro_subcuenta' => $nro_subcuenta,
-            'activo' => true
-        ));
-
-        if ($action == 'upd') {
-            foreach ($arr_obj as $obj) {
-                /**@var $obj Subcuenta* */
-                if ($obj->getId() != $id)
-                    return true;
-            }
-        } elseif ($action == 'add') {
-            if (!empty($arr_obj))
-                return true;
-        }
-        return false;
-    }
-
 }
