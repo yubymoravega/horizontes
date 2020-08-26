@@ -12,8 +12,8 @@ class InformeRecepcionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id_documento')
-            ->add('id_proveedor')
+//            ->add('id_documento')
+//            ->add('id_proveedor')
         ;
     }
 

@@ -1,20 +1,68 @@
-{% extends 'base.html.twig' %}
+{% extends 'contabilidad/inventario/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
 
-{% block title %}Hello InformeRecepcionController!{% endblock %}
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Informes de recepción
+            </h4>
+            <div>
+                <a role="button" class="btn btn-primary" href="{{ url('contabilidad_inventario_informe_recepcion_gestionar') }}">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </a>
+            </div>
+        </div>
+        {# end header #}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'F:/sistemas/TIM/horizontes/src/Controller/Contabilidad/Inventario/InformeRecepcionController.php'|file_link(0) }}">src/Controller/Contabilidad/Inventario/InformeRecepcionController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'F:/sistemas/TIM/horizontes/templates/contabilidad/inventario/informe_recepcion/index.html.twig'|file_link(0) }}">templates/contabilidad/inventario/informe_recepcion/index.html.twig</a></code></li>
-    </ul>
-</div>
+       {# list#}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="70px">#</th>
+            <th scope="col-1">Código-Descripción</th>
+            <th width="50px">UM</th>
+            <th width="70px">Cant.</th>
+            <th width="70px">Importe</th>
+            <th width="80px">Fecha</th>
+            <th width="120px">Cuenta-Subcuenta(Inv)</th>
+            <th width="120px">Cuenta-Proveedor(Acreedoras)</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in informes %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        {#id: '{{ item.id }}',#}
+                                        {#nombre: '{{ item.nombre }}',#}
+                                        {#codigo: '{{ item.codigo }}'#}
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        {#message:'Está seguro que desea eliminar informe seleccionado ?',#}
+                                        {#url:'{{ path('contabilidad_inventario_informe_delete',{id: item.id}) }}'#}
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
 {% endblock %}

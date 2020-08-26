@@ -37,28 +37,29 @@
                         </button>
                     </div>
                     {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
-                    <div class="modal-body">
+                    <div class="modal-body bg-dark-app">
                         <label for="grupo_activos_porciento_deprecia_anno" class="font-weight-bold">Nombre</label>
                         {{ form_widget(form.nombre,{'attr': {'class': 'form-control'}}) }}
                         <label for="grupo_activos_id_cuenta" class="font-weight-bold">Código</label>
                         {{ form_widget(form.codigo,{'attr': {'class': 'form-control'}}) }}
                         <input type="text" id="id_proveedor" hidden>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                        aria-label="Cerrar">
+                                    <span aria-hidden="true">Cancelar</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     {{ form_end(form) }}
-                    <div class="modal-footer d-flex">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -119,7 +120,7 @@
             $('#proveedor_nombre').val(nombre)
             $('#proveedor_codigo').val(codigo)
             $('#id_proveedor').val(id)
-            $('#gestionarProveedoresModalLabel').html("Modificar "+nombre)
+            $('#gestionarProveedoresModalLabel').html("Modificar " + nombre)
         }
 
         $('#btnAceptar').on('click', function () {

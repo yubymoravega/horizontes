@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Repository\Contabilidad\Inventario\MercanciaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -41,6 +42,13 @@ class Mercancia
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $activo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_almacen;
+
 
     public function getId(): ?int
     {
@@ -103,6 +111,18 @@ class Mercancia
     public function setActivo(?bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
 
         return $this;
     }
