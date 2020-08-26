@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class ApiController extends AbstractController
 {
 
-  public $apiKey = 'sk_test_51GqMhfF2pLNIoJ5O8g0MrVyCAe6UEcGo7x2PD9DWBeeDONKWwJMpO8CXY0tefeLHKAVctTdxkIXHl5Y6qy7tYpEx00IWD9yulx';
+  public $apiKey = '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';
 
   public function __construct(HttpClientInterface $client)
   {
@@ -98,9 +98,9 @@ class ApiController extends AbstractController
       'tel' => $json_obj->items[0]->tel
     ];
 
-    echo json_encode($output);
+    //echo json_encode($output);
 
-    return new Response('');
+    return new Response(json_encode($output));
   }
 
   /**
@@ -156,8 +156,55 @@ class ApiController extends AbstractController
     $json['mStatus'] = $request->get('status');
     $json['pi'] = $paymentIntent->id;
 
+    $dataBase = $this->getDoctrine()->getManager();
 
-    return new Response(json_encode($json));
+    $clienteReporte = new ClienteReporte();
+
+    $user =  $this->getUser();
+    date_default_timezone_set('America/Santo_Domingo');
+
+    $date = new DateTime('NOW');  
+    $clienteReporte->setUser($user->getUsername());
+    $clienteReporte->setFecha($date);
+    $clienteReporte->setIdCliente($json['mPhoneNo']);
+    $clienteReporte->setBram($json['mCardTypeID']);
+    $clienteReporte->setLast4($json['mCard4']);
+    $clienteReporte->setMonto($json['mAmount']);
+    $clienteReporte->setComercio('Solyag');
+    $clienteReporte->setEstado($json['mStatus']);
+    $clienteReporte->setAuth($request->get('pay'));
+
+    $dataBase->persist($clienteReporte);
+    $dataBase->flush();
+
+    $dataBase = $this->getDoctrine()->getManager();
+    $cliente = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $json['mPhoneNo']]);
+
+    $estatus = null;
+
+    if ($json['mStatus'] == "succeeded") {
+      $estatus = "succeeded";
+    } else {
+      $estatus = "declined";
+    }
+
+    $response = $this->client->request('POST', 'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction', [
+      'json' => [
+        'mApikey' => 'xAe45cc95dgvz94cm',
+        'mEmployeeID' => $user->getUsername(),
+        'mFirstName' => $cliente[0]->getNombre(),
+        'mLastName' => $cliente[0]->getApellidos(),
+        'mPhoneNo' => $json['mPhoneNo'],
+        'mCardTypeID' => $json['mCardTypeID'],
+        'mCard4' => $json['mCard4'],
+        'mExpDate' => '0000',
+        'mProfileClientID' => $cliente[0]->getToken(),
+        'mAmount' => $json['mAmount'],
+        'mStatus' => $estatus
+      ]
+    ]);
+
+    return new Response("200");
   }
 
   /**

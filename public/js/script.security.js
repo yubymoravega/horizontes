@@ -1,7 +1,7 @@
 // A reference to Stripe.js initialized with a fake API key.
 //Sign in to see examples pre-filled with your key.
 var stripe = Stripe(
-  "pk_test_51GqMhfF2pLNIoJ5OZOn2hPgISbzCyX390U4JNhGqREy0ROZ7LYYZI6fWc2GX8afffee5RRiHkaob2siID4oBqgqA00YhsncFkb"
+  "pk_live_51HJlIfIqYTGPXQXuLsUVb5kempohAPBLEkW6EprE3lRgp7YoAsmuaUnq08XOAEZi6LFxynqCKeqPhNFvnUm7zz2p007ceFM7E1"
 );
 // The items the customer wants to buy
 
@@ -9,7 +9,7 @@ var monto = null;
 var tel = null;
 
 var split = window.location.pathname.split("/");
-console.log(split);
+
 var purchase = {
   items: [{ id: "xl-tshirt", tel: split[2], monto: split[3], last4: split[4] }],
 };

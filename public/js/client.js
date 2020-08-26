@@ -1,12 +1,13 @@
 // A reference to Stripe.js initialized with a fake API key.
 //Sign in to see examples pre-filled with your key.
 var stripe = Stripe(
-  "pk_test_51GqMhfF2pLNIoJ5OZOn2hPgISbzCyX390U4JNhGqREy0ROZ7LYYZI6fWc2GX8afffee5RRiHkaob2siID4oBqgqA00YhsncFkb"
+  "pk_live_51HJlIfIqYTGPXQXuLsUVb5kempohAPBLEkW6EprE3lRgp7YoAsmuaUnq08XOAEZi6LFxynqCKeqPhNFvnUm7zz2p007ceFM7E1"
 );
 // The items the customer wants to buy
 var customerID = null;
 var tel = null;
 var send = null;
+var rep = null ;
 
 var split = window.location.pathname.split("/");
 
@@ -84,6 +85,7 @@ var payWithCard = function (stripe, card, clientSecret) {
       setup_future_usage: "off_session",
     })
     .then(function (result) {
+    
       if (result.error) {
         // Show error to your customer
 
@@ -137,26 +139,10 @@ var payWithCard = function (stripe, card, clientSecret) {
             customer: customerID,
             metodoPago: result.paymentIntent.payment_method,
             tel: tel,
+            pay : result.paymentIntent.id,
             monto: split[3],
-          },
-          success: function (data) {
-            data = JSON.parse(data);
-            data.pi = result.paymentIntent.id;
-
-            $.ajax({
-              url:
-                window.location.protocol +
-                "//" +
-                location.hostname +
-                ":" +
-                window.location.port +
-                "/index.php/api.rep",
-              method: "post",
-              dataType: "json",
-              data: { data: data },
-              success: function () {},
-            });
-          },
+          }
+          
         });
 
         $(location).attr(

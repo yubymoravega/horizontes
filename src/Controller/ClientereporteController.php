@@ -35,7 +35,7 @@ class ClientereporteController extends AbstractController
     {
 
 
-        $dql = "SELECT a FROM App:ClienteReporte a ";
+        $dql = "SELECT a,b.nombre,b.apellidos FROM App:ClienteReporte a JOIN App:Cliente b WHERE b.token != '' ";
 
 
         if ($request->get('to') && $request->get('from')) {
@@ -46,7 +46,7 @@ class ClientereporteController extends AbstractController
             $from = str_replace('/', "-", $request->get('from'));
             $from = $from[6] . $from[7] . $from[8] . $from[9] . '-' . $from[0] . $from[1] . '-' . $from[3] . $from[4];
 
-            $dql .= "WHERE a.fecha BETWEEN '$from' AND '$to'";
+            $dql .= "AND a.fecha BETWEEN '$from' AND '$to'";
 
             if ($request->get('estado')) {
 
@@ -69,9 +69,9 @@ class ClientereporteController extends AbstractController
         } elseif ($request->get('estado')) {
 
             if ($request->get('estado') == 'succeeded') {
-                $dql .= " WHERE  a.estado = 'succeeded'";
+                $dql .= " AND  a.estado = 'succeeded'";
             } else {
-                $dql .= " WHERE  a.estado != 'succeeded'";
+                $dql .= " AND  a.estado != 'succeeded'";
             }
 
             if ($request->get('empleado')) {
@@ -85,7 +85,7 @@ class ClientereporteController extends AbstractController
             }
         } elseif ($request->get('empleado')) {
 
-            $dql .= " WHERE  a.user = '" . $request->get('empleado') . "'";
+            $dql .= " AND  a.user = '" . $request->get('empleado') . "'";
 
             if ($request->get('telefono')) {
 
@@ -95,7 +95,7 @@ class ClientereporteController extends AbstractController
 
             if ($request->get('telefono')) {
 
-                $dql .= " WHERE  a.idCliente ='" . $request->get('telefono') . "'";
+                $dql .= " AND  a.idCliente ='" . $request->get('telefono') . "'";
             }
         }
 
@@ -110,9 +110,30 @@ class ClientereporteController extends AbstractController
 
         $user = $this->getDoctrine()->getRepository(User::class)->findAll();
 
+        //return new Response(var_dump($pagination));
+
         return $this->render(
             'clientereporte/index.html.twig',
             ['pagination' => $pagination, 'user' => $user]
         );
     }
+
+    /**
+     * @Route("/paymentreport.get", name="paymentreport.get")
+     */
+    public function getClient( Request $request)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $request->get('data')]);
+        
+        $response = new Response(
+            $data[0]->getNombre()." ".$data[0]->getApellidos(),
+            Response::HTTP_OK,
+            ['content-type' => 'text/html']
+        );
+        return $response;
+        
+    }
+
+
 }

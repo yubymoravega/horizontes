@@ -2,6 +2,7 @@
 
 {% block content %}
 {% set total = null %}
+{% include 'breadcrumbs.html.twig' %}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <section class="section novi-background section-66 section-sm-bottom-110">
         <div class="container">
@@ -59,18 +60,18 @@
                  {# table body #}
     {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ data.fecha | date('d-M-y') }} </br> {{ data.fecha | date('h:i a') }}</td>
-            <td> {{ data.idCliente }} </td>     
-            <td><img height="40" src="/images/iconos/{{ data.bram }}.svg" > - {{ data.last4  }} </br>  </td>       
-            <td>{{ data.monto }} </td> {% set total = total + data.monto %}
-            <td><a  onClick="caja('{{ data.estado }}','{{ data.auth }}');" > 
-            {% if data.estado == 'succeeded' %}
+            <td>{{ data[0].fecha | date('d-M-y') }} </br> {{ data[0].fecha | date('h:i a') }}</td>
+            <td > {{ data[0].idCliente }} </td>     
+            <td><img height="40" src="/images/iconos/{{ data[0].bram }}.svg" > - {{ data[0].last4  }} </br>{{data.nombre}} {{data.apellidos}}   </td>       
+            <td>{{ data[0].monto }} </td> {% set total = total + data[0].monto %}
+            <td><a  onClick="caja('{{ data[0].estado }}','{{ data[0].auth }}');" > 
+            {% if data[0].estado == 'succeeded' %}
                 Exitoso
             {% else %}    
               Declinado
             {% endif %}
              </a></td>
-             <td>{{ data.user }}</td>
+             <td>{{ data[0].user }}</td>
         </tr>
     {% endfor %}    
                 </tbody></table> <hr style="background-color: white; margin-top: 0px;">
@@ -210,6 +211,35 @@ input#telefono {
  $('#telefono').on('input', function () { 
     this.value = this.value.replace(/[^0-9]/g,'');
 });   
+
+function getCliente($tel) {
+ let response = '';
+ let ajax = $.ajax({
+          url:
+            window.location.protocol +
+            "//" +
+            location.hostname +
+            ":" +
+            window.location.port +
+            "/index.php/paymentreport.get",
+          method: "post",
+          dataType: "json",
+          data: { data: JSON.parse($tel) },
+            async: false,
+            success : function(text)
+            {
+                response = text;
+            }
+        }).responseText;
+
+        console.log(ajax);
+
+         
+        
+}
+
+  
+
 
   </script>
  
