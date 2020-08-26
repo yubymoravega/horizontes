@@ -35,7 +35,7 @@ class ClientereporteController extends AbstractController
     {
 
 
-        $dql = "SELECT a,b.nombre,b.apellidos FROM App:ClienteReporte a JOIN App:Cliente b WHERE b.token != '' ";
+        $dql = "SELECT a,b.nombre,b.apellidos FROM App:ClienteReporte a JOIN App:Cliente b WHERE b.token != '' AND a.idCliente = b.telefono ";
 
 
         if ($request->get('to') && $request->get('from')) {
