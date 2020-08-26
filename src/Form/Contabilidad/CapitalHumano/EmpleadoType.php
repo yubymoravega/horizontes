@@ -59,9 +59,9 @@ class EmpleadoType extends AbstractType
             ))
             ->add('rol',ChoiceType::class,[
                 'choices'=>[
-                    'ROL_ADMIN'=>'ROL_ADMIN',
-                    'ROL_EMPLEADO'=>'ROL_EMPLEADO',
-                    'ROL_FACTURADOR'=>'ROL_FACTURADOR',
+                    'ROLE_ADMIN'=>'ROL_ADMIN',
+                    'ROLE_EMPLEADO'=>'ROL_EMPLEADO',
+                    'ROLE_FACTURADOR'=>'ROL_FACTURADOR',
                 ]
             ])
         ;

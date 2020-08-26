@@ -39,15 +39,16 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-          - { path: '^/home', roles: [ROLE_USER] } 
-          - { path: '^/cliente', roles: [ ROLE_USER] } 
+          - { path: '^/home', roles: [ROLE_USER] }
+          - { path: '^/cliente', roles: [ ROLE_USER] }
           - { path: '^/registrar', roles: [ ROLE_USER] }
           - { path: '^/edit', roles: [ ROLE_USER] } 
           - { path: '^/api', roles: [ ROLE_USER] } 
           - { path: '^/select', roles: [ ROLE_USER] } 
           - { path: '^/confirm', roles: [ ROLE_USER] }
-          - { path: '^/contabilidad', roles: [ ROLE_ADMIN] }
-          - { path: '^/contabilidad/config', roles: [ ROLE_ADMIN] }
+          - { path: '^/contabilidad/config/almacen', roles: [ ROLE_USER,ROLE_ADMIN] }
+          - { path: '^/contabilidad/config/cuenta', roles: [ ROLE_ADMIN] }
+          - { path: '^/contabilidad/config/unidad', roles: [ ROLE_USER] }
           - { path: '^/config', roles: [ ROLE_ADMIN] }
 
           

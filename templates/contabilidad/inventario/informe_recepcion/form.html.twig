@@ -33,7 +33,8 @@
                             </button>
                         </div>
                         <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar" onclick=""
+                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
+                                    onclick="SeleccionarMercancia()"
                                     data-dismiss="modal">Seleccionar
                             </button>
                         </div>
@@ -51,168 +52,216 @@
                 <h1 class="text-reporte"> Adicionar Informe de Recepción</h1>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
-                        <label for="codigo_mercancia" class="font-weight-bold">Código</label>
-                        <span class="input-group-append"></span>
-                        <div class="row m-0 p-0">
-                            <div class="col-8 p-0">
-                                <input type="text" name="codigo_mercancia" class="form-control w-100"
-                                       id="codigo_mercancia">
-                            </div>
-                            <div class="col-1 mt-0 p-0">
-                                <button class="btn btn-secondary btn-sm" data-toggle="modal"
-                                        data-target="#listarMercanciasModal" id="btnSearchMercancia"><i class="fa fa-search"></i></button>
+                {{ form_start(formulario, {'attr':{'id':'form_add_informe_recepcion'}}) }}
+                    <div class="row">
+                        <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
+                            <label for="codigo_mercancia" class="font-weight-bold">Código</label>
+                            <span class="input-group-append"></span>
+                            <div class="row m-0 p-0">
+                                <div class="col-8 p-0">
+                                    {{ form_widget(formulario.codigo_mercancia) }}
+                                </div>
+                                <div class="col-1 mt-0 p-0">
+                                    <button class="btn btn-secondary btn-sm" data-toggle="modal"
+                                            data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
+                                                class="fa fa-search"></i></button>
+                                </div>
                             </div>
                         </div>
+                        <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
+                            <label for="descripcion_mercancia" class="font-weight-bold">Descripción</label>
+                            <span class="input-group-append"></span>
+                            {{ form_widget(formulario.descripcion_mercancia) }}
+                        </div>
                     </div>
-                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
-                        <label for="descripcion_mercancia" class="font-weight-bold">Descripción</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="descripcion_mercancia" class="form-control w-100"
-                               id="descripcion_mercancia">
-                    </div>
-                </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
-                        <label for="unidad_medida" class="font-weight-bold">Unidad Medida</label>
-                        <span class="input-group-append"></span>
-                        <select type="text" name="unidad_medida" class="form-control w-100"
-                                id="unidad_medida"></select>
-                    </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
-                        <label for="cantidad_mercancia" class="font-weight-bold">Cantidad</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="cantidad_mercancia" class="form-control w-100"
-                               id="cantidad_mercancia">
-                    </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
-                        <label for="importe_mercancia" class="font-weight-bold">Importe</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="importe_mercancia" class="form-control w-100"
-                               id="importe_mercancia">
-                    </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
-                        <label for="precio_mercancia" class="font-weight-bold">Precio</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="precio_mercancia" class="form-control w-100"
-                               id="precio_mercancia" disabled>
-                    </div>
-                </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
-                        <label for="fecha_mercancia" class="font-weight-bold">Fecha Doc.</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="fecha_mercancia" class="form-control w-100"
-                               id="fecha_mercancia">
-                    </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
-                        <label for="existencia_mercancia" class="font-weight-bold">Existencia</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="existencia_mercancia" class="form-control w-100"
-                               id="existencia_mercancia">
-                    </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
-                        <label for="existencia_incremento_mercancia" class="font-weight-bold">Existencia + incremento</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="existencia_incremento_mercancia" class="form-control w-100"
-                               id="existencia_incremento_mercancia">
-                    </div>
-                </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
-                        <label for="cuenta_inventario" class="font-weight-bold">Cuenta de inventario.</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="cuenta_inventario" class="form-control w-100"
-                               id="cuenta_inventario">
-                    </div>
-                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
-                        <label for="cuenta_acreedora" class="font-weight-bold">Cuenta acreedora</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="cuenta_acreedora" class="form-control w-100"
-                               id="cuenta_acreedora">
-                    </div>
+                 <div class="row mt-0 p-0">
+                     <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                         <label for="unidad_medida" class="font-weight-bold">Unidad Medida</label>
+                         <span class="input-group-append">
+                             {{ form_widget(formulario.unidad_medida) }}
+                     </div>
+                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                         <label for="cantidad_mercancia" class="font-weight-bold">Cantidad</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.cantidad_mercancia) }}
+                     </div>
+                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                         <label for="importe_mercancia" class="font-weight-bold">Importe</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.importe_mercancia) }}
+                     </div>
+                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                         <label for="precio_mercancia" class="font-weight-bold">Precio</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.precio_mercancia) }}
+                     </div>
+                 </div>
+                 <div class="row mt-0 p-0">
+                     <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                         <label for="fecha_mercancia" class="font-weight-bold">Fecha Doc.</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.fecha_mercancia) }}
+                     </div>
+                     <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
+                         <label for="existencia_mercancia" class="font-weight-bold">Existencia</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.existencia_mercancia) }}
+                     </div>
+                     <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                         <label for="existencia_incremento_mercancia" class="font-weight-bold">Existencia +
+                             incremento</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.existencia_incremento_mercancia) }}
+                     </div>
+                 </div>
+                 <div class="row mt-0 p-0">
+                     <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                         <label for="cuenta_inventario" class="font-weight-bold">Cuenta de inventario.</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.cuenta_inventario) }}
+                     </div>
+                     <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                         <label for="cuenta_acreedora" class="font-weight-bold">Cuenta acreedora</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.cuenta_acreedora) }}
+                     </div>
+                 </div>
+                 <div class="row mt-0 p-0">
+                     <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                         <label for="subcuenta_inventario" class="font-weight-bold">Subcuenta de inventario.</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.subcuenta_inventario) }}
+                     </div>
+                     <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                         <label for="proveedor" class="font-weight-bold">Proveedor</label>
+                         <span class="input-group-append"></span>
+                         {{ form_widget(formulario.proveedor) }}
+                     </div>
 
-                </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
-                        <label for="subcuenta_inventario" class="font-weight-bold">Subcuenta de inventario.</label>
-                        <span class="input-group-append"></span>
-                        <input type="text" name="subcuenta_inventario" class="form-control w-100"
-                               id="subcuenta_inventario">
-                    </div>
-                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
-                        <label for="proveedor" class="font-weight-bold">Proveedor</label>
-                        <span class="input-group-append"></span>
-                        <select type="text" name="proveedor" class="form-control w-100"
-                                id="proveedor"></select>
-                    </div>
+                 </div>
+                 <div class="d-flex mt-2">
+                     <div class="mr-auto">
+                         <a href="{{ url('contabilidad_inventario_informe_recepcion') }}"
+                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
+                     </div>
+                     <div class="ml-2">
+                         <button type="submit" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
+                     </div>
+                 </div>
+{#                </form>#}
 
-                </div>
-                <div class="d-flex mt-2">
-                    <div class="mr-auto">
-                        <a href="{{ url('contabilidad_inventario_informe_recepcion') }}"
-                           class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
-                    </div>
-                    <div class="ml-2">
-                        <button type="button" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
-                    </div>
-                </div>
+
+                {{ form_end(formulario) }}
+
             </div>
-
         </div>
     </div>
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $('#unidad_medida').prepend('<option selected = "true" value = "0" disabled>Seleccione la UM</option>');
-        $('#proveedor').prepend('<option selected = "true" value = "0" disabled>Seleccione el proveedor</option>');
+        let mercancias = [];
+        let cuentas_inventarios = [];
+        $('#informe_recepcion_unidad_medida').prepend('<option selected = "true" value = "0" disabled>Seleccione la UM</option>');
+        $('#informe_recepcion_proveedor').prepend('<option selected = "true" value = "0" disabled>Seleccione el proveedor</option>');
+        $('#informe_recepcion_cuenta_inventario').prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
+        $('#informe_recepcion_subcuenta_inventario').prepend('<option selected = "true" value = "0" disabled>Seleccione la subcuenta</option>');
+        $('#informe_recepcion_cuenta_acreedora').prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
         $(document).ready(function () {
             $.ajax({
-                url: '/contabilidad/inventario/informe-recepcion/getUM',
+                url: '/contabilidad/inventario/informe-recepcion/getCuentas',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
-                    $(result.unidad_medidas).each(function (pos, valor) {
-                            $('#unidad_medida').append('<option value = "'+valor.id+'">'+valor.nombre+'</option>');
+                    cuentas_inventarios = result.cuentas_inventario
+                    $(result.cuentas_inventario).each(function (pos, valor) {
+                        $('#informe_recepcion_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                    })
+                    $(result.cuentas_acrredoras).each(function (pos, valor) {
+                        $('#informe_recepcion_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
                 },
                 error: function () {
                 }
             })
-            $.ajax({
-                url: '/contabilidad/inventario/informe-recepcion/getProveedor',
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    $(result.proveedores).each(function (pos, valor) {
-                        $('#proveedor').append('<option value = "'+valor.id+'">('+valor.codigo+') '+valor.nombre+'</option>');
-                    })
-                },
-                error: function () {
-                }
-            })
+
             $('#btnSearchMercancia').on('click', function () {
+                $('#rows_table').find('tr').remove();
+                let codigo = $('#informe_recepcion_codigo_mercancia').val() != '' ? $('#informe_recepcion_codigo_mercancia').val() : -1
                 $.ajax({
-                    url: '/contabilidad/inventario/informe-recepcion/getMercancias',
+                    url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
+                        mercancias = result.mercancias
                         $(result.mercancias).each(function (pos, valor) {
-                                $('#rows_table').append('<tr>' +
-                                    '<td style="font-weight:400;"> ' +
-                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                                    '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'+
-                                    '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
-                                );
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
+                            );
                         })
                     },
                     error: function () {
                     }
                 })
+            })
+        })
+
+        function SeleccionarMercancia() {
+            for (var i = 0; i < mercancias.length; i++) {
+                let id = '#' + mercancias[i]['codigo']
+                if ($(id).prop('checked') == true) {
+                    $('#informe_recepcion_codigo_mercancia').val(mercancias[i]['codigo'])
+                    $('#informe_recepcion_descripcion_mercancia').val(mercancias[i]['descripcion'])
+                    $('#informe_recepcion_precio_mercancia').val(mercancias[i]['precio_compra'])
+                    $('#informe_recepcion_existencia_mercancia').val(mercancias[i]['existencia'])
+                    break
+                }
+            }
+        }
+
+        $('#informe_recepcion_importe_mercancia').on('keyup', function () {
+            let importe = parseFloat($('#informe_recepcion_importe_mercancia').val())
+            let cantidad = parseFloat($('#informe_recepcion_cantidad_mercancia').val())
+            if (importe > 0) {
+                let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                $('#informe_recepcion_precio_mercancia').val(precio_final)
+            } else {
+                $('#informe_recepcion_precio_mercancia').val(0)
+            }
+        })
+
+        $('#informe_recepcion_cantidad_mercancia').on('keyup', function () {
+            let importe = parseFloat($('#informe_recepcion_importe_mercancia').val())
+            let cantidad = parseFloat($('#informe_recepcion_cantidad_mercancia').val())
+            if (importe > 0) {
+                let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                $('#informe_recepcion_precio_mercancia').val(precio_final)
+            } else {
+                $('#informe_recepcion_precio_mercancia').val(0)
+            }
+            let existencia_inicial = (parseFloat($('#informe_recepcion_existencia_mercancia').val()) > 0 || $('#informe_recepcion_existencia_mercancia').val() != '') ? parseFloat($('#informe_recepcion_existencia_mercancia').val()) : 0
+            $('#informe_recepcion_existencia_incremento_mercancia').val(existencia_inicial + parseFloat($('#informe_recepcion_cantidad_mercancia').val()))
+        })
+
+        $('#informe_recepcion_codigo_mercancia').on('keyup', function () {
+            $('#informe_recepcion_descripcion_mercancia').val('')
+            $('#informe_recepcion_precio_mercancia').val('')
+            $('#informe_recepcion_existencia_mercancia').val('')
+        })
+
+        $('#informe_recepcion_cuenta_inventario').on('change', function () {
+            $('#informe_recepcion_subcuenta_inventario').find('option').remove()
+            cuentas_inventarios.forEach(function (valor, pos) {
+                if ($('#informe_recepcion_cuenta_inventario').val() == valor.nro_cuenta) {
+                    for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                        $('#informe_recepcion_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                    }
+                }
             })
         })
     </script>

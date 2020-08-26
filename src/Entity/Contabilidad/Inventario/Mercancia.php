@@ -34,6 +34,11 @@ class Mercancia
     private $precio_compra;
 
     /**
+     * @ORM\Column(type="float")
+     */
+    private $existencia;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $materiales_auxiliares;
@@ -87,6 +92,18 @@ class Mercancia
     public function setPrecioCompra(float $precio_compra): self
     {
         $this->precio_compra = $precio_compra;
+
+        return $this;
+    }
+
+    public function getExistencia(): ?float
+    {
+        return $this->existencia;
+    }
+
+    public function setExistencia(float $existencia): self
+    {
+        $this->existencia = $existencia;
 
         return $this;
     }

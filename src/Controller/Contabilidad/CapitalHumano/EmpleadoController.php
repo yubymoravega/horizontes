@@ -44,7 +44,8 @@ class EmpleadoController extends AbstractController
                 'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                 'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',
                 'direccion' => $item->getDireccionParticular(),
-                'fecha_alta' => $item->getFechaAlta()
+//                'fecha_alta' => $item->getFechaAlta()
+                'fecha_alta' => '12-12-2020'
             );
         }
         $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
