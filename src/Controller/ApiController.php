@@ -517,7 +517,7 @@ class ApiController extends AbstractController
       $estatus = "declined";
     }
 
-    /*$response = $this->client->request('POST', 'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction', [
+    $response = $this->client->request('POST', 'https://www.horizontesclub.com/simplerest/api/person/Stripe_Card_Transaction', [
       'json' => [
         'mApikey' => 'xAe45cc95dgvz94cm',
         'mEmployeeID' => $user->getUsername(),
@@ -531,7 +531,7 @@ class ApiController extends AbstractController
         'mAmount' => $request->get('data')['mAmount'],
         'mStatus' => $estatus
       ]
-    ]);*/
+    ]);
 
     //$statusCode = $response->getStatusCode();
 
