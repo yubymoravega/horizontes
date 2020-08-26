@@ -131,6 +131,7 @@
                     if (error_label.length) {
                         error_label.removeClass('hide')
                     } else {
+                        error.addClass('ml-3')
                         $(element)
                             .closest("form")
                             .find("label[for='" + element.attr("id") + "']")

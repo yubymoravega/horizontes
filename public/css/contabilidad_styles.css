@@ -63,7 +63,7 @@ body {
 
 /* estilo impuesto por espesificidad */
 .invalid-label-orange {
-    margin-left: 10px;
+    /*margin-left: 10px;*/
     color: darkorange !important;
 }
 

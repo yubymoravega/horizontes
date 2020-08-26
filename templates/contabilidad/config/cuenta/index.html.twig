@@ -34,13 +34,13 @@
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-1" width="112px">Nro. cuenta</th>
+            <th scope="col-1" style="width: 160px">Nro. cuenta</th>
             <th scope="col-6">Descripción</th>
             <th scope="col-6" width="90px">Naturaleza</th>
             <th scope="col-1" width="90px">Producción</th>
             <th scope="col-1" width="85px">Patrimonio</th>
             <th scope="col-1" width="130px">E. Gasto</th>
-            <th scope="col-1" width="175px">Acciones</th>
+            <th scope="col-1" style="width: 200px" width="200px">Acciones</th>
             </thead>
             <tbody>
             {% for item in cuentas %}
@@ -51,7 +51,7 @@
                     <td style="font-weight:400;">{{ item.produccion }}</td>
                     <td style="font-weight:400;">{{ item.patrimonio }}</td>
                     <td style="font-weight:400;">{{ item.elemento_gasto }}</td>
-                    <td>
+                    <td style="width: 375px">
                         <a type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
                            data-placement="bottom" title="Ver subcuentas"
                            href="{{ path('contabilidad_config_subcuenta',{id:item.id}) }}">
@@ -154,13 +154,15 @@
 
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
-                errorClass: 'invalid-label',
+                errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
                     // colocar mensajes de error a la derecha de cada label para el componente
+                    console.log(error)
                     const error_label = element.closest("form").find(element.attr('id') + "-error")
                     if (error_label.length) {
                         error_label.removeClass('hide')
                     } else {
+                        error.addClass('ml-3')
                         $(element)
                             .closest("form")
                             .find("label[for='" + element.attr("id") + "']")

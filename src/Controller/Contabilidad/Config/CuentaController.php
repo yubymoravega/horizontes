@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
@@ -76,18 +77,22 @@ class CuentaController extends AbstractController
      */
     public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        dd($request);
-        if (!$this->isDuplicate($em, $request->get('nro_cuenta'), 'add')) {
+//        dd($request->get('cuenta'));
+        $request_cuenta = $request->get('cuenta');
+//        dd($request_cuenta);
+        if (!AuxFunctions::isDuplicate($em->getRepository(Cuenta::class),
+            ['nro_cuenta' => $request_cuenta['nro_cuenta']],
+            AuxFunctions::$ACTION_ADD)) {
             /**@var $obj_cuenta Cuenta** */
 
             $obj_cuenta = new Cuenta();
             $obj_cuenta
-                ->setNroCuenta($request->get('nro_cuenta'))
-                ->setDescripcion($request->get('descripcion'))
-                ->setDeudora($request->get('deudora'))
-                ->setPatrimonio($request->get('patrimonio'))
-                ->setProduccion($request->get('produccion'))
-                ->setElementoGasto($request->get('elemento_gasto'))
+                ->setNroCuenta($request_cuenta['nro_cuenta'])
+                ->setDescripcion($request_cuenta['descripcion'])
+                ->setDeudora($request_cuenta['naturaleza'])
+                ->setPatrimonio(array_key_exists('patrimonio', $request_cuenta))
+                ->setProduccion(array_key_exists('produccion', $request_cuenta))
+                ->setElementoGasto(array_key_exists('elemento_gasto', $request_cuenta))
                 ->setActivo(true);
             try {
                 $em->persist($obj_cuenta);
@@ -96,10 +101,9 @@ class CuentaController extends AbstractController
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
             $this->addFlash('success', "Cuenta adicionada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
-        }
-        $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
-        return new JsonResponse(['success' => false]);
+        } else
+            $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
+        return $this->redirectToRoute('contabilidad_config_cuenta');
     }
 
     /**
