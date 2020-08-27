@@ -3,16 +3,13 @@
 namespace App\Form\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\UnidadMedida;
-use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -22,14 +19,14 @@ class InformeRecepcionType extends AbstractType
     {
         $builder
             ->add('codigo_mercancia', TextType::class, [
-                'attr'=>['class'=>'w-100']
+                'required' => true,
+                'attr' => ['class' => 'w-100']
             ])
             ->add('descripcion_mercancia', TextType::class, [
-                'attr'=>['class'=>'w-100']
+                'attr' => ['class' => 'w-100']
             ])
             ->add('unidad_medida', EntityType::class, [
-                'mapped' => false,
-                'attr'=>['class'=>'w-100'],
+                'attr' => ['class' => 'w-100'],
                 'class' => UnidadMedida::class,
                 'choice_label' => 'nombre',
                 'query_builder' => function (EntityRepository $er) {
@@ -39,48 +36,53 @@ class InformeRecepcionType extends AbstractType
                 }
             ])
             ->add('cantidad_mercancia', TextType::class, [
-                'attr'=>['class'=>'w-100']
+                'attr' => ['class' => 'w-100']
             ])
             ->add('importe_mercancia', TextType::class, [
-                'attr'=>['class'=>'w-100']
+                'attr' => ['class' => 'w-100']
             ])
             ->add('precio_mercancia', TextType::class, [
-                'attr'=>['class'=>'w-100']
+                'attr' => ['class' => 'w-100'],
+                'disabled' => true
             ])
             ->add('fecha_mercancia', DateType::class, array(
                 'input' => 'datetime',
-                'attr'=>['class'=>'w-100'],
+                'attr' => ['class' => 'w-100'],
                 'widget' => 'single_text',
                 'placeholder' => 'Fecha'
             ))
-            ->add('existencia_mercancia',TextType::class, [
-                'required'=>false,
-                'attr'=>['class'=>'w-100']
+            ->add('existencia_mercancia', TextType::class, [
+                'required' => false,
+                'disabled' => true,
+                'attr' => ['class' => 'w-100']
             ])
             ->add('existencia_incremento_mercancia', TextType::class, [
-                'attr'=>['class'=>'w-100']
+                'attr' => ['class' => 'w-100']
             ])
-            ->add('cuenta_inventario', ChoiceType::class, [
-                'attr'=>['class'=>'w-100']
+            ->add('cuenta_inventario', TextType::class, array(
+                'attr' => ['class' => 'w-100'],
+//                'choice_label' => 'nro_cuenta',
+            ))
+            ->add('cuenta_acreedora', TextType::class, [
+                'attr' => ['class' => 'w-100'],
+//                'choice_label' => 'nro_cuenta',
             ])
-            ->add('cuenta_acreedora', ChoiceType::class, [
-                'attr'=>['class'=>'w-100']
-            ])
-            ->add('subcuenta_inventario',ChoiceType::class,[
-                'attr'=>['class'=>'w-100']
+            ->add('subcuenta_inventario', TextType::class, [
+                'attr' => ['class' => 'w-100'],
+//                'choice_label' => 'nro_subcuenta',
+//                'choice_value'=>'nro_subcuenta',
             ])
             ->add('proveedor', EntityType::class, [
-                'mapped' => false,
                 'class' => Proveedor::class,
-                'attr'=>['class'=>'w-100'],
+                'attr' => ['class' => 'w-100'],
                 'choice_label' => 'nombre',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.activo = true')
                         ->orderBy('u.nombre', 'ASC');
                 }
-            ]);
-
+            ])
+            ;
     }
 
 //

@@ -9,11 +9,13 @@ use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\InformeRecepcionType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,7 +35,6 @@ class InformeRecepcionController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $form = $this->createForm(InformeRecepcionType::class);
 
         return $this->render('contabilidad/inventario/informe_recepcion/index.html.twig', [
             'controller_name' => 'InformeRecepcionController',
@@ -50,86 +51,73 @@ class InformeRecepcionController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
+//            dd($form,$form->isValid(),$form->getData(), $request);
             if ($form->isValid()) {
-//                $id_modulo = $request->get('configuracion_inicial')['id_modulo'];
-//                $id_tipo_documento = $request->get('configuracion_inicial')['id_tipo_documento'];
-//                $configuracion_inicial_id_cuenta = $request->get('configuracion_inicial_id_cuenta');
-//                $configuracion_inicial_id_subcuenta = $request->get('configuracion_inicial_id_subcuenta');
-//                $configuracion_inicial_id_cuenta_contrapartida = $request->get('configuracion_inicial_id_cuenta_contrapartida');
-//                $configuracion_inicial_id_subcuenta_contrapartida = $request->get('configuracion_inicial_id_subcuenta_contrapartida');
-//                $deudora = $request->get('naturaleza') == '1' ? true : false;
-//
-//                if (!$this->isDuplicate($em, $id_modulo, $id_tipo_documento, 'add')) {
-//                    $obj = new ConfiguracionInicial();
-//                    $obj
-//                        ->setDeudora($deudora)
-//                        ->setIdTipoDocumento($em->getRepository(TipoDocumento::class)->find($id_tipo_documento))
-//                        ->setIdModulo($em->getRepository(Modulo::class)->find($id_modulo))
-//                        ->setStrCuentas($configuracion_inicial_id_cuenta)
-//                        ->setStrSubcuentas($configuracion_inicial_id_subcuenta)
-//                        ->setStrCuentasContrapartida($configuracion_inicial_id_cuenta_contrapartida)
-//                        ->setStrSubcuentasContrapartida($configuracion_inicial_id_subcuenta_contrapartida)
-//                        ->setActivo(true);
-//                    try {
-//                        $em->persist($obj);
-//                        $em->flush();
-//                    } catch (FileException $exception) {
-//                        return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-//                    }
-//                    if (isset($arr_result['aplicar'])) {
-//                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aplicar).');
-//                        return $this->redirectToRoute('contabilidad_config_conf_inicial_form');
-//                    } else {
-//                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aceptar).');
-//                        return $this->redirectToRoute('contabilidad_config_conf_inicial');
-//                    }
-//                } else {
-//                    $this->addFlash('error', 'Ya existe una configuración con esos parámetros.');
-//                    return $this->redirectToRoute('contabilidad_config_conf_inicial_form');
-//                }
+//                dd($form, $request);
+                $informe_recepcion = $request->get('informe_recepcion');
+                $codigo_mercancia = $informe_recepcion['codigo_mercancia'];
+                $unidad_medida = $informe_recepcion['unidad_medida'];
+                $cantidad_mercancia = $informe_recepcion['cantidad_mercancia'];
+                $importe_mercancia = $informe_recepcion['importe_mercancia'];
+                $fecha_mercancia = $informe_recepcion['fecha_mercancia'];
+                $proveedor = $informe_recepcion['proveedor'];
+                $cuenta_acreedora = $informe_recepcion['cuenta_acreedora'];
+                $cuenta_inventario = $informe_recepcion['cuenta_inventario'];
+                $subcuenta_inventario = $informe_recepcion['subcuenta_inventario'];
+
+                //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
+                $sub_cuenta_er = $em->getRepository(Subcuenta::class);
+                $cuenta_er = $em->getRepository(Cuenta::class);
+                $proveedor_obj = $em->getRepository(Proveedor::class)->find($proveedor);
+                $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
+                    'nro_cuenta'=>$cuenta_acreedora,
+                    'activo'=>true
+                ));
+                if($cuenta_acreedora_obj && $proveedor_obj){
+                    $arr_subcuenta_acreedora = $sub_cuenta_er->findBy(array(
+                        'nro_subcuenta'=>$proveedor_obj->getCodigo(),
+                        'activo'=>true,
+                        'id_cuenta'=>$cuenta_acreedora_obj->getId()
+                    ));
+                    if(empty($arr_subcuenta_acreedora)){
+                        $new_Subcuenta = new Subcuenta();
+                        $new_Subcuenta
+                            ->setNroSubcuenta($proveedor_obj->getCodigo())
+                            ->setDescripcion($proveedor_obj->getNombre())
+                            ->setIdCuenta($cuenta_acreedora_obj)
+                            ->setDeudora(false)
+                            ->setActivo(true);
+                        $em->persist($new_Subcuenta);
+                    }
+
+                    try {
+                        $em->flush();
+                    }
+                    catch (FileException $e){
+                        return $e->getMessage();
+                    }
+                }
+                //2-obtengo elnumero consecutivo de documento
+                $documento_er = $em->getRepository(Documento::class);
+//                $arr_documentos = $documento_er->findBy(array(
+//                    'id'
+//                ));
+                //2.1-adicionar en documento
+
+
+
+
+
+                //3-adicionar en informe de recepcion
+                //4-crear la obligacion de pago con el proveedor(crear la tabla)
+                //5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
+
             }
         }
         return $this->render('contabilidad/inventario/informe_recepcion/form.html.twig', [
             'controller_name' => 'CRUDInformeRecepcion',
             'formulario' => $form->createView()
         ]);
-    }
-
-    /**
-     * @Route("/getUM", name="contabilidad_inventario_informe_recepcion_gestionar_getUM", methods={"POST"})
-     */
-    public function getUM()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $unidad_medida_er = $em->getRepository(UnidadMedida::class)->findByActivo(true);
-        $row = array();
-        foreach ($unidad_medida_er as $um) {
-            /**@var $um UnidadMedida* */
-            $row [] = array(
-                'id' => $um->getId(),
-                'nombre' => $um->getNombre()
-            );
-        }
-        return new JsonResponse(['unidad_medidas' => $row, 'success' => true]);
-    }
-
-    /**
-     * @Route("/getProveedor", name="contabilidad_inventario_informe_recepcion_gestionar_getProveedor", methods={"POST"})
-     */
-    public function getProveedor()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $proveedor_er = $em->getRepository(Proveedor::class)->findByActivo(true);
-        $row = array();
-        foreach ($proveedor_er as $obj) {
-            /**@var $obj Proveedor* */
-            $row [] = array(
-                'id' => $obj->getId(),
-                'nombre' => $obj->getNombre(),
-                'codigo' => $obj->getCodigo()
-            );
-        }
-        return new JsonResponse(['proveedores' => $row, 'success' => true]);
     }
 
     /**
