@@ -9,3 +9,4 @@ contabilidad:
     cuenta_not_blank: Debe seleccionar la cuenta !
     sub_cuenta_not_blank: Debe seleccionar la subcuenta !
     naturaleza_not_blank: Debe seleccionar la naturaleza !
+    codigo_not_blank: El codigo no puede estar vacio !

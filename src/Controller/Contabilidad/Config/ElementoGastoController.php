@@ -2,22 +2,25 @@
 
 namespace App\Controller\Contabilidad\Config;
 
-use App\Entity\Contabilidad\Config\Cuenta;
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Form\Contabilidad\Config\ElementoGastoType;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class ElementoGastoController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/elemento-gasto")
+ */
 class ElementoGastoController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/config/elemento-gasto", name="contabilidad_config_elemento_gasto")
+     * @Route("/", name="contabilidad_config_elemento_gasto", methods={"GET"})
      */
     public function index(EntityManagerInterface $em)
     {
@@ -44,110 +47,99 @@ class ElementoGastoController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/elemento-gasto-add", name="contabilidad_config_elemento_gasto_add")
+     * @Route("/add", name="contabilidad_config_elemento_gasto_add",methods={"POST"})
      */
     public function addElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
+        $form = $this->createForm(ElementoGastoType::class);
+        $form->handleRequest($request);
+        /** @var ElementoGasto $elemento */
+        $elemento = $form->getData();
+        $errors = $validator->validate($elemento);
 
-        //dd($request->get('elemento_gasto')['id_cuenta']);
-        //$form = $this->createForm(ElementoGastoType::class);
-        //dd($form->handleRequest($request)->getData());
-        $arr_request = $request->get('elemento_gasto');
-        if (!$this->isDuplicate($em, $arr_request['descripcion'], 'add')) {
-            /**@var $obj ElementoGasto** */
+        if ($form->isValid() && $form->isSubmitted()) {
+            if (!AuxFunctions::isDuplicate($em->getRepository(ElementoGasto::class),
+                ['descripcion' => $elemento->getDescripcion()], AuxFunctions::$ACTION_ADD)) {
 
-            $obj = new ElementoGasto();
+                $elemento->setActivo(true);
+                try {
+                    $em->persist($elemento);
+                    $em->flush();
+                } catch (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                }
+                $this->addFlash('success', "Elemento de Gasto adicionado satisfactoriamente");
+            } else
+                $this->addFlash('error', "Elemento de Gasto ya se encuentra registrado");
+        }
 
-            $obj->setDescripcion($arr_request['descripcion']);
-            $obj->setCodigo($arr_request['codigo']);
-            $obj->setActivo(true);
-            $id_cuenta = $arr_request['id_cuenta'];
-            $obj->setIdCuenta($em->getRepository(Cuenta::class)->find($id_cuenta));
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
 
-            try {
-                $em->persist($obj);
-                $em->flush();
-            } catch (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-            }
-            $this->addFlash('success', "Elemento de Gasto adicionado satisfactoriamente");
-        } else
-            $this->addFlash('error', "Elemento de Gasto ya se encuentra registrado");
+
         return $this->redirectToRoute('contabilidad_config_elemento_gasto');
     }
 
     /**
-     * @Route("/contabilidad/config/elemento-gasto-upd/{id}", name="contabilidad_config_elemento_gasto_update")
+     * @Route("/upd/{id}", name="contabilidad_config_elemento_gasto_update", methods={"POST"})
      */
     public function updateElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
-        $arr_request = $request->get('elemento_gasto');
+        $form = $this->createForm(ElementoGastoType::class);
+        $form->handleRequest($request);
+        /** @var ElementoGasto $elemento_upd */
+        $elemento_upd = $form->getData();
+        $errors = $validator->validate($elemento_upd);
 
-        if (!$this->isDuplicate($em, $arr_request['descripcion'], 'upd', $id)) {
-            /**@var ElementoGasto $elemto_gasto ** */
-            $elemto_gasto = $em->getRepository(ElementoGasto::class)->find($id);
-            $elemto_gasto->setDescripcion($arr_request['descripcion']);
-            $elemto_gasto->setCodigo($arr_request['codigo']);
-            $elemto_gasto->setIdCuenta($em->getRepository(Cuenta::class)
-                ->find($arr_request['id_cuenta']));
+        if ($form->isValid() && $form->isSubmitted()) {
+            if (!AuxFunctions::isDuplicate($em->getRepository(ElementoGasto::class),
+                ['descripcion' => $elemento_upd->getDescripcion()], AuxFunctions::$ACTION_UPD, $id)) {
 
-            try {
-                $em->persist($elemto_gasto);
-                $em->flush();
-            } catch (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-            }
-            $this->addFlash('success', 'Elemento de gasto actualizado satisfactoriamente');
-        } else
-            $this->addFlash('error', 'Elemento de gasto ya se encuentra registrado');
+                /**@var ElementoGasto $elemto_gasto ** */
+                $elemto_gasto = $em->getRepository(ElementoGasto::class)->find($id);
+                $elemto_gasto->setDescripcion($elemento_upd->getDescripcion());
+                $elemto_gasto->setCodigo($elemento_upd->getCodigo());
+                $elemto_gasto->setIdCuenta($elemento_upd->getIdCuenta());
+
+                try {
+                    $em->persist($elemto_gasto);
+                    $em->flush();
+                } catch (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                }
+                $this->addFlash('success', 'Elemento de gasto actualizado satisfactoriamente');
+            } else
+                $this->addFlash('error', 'Elemento de gasto ya se encuentra registrado');
+        }
+
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+
         return $this->redirectToRoute('contabilidad_config_elemento_gasto');
     }
 
     /**
-     * @Route("/contabilidad/config/elemento-gasto-delete/{id}", name="contabilidad_config_elemento_gasto_delete")
+     * @Route("/delete/{id}", name="contabilidad_config_elemento_gasto_delete", methods={"DELETE"})
      */
-    public function delete(EntityManagerInterface $em, $id)
+    public function delete(EntityManagerInterface $em, Request $request, $id)
     {
-        $elgasto_obj = $em->getRepository(ElementoGasto::class)->find($id);
-        $msg = 'No se pudo eliminar el Elemento de gasto';
-        $success = 'error';
-        if ($elgasto_obj) {
-            /**@var $elgasto_obj ElementoGasto** */
-            $elgasto_obj->setActivo(false);
-            try {
-                $em->persist($elgasto_obj);
-                $em->flush();
-                $success = 'success';
-                $msg = 'Elemento de gasto eliminado satisfactoriamente';
-            } catch
-            (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $elgasto_obj = $em->getRepository(ElementoGasto::class)->find($id);
+            $msg = 'No se pudo eliminar el Elemento de gasto';
+            $success = 'error';
+            if ($elgasto_obj) {
+                /**@var $elgasto_obj ElementoGasto** */
+                $elgasto_obj->setActivo(false);
+                try {
+                    $em->persist($elgasto_obj);
+                    $em->flush();
+                    $success = 'success';
+                    $msg = 'Elemento de gasto eliminado satisfactoriamente';
+                } catch
+                (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                }
             }
+            $this->addFlash($success, $msg);
         }
-
-        $this->addFlash($success, $msg);
         return $this->redirectToRoute('contabilidad_config_elemento_gasto');
-    }
-
-    /**************-Indica si un objeto esta duplicado en BD,ya sea para adicionar como modificar-****************/
-    public function isDuplicate($em, $nombre, $action, $id = null)
-    {
-        $er = $em->getRepository(ElementoGasto::class);
-
-        $arr_obj = $er->findBy(array(
-            'descripcion' => $nombre
-        ));
-
-        if ($action == 'upd') {
-            foreach ($arr_obj as $obj) {
-                /**@var $obj ElementoGasto* */
-                if ($obj->getId() != $id)
-                    return true;
-            }
-        } elseif ($action == 'add') {
-            if (!empty($arr_obj))
-                return true;
-        }
-        return false;
     }
 }

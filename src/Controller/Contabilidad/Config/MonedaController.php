@@ -21,7 +21,7 @@ class MonedaController extends CrudController
     public function __construct()
     {
         $this->setTitle('Moneda');
-        $this->setLabel('Nombre');
+        $this->setLabel('nombre');
         $this->setClassTypeName(MonedaType::class);
         $this->setClassEntity(Moneda::class);
         $this->setMessages([

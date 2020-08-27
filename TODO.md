@@ -6,10 +6,11 @@
 - [x] CRUD por cada Entidad -- REVISION
     - [x] Config inicial 
     - [x] Almacén `u`
-    - [x] Centro Costo --- `GUIA para validaciones` 
+        - [ ] ponerle la Unidad
+    - [x] Centro Costo
     - [x] Cuenta 
     - [x] Subcuenta
-    - [ ] Elemento de Gasto
+    - [x] Elemento de Gasto --- `GUIA para validaciones` 
     - [ ] Grupo Activo ---camilo
     - [x] Instrumento Cobro `u`
     - [x] Modulo `u`

@@ -21,7 +21,7 @@ class InstrumentoCobroController extends CrudController
     public function __construct()
     {
         $this->setTitle('Instrumento de Cobro');
-        $this->setLabel('Nombre');
+        $this->setLabel('nombre');
         $this->setClassTypeName(InstrumentoCobroType::class);
         $this->setClassEntity(InstrumentoCobro::class);
         $this->setMessages([
