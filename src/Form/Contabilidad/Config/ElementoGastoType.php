@@ -16,16 +16,17 @@ class ElementoGastoType extends AbstractType
     {
         $builder
             ->add('codigo')
-            ->add('descripcion')
+            ->add('descripcion', null, [
+                'required' => true
+            ])
             ->add('id_cuenta', EntityType::class, [
-                'mapped'=>false,
-                'class'=>Cuenta::class,
-                'choice_label'=>'descripcion',
-                'query_builder'=>function(EntityRepository $er){
+                'class' => Cuenta::class,
+                'choice_label' => 'descripcion',
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.activo = true')
                         ->andWhere('u.elemento_gasto = true')
-                        ->orderBy('u.descripcion','ASC');
+                        ->orderBy('u.descripcion', 'ASC');
                 }
             ]);
     }

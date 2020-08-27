@@ -4,6 +4,7 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ElementoGastoRepository::class)
@@ -19,11 +20,13 @@ class ElementoGasto
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.codigo_not_blank")
      */
     private $codigo;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $descripcion;
 
@@ -35,6 +38,7 @@ class ElementoGasto
     /**
      * @ORM\ManyToOne(targetEntity=Cuenta::class)
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotNull(message="contabilidad.config.cuenta_not_blank")
      */
     private $id_cuenta;
 

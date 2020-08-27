@@ -21,7 +21,7 @@ class TipoDocumentoController extends CrudController
     public function __construct()
     {
         $this->setTitle('Tipo de Documento');
-        $this->setLabel('Nombre');
+        $this->setLabel('nombre');
         $this->setClassTypeName(TipoDocumentoType::class);
         $this->setClassEntity(TipoDocumento::class);
         $this->setMessages([

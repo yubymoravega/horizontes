@@ -18,16 +18,16 @@
 
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-10">{{ label }}</th>
+            <th scope="col-10">{{ label|capitalize }}</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in list %}
                 <tr>
                     {% if label == 'nombre' %}
-                        <td style="font-weight:400;">{{ item.nombre|capitalize }}</td>
+                        <td style="font-weight:400;">{{ item.nombre }}</td>
                     {% else %}
-                        <td style="font-weight:400;">{{ item.descripcion|capitalize }}</td>
+                        <td style="font-weight:400;">{{ item.descripcion }}</td>
                     {% endif %}
                     <td>
                         <a href="{{ path(paths.edit,{id: item.id}) }}"
@@ -39,7 +39,7 @@
                         <button type="button" class="btn btn-danger btn-sm ml-2" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar {{ title }}: {{ label == 'Nombre' ? item.nombre: item.descripcion }}?',
+                                        message:'Está seguro que desea eliminar {{ title }}: {{ label == 'nombre' ? item.nombre: item.descripcion }}?',
                                         url:'{{ path(paths.delete,{id: item.id}) }}',
                                         _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">

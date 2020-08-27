@@ -21,7 +21,7 @@ class ModulosController extends CrudController
     public function __construct()
     {
         $this->setTitle('Módulo');
-        $this->setLabel('Nombre');
+        $this->setLabel('nombre');
         $this->setClassTypeName(ModulosType::class);
         $this->setClassEntity(Modulo::class);
         $this->setMessages([
