@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
@@ -48,11 +49,12 @@ class InformeRecepcionController extends AbstractController
     public function gestionarInforme(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
         $form = $this->createForm(InformeRecepcionType::class);
+        $id_almacen = 1;//aqui es donde cojo la variable global que contiene el almacen seleccionado
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
 //            dd($form,$form->isValid(),$form->getData(), $request);
-            if ($form->isValid()) {
+//            if ($form->isValid()) {
 //                dd($form, $request);
                 $informe_recepcion = $request->get('informe_recepcion');
                 $codigo_mercancia = $informe_recepcion['codigo_mercancia'];
@@ -97,11 +99,16 @@ class InformeRecepcionController extends AbstractController
                         return $e->getMessage();
                     }
                 }
+
                 //2-obtengo elnumero consecutivo de documento
+                $year_ = new Date('Y');
+
                 $documento_er = $em->getRepository(Documento::class);
-//                $arr_documentos = $documento_er->findBy(array(
-//                    'id'
-//                ));
+                $arr_documentos = $documento_er->findBy(array(
+                    'id_almacen'=>$id_almacen,
+                    'activo'=>true
+                ));
+
                 //2.1-adicionar en documento
 
 
@@ -113,7 +120,7 @@ class InformeRecepcionController extends AbstractController
                 //5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
 
             }
-        }
+//        }
         return $this->render('contabilidad/inventario/informe_recepcion/form.html.twig', [
             'controller_name' => 'CRUDInformeRecepcion',
             'formulario' => $form->createView()

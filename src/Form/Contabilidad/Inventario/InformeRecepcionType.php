@@ -59,15 +59,15 @@ class InformeRecepcionType extends AbstractType
             ->add('existencia_incremento_mercancia', TextType::class, [
                 'attr' => ['class' => 'w-100']
             ])
-            ->add('cuenta_inventario', TextType::class, array(
+            ->add('cuenta_inventario', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
 //                'choice_label' => 'nro_cuenta',
             ))
-            ->add('cuenta_acreedora', TextType::class, [
+            ->add('cuenta_acreedora', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
 //                'choice_label' => 'nro_cuenta',
             ])
-            ->add('subcuenta_inventario', TextType::class, [
+            ->add('subcuenta_inventario', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
 //                'choice_label' => 'nro_subcuenta',
 //                'choice_value'=>'nro_subcuenta',

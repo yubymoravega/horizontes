@@ -29,6 +29,26 @@ class InformeRecepcion
      */
     private $id_proveedor;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nro_cuenta_inventario;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nro_subcuenta_inventario;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nro_cuenta_areedora;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nro_subcuenta_acreedora;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -54,6 +74,54 @@ class InformeRecepcion
     public function setIdProveedor(?Proveedor $id_proveedor): self
     {
         $this->id_proveedor = $id_proveedor;
+
+        return $this;
+    }
+
+    public function getNroCuentaInventario(): ?string
+    {
+        return $this->nro_cuenta_inventario;
+    }
+
+    public function setNroCuentaInventario(string $nro_cuenta_inventario): self
+    {
+        $this->nro_cuenta_inventario = $nro_cuenta_inventario;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaInventario(): ?string
+    {
+        return $this->nro_subcuenta_inventario;
+    }
+
+    public function setNroSubcuentaInventario(string $nro_subcuenta_inventario): self
+    {
+        $this->nro_subcuenta_inventario = $nro_subcuenta_inventario;
+
+        return $this;
+    }
+
+    public function getNroCuentaAreedora(): ?string
+    {
+        return $this->nro_cuenta_areedora;
+    }
+
+    public function setNroCuentaAreedora(string $nro_cuenta_areedora): self
+    {
+        $this->nro_cuenta_areedora = $nro_cuenta_areedora;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaAcreedora(): ?string
+    {
+        return $this->nro_subcuenta_acreedora;
+    }
+
+    public function setNroSubcuentaAcreedora(string $nro_subcuenta_acreedora): self
+    {
+        $this->nro_subcuenta_acreedora = $nro_subcuenta_acreedora;
 
         return $this;
     }
