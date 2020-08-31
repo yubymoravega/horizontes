@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Security | Permisos{% endblock %}
+
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Permisos por roles
+            </h4>
+            <form action="">
+                <select name="roles_id" id="roles_id" class="form-control w-100 h-25">
+                    <option selected = "true" value = "0" disabled>Seleccione el rol</option>
+                    {% for item in roles %}
+                        <option value = "{{ item.rol }}">{{ item.rol }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+
+        </div>
+        {# end header #}
+
+        {# list #}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-1">Roles</th>
+            <th scope="col-2">Rutas</th>
+            </thead>
+            <tbody>
+            {% for item in permisos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.roles }}</td>
+                    <td style="font-weight:400;">{{ item.path }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function () {
+            var roles_id = $('#roles_id');
+            $('#roles_id').change(function (evernt) {
+                if (typeof ($(this).val()) != 'object') {
+                    console.info('/permisos-por-rol/' + $(this).val())
+                    $('form').attr('action', '/permisos-por-rol/' + $(this).val())
+                    $('form').submit()
+                }
+            })
+        })
+    </script>
+{% endblock %}
+

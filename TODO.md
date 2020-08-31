@@ -34,9 +34,17 @@ validar si esta requerido y al escribir también, ponerle un id al
 # Pendiente
 
 ### Investigar
+- Como poner la variable de Id almacen seleccionado en session o como sea para usarlo en el modulo de inventario.(OJO)
 
 ### bugs
 - cuando se actualiza el navegador con f5/click en el simbolo de actulizar
 no se limpia el request anterior y se envia el mismo nuevamente
 - los inputs no tienen un funcionamiento correcto, no permiten desplacamientos con las 
 arrow ni seleccion mediante el teclado... algun problema con las librerias incorporadas al parecer
+
+###Pendiente a revisar e implementar(Camilo)
+- En Informe de recepción:
+    - El isValid() del formulario no se esta enviando
+    - en obligacion de pago porner la entiguedad por periodo(<30 dias, entre 30-60 dias, entre 60-90 y >90 dias)
+    - en mercancia tengo que hacer una tarjeta de estiva()
+    - en todas las tablase de base de dato de inventario tengo que cambiar donde guardo precio, guardar importe(OJO)

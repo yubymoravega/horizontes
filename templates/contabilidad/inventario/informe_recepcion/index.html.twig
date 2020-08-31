@@ -26,11 +26,8 @@
         <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th width="70px">#</th>
-            <th scope="col-1">Código-Descripción</th>
-            <th width="50px">UM</th>
-            <th width="70px">Cant.</th>
             <th width="70px">Importe</th>
-            <th width="80px">Fecha</th>
+            <th width="175px">Fecha</th>
             <th width="120px">Cuenta-Subcuenta(Inv)</th>
             <th width="120px">Cuenta-Proveedor(Acreedoras)</th>
             <th scope="col-1" width="150px">Acciones</th>
@@ -38,23 +35,17 @@
             <tbody>
             {% for item in informes %}
                 <tr>
-                    <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.concecutivo }}</td>
+                    <td style="font-weight:400;">{{ item.importe }}</td>
+                    <td style="font-weight:400;">{{ item.fecha }}</td>
+                    <td style="font-weight:400;">{{ item.inventario }}</td>
+                    <td style="font-weight:400;">{{ item.acreedora }}</td>
                     <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Actualizar"
-                                onclick="onUpdate({
-                                        {#id: '{{ item.id }}',#}
-                                        {#nombre: '{{ item.nombre }}',#}
-                                        {#codigo: '{{ item.codigo }}'#}
-                                        })">
-                            <i class="fa fa-edit"></i>
-                        </button>
                         <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Eliminar"
+                                data-placement="bottom" title="Cancelar"
                                 onclick="onDeleteConfirm({
-                                        {#message:'Está seguro que desea eliminar informe seleccionado ?',#}
-                                        {#url:'{{ path('contabilidad_inventario_informe_delete',{id: item.id}) }}'#}
+                                        message:'Está seguro que desea cancelar informe de recepción {{ item.concecutivo }} ?',
+                                        url:'{{ path('contabilidad_inventario_informe_recepcion_delete',{id: item.id}) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>

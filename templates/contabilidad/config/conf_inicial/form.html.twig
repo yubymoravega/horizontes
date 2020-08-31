@@ -90,6 +90,47 @@
         </div>
     </div>
 
+    {# Modal de Elemento de Gasto#}
+    <div class="modal fade" id="listarElementoGastoModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarElementoGastoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarElementoGastoLabel">Listado de elementos de gasto</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app" style="height: 600px;">
+                    <div style="height: 500px; overflow-y: auto;">
+                        <table class="table table-hover text-light">
+                            <thead class="thead-dark">
+                            <th scope="col-1" style="width: 10px">Sel.</th>
+                            <th scope="col-1" style="width: 190px">Código</th>
+                            <th scope="col-6">Descripción</th>
+                            </thead>
+                            <tbody id="rows_table_elemento_gasto">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex mt-4">
+                        <button class="mr-auto btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                aria-label="Cerrar">
+                            <span aria-hidden="true">Cancelar</span>
+                        </button>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-outline-secondary"
+                                    id="btnAceptarElementoGasto" onclick="AddElementoGasto()"
+                                    data-dismiss="modal">Seleccionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {# Formulario de gestión de las configuraciones iniciales del sistema #}
     <div class="container d-flex justify-content-center">
         <div class="card mt-5" style="width: 50rem;">
@@ -145,6 +186,11 @@
                            id="configuracion_inicial_id_subcuenta_contrapartida" class="form-control w-100"
                            data-toggle="modal" data-target="#listarSubcuentasModal">
                 </div>
+                <div class="form-group input-group input-group-sm d-block">
+                    <label for="configuracion_inicial_id_elemento_gasto" class="font-weight-bold">Elemento de Gasto</label>
+                    <input type="text" name="configuracion_inicial_id_elemento_gasto" id="configuracion_inicial_id_elemento_gasto"
+                           class="form-control w-100" data-toggle="modal" data-target="#listarElementoGastoModal">
+                </div>
 
                 <div class="form-group">
                     <div id="lista" class="input-group input-group-sm"></div>
@@ -175,6 +221,7 @@
         let subcuentas = [];
         let cuentas_contrapartida = [];
         let subcuentas_contrapartida = [];
+        let elemento_gasto = [];
         $(document).ready(function () {
             $('#btnAceptarCuentasContrapartida').hide()
             $('#btnAceptarSubcuentasContrapartida').hide()
@@ -331,6 +378,41 @@
                 }
             })
         })
+
+        /**Cargando los elementos de gastos dada las cuentas contrapartidas**/
+        $('#configuracion_inicial_id_elemento_gasto').on('click', function () {
+            $('#rows_table_elemento_gasto').find('tr').remove();
+            let cuentas_str = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+            $.ajax({
+                url: '/contabilidad/config/conf-inicial/form-elemento-gasto/' + cuentas_str,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    elemento_gasto = result.elemento_gasto
+                    $(result.elemento_gasto).each(function (pos, valor) {
+                        if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
+                            $('#rows_table_elemento_gasto').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        else {
+                            $('#rows_table_elemento_gasto').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                            );
+                        }
+                    })
+                },
+                error: function () {
+                }
+            })
+        })
         $('#configuracion_inicial_id_subcuenta_contrapartida').on('click', function () {
             $('#btnAceptarSubcuentasContrapartida').show()
             $('#btnAceptarSubcuentas').hide()
@@ -410,6 +492,17 @@
                 }
             }
             $('#configuracion_inicial_id_subcuenta_contrapartida').val(str_subcuentas.substr(0, str_subcuentas.length - 2))
+        }
+
+        function AddElementoGasto() {
+            let str_elemento_gasto = ''
+            for (var i = 0; i < elemento_gasto.length; i++) {
+                let id = '#' + elemento_gasto[i]['codigo']
+                if ($(id).prop('checked') == true) {
+                    str_elemento_gasto = str_elemento_gasto + elemento_gasto[i]['codigo'] + ' - '
+                }
+            }
+            $('#configuracion_inicial_id_elemento_gasto').val(str_elemento_gasto.substr(0, str_elemento_gasto.length - 2))
         }
     </script>
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Repository\Contabilidad\Inventario\MercanciaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,29 +32,29 @@ class Mercancia
     /**
      * @ORM\Column(type="float")
      */
-    private $precio_compra;
+    private $existencia;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $existencia;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $materiales_auxiliares;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $activo;
+    private $importe;
 
     /**
      * @ORM\ManyToOne(targetEntity=Almacen::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $id_almacen;
+    private $id_amlacen;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=UnidadMedida::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad_medida;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activo;
 
     public function getId(): ?int
     {
@@ -84,18 +85,6 @@ class Mercancia
         return $this;
     }
 
-    public function getPrecioCompra(): ?float
-    {
-        return $this->precio_compra;
-    }
-
-    public function setPrecioCompra(float $precio_compra): self
-    {
-        $this->precio_compra = $precio_compra;
-
-        return $this;
-    }
-
     public function getExistencia(): ?float
     {
         return $this->existencia;
@@ -108,14 +97,38 @@ class Mercancia
         return $this;
     }
 
-    public function getMaterialesAuxiliares(): ?bool
+    public function getImporte(): ?float
     {
-        return $this->materiales_auxiliares;
+        return $this->importe;
     }
 
-    public function setMaterialesAuxiliares(?bool $materiales_auxiliares): self
+    public function setImporte(float $importe): self
     {
-        $this->materiales_auxiliares = $materiales_auxiliares;
+        $this->importe = $importe;
+
+        return $this;
+    }
+
+    public function getIdAmlacen(): ?Almacen
+    {
+        return $this->id_amlacen;
+    }
+
+    public function setIdAmlacen(?Almacen $id_amlacen): self
+    {
+        $this->id_amlacen = $id_amlacen;
+
+        return $this;
+    }
+
+    public function getIdUnidadMedida(): ?UnidadMedida
+    {
+        return $this->id_unidad_medida;
+    }
+
+    public function setIdUnidadMedida(?UnidadMedida $id_unidad_medida): self
+    {
+        $this->id_unidad_medida = $id_unidad_medida;
 
         return $this;
     }
@@ -125,21 +138,9 @@ class Mercancia
         return $this->activo;
     }
 
-    public function setActivo(?bool $activo): self
+    public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
-
-        return $this;
-    }
-
-    public function getIdAlmacen(): ?Almacen
-    {
-        return $this->id_almacen;
-    }
-
-    public function setIdAlmacen(?Almacen $id_almacen): self
-    {
-        $this->id_almacen = $id_almacen;
 
         return $this;
     }

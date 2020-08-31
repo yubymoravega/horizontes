@@ -32,6 +32,7 @@ class InventarioController extends AbstractController
      */
     public function selAlmacen()
     {
+
         $row = [];
         $obj_user = $this->getUser();
         $em = $this->getDoctrine()->getManager();

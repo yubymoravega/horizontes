@@ -33,7 +33,6 @@ class EmpleadoType extends AbstractType
             ))
             ->add('telefono')
             ->add('id_unidad', EntityType::class, [
-                'mapped' => false,
                 'class' => Unidad::class,
                 'choice_label' => 'nombre',
                 'label'=>'Unidad a la que pertenece',
@@ -44,7 +43,6 @@ class EmpleadoType extends AbstractType
                 }
             ])
             ->add('id_cargo', EntityType::class, [
-                'mapped' => false,
                 'class' => Cargo::class,
                 'label'=>'Cargo en la Empresa',
                 'choice_label' => 'nombre',

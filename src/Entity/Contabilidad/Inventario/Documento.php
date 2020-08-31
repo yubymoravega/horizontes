@@ -2,8 +2,8 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
-use App\Entity\Contabilidad\Config\ConfiguracionInicial;
-use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Repository\Contabilidad\Inventario\DocumentoRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,170 +21,45 @@ class Documento
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $codigo;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $descripcion;
-
-    /**
      * @ORM\Column(type="float")
      */
-    private $cantidad;
+    private $importe_total;
 
     /**
-     * @ORM\Column(type="float")
-     */
-    private $importe;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $precio;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $existencia;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $is_producto;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $nro_tipo_anno;
-
-    /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="date")
      */
     private $fecha;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_almacen;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad;
+
+    /**
+     * @ORM\Column(type="boolean")
      */
     private $activo;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=UnidadMedida::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $id_unidad_medida;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=TipoDocumento::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $id_tipo_documento;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=ConfiguracionInicial::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $id_configuracion_inicial;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCodigo(): ?string
+    public function getImporteTotal(): ?float
     {
-        return $this->codigo;
+        return $this->importe_total;
     }
 
-    public function setCodigo(string $codigo): self
+    public function setImporteTotal(float $importe_total): self
     {
-        $this->codigo = $codigo;
-
-        return $this;
-    }
-
-    public function getDescripcion(): ?string
-    {
-        return $this->descripcion;
-    }
-
-    public function setDescripcion(string $descripcion): self
-    {
-        $this->descripcion = $descripcion;
-
-        return $this;
-    }
-
-    public function getCantidad(): ?float
-    {
-        return $this->cantidad;
-    }
-
-    public function setCantidad(float $cantidad): self
-    {
-        $this->cantidad = $cantidad;
-
-        return $this;
-    }
-
-    public function getImporte(): ?float
-    {
-        return $this->importe;
-    }
-
-    public function setImporte(float $importe): self
-    {
-        $this->importe = $importe;
-
-        return $this;
-    }
-
-    public function getPrecio(): ?float
-    {
-        return $this->precio;
-    }
-
-    public function setPrecio(?float $precio): self
-    {
-        $this->precio = $precio;
-
-        return $this;
-    }
-
-    public function getExistencia(): ?float
-    {
-        return $this->existencia;
-    }
-
-    public function setExistencia(?float $existencia): self
-    {
-        $this->existencia = $existencia;
-
-        return $this;
-    }
-
-    public function getIsProducto(): ?bool
-    {
-        return $this->is_producto;
-    }
-
-    public function setIsProducto(?bool $is_producto): self
-    {
-        $this->is_producto = $is_producto;
-
-        return $this;
-    }
-
-    public function getNroTipoAnno(): ?int
-    {
-        return $this->nro_tipo_anno;
-    }
-
-    public function setNroTipoAnno(?int $nro_tipo_anno): self
-    {
-        $this->nro_tipo_anno = $nro_tipo_anno;
+        $this->importe_total = $importe_total;
 
         return $this;
     }
@@ -194,9 +69,33 @@ class Documento
         return $this->fecha;
     }
 
-    public function setFecha(?\DateTimeInterface $fecha): self
+    public function setFecha(\DateTimeInterface $fecha): self
     {
         $this->fecha = $fecha;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
 
         return $this;
     }
@@ -206,45 +105,9 @@ class Documento
         return $this->activo;
     }
 
-    public function setActivo(?bool $activo): self
+    public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
-
-        return $this;
-    }
-
-    public function getIdUnidadMedida(): ?UnidadMedida
-    {
-        return $this->id_unidad_medida;
-    }
-
-    public function setIdUnidadMedida(?UnidadMedida $id_unidad_medida): self
-    {
-        $this->id_unidad_medida = $id_unidad_medida;
-
-        return $this;
-    }
-
-    public function getIdTipoDocumento(): ?TipoDocumento
-    {
-        return $this->id_tipo_documento;
-    }
-
-    public function setIdTipoDocumento(?TipoDocumento $id_tipo_documento): self
-    {
-        $this->id_tipo_documento = $id_tipo_documento;
-
-        return $this;
-    }
-
-    public function getIdConfiguracionInicial(): ?ConfiguracionInicial
-    {
-        return $this->id_configuracion_inicial;
-    }
-
-    public function setIdConfiguracionInicial(?ConfiguracionInicial $id_configuracion_inicial): self
-    {
-        $this->id_configuracion_inicial = $id_configuracion_inicial;
 
         return $this;
     }
