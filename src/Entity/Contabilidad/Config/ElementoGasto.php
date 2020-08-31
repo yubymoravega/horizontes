@@ -4,10 +4,12 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ElementoGastoRepository::class)
+ * @UniqueEntity(fields={"descripcion"}, message="contabilidad.config.descripcion_unique")
  */
 class ElementoGasto
 {

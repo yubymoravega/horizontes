@@ -16,7 +16,7 @@
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
-                        data-target="#gestionarTasaCambioModal" data-placement="bottom" title="Adicionar"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
@@ -25,49 +25,7 @@
         {# end header #}
 
         {# Modal de adicionar#}
-        <div class="modal fade" id="gestionarTasaCambioModal" tabindex="-1" role="dialog" data-backdrop="static"
-             data-keyboard="false"
-             aria-labelledby="gestionarTasaCambioModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarTasaCambioModalLabel">Adicionar tasa de cambio</h4>
-                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{ form_start(form,{'attr': {'class': 'rd-mailform text-left'}}) }}
-                    <div class="modal-body">
-                        <label for="tasa_cambio_anno" class="font-weight-bold">Año</label>
-                        {{ form_widget(form.anno,{'attr': {'class': 'form-control'}}) }}
-                        <label for="tasa_cambio_mes" class="font-weight-bold">Mes</label>
-                        {{ form_widget(form.mes,{'attr': {'class': 'form-control'}}) }}
-                        <label for="tasa_cambio_valor" class="font-weight-bold">Valor</label>
-                        {{ form_widget(form.valor,{'attr': {'class': 'form-control'}}) }}
-                        <label for="tasa_cambio_id_moneda_origen" class="font-weight-bold">Moneda origen</label>
-                        {{ form_widget(form.id_moneda_origen,{'attr': {'class': 'form-control'}}) }}
-                        <label for="tasa_cambio_id_moneda_destino" class="font-weight-bold">Moneda destino</label>
-                        {{ form_widget(form.id_moneda_destino,{'attr': {'class': 'form-control'}}) }}
-                    </div>
-                    {{ form_end(form) }}
-                    <div class="modal-footer d-flex">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        {{ include('contabilidad/config/tasa_cambio/form_modal.html.twig',{ title: 'add' }) }}
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
@@ -87,17 +45,14 @@
                     <td style="font-weight:400;">{{ item.nombre_moneda_destino }}</td>
                     <td style="font-weight:400;">{{ item.valor }}</td>
                     <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
                                         id: '{{ item.id }}',
                                         anno: '{{ item.anno }}',
                                         mes: '{{ item.mes }}',
-                                        nombre_mes: '{{ item.nombre_mes }}',
                                         valor: '{{ item.valor }}',
-                                        nombre_moneda_origen: '{{ item.nombre_moneda_origen }}',
                                         id_moneda_origen: '{{ item.id_moneda_origen }}',
-                                        nombre_moneda_destino: '{{ item.nombre_moneda_destino }}',
                                         id_moneda_destino: '{{ item.id_moneda_destino }}',
                                         })">
                             <i class="fa fa-edit"></i>
@@ -106,7 +61,8 @@
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la tasa de cambio seleccionada ?',
-                                        url:'{{ path('contabilidad_config_tasa_cambio_delete',{id: item.id}) }}'
+                                        url:'{{ path('contabilidad_config_tasa_cambio_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -123,82 +79,88 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-            resetField()
-            $('#btnActualizar').hide()
-        })
+        const TEXT_SELECT = '... seleccione ...';
+
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
 
         const onUpdate = function (config) {
-            $('#btnActualizar').show()
-            $('#btnAceptar').hide()
-            const {anno = '', id = '', mes = '', nombre_mes = '', valor = '', nombre_moneda_origen = '', id_moneda_origen = '', nombre_moneda_destino = '', id_moneda_destino = ''} = config
-            $('#gestionarTasaCambioModal').modal('show')
-            $('#select2-tasa_cambio_id_moneda_destino-container')[0].textContent = nombre_moneda_destino
-            $('#select2-tasa_cambio_id_moneda_origen-container')[0].textContent = nombre_moneda_origen
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {anno = '', id = '', mes = '', valor = '', id_moneda_origen = '', id_moneda_destino = ''} = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar Tasa de cambio")
+
             $('#tasa_cambio_id_moneda_origen').val(id_moneda_origen)
             $('#tasa_cambio_id_moneda_destino').val(id_moneda_destino)
             $('#tasa_cambio_mes').val(mes)
-            $('#select2-tasa_cambio_mes-container')[0].textContent = nombre_mes
-            $('#id_tasa_cambio').val(id)
             $('#tasa_cambio_anno').val(anno)
             $('#tasa_cambio_valor').val(valor)
-            $('#gestionarTasaCambioModalLabel').html("Modificar tasa de cambio")
+            $('#id_tasa_cambio').val(id)
         }
 
-        $('#btnAceptar').on('click', function () {
-            let params = {
-                anno: $('#tasa_cambio_anno').val(),
-                mes: $('#tasa_cambio_mes').val(),
-                valor: $('#tasa_cambio_valor').val(),
-                id_moneda_origen: $('#tasa_cambio_id_moneda_origen').val(),
-                id_moneda_destino: $('#tasa_cambio_id_moneda_destino').val()
-            }
-            $.ajax({
-                url: '/contabilidad/config/tasa-cambio-add',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/contabilidad/config/tasa-cambio');
+        $(document).ready(function () {
+            // init
+            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
+            $('#modal__btn__actualizar').hide()
+
+
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'tasa_cambio[anno]': "required",
+                    'tasa_cambio[mes]': "required",
+                    'tasa_cambio[valor]': "required",
+                    'tasa_cambio[id_moneda_origen]': "required",
+                    'tasa_cambio[id_moneda_destino]': "required",
+                },
+                messages: {
+                    'tasa_cambio[anno]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'tasa_cambio[mes]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'tasa_cambio[valor]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'tasa_cambio[id_moneda_origen]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'tasa_cambio[id_moneda_destino]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                }
+            })
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/tasa-cambio/add`)
+                formulario.submit()
+            })
+
+            $('#modal__btn__actualizar').on('click', function () {
+                const id_taza_cambio = $('#id_tasa_cambio').val()
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/tasa-cambio/upd/${id_taza_cambio}`)
+                formulario.submit()
+            })
+
+            $('#modal__form__id').on('show.bs.modal', function (event) {
+                validateForm.resetForm()
+                $('#modal__form__label__id').text('Adicionar Tasa de Cambio')
             })
         })
 
-        $('#btnActualizar').on('click', function () {
-            let params = {
-                anno: $('#tasa_cambio_anno').val(),
-                mes: $('#tasa_cambio_mes').val(),
-                valor: $('#tasa_cambio_valor').val(),
-                id_moneda_origen: $('#tasa_cambio_id_moneda_origen').val(),
-                id_moneda_destino: $('#tasa_cambio_id_moneda_destino').val(),
-                id_tasa_cambio: $('#id_tasa_cambio').val()
-            }
-            $.ajax({
-                url: '/contabilidad/config/tasa-cambio-upd',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/contabilidad/config/tasa-cambio');
-            })
-        })
-
-
-        $('#gestionarTasaCambioModal').on('show.bs.modal', function (event) {
-            var modal = $(this)
-            modal.find('.modal-title').text('Adicionar tasa de cambio')
-        })
-
-        function mostrarBtn() {
-            $('#btnActualizar').hide()
-            $('#btnAceptar').show()
-            resetField()
-        }
-
-        function resetField() {
-            $('#tasa_cambio_mes').val(1)
-            $('#select2-tasa_cambio_mes-container')[0].textContent = 'Enero'
-            $('#id_tasa_cambio').val('')
-            $('#tasa_cambio_anno').val(new Date().getFullYear())
-            $('#tasa_cambio_valor').val(0)
-        }
     </script>
 {% endblock %}
 

@@ -4,9 +4,12 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\SubcuentaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=SubcuentaRepository::class)
+ * @UniqueEntity(fields={"nro_subcuenta"},message="contabilidad.config.subcuenta_nro_unique")
  */
 class Subcuenta
 {
@@ -24,6 +27,7 @@ class Subcuenta
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $descripcion;
 

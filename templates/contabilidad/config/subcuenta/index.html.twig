@@ -56,8 +56,8 @@
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la subcuenta {{ item.nro_subcuenta }} ?',
-                                        url:'{{ path('contabilidad_config_subcuenta_delete',{id: item.id, id_cuenta:id_cuenta }) }}'
-                                        _token: {{ csrf_token('delete' ~ item.id) }}
+                                        url:'{{ path('contabilidad_config_subcuenta_delete',{id: item.id, id_cuenta: id_cuenta }) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -127,14 +127,15 @@
             $('#modal__btn__aceptar').on('click', function () {
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/subcuenta/add`)
+                formulario.attr('action', `/contabilidad/config/subcuenta/{{ id_cuenta }}/add`)
                 formulario.submit()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
                 const formulario = $('#form_modal_target')
+                const id_subcuenta = $('#id_subcuenta').val()
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/subcuenta/upd`)
+                formulario.attr('action', `/contabilidad/config/subcuenta/{{ id_cuenta }}/upd/${id_subcuenta}`)
                 formulario.submit()
             })
 

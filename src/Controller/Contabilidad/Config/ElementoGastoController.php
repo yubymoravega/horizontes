@@ -53,66 +53,43 @@ class ElementoGastoController extends AbstractController
     {
         $form = $this->createForm(ElementoGastoType::class);
         $form->handleRequest($request);
+
         /** @var ElementoGasto $elemento */
         $elemento = $form->getData();
         $errors = $validator->validate($elemento);
 
         if ($form->isValid() && $form->isSubmitted()) {
-            if (!AuxFunctions::isDuplicate($em->getRepository(ElementoGasto::class),
-                ['descripcion' => $elemento->getDescripcion()], AuxFunctions::$ACTION_ADD)) {
-
-                $elemento->setActivo(true);
-                try {
-                    $em->persist($elemento);
-                    $em->flush();
-                } catch (FileException $exception) {
-                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-                }
-                $this->addFlash('success', "Elemento de Gasto adicionado satisfactoriamente");
-            } else
-                $this->addFlash('error', "Elemento de Gasto ya se encuentra registrado");
+            $elemento->setActivo(true);
+            try {
+                $em->persist($elemento);
+                $em->flush();
+            } catch (FileException $exception) {
+                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+            }
+            $this->addFlash('success', "Elemento de Gasto adicionado satisfactoriamente");
         }
-
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-
-
         return $this->redirectToRoute('contabilidad_config_elemento_gasto');
     }
 
     /**
      * @Route("/upd/{id}", name="contabilidad_config_elemento_gasto_update", methods={"POST"})
      */
-    public function updateElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
+    public function updateElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, ElementoGasto $elementoGasto)
     {
-        $form = $this->createForm(ElementoGastoType::class);
+        $form = $this->createForm(ElementoGastoType::class, $elementoGasto);
         $form->handleRequest($request);
-        /** @var ElementoGasto $elemento_upd */
-        $elemento_upd = $form->getData();
-        $errors = $validator->validate($elemento_upd);
-
+        $errors = $validator->validate($elementoGasto);
         if ($form->isValid() && $form->isSubmitted()) {
-            if (!AuxFunctions::isDuplicate($em->getRepository(ElementoGasto::class),
-                ['descripcion' => $elemento_upd->getDescripcion()], AuxFunctions::$ACTION_UPD, $id)) {
-
-                /**@var ElementoGasto $elemto_gasto ** */
-                $elemto_gasto = $em->getRepository(ElementoGasto::class)->find($id);
-                $elemto_gasto->setDescripcion($elemento_upd->getDescripcion());
-                $elemto_gasto->setCodigo($elemento_upd->getCodigo());
-                $elemto_gasto->setIdCuenta($elemento_upd->getIdCuenta());
-
-                try {
-                    $em->persist($elemto_gasto);
-                    $em->flush();
-                } catch (FileException $exception) {
-                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-                }
+            try {
+                $em->persist($elementoGasto);
+                $em->flush();
                 $this->addFlash('success', 'Elemento de gasto actualizado satisfactoriamente');
-            } else
-                $this->addFlash('error', 'Elemento de gasto ya se encuentra registrado');
+            } catch (FileException $exception) {
+                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+            }
         }
-
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-
         return $this->redirectToRoute('contabilidad_config_elemento_gasto');
     }
 

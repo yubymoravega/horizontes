@@ -1,0 +1,29 @@
+{% extends 'utils/modal_form.html.twig' %}
+
+{% block modalbody %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="tasa_cambio_anno" class="font-weight-bold">Año</label>
+        {{ form_widget(form.anno,{'type':'number','attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="tasa_cambio_mes" class="font-weight-bold">Mes</label>
+        {{ form_widget(form.mes,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="tasa_cambio_valor" class="font-weight-bold">Valor</label>
+        {{ form_widget(form.valor,{'type':'number','attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="tasa_cambio_id_moneda_origen" class="font-weight-bold">Moneda origen</label>
+        {{ form_widget(form.id_moneda_origen,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="tasa_cambio_id_moneda_destino" class="font-weight-bold">Moneda destino</label>
+        {{ form_widget(form.id_moneda_destino,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <input type="text" id="id_tasa_cambio" hidden>
+    {{ form_end(form) }}
+
+{% endblock %}

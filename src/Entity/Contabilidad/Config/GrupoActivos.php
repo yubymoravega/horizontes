@@ -4,9 +4,12 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\GrupoActivosRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=GrupoActivosRepository::class)
+ * @UniqueEntity(fields={"descripcion"}, message="contabilidad.config.grupo_activo_unique")
  */
 class GrupoActivos
 {
@@ -19,11 +22,13 @@ class GrupoActivos
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotNull(message="Debe ser Numérico")
      */
     private $porciento_deprecia_anno;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $descripcion;
 

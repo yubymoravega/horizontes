@@ -5,21 +5,21 @@
 - [x] Crear las Entidades
 - [x] CRUD por cada Entidad -- REVISION
     - [x] Config inicial 
-    - [x] Almacén `u`
-        - [ ] ponerle la Unidad
-    - [x] Centro Costo
+    - [x] Almacén `u` 
+        - [x] ponerle la Unidad
+    - [x] Centro Costo --->>> `GUIA DE CODIFICACION` 
     - [x] Cuenta 
     - [x] Subcuenta
-    - [x] Elemento de Gasto --- `GUIA para validaciones` 
-    - [ ] Grupo Activo ---camilo
+    - [x] Elemento de Gasto 
+    - [x] Grupo Activo ---camilo
     - [x] Instrumento Cobro `u`
     - [x] Modulo `u`
     - [x] Moneda `u`    
-    - [ ] Tasa Cambio---camilo
+    - [x] Tasa Cambio---camilo
     - [x] Tipo Documento `u`
     - [x] Tipo Documento Activo Fijo `u`
     - [x] Tipo Movimiento `u`
-    - [ ] Unidad
+    - [x] Unidad
     - [x] Unidad Medida `u`
 - [ ] Refactorización el CODIGO   
    - [ ] Ajustar controladores `php bin/console make:crud` del ejemplo TestCrd

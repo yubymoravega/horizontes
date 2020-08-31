@@ -47,7 +47,7 @@
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
                                         id_cuenta: '{{ item.id_cuenta }}',
-                                        id_sub_cuenta: '{{ item.id_sub_cuenta }}',
+                                        id_subcuenta: '{{ item.id_sub_cuenta }}',
                                         cuenta:'{{ item.cuenta }}' ,
                                         sub_cuenta:'{{ item.sub_cuenta }}' ,
                                         codigo:'{{ item.codigo }}',
@@ -88,7 +88,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {id = '', codigo = '', nombre = '', id_cuenta = '', id_sub_cuenta = ''} = config
+            const {id = '', codigo = '', nombre = '', id_cuenta = '', id_subcuenta = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
@@ -102,7 +102,7 @@
             $('#centro_costo_id_cuenta').val(id_cuenta)
 
             //sub cuenta
-            contableAsyncLoads.config.loadSubcuentaByCuenta(id_cuenta, $('#subcuenta_id'), id_sub_cuenta)
+            contableAsyncLoads.config.loadSubcuentaByCuenta(id_cuenta, $('#centro_costo_id_subcuenta'), id_subcuenta)
         }
 
         $(document).ready(function () {
@@ -112,7 +112,7 @@
             $('#modal__btn__actualizar').hide()
 
             // cargar subcuenta por la cuenta seleccionada
-            var subcuenta = $('#subcuenta_id');
+            var subcuenta = $('#centro_costo_id_subcuenta');
             $('#centro_costo_id_cuenta').change(function (evernt) {
                 subcuenta.find('option').remove();
                 if (typeof ($(this).val()) != 'object') {
@@ -142,13 +142,13 @@
                     'centro_costo[nombre]': "required",
                     'centro_costo[codigo]': "required",
                     'centro_costo[id_cuenta]': "required",
-                    'centro_costo[id_sub_cuenta]': "required",
+                    'centro_costo[id_subcuenta]': "required",
                 },
                 messages: {
                     'centro_costo[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'centro_costo[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'centro_costo[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
-                    'centro_costo[id_sub_cuenta]': CONTAB_MSG.REQUIRED_SUBCUENTA,
+                    'centro_costo[id_subcuenta]': CONTAB_MSG.REQUIRED_SUBCUENTA,
                 }
             })
 

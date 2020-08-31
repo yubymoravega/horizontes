@@ -4,9 +4,12 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\CentroCostoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CentroCostoRepository::class)
+ * @UniqueEntity(fields={"nombre"},message="contabilidad.config.centro_costo_unique")
  */
 class CentroCosto
 {
@@ -24,6 +27,7 @@ class CentroCosto
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.codigo_not_blank")
      */
     private $codigo;
 

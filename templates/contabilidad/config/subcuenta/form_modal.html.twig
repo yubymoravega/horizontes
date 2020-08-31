@@ -12,14 +12,11 @@
         {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
     <div class="form-group input-group input-group-sm d-block">
-        <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
-        <select name="subcuenta[naturaleza]" id="naturaleza_cuenta" class="form-control w-100">
-            <option value="1">Deudora</option>
-            <option value="0">Acreedora</option>
-        </select>
+        <label class="font-weight-bold">Naturaleza</label>
+        {{ form_widget(form.deudora,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
-    <input type="text" id="id_subcuenta" name="subcuenta[id_subcuenta]" hidden>
-    <input type="text" id="id_cuenta" name="subcuenta[id_cuenta]" hidden value="{{ id_cuenta }}">
+    <input type="text" id="id_subcuenta"  hidden>
+    <input type="text" id="id_cuenta" hidden value="{{ id_cuenta }}">
 
     {{ form_end(form) }}
 {% endblock %}

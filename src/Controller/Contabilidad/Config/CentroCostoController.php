@@ -3,15 +3,14 @@
 namespace App\Controller\Contabilidad\Config;
 
 use App\Entity\Contabilidad\Config\CentroCosto;
-use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\CentroCostoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use App\CoreContabilidad\AuxFunctions;
 
 /**
  * Class CentroCostoController
@@ -54,59 +53,45 @@ class CentroCostoController extends AbstractController
      */
     public function add(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $arr_request = $request->get('centro_costo');
-        if (!AuxFunctions::isDuplicate(
-            $em->getRepository(CentroCosto::class),
-            array('nombre' => $arr_request['nombre']),
-            AuxFunctions::$ACTION_ADD)) {
-            $obj = new CentroCosto();
-            $obj->setNombre($arr_request['nombre']);
-            $obj->setCodigo($arr_request['codigo']);
-            $obj->setActivo(true);
-            $id_cuenta = $arr_request['id_cuenta'];
-            $obj->setIdCuenta($em->getRepository(Cuenta::class)->find($id_cuenta));
-            $id_sub_cuenta = $arr_request['id_sub_cuenta'];
-            $obj->setIdSubcuenta($em->getRepository(Subcuenta::class)->find($id_sub_cuenta));
-
+        $form = $this->createForm(CentroCostoType::class);
+        $form->handleRequest($request);
+        /** @var CentroCosto $centro_costo */
+        $centro_costo = $form->getData();
+        $errors = $validator->validate($centro_costo);
+        if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $em->persist($obj);
+                $centro_costo->setActivo(true);
+                $em->persist($centro_costo);
                 $em->flush();
+                $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");
-        } else
-            $this->addFlash('error', "Centro de Costo ya se encuentra registrado");
+        }
+
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
         return $this->redirectToRoute('contabilidad_config_centro_costo');
     }
 
     /**
      * @Route("/{id}", name="contabilidad_config_centro_costo_upd", methods={"POST"})
      */
-    public function update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
+    public function update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCosto $centroCosto)
     {
-        $arr_request = $request->get('centro_costo');
-        if (!AuxFunctions::isDuplicate(
-            $em->getRepository(CentroCosto::class),
-            array('nombre' => $arr_request['nombre']),
-            AuxFunctions::$ACTION_UPD, $id)) {
-            $obj = $em->getRepository(CentroCosto::class)->find($id);
-            $obj->setNombre($arr_request['nombre']);
-            $obj->setCodigo($arr_request['codigo']);
-            $id_cuenta = $arr_request['id_cuenta'];
-            $obj->setIdCuenta($em->getRepository(Cuenta::class)->find($id_cuenta));
-            $id_sub_cuenta = $arr_request['id_sub_cuenta'];
-            $obj->setIdSubcuenta($em->getRepository(Subcuenta::class)->find($id_sub_cuenta));
-
+        $form = $this->createForm(CentroCostoType::class, $centroCosto);
+        $form->handleRequest($request);
+        $errors = $validator->validate($centroCosto);
+        if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $em->persist($obj);
+                $em->persist($centroCosto);
                 $em->flush();
+                $this->addFlash('success', "Centro de Costo actualizado satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Centro de Costo actualizado satisfactoriamente");
-        } else
-            $this->addFlash('error', "Centro de Costo ya se encuentra registrado");
+        }
+
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
         return $this->redirectToRoute('contabilidad_config_centro_costo');
     }
 
@@ -117,27 +102,45 @@ class CentroCostoController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
-            $repo = $em->getRepository(CentroCosto::class);
-            $_obj = $repo->find($id);
-            $msg = 'No se pudo eliminar el centro de costo';
-            $success = 'error';
+            $_obj = $em->getRepository(CentroCosto::class)->find($id);
             if ($_obj) {
-
                 /**@var $_obj CentroCosto** */
                 $_obj->setActivo(false);
                 try {
                     $em->persist($_obj);
                     $em->flush();
-                    $success = 'success';
-                    $msg = 'Centro de costo eliminado satisfactoriamente';
-
+                    $this->addFlash('success', 'Centro de costo eliminado satisfactoriamente');
                 } catch
                 (FileException $exception) {
                     return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
                 }
-            }
-            $this->addFlash($success, $msg);
+            } else $this->addFlash('error', 'No se pudo eliminar el centro de costo');
+
         }
         return $this->redirectToRoute('contabilidad_config_centro_costo');
+    }
+
+    /**
+     * @Route("/getsubcuenta/{idcuenta}", name="contabilidad_config_centro_costo_getsubcuenta", methods={"POST"})
+     */
+    public function getSubcuentas($idcuenta)
+    {
+        $subcuenta_er = $this->getDoctrine()->getManager()->getRepository(Subcuenta::class);
+        $arr_subcuenta_obj = $subcuenta_er->findBy(array(
+            'id_cuenta' => $idcuenta,
+            'activo' => true
+        ));
+        $row = [];
+        if (!empty($arr_subcuenta_obj)) {
+            foreach ($arr_subcuenta_obj as $item) {
+                /**@var $item Subcuenta** */
+                $row[] = array(
+                    'id' => $item->getId(),
+                    'nro_subcuenta' => $item->getNroSubcuenta(),
+                    'subcuenta' => $item->getDescripcion()
+                );
+            }
+        }
+        return new JsonResponse(['subcuentas' => $row]);
     }
 }

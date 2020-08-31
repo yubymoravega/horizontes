@@ -33,6 +33,12 @@ class Almacen
      */
     private $activo;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,4 +67,17 @@ class Almacen
 
         return $this;
     }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
 }

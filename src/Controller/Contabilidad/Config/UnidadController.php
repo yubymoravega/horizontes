@@ -2,23 +2,26 @@
 
 namespace App\Controller\Contabilidad\Config;
 
-use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Form\Contabilidad\Config\UnidadType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class UnidadController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/unidad")
+ */
 class UnidadController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/config/unidad", name="contabilidad_config_unidad")
+     * @Route("/", name="contabilidad_config_unidad", methods={"GET"})
      */
-    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function index(EntityManagerInterface $em)
     {
         $form = $this->createForm(UnidadType::class);
 
@@ -41,97 +44,88 @@ class UnidadController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/unidad-add", name="contabilidad_config_unidad_add")
+     * @Route("/add", name="contabilidad_config_unidad_add", methods={"POST"})
      */
     public function addUnidad(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        if (!$this->isDuplicate($em, $request->get('nombre'), 'add')) {
-            /**@var $obj_unidad Unidad** */
-
-            $obj_unidad = new Unidad();
-
-            $obj_unidad->setNombre($request->get('nombre'));
-            $obj_unidad->setActivo(true);
-            if ($request->get('id_padre') && $request->get('id_padre') > 0) {
-                $id_padre = $request->get('id_padre');
-                $obj_unidad->setIdPadre($em->getRepository(Unidad::class)->find($id_padre));
-            } else {
-                $obj_unidad->setIdPadre(null);
-            }
+        $form = $this->createForm(UnidadType::class);
+        $form->handleRequest($request);
+        /** @var Unidad $unidad */
+        $unidad = $form->getData();
+        $errors = $validator->validate($unidad);
+        if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $em->persist($obj_unidad);
+                $unidad->setActivo(true);
+                $em->persist($unidad);
                 $em->flush();
+                $this->addFlash('success', "Unidad adicionada satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Unidad adicionada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "La unidad ya se encuentra registrada");
-        return new JsonResponse(['success' => false]);
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_config_unidad');
     }
 
 
     /**
-     * @Route("/contabilidad/config/unidad-upd", name="contabilidad_config_unidad_update")
+     * @Route("/upd/{id}", name="contabilidad_config_unidad_update")
      */
-    public function updateUnidad(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function updateUnidad(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Unidad $unidad)
     {
-        //dd($request);
-        $id = $request->get('id');
-        if (!$this->isDuplicate($em, $request->get('nombre'), 'upd', $id)) {
-            /**@var $obj_unidad Unidad** */
-            $obj_unidad = $em->getRepository(Unidad::class)->find($id);
-            $obj_unidad->setNombre($request->get('nombre'));
 
-            if ($request->get('id_padre')) {
-                $id_padre = $request->get('id_padre');
-                $obj_unidad->setIdPadre($em->getRepository(Unidad::class)->find($id_padre));
-            } else {
-                $obj_unidad->setIdPadre(null);
-            }
+        $form = $this->createForm(UnidadType::class, $unidad);
+        $form->handleRequest($request);
+        $errors = $validator->validate($unidad);
+        if ($unidad->getIdPadre() === $unidad) {
+            $this->addFlash('error', 'La Unidad no puede ser padre de si misma');
+            return $this->redirectToRoute('contabilidad_config_unidad');
+        }
+        if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $em->persist($obj_unidad);
+                $em->persist($unidad);
                 $em->flush();
+                $this->addFlash('success', "Unidad actualizada satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', 'Unidad actualizada satisfactoriamente');
-            return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', 'La unidad ya se encuentra registrada');
-        return new JsonResponse(['success' => false]);
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_config_unidad');
     }
 
     /**
-     * @Route("/contabilidad/config/unidad-delete/{id}", name="contabilidad_config_unidad_delete")
+     * @Route("/delete/{id}", name="contabilidad_config_unidad_delete", methods={"DELETE"})
      */
     public function deleteUnidad(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
-        $unidad_er = $em->getRepository(Unidad::class);
-
-        if ($this->isPadre($unidad_er, $id)) {
-            $success = 'error';
-            $msg = 'La unidad a borrar tiene 1 o varias unidades subordinadas, antes de borrarla debe reubicar estas unidades';
-        } else {
-            $unidad_obj = $unidad_er->find($id);
-            $msg = 'No se pudo eliminar el almacén';
-            $success = 'error';
-            if ($unidad_obj) {
-                /**@var $unidad_obj Unidad** */
-                $unidad_obj->setActivo(false);
-                try {
-                    $em->persist($unidad_obj);
-                    $em->flush();
-                    $success = 'success';
-                    $msg = 'Unidad eliminada satisfactoriamente';
-                } catch
-                (FileException $exception) {
-                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $unidad_er = $em->getRepository(Unidad::class);
+            $success = '';
+            $msg = '';
+            if ($this->isPadre($unidad_er, $id)) {
+                $success = 'error';
+                $msg = 'La unidad a borrar tiene 1 o varias unidades subordinadas, antes de borrarla debe reubicar estas unidades';
+            } else {
+                $unidad_obj = $unidad_er->find($id);
+                $msg = 'No se pudo eliminar el almacén';
+                $success = 'error';
+                if ($unidad_obj) {
+                    /**@var $unidad_obj Unidad** */
+                    $unidad_obj->setActivo(false);
+                    try {
+                        $em->persist($unidad_obj);
+                        $em->flush();
+                        $success = 'success';
+                        $msg = 'Unidad eliminada satisfactoriamente';
+                    } catch
+                    (FileException $exception) {
+                        return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                    }
                 }
             }
+            $this->addFlash($success, $msg);
         }
-        $this->addFlash($success, $msg);
         return $this->redirectToRoute('contabilidad_config_unidad');
     }
 
@@ -156,7 +150,7 @@ class UnidadController extends AbstractController
 
         $arr_obj = $unidad_er->findBy(array(
             'nombre' => $nombre,
-            'activo'=>true
+            'activo' => true
         ));
 
         if ($action == 'upd') {

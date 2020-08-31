@@ -4,10 +4,14 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\TasaCambioRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TasaCambioRepository::class)
+ * @UniqueEntity(
+ *     fields={"mes", "anno", "id_moneda_destino", "id_moneda_origen"},
+ *     message="contabilidad.config.taza_cambio_unique")
  */
 class TasaCambio
 {

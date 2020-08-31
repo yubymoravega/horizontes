@@ -71,7 +71,7 @@ var contableAsyncLoads = {
          */
         loadSubcuentaByCuenta: function (id_cuenta, select_input, select_index = 0) {
             $.ajax({
-                url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + id_cuenta,
+                url: '/contabilidad/config/centro-costo/getsubcuenta/' + id_cuenta,
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {

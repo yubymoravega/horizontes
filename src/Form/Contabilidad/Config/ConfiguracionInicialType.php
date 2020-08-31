@@ -23,7 +23,6 @@ class ConfiguracionInicialType extends AbstractType
 
         $builder
             ->add('id_modulo',EntityType::class,[
-                'mapped'=>false,
                 'class'=>Modulo::class,
                 'choice_label'=>'nombre',
                 'query_builder'=>function(EntityRepository $er){
@@ -33,7 +32,6 @@ class ConfiguracionInicialType extends AbstractType
                 }
             ])
             ->add('id_tipo_documento',EntityType::class,[
-                'mapped'=>false,
                 'class'=>TipoDocumento::class,
                 'choice_label'=>'nombre',
                 'query_builder'=>function(EntityRepository $er){

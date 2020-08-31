@@ -2,13 +2,9 @@
 
 namespace App\Controller\Contabilidad\Config;
 
-use App\CoreContabilidad\AuxFunctions;
-use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
-use App\Entity\Contabilidad\Config\Unidad;
 use App\Form\Contabilidad\Config\CuentaType;
-use App\Form\Contabilidad\Config\UnidadType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -77,65 +73,46 @@ class CuentaController extends AbstractController
      */
     public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $request_cuenta = $request->get('cuenta');
-        if (!AuxFunctions::isDuplicate($em->getRepository(Cuenta::class),
-            ['nro_cuenta' => $request_cuenta['nro_cuenta']],
-            AuxFunctions::$ACTION_ADD)) {
-            /**@var $obj_cuenta Cuenta** */
+        $form = $this->createForm(CuentaType::class);
+        $form->handleRequest($request);
 
-            $obj_cuenta = new Cuenta();
-            $obj_cuenta
-                ->setNroCuenta(strtoupper($request_cuenta['nro_cuenta']))
-                ->setDescripcion(strtoupper($request_cuenta['descripcion']))
-                ->setDeudora(strtoupper($request_cuenta['naturaleza']))
-                ->setPatrimonio(array_key_exists('patrimonio', $request_cuenta))
-                ->setProduccion(array_key_exists('produccion', $request_cuenta))
-                ->setElementoGasto(array_key_exists('elemento_gasto', $request_cuenta))
-                ->setActivo(true);
+        /** @var Cuenta $cuenta */
+        $cuenta = $form->getData();
+        $errors = $validator->validate($cuenta);
+        if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $em->persist($obj_cuenta);
+                $cuenta->setActivo(true);
+                $em->persist($cuenta);
                 $em->flush();
+                $this->addFlash('success', "Cuenta adicionada satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Cuenta adicionada satisfactoriamente");
-        } else
-            $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
+        }
+
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+
         return $this->redirectToRoute('contabilidad_config_cuenta');
     }
 
     /**
-     * @Route("/upd", name="contabilidad_config_cuenta_upd", methods={"POST"})
+     * @Route("/upd/{id}", name="contabilidad_config_cuenta_upd", methods={"POST"})
      */
-    public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Cuenta $cuenta)
     {
-        $request_cuenta = $request->get('cuenta');
-        if (!AuxFunctions::isDuplicate($em->getRepository(Cuenta::class),
-            ['nro_cuenta' => $request_cuenta['nro_cuenta']],
-            AuxFunctions::$ACTION_UPD, $request_cuenta['id_cuenta'])) {
-
-            /**@var $obj_cuenta Cuenta** */
-            $obj_cuenta = $em->getRepository(Cuenta::class)->find($request_cuenta['id_cuenta']);
-            if (!$obj_cuenta) {
-                $this->addFlash('error', "La cuenta solicitada no se encuentra en la base de datos");
-            }
-            $obj_cuenta
-                ->setNroCuenta(strtoupper($request_cuenta['nro_cuenta']))
-                ->setDescripcion(strtoupper($request_cuenta['descripcion']))
-                ->setDeudora(strtoupper($request_cuenta['naturaleza']))
-                ->setPatrimonio(array_key_exists('patrimonio', $request_cuenta))
-                ->setProduccion(array_key_exists('produccion', $request_cuenta))
-                ->setElementoGasto(array_key_exists('elemento_gasto', $request_cuenta))
-                ->setActivo(true);
+        $form = $this->createForm(CuentaType::class, $cuenta);
+        $form->handleRequest($request);
+        $errors = $validator->validate($cuenta);
+        if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $em->persist($obj_cuenta);
+                $em->persist($cuenta);
                 $em->flush();
+                $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
-        } else
-            $this->addFlash('error', "El Nro de cuenta ya se encuentra registrado");
+        }
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
         return $this->redirectToRoute('contabilidad_config_cuenta');
     }
 
@@ -146,7 +123,7 @@ class CuentaController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
-            $arr_subcuentas = $em->getRepository(Subcuenta::class)->find($id);
+            $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy(['id_cuenta' => $id]);
             if (empty($arr_subcuentas)) {
                 $cuenta_er = $em->getRepository(Cuenta::class);
                 $cuenta_obj = $cuenta_er->find($id);

@@ -7,6 +7,12 @@ contabilidad:
     modulo_not_blank: Debe seleccionar el módulo !
     tipo_doc_not_blank: Debe seleccionar el tipo de documento !
     cuenta_not_blank: Debe seleccionar la cuenta !
+    cuenta_nro_unique: El Nro de cuenta ya se encuentra registrado
+    subcuenta_nro_unique: El Nro de subcuenta ya se encuentra registrado
+    cuenta_nro_not_blank: El Nro de cuenta esta vacio
     sub_cuenta_not_blank: Debe seleccionar la subcuenta !
     naturaleza_not_blank: Debe seleccionar la naturaleza !
     codigo_not_blank: El codigo no puede estar vacio !
+    centro_costo_unique: Centro de Costo ya se encuentra registrado
+    grupo_activo_unique: Ya se encuentra registrado un grupo con esa descripción
+    taza_cambio_unique: La tasa de cambio ya se encuentra registrada

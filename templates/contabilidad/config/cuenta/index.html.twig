@@ -55,7 +55,7 @@
                         <div style="width: max-content;">
                             <a type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
                                data-placement="bottom" title="Ver subcuentas"
-                               href="{{ path('contabilidad_config_subcuenta',{id:item.id}) }}">
+                               href="{{ path('contabilidad_config_subcuenta',{id_cuenta:item.id}) }}">
                                 <i class="fa fa-eye"></i>
                             </a>
                             <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
@@ -121,17 +121,17 @@
             $('#cuenta_nro_cuenta').val(nro_cuenta)
             $('#cuenta_descripcion').val(descripcion)
             if (produccion == 'SI')
-                $('#produccion_check').prop('checked', true)
+                $('#cuenta_produccion').prop('checked', true)
             else
-                $('#produccion_check').prop('checked', false)
+                $('#cuenta_produccion').prop('checked', false)
             if (patrimonio == 'SI')
-                $('#patrimonio_check').prop('checked', true)
+                $('#cuenta_patrimonio').prop('checked', true)
             else
-                $('#patrimonio_check').prop('checked', false)
+                $('#cuenta_patrimonio').prop('checked', false)
             if (elemento_gasto == 'SI')
-                $('#elemento_gasto_check').prop('checked', true)
+                $('#cuenta_elemento_gasto').prop('checked', true)
             else
-                $('#elemento_gasto_check').prop('checked', false)
+                $('#cuenta_elemento_gasto').prop('checked', false)
 
             if (deudora == 'Deudora') $('#naturaleza_cuenta').val(1)
             else $('#naturaleza_cuenta').val(0)
@@ -175,8 +175,9 @@
             })
             $('#modal__btn__actualizar').on('click', function () {
                 const formulario = $('#form_modal_target')
+                const id_cuenta = $('#id_cuenta').val()
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/cuenta/upd`)
+                formulario.attr('action', `/contabilidad/config/cuenta/upd/` + id_cuenta)
                 formulario.submit()
             })
 
@@ -188,13 +189,13 @@
             /**
              * Eventos para validar que no seleccione los dos tipos de cuentas(patrimonio y producción) a la vez
              */
-            $('#patrimonio_check').on('change', function () {
-                if ($('#patrimonio_check').is(':checked'))
-                    $('#produccion_check').prop('checked', false)
+            $('#cuenta_patrimonio').on('change', function () {
+                if ($('#cuenta_patrimonio').is(':checked'))
+                    $('#cuenta_produccion').prop('checked', false)
             })
-            $('#produccion_check').on('change', function () {
-                if ($('#produccion_check').is(':checked'))
-                    $('#patrimonio_check').prop('checked', false)
+            $('#cuenta_produccion').on('change', function () {
+                if ($('#cuenta_produccion').is(':checked'))
+                    $('#cuenta_patrimonio').prop('checked', false)
             })
 
         })

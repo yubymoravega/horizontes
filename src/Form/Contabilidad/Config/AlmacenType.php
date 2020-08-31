@@ -2,22 +2,21 @@
 
 namespace App\Form\Contabilidad\Config;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Unidad;
-use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UnidadType extends AbstractType
+class AlmacenType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombre')
-            ->add('id_padre', EntityType::class, [
+            ->add('descripcion')
+            ->add('id_unidad', EntityType::class, [
                 'class' => Unidad::class,
                 'choice_label' => 'nombre',
                 'query_builder' => function (EntityRepository $er) {
@@ -31,7 +30,7 @@ class UnidadType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Unidad::class,
+            'data_class' => Almacen::class,
         ]);
     }
 }

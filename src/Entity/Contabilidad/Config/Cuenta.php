@@ -4,9 +4,12 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\CuentaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CuentaRepository::class)
+ * @UniqueEntity(fields={"nro_cuenta"}, message="contabilidad.config.cuenta_nro_unique")
  */
 class Cuenta
 {
@@ -24,11 +27,13 @@ class Cuenta
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.cuenta_nro_not_blank")
      */
     private $descripcion;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $deudora;
 

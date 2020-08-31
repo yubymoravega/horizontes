@@ -3,27 +3,26 @@
 namespace App\Controller\Contabilidad\Config;
 
 use App\CoreContabilidad\AuxFunctions;
-use App\Entity\Contabilidad\Config\Cuenta;
-use App\Entity\Contabilidad\Config\Moneda;
-use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TasaCambio;
-use App\Form\Contabilidad\Config\CuentaType;
 use App\Form\Contabilidad\Config\TasaCambioType;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class TasaCambioController
+ * @package App\Controller\Contabilidad\Config
+ * @Route("/contabilidad/config/tasa-cambio")
+ */
 class TasaCambioController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/config/tasa-cambio", name="contabilidad_config_tasa_cambio")
+     * @Route("/", name="contabilidad_config_tasa_cambio", methods={"GET"})
      */
-    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function index(EntityManagerInterface $em)
     {
         $form = $this->createForm(TasaCambioType::class);
 
@@ -51,107 +50,79 @@ class TasaCambioController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/tasa-cambio-add", name="contabilidad_config_tasa-cambio_add")
+     * @Route("/add", name="contabilidad_config_tasa-cambio_add", methods={"POST"})
      */
     public function addTasaCambio(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $entity_repository = $em->getRepository(TasaCambio::class);
-        $params = array(
-            'id_moneda_origen' => $request->get('id_moneda_origen'),
-            'id_moneda_destino' => $request->get('id_moneda_destino'),
-            'mes' => $request->get('mes'),
-            'anno' => $request->get('anno'),
-            'activo' => true
-        );
-        if (!AuxFunctions::isDuplicate($entity_repository, $params, 'add')) {
-            /**@var $obj_tazaCambio TasaCambio** */
-            $obj_tazaCambio = new TasaCambio();
-            $obj_tazaCambio
-                ->setAnno(intval($request->get('anno')))
-                ->setMes($request->get('mes'))
-                ->setValor(floatval($request->get('valor')))
-                ->setIdMonedaOrigen($em->getRepository(Moneda::class)->find($request->get('id_moneda_origen')))
-                ->setIdMonedaDestino($em->getRepository(Moneda::class)->find($request->get('id_moneda_destino')))
-                ->setActivo(true);
+        $form = $this->createForm(TasaCambioType::class);
+        $form->handleRequest($request);
+        /** @var TasaCambio $tasacambio */
+        $tasacambio = $form->getData();
+        $errors = $validator->validate($tasacambio);
+        if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $em->persist($obj_tazaCambio);
+                $tasacambio->setActivo(true);
+                $em->persist($tasacambio);
                 $em->flush();
+                $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Tasa de cambio adicionada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "La tasa de cambio ya se encuentra registrada");
-        return new JsonResponse(['success' => false]);
+
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_config_tasa_cambio');
     }
 
     /**
-     * @Route("/contabilidad/config/tasa-cambio-upd", name="contabilidad_config_tasa-cambio_upd")
+     * @Route("/upd/{id}", name="contabilidad_config_tasa-cambio_upd", methods={"POST"})
      */
-    public function updTasaCambio(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function updTasaCambio(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, TasaCambio $cambio)
     {
-        $entity_repository = $em->getRepository(TasaCambio::class);
-        $params = array(
-            'id_moneda_origen' => $request->get('id_moneda_origen'),
-            'id_moneda_destino' => $request->get('id_moneda_destino'),
-            'mes' => $request->get('mes'),
-            'anno' => $request->get('anno'),
-            'activo' => true
-        );
-        if (!AuxFunctions::isDuplicate($entity_repository, $params, 'upd', $request->get('id_tasa_cambio'))) {
-            /**@var $obj_tasa_cambio TasaCambio** */
-            $obj_tasa_cambio = $em->getRepository(TasaCambio::class)->find($request->get('id_tasa_cambio'));
-            if (!$obj_tasa_cambio) {
-                $this->addFlash('error', "La tasa de cambio solicitada no se encuentra en la base de datos");
-                return new JsonResponse(['success' => true]);
-            }
-            $obj_tasa_cambio
-                ->setAnno(intval($request->get('anno')))
-                ->setMes($request->get('mes'))
-                ->setValor(floatval($request->get('valor')))
-                ->setIdMonedaOrigen($em->getRepository(Moneda::class)->find($request->get('id_moneda_origen')))
-                ->setIdMonedaDestino($em->getRepository(Moneda::class)->find($request->get('id_moneda_destino')))
-                ->setActivo(true);
+        $form = $this->createForm(TasaCambioType::class, $cambio);
+        $form->handleRequest($request);
+        $errors = $validator->validate($cambio);
+        if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $em->persist($obj_tasa_cambio);
+                $em->persist($cambio);
                 $em->flush();
+                $this->addFlash('success', "La tasa de cambio actualizada satisfactoriamente");
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Tasa de cambio actualizada satisfactoriamente");
-            return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "La tasa de cambio ya se encuentra registrada");
-        return new JsonResponse(['success' => false]);
+
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_config_tasa_cambio');
     }
 
     /**
-     * @Route("/contabilidad/config/tasa-cambio-delete/{id}", name="contabilidad_config_tasa_cambio_delete")
+     * @Route("/delete/{id}", name="contabilidad_config_tasa_cambio_delete", methods={"DELETE"})
      */
-    public function Delete($id)
+    public function Delete(Request $request, $id)
     {
-        $em = $this->getDoctrine()->getManager();
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
 
-        $tasa_cambio_er = $em->getRepository(TasaCambio::class);
-        $tasa_cambio_obj = $tasa_cambio_er->find($id);
-        $msg = 'No se pudo eliminar la tasa de cambio seleccionada';
-        $success = 'error';
-        if ($tasa_cambio_obj) {
-            /**@var $tasa_cambio_obj TasaCambio** */
-            $tasa_cambio_obj->setActivo(false);
-            try {
-                $em->persist($tasa_cambio_obj);
-                $em->flush();
-                $success = 'success';
-                $msg = 'Tasa de cambio eliminada satisfactoriamente';
+            $em = $this->getDoctrine()->getManager();
+            $tasa_cambio_obj = $em->getRepository(TasaCambio::class)->find($id);
+            $msg = 'No se pudo eliminar la tasa de cambio seleccionada';
+            $success = 'error';
+            if ($tasa_cambio_obj) {
+                /**@var $tasa_cambio_obj TasaCambio** */
+                $tasa_cambio_obj->setActivo(false);
+                try {
+                    $em->persist($tasa_cambio_obj);
+                    $em->flush();
+                    $success = 'success';
+                    $msg = 'Tasa de cambio eliminada satisfactoriamente';
 
-            } catch
-            (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                } catch
+                (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                }
             }
+            $this->addFlash($success, $msg);
         }
-        $this->addFlash($success, $msg);
         return $this->redirectToRoute('contabilidad_config_tasa_cambio');
     }
 }

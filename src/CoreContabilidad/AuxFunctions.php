@@ -4,8 +4,12 @@
 namespace App\CoreContabilidad;
 
 
+use App\Entity\Contabilidad\Config\Subcuenta;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Environment;
 
@@ -121,5 +125,27 @@ class AuxFunctions
     public static function generateRandomPassword($length = 6)
     {
         return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
+    }
+
+    /**
+     * Creacion dinamica del campo id_subcuenta para el formulario dependiendo de una cuenta seleccionada
+     * @param FormInterface $form
+     * @param string $cuenta
+     */
+
+    public static function formModifierSubcuenta(FormInterface $form, $cuenta = '')
+    {
+        $form->add('id_subcuenta', EntityType::class, [
+            'class' => Subcuenta::class,
+            'label' => 'Subcuenta',
+            'choice_label' => 'descripcion',
+            'query_builder' => function (EntityRepository $er) use ($cuenta) {
+                return $er->createQueryBuilder('u')
+                    ->where('u.activo = true')
+                    ->andWhere('u.id_cuenta = :id_cuenta')
+                    ->setParameter('id_cuenta', $cuenta)
+                    ->orderBy('u.descripcion', 'ASC');
+            }
+        ]);
     }
 }

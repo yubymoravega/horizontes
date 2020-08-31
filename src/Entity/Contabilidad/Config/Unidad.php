@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UnidadRepository::class)
- * @UniqueEntity("nombre", message="contabilidad.config.almacen.descripcion_unique")
+ * @UniqueEntity("nombre", message="contabilidad.config.descripcion_unique")
  */
 class Unidad
 {
