@@ -16,16 +16,23 @@ class DocumentoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('cantidad_mercancia',TextType::class, [
-                'required' => true,
-                'label'=>'Cantidad',
+            ->add('cantidad_mercancia', TextType::class, [
+                'required' => false,
+                'label' => 'Cantidad',
                 'attr' => ['class' => 'w-100']
             ])
-            ->add('importe_mercancia',TextType::class, [
-                'required' => true,
-                'label'=>'Importe',
+            ->add('importe_mercancia', TextType::class, [
+                'required' => false,
+                'label' => 'Importe',
                 'attr' => ['class' => 'w-100']
             ])
+//            ->add('importe_total', TextType::class, [
+//                'required' => true,
+////                'hidden' => true,
+////                'disabled'=>true,
+//                'label' => 'Importe Total',
+//                'attr' => ['class' => 'w-100']
+//            ])
 //            ->add('nro_concecutivo',TextType::class, [
 //                'required' => true,
 //                'attr' => ['class' => 'w-100'],
@@ -43,7 +50,7 @@ class DocumentoType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Documento::class,
+            //  'data_class' => Documento::class,
         ]);
     }
 }

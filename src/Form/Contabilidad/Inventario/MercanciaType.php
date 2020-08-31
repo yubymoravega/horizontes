@@ -17,18 +17,20 @@ class MercanciaType extends AbstractType
     {
         $builder
             ->add('codigo', TextType::class, [
-                'required' => true,
+                'required' => false,
                 'attr' => ['class' => 'w-100'],
                 'label'=>'Código',
             ])
             ->add('descripcion', TextType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Descripción',
+                'required' => false,
 
             ])
             ->add('precio', TextType::class, [
                 'attr' => ['class' => 'w-100'],
-                'disabled' => true
+                'disabled' => true,
+                'required' => false,
             ])
             ->add('existencia', TextType::class, [
                 'required' => false,
@@ -44,6 +46,7 @@ class MercanciaType extends AbstractType
             ])
             ->add('id_unidad_medida', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
+                'required' => false,
                 'label'=>'UM',
                 'class' => UnidadMedida::class,
                 'choice_label' => 'nombre',
@@ -58,7 +61,7 @@ class MercanciaType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Mercancia::class,
+            //'data_class' => Mercancia::class,
         ]);
     }
 }

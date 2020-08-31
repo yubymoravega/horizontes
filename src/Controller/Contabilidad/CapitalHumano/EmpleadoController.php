@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Environment;
 
 class EmpleadoController extends AbstractController
@@ -49,10 +50,12 @@ class EmpleadoController extends AbstractController
         }
         $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
 //
+        $roles = $this->getRoles();
         return $this->render($callback, [
             'controller_name' => 'EmpleadoController',
             'empleados' => $row,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'roles' => $roles
         ]);
     }
 
@@ -61,7 +64,6 @@ class EmpleadoController extends AbstractController
      */
     public function addEmplpeado(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
     {
-//        dd('dsdsds');
         $entity_repository = $em->getRepository(Empleado::class);
         $params = array(
             'correo' => $request->get('correo'),
@@ -221,4 +223,26 @@ class EmpleadoController extends AbstractController
         return $this->redirectToRoute('contabilidad_capital_humano_empleado');
     }
 
+    public function getRoles()
+    {
+        $str = "";
+        $config = Yaml::parse(file_get_contents('../config/packages/security.yaml'));
+        $access_control = $config['security']['access_control'];
+        foreach ($access_control as $ac) {
+            foreach ($ac['roles'] as $item) {
+                $str = $str . $item . ",";
+            }
+        }
+        $str = substr($str, 0, -1);
+        $array = explode(",", $str);
+        $array = array_unique($array);
+
+        $roles = [];
+        foreach ($array as $item){
+            $roles[] = array(
+                'rol'=>$item
+            );
+        }
+        return $roles;
+    }
 }

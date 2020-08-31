@@ -21,34 +21,9 @@ class Documento
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $codigo_mercancia;
-
-    /**
      * @ORM\Column(type="float")
      */
-    private $cantidad_mercancia;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $importe_mercancia;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $precio_total;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $descripcion_mercancia;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $is_producto;
+    private $importe_total;
 
     /**
      * @ORM\Column(type="date")
@@ -68,12 +43,6 @@ class Documento
     private $id_unidad;
 
     /**
-     * @ORM\ManyToOne(targetEntity=UnidadMedida::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $id_unidad_medida;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $activo;
@@ -83,74 +52,14 @@ class Documento
         return $this->id;
     }
 
-    public function getCodigoMercancia(): ?string
+    public function getImporteTotal(): ?float
     {
-        return $this->codigo_mercancia;
+        return $this->importe_total;
     }
 
-    public function setCodigoMercancia(string $codigo_mercancia): self
+    public function setImporteTotal(float $importe_total): self
     {
-        $this->codigo_mercancia = $codigo_mercancia;
-
-        return $this;
-    }
-
-    public function getCantidadMercancia(): ?float
-    {
-        return $this->cantidad_mercancia;
-    }
-
-    public function setCantidadMercancia(float $cantidad_mercancia): self
-    {
-        $this->cantidad_mercancia = $cantidad_mercancia;
-
-        return $this;
-    }
-
-    public function getImporteMercancia(): ?float
-    {
-        return $this->importe_mercancia;
-    }
-
-    public function setImporteMercancia(float $importe_mercancia): self
-    {
-        $this->importe_mercancia = $importe_mercancia;
-
-        return $this;
-    }
-
-    public function getPrecioTotal(): ?float
-    {
-        return $this->precio_total;
-    }
-
-    public function setPrecioTotal(float $precio_total): self
-    {
-        $this->precio_total = $precio_total;
-
-        return $this;
-    }
-
-    public function getDescripcionMercancia(): ?string
-    {
-        return $this->descripcion_mercancia;
-    }
-
-    public function setDescripcionMercancia(string $descripcion_mercancia): self
-    {
-        $this->descripcion_mercancia = $descripcion_mercancia;
-
-        return $this;
-    }
-
-    public function getIsProducto(): ?bool
-    {
-        return $this->is_producto;
-    }
-
-    public function setIsProducto(bool $is_producto): self
-    {
-        $this->is_producto = $is_producto;
+        $this->importe_total = $importe_total;
 
         return $this;
     }
@@ -187,18 +96,6 @@ class Documento
     public function setIdUnidad(?Unidad $id_unidad): self
     {
         $this->id_unidad = $id_unidad;
-
-        return $this;
-    }
-
-    public function getIdUnidadMedida(): ?UnidadMedida
-    {
-        return $this->id_unidad_medida;
-    }
-
-    public function setIdUnidadMedida(?UnidadMedida $id_unidad_medida): self
-    {
-        $this->id_unidad_medida = $id_unidad_medida;
 
         return $this;
     }

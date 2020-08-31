@@ -37,7 +37,7 @@ class Mercancia
     /**
      * @ORM\Column(type="float")
      */
-    private $precio;
+    private $importe;
 
     /**
      * @ORM\ManyToOne(targetEntity=Almacen::class)
@@ -97,14 +97,14 @@ class Mercancia
         return $this;
     }
 
-    public function getPrecio(): ?float
+    public function getImporte(): ?float
     {
-        return $this->precio;
+        return $this->importe;
     }
 
-    public function setPrecio(float $precio): self
+    public function setImporte(float $importe): self
     {
-        $this->precio = $precio;
+        $this->importe = $importe;
 
         return $this;
     }

@@ -13,6 +13,7 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\EntradaMercancia;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\Proveedor;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -82,17 +84,12 @@ class InformeRecepcionController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
+            dd($form,$request);
 //            if ($form->isValid()) {
             $informe_recepcion = $request->get('informe_recepcion');
-            /**  datos de MercanciaType **/
-            $codigo_mercancia = $informe_recepcion['mercancia']['codigo'];
-            $unidad_medida = $informe_recepcion['mercancia']['id_unidad_medida'];
-            $descripcion = $informe_recepcion['mercancia']['descripcion'];
 
             /**  datos de DocumentoType **/
-            $cantidad_mercancia = $informe_recepcion['documento']['cantidad_mercancia'];
-            $importe_mercancia = $informe_recepcion['documento']['importe_mercancia'];
-//            $fecha = $informe_recepcion['documento']['fecha'];
+            $importe_total = $informe_recepcion['documento']['importe_total'];
 
             /**  datos de InformeRecepcionType **/
             $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
@@ -157,16 +154,10 @@ class InformeRecepcionController extends AbstractController
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                    ->setCantidadMercancia($cantidad_mercancia)
-                    ->setCodigoMercancia($codigo_mercancia)
-                    ->setDescripcionMercancia($descripcion)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
-                    ->setImporteMercancia($importe_mercancia)
-                    ->setPrecioTotal(floatval($importe_mercancia * $cantidad_mercancia))
-                    ->setIsProducto(false);
+                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+                    ->setImporteTotal($importe_total);
                 $em->persist($documento);
 
                 //3.1-adicionar en informe de recepcion
@@ -195,7 +186,7 @@ class InformeRecepcionController extends AbstractController
                     ->setNroSubcuenta($proveedor_obj->getCodigo())
                     ->setNroCuenta($cuenta_acreedora)
                     ->setLiquidado(false)
-                    ->setResto(floatval($importe_mercancia))
+                    ->setResto(floatval($importe_total))
                     ->setValorPagado(0)
                     ->setCodigoFactura($codigo_factura)
                     ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
@@ -207,37 +198,46 @@ class InformeRecepcionController extends AbstractController
                  * OJO todo esto se hara si la mercancia a adicionar ya se encuentra registrada y su existencia es >0
                  * de lo contrario se pondra en existencia la cantidad a adicionar y el precio sera el precio a adicionar)*
                  */
+
+                    /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
+                $arr_mercancias = [];
                 $mercancia_er = $em->getRepository(Mercancia::class);
-                $obj_mercancia = $mercancia_er->findOneBy(array(
-                    'codigo' => $codigo_mercancia,
-                    'id_amlacen' => $id_almacen,
-                    'activo' => true
-                ));
-                if (!$obj_mercancia) {
-                    $new_mercancia = new Mercancia();
-                    $new_mercancia
-                        ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
-                        ->setActivo(true)
-                        ->setDescripcion($descripcion)
-                        ->setExistencia($cantidad_mercancia)
-                        ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
-                        ->setCodigo($codigo_mercancia)
-                        ->setPrecio(round(floatval($importe_mercancia / $cantidad_mercancia),3));
-                    $em->persist($new_mercancia);
-                } else {
-                    /**@var $obj_mercancia Mercancia* */
-                    if ($obj_mercancia->getExistencia() == 0) {
-                        $obj_mercancia
+                foreach ($arr_mercancias as $mercancia){
+                    //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
+                    $obj_mercancia = $mercancia_er->findOneBy(array(
+                        'codigo' => $codigo_mercancia,
+                        'id_amlacen' => $id_almacen,
+                        'activo' => true
+                    ));
+                    if (!$obj_mercancia) {
+                        $new_mercancia = new Mercancia();
+                        $new_mercancia
+                            ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
+                            ->setActivo(true)
+                            ->setDescripcion($descripcion)
                             ->setExistencia($cantidad_mercancia)
-                            ->setPrecio(round(floatval($importe_mercancia / $cantidad_mercancia), 2));
+                            ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
+                            ->setCodigo($codigo_mercancia)
+                            ->setImporte(floatval($importe_mercancia));
+                        $em->persist($new_mercancia);
                     } else {
-                        $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                        $importe_actualizado = floatval($obj_mercancia->getPrecio() * $obj_mercancia->getExistencia()) + floatval($importe_mercancia);
-                        $obj_mercancia
-                            ->setExistencia($existencia_actualizada)
-                            ->setPrecio(floatval($importe_actualizado / $existencia_actualizada));
+                        /**@var $obj_mercancia Mercancia* */
+                        if ($obj_mercancia->getExistencia() == 0) {
+                            $obj_mercancia
+                                ->setExistencia($cantidad_mercancia)
+                                ->setImporte(0);
+                        } else {
+                            $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                            $importe_actualizado = floatval($obj_mercancia->getImporte() - floatval($importe_mercancia));
+                            $obj_mercancia
+                                ->setExistencia($existencia_actualizada)
+                                ->setImporte($importe_actualizado);
+                        }
+                        $em->persist($obj_mercancia);
                     }
-                    $em->persist($obj_mercancia);
+
+                    //------ADICIONANDO EN LA TABLA DE ENTRADAMERCANCIA
+
                 }
 
                 try {
@@ -427,10 +427,10 @@ class InformeRecepcionController extends AbstractController
                     /**@var $obj_mercancia Mercancia**/
                     if($obj_mercancia->getExistencia() >= $obj_documento->getCantidadMercancia()){
                         $nueva_existencia = floatval($obj_mercancia->getExistencia())-floatval($obj_documento->getCantidadMercancia());
-                        //esto tengo que verlo con tio(seria solo restar el importe ya que tebajo con importes)
+                        //esto tengo que verlo con tio(seria solo restar el importe ya que tebajo con importes)---ojo
                         $nuevo_precio =  (floatval($obj_mercancia->getPrecio()*$obj_mercancia->getExistencia())-floatval($obj_documento->getImporteMercancia()))/$nueva_existencia;
                         $obj_mercancia->setExistencia($nueva_existencia);
-                        $obj_mercancia->setPrecio($nuevo_precio);
+                        $obj_mercancia->setImporte($nuevo_precio);
                         if($nueva_existencia == 0){
                             $obj_mercancia->setActivo(false);
                         }
