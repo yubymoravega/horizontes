@@ -44,8 +44,7 @@ class EmpleadoController extends AbstractController
                 'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                 'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',
                 'direccion' => $item->getDireccionParticular(),
-//                'fecha_alta' => $item->getFechaAlta()
-                'fecha_alta' => '12-12-2020'
+                'fecha_alta' => $item->getFechaAlta()->format('d-m-Y')
             );
         }
         $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
@@ -75,7 +74,7 @@ class EmpleadoController extends AbstractController
                 ->setNombre($request->get('nombre'))
                 ->setCorreo($request->get('correo'))
                 ->setTelefono($request->get('telefono'))
-//                ->setFechaAlta($request->get('fecha_alta'))
+                ->setFechaAlta(\DateTime::createFromFormat('Y-m-d', $request->get('fecha_alta')))
                 ->setSalarioXHora(floatval($request->get('salario_x_hora')))
                 ->setIdUnidad($em->getRepository(Unidad::class)->find($request->get('id_unidad')))
                 ->setIdCargo($em->getRepository(Cargo::class)->find($request->get('id_cargo')))
@@ -102,8 +101,8 @@ class EmpleadoController extends AbstractController
                     $obj_usuario->setPassword($passEncoder->encodePassword($obj_usuario, $password));
                     $obj_empleado->setIdUsuario($obj_usuario);
 
-                    $msg = "Felicitaciones es usted miembro de nuestro equipo de trabajo, use la siguiente dirección para acceder al sistema www.google.com, su usuario es: ".$request->get('correo')." y su contraseña: ".$password;
-                    AuxFunctions::sendEmail('Credenciales del sistema',$request->get('correo'),$request->get('nombre'),$msg);
+                    $msg = "Felicitaciones es usted miembro de nuestro equipo de trabajo, use la siguiente dirección para acceder al sistema www.google.com, su usuario es: " . $request->get('correo') . " y su contraseña: " . $password;
+                    AuxFunctions::sendEmail('Credenciales del sistema', $request->get('correo'), $request->get('nombre'), $msg);
                 }
                 $em->persist($obj_empleado);
                 $em->flush();
@@ -120,7 +119,7 @@ class EmpleadoController extends AbstractController
     /**
      * @Route("/contabilidad/capital-humano/empleado-upd", name="contabilidad_capital_humano_empleado_upd")
      */
-    public function updEmpleado(EntityManagerInterface $em, Request $request, ValidatorInterface $validator,UserPasswordEncoderInterface $passEncoder)
+    public function updEmpleado(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
     {
         $entity_repository = $em->getRepository(Empleado::class);
         $params = array(
@@ -139,7 +138,7 @@ class EmpleadoController extends AbstractController
                 ->setNombre($request->get('nombre'))
                 ->setCorreo($request->get('correo'))
                 ->setTelefono($request->get('telefono'))
-//                ->setFechaAlta($request->get('fecha_alta'))
+                ->setFechaAlta(\DateTime::createFromFormat('Y-m-d', $request->get('fecha_alta')))
                 ->setSalarioXHora(floatval($request->get('salario_x_hora')))
                 ->setIdUnidad($em->getRepository(Unidad::class)->find($request->get('id_unidad')))
                 ->setIdCargo($em->getRepository(Cargo::class)->find($request->get('id_cargo')))

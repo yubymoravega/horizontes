@@ -42,12 +42,73 @@ class InformeRecepcion
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $nro_cuenta_areedora;
+    private $nro_cuenta_acreedora;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $nro_subcuenta_acreedora;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nro_concecutivo;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $anno;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $codigo_factura;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $fecha_factura;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activo;
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(bool $activo): self
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getNroConcecutivo(): ?string
+    {
+        return $this->nro_concecutivo;
+    }
+
+    public function setNroConcecutivo(string $nro_concecutivo): self
+    {
+        $this->nro_concecutivo = $nro_concecutivo;
+
+        return $this;
+    }
+
+    public function getAnno(): ?int
+    {
+        return $this->anno;
+    }
+
+    public function setAnno(string $anno): self
+    {
+        $this->anno = $anno;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -102,14 +163,14 @@ class InformeRecepcion
         return $this;
     }
 
-    public function getNroCuentaAreedora(): ?string
+    public function getNroCuentaAcreedora(): ?string
     {
-        return $this->nro_cuenta_areedora;
+        return $this->nro_cuenta_acreedora;
     }
 
-    public function setNroCuentaAreedora(string $nro_cuenta_areedora): self
+    public function setNroCuentaAcreedora(string $nro_cuenta_acreedora): self
     {
-        $this->nro_cuenta_areedora = $nro_cuenta_areedora;
+        $this->nro_cuenta_acreedora = $nro_cuenta_acreedora;
 
         return $this;
     }
@@ -122,6 +183,30 @@ class InformeRecepcion
     public function setNroSubcuentaAcreedora(string $nro_subcuenta_acreedora): self
     {
         $this->nro_subcuenta_acreedora = $nro_subcuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getFechaFactura(): ?\DateTimeInterface
+    {
+        return $this->fecha_factura;
+    }
+
+    public function setFechaFactura(\DateTimeInterface $fecha): self
+    {
+        $this->fecha_factura = $fecha;
+
+        return $this;
+    }
+
+    public function getCodigoFactura(): ?string
+    {
+        return $this->codigo_factura;
+    }
+
+    public function setCodigoFactura(string $codigo): self
+    {
+        $this->codigo_factura = $codigo;
 
         return $this;
     }

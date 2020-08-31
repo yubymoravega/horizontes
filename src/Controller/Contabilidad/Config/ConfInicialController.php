@@ -4,6 +4,7 @@ namespace App\Controller\Contabilidad\Config;
 
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Modulo;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
@@ -56,6 +57,7 @@ class ConfInicialController extends AbstractController
                 $configuracion_inicial_id_subcuenta = $request->get('configuracion_inicial_id_subcuenta');
                 $configuracion_inicial_id_cuenta_contrapartida = $request->get('configuracion_inicial_id_cuenta_contrapartida');
                 $configuracion_inicial_id_subcuenta_contrapartida = $request->get('configuracion_inicial_id_subcuenta_contrapartida');
+                $configuracion_inicial_id_elemento_gasto = $request->get('configuracion_inicial_id_elemento_gasto');
                 $deudora = $request->get('naturaleza') == '1' ? true : false;
 
                 if (!$this->isDuplicate($em, $id_modulo, $id_tipo_documento, 'add')) {
@@ -68,6 +70,7 @@ class ConfInicialController extends AbstractController
                         ->setStrSubcuentas($configuracion_inicial_id_subcuenta)
                         ->setStrCuentasContrapartida($configuracion_inicial_id_cuenta_contrapartida)
                         ->setStrSubcuentasContrapartida($configuracion_inicial_id_subcuenta_contrapartida)
+                        ->setStrElementoGasto($configuracion_inicial_id_elemento_gasto)
                         ->setActivo(true);
                     try {
                         $em->persist($obj);
@@ -76,10 +79,10 @@ class ConfInicialController extends AbstractController
                         return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
                     }
                     if (isset($arr_result['aplicar'])) {
-                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aplicar).');
+                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente.');
                         return $this->redirectToRoute('contabilidad_config_conf_inicial_form');
                     } else {
-                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente(Aceptar).');
+                        $this->addFlash('success', 'Configuración adicionada satisfactoriamente.');
                         return $this->redirectToRoute('contabilidad_config_conf_inicial');
                     }
                 } else {
@@ -210,6 +213,43 @@ class ConfInicialController extends AbstractController
             }
         }
         return new JsonResponse(['subcuentas' => $row]);
+    }
+
+    /**
+     * @Route("/form-elemento-gasto/{idcuentas}", name="contabilidad_config_conf_inicial_form_getelementogasto")
+     */
+    public function getElementoGasto($idcuentas)
+    {
+        $cuentas_str = explode(" ", $idcuentas);
+        $em = $this->getDoctrine()->getManager();
+        $elemento_gasto_er = $em->getRepository(ElementoGasto::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $row = [];
+        foreach ($cuentas_str as $nro_cuenta) {
+            if (strlen($nro_cuenta) > 2) {
+                $idcuenta = $cuenta_er->findOneBy(array(
+                    'nro_cuenta' => $nro_cuenta,
+                    'activo' => true
+                ));
+                if ($idcuenta) {
+                    $arr_elemento_gasto = $elemento_gasto_er->findBy(array(
+                        'id_cuenta' => $idcuenta,
+                        'activo' => true
+                    ));
+                    if (!empty($arr_elemento_gasto)) {
+                        foreach ($arr_elemento_gasto as $item) {
+                            /**@var $item ElementoGasto***/
+                            $row[] = array(
+                                'id' => $item->getId(),
+                                'codigo' => $item->getCodigo(),
+                                'descripcion' => $item->getDescripcion()
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        return new JsonResponse(['elemento_gasto' => $row]);
     }
 
     /**

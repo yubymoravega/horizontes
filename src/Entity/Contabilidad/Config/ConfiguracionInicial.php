@@ -52,6 +52,11 @@ class ConfiguracionInicial
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $str_elemento_gasto;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $str_cuentas_contrapartida;
 
     /**
@@ -157,6 +162,18 @@ class ConfiguracionInicial
     public function setStrSubcuentasContrapartida(?string $str_subcuentas_contrapartida): self
     {
         $this->str_subcuentas_contrapartida = $str_subcuentas_contrapartida;
+
+        return $this;
+    }
+
+    public function getStrElementoGasto(): ?string
+    {
+        return $this->str_elemento_gasto;
+    }
+
+    public function setStrElementoGasto(?string $str_elemento_gasto): self
+    {
+        $this->str_elemento_gasto = $str_elemento_gasto;
 
         return $this;
     }

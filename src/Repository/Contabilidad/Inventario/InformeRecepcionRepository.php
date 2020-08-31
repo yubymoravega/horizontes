@@ -2,6 +2,7 @@
 
 namespace App\Repository\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,22 +20,26 @@ class InformeRecepcionRepository extends ServiceEntityRepository
         parent::__construct($registry, InformeRecepcion::class);
     }
 
-    // /**
-    //  * @return InformeRecepcion[] Returns an array of InformeRecepcion objects
-    //  */
-    /*
-    public function findByExampleField($value)
+     /**
+      * @return InformeRecepcion[] Returns an array of InformeRecepcion objects
+      */
+
+    public function findByIdUnidad($id_unidad,$year,$id_almacen)
     {
-        return $this->createQueryBuilder('i')
-            ->andWhere('i.exampleField = :val')
-            ->setParameter('val', $value)
+        $query = $this->createQueryBuilder('i')
+            ->join(Documento::class, 'd','d.id = i.id_documento')
+            ->andWhere('d.id_unidad = :val')
+            ->setParameter('val', $id_unidad)
+            ->andWhere('d.id_almacen = :val')
+            ->setParameter('val', $id_almacen)
+            ->andWhere('i.anno = :val')
+            ->setParameter('val', $year)
             ->orderBy('i.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
+            ->getQuery();
+        return $query->getResult()
         ;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?InformeRecepcion

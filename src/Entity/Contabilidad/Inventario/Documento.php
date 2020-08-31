@@ -51,11 +51,6 @@ class Documento
     private $is_producto;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $nro_concecutivo;
-
-    /**
      * @ORM\Column(type="date")
      */
     private $fecha;
@@ -156,18 +151,6 @@ class Documento
     public function setIsProducto(bool $is_producto): self
     {
         $this->is_producto = $is_producto;
-
-        return $this;
-    }
-
-    public function getNroConcecutivo(): ?string
-    {
-        return $this->nro_concecutivo;
-    }
-
-    public function setNroConcecutivo(string $nro_concecutivo): self
-    {
-        $this->nro_concecutivo = $nro_concecutivo;
 
         return $this;
     }

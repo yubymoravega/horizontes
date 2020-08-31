@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\General;
 
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Repository\Contabilidad\General\ObligacionPagoRepository;
@@ -60,6 +61,24 @@ class ObligacionPago
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad;
+
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $codigo_factura;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $fecha_factura;
+
 
     public function getId(): ?int
     {
@@ -158,6 +177,42 @@ class ObligacionPago
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getFechaFactura(): ?\DateTimeInterface
+    {
+        return $this->fecha_factura;
+    }
+
+    public function setFechaFactura(\DateTimeInterface $fecha): self
+    {
+        $this->fecha_factura = $fecha;
+
+        return $this;
+    }
+
+    public function getCodigoFactura(): ?string
+    {
+        return $this->codigo_factura;
+    }
+
+    public function setCodigoFactura(string $codigo): self
+    {
+        $this->codigo_factura = $codigo;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
 
         return $this;
     }
