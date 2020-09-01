@@ -6,6 +6,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\CuentaType;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,14 +24,13 @@ class CuentaController extends AbstractController
     /**
      * @Route("/", name="contabilidad_config_cuenta")
      */
-    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         $form = $this->createForm(CuentaType::class);
-
         $cuentas_arr = $em->getRepository(Cuenta::class)->findByActivo(true);
         $row = [];
         foreach ($cuentas_arr as $item) {
-            /**@var $item Cuenta** */
+
             $row [] = array(
                 'id' => $item->getId(),
                 'nro_cuenta' => $item->getNroCuenta(),
@@ -41,9 +41,15 @@ class CuentaController extends AbstractController
                 'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : 'NO',
             );
         }
+        $paginator = $pagination->paginate(
+            $row,
+            $request->query->getInt('page', 1), /*page number*/
+            15, /*limit per page*/
+            ['align' => 'center', 'style' => 'bottom',]
+        );
         return $this->render('contabilidad/config/cuenta/index.html.twig', [
             'controller_name' => 'CuentaController',
-            'cuentas' => $row,
+            'cuentas' => $paginator,
             'form' => $form->createView()
         ]);
     }

@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\SubcuentaType;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -25,7 +26,7 @@ class SubcuentaController extends AbstractController
     /**
      * @Route("/", name="contabilidad_config_subcuenta", methods={"GET"})
      */
-    public function index(EntityManagerInterface $em, $id_cuenta)
+    public function index(EntityManagerInterface $em, $id_cuenta,Request $request, PaginatorInterface $pagination)
     {
         $form = $this->createForm(SubcuentaType::class);
 
@@ -51,10 +52,16 @@ class SubcuentaController extends AbstractController
                 'deudora' => $item->getDeudora() == true ? 'Deudora' : 'Acreedora',
             );
         }
+        $paginator = $pagination->paginate(
+            $row,
+            $request->query->getInt('page', 1), /*page number*/
+            15, /*limit per page*/
+            ['align' => 'center', 'style' => 'bottom',]
+        );
 
         return $this->render('contabilidad/config/subcuenta/index.html.twig', [
             'controller_name' => 'SubcuentaController',
-            'subcuentas' => $row,
+            'subcuentas' => $paginator,
             'form' => $form->createView(),
             'subtitle' => $descripcion,
             'id_cuenta' => $id_cuenta

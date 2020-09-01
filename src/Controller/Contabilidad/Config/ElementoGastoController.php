@@ -6,6 +6,7 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Form\Contabilidad\Config\ElementoGastoType;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,7 @@ class ElementoGastoController extends AbstractController
     /**
      * @Route("/", name="contabilidad_config_elemento_gasto", methods={"GET"})
      */
-    public function index(EntityManagerInterface $em)
+    public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         $form = $this->createForm(ElementoGastoType::class);
 
@@ -39,9 +40,15 @@ class ElementoGastoController extends AbstractController
                 'cuenta' => $item->getIdCuenta()->getDescripcion()
             );
         }
+        $paginator = $pagination->paginate(
+            $row,
+            $request->query->getInt('page', 1), /*page number*/
+            15, /*limit per page*/
+            ['align' => 'center', 'style' => 'bottom',]
+        );
         return $this->render('contabilidad/config/elemento_gasto/index.html.twig', [
             'controller_name' => '| Elemento de Gasto',
-            'elemento_gasto' => $row,
+            'elemento_gasto' => $paginator,
             'form' => $form->createView()
         ]);
     }

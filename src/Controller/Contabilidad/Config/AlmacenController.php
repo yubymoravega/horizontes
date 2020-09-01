@@ -67,7 +67,7 @@ class AlmacenController extends AbstractController
     }
 
     /**
-     * @Route("/upd/{id}", name="contabilidad_config_almacen_edit", methods={"POST"})
+     * @Route("/upd/{id}", name="contabilidad_config_alamcen_upd", methods={"POST"})
      */
     public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Almacen $almacen)
     {

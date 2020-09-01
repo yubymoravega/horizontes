@@ -133,9 +133,8 @@
             $('#modal__btn__actualizar').on('click', function () {
                 const id_alamcen = $('#id_alamcen').val()
                 const formulario = $('#form_modal_target')
-                console.log(123456789)
-                formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/alamcen/upd/${id_alamcen}`)
+                formulario.attr('method', 'POST')
+                formulario.attr('action', '/contabilidad/config/almacen/upd/' + id_alamcen)
                 formulario.submit()
             })
 

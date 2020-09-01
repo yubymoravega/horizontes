@@ -37,6 +37,19 @@ class CuentaRepository extends ParanoidEntityRepository
             ;
     }
 
+    /**
+     * @return Cuenta[] Returns an array of Cuenta objects
+     */
+
+    public function getCuentasPagination()
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.activo = :val')
+            ->setParameter('val', true)
+            ->orderBy('c.id', 'ASC')
+            ->getQuery();
+    }
+
     // /**
     //  * @return Cuenta[] Returns an array of Cuenta objects
     //  */

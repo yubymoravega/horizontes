@@ -21,17 +21,11 @@
     - [x] Tipo Movimiento `u`
     - [x] Unidad
     - [x] Unidad Medida `u`
-- [ ] Refactorización el CODIGO   
-   - [ ] Ajustar controladores `php bin/console make:crud` del ejemplo TestCrd
-   , Las Rutas definir el método que esperan  como en `AlmacenCOntroller.php`
-   - [ ] `php bin/console debug:Route` -> Revisar los métodos q acceden a las controladoras ("GET","POST") "DELETE"
-   - [ ] validar formulario en el frontend o Jquery 
-   - [ ] hacer q al borrar el formulario se limpie la opción de 
-validar si esta requerido y al escribir también, ponerle un id al
 `input`
 - [ ]  paginación instalando el modulo de paginación
-- [ ]  `AuxFunctions::existWidthFK()` -> para validar las llaves foraneas antes de eliminar
+    - [ ] Cuenta, Subcuenta, Elemento gasto    
 # Pendiente
+- [ ]  `AuxFunctions::existWidthFK()` -> para validar las llaves foraneas antes de eliminar
 
 ### Investigar
 - Como poner la variable de Id almacen seleccionado en session o como sea para usarlo en el modulo de inventario.(OJO)
