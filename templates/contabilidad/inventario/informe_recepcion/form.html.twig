@@ -50,7 +50,7 @@
                 <h1 class="text-reporte"> Adicionar Informe de Recepción</h1>
             </div>
             <div class="card-body">
-                {{ form_start(formulario) }}
+                {{ form_start(formulario, {'attr':{'id':'informe_recepcion'}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.fecha_factura) }}
@@ -125,7 +125,7 @@
                         {{ form_widget(formulario.mercancia.existencia_incremento) }}
                     </div>
                     <div class="col-1 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" id="btnAplicarMercancia">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">
                             <i class="fa fa-plus"></i></button>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary'  type="submit">Aceptar</button>
+                        <button class='my-0 btn btn-secondary' type="submit">Aceptar</button>
                     </div>
                 </div>
                 {{ form_end(formulario) }}
@@ -166,11 +166,12 @@
         let mercancias_seleccionada = [];
         let mercancias = [];
         let cuentas_inventarios = [];
-        $('#informe_recepcion_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>Seleccione...</option>');
-        $('#informe_recepcion_proveedor').prepend('<option selected = "true" value = "0" disabled>Seleccione el proveedor</option>');
-        $('#informe_recepcion_nro_cuenta_inventario').prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
-        $('#informe_recepcion_nro_subcuenta_inventario').prepend('<option selected = "true" value = "0" disabled>Seleccione la subcuenta</option>');
-        $('#informe_recepcion_nro_cuenta_acreedora').prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
+        /* $('#informe_recepcion_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>Seleccione...</option>');
+         $('#informe_recepcion_proveedor').prepend('<option selected = "true" value = "0" disabled>Seleccione el proveedor</option>');
+         $('#informe_recepcion_nro_cuenta_inventario').prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');
+         $('#informe_recepcion_nro_subcuenta_inventario').prepend('<option selected = "true" value = "0" disabled>Seleccione la subcuenta</option>');
+         $('#informe_recepcion_nro_cuenta_acreedora').prepend('<option selected = "true" value = "0" disabled>Seleccione la cuenta</option>');*/
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         $(document).ready(function () {
             $.ajax({
                 url: '/contabilidad/inventario/informe-recepcion/getCuentas',
@@ -269,8 +270,28 @@
             })
         })
 
+        $("#informe_recepcion").submit(function (e) {
+            e.preventDefault();
+            console.log(e)
+
+            $.ajax({
+                url: '/contabilidad/inventario/informe-recepcion/form-add/',
+                method: 'POST',
+                data:{},
+                dataType: 'json',
+                success: function (result) {
+                },
+                error: function () {
+                }
+            })
+
+        });
+
+
+        let list_mercancia = []
+
         $('#btnAplicarMercancia').on('click', function () {
-            if($('#informe_recepcion_mercancia_id_unidad_medida').val()>0){
+            if ($('#informe_recepcion_mercancia_id_unidad_medida').val() > 0) {
                 let codigo = $('#informe_recepcion_mercancia_codigo').val()
                 let cant = $('#informe_recepcion_documento_cantidad_mercancia').val()
                 let importe = $('#informe_recepcion_documento_importe_mercancia').val()
@@ -278,17 +299,20 @@
                 let nueva_existencia = $('#informe_recepcion_mercancia_existencia_incremento').val()
                 let um = $('#informe_recepcion_mercancia_id_unidad_medida').val()
                 let descripcion = $('#informe_recepcion_mercancia_descripcion').val()
+
+                list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
+
                 $('#rows_mercancias').append('<tr>' +
                     '<td style="font-weight:400;"> ' + codigo + '</td>' +
                     '<td style="font-weight:400;"> ' + cant + '</td>' +
                     '<td style="font-weight:400;"> ' + importe + '</td>' +
                     '<td style="font-weight:400;"> ' + precio + '</td>' +
-                    '<td style="font-weight:400;"> ' + nueva_existencia + '</td>'+
-                    '<td style="font-weight:400;" hidden> ' + descripcion + '</td>'+
-                    '<td> <button type="button" class="btn btn-outline-danger btn-sm borrar" data-toggle="tooltip" data-placement="bottom" title="Eliminar"> '+
-                        '<i class="fa fa-minus-circle"></i>'+
-                    '</button>'+
-                    '</td>'+
+                    '<td style="font-weight:400;"> ' + nueva_existencia + '</td>' +
+                    '<td style="font-weight:400;" hidden> ' + descripcion + '</td>' +
+                    '<td> <button type="button" class="btn btn-outline-danger btn-sm borrar" data-toggle="tooltip" data-placement="bottom" title="Eliminar"> ' +
+                    '<i class="fa fa-minus-circle"></i>' +
+                    '</button>' +
+                    '</td>' +
                     '<td style="font-weight:400;" hidden> ' + um + '</td> </tr>'
                 );
                 $('#informe_recepcion_mercancia_codigo').val('')
@@ -298,12 +322,11 @@
                 $('#informe_recepcion_documento_importe_mercancia').val('')
                 $('#informe_recepcion_mercancia_precio').val('')
                 $('#informe_recepcion_mercancia_existencia_incremento').val('')
-            }
-            else{
+            } else {
                 alert('selecciona la unidad de medida')
             }
         })
-        $(document).on('click','.borrar',function (event) {
+        $(document).on('click', '.borrar', function (event) {
             event.preventDefault();
             $(this).closest('tr').remove()
         })

@@ -22,8 +22,8 @@
     - [x] Unidad
     - [x] Unidad Medida `u`
 `input`
-- [ ]  paginación instalando el modulo de paginación
-    - [ ] Cuenta, Subcuenta, Elemento gasto    
+- [x]  paginación instalando el modulo de paginación
+    - [x] Cuenta, Subcuenta, Elemento gasto    
 # Pendiente
 - [ ]  `AuxFunctions::existWidthFK()` -> para validar las llaves foraneas antes de eliminar
 
