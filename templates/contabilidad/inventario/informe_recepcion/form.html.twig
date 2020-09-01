@@ -272,12 +272,15 @@
 
         $("#informe_recepcion").submit(function (e) {
             e.preventDefault();
-            console.log(e)
 
+
+            let data = $('#informe_recepcion').serializeArray()
+            data.push({list_mercancia})
+            console.log(data)
             $.ajax({
-                url: '/contabilidad/inventario/informe-recepcion/form-add/',
+                url: '/contabilidad/inventario/informe-recepcion/form-add',
                 method: 'POST',
-                data:{},
+                data: [],
                 dataType: 'json',
                 success: function (result) {
                 },
@@ -286,8 +289,6 @@
             })
 
         });
-
-
         let list_mercancia = []
 
         $('#btnAplicarMercancia').on('click', function () {

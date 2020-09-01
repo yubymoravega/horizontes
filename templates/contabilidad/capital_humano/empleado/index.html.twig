@@ -37,42 +37,50 @@
                         </button>
                     </div>
                     <div class="modal-body bg-dark-app">
-                        {{ form_start(form,{'attr': {'class': 'p-2 rd-mailform text-left'}}) }}
-                        <label class="font-weight-bold">Nombre</label>
-                        {{ form_widget(form.nombre) }}
+                        {{ form_start(form,{'attr': {'class': 'p-2 rd-mailform w-100'}}) }}
+                        <div class="form-group input-group input-group-sm d-block">
+                            <label class="">Nombre</label>
+                            {{ form_widget(form.nombre, {'attr': {'class': 'w-100 from-control'}}) }}
+                        </div>
                         <div class="row pt-0 mt-0">
-                            <div class="col-6">
-                                <label class="font-weight-bold">Correo</label>
-                                {{ form_widget(form.correo, {'attr': {'class': 'text-left','placeholder':'usuario@dominio.com'}}) }}
+                            <div class="col-6 form-group input-group input-group-sm d-block">
+                                <label class="">Correo</label>
+                                {{ form_widget(form.correo, {'attr': {'class': 'w-100','placeholder':'usuario@dominio.com'}}) }}
                             </div>
-                            <div class="col-6 mt-0">
-                                <label class="font-weight-bold">Teléfono</label>
-                                {{ form_widget(form.telefono, {'attr': {'class': 'text-left','placeholder':'+## ########'}}) }}
+                            <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
+                                <label class="">Teléfono</label>
+                                {{ form_widget(form.telefono, {'attr': {'class': 'w-100','placeholder':'+## ########'}}) }}
                             </div>
                         </div>
                         <div class="row pt-0 mt-0">
-                            <div class="col-6">
-                                <label class="font-weight-bold">Fecha de alta</label>
-                                {{ form_widget(form.fecha_alta, {'attr': {'class': 'text-left','placeholder':'aasa'}}) }}
+                            <div class="col-6 form-group input-group input-group-sm d-block">
+                                <label class="">Fecha de alta</label>
+                                {{ form_widget(form.fecha_alta, {'attr': {'class': 'w-100','placeholder':'aasa'}}) }}
                             </div>
-                            <div class="col-6 mt-0">
-                                <label class="font-weight-bold">Salario x hora</label>
-                                {{ form_widget(form.salario_x_hora, {'attr': {'class': 'text-left'}}) }}
+                            <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
+                                <label class="">Salario x hora</label>
+                                {{ form_widget(form.salario_x_hora, {'attr': {'class': 'w-100'}}) }}
                             </div>
                         </div>
-                        <label class="font-weight-bold">Empresa a la que perteneze</label>
-                        {{ form_widget(form.id_unidad, {'attr': {'class': 'text-left'}}) }}
-                        <label class="font-weight-bold">Cargo en la empresa</label>
-                        {{ form_widget(form.id_cargo, {'attr': {'class': 'text-left'}}) }}
-                        <label class="font-weight-bold">Dirección particular</label>
-                        {{ form_widget(form.direccion_particular, {'attr': {'class': 'text-left'}}) }}
-                        <label for="is-user" class="form-check-label font-weight-bold">Es usuario del
+                        <div class="form-group input-group input-group-sm d-block">
+                            <label class="">Empresa a la que perteneze</label>
+                            {{ form_widget(form.id_unidad, {'attr': {'class': 'form-control w-100 w-100'}}) }}
+                        </div>
+                        <div class="form-group input-group input-group-sm d-block">
+                            <label class="">Cargo en la empresa</label>
+                            {{ form_widget(form.id_cargo, {'attr': {'class': 'w-100'}}) }}
+                        </div>
+                        <div class="form-group input-group input-group-sm d-block">
+                            <label class="">Dirección particular</label>
+                            {{ form_widget(form.direccion_particular, {'attr': {'class': 'w-100'}}) }}
+                        </div>
+                        <label for="is-user" class="form-check-label ">Es usuario del
                             sistema</label>
                         <input type="checkbox" class="form-check-input ml-2" id="is-user">
 
-                        <div class="container-fluid ml-0 p-0" id="div_rol">
-                            <label class="font-weight-bold">Rol que ejecuta:</label>
-                            {{ form_widget(form.rol, {'attr': {'class': 'text-left'}}) }}
+                        <div class="container-fluid ml-0 p-0 form-group input-group input-group-sm d-block" id="div_rol">
+                            <label class="">Rol que ejecuta:</label>
+                            {{ form_widget(form.rol, {'attr': {'class': 'w-100'}}) }}
                         </div>
                         <input type="text" id="id_empleado" hidden>
                         {{ form_end(form) }}

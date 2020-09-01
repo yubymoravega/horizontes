@@ -83,8 +83,8 @@ class InformeRecepcionController extends AbstractController
         $id_almacen = 1;//aqui es donde cojo la variable global que contiene el almacen seleccionado
         $error = null;
         $form->handleRequest($request);
+        dd($form->getData(), $request);
         if ($form->isSubmitted()) {
-            dd($form,$request);
 //            if ($form->isValid()) {
             $informe_recepcion = $request->get('informe_recepcion');
 
