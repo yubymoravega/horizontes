@@ -19,49 +19,100 @@
             </h4>
             <form action="">
                 <select name="roles_id" id="roles_id" class="form-control w-100 h-25">
-                    <option selected = "true" value = "0" disabled>Seleccione el rol</option>
+                    <option selected="true" value="0" disabled>Seleccione el rol</option>
                     {% for item in roles %}
-                        <option value = "{{ item.rol }}">{{ item.rol }}</option>
+                        <option value="{{ item.rol }}">{{ item.rol }}</option>
                     {% endfor %}
                 </select>
             </form>
-
+            <div class="ml-2">
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarCargosModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
         </div>
         {# end header #}
 
-        {# list #}
-        <table class="table table-hover text-light">
-            <thead class="thead-dark">
-            <th scope="col-1">Roles</th>
-            <th scope="col-2">Rutas</th>
-            </thead>
-            <tbody>
-            {% for item in permisos %}
-                <tr>
-                    <td style="font-weight:400;">{{ item.roles }}</td>
-                    <td style="font-weight:400;">{{ item.path }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {# end list #}
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarCargosModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarCargosModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarCargosModalLabel">Adicionar Permiso</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body bg-dark-app">
+                        <form action="{{ path('permisos_por_rol_add') }}" method="post">
+                            <div class="mt-0 form-group input-group input-group-sm d-block">
+                                <label>Roles</label>
+                                <input type="text" name="roles" class="form-control w-100" placeholder="ROL_1,ROL_2,ROL_N">
+                            </div>
+                            <div class="mt-0 form-group input-group input-group-sm d-block">
+                                <label>Path</label>
+                                <input type="text" name="path" class="form-control w-100" value="^/">
+                            </div>
+
+                            <div class="d-flex mt-4">
+                                <div class="mr-auto">
+                                    <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                            aria-label="Cerrar">
+                                        <span aria-hidden="true">Cancelar</span>
+                                    </button>
+                                </div>
+                                <div class="ml-2">
+                                    <button type="submit" class="my-0 btn btn-primary" id="btnAceptar" onclick="">Aceptar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# list #}
+    <table class="table table-hover text-light">
+        <thead class="thead-dark">
+        <th scope="col-1">Roles</th>
+        <th scope="col-2">Subsistema</th>
+        <th scope="col-2">Módulo</th>
+        <th scope="col-2">Acción</th>
+        </thead>
+        <tbody>
+        {% for item in permisos %}
+            <tr>
+                <td style="font-weight:400;">{{ item.roles }}</td>
+                <td style="font-weight:400;">{{ item.subsistema }}</td>
+                <td style="font-weight:400;">{{ item.modulo }}</td>
+                <td style="font-weight:400;">{{ item.accion }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {# end list #}
     </div>
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
+    {% block javascripts %}
+        {{ parent() }}
 
-    <script>
-        $(document).ready(function () {
-            var roles_id = $('#roles_id');
-            $('#roles_id').change(function (evernt) {
-                if (typeof ($(this).val()) != 'object') {
-                    console.info('/permisos-por-rol/' + $(this).val())
-                    $('form').attr('action', '/permisos-por-rol/' + $(this).val())
-                    $('form').submit()
-                }
+        <script>
+            $(document).ready(function () {
+                var roles_id = $('#roles_id');
+                $('#roles_id').change(function (evernt) {
+                    if (typeof ($(this).val()) != 'object') {
+                        $('form').attr('method', 'GET')
+                        $('form').attr('action', '/permisos-por-rol/' + $(this).val())
+                        $('form').submit()
+                    }
+                })
             })
-        })
-    </script>
-{% endblock %}
+        </script>
+    {% endblock %}
 
