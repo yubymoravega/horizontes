@@ -20,10 +20,14 @@ class InformeRecepcionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('mercancia', MercanciaType::class,array(
+            ->add('mercancia', MercanciaType::class,[
+                'mapped'=>false,
                 'auto_initialize'=>true
-            ))
-            ->add('documento', DocumentoType::class)
+            ])
+            ->add('documento', DocumentoType::class,[
+                'mapped'=>false,
+                'auto_initialize'=>true
+            ])
             ->add('nro_cuenta_inventario', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label'=>'Cuenta de inventario',
@@ -62,6 +66,7 @@ class InformeRecepcionType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'label'=>'Número de factura',
             ])
+            ->add('list_mercancia')
         ;
     }
 

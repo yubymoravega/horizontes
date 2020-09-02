@@ -272,15 +272,13 @@
 
         $("#informe_recepcion").submit(function (e) {
             e.preventDefault();
-
-
             let data = $('#informe_recepcion').serializeArray()
-            data.push({list_mercancia})
+            data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
             console.log(data)
             $.ajax({
                 url: '/contabilidad/inventario/informe-recepcion/form-add',
                 method: 'POST',
-                data: [],
+                data: data,
                 dataType: 'json',
                 success: function (result) {
                 },
