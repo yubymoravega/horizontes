@@ -21,9 +21,7 @@
     - [x] Tipo Movimiento `u`
     - [x] Unidad
     - [x] Unidad Medida `u`
-`input`
-- [x]  paginación instalando el modulo de paginación
-    - [x] Cuenta, Subcuenta, Elemento gasto    
+       
 # Pendiente
 - [ ]  `AuxFunctions::existWidthFK()` -> para validar las llaves foraneas antes de eliminar
 
@@ -31,8 +29,6 @@
 - Como poner la variable de Id almacen seleccionado en session o como sea para usarlo en el modulo de inventario.(OJO)
 
 ### bugs
-- cuando se actualiza el navegador con f5/click en el simbolo de actulizar
-no se limpia el request anterior y se envia el mismo nuevamente
 - los inputs no tienen un funcionamiento correcto, no permiten desplacamientos con las 
 arrow ni seleccion mediante el teclado... algun problema con las librerias incorporadas al parecer
 

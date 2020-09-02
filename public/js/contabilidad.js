@@ -19,6 +19,7 @@ const CONTAB_MSG = {
     REQUIRED_CUENTA: 'seleccione una cuenta',
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
+    REQUIRED_OBLIGATORIO: 'El campo obligatorio!',
 }
 
 
