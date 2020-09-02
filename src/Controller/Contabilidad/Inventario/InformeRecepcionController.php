@@ -13,7 +13,7 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Documento;
-use App\Entity\Contabilidad\Inventario\EntradaMercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\Proveedor;
@@ -58,10 +58,8 @@ class InformeRecepcionController extends AbstractController
                 $rows[] = array(
                     'id' => $obj_informe_recepcion->getId(),
                     'concecutivo' => $obj_informe_recepcion->getNroConcecutivo(),
-                    'mercancia' => '(' . $obj_documento->getCodigoMercancia() . ') ' . $obj_documento->getDescripcionMercancia(),
-                    'um' => $obj_documento->getIdUnidadMedida()->getNombre(),
-                    'cantidad' => $obj_documento->getCantidadMercancia(),
-                    'importe' => number_format(floatval($obj_documento->getImporteMercancia()), 2, '.', ''),
+//                    'cantidad' => $obj_documento->getCantidadMercancia(),
+                    'importe' => number_format($obj_documento->getImporteTotal(), 2, '.', ''),
                     'fecha' => $obj_documento->getFecha()->format('d-m-Y'),
                     'inventario' => $obj_informe_recepcion->getNroCuentaInventario() . ' / ' . $obj_informe_recepcion->getNroSubcuentaInventario(),
                     'acreedora' => $obj_informe_recepcion->getNroCuentaAcreedora() . ' / ' . $obj_informe_recepcion->getNroSubcuentaAcreedora()
@@ -85,12 +83,8 @@ class InformeRecepcionController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $list_mercancia = json_decode($request->get('informe_recepcion')['list_mercancia'], true);
-
-            if ($form->isValid()) {
+//            if ($form->isValid()) {
                 $informe_recepcion = $request->get('informe_recepcion');
-
-                /**  datos de DocumentoType **/
-                $importe_total = $informe_recepcion['documento']['importe_total'];
 
                 /**  datos de InformeRecepcionType **/
                 $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
@@ -157,8 +151,7 @@ class InformeRecepcionController extends AbstractController
                         ->setActivo(true)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                        ->setImporteTotal($importe_total);
+                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
                     $em->persist($documento);
 
                     //3.1-adicionar en informe de recepcion
@@ -178,20 +171,20 @@ class InformeRecepcionController extends AbstractController
                     $em->persist($informe_recepcion);
 
                     //4-crear la obligacion de pago con el proveedor(crear la tabla)
-                    $obligacion_pago = new ObligacionPago();
-                    $obligacion_pago
-                        ->setIdProveedor($proveedor_obj)
-                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                        ->setIdDocumento($documento)
-                        ->setActivo(true)
-                        ->setNroSubcuenta($proveedor_obj->getCodigo())
-                        ->setNroCuenta($cuenta_acreedora)
-                        ->setLiquidado(false)
-                        ->setResto(floatval($importe_total))
-                        ->setValorPagado(0)
-                        ->setCodigoFactura($codigo_factura)
-                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
-                    $em->persist($obligacion_pago);
+//                    $obligacion_pago = new ObligacionPago();
+//                    $obligacion_pago
+//                        ->setIdProveedor($proveedor_obj)
+//                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+//                        ->setIdDocumento($documento)
+//                        ->setActivo(true)
+//                        ->setNroSubcuenta($proveedor_obj->getCodigo())
+//                        ->setNroCuenta($cuenta_acreedora)
+//                        ->setLiquidado(false)
+//                        ->setResto(floatval($importe_total))
+//                        ->setValorPagado(0)
+//                        ->setCodigoFactura($codigo_factura)
+//                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
+//                    $em->persist($obligacion_pago);
 
                     /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                      * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
@@ -201,45 +194,78 @@ class InformeRecepcionController extends AbstractController
                      */
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
-                    $arr_mercancias = [];
                     $mercancia_er = $em->getRepository(Mercancia::class);
-                    foreach ($arr_mercancias as $mercancia) {
-                        //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
-                        $obj_mercancia = $mercancia_er->findOneBy(array(
-                            'codigo' => $codigo_mercancia,
-                            'id_amlacen' => $id_almacen,
-                            'activo' => true
-                        ));
-                        if (!$obj_mercancia) {
-                            $new_mercancia = new Mercancia();
-                            $new_mercancia
-                                ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
+                    $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                    $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
+                        'nombre' => 'INFORME DE RECECIÓN',
+                        'activo' => true
+                    ));
+                    $importe_total = 0;
+                    if ($obj_tipo_documento) {
+                        foreach ($list_mercancia as $mercancia) {
+                            $codigo_mercancia = $mercancia['codigo'];
+                            $cantidad_mercancia = $mercancia['cant'];
+                            $descripcion = $mercancia['descripcion'];
+                            $importe_mercancia = $mercancia['importe'];
+                            $unidad_medida = $mercancia['um'];
+
+                            $importe_total += floatval($importe_mercancia);
+
+                            //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
+                            $movimiento_mercancia = new MovimientoMercancia();
+                            $movimiento_mercancia
                                 ->setActivo(true)
-                                ->setDescripcion($descripcion)
-                                ->setExistencia($cantidad_mercancia)
-                                ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
-                                ->setCodigo($codigo_mercancia)
-                                ->setImporte(floatval($importe_mercancia));
-                            $em->persist($new_mercancia);
-                        } else {
-                            /**@var $obj_mercancia Mercancia* */
-                            if ($obj_mercancia->getExistencia() == 0) {
-                                $obj_mercancia
+                                ->setImporte($importe_mercancia)
+                                ->setEntrada(true)
+                                ->setCantidad($cantidad_mercancia)
+                                ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                                ->setIdDocumento($documento)
+                                ->setIdTipoDocumento($obj_tipo_documento);
+
+                            //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
+                            $obj_mercancia = $mercancia_er->findOneBy(array(
+                                'codigo' => $codigo_mercancia,
+                                'id_amlacen' => $id_almacen,
+                                'activo' => true
+                            ));
+                            if (!$obj_mercancia) {
+                                $new_mercancia = new Mercancia();
+                                $new_mercancia
+                                    ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
+                                    ->setActivo(true)
+                                    ->setDescripcion($descripcion)
                                     ->setExistencia($cantidad_mercancia)
-                                    ->setImporte(0);
+                                    ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
+                                    ->setCodigo($codigo_mercancia)
+                                    ->setImporte(floatval($importe_mercancia));
+                                $em->persist($new_mercancia);
+                                $movimiento_mercancia
+                                    ->setIdMercancia($new_mercancia);
                             } else {
-                                $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                $importe_actualizado = floatval($obj_mercancia->getImporte() - floatval($importe_mercancia));
-                                $obj_mercancia
-                                    ->setExistencia($existencia_actualizada)
-                                    ->setImporte($importe_actualizado);
+                                /**@var $obj_mercancia Mercancia* */
+                                if ($obj_mercancia->getExistencia() == 0) {
+                                    $obj_mercancia
+                                        ->setExistencia($cantidad_mercancia)
+                                        ->setImporte($importe_mercancia);
+                                } else {
+                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                                    $importe_actualizado = floatval($obj_mercancia->getImporte() - floatval($importe_mercancia));
+                                    $obj_mercancia
+                                        ->setExistencia($existencia_actualizada)
+                                        ->setImporte($importe_actualizado);
+                                }
+                                $em->persist($obj_mercancia);
+                                $movimiento_mercancia
+                                    ->setIdMercancia($obj_mercancia);
                             }
-                            $em->persist($obj_mercancia);
+                            $em->persist($movimiento_mercancia);
                         }
-
-                        //------ADICIONANDO EN LA TABLA DE ENTRADAMERCANCIA
-
                     }
+
+                    //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
+                    $documento
+                        ->setImporteTotal($importe_total);
+                    $em->persist($documento);
 
                     try {
                         $em->flush();
@@ -250,9 +276,8 @@ class InformeRecepcionController extends AbstractController
                 } else {
                     $this->addFlash('error', 'Usted no es empleado de la empresa.');
                 }
-                return $this->redirectToRoute('contabilidad_inventario_informe_recepcion');
-
-            }
+                return new JsonResponse(['success'=>true]);
+//            }
         }
         return $this->render('contabilidad/inventario/informe_recepcion/form.html.twig', [
             'controller_name' => 'CRUDInformeRecepcion',

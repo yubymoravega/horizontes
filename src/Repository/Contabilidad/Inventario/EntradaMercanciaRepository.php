@@ -2,25 +2,25 @@
 
 namespace App\Repository\Contabilidad\Inventario;
 
-use App\Entity\Contabilidad\Inventario\EntradaMercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method EntradaMercancia|null find($id, $lockMode = null, $lockVersion = null)
- * @method EntradaMercancia|null findOneBy(array $criteria, array $orderBy = null)
- * @method EntradaMercancia[]    findAll()
- * @method EntradaMercancia[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method MovimientoMercancia|null find($id, $lockMode = null, $lockVersion = null)
+ * @method MovimientoMercancia|null findOneBy(array $criteria, array $orderBy = null)
+ * @method MovimientoMercancia[]    findAll()
+ * @method MovimientoMercancia[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class EntradaMercanciaRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, EntradaMercancia::class);
+        parent::__construct($registry, MovimientoMercancia::class);
     }
 
     // /**
-    //  * @return EntradaMercancia[] Returns an array of EntradaMercancia objects
+    //  * @return MovimientoMercancia[] Returns an array of MovimientoMercancia objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class EntradaMercanciaRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?EntradaMercancia
+    public function findOneBySomeField($value): ?MovimientoMercancia
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.exampleField = :val')

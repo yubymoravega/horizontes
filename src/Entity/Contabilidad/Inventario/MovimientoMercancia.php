@@ -2,13 +2,14 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Repository\Contabilidad\Inventario\EntradaMercanciaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=EntradaMercanciaRepository::class)
  */
-class EntradaMercancia
+class MovimientoMercancia
 {
     /**
      * @ORM\Id()
@@ -30,10 +31,10 @@ class EntradaMercancia
     private $id_documento;
 
     /**
-     * @ORM\ManyToOne(targetEntity=InformeRecepcion::class)
+     * @ORM\ManyToOne(targetEntity=TipoDocumento::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $id_informe_recepcion;
+    private $id_tipo_documento;
 
     /**
      * @ORM\Column(type="float")
@@ -54,6 +55,13 @@ class EntradaMercancia
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $entrada;
+
+
 
     public function getId(): ?int
     {
@@ -84,14 +92,14 @@ class EntradaMercancia
         return $this;
     }
 
-    public function getIdInformeRecepcion(): ?InformeRecepcion
+    public function getIdTipoDocumento(): ?TipoDocumento
     {
-        return $this->id_informe_recepcion;
+        return $this->id_tipo_documento;
     }
 
-    public function setIdInformeRecepcion(?InformeRecepcion $id_informe_recepcion): self
+    public function setIdTipoDocumento(?TipoDocumento $id_tipo_documento): self
     {
-        $this->id_informe_recepcion = $id_informe_recepcion;
+        $this->id_tipo_documento = $id_tipo_documento;
 
         return $this;
     }
@@ -140,6 +148,18 @@ class EntradaMercancia
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getEntrada(): ?bool
+    {
+        return $this->entrada;
+    }
+
+    public function setEntrada(bool $entrada): self
+    {
+        $this->entrada = $entrada;
 
         return $this;
     }
