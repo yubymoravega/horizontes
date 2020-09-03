@@ -49,6 +49,30 @@ const onDeleteConfirm = function (config) {
 }
 
 /**
+ * funcion que crea las alertas para el usuario dependiendo de la configuración
+ *
+ * @param msg - mensaje de la alerta
+ * @param type - genera la clase css para el color de la alerta `alert-type` (success por defecto)
+ * @param time - tiempo de espera del mensaje para desaparecer (4s por defecto)
+ */
+const alertTemplate = (msg, type = 'success', time = 4000) => {
+    const template =
+        `<div class="toasts-alert alert alert-${type} fade show" role="alert">
+            <span>${msg}</span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true" class="ml-2 text-white">&times;</span>
+            </button>
+        </div>`;
+
+    $('body').append(template)
+    setTimeout(() => {
+        $('.toasts-alert').addClass('transition-right')
+        setTimeout(() => $('.toasts-alert').remove(), 1000)
+    }, time)
+}
+
+
+/**
  * Centralizacion de todas las cargas asyncronas de el Subsistema Contable
  * agrupado por cada uno de los módulos:
  * - config

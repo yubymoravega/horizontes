@@ -1,12 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block content %}
     {# Modal de Cuentas#}
-    <div class="toasts-alert alert alert-danger fade" role="alert" id="alert__success">
-        <span id="text_"></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true" class="ml-2 text-white">&times;</span>
-        </button>
-    </div>
     <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
          data-keyboard="false"
          aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
@@ -310,18 +304,7 @@
                 }
             })
 
-            function showAlert(text, type = 'success') {
-                $('#alert__success').addClass('show')
-                // ocultar a los 3s
-                $('#alert__success').show()
-                setTimeout(function () {
-                    $('#alert__success').addClass('transition-right')
-                    $('#alert__success').hide(1000)
-                }, 4000)
-            }
-
             $("#btnSubbmitInforme").click(function (e) {
-
                 if (form_informe_recepcion.valid()) {
                     if (list_mercancia.length) {
                         let data = form_informe_recepcion.serializeArray()
@@ -337,7 +320,7 @@
                             }
                         })
                     } else {
-                        showAlert()
+                        alertTemplate('el Informe de Recepción debe contener algunas mercancias', 'danger')
                     }
                 }
             });
@@ -356,18 +339,19 @@
 
                     list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
 
-                    $('#rows_mercancias').append('<tr>' +
-                        '<td style="font-weight:400;"> ' + codigo + '</td>' +
-                        '<td style="font-weight:400;"> ' + cant + '</td>' +
-                        '<td style="font-weight:400;"> ' + importe + '</td>' +
-                        '<td style="font-weight:400;"> ' + precio + '</td>' +
-                        '<td style="font-weight:400;"> ' + nueva_existencia + '</td>' +
-                        '<td style="font-weight:400;" hidden> ' + descripcion + '</td>' +
-                        '<td> <button type="button" class="btn btn-outline-danger btn-sm borrar" data-toggle="tooltip" data-placement="bottom" title="Eliminar"> ' +
-                        '<i class="fa fa-minus-circle"></i>' +
-                        '</button>' +
-                        '</td>' +
-                        '<td style="font-weight:400;" hidden> ' + um + '</td> </tr>'
+                    $('#rows_mercancias').append(`<tr>
+                        <td style="font-weight:400;"> ${codigo}</td>
+                        <td style="font-weight:400;"> ${cant}</td>
+                        <td style="font-weight:400;"> ${importe}</td>
+                        <td style="font-weight:400;"> ${precio} </td>
+                        <td style="font-weight:400;">${nueva_existencia}</td>
+                        <td style="font-weight:400;" hidden> ${descripcion}</td>
+                        <td> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td>
+                        <td style="font-weight:400;" hidden> ${um} </td> </tr>`
                     );
                     $('#informe_recepcion_mercancia_codigo').val('')
                     $('#informe_recepcion_mercancia_descripcion').val('')
@@ -377,6 +361,13 @@
                     $('#informe_recepcion_mercancia_precio').val('')
                     $('#informe_recepcion_mercancia_existencia_incremento').val('')
                 }
+            })
+
+            // eliminar la mercancia de la lista
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
+                $(this).closest('tr').remove()
             })
         })
 
@@ -393,11 +384,7 @@
             }
         }
 
-        $(document).on('click', '.borrar', function (event) {
-            console.log($(this).closest('tr'))
-            event.preventDefault();
-            $(this).closest('tr').remove()
-        })
+
     </script>
 {% endblock %}
 
