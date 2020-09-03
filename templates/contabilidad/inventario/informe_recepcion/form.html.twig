@@ -81,7 +81,15 @@
                     </div>
                 </div>
                 {{ form_end(formulario.nro_cuenta_acreedora) }}
-                <h3 class="text-light mt-2" style="font-weight: 300;">Mercancias</h3>
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
+                    <div class="px-2" style="background: dimgray; border-radius: .3rem;">
+                        <span class="pr-1">Importe Total : </span>
+                        <span id="importe-total">0</span>
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+
                 {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia'}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
@@ -171,6 +179,8 @@
         let mercancias = [];
         let cuentas_inventarios = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        loadingModal.show()
+
         $(document).ready(function () {
             $.ajax({
                 url: '/contabilidad/inventario/informe-recepcion/getCuentas',
@@ -184,6 +194,7 @@
                     $(result.cuentas_acrredoras).each(function (pos, valor) {
                         $('#informe_recepcion_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
+                    loadingModal.close()
                 },
                 error: function () {
                 }
@@ -308,6 +319,7 @@
                 if (form_informe_recepcion.valid()) {
                     if (list_mercancia.length) {
                         let data = form_informe_recepcion.serializeArray()
+                        loadingModal.show()
                         data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
                             url: '/contabilidad/inventario/informe-recepcion/form-add',
@@ -315,20 +327,27 @@
                             data: data,
                             dataType: 'json',
                             success: function (result) {
+                                if (result.success) {
+                                    window.location.replace('{{ path('contabilidad_inventario_informe_recepcion') }}')
+                                } else {
+                                    loadingModal.close()
+                                    alertTemplate(result.msg)
+                                }
                             },
                             error: function () {
                             }
                         })
                     } else {
-                        alertTemplate('el Informe de Recepción debe contener algunas mercancias', 'danger')
+                        alertTemplate('El Informe de Recepción debe contener algunas mercancias', 'danger')
                     }
                 }
             });
+
             let list_mercancia = []
+            let importe_total = 0;
 
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
-
                     let codigo = $('#informe_recepcion_mercancia_codigo').val()
                     let cant = $('#informe_recepcion_documento_cantidad_mercancia').val()
                     let importe = $('#informe_recepcion_documento_importe_mercancia').val()
@@ -337,9 +356,15 @@
                     let um = $('#informe_recepcion_mercancia_id_unidad_medida').val()
                     let descripcion = $('#informe_recepcion_mercancia_descripcion').val()
 
-                    list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
+                    //validar que el codigo no se repita
+                    if (list_mercancia.some(e => e.codigo === codigo)) {
+                        alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
+                    } else {
+                        list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
+                        importe_total += Number.parseInt(importe)
 
-                    $('#rows_mercancias').append(`<tr>
+                        $("#importe-total").text('$' + importe_total)
+                        $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
                         <td style="font-weight:400;"> ${importe}</td>
@@ -352,20 +377,25 @@
                         </button>
                         </td>
                         <td style="font-weight:400;" hidden> ${um} </td> </tr>`
-                    );
-                    $('#informe_recepcion_mercancia_codigo').val('')
-                    $('#informe_recepcion_mercancia_descripcion').val('')
-                    $('#informe_recepcion_mercancia_existencia').val('')
-                    $('#informe_recepcion_documento_cantidad_mercancia').val('')
-                    $('#informe_recepcion_documento_importe_mercancia').val('')
-                    $('#informe_recepcion_mercancia_precio').val('')
-                    $('#informe_recepcion_mercancia_existencia_incremento').val('')
+                        );
+                        $('#informe_recepcion_mercancia_codigo').val('')
+                        $('#informe_recepcion_mercancia_descripcion').val('')
+                        $('#informe_recepcion_mercancia_existencia').val('')
+                        $('#informe_recepcion_documento_cantidad_mercancia').val('')
+                        $('#informe_recepcion_documento_importe_mercancia').val('')
+                        $('#informe_recepcion_mercancia_precio').val('')
+                        $('#informe_recepcion_mercancia_existencia_incremento').val('')
+                    }
+
                 }
             })
 
             // eliminar la mercancia de la lista
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
+                const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
+                importe_total -= Number.parseInt(mercancia.importe)
+                $("#importe-total").text('$' + importe_total)
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })

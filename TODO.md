@@ -24,7 +24,7 @@
 
 ### Inventario
 - [ ] { Tipo Documento, Modulos } -> resolver el tema de los valores estaticos con un JSON, YAML u otro tipo de config
-- [ ] utilizar la funcion js `contabilidad.js/alertTemplate` en security/index.html.twig
+- [x] utilizar la funcion js `contabilidad.js/alertTemplate` en security/index.html.twig
 - LOADING...
     - [ ] http://127.0.0.1:8000/contabilidad/config/conf-inicial/form-add
     

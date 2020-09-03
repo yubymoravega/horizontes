@@ -46,7 +46,6 @@ class MercanciaType extends AbstractType
             ])
             ->add('id_unidad_medida', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
-                'required' => false,
                 'label'=>'UM',
                 'class' => UnidadMedida::class,
                 'choice_label' => 'nombre',

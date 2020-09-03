@@ -43,6 +43,7 @@ const onDeleteConfirm = function (config) {
 
     $('#confirm__modal__btn_ok').click(function () {
         const form = $('#form__confirm__modal')
+        $('#confirm__modal').modal('hide')
         form.attr('action', url)
         form.submit()
     })
@@ -69,6 +70,15 @@ const alertTemplate = (msg, type = 'success', time = 4000) => {
         $('.toasts-alert').addClass('transition-right')
         setTimeout(() => $('.toasts-alert').remove(), 1000)
     }, time)
+}
+
+const loadingModal = {
+    show: (msg = 'Procesando...') => {
+        $('#loading-modal').modal('show')
+        $('#loading-modal-msg').text(msg)
+    },
+    close: () => $('#loading-modal').modal('hide')
+
 }
 
 

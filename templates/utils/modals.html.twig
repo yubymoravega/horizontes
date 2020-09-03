@@ -1,3 +1,5 @@
+
+{# -------------- Modal Confirm ---------------------#}
 <div class="modal fade" id="confirm__modal" data-backdrop="static" data-keyboard="false"
      tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -25,4 +27,20 @@
             </div>
         </div>
     </div>
+</div>
+
+{# ------------- modal loading ----------------- #}
+
+<div class="modal show fade" id="loading-modal" data-backdrop="static" data-keyboard="false"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered d-flex justify-content-center">
+        {#<div class="modal-dialog modal-dialog-centered">
+            <span class="spinner-border text-primary" role="status">
+            </span>
+        </div>#}
+        <span class="spinner-border text-primary" role="status" aria-hidden="true"></span>
+        <span class="text-primary ml-2" id="loading-modal-msg"> Loading...</span>
+    </div>
+{#    <div class="sr-only">Loading...</div>#}
+
 </div>
