@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20200824171139 extends AbstractMigration
+final class Version20200829164124 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -77,7 +77,7 @@ final class Version20200824171139 extends AbstractMigration
         $this->addSql('ALTER TABLE unidad ADD CONSTRAINT FK_F3E6D02F31E700CD FOREIGN KEY (id_padre_id) REFERENCES unidad (id)');
         $this->addSql('ALTER TABLE vale_salida ADD CONSTRAINT FK_90C265C86601BA07 FOREIGN KEY (id_documento_id) REFERENCES documento (id)');
         $this->addSql('ALTER TABLE vale_salida ADD CONSTRAINT FK_90C265C8F66372E9 FOREIGN KEY (id_elemento_gasto_id) REFERENCES elemento_gasto (id)');
-        $this->addSql('ALTER TABLE cliente_reporte CHANGE fecha fecha DATE NOT NULL');
+        $this->addSql('ALTER TABLE cliente_reporte DROP efectivo');
     }
 
     public function down(Schema $schema) : void
@@ -139,6 +139,6 @@ final class Version20200824171139 extends AbstractMigration
         $this->addSql('DROP TABLE unidad');
         $this->addSql('DROP TABLE unidad_medida');
         $this->addSql('DROP TABLE vale_salida');
-        $this->addSql('ALTER TABLE cliente_reporte CHANGE fecha fecha DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE cliente_reporte ADD efectivo VARCHAR(255) DEFAULT NULL');
     }
 }

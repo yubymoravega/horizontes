@@ -1,7 +1,7 @@
 // A reference to Stripe.js initialized with a fake API key.
 //Sign in to see examples pre-filled with your key.
 var stripe = Stripe(
-  "pk_live_51HJlIfIqYTGPXQXuLsUVb5kempohAPBLEkW6EprE3lRgp7YoAsmuaUnq08XOAEZi6LFxynqCKeqPhNFvnUm7zz2p007ceFM7E1"
+  "pk_test_MIpejjMeEiFcGCJiw2oR7ASl"
 );
 // The items the customer wants to buy
 var customerID = null;
@@ -91,8 +91,17 @@ var payWithCard = function (stripe, card, clientSecret) {
 
         var json = {};
         json["mPhoneNo"] = tel;
-        json["mCardTypeID"] = result.error.payment_method.card.brand;
-        json["mCard4"] = result.error.payment_method.card.last4;
+
+        if(result.error.payment_method.card){
+          json["mCardTypeID"] = result.error.payment_method.card.brand;
+          json["mCard4"] = result.error.payment_method.card.last4;
+        
+        }else{
+
+          json["mCardTypeID"] = "Desconocido";
+          json["mCard4"] = "Desconocido";
+        }
+
         json["mAmount"] = result.error.payment_intent.amount / 100;
         json["mStatus"] = result.error.code;
         json["pi"] = result.error.payment_intent.id;
@@ -109,7 +118,7 @@ var payWithCard = function (stripe, card, clientSecret) {
           dataType: "json",
           data: { data: json },
           success: function () {},
-        });
+        }); 
 
         //showError(result.error.message);
         $(location).attr(
@@ -120,7 +129,7 @@ var payWithCard = function (stripe, card, clientSecret) {
             ":" +
             window.location.port +
             "/estatus?code=" +
-            result.error.message
+            result.error.message+"&tel="+tel+"&monto="+json["mAmount"]
         );
       } else {
         // The payment succeeded!
@@ -145,7 +154,7 @@ var payWithCard = function (stripe, card, clientSecret) {
           
         });
 
-        $(location).attr(
+       $(location).attr(
           "href",
           window.location.protocol +
             "//" +
@@ -153,7 +162,7 @@ var payWithCard = function (stripe, card, clientSecret) {
             ":" +
             window.location.port +
             "/estatus?code=" +
-            result.paymentIntent.status
+            result.paymentIntent.status+"&tel="+tel+"&monto="+split[3]
         );
       }
     });

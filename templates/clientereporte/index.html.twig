@@ -52,7 +52,7 @@
                   <tbody><tr>
                   <th>Fecha</th> 
                     <th>Teléfono</th>
-                    <th>Tarjeta</th>
+                    <th>Metodo de Pago</th>
                     <th class = "th-monto">Monto</th>                  
                     <th>Estado</th>
                     <th>Empleado</th>
@@ -62,7 +62,15 @@
         <tr {% if loop.index is odd %}class="color"{% endif %}>
             <td>{{ data[0].fecha | date('d-M-y') }} </br> {{ data[0].fecha | date('h:i a') }}</td>
             <td > {{ data[0].idCliente }} </td>     
-            <td><img height="40" src="/images/iconos/{{ data[0].bram }}.svg" > - {{ data[0].last4  }} </br>{{data.nombre}} {{data.apellidos}}   </td>       
+            <td>
+            {% if data[0].bram != '$' %}
+                <img height="40" src="/images/iconos/{{ data[0].bram }}.svg" >
+                - {{ data[0].last4  }} </br>{{data.nombre}} {{data.apellidos}} 
+           {% else %}  
+           <a  onClick="cajaEfectivo('{{ data[0].efectivo }}','{{ data[0].monto }}');" > 
+            {{data[0].bram}} - {{ data[0].last4  }} </br>{{data.nombre}} {{data.apellidos}}</a>
+            {% endif %}
+              </td>       
             <td>{{ data[0].monto }} </td> {% set total = total + data[0].monto %}
             <td><a  onClick="caja('{{ data[0].estado }}','{{ data[0].auth }}');" > 
             {% if data[0].estado == 'succeeded' %}
@@ -84,13 +92,28 @@
         </div>
       </section>
 
-<div id="dialog"  title="Facturador Stripe">
+<div id="dialog" class="modal"  title="Facturador Stripe">
   <p>
     <b>Auth:</b> <span id="Auth"></span>
   </p>
 
   <p>
     <b>Estado:</b> <span id="Estado"></span>
+  </p>
+
+</div>
+
+<div id="dialogEfectivo" class="modal" title="Detalle efectivo">
+  <p>
+    <b>Efectivo:</b>$ <span id="efectivo"></span>
+  </p>
+
+  <p>
+    <b>Factura:</b>$ <span id="factura"></span>
+  </p>
+
+  <p>
+    <b>Cambio:</b>$ <span id="cambio"></span>
   </p>
 
 </div>
@@ -159,6 +182,18 @@ input#telefono {
    
    $( "#dialog" ).dialog({width: 500});
     $( "#dialog" ).dialog( "open" );
+  }; 
+
+  function cajaEfectivo(efectivo,factura) {
+   $("#efectivo").text(parseFloat(efectivo).toFixed(2));
+   $("#factura").text(parseFloat(factura).toFixed(2)); 
+   var cambio = efectivo-factura;
+   $("#cambio").text(parseFloat(cambio).toFixed(2));
+
+   
+   
+   $( "#dialogEfectivo" ).dialog({width: 500});
+    $( "#dialogEfectivo" ).dialog( "open" );
   }; 
 
 
@@ -232,7 +267,7 @@ function getCliente($tel) {
             }
         }).responseText;
 
-        console.log(ajax);
+        //console.log(ajax);
 
          
         

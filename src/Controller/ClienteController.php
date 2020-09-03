@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ClienteController extends AbstractController
 {
 
+    public $apiKey = 'sk_test_szvCvPRPHBF2sWZFxRWCp5hT';
+
     /**
      * @Route("/cliente-index", name="cliente-index")
      */
@@ -77,9 +79,14 @@ class ClienteController extends AbstractController
      */
     public function clienteEdit(Request $request, $tel)
     {
+        $email = true ;
 
         $dataBase = $this->getDoctrine()->getManager();
         $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
+
+        if(!$data[0]->getCorreo()){
+            $email = false;
+        }
 
         $formulario = $this->createForm(
             ClienteType::class,
@@ -88,7 +95,7 @@ class ClienteController extends AbstractController
         );
 
         return $this->render('cliente/editar.html.twig', [
-            'formulario' => $formulario->createView(), 'disabled' => true
+            'formulario' => $formulario->createView(), 'disabled' => true,'email' => $email
         ]);
     }
 
@@ -96,10 +103,14 @@ class ClienteController extends AbstractController
      * @Route("/edit-save/{tel}", name="edit-save")
      */
     public function editSave($tel, Request $request)
-    {
+    { 
 
-        $dataBase = $this->getDoctrine()->getManager();
-        $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
+        $stripe = new \Stripe\StripeClient(
+            $this->apiKey
+           );
+
+          $dataBase = $this->getDoctrine()->getManager();
+          $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
 
         $formulario = $this->createForm(ClienteType::class, $data[0]);
         $formulario->handleRequest($request);
@@ -134,6 +145,18 @@ class ClienteController extends AbstractController
             $dataBase->flush();
         }
 
+        if($data[0]->getToken()){
+        if($data[0]->getCorreo()){
+        $stripe->customers->update(
+            $data[0]->getToken(),
+            ['email' => $data[0]->getCorreo(),
+             'name'  => $data[0]->getNombre().$data[0]->getApellidos(),
+             'phone' =>  $data[0]->getTelefono() ]         
+          );
+        }
+    
+    }
+   
         return $this->redirectToRoute('cliente-monto', ['tel' => $tel]);
     }
 }

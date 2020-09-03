@@ -62,6 +62,23 @@ class ClienteReporte
      */
     private $auth;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $efectivo;
+
+    public function setEfectivo(string $efectivo): self
+       {
+    $this->efectivo = $efectivo;
+
+        return $this;
+    }
+
+    public function getEfectivo()
+    {
+        return $this->efectivo;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

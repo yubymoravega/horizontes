@@ -1,19 +1,22 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-{% include 'breadcrumbs.html.twig' %}
+
     <link rel="stylesheet" href="{{ asset('css/tarjetas.css') }}"  />
-   
 
 <div class="confirm">
 <img id='espere' class="imagen-resultado" src="{{ asset('images/iconos/espere.svg') }}" > 
 <img id='diclinada' style="display: none;" class="imagen-resultado" src="{{ asset('images/iconos/diclinada.svg') }}" > 
 <img id='aprobada' style="display: none;" class="imagen-resultado" src="{{ asset('images/iconos/aprobada.svg') }}" > 
 
-<h1 id='mensaje' style="text-align: center;  "></h1>
+<h1 id='mensaje' style="text-align: center;"></h1>
 
-     <a   class='boton-agregar-tarjeta'  id='home' href="{{ path('home')}}">
+     <a class='boton-agregar-tarjeta' style="display: none !important;"  id='home' href="{{ path('home')}}">
        Finalizar
+    </a>
+
+    <a class='boton-agregar-tarjeta'  style="display: none !important;" id='factura' href="{{ path('api.factura', {'tel': app.request.query.get('tel'), 'monto': app.request.query.get('monto') }) }}">
+       Enviar Factura
     </a>
 
 {% endblock %} 
@@ -28,22 +31,29 @@ $( document ).ready(function() {
 
       let params = new URLSearchParams(location.search);
       var code = params.get('code');
+      var tel = params.get('tel');
+      var monto = params.get('monto');
 
       if(code == "succeeded"){
           $("#mensaje").text("Cobro Exitoso");
           $("#espere").css({"display": "none"});
           $("#aprobada").css({"display": ""});
+          $("#home").css({"display": ""});
       }else{
 
+          if(code == "factura"){
+
+              $("#mensaje").text("Factura Enviada");         
+              $("#home").css({"display": ""});
+     
+          }else{
 
           $("#mensaje").text(code);
           $("#espere").css({"display": "none"});
+          $("#factura").css({"display": ""});
           $("#diclinada").css({"display": ""});
-
+          }       
       }
-   
-    
-
 });
 
 </script>

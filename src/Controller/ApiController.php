@@ -6,6 +6,7 @@ use \Datetime;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Cliente;
 use App\Entity\ClienteReporte;
+use App\Entity\StripeFactura;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security as ConfigurationSecurity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class ApiController extends AbstractController
 {
 
-  public $apiKey = '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';
+  public $apiKey = 'sk_test_szvCvPRPHBF2sWZFxRWCp5hT';
 
   public function __construct(HttpClientInterface $client)
   {
@@ -78,17 +79,25 @@ class ApiController extends AbstractController
 
     if ($cliente[0]->getToken() == null) {
 
-      $customer  = \Stripe\Customer::create(['name' => $cliente[0]->getNombre()]);
+      $customer  = \Stripe\Customer::create(
+        ['name' => $cliente[0]->getNombre().' '.$cliente[0]->getApellidos(),
+        'email' => $cliente[0]->getCorreo(),
+        'phone' => $cliente[0]->getTelefono()]);
       $customer  = $customer->id;
-    } else {
 
+        $cliente[0]->setToken($customer);
+  
+        $dataBase = $this->getDoctrine()->getManager();
+        $dataBase->persist($cliente[0]);
+        $dataBase->flush();
+    
+    } else {
       $customer = $cliente[0]->getToken();
     }
 
     $paymentIntent = \Stripe\PaymentIntent::create([
       'amount' =>  $json_obj->items[0]->monto * 100,
       'currency' => 'usd',
-      "metadata" => ["telefono" => $json_obj->items[0]->tel],
       'customer' => $customer
     ]);
 
@@ -108,20 +117,6 @@ class ApiController extends AbstractController
    */
   public function apiStatus(Request $request)
   {
-
-    $status = $request->getContent();
-
-    $dataBase = $this->getDoctrine()->getManager();
-    $cliente = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $request->get('tel')]);
-
-    if (!$cliente[0]->getToken()) {
-
-      $cliente[0]->setToken($request->get('customer'));
-
-      $dataBase = $this->getDoctrine()->getManager();
-      $dataBase->persist($cliente[0]);
-      $dataBase->flush();
-    }
 
     // stripe formulario
 
@@ -211,7 +206,12 @@ class ApiController extends AbstractController
    * @Route("/select/{tel}", name="select")
    */
   public function select($tel, Request $request)
-  {
+  { 
+    //return new Response(var_dump($request->getContent()));
+
+    if($request->get('filtro') == 'efectivo'){
+      return $this->redirectToRoute('api.efectivo', ['tel' => $tel, 'monto' => $request->get('monto')]);
+    }
 
     \Stripe\Stripe::setApiKey($this->apiKey);
 
@@ -232,6 +232,8 @@ class ApiController extends AbstractController
 
       $cantidadTarjetas = json_encode(sizeof($tarjetas['data']));
       $con = 0;
+
+      if($cantidadTarjetas < 1){return $this->redirectToRoute('api.get-user', ['tel' => $tel, 'monto' => $request->get('monto')]);}
 
       $credit = array();
 
@@ -538,4 +540,164 @@ class ApiController extends AbstractController
     //return new Response($statusCode);
     return new Response("200");
   }
+
+
+/**
+   * @Route("/api.efectivo/{tel}/{monto}", name="api.efectivo")
+   */
+  public function efectivo($tel,$monto)
+  {
+    $monto = number_format($monto, 2, '.', '');
+    return $this->render('api/efectivo.html.twig',['tel' => $tel,'monto' => $monto]);
+  }
+
+  /**
+   * @Route("/api.efectivo.save/{tel}/{monto}", name="api.efectivo.save")
+   */
+  public function efectivoSave($tel,$monto, Request $request)
+  {
+    
+    $dataBase = $this->getDoctrine()->getManager();
+
+    $clienteReporte = new ClienteReporte();
+
+    $user =  $this->getUser();
+    date_default_timezone_set('America/Santo_Domingo');
+
+    $date = new DateTime('NOW');  
+    $efectivo =0;
+   
+    
+    if($request->get('i-100')){
+      $efectivo = $efectivo + ($request->get('i-100')*100);
+    }
+
+     
+    if($request->get('i-50')){
+      $efectivo = $efectivo + ($request->get('i-50')*50);
+    }
+
+    if($request->get('i-20')){
+      $efectivo = $efectivo + ($request->get('i-20')*20);
+    }
+
+    if($request->get('i-10')){
+      $efectivo = $efectivo + ($request->get('i-10')*10);
+    }
+
+    if($request->get('i-5')){
+      $efectivo = $efectivo + ($request->get('i-5')*5);
+    }
+
+    if($request->get('i-2')){
+      $efectivo = $efectivo + ($request->get('i-2')*2);
+    }
+
+    if($request->get('i-1')){
+      $efectivo = $efectivo + $request->get('i-1');
+    }
+
+    if($request->get('ic-1')){
+      $efectivo = $efectivo + ($request->get('ic-1')*0.01);
+    }
+
+
+    if($request->get('ic-5')){
+      $efectivo = $efectivo + ($request->get('ic-5')*0.05);
+    }
+
+    if($request->get('ic-10')){
+      $efectivo = $efectivo + ($request->get('ic-10')*0.10);
+    }
+
+    if($request->get('ic-25')){
+      $efectivo = $efectivo + ($request->get('ic-25')*0.25);
+    }
+
+    if($request->get('ic-50')){
+      $efectivo = $efectivo + ($request->get('ic-50')*0.50);
+    }
+
+    if($request->get('ic-100')){
+      $efectivo = $efectivo + ($request->get('ic-10')*1);
+    }
+
+    $clienteReporte->setUser($user->getUsername());
+    $clienteReporte->setFecha($date);
+    $clienteReporte->setIdCliente($tel);
+    $clienteReporte->setBram("$");
+    $clienteReporte->setLast4("Efectivo");
+    $clienteReporte->setMonto($monto);
+    $clienteReporte->setEfectivo($efectivo);
+    $clienteReporte->setComercio('Solyag');
+    $clienteReporte->setEstado("succeeded");
+    $clienteReporte->setAuth("-");
+
+    $dataBase->persist($clienteReporte);
+    $dataBase->flush();
+
+
+    return $this->redirectToRoute('estatus', ["code" => "succeeded"]);
+  }
+
+  /**
+   * @Route("/api.factura/{tel}/{monto}", name="api.factura")
+   */
+  public function factura($tel,$monto)
+  {
+   $dataBase = $this->getDoctrine()->getManager();
+   
+   $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
+
+    $stripe = new \Stripe\StripeClient(
+      $this->apiKey
+    );
+
+     $product = $stripe->products->create([
+      'name' => 'Cargo',
+    ]);
+
+   $price = $stripe->prices->create([
+      'unit_amount' => $monto*100,
+      'currency' => 'usd',
+      'product' => $product->id,
+    ]);
+
+    $stripe->invoiceItems->create([
+      'customer' => $data[0]->getToken(),
+      'price' => $price->id 
+    ]);
+
+    $factura= $stripe->invoices->create([
+      'customer' => $data[0]->getToken(),
+      'collection_method' => 'send_invoice',
+      'days_until_due' => 1
+     ]);
+
+   $envio = $stripe->invoices->sendInvoice(
+      $factura->id,
+      []
+    );
+
+    $user =  $this->getUser();
+    date_default_timezone_set('America/Santo_Domingo');
+    $date = new DateTime('NOW');  
+
+    $stripe_factura = new StripeFactura();
+    $stripe_factura->setAuth($factura->id);
+    $stripe_factura->setEstatus($envio->status);
+    $stripe_factura->setClienteId($tel);
+    $stripe_factura->setIdEmpleado($user->getUsername());
+    $stripe_factura->setFecha($date);
+    $stripe_factura->setMonto($monto);
+
+    $dataBase->persist($stripe_factura);
+    $dataBase->flush();
+
+    return $this->redirectToRoute('estatus', ["code" => "factura", 'tel' => $tel, 'monto' => $monto]);
+  
+    
+  }
+
+
 }

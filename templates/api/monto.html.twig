@@ -28,6 +28,20 @@
 								<button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button>
 							</span>
 						</div>
+
+						<div style="margin-left: 15%; margin-top: 10px;" class="form-check form-check-inline justify-content-md-center">
+							<input name="filtro" class="form-check-input check" type="checkbox" id='tarjeta' value="tarjeta">
+							<label class="form-check-label" for="inlineCheckbox1">Tarjeta</label>
+						</div>
+						<div class="form-check form-check-inline justify-content-md-center">
+							<input name="filtro" class="form-check-input check" type="checkbox"  id='efectivo' value="efectivo">
+							<label class="form-check-label" for="inlineCheckbox2">Efectivo</label>
+						</div>
+						<div class="form-check form-check-inline justify-content-md-center">
+							<input class="form-check-input" type="checkbox"  value="option3" disabled>
+							<label class="form-check-label" for="inlineCheckbox3">Swipe</label>
+						</div>
+
 					</div>
 				</form>
 			</div>
@@ -47,7 +61,7 @@ rules: {
 required: true,
 minlength: 1,
 min: 1
-},"filtros[]": {required: true}
+},"filtro": {required: true}
 
 },
 
@@ -56,7 +70,10 @@ messages: {
 required: "Monto Requerido",
 minlength: "Minimo 1 US$",
 min: "Minimo $ 1.00"
-}, 'filtros[]'
+}, 
+'filtro': {
+required: "Seleccione Metodo De Pago"
+}, 
 }
 
 });

@@ -114,13 +114,13 @@ $("#form_cliente").validate({
       required: true, minlength: 3
     },
     'cliente[correo]': {
-        email: true
+        email: true,required: true
       },
     },
     messages: {
       'cliente[nombre]': {required: "Nombre Requerido", minlength: "Minimo 3 Caracteres" },
       'cliente[apellidos]': {required: "Apellido Requerido", minlength: "Minimo 3 Caracteres" },
-      'cliente[correo]': {email: "Formato de Email no Valido"},
+      'cliente[correo]': {email: "Formato de Email no Valido",required: "Email obligatorio"},
       'cliente[telefono]': {required: "Telefono Requerido", minlength: "Minimo 8 Caracteres" }},
  });
      
