@@ -84,93 +84,93 @@ class InformeRecepcionController extends AbstractController
         if ($form->isSubmitted()) {
             $list_mercancia = json_decode($request->get('informe_recepcion')['list_mercancia'], true);
 //            if ($form->isValid()) {
-                $informe_recepcion = $request->get('informe_recepcion');
+            $informe_recepcion = $request->get('informe_recepcion');
 
-                /**  datos de InformeRecepcionType **/
-                $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
-                $cuenta_inventario = $informe_recepcion['nro_cuenta_inventario'];
-                $proveedor = $informe_recepcion['id_proveedor'];
-                $subcuenta_inventario = $informe_recepcion['nro_subcuenta_inventario'];
-                $fecha_factura = $informe_recepcion['fecha_factura'];
-                $codigo_factura = $informe_recepcion['codigo_factura'];
+            /**  datos de InformeRecepcionType **/
+            $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
+            $cuenta_inventario = $informe_recepcion['nro_cuenta_inventario'];
+            $proveedor = $informe_recepcion['id_proveedor'];
+            $subcuenta_inventario = $informe_recepcion['nro_subcuenta_inventario'];
+            $fecha_factura = $informe_recepcion['fecha_factura'];
+            $codigo_factura = $informe_recepcion['codigo_factura'];
 
-                ////0-obtengo el numero consecutivo de documento
-                $arr_fecha = explode('-', $fecha_factura);
-                $year_ = $arr_fecha[0];
-                $id_user = $this->getUser()->getId();
-                $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
-                    'activo' => true,
-                    'id_usuario' => $id_user
+            ////0-obtengo el numero consecutivo de documento
+            $arr_fecha = explode('-', $fecha_factura);
+            $year_ = $arr_fecha[0];
+            $id_user = $this->getUser()->getId();
+            $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+                'activo' => true,
+                'id_usuario' => $id_user
+            ));
+            $consecutivo = 0;
+            if ($obj_empleado) {
+                $id_unidad = $obj_empleado->getIdUnidad()->getId();
+                $informes_recepcion_arr = $em->getRepository(InformeRecepcion::class)->findBy(array(
+                    'anno' => $year_,
+                    'activo' => true
                 ));
-                $consecutivo = 0;
-                if ($obj_empleado) {
-                    $id_unidad = $obj_empleado->getIdUnidad()->getId();
-                    $informes_recepcion_arr = $em->getRepository(InformeRecepcion::class)->findBy(array(
-                        'anno' => $year_,
-                        'activo' => true
+                $contador = 0;
+                foreach ($informes_recepcion_arr as $obj) {
+                    /**@var $obj InformeRecepcion* */
+                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == 1 && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                        $contador++;
+                }
+                $consecutivo = $contador + 1;
+
+
+                //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
+                $sub_cuenta_er = $em->getRepository(Subcuenta::class);
+                $cuenta_er = $em->getRepository(Cuenta::class);
+                $proveedor_obj = $em->getRepository(Proveedor::class)->find($proveedor);
+                $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
+                    'nro_cuenta' => $cuenta_acreedora,
+                    'activo' => true
+                ));
+                if ($cuenta_acreedora_obj && $proveedor_obj) {
+                    $obj_subcuenta_acreedora = $sub_cuenta_er->findOneBy(array(
+                        'nro_subcuenta' => $proveedor_obj->getCodigo(),
+                        'activo' => true,
+                        'id_cuenta' => $cuenta_acreedora_obj->getId()
                     ));
-                    $contador = 0;
-                    foreach ($informes_recepcion_arr as $obj) {
-                        /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == 1 && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
-                            $contador++;
+                    if (!$obj_subcuenta_acreedora) {
+                        $new_Subcuenta = new Subcuenta();
+                        $new_Subcuenta
+                            ->setNroSubcuenta($proveedor_obj->getCodigo())
+                            ->setDescripcion($proveedor_obj->getNombre())
+                            ->setIdCuenta($cuenta_acreedora_obj)
+                            ->setDeudora(false)
+                            ->setActivo(true);
+                        $em->persist($new_Subcuenta);
                     }
-                    $consecutivo = $contador + 1;
+                }
 
+                //2-adicionar en documento
+                $today = Date('Y-m-d');
+                $documento = new Documento();
+                $documento
+                    ->setActivo(true)
+                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
+                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
+                $em->persist($documento);
 
-                    //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
-                    $sub_cuenta_er = $em->getRepository(Subcuenta::class);
-                    $cuenta_er = $em->getRepository(Cuenta::class);
-                    $proveedor_obj = $em->getRepository(Proveedor::class)->find($proveedor);
-                    $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
-                        'nro_cuenta' => $cuenta_acreedora,
-                        'activo' => true
-                    ));
-                    if ($cuenta_acreedora_obj && $proveedor_obj) {
-                        $obj_subcuenta_acreedora = $sub_cuenta_er->findOneBy(array(
-                            'nro_subcuenta' => $proveedor_obj->getCodigo(),
-                            'activo' => true,
-                            'id_cuenta' => $cuenta_acreedora_obj->getId()
-                        ));
-                        if (!$obj_subcuenta_acreedora) {
-                            $new_Subcuenta = new Subcuenta();
-                            $new_Subcuenta
-                                ->setNroSubcuenta($proveedor_obj->getCodigo())
-                                ->setDescripcion($proveedor_obj->getNombre())
-                                ->setIdCuenta($cuenta_acreedora_obj)
-                                ->setDeudora(false)
-                                ->setActivo(true);
-                            $em->persist($new_Subcuenta);
-                        }
-                    }
+                //3.1-adicionar en informe de recepcion
+                $informe_recepcion = new InformeRecepcion();
+                $informe_recepcion
+                    ->setAnno($year_)
+                    ->setCodigoFactura($codigo_factura)
+                    ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura))
+                    ->setIdDocumento($documento)
+                    ->setIdProveedor($proveedor_obj)
+                    ->setNroConcecutivo($consecutivo)
+                    ->setNroCuentaAcreedora($cuenta_acreedora)
+                    ->setNroCuentaInventario($cuenta_inventario)
+                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                    ->setActivo(true)
+                    ->setNroSubcuentaAcreedora($proveedor_obj->getCodigo());
+                $em->persist($informe_recepcion);
 
-                    //2-adicionar en documento
-                    $today = Date('Y-m-d');
-                    $documento = new Documento();
-                    $documento
-                        ->setActivo(true)
-                        ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
-                        ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
-                    $em->persist($documento);
-
-                    //3.1-adicionar en informe de recepcion
-                    $informe_recepcion = new InformeRecepcion();
-                    $informe_recepcion
-                        ->setAnno($year_)
-                        ->setCodigoFactura($codigo_factura)
-                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura))
-                        ->setIdDocumento($documento)
-                        ->setIdProveedor($proveedor_obj)
-                        ->setNroConcecutivo($consecutivo)
-                        ->setNroCuentaAcreedora($cuenta_acreedora)
-                        ->setNroCuentaInventario($cuenta_inventario)
-                        ->setNroSubcuentaInventario($subcuenta_inventario)
-                        ->setActivo(true)
-                        ->setNroSubcuentaAcreedora($proveedor_obj->getCodigo());
-                    $em->persist($informe_recepcion);
-
-                    //4-crear la obligacion de pago con el proveedor(crear la tabla)
+                //4-crear la obligacion de pago con el proveedor(crear la tabla)
 //                    $obligacion_pago = new ObligacionPago();
 //                    $obligacion_pago
 //                        ->setIdProveedor($proveedor_obj)
@@ -186,97 +186,102 @@ class InformeRecepcionController extends AbstractController
 //                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
 //                    $em->persist($obligacion_pago);
 
-                    /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
-                     * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
-                     * entre la suma del importe de la mercancia + el importe adicionado,
-                     * OJO todos esto se hara si la mercancia a adicionar ya se encuentra registrada y su existencia es >0
-                     * de lo contrario se pondra en existencia la cantidad a adicionar y el precio sera el precio a adicionar)*
-                     */
+                /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
+                 * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
+                 * entre la suma del importe de la mercancia + el importe adicionado,
+                 * OJO todos esto se hara si la mercancia a adicionar ya se encuentra registrada y su existencia es >0
+                 * de lo contrario se pondra en existencia la cantidad a adicionar y el precio sera el precio a adicionar)*
+                 */
 
-                    /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
-                    $mercancia_er = $em->getRepository(Mercancia::class);
-                    $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-                        'nombre' => 'INFORME DE RECECIÓN',
-                        'activo' => true
-                    ));
-                    $importe_total = 0;
-                    if ($obj_tipo_documento) {
-                        foreach ($list_mercancia as $mercancia) {
-                            $codigo_mercancia = $mercancia['codigo'];
-                            $cantidad_mercancia = $mercancia['cant'];
-                            $descripcion = $mercancia['descripcion'];
-                            $importe_mercancia = $mercancia['importe'];
-                            $unidad_medida = $mercancia['um'];
+                /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
+                $mercancia_er = $em->getRepository(Mercancia::class);
+                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
+                    'nombre' => 'INFORME DE RECECIÓN',
+                    'activo' => true
+                ));
+                $importe_total = 0;
+                if ($obj_tipo_documento) {
+                    foreach ($list_mercancia as $mercancia) {
+                        $codigo_mercancia = $mercancia['codigo'];
+                        $cantidad_mercancia = $mercancia['cant'];
+                        $descripcion = $mercancia['descripcion'];
+                        $importe_mercancia = $mercancia['importe'];
+                        $unidad_medida = $mercancia['um'];
 
-                            $importe_total += floatval($importe_mercancia);
+                        $importe_total += floatval($importe_mercancia);
 
-                            //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
-                            $movimiento_mercancia = new MovimientoMercancia();
-                            $movimiento_mercancia
+                        //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
+                        $movimiento_mercancia = new MovimientoMercancia();
+                        $movimiento_mercancia
+                            ->setActivo(true)
+                            ->setImporte(floatval($importe_mercancia))
+                            ->setEntrada(true)
+                            ->setCantidad($cantidad_mercancia)
+                            ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                            ->setIdDocumento($documento)
+                            ->setIdTipoDocumento($obj_tipo_documento);
+
+                        //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
+                        $obj_mercancia = $mercancia_er->findOneBy(array(
+                            'codigo' => $codigo_mercancia,
+                            'id_amlacen' => $id_almacen,
+//                            'activo' => true //-----Para que traiga tanto las mercancias con existencia como las que se eliminaron
+                        ));
+                        if (!$obj_mercancia) {
+                            $new_mercancia = new Mercancia();
+                            $new_mercancia
+                                ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
                                 ->setActivo(true)
-                                ->setImporte($importe_mercancia)
-                                ->setEntrada(true)
-                                ->setCantidad($cantidad_mercancia)
-                                ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
-                                ->setIdDocumento($documento)
-                                ->setIdTipoDocumento($obj_tipo_documento);
-
-                            //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
-                            $obj_mercancia = $mercancia_er->findOneBy(array(
-                                'codigo' => $codigo_mercancia,
-                                'id_amlacen' => $id_almacen,
-                                'activo' => true
-                            ));
-                            if (!$obj_mercancia) {
-                                $new_mercancia = new Mercancia();
-                                $new_mercancia
-                                    ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
-                                    ->setActivo(true)
-                                    ->setDescripcion($descripcion)
-                                    ->setExistencia($cantidad_mercancia)
-                                    ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
-                                    ->setCodigo($codigo_mercancia)
-                                    ->setImporte(floatval($importe_mercancia));
-                                $em->persist($new_mercancia);
-                                $movimiento_mercancia
-                                    ->setIdMercancia($new_mercancia);
-                            } else {
-                                /**@var $obj_mercancia Mercancia* */
-                                if ($obj_mercancia->getExistencia() == 0) {
-                                    $obj_mercancia
-                                        ->setExistencia($cantidad_mercancia)
-                                        ->setImporte($importe_mercancia);
-                                } else {
-                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                    $importe_actualizado = floatval($obj_mercancia->getImporte() - floatval($importe_mercancia));
-                                    $obj_mercancia
-                                        ->setExistencia($existencia_actualizada)
-                                        ->setImporte($importe_actualizado);
-                                }
+                                ->setDescripcion($descripcion)
+                                ->setExistencia($cantidad_mercancia)
+                                ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
+                                ->setCodigo($codigo_mercancia)
+                                ->setImporte(floatval($importe_mercancia));
+                            $em->persist($new_mercancia);
+                            $movimiento_mercancia
+                                ->setIdMercancia($new_mercancia);
+                        } else {
+                            if($obj_mercancia->getActivo() == false){
+                                $obj_mercancia
+                                    ->setExistencia(0)
+                                    ->setImporte(0);
                                 $em->persist($obj_mercancia);
-                                $movimiento_mercancia
-                                    ->setIdMercancia($obj_mercancia);
                             }
-                            $em->persist($movimiento_mercancia);
+                            /**@var $obj_mercancia Mercancia* */
+                            if ($obj_mercancia->getExistencia() == 0) {
+                                $obj_mercancia
+                                    ->setExistencia($cantidad_mercancia)
+                                    ->setImporte($importe_mercancia);
+                            } else {
+                                $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                                $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
+                                $obj_mercancia
+                                    ->setExistencia($existencia_actualizada)
+                                    ->setImporte($importe_actualizado);
+                            }
+                            $em->persist($obj_mercancia);
+                            $movimiento_mercancia
+                                ->setIdMercancia($obj_mercancia);
                         }
+                        $em->persist($movimiento_mercancia);
                     }
-
-                    //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
-                    $documento
-                        ->setImporteTotal($importe_total);
-                    $em->persist($documento);
-
-                    try {
-                        $em->flush();
-                    } catch (FileException $e) {
-                        return $e->getMessage();
-                    }
-                    $this->addFlash('success', 'Informe de recepción adicionado satisfactoriamente.');
-                } else {
-                    $this->addFlash('error', 'Usted no es empleado de la empresa.');
                 }
-                return new JsonResponse(['success'=>true]);
+
+                //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
+                $documento
+                    ->setImporteTotal($importe_total);
+                $em->persist($documento);
+
+                try {
+                    $em->flush();
+                } catch (FileException $e) {
+                    return $e->getMessage();
+                }
+                return new JsonResponse(['success' => true, 'message' => 'Informe de recepción adicionado satisfactoriamente.']);
+            } else {
+                return new JsonResponse(['success' => true, 'message' => 'Usted no es empleado de la empresa.']);
+            }
 //            }
         }
         return $this->render('contabilidad/inventario/informe_recepcion/form.html.twig', [
@@ -310,7 +315,7 @@ class InformeRecepcionController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getPrecio(), 2),
+                'precio_compra' => round($obj->getImporte()/$obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia()
             );
@@ -426,65 +431,105 @@ class InformeRecepcionController extends AbstractController
             $obligacion_er = $em->getRepository(ObligacionPago::class);
 
             //SI EN OBLIGACION DE PAGO NO SE HA PAGADO NADA DE LA OBLIGACION DE PAGO QUE EL INFORME GENERO, ENTONCES ELIMINO
-            $importe_informe = $obj_informe_recepcion->getIdDocumento()->getImporteMercancia();
-            $obj_obligacion = $obligacion_er->findOneBy(array(
-                    'id_documento' => $obj_informe_recepcion->getIdDocumento()
-                )
-            );
-            /**@var $obj_obligacion ObligacionPago* */
-            $importe_obligacion = $obj_obligacion->getResto();
-            if (floatval($importe_informe) - floatval($importe_obligacion) == 0) {
+            $importe_informe = $obj_informe_recepcion->getIdDocumento()->getImporteTotal();
+//            $obj_obligacion = $obligacion_er->findOneBy(array(
+//                    'id_documento' => $obj_informe_recepcion->getIdDocumento()
+//                )
+//            );
+//            /**@var $obj_obligacion ObligacionPago* */
+//            $importe_obligacion = $obj_obligacion->getResto();
+//            if (floatval($importe_informe) - floatval($importe_obligacion) == 0) {
                 //voy a informe de recepcion y lo elimino
                 $obj_informe_recepcion->setActivo(false);
                 //voy a obligacion de pago y la elimino
-                $obj_obligacion->setActivo(false);
+//                $obj_obligacion->setActivo(false);
                 $obj_documento = $obj_informe_recepcion->getIdDocumento();
                 /**@var $obj_documento Documento* */
                 //voy a documento y lo elimino
                 $obj_documento->setActivo(false);
-                //voy a mercancia y disminuyo la existencia y actualizo el precio de la mercancia relacionada en el informe
-                $obj_mercancia = $em->getRepository(Mercancia::class)->findOneBy(array(
-                    'id_amlacen' => 1,
-                    'codigo' => $obj_documento->getCodigoMercancia(),
-                    'descripcion' => $obj_documento->getDescripcionMercancia(),
-                    'activo' => 1
+
+
+                //eliminar la entrada de la tabla de movimiento_mercancia
+                $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
+                    'id_documento' => $obj_documento->getId(),
+                    'activo' => true
                 ));
-                /**@var $obj_mercancia Mercancia* */
-                if ($obj_mercancia->getExistencia() >= $obj_documento->getCantidadMercancia()) {
-                    $nueva_existencia = floatval($obj_mercancia->getExistencia()) - floatval($obj_documento->getCantidadMercancia());
-                    //esto tengo que verlo con tio(seria solo restar el importe ya que tebajo con importes)---ojo
-                    $nuevo_precio = (floatval($obj_mercancia->getPrecio() * $obj_mercancia->getExistencia()) - floatval($obj_documento->getImporteMercancia())) / $nueva_existencia;
-                    $obj_mercancia->setExistencia($nueva_existencia);
-                    $obj_mercancia->setImporte($nuevo_precio);
-                    if ($nueva_existencia == 0) {
-                        $obj_mercancia->setActivo(false);
-                    }
-                    try {
+
+                //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
+                if (!empty($arr_movimientos_mercancia)) {
+                    foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
+                        /**@var $obj_movimiento_mercancia MovimientoMercancia* */
+                        $obj_movimiento_mercancia
+                            ->setActivo(false);
+                        $em->persist($obj_movimiento_mercancia);
+
+                        /**@var $obj_mercancia Mercancia* */
+                        $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
+                        $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
+                        $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
+                        $obj_mercancia->setExistencia($nueva_existencia);
+                        $obj_mercancia->setImporte($nuevo_importe);
+                        if ($nueva_existencia == 0) {
+                            $obj_mercancia->setActivo(false);
+                        }
                         $em->persist($obj_mercancia);
-                        $em->persist($obj_informe_recepcion);
-                        $em->persist($obj_obligacion);
-                        $em->persist($obj_documento);
-                        $em->flush();
-                        $success = 'success';
-                        $msg = 'Informe de recepción eliminado satisfactoriamente';
-
-                    } catch
-                    (FileException $exception) {
-                        return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
                     }
-                } else {
-                    $msg = 'El informe de recepcion no se puede eliminar, porque tiene una cantidad de mercancia mayos a la existencia de la misma.';
-                    $success = 'error';
                 }
+                try {
+                    $em->persist($obj_informe_recepcion);
+//                    $em->persist($obj_obligacion);
+                    $em->persist($obj_documento);
+                    $em->flush();
+                    $success = 'success';
+                    $msg = 'Informe de recepción eliminado satisfactoriamente';
 
-            } else {
-                $msg = 'El informe de recepcion no se puede eliminar, porque existen pagos asociados.';
-                $success = 'error';
-            }
+                } catch
+                (FileException $exception) {
+                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                }
+//            } else {
+//                $msg = 'El informe de recepcion no se puede eliminar, porque existen pagos asociados.';
+//                $success = 'error';
+//            }
         }
         $this->addFlash($success, $msg);
         // }
         return $this->redirectToRoute('contabilidad_inventario_informe_recepcion');
+    }
+
+    /**
+     * @Route("/print_report/{id}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
+     */
+    public function print(EntityManagerInterface $em,$id)
+    {
+//        $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
+//
+//        $year_ = Date('Y');
+//        $informe_arr = $informe_recepcion_er->findBy(array(
+//            'activo' => true,
+//            'anno' => $year_
+//        ));
+//        $rows = [];
+//        foreach ($informe_arr as $obj_informe_recepcion) {
+//            /**@var $obj_informe_recepcion InformeRecepcion* */
+//            if ($obj_informe_recepcion->getIdDocumento()->getIdAlmacen()->getId() == 1) {
+//                $obj_documento = $obj_informe_recepcion->getIdDocumento();
+//                $rows[] = array(
+//                    'id' => $obj_informe_recepcion->getId(),
+//                    'concecutivo' => $obj_informe_recepcion->getNroConcecutivo(),
+////                    'cantidad' => $obj_documento->getCantidadMercancia(),
+//                    'importe' => number_format($obj_documento->getImporteTotal(), 2, '.', ''),
+//                    'fecha' => $obj_documento->getFecha()->format('d-m-Y'),
+//                    'inventario' => $obj_informe_recepcion->getNroCuentaInventario() . ' / ' . $obj_informe_recepcion->getNroSubcuentaInventario(),
+//                    'acreedora' => $obj_informe_recepcion->getNroCuentaAcreedora() . ' / ' . $obj_informe_recepcion->getNroSubcuentaAcreedora()
+//                );
+//            }
+//        }
+        return $this->render('contabilidad/inventario/informe_recepcion/print.html.twig', [
+            'controller_name' => 'InformeRecepcionControllerPrint',
+            'informes' => array(),
+            'id'=>$id
+        ]);
     }
 
 }
