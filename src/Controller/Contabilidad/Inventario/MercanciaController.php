@@ -33,7 +33,7 @@ class MercanciaController extends AbstractController
                 'descripcion'=>$mercancia_obj->getDescripcion(),
                 'unidad_medida'=>$mercancia_obj->getIdUnidadMedida()->getNombre(),
                 'existencia'=>$mercancia_obj->getExistencia(),
-                'precio'=> $mercancia_obj->getImporte()/$mercancia_obj->getExistencia(),
+                'precio'=> number_format(($mercancia_obj->getImporte()/$mercancia_obj->getExistencia()),3,'.',''),
                 'importe'=> $mercancia_obj->getImporte(),
 
             );
