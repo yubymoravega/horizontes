@@ -444,54 +444,54 @@ class InformeRecepcionController extends AbstractController
 //            /**@var $obj_obligacion ObligacionPago* */
 //            $importe_obligacion = $obj_obligacion->getResto();
 //            if (floatval($importe_informe) - floatval($importe_obligacion) == 0) {
-                //voy a informe de recepcion y lo elimino
-                $obj_informe_recepcion->setActivo(false);
-                //voy a obligacion de pago y la elimino
+            //voy a informe de recepcion y lo elimino
+            $obj_informe_recepcion->setActivo(false);
+            //voy a obligacion de pago y la elimino
 //                $obj_obligacion->setActivo(false);
-                $obj_documento = $obj_informe_recepcion->getIdDocumento();
-                /**@var $obj_documento Documento* */
-                //voy a documento y lo elimino
-                $obj_documento->setActivo(false);
+            $obj_documento = $obj_informe_recepcion->getIdDocumento();
+            /**@var $obj_documento Documento* */
+            //voy a documento y lo elimino
+            $obj_documento->setActivo(false);
 
 
-                //eliminar la entrada de la tabla de movimiento_mercancia
-                $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
-                    'id_documento' => $obj_documento->getId(),
-                    'activo' => true
-                ));
+            //eliminar la entrada de la tabla de movimiento_mercancia
+            $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
+                'id_documento' => $obj_documento->getId(),
+                'activo' => true
+            ));
 
-                //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
-                if (!empty($arr_movimientos_mercancia)) {
-                    foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
-                        /**@var $obj_movimiento_mercancia MovimientoMercancia* */
-                        $obj_movimiento_mercancia
-                            ->setActivo(false);
-                        $em->persist($obj_movimiento_mercancia);
+            //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
+            if (!empty($arr_movimientos_mercancia)) {
+                foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia* */
+                    $obj_movimiento_mercancia
+                        ->setActivo(false);
+                    $em->persist($obj_movimiento_mercancia);
 
-                        /**@var $obj_mercancia Mercancia* */
-                        $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
-                        $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
-                        $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
-                        $obj_mercancia->setExistencia($nueva_existencia);
-                        $obj_mercancia->setImporte($nuevo_importe);
-                        if ($nueva_existencia == 0) {
-                            $obj_mercancia->setActivo(false);
-                        }
-                        $em->persist($obj_mercancia);
+                    /**@var $obj_mercancia Mercancia* */
+                    $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
+                    $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
+                    $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
+                    $obj_mercancia->setExistencia($nueva_existencia);
+                    $obj_mercancia->setImporte($nuevo_importe);
+                    if ($nueva_existencia == 0) {
+                        $obj_mercancia->setActivo(false);
                     }
+                    $em->persist($obj_mercancia);
                 }
-                try {
-                    $em->persist($obj_informe_recepcion);
+            }
+            try {
+                $em->persist($obj_informe_recepcion);
 //                    $em->persist($obj_obligacion);
-                    $em->persist($obj_documento);
-                    $em->flush();
-                    $success = 'success';
-                    $msg = 'Informe de recepción eliminado satisfactoriamente';
+                $em->persist($obj_documento);
+                $em->flush();
+                $success = 'success';
+                $msg = 'Informe de recepción eliminado satisfactoriamente';
 
-                } catch
-                (FileException $exception) {
-                    return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
-                }
+            } catch
+            (FileException $exception) {
+                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+            }
 //            } else {
 //                $msg = 'El informe de recepcion no se puede eliminar, porque existen pagos asociados.';
 //                $success = 'error';
@@ -555,16 +555,16 @@ class InformeRecepcionController extends AbstractController
                 $unidad = $obj_empleado->getIdUnidad()->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
                     /**@var $obj MovimientoMercancia* */
-                        $rows[] = array(
-                            'id' => $obj->getIdMercancia()->getId(),
-                            'codigo' => $obj->getIdMercancia()->getCodigo(),
-                            'descripcion' => $obj->getIdMercancia()->getDescripcion(),
-                            'existencia'=>$obj->getExistencia(),
-                            'cantidad'=>$obj->getCantidad(),
-                            'precio'=>number_format(($obj->getImporte()/$obj->getCantidad()),3,'.',''),
-                            'importe'=>number_format($obj->getImporte(),2,'.',''),
-                        );
-                        $importe_total += $obj->getImporte();
+                    $rows[] = array(
+                        'id' => $obj->getIdMercancia()->getId(),
+                        'codigo' => $obj->getIdMercancia()->getCodigo(),
+                        'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                        'existencia'=>$obj->getExistencia(),
+                        'cantidad'=>$obj->getCantidad(),
+                        'precio'=>number_format(($obj->getImporte()/$obj->getCantidad()),3,'.',''),
+                        'importe'=>number_format($obj->getImporte(),2,'.',''),
+                    );
+                    $importe_total += $obj->getImporte();
                 }
             }
 

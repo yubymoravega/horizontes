@@ -30,9 +30,8 @@ class InventarioController extends AbstractController
     /**
      * @Route("/contabilidad/inventario/selAlmacen", name="sel_alamacen_inventario")
      */
-    public function selAlmacen()
+    public function selAlmacen(Request $request)
     {
-
         $row = [];
         $obj_user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
@@ -65,8 +64,12 @@ class InventarioController extends AbstractController
      */
     public function seleccionarAlmacen(Request $request)
     {
+        $session = $request->getSession();
         $almacen_id =$request->get('id_almacen');
-        $this->addFlash('success', 'Usted se encuentra trabajando dento del almacén '.$almacen_id);
+        $name_almacen =$request->get('name_almacen');
+        $session->set('selected_almacen/id', $almacen_id);
+        $session->set('selected_almacen/name', $name_almacen);
+        $this->addFlash('success', 'Usted se encuentra trabajando dento del almacén '.$name_almacen);
         return new JsonResponse(['success'=>true]);
     }
 }

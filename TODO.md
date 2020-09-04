@@ -24,12 +24,10 @@
 
 ### Inventario
 - [ ] { Tipo Documento, Modulos } -> resolver el tema de los valores estaticos con un JSON, YAML u otro tipo de config
-- [x] utilizar la funcion js `contabilidad.js/alertTemplate` en security/index.html.twig
+- eliminar flechas de number o regex-> para esto
 - LOADING...
     - [ ] http://127.0.0.1:8000/contabilidad/config/conf-inicial/form-add
-    
 - [ ] validar el formato codigo cuenta
-- [ ] Variable global guardarla en la seccion y/o algo como {{ app }} de twig 
        
 # Pendiente
 - [ ]  `AuxFunctions::existWidthFK()` -> para validar las llaves foraneas antes de eliminar

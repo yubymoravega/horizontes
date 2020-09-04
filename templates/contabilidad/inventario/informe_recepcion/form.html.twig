@@ -319,6 +319,7 @@
                 if (form_informe_recepcion.valid()) {
                     if (list_mercancia.length) {
                         let data = form_informe_recepcion.serializeArray()
+                        console.log(data)
                         loadingModal.show()
                         data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
