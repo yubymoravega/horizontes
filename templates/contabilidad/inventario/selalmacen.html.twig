@@ -50,12 +50,15 @@
         $(document).ready(function () {
             $('#selecionarAlmacen').modal('show')
         })
-
+        console.log()
         $('#btnAceptar').on('click', function () {
             $.ajax({
                 url: '/contabilidad/inventario/seleccionarAlmacen',
                 method: "POST",
-                data: {id_almacen: $('#almacenes_select').val()}
+                data: {
+                    id_almacen: $('#almacenes_select').val(),
+                    name_almacen: $('#almacenes_select option:selected').text()
+                }
             }).then(res => {
                 window.location.replace('/contabilidad/inventario');
             })
