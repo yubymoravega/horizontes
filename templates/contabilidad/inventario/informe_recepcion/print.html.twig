@@ -5,9 +5,88 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    {#Style#}
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+
+
     <title>Imprimir Informe</title>
 </head>
 <body>
-<p>HELLOW from {{ id }}, we are ready to print report</p>
+<div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+    <table border="1" width="960px" class="mt-1">
+        <tbody>
+        <tr>
+            <td  colspan="7" height="70px" class="font-weight-bold text-center">INFORME DE RECEPCION ({{ datos.nro_solicitud }})</td>
+        </tr>
+        <tr>
+            <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>
+            <td colspan="1" width="200px"><strong>Fecha: </strong>{{ datos.fecha_informe }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table border="1" width="960px">
+        <tbody>
+        <tr>
+            <td class="text-center font-weight-bold" colspan="5">Datos del proveedor</td>
+            <td class="text-center font-weight-bold" colspan="2">Datos de la factura</td>
+        </tr>
+        <tr>
+            <td colspan="4"><strong>Nombre: </strong>{{ datos.proveedor }}</td>
+            <td width="140px"><strong>Código: </strong>{{ datos.cod_proveedor }}</td>
+            <td width="140px"><strong>Número: </strong>{{ datos.cod_factura }}</td>
+            <td width="160px"><strong>Fecha: </strong>{{ datos.fecha }}</td>
+        </tr>
+        <tr>
+            <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table  border="1" width="960px">
+        <tbody>
+        <tr>
+            <td width="80"><strong>Código</strong></td>
+            <td colspan="2"><strong>Descripción</strong></td>
+            <td width="100"><strong>Cantidad</strong></td>
+            <td width="100"><strong>Precio</strong></td>
+            <td width="100"><strong>Importe</strong></td>
+            <td width="100"><strong>Existencia</strong></td>
+        </tr>
+        {% for item in mercancias %}
+            <tr>
+                <td>{{ item.codigo }}</td>
+                <td colspan="2">{{ item.descripcion }}</td>
+                <td class="text-right">{{ item.cantidad }}</td>
+                <td class="text-right">{{ item.precio }}</td>
+                <td class="text-right">{{ item.importe }}</td>
+                <td class="text-right">{{ item.existencia }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td class="font-weight-bold text-center" colspan="5">IMPORTE TOTAL</td>
+            <td class="font-weight-bold text-right">{{ datos.importe_total }}</td>
+            <td class="font-weight-bold text-center" style="background-color: #aaaeb7"></td>
+        </tr>
+        </tbody>
+     <table  border="1" class="mt-4" width="960px" height="70px">
+        <tbody>
+        <tr>
+            <td width="155"><strong>Jefe de Almacén</strong></td>
+            <td colspan="2"><strong>Transportador</strong></td>
+            <td width="155"><strong>Recepciona</strong></td>
+            <td width="155"><strong>Contabiliza</strong></td>
+            <td width="165"><strong>Submayor</strong></td>
+            <td width="100"><strong>Nro</strong></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+{#JavaScript#}
+<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
+
 </body>
 </html>

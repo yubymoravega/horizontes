@@ -3,6 +3,7 @@
 namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\User;
 use App\Repository\Contabilidad\Inventario\EntradaMercanciaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -47,6 +48,11 @@ class MovimientoMercancia
     private $importe;
 
     /**
+     * @ORM\Column(type="float")
+     */
+    private $existencia;
+
+    /**
      * @ORM\Column(type="date")
      */
     private $fecha;
@@ -61,7 +67,10 @@ class MovimientoMercancia
      */
     private $entrada;
 
-
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, cascade={"persist", "remove"})
+     */
+    private $id_usuario;
 
     public function getId(): ?int
     {
@@ -128,6 +137,18 @@ class MovimientoMercancia
         return $this;
     }
 
+    public function getExistencia(): ?float
+    {
+        return $this->existencia;
+    }
+
+    public function setExistencia(float $existencia): self
+    {
+        $this->existencia = $existencia;
+
+        return $this;
+    }
+
     public function getFecha(): ?\DateTimeInterface
     {
         return $this->fecha;
@@ -160,6 +181,18 @@ class MovimientoMercancia
     public function setEntrada(bool $entrada): self
     {
         $this->entrada = $entrada;
+
+        return $this;
+    }
+
+    public function getIdUsuario(): ?User
+    {
+        return $this->id_usuario;
+    }
+
+    public function setIdUsuario(?User $id_usuario): self
+    {
+        $this->id_usuario = $id_usuario;
 
         return $this;
     }
