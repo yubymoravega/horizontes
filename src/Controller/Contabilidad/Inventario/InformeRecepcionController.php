@@ -58,7 +58,6 @@ class InformeRecepcionController extends AbstractController
                 $rows[] = array(
                     'id' => $obj_informe_recepcion->getId(),
                     'concecutivo' => $obj_informe_recepcion->getNroConcecutivo(),
-//                    'cantidad' => $obj_documento->getCantidadMercancia(),
                     'importe' => number_format($obj_documento->getImporteTotal(), 2, '.', ''),
                     'fecha' => $obj_documento->getFecha()->format('d-m-Y'),
                     'inventario' => $obj_informe_recepcion->getNroCuentaInventario() . ' / ' . $obj_informe_recepcion->getNroSubcuentaInventario(),

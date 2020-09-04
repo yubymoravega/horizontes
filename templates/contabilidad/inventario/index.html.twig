@@ -31,16 +31,25 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Operaciones
+                        Entrada
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste') }}">Ajuste</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida') }}">Vale de
-                            salida</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia') }}">Transferencia</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion') }}">Informe
                             de recepción</a>
-                        {#                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_factura') }}">Factura</a>#}
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Salida
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste') }}">Ajuste</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia') }}">Transferencia</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida') }}">Vale de
+                            salida</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
