@@ -53,7 +53,7 @@ class InformeRecepcionController extends AbstractController
         $rows = [];
         foreach ($informe_arr as $obj_informe_recepcion) {
             /**@var $obj_informe_recepcion InformeRecepcion* */
-            if ($obj_informe_recepcion->getIdDocumento()->getIdAlmacen()->getId() == 1) {
+            if ($obj_informe_recepcion->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id')) {
                 $obj_documento = $obj_informe_recepcion->getIdDocumento();
                 $rows[] = array(
                     'id' => $obj_informe_recepcion->getId(),
@@ -77,7 +77,7 @@ class InformeRecepcionController extends AbstractController
     public function gestionarInforme(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
         $form = $this->createForm(InformeRecepcionType::class);
-        $id_almacen = 1;//aqui es donde cojo la variable global que contiene el almacen seleccionado
+        $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
@@ -111,7 +111,7 @@ class InformeRecepcionController extends AbstractController
                 $contador = 0;
                 foreach ($informes_recepcion_arr as $obj) {
                     /**@var $obj InformeRecepcion* */
-                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == 1 && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id') && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
                         $contador++;
                 }
                 $consecutivo = $contador + 1;
@@ -196,7 +196,7 @@ class InformeRecepcionController extends AbstractController
                 $mercancia_er = $em->getRepository(Mercancia::class);
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
                 $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-                    'nombre' => 'INFORME DE RECECIÓN',
+                    'nombre' => 'INFORME DE RECEPCIÓN',
                     'activo' => true
                 ));
                 $importe_total = 0;
@@ -220,8 +220,7 @@ class InformeRecepcionController extends AbstractController
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
-                            ->setIdUsuario($this->getUser())
-                        ;
+                            ->setIdUsuario($this->getUser());
 
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
                         $obj_mercancia = $mercancia_er->findOneBy(array(
@@ -242,10 +241,9 @@ class InformeRecepcionController extends AbstractController
                             $em->persist($new_mercancia);
                             $movimiento_mercancia
                                 ->setIdMercancia($new_mercancia)
-                                ->setExistencia($cantidad_mercancia)
-                            ;
+                                ->setExistencia($cantidad_mercancia);
                         } else {
-                            if($obj_mercancia->getActivo() == false){
+                            if ($obj_mercancia->getActivo() == false) {
                                 $obj_mercancia
                                     ->setExistencia(0)
                                     ->setImporte(0);
@@ -266,8 +264,7 @@ class InformeRecepcionController extends AbstractController
                             $em->persist($obj_mercancia);
                             $movimiento_mercancia
                                 ->setIdMercancia($obj_mercancia)
-                                ->setExistencia($obj_mercancia->getExistencia())
-                            ;
+                                ->setExistencia($obj_mercancia->getExistencia());
                         }
                         $em->persist($movimiento_mercancia);
                     }
@@ -298,17 +295,17 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia($codigo)
+    public function getMercancia(Request $request,$codigo)
     {
         $em = $this->getDoctrine()->getManager();
         if ($codigo == -1 || $codigo == '-1')
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'activo' => true,
-                'id_amlacen' => 1
+                'id_amlacen' => $request->getSession()->get('selected_almacen/id')
             ));
         else
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'id_amlacen' => 1,
+                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
                 'codigo' => $codigo
             ));
@@ -320,7 +317,7 @@ class InformeRecepcionController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte()/$obj->getExistencia(), 3),
+                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia()
             );
@@ -344,7 +341,7 @@ class InformeRecepcionController extends AbstractController
         $cuenta_er = $em->getRepository(Cuenta::class);
 
         $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'INFORME DE RECECIÓN',
+            'nombre' => 'INFORME DE RECEPCIÓN',
             'activo' => true
         ));
         $obj_modulo = $modulo_er->findOneBy(array(
@@ -505,7 +502,7 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/print_report/{id}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em,$id)
+    public function print(EntityManagerInterface $em, $id)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -517,7 +514,7 @@ class InformeRecepcionController extends AbstractController
         ));
 
         $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'INFORME DE RECECIÓN',
+            'nombre' => 'INFORME DE RECEPCIÓN',
             'activo' => true
         ));
         $rows = [];
@@ -530,7 +527,7 @@ class InformeRecepcionController extends AbstractController
         $unidad = '';
         $nro_solicitud = '';
         $fecha_informe = '';
-        if($informe_obj && $obj_tipo_documento){
+        if ($informe_obj && $obj_tipo_documento) {
             $almacen = $informe_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $cod_proveedor = $informe_obj->getIdProveedor()->getCodigo();
             $proveedor = $informe_obj->getIdProveedor()->getNombre();
@@ -540,17 +537,17 @@ class InformeRecepcionController extends AbstractController
             $nro_solicitud = $informe_obj->getNroConcecutivo();
             $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
                 'id_tipo_documento' => $obj_tipo_documento->getId(),
-                'id_documento'=>$informe_obj->getIdDocumento()->getId(),
+                'id_documento' => $informe_obj->getIdDocumento()->getId(),
                 'activo' => true
             ));
 
-            if(!empty($arr_movimiento_mercancia)){
+            if (!empty($arr_movimiento_mercancia)) {
                 /** @var  $mov_mercancia MovimientoMercancia */
                 $mov_mercancia = $arr_movimiento_mercancia[0];
                 $id_usuario_movimiento = $mov_mercancia->getIdUsuario()->getId();
                 /** @var Empleado $obj_empleado */
                 $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
-                    'id_usuario'=>$id_usuario_movimiento
+                    'id_usuario' => $id_usuario_movimiento
                 ));
                 $unidad = $obj_empleado->getIdUnidad()->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
@@ -559,10 +556,10 @@ class InformeRecepcionController extends AbstractController
                         'id' => $obj->getIdMercancia()->getId(),
                         'codigo' => $obj->getIdMercancia()->getCodigo(),
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
-                        'existencia'=>$obj->getExistencia(),
-                        'cantidad'=>$obj->getCantidad(),
-                        'precio'=>number_format(($obj->getImporte()/$obj->getCantidad()),3,'.',''),
-                        'importe'=>number_format($obj->getImporte(),2,'.',''),
+                        'existencia' => $obj->getExistencia(),
+                        'cantidad' => $obj->getCantidad(),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                        'importe' => number_format($obj->getImporte(), 2, '.', ''),
                     );
                     $importe_total += $obj->getImporte();
                 }
@@ -572,18 +569,18 @@ class InformeRecepcionController extends AbstractController
         return $this->render('contabilidad/inventario/informe_recepcion/print.html.twig', [
             'controller_name' => 'InformeRecepcionControllerPrint',
             'datos' => array(
-                'importe_total'=>number_format($importe_total,2,'.',''),
-                'almacen'=>$almacen,
-                'cod_proveedor'=>$cod_proveedor,
-                'proveedor'=>$proveedor,
-                'fecha'=>$fecha_factura,
-                'cod_factura'=>$numero_factura,
-                'unidad'=>$unidad,
-                'fecha_informe'=>$fecha_informe,
-                'nro_solicitud'=>$nro_solicitud
+                'importe_total' => number_format($importe_total, 2, '.', ''),
+                'almacen' => $almacen,
+                'cod_proveedor' => $cod_proveedor,
+                'proveedor' => $proveedor,
+                'fecha' => $fecha_factura,
+                'cod_factura' => $numero_factura,
+                'unidad' => $unidad,
+                'fecha_informe' => $fecha_informe,
+                'nro_solicitud' => $nro_solicitud
             ),
-            'mercancias'=>$rows,
-            'id'=>$id
+            'mercancias' => $rows,
+            'id' => $id
         ]);
     }
 
