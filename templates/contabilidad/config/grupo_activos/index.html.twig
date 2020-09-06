@@ -28,7 +28,7 @@
         {{ include('contabilidad/config/grupo_activos/form_modal.html.twig',{title: 'Adicionar'}) }}
 
         {# list #}
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Descripción</th>
             <th scope="col-1">% deprecia(año)</th>
@@ -156,6 +156,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/grupo-activos/add`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -164,6 +165,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/grupo-activos/upd/${id_grupo_activos}`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
 

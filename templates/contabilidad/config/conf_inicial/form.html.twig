@@ -12,13 +12,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body bg-dark-app" style="height: 600px;">
-                    <div style="height: 500px; overflow-y: auto;">
-                        <table class="table table-hover text-light">
+                <div class="modal-body bg-dark-app d-flex flex-column">
+                    <div style="height: 450px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light">
                             <thead class="thead-dark">
-                            <th scope="col-1" style="width: 10px">Sel.</th>
+                            <th style="width: 10px">Sel.</th>
                             <th style="width: 160px">Nro. cuenta</th>
-                            <th scope="col-6">Descripción</th>
+                            <th>Descripción</th>
                             </thead>
                             <tbody id="rows_table">
                             </tbody>
@@ -58,9 +58,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body bg-dark-app" style="height: 600px;">
-                    <div style="height: 500px; overflow-y: auto;">
-                        <table class="table table-hover text-light">
+                <div class="modal-body bg-dark-app d-flex flex-column">
+                    <div style="height: 450px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light">
                             <thead class="thead-dark">
                             <th scope="col-1" style="width: 10px">Sel.</th>
                             <th scope="col-1" style="width: 190px">Nro. subcuenta</th>
@@ -102,9 +102,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body bg-dark-app" style="height: 600px;">
-                    <div style="height: 500px; overflow-y: auto;">
-                        <table class="table table-hover text-light">
+                <div class="modal-body bg-dark-app d-flex flex-column">
+                    <div style="height: 450px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light">
                             <thead class="thead-dark">
                             <th scope="col-1" style="width: 10px">Sel.</th>
                             <th scope="col-1" style="width: 190px">Código</th>
@@ -139,18 +139,19 @@
             </div>
             <div class="card-body">
                 {{ form_start(formulario, {'attr':{'id':'form_add_configinicial'}}) }}
-                <div class="row">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                <div class="row mb-3 mb-md-0">
+                    <div class="col-md-4 form-group input-group input-group-sm pa-2 d-block">
                         <label for="configuracion_inicial_id_modulo" class="font-weight-bold">Módulo</label>
                         {{ form_widget(formulario.id_modulo, {'attr': {'class': 'form-control w-100'}}) }}
                         <span class="input-group-append"></span>
                     </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
-                        <label for="configuracion_inicial_id_tipo_documento" class="font-weight-bold">Tipo de documento</label>
+                    <div class="col-md-4 mt-0 form-group input-group input-group-sm d-block">
+                        <label for="configuracion_inicial_id_tipo_documento" class="font-weight-bold">Tipo de
+                            documento</label>
                         {{ form_widget(formulario.id_tipo_documento, {'attr': {'class': 'form-control w-100','id': 'id_tipo_documento'}}) }}
                         <span class="input-group-append"></span>
                     </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block">
+                    <div class="col-md-4 mt-0 form-group input-group input-group-sm d-block">
                         <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
                         <select name="naturaleza" id="naturaleza_cuenta" class="form-control w-100">
                             <option value="1">Deudora</option>
@@ -163,33 +164,36 @@
                     <label for="configuracion_inicial_id_cuenta" class="font-weight-bold">Cuenta</label>
                     <input type="text" name="configuracion_inicial_id_cuenta" class="form-control w-100"
                            id="configuracion_inicial_id_cuenta" data-toggle="modal"
-                           data-target="#listarCuentasModal">
+                    >
                 </div>
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="configuracion_inicial_id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
                     <input type="text" name="configuracion_inicial_id_subcuenta" id="configuracion_inicial_id_subcuenta"
-                           class="form-control w-100" data-toggle="modal" data-target="#listarSubcuentasModal">
+                           class="form-control w-100" data-toggle="modal">
                 </div>
 
 
                 <div class="form-group input-group input-group-sm d-block">
-                    <label for="configuracion_inicial_id_cuenta_contrapartida" class="font-weight-bold">Cuenta Contrapartida</label>
+                    <label for="configuracion_inicial_id_cuenta_contrapartida" class="font-weight-bold">Cuenta
+                        Contrapartida</label>
                     <input type="text" name="configuracion_inicial_id_cuenta_contrapartida"
                            class="form-control w-100" id="configuracion_inicial_id_cuenta_contrapartida"
                            data-toggle="modal"
-                           data-target="#listarCuentasModal">
+                    >
                 </div>
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="configuracion_inicial_id_subcuenta_contrapartida" class="font-weight-bold" id="test">Subcuenta
                         Contrapartida</label>
                     <input type="text" name="configuracion_inicial_id_subcuenta_contrapartida"
                            id="configuracion_inicial_id_subcuenta_contrapartida" class="form-control w-100"
-                           data-toggle="modal" data-target="#listarSubcuentasModal">
+                           data-toggle="modal">
                 </div>
                 <div class="form-group input-group input-group-sm d-block">
-                    <label for="configuracion_inicial_id_elemento_gasto" class="font-weight-bold">Elemento de Gasto</label>
-                    <input type="text" name="configuracion_inicial_id_elemento_gasto" id="configuracion_inicial_id_elemento_gasto"
-                           class="form-control w-100" data-toggle="modal" data-target="#listarElementoGastoModal">
+                    <label for="configuracion_inicial_id_elemento_gasto" class="font-weight-bold">Elemento de
+                        Gasto</label>
+                    <input type="text" name="configuracion_inicial_id_elemento_gasto"
+                           id="configuracion_inicial_id_elemento_gasto"
+                           class="form-control w-100" data-toggle="modal">
                 </div>
 
                 <div class="form-group">
@@ -276,6 +280,7 @@
             $('#btnAceptar').show()
             $('#rows_table').find('tr').remove();
             let cuentas_contrapartidas = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+            loadingModal.show()
             $.ajax({
                 url: '/contabilidad/config/cuenta/getCuentas/' + cuentas_contrapartidas,
                 method: 'POST',
@@ -301,6 +306,8 @@
                             );
                         }
                     })
+                    loadingModal.close()
+                    $('#listarCuentasModal').modal('show')
                 },
                 error: function () {
                 }
@@ -311,6 +318,7 @@
             $('#btnAceptar').hide()
             $('#rows_table').find('tr').remove();
             let cuentas = $('#configuracion_inicial_id_cuenta').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta').val()
+            loadingModal.show()
             $.ajax({
                 url: '/contabilidad/config/cuenta/getCuentas/' + cuentas,
                 method: 'POST',
@@ -321,7 +329,7 @@
                         if ($('#configuracion_inicial_id_cuenta_contrapartida').val().includes(valor.nro_cuenta + ' '))
                             $('#rows_table').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
-                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '" checked>' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '" checked>' +
                                 '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.nro_cuenta + '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
@@ -329,13 +337,15 @@
                         else {
                             $('#rows_table').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
-                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '">' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.nro_cuenta + '">' +
                                 '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.nro_cuenta + '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
                             );
                         }
                     })
+                    loadingModal.close()
+                    $('#listarCuentasModal').modal('show')
                 },
                 error: function () {
                 }
@@ -344,6 +354,7 @@
 
         /**Cargando las subcuentas dado las cuentas, tanto deudoras como acreedoras(contrapartida)**/
         $('#configuracion_inicial_id_subcuenta').on('click', function () {
+            loadingModal.show()
             $('#btnAceptarSubcuentasContrapartida').hide()
             $('#btnAceptarSubcuentas').show()
             $('#rows_table_subcuenta').find('tr').remove();
@@ -358,7 +369,7 @@
                         if ($('#configuracion_inicial_id_subcuenta').val().includes(valor.nro_subcuenta + ' '))
                             $('#rows_table_subcuenta').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
-                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '" checked>' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '" checked>' +
                                 '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.nro_subcuenta + '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
@@ -366,13 +377,15 @@
                         else {
                             $('#rows_table_subcuenta').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
-                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '">' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.nro_subcuenta + '">' +
                                 '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.nro_subcuenta + '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
                             );
                         }
                     })
+                    loadingModal.close()
+                    $('#listarSubcuentasModal').modal('show')
                 },
                 error: function () {
                 }
@@ -383,6 +396,7 @@
         $('#configuracion_inicial_id_elemento_gasto').on('click', function () {
             $('#rows_table_elemento_gasto').find('tr').remove();
             let cuentas_str = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+            loadingModal.show()
             $.ajax({
                 url: '/contabilidad/config/conf-inicial/form-elemento-gasto/' + cuentas_str,
                 method: 'POST',
@@ -393,7 +407,7 @@
                         if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
                             $('#rows_table_elemento_gasto').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
-                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
                                 '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
@@ -401,13 +415,15 @@
                         else {
                             $('#rows_table_elemento_gasto').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
-                                '<input class="form-check-input" type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
                                 '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
                                 '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
                             );
                         }
                     })
+                    loadingModal.close()
+                    $('#listarElementoGastoModal').modal('show')
                 },
                 error: function () {
                 }
@@ -418,6 +434,7 @@
             $('#btnAceptarSubcuentas').hide()
             $('#rows_table_subcuenta').find('tr').remove();
             let cuentas_contrapartida_str = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+            loadingModal.show()
             $.ajax({
                 url: '/contabilidad/config/conf-inicial/form-getsubcuenta/' + cuentas_contrapartida_str,
                 method: 'POST',
@@ -443,6 +460,8 @@
                             );
                         }
                     })
+                    loadingModal.close()
+                    $('#listarSubcuentasModal').modal('show')
                 },
                 error: function () {
                 }
