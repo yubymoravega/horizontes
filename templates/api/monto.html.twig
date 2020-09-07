@@ -1,57 +1,98 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+	<!-- Section Input Groups-->
+	<section class="section novi-background section-50">
+		<div class="container ">
+			<div class="card-header text-center">
+				<h1>Monto a cobrar</h1>
+			</div>
+			<div class="row justify-content-md-center text-left ">
+				<div class="col-md-7 col-lg-5 card ">
+					<div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger" role="alert"></div>
+					<form id="payment-form" name='payment-form' action="{{ path('select', {'tel': tel}) }}" method="POST">
 
-      <!-- Section Input Groups-->
-      <section class="section novi-background section-50">
-        <div class="container ">
-       <div class="card-header text-center"><h1>Monto a cobrar</h1></div>
-          <div class="row justify-content-md-center text-left ">
-            <div class="col-md-7 col-lg-5 card "><div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger" role="alert"></div>
-              <form id="payment-form" name='payment-form' action="{{ path('select', {'tel': tel}) }}" method="POST" >
-                
-                 <div class="card-header text-center texto-cobrar">Facturar a : {{nombre}} {{apellido}}</div>
-               
-                <div class="form-group  ">
-                  <div class="input-group input-group-sm justify-content-md-center"><span class="input-group-prepend"><span class="input-group-text input-group-icon"><span class="novi-icon mdi mdi-square-inc-cash"></span></span></span>
-                    <input autocomplete="off" name='monto' type="text" id="monto" placeholder="0.00" required/>
-                      <button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button></span>
-                  </div>
-                </div>    
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
+						<div class="card-header text-center texto-cobrar">Facturar a :
+							{{nombre}}
+							{{apellido}}</div>
 
-{% endblock %}
+						<div class="form-group">
+							<div class="input-group input-group-sm justify-content-md-center">
+								<span class="input-group-prepend">
+									<span class="input-group-text input-group-icon">
+										<span class="novi-icon mdi mdi-square-inc-cash"></span>
+									</span>
+								</span>
+								<input autocomplete="off" name='monto' type="text" id="monto" placeholder="0.00" required/>
+								<button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button>
+							</span>
+						</div>
 
-{% block javascripts %} 
+						<div style="margin-left: 15%; margin-top: 10px;" class="form-check form-check-inline justify-content-md-center">
+							<input name="filtro" class="form-check-input check" type="checkbox" id='tarjeta' value="tarjeta">
+							<label class="form-check-label" for="inlineCheckbox1">Tarjeta</label>
+						</div>
+						<div class="form-check form-check-inline justify-content-md-center">
+							<input name="filtro" class="form-check-input check" type="checkbox"  id='efectivo' value="efectivo">
+							<label class="form-check-label" for="inlineCheckbox2">Efectivo</label>
+						</div>
+						<div class="form-check form-check-inline justify-content-md-center">
+							<input class="form-check-input" type="checkbox"  value="option3" disabled>
+							<label class="form-check-label" for="inlineCheckbox3">Swipe</label>
+						</div>
+
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>{% endblock %}{% block javascripts %}
 {{parent()}}
 
 <script>
 
 
+	$("#payment-form").validate({
+errorLabelContainer: "#messageBox",
+wrapper: "li",
+rules: {
+'monto': {
+required: true,
+minlength: 1,
+min: 1
+},"filtro": {required: true}
 
-$("#payment-form").validate({
-   errorLabelContainer: "#messageBox",
-    wrapper: "li",
-    rules: {
-      'monto': {
-      required: true, minlength: 1 ,  min:1},
-      
-    },
-    
-    messages: {
-      'monto': {required: "Monto Requerido", minlength: "Minimo 1 US$", min:"Minimo $ 1.00" }},
- 
- });
+},
 
+messages: {
+'monto': {
+required: "Monto Requerido",
+minlength: "Minimo 1 US$",
+min: "Minimo $ 1.00"
+}, 
+'filtro': {
+required: "Seleccione Metodo De Pago"
+}, 
+}
 
-$('#monto').on('input', function () { 
-    this.value = this.value.replace(/[^0-9-.]/g,'');
 });
 
- </script>
- 
-{% endblock %}
+
+$('#monto').on('input', function () {
+this.value = this.value.replace(/[^0-9-.]/g, '');
+});
+
+let Checked = null;
+//The class name can vary
+for (let CheckBox of document.getElementsByClassName('check')){
+	CheckBox.onclick = function(){
+  	if(Checked!=null){
+      Checked.checked = false;
+      Checked = CheckBox;
+    }
+    Checked = CheckBox;
+  }
+}
+
+</script>{% endblock %}

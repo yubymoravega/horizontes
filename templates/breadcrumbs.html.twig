@@ -1,0 +1,21 @@
+
+<div class="offset-top-41 offset-xl-top-66 breadcrumbs">
+        <button id='back'  class="btn btn btn-default btn-icon btn-icon-left"><span class="icon novi-icon mdi mdi-keyboard-backspace"></span><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"></font></font></button>
+        <button id='inicio' class="btn btn btn-default btn-icon btn-icon-right"><span class="icon novi-icon mdi mdi-home"></span><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Inicio</font></font></button>
+        </div>
+<script>
+
+let back = document.getElementById('back');
+back.addEventListener('click',function (event) {
+ 
+ window.history.back()
+});
+
+let inicio = document.getElementById('inicio');
+inicio.addEventListener('click',function (event) {
+ 
+ location.href = window.location.protocol+'//'+location.hostname+':'+window.location.port
+});
+
+</script>
+

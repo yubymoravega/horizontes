@@ -1,20 +1,28 @@
-<li> <a href="{{ url ('home') }}">
-    <span>Página Inicio</span>
-        
-    </a>
-    
-</li>
-
 <li>
-    <a href="#"><span>Reportes</span>
-        
-    </a>
-    <ul class="rd-navbar-dropdown">
-        <li>
-            <a href="{{ url ('paymentreport') }}">
-                <span class="text-middle">Reporte de cobros</span>
-              
-            </a>
-        </li>
-    </ul>
+
+	<a href="#">
+		<span>Reportes</span>
+	</a>
+	<ul class="rd-navbar-dropdown">
+
+		<li>
+			<a href="{{ url ('config') }}">
+				<a href="{{ url ('paymentreport') }}">
+					<span>Tarjetas</span>
+				</a>
+
+			</a>
+		</li>
+		<li>
+			<a href="{{ url ('config') }}">
+				<a href="{{ url ('paymentreport.buscar') }}">
+					<span>Facturas</span>
+				</a>
+
+			</a>
+		</li>
+
+	</ul>
+
+
 </li>

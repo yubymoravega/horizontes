@@ -23,7 +23,7 @@ class ClienteReporte
     private $user;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $fecha;
 
@@ -61,6 +61,23 @@ class ClienteReporte
      * @ORM\Column(type="string", length=255)
      */
     private $auth;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $efectivo;
+
+    public function setEfectivo(string $efectivo): self
+       {
+    $this->efectivo = $efectivo;
+
+        return $this;
+    }
+
+    public function getEfectivo()
+    {
+        return $this->efectivo;
+    }
 
     public function getId(): ?int
     {

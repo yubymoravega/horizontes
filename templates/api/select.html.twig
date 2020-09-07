@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-   
+   {% include 'breadcrumbs.html.twig' %}
 <div class="select-tarjetas" style='margin: auto; padding: 10px; margin-top: 50px; margin-bottom: 50px;'>
 <img class="imagen-tarjetas-guardadas" src="{{ asset('images/iconos/wallet.svg') }}" >    
 <h1 class="tarjetas-guardadas">Tarjetas guardadas</h1>
 <hr class="divider bg-mantis">
-
+<h2 style=" color: #fff;text-align: center;font-weight: 100;" class="tarjetas-guardadas">Nombre: {{nombre}} {{apellido}}</h2>
      {% for tarjetas in tarjeta %}
       <a style="text-decoration: none;" href="{{ path('api.form', {'tel': tel, 'monto': monto,'last4': tarjetas.last4}) }}">
        <div  id='credit' class="credit-card {{tarjetas.brand}} selectable">
