@@ -21,7 +21,7 @@ class Unidad
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="contabilidad.config.unidad.descripcion_not_blank")
      */
     private $nombre;

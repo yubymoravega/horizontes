@@ -14,7 +14,7 @@
                 </div>
                 <div class="modal-body bg-dark-app" style="height: 600px;">
                     <div style="height: 500px; overflow-y: auto;">
-                        <table class="table table-hover text-light">
+                        <table class="table-small-rows table table-hover text-light">
                             <thead class="thead-dark">
                             <th style="width: 10px">Sel.</th>
                             <th style="width: 160px">Código</th>
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 <div>
-                    <table class="table table-hover text-light">
+                    <table class="table-small-rows table table-hover text-light">
                         <thead class="thead-dark">
                         <th width="120px">Cod.</th>
                         <th width="110px">Cant.</th>
@@ -322,7 +322,7 @@
                     if (list_mercancia.length) {
                         let data = form_informe_recepcion.serializeArray()
                         console.log(data)
-                        loadingModal.show()
+                        // loadingModal.show()
                         data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
                             url: '/contabilidad/inventario/informe-recepcion/form-add',
