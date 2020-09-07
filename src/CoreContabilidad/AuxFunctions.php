@@ -4,6 +4,7 @@
 namespace App\CoreContabilidad;
 
 
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
@@ -147,5 +148,23 @@ class AuxFunctions
                     ->orderBy('u.descripcion', 'ASC');
             }
         ]);
+    }
+    /**
+     * Obtener la unidad del usuario
+     */
+
+    public static function getUnidad($em, $user)
+    {
+        $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $user
+        ));
+        if ($obj_empleado) {
+            $unidad = $obj_empleado->getIdUnidad();
+        }
+        else{
+            $unidad = null;
+        }
+        return $unidad;
     }
 }

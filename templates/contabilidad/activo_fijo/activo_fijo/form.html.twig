@@ -100,7 +100,7 @@
                                 {{ form_widget(formulario.mercancia.codigo) }}
                             </div>
                             <div class="col-1 mt-0 p-0">
-                                <button class="btn btn-secondary btn-sm" data-toggle="modal" type="button"
+                                <button class="btn btn-secondary btn-sm" data-toggle="modal"
                                         data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
                                             class="fa fa-search"></i></button>
                             </div>
@@ -165,7 +165,7 @@
                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">contabilizar</button>
+                        <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">Salvar Informe</button>
                     </div>
                 </div>
 
@@ -204,9 +204,8 @@
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
                 let codigo = $('#informe_recepcion_mercancia_codigo').val() != '' ? $('#informe_recepcion_mercancia_codigo').val() : -1
-                let cuenta = $('#informe_recepcion_nro_cuenta_inventario').val() != '' ? $('#informe_recepcion_nro_cuenta_inventario').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo +','+ cuenta,
+                    url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -309,11 +308,11 @@
                     'informe_recepcion[documento][importe_mercancia]': "required",
                 },
                 messages: {
-                    'informe_recepcion[mercancia][codigo]': 'Obligatorio!',
+                    'informe_recepcion[mercancia][codigo]': 'obligatorio!',
                     'informe_recepcion[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[mercancia][id_unidad_medida]': 'Obligatorio!',
-                    'informe_recepcion[documento][cantidad_mercancia]': 'Obligatorio!',
-                    'informe_recepcion[documento][importe_mercancia]': 'Obligatorio!',
+                    'informe_recepcion[mercancia][id_unidad_medida]': 'obligatorio!',
+                    'informe_recepcion[documento][cantidad_mercancia]': 'obligatorio!',
+                    'informe_recepcion[documento][importe_mercancia]': 'obligatorio!',
                 }
             })
 
@@ -364,7 +363,7 @@
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
                         list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
-                        importe_total += Number.parseFloat(importe)
+                        importe_total += Number.parseInt(importe)
 
                         $("#importe-total").text('$' + importe_total)
                         $('#rows_mercancias').append(`<tr>
@@ -397,7 +396,7 @@
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
-                importe_total -= Number.parseFloat(mercancia.importe)
+                importe_total -= Number.parseInt(mercancia.importe)
                 $("#importe-total").text('$' + importe_total)
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()

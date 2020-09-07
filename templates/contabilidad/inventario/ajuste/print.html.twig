@@ -11,32 +11,29 @@
     <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
 
 
-    <title>Imprimir Informe</title>
+    <title>Imprimir Ajuste Entrada</title>
 </head>
 <body>
 <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
     <table border="1" width="960px" class="mt-1">
         <tbody>
         <tr>
-            <td  colspan="7" height="70px" class="font-weight-bold text-center">INFORME DE RECEPCION</td>
+            <td  colspan="7" height="70px" class="font-weight-bold text-center">AJUSTE DE ENTRADA</td>
         </tr>
         <tr>
             <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>
-            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_informe }}</td>
+            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_ajuste }}</td>
         </tr>
         </tbody>
     </table>
     <table border="1" width="960px">
         <tbody>
         <tr>
-            <td class="text-center font-weight-bold" colspan="5">Datos del proveedor</td>
-            <td class="text-center font-weight-bold" colspan="2">Datos de la factura</td>
+            <td class="text-center font-weight-bold" colspan="7">Datos del proveedor</td>
         </tr>
         <tr>
-            <td colspan="4"><strong>Nombre: </strong>{{ datos.proveedor }}</td>
-            <td width="140px"><strong>Código: </strong>{{ datos.cod_proveedor }}</td>
-            <td width="140px"><strong>Número: </strong>{{ datos.cod_factura }}</td>
-            <td width="160px"><strong>Fecha: </strong>{{ datos.fecha }}</td>
+            <td colspan="5"><strong>Nombre: </strong>{{ datos.proveedor }}</td>
+            <td colspan="2"><strong>Código: </strong>{{ datos.cod_proveedor }}</td>
         </tr>
         <tr>
             <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>
@@ -77,7 +74,7 @@
             <td width="155"><strong>Recepciona</strong></td>
             <td width="155"><strong>Contabiliza</strong></td>
             <td width="165"><strong>Submayor</strong></td>
-            <td width="100" class="text-center"><strong> IR-{{ datos.nro_solicitud }}</strong></td>
+            <td width="100" class="text-center"><strong> AE-{{ datos.nro_solicitud }}</strong></td>
         </tr>
         </tbody>
     </table>

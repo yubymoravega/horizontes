@@ -237,31 +237,40 @@ class InformeRecepcionController extends AbstractController
                                 ->setExistencia($cantidad_mercancia)
                                 ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
                                 ->setCodigo($codigo_mercancia)
+                                ->setCuenta($cuenta_inventario)
                                 ->setImporte(floatval($importe_mercancia));
                             $em->persist($new_mercancia);
                             $movimiento_mercancia
                                 ->setIdMercancia($new_mercancia)
                                 ->setExistencia($cantidad_mercancia);
                         } else {
-                            if ($obj_mercancia->getActivo() == false) {
-                                $obj_mercancia
-                                    ->setExistencia(0)
-                                    ->setImporte(0);
+                            if($obj_mercancia->getCuenta() == $cuenta_inventario){
+                                if ($obj_mercancia->getActivo() == false) {
+                                    $obj_mercancia
+                                        ->setExistencia(0)
+                                        ->setActivo(true)
+                                        ->setImporte(0);
+                                    $em->persist($obj_mercancia);
+                                }
+                                /**@var $obj_mercancia Mercancia* */
+                                if ($obj_mercancia->getExistencia() == 0) {
+                                    $obj_mercancia
+                                        ->setExistencia($cantidad_mercancia)
+                                        ->setActivo(true)
+                                        ->setImporte($importe_mercancia);
+                                } else {
+                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                                    $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
+                                    $obj_mercancia
+                                        ->setExistencia($existencia_actualizada)
+                                        ->setActivo(true)
+                                        ->setImporte($importe_actualizado);
+                                }
                                 $em->persist($obj_mercancia);
                             }
-                            /**@var $obj_mercancia Mercancia* */
-                            if ($obj_mercancia->getExistencia() == 0) {
-                                $obj_mercancia
-                                    ->setExistencia($cantidad_mercancia)
-                                    ->setImporte($importe_mercancia);
-                            } else {
-                                $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
-                                $obj_mercancia
-                                    ->setExistencia($existencia_actualizada)
-                                    ->setImporte($importe_actualizado);
+                            else{
+                                return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
                             }
-                            $em->persist($obj_mercancia);
                             $movimiento_mercancia
                                 ->setIdMercancia($obj_mercancia)
                                 ->setExistencia($obj_mercancia->getExistencia());
@@ -282,7 +291,7 @@ class InformeRecepcionController extends AbstractController
                 }
                 return new JsonResponse(['success' => true, 'message' => 'Informe de recepción adicionado satisfactoriamente.']);
             } else {
-                return new JsonResponse(['success' => true, 'message' => 'Usted no es empleado de la empresa.']);
+                return new JsonResponse(['success' => false, 'message' => 'Usted no es empleado de la empresa.']);
             }
 //            }
         }
@@ -293,15 +302,19 @@ class InformeRecepcionController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{params}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request,$codigo)
+    public function getMercancia(Request $request,$params)
     {
+        $arr = explode(',',$params);
+        $codigo = $arr[0];
+        $cuenta = $arr[1];
         $em = $this->getDoctrine()->getManager();
         if ($codigo == -1 || $codigo == '-1')
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'activo' => true,
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id')
+                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
+                'cuenta'=>$cuenta
             ));
         else
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(

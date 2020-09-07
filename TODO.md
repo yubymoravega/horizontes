@@ -45,3 +45,10 @@ arrow ni seleccion mediante el teclado... algun problema con las librerias incor
     - en obligacion de pago porner la entiguedad por periodo(<30 dias, entre 30-60 dias, entre 60-90 y >90 dias)
     - en mercancia tengo que hacer una tarjeta de estiva()
     - en todas las tablase de base de dato de inventario tengo que cambiar donde guardo precio, guardar importe(OJO)
+    
+#####El cierre diario es por cuentas dentro del almacen
+saldo anterior(cierre del dia anterior) + debitos(cuentas de inventaro) - credito(vales de salida, tranferencias de salida y ajuste de salida) = saldo actual(tiene que ser igual a la suma de todos los importes de ls productos que pertenecen a las cuentas  relacionadas)
+la suma de los saldos de las cuentas tiene que ser igual a la suma de los importes de los productos que pertenecen a cada cuenta
+
+OJO NUEVO
+verifica rque el producto tiene que estar asociado por cuentas(1 producto solo puede estar asociado a una sola cuenta), si trata de adicionar el mismo codigo de mercancia en diferente cuenta enviar alerta y no permitirlo
