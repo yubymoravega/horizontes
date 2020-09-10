@@ -105,47 +105,25 @@
                                href="#"><span></span><br>
                                 <p class="p-text">Usuario</p></a>
                             <a class="rd-navbar-cart mdi icon-notification" href="#"><span></span> <br>
-                                <p class="p-text">Ayuda</p></a>
+                                <p class="p-text">Atender</p></a>
                             <a class="rd-navbar-cart mdi icon-ventas" href="#"><span></span><br>
                                 <p class="p-text">Ventas</p></a>
-                            <a class="rd-navbar-cart mdi icon-carrito "
+                            <a id="iconCarrito" class="rd-navbar-cart mdi icon-carrito fas " data-count="0"
                                data-rd-navbar-toggle=".rd-navbar-cart-dropdown"
                                href="#"><span></span><br>
                                 <p class="p-text">Factura</p></a>
                             <a class="rd-navbar-cart mdi icon-texto" href="#"><span class="span-text"
-                                                                                    style="width: 115px;">$ 00.00</span><br>
+                                                                                    style="width: 115px;"></span><br>
                                 <p style="margin-top: -3px;" class="p-text">Valor Total</p></a>
 
                             <div class="rd-navbar-cart-dropdown">
-                                <ul class="rd-navbar-list-products">
-                                    <li>
-                                        <div class="rd-navbar-product-image"><img
-                                                    src="images/shop/product-01-60x60.png"
-                                                    alt=""/></div>
-                                        <div class="rd-navbar-product-caption">
-                                            <h6 class="rd-navbar-product-title"><a
-                                                        href="shop-single-product-left-sidebar.html">Fashion model
-                                                    new</a></h6>
-                                            <p class="rd-navbar-product-price">$129.99</p>
-                                        </div>
-                                        <a class="mdi mdi-window-close rd-navbar-product-remove" href="#"></a>
-                                    </li>
-                                    <li>
-                                        <div class="rd-navbar-product-image"><img
-                                                    src="images/shop/product-01-60x60-3.png" alt=""/></div>
-                                        <div class="rd-navbar-product-caption">
-                                            <h6 class="rd-navbar-product-title"><a
-                                                        href="shop-single-product-left-sidebar.html">Fashion model
-                                                    new
-                                                    2</a></h6>
-                                            <p class="rd-navbar-product-price">$69.99</p>
-                                        </div>
-                                        <a class="mdi mdi-window-close rd-navbar-product-remove" href="#"></a>
-                                    </li>
+                                <ul id='carrito' class="rd-navbar-list-products">
+                                   
+                                   
                                 </ul>
                                 <div class="rd-navbar-cart-total">
-                                    <h6 class="rd-navbar-cart-total-title">Cart subtotal</h6><span
-                                            class="rd-navbar-cart-total-price">$199.98</span>
+                                    <h6 class="rd-navbar-cart-total-title">total</h6><span
+                                            id='totalCarrito' class="rd-navbar-cart-total-price">00</span>
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"

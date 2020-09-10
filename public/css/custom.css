@@ -29,18 +29,6 @@ a.rd-navbar-cart.mdi.icon-texto {
     display: none !important;
 }
 
-a.rd-navbar-cart.mdi.icon-carrito.toggle-original {
-    display: none !important;
-}
-
-
-a.rd-navbar-cart.mdi.icon-ventas {
-    display: none !important;
-}
-
-
-
-
 body.overflow-hidden-x-content.fondo {
     background-color: #2f2f2f !important;
 }
@@ -587,4 +575,41 @@ h3.texto-efectivo {
 
 img.imagen-efectivo {
     width: 4%;
+}
+
+.fas[data-count]{
+    position:relative;
+}
+.fas[data-count]:after {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    content: attr(data-count);
+    padding: .5em;
+    border-radius: 10em;
+    line-height: .9em;
+    color: white;
+    background: rgba(255,0,0,.75);
+    text-align: center;
+    width: 2em;
+    font-size: 11px;
+    font: bold .5em sans-serif;
+    height: 2em;
+}
+
+a.rd-navbar-cart.mdi.icon-carrito.fas.toggle-original {
+    font-size: 33px;
+}
+
+svg.iconCarritoEdit{
+    width: 20px;
+   
+}
+svg.iconCarritoDelete{
+    width: 20px;
+    
+}
+.svgCarrito{
+    float: right;
+    margin-right: 7%;
 }
