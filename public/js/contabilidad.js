@@ -73,12 +73,16 @@ const alertTemplate = (msg, type = 'success', time = 4000) => {
     }, time)
 }
 
-const loadingModal = {
-    show: (msg = 'Procesando...') => {
+loadingModal = {
+    show: function (msg = 'Procesando...') {
         $('#loading-modal').modal('show')
         $('#loading-modal-msg').text(msg)
     },
-    close: () => $('#loading-modal').modal('hide')
+    close: function () {
+        setTimeout(function () {
+            $('#loading-modal').modal('hide');
+        }, 500)
+    }
 
 }
 

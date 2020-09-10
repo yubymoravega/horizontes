@@ -2,18 +2,587 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\ConfiguracionInicial;
+use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\Modulo;
+use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Config\UnidadMedida;
+use App\Entity\Contabilidad\General\ObligacionPago;
+use App\Entity\Contabilidad\Inventario\Transferencia;
+use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\Mercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\Proveedor;
+use App\Form\Contabilidad\Inventario\TransferenciaType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class TransferenciaController
+ * CRUD DE TRANSFERENCIA DE ENTRADA
+ * @package App\Controller\Contabilidad\Inventario
+ * @Route("/contabilidad/inventario/transferencia-entrada")
+ */
 class TransferenciaController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/inventario/transferencia", name="contabilidad_inventario_transferencia")
+     * @Route("/", name="contabilidad_inventario_transferencia_entrada",methods={"GET"})
      */
-    public function index()
+    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
+        $transferencia_er = $em->getRepository(Transferencia::class);
+
+        $year_ = Date('Y');
+        $transferencia_arr = $transferencia_er->findBy(array(
+            'activo' => true,
+            'anno' => $year_,
+            'entrada'=>true
+        ));
+        $rows = [];
+        foreach ($transferencia_arr as $obj_transferencia) {
+            /**@var $obj_transferencia Transferencia* */
+            if ($obj_transferencia->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id')) {
+                $obj_documento = $obj_transferencia->getIdDocumento();
+                $rows[] = array(
+                    'id' => $obj_transferencia->getId(),
+                    'concecutivo' => $obj_transferencia->getNroConcecutivo(),
+                    'importe' => number_format($obj_documento->getImporteTotal(), 2, '.', ''),
+                    'fecha' => $obj_documento->getFecha()->format('d-m-Y'),
+                    'inventario' => $obj_transferencia->getNroCuentaInventario() . ' / ' . $obj_transferencia->getNroSubcuentaInventario(),
+                    'acreedora' => $obj_transferencia->getNroCuentaAcreedora()
+                );
+            }
+        }
         return $this->render('contabilidad/inventario/transferencia/index.html.twig', [
-            'controller_name' => 'TransferenciaController',
+            'controller_name' => 'TransferenciaEntradaController',
+            'transferencias' => $rows
+        ]);
+    }
+
+    /**
+     * @Route("/form-add", name="contabilidad_inventario_transferencia_entrada_gestionar", methods={"GET","POST"})
+     */
+    public function gestionarTransferencia(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    {
+        $form = $this->createForm(TransferenciaType::class);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
+        $error = null;
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $list_mercancia = json_decode($request->get('transferencia_entrada')['list_mercancia'], true);
+//            if ($form->isValid()) {
+            $transferencia_entrada = $request->get('transferencia');
+
+            /**  datos de TransferenciaEntradaType **/
+            $cuenta_acreedora = $transferencia_entrada['nro_cuenta_acreedora'];
+            $cuenta_inventario = $transferencia_entrada['nro_cuenta_inventario'];
+            $proveedor = $transferencia_entrada['id_proveedor'];
+            $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
+
+            ////0-obtengo el numero consecutivo de documento
+            /// aqui va la fecha del cierre pero como aun no esta hecho cojo la del servidor, para ir trabajando
+            $year_ = Date('Y');
+            $id_user = $this->getUser()->getId();
+            $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+                'activo' => true,
+                'id_usuario' => $id_user
+            ));
+            $consecutivo = 0;
+            if ($obj_empleado) {
+                $id_unidad = $obj_empleado->getIdUnidad()->getId();
+                $transferencias_entrada_arr = $em->getRepository(Transferencia::class)->findBy(array(
+                    'anno' => $year_,
+                    'activo' => true,
+                    'entrada' => true
+                ));
+                $contador = 0;
+                foreach ($transferencias_entrada_arr as $obj) {
+                    /**@var $obj Transferencia* */
+                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id') && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                        $contador++;
+                }
+                $consecutivo = $contador + 1;
+
+
+                //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
+                $sub_cuenta_er = $em->getRepository(Subcuenta::class);
+                $cuenta_er = $em->getRepository(Cuenta::class);
+                $proveedor_obj = $em->getRepository(Proveedor::class)->find($proveedor);
+                $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
+                    'nro_cuenta' => $cuenta_acreedora,
+                    'activo' => true
+                ));
+                if ($cuenta_acreedora_obj && $proveedor_obj) {
+                    $obj_subcuenta_acreedora = $sub_cuenta_er->findOneBy(array(
+                        'nro_subcuenta' => $proveedor_obj->getCodigo(),
+                        'activo' => true,
+                        'id_cuenta' => $cuenta_acreedora_obj->getId()
+                    ));
+                    if (!$obj_subcuenta_acreedora) {
+                        $new_Subcuenta = new Subcuenta();
+                        $new_Subcuenta
+                            ->setNroSubcuenta($proveedor_obj->getCodigo())
+                            ->setDescripcion($proveedor_obj->getNombre())
+                            ->setIdCuenta($cuenta_acreedora_obj)
+                            ->setDeudora(false)
+                            ->setActivo(true);
+                        $em->persist($new_Subcuenta);
+                    }
+                }
+
+                //2-adicionar en documento
+                $today = Date('Y-m-d');
+                $documento = new Documento();
+                $documento
+                    ->setActivo(true)
+                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
+                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
+                $em->persist($documento);
+
+                //3.1-adicionar en transferencia de entrada
+                $transferencia_entrada = new Transferencia();
+                $transferencia_entrada
+                    ->setAnno($year_)
+                    ->setIdDocumento($documento)
+                    ->setNroConcecutivo($consecutivo)
+                    ->setNroCuentaAcreedora($cuenta_acreedora)
+                    ->setNroCuentaInventario($cuenta_inventario)
+                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                    ->setActivo(true)
+                    ->setEntrada(true);
+                $em->persist($transferencia_entrada);
+
+                //4-crear la obligacion de pago con el proveedor(crear la tabla)
+//                    $obligacion_pago = new ObligacionPago();
+//                    $obligacion_pago
+//                        ->setIdProveedor($proveedor_obj)
+//                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+//                        ->setIdDocumento($documento)
+//                        ->setActivo(true)
+//                        ->setNroSubcuenta($proveedor_obj->getCodigo())
+//                        ->setNroCuenta($cuenta_acreedora)
+//                        ->setLiquidado(false)
+//                        ->setResto(floatval($importe_total))
+//                        ->setValorPagado(0)
+//                        ->setCodigoFactura($codigo_factura)
+//                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
+//                    $em->persist($obligacion_pago);
+
+                /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
+                 * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
+                 * entre la suma del importe de la mercancia + el importe adicionado,
+                 * OJO todos esto se hara si la mercancia a adicionar ya se encuentra registrada y su existencia es >0
+                 * de lo contrario se pondra en existencia la cantidad a adicionar y el precio sera el precio a adicionar)*
+                 */
+
+                /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
+                $mercancia_er = $em->getRepository(Mercancia::class);
+                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
+                    'nombre' => 'transferencia DE ENTRADA',
+                    'activo' => true
+                ));
+                $importe_total = 0;
+                if ($obj_tipo_documento) {
+                    foreach ($list_mercancia as $mercancia) {
+                        $codigo_mercancia = $mercancia['codigo'];
+                        $cantidad_mercancia = $mercancia['cant'];
+                        $descripcion = $mercancia['descripcion'];
+                        $importe_mercancia = $mercancia['importe'];
+                        $unidad_medida = $mercancia['um'];
+
+                        $importe_total += floatval($importe_mercancia);
+
+                        //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
+                        $movimiento_mercancia = new MovimientoMercancia();
+                        $movimiento_mercancia
+                            ->setActivo(true)
+                            ->setImporte(floatval($importe_mercancia))
+                            ->setEntrada(true)
+                            ->setCantidad($cantidad_mercancia)
+                            ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                            ->setIdDocumento($documento)
+                            ->setIdTipoDocumento($obj_tipo_documento)
+                            ->setIdUsuario($this->getUser());
+
+                        //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
+                        $obj_mercancia = $mercancia_er->findOneBy(array(
+                            'codigo' => $codigo_mercancia,
+                            'id_amlacen' => $id_almacen,
+//                            'activo' => true //-----Para que traiga tanto las mercancias con existencia como las que se eliminaron
+                        ));
+                        if (!$obj_mercancia) {
+                            $new_mercancia = new Mercancia();
+                            $new_mercancia
+                                ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
+                                ->setActivo(true)
+                                ->setDescripcion($descripcion)
+                                ->setExistencia($cantidad_mercancia)
+                                ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
+                                ->setCodigo($codigo_mercancia)
+                                ->setCuenta($cuenta_inventario)
+                                ->setImporte(floatval($importe_mercancia));
+                            $em->persist($new_mercancia);
+                            $movimiento_mercancia
+                                ->setIdMercancia($new_mercancia)
+                                ->setExistencia($cantidad_mercancia);
+                        } else {
+                            if($obj_mercancia->getCuenta() == $cuenta_inventario){
+                                if ($obj_mercancia->getActivo() == false) {
+                                    $obj_mercancia
+                                        ->setExistencia(0)
+                                        ->setActivo(true)
+                                        ->setImporte(0);
+                                    $em->persist($obj_mercancia);
+                                }
+                                /**@var $obj_mercancia Mercancia* */
+                                if ($obj_mercancia->getExistencia() == 0) {
+                                    $obj_mercancia
+                                        ->setExistencia($cantidad_mercancia)
+                                        ->setActivo(true)
+                                        ->setImporte($importe_mercancia);
+                                } else {
+                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                                    $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
+                                    $obj_mercancia
+                                        ->setExistencia($existencia_actualizada)
+                                        ->setActivo(true)
+                                        ->setImporte($importe_actualizado);
+                                }
+                                $em->persist($obj_mercancia);
+                            }
+                            else{
+                                return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
+                            }
+                            $movimiento_mercancia
+                                ->setIdMercancia($obj_mercancia)
+                                ->setExistencia($obj_mercancia->getExistencia());
+                        }
+                        $em->persist($movimiento_mercancia);
+                    }
+                }
+
+                //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
+                $documento
+                    ->setImporteTotal($importe_total);
+                $em->persist($documento);
+
+                try {
+                    $em->flush();
+                } catch (FileException $e) {
+                    return $e->getMessage();
+                }
+                return new JsonResponse(['success' => true, 'msg' => 'Transferencia de entrada adicionado satisfactoriamente.']);
+            } else {
+                return new JsonResponse(['success' => false, 'msg' => 'Usted no es empleado de la empresa.']);
+            }
+//            }
+        }
+        return $this->render('contabilidad/inventario/transferencia/form.html.twig', [
+            'controller_name' => 'CRUDTransferenciaEntrada',
+            'formulario' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/getMercancia/{params}", name="contabilidad_inventario_transferencia_entrada_gestionar_getMercancia", methods={"POST"})
+     */
+    public function getMercancia(Request $request,$params)
+    {
+        $arr = explode(',',$params);
+        $codigo = $arr[0];
+        $cuenta = $arr[1];
+        $em = $this->getDoctrine()->getManager();
+        if ($codigo == -1 || $codigo == '-1')
+            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
+                'activo' => true,
+                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
+                'cuenta'=>$cuenta
+            ));
+        else
+            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
+                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
+                'activo' => true,
+                'codigo' => $codigo
+            ));
+
+        $row = array();
+        foreach ($mercancia_arr as $obj) {
+            /**@var $obj Mercancia* */
+            $row [] = array(
+                'id' => $obj->getId(),
+                'codigo' => $obj->getCodigo(),
+                'descripcion' => $obj->getDescripcion(),
+                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
+                'id_almacen' => $obj->getIdAmlacen(),
+                'existencia' => $obj->getExistencia()
+            );
+        }
+        return new JsonResponse(['mercancias' => $row, 'success' => true]);
+    }
+
+    /**
+     * @Route("/getCuentas", name="contabilidad_inventario_transferencia_entrada_gestionar_getCuentas", methods={"POST"})
+     */
+    public function getCuentas()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //MODULO INVENTARIO
+        //TIPO DE DOCUMENTO "transferencia DE ENTRADA"
+        $conf_inicial_er = $em->getRepository(ConfiguracionInicial::class);
+        $modulo_er = $em->getRepository(Modulo::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+
+        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
+            'nombre' => 'TRANSFERENCIA DE ENTRADA',
+            'activo' => true
+        ));
+
+        $obj_modulo = $modulo_er->findOneBy(array(
+            'nombre' => strtoupper('inventario'),
+            'activo' => true
+        ));
+
+        $row_inventario = array();
+        $row_acreedoras = array();
+
+        if ($obj_modulo && $obj_tipo_documento) {
+            $obj_conf_inicial = $conf_inicial_er->findOneBy(array(
+                'id_modulo' => $obj_modulo->getId(),
+                'id_tipo_documento' => $obj_tipo_documento->getId(),
+                'activo' => true
+            ));
+            if ($obj_conf_inicial) {
+                /**@var $obj_conf_inicial ConfiguracionInicial* */
+                $str_cuentas = $obj_conf_inicial->getStrCuentas();
+                $str_cuentas_acreedoras = $obj_conf_inicial->getStrCuentasContrapartida();
+
+                $cuentas_inventario = explode('-', $str_cuentas);
+                $cuentas_acreedoras = explode('-', $str_cuentas_acreedoras);
+
+                foreach ($cuentas_inventario as $cuentas) {
+                    $row_inventario [] = array(
+                        'nro_cuenta' => trim($cuentas),
+                        'sub_cuenta' => $this->getSubcuentas($obj_conf_inicial->getStrSubcuentas(), trim($cuentas), $subcuenta_er, $cuenta_er)
+                    );
+                }
+                foreach ($cuentas_acreedoras as $cuentas) {
+                    $row_acreedoras [] = array(
+                        'nro_cuenta' => trim($cuentas)
+                    );
+                }
+            }
+        }
+        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
+    }
+
+    public function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
+    {
+        $obj_cuenta = $cuenta_er->findOneBy(array(
+            'activo' => true,
+            'nro_cuenta' => $nro_cuenta
+        ));
+        if ($obj_cuenta) {
+            /**@var $obj_cuenta Cuenta* */
+            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                'activo' => true,
+                'id_cuenta' => $obj_cuenta->getId()
+            ));
+            if (!empty($arr_obj_subcuentas)) {
+                $rows = [];
+                $subcuentas_array = explode('-', $str_subcuentas);
+                foreach ($arr_obj_subcuentas as $subcuenta) {
+                    /**@var $subcuenta Subcuenta* */
+                    foreach ($subcuentas_array as $nro_subcuenta) {
+                        if ($subcuenta->getNroSubcuenta() == trim($nro_subcuenta))
+                            $rows [] = array(
+                                'nro_cuenta' => $nro_cuenta,
+                                'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                                'id' => $subcuenta->getId()
+                            );
+                    }
+                }
+                return $rows;
+            } else {
+                return '';
+            }
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * @Route("/delete/{id}", name="contabilidad_inventario_transferencia_entrada_delete", methods={"DELETE"})
+     */
+    public function deleteTransferencia(Request $request, $id)
+    {
+        // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+        $em = $this->getDoctrine()->getManager();
+
+        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->find($id);
+        $msg = 'No se pudo eliminar el transferencia seleccionado';
+        $success = 'error';
+        if ($obj_transferencia_entrada) {
+            /**@var $obj_transferencia_entrada Transferencia** */
+            $obligacion_er = $em->getRepository(ObligacionPago::class);
+
+            //SI EN OBLIGACION DE PAGO NO SE HA PAGADO NADA DE LA OBLIGACION DE PAGO QUE EL transferencia GENERO, ENTONCES ELIMINO
+            $importe_transferencia = $obj_transferencia_entrada->getIdDocumento()->getImporteTotal();
+//            $obj_obligacion = $obligacion_er->findOneBy(array(
+//                    'id_documento' => $obj_transferencia_entrada->getIdDocumento()
+//                )
+//            );
+//            /**@var $obj_obligacion ObligacionPago* */
+//            $importe_obligacion = $obj_obligacion->getResto();
+//            if (floatval($importe_transferencia) - floatval($importe_obligacion) == 0) {
+            //voy a transferencia de entrada y lo elimino
+            $obj_transferencia_entrada->setActivo(false);
+            //voy a obligacion de pago y la elimino
+//                $obj_obligacion->setActivo(false);
+            $obj_documento = $obj_transferencia_entrada->getIdDocumento();
+            /**@var $obj_documento Documento* */
+            //voy a documento y lo elimino
+            $obj_documento->setActivo(false);
+
+
+            //eliminar la entrada de la tabla de movimiento_mercancia
+            $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
+                'id_documento' => $obj_documento->getId(),
+                'activo' => true
+            ));
+
+            //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
+            if (!empty($arr_movimientos_mercancia)) {
+                foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia* */
+                    $obj_movimiento_mercancia
+                        ->setActivo(false);
+                    $em->persist($obj_movimiento_mercancia);
+
+                    /**@var $obj_mercancia Mercancia* */
+                    $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
+                    $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
+                    $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
+                    $obj_mercancia->setExistencia($nueva_existencia);
+                    $obj_mercancia->setImporte($nuevo_importe);
+                    if ($nueva_existencia == 0) {
+                        $obj_mercancia->setActivo(false);
+                    }
+                    $em->persist($obj_mercancia);
+                }
+            }
+            try {
+                $em->persist($obj_transferencia_entrada);
+//                    $em->persist($obj_obligacion);
+                $em->persist($obj_documento);
+                $em->flush();
+                $success = 'success';
+                $msg = 'Transferencia de entrada eliminado satisfactoriamente';
+
+            } catch
+            (FileException $exception) {
+                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+            }
+//            } else {
+//                $msg = 'El transferencia de entrada no se puede eliminar, porque existen pagos asociados.';
+//                $success = 'error';
+//            }
+        }
+        $this->addFlash($success, $msg);
+        // }
+        return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada');
+    }
+
+    /**
+     * @Route("/print_report/{id}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
+     */
+    public function print(EntityManagerInterface $em, $id)
+    {
+        $transferencia_entrada_er = $em->getRepository(Transferencia::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+
+        $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
+            'activo' => true,
+            'id' => $id
+        ));
+
+        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
+            'nombre' => 'transferencia DE ENTRADA',
+            'activo' => true
+        ));
+        $rows = [];
+        $almacen = '';
+        $cod_proveedor = '';
+        $proveedor = '';
+        $importe_total = 0;
+        $unidad = '';
+        $nro_solicitud = '';
+        $fecha_transferencia = '';
+        if ($transferencia_obj && $obj_tipo_documento) {
+            /** @var  $transferencia_obj Transferencia*/
+            $almacen = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $cod_proveedor = $transferencia_obj->getIdProveedor()->getCodigo();
+            $proveedor = $transferencia_obj->getIdProveedor()->getNombre();
+            $fecha_transferencia = $transferencia_obj->getIdDocumento()->getFecha()->format('d/m/Y');
+            $nro_solicitud = $transferencia_obj->getNroConcecutivo();
+            $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+                'id_tipo_documento' => $obj_tipo_documento->getId(),
+                'id_documento' => $transferencia_obj->getIdDocumento()->getId(),
+                'activo' => true
+            ));
+
+            if (!empty($arr_movimiento_mercancia)) {
+                /** @var  $mov_mercancia MovimientoMercancia */
+                $mov_mercancia = $arr_movimiento_mercancia[0];
+                $id_usuario_movimiento = $mov_mercancia->getIdUsuario()->getId();
+                /** @var Empleado $obj_empleado */
+                $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+                    'id_usuario' => $id_usuario_movimiento
+                ));
+                $unidad = $obj_empleado->getIdUnidad()->getNombre();
+                foreach ($arr_movimiento_mercancia as $obj) {
+                    /**@var $obj MovimientoMercancia* */
+                    $rows[] = array(
+                        'id' => $obj->getIdMercancia()->getId(),
+                        'codigo' => $obj->getIdMercancia()->getCodigo(),
+                        'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                        'existencia' => $obj->getExistencia(),
+                        'cantidad' => $obj->getCantidad(),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                        'importe' => number_format($obj->getImporte(), 2, '.', ''),
+                    );
+                    $importe_total += $obj->getImporte();
+                }
+            }
+
+        }
+        return $this->render('contabilidad/inventario/transferencia/print.html.twig', [
+            'controller_name' => 'TransferenciaEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($importe_total, 2, '.', ''),
+                'almacen' => $almacen,
+                'cod_proveedor' => $cod_proveedor,
+                'proveedor' => $proveedor,
+                'unidad' => $unidad,
+                'fecha_transferencia' => $fecha_transferencia,
+                'nro_solicitud' => $nro_solicitud
+            ),
+            'mercancias' => $rows,
+            'id' => $id
         ]);
     }
 }

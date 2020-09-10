@@ -195,10 +195,7 @@ class InformeRecepcionController extends AbstractController
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $mercancia_er = $em->getRepository(Mercancia::class);
                     $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-                        'nombre' => 'INFORME DE RECECIÓN',
-                        'activo' => true
-                    ));
+                    $obj_tipo_documento = $tipo_documento_er->find(1);
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $mercancia) {
@@ -237,6 +234,7 @@ class InformeRecepcionController extends AbstractController
                                     ->setExistencia($cantidad_mercancia)
                                     ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
                                     ->setCodigo($codigo_mercancia)
+                                    ->setCuenta($cuenta_inventario)
                                     ->setImporte(floatval($importe_mercancia));
                                 $em->persist($new_mercancia);
                                 $movimiento_mercancia
@@ -262,6 +260,33 @@ class InformeRecepcionController extends AbstractController
                                         ->setImporte($importe_actualizado);
                                 }
                                 $em->persist($obj_mercancia);
+                                if($obj_mercancia->getCuenta() == $cuenta_inventario){
+                                    if ($obj_mercancia->getActivo() == false) {
+                                        $obj_mercancia
+                                            ->setExistencia(0)
+                                            ->setActivo(true)
+                                            ->setImporte(0);
+                                        $em->persist($obj_mercancia);
+                                    }
+                                    /**@var $obj_mercancia Mercancia* */
+                                    if ($obj_mercancia->getExistencia() == 0) {
+                                        $obj_mercancia
+                                            ->setExistencia($cantidad_mercancia)
+                                            ->setActivo(true)
+                                            ->setImporte($importe_mercancia);
+                                    } else {
+                                        $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                                        $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
+                                        $obj_mercancia
+                                            ->setExistencia($existencia_actualizada)
+                                            ->setActivo(true)
+                                            ->setImporte($importe_actualizado);
+                                    }
+                                    $em->persist($obj_mercancia);
+                                }
+                                else{
+                                    return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
+                                }
                                 $movimiento_mercancia
                                     ->setIdMercancia($obj_mercancia)
                                     ->setExistencia($obj_mercancia->getExistencia());
@@ -345,10 +370,7 @@ class InformeRecepcionController extends AbstractController
         $subcuenta_er = $em->getRepository(Subcuenta::class);
         $cuenta_er = $em->getRepository(Cuenta::class);
 
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'INFORME DE RECEPCIÓN',
-            'activo' => true
-        ));
+        $obj_tipo_documento = $tipo_documento_er->find(1);
         $obj_modulo = $modulo_er->findOneBy(array(
             'nombre' => strtoupper('inventario'),
             'activo' => true
@@ -520,10 +542,7 @@ class InformeRecepcionController extends AbstractController
             'id' => $id
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'INFORME DE RECEPCIÓN',
-            'activo' => true
-        ));
+        $obj_tipo_documento = $tipo_documento_er->find(1);
         $rows = [];
         $almacen = '';
         $cod_proveedor = '';
