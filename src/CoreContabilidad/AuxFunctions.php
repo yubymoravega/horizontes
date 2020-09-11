@@ -1,18 +1,14 @@
 <?php
 
-
 namespace App\CoreContabilidad;
 
 
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Yaml\Yaml;
-use Twig\Environment;
 
 
 class AuxFunctions
@@ -149,6 +145,7 @@ class AuxFunctions
             }
         ]);
     }
+
     /**
      * Obtener la unidad del usuario
      */
@@ -160,11 +157,8 @@ class AuxFunctions
             'id_usuario' => $user
         ));
         if ($obj_empleado) {
-            $unidad = $obj_empleado->getIdUnidad();
+            return $obj_empleado->getIdUnidad();
         }
-        else{
-            $unidad = null;
-        }
-        return $unidad;
+        return null;
     }
 }

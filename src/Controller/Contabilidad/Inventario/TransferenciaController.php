@@ -45,7 +45,7 @@ class TransferenciaController extends AbstractController
         $transferencia_arr = $transferencia_er->findBy(array(
             'activo' => true,
             'anno' => $year_,
-            'entrada'=>true
+            'entrada' => true
         ));
         $rows = [];
         foreach ($transferencia_arr as $obj_transferencia) {
@@ -85,7 +85,9 @@ class TransferenciaController extends AbstractController
             /**  datos de TransferenciaEntradaType **/
             $cuenta_acreedora = $transferencia_entrada['nro_cuenta_acreedora'];
             $cuenta_inventario = $transferencia_entrada['nro_cuenta_inventario'];
-            $proveedor = $transferencia_entrada['id_proveedor'];
+            $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
+            $id_unidad_origen = isset($transferencia_entrada['id_unidad']) ? $transferencia_entrada['id_unidad'] : '';
+            $id_almacen_origen = isset($transferencia_entrada['id_almacen']) ? $transferencia_entrada['id_almacen'] : '';
             $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
 
             ////0-obtengo el numero consecutivo de documento
@@ -116,28 +118,10 @@ class TransferenciaController extends AbstractController
                 //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
                 $sub_cuenta_er = $em->getRepository(Subcuenta::class);
                 $cuenta_er = $em->getRepository(Cuenta::class);
-                $proveedor_obj = $em->getRepository(Proveedor::class)->find($proveedor);
                 $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
                     'nro_cuenta' => $cuenta_acreedora,
                     'activo' => true
                 ));
-                if ($cuenta_acreedora_obj && $proveedor_obj) {
-                    $obj_subcuenta_acreedora = $sub_cuenta_er->findOneBy(array(
-                        'nro_subcuenta' => $proveedor_obj->getCodigo(),
-                        'activo' => true,
-                        'id_cuenta' => $cuenta_acreedora_obj->getId()
-                    ));
-                    if (!$obj_subcuenta_acreedora) {
-                        $new_Subcuenta = new Subcuenta();
-                        $new_Subcuenta
-                            ->setNroSubcuenta($proveedor_obj->getCodigo())
-                            ->setDescripcion($proveedor_obj->getNombre())
-                            ->setIdCuenta($cuenta_acreedora_obj)
-                            ->setDeudora(false)
-                            ->setActivo(true);
-                        $em->persist($new_Subcuenta);
-                    }
-                }
 
                 //2-adicionar en documento
                 $today = Date('Y-m-d');
@@ -158,6 +142,8 @@ class TransferenciaController extends AbstractController
                     ->setNroCuentaAcreedora($cuenta_acreedora)
                     ->setNroCuentaInventario($cuenta_inventario)
                     ->setNroSubcuentaInventario($subcuenta_inventario)
+                    ->setIdUnidad($id_unidad_origen != '' ? $em->getRepository(Unidad::class)->find($id_unidad_origen) : null)
+                    ->setIdAlmacen($id_almacen_origen != '' ? $em->getRepository(Almacen::class)->find($id_almacen_origen) : null)
                     ->setActivo(true)
                     ->setEntrada(true);
                 $em->persist($transferencia_entrada);
@@ -189,7 +175,7 @@ class TransferenciaController extends AbstractController
                 $mercancia_er = $em->getRepository(Mercancia::class);
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
                 $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-                    'nombre' => 'transferencia DE ENTRADA',
+                    'nombre' => 'TRANSFERENCIA DE ENTRADA',
                     'activo' => true
                 ));
                 $importe_total = 0;
@@ -218,8 +204,7 @@ class TransferenciaController extends AbstractController
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
                         $obj_mercancia = $mercancia_er->findOneBy(array(
                             'codigo' => $codigo_mercancia,
-                            'id_amlacen' => $id_almacen,
-//                            'activo' => true //-----Para que traiga tanto las mercancias con existencia como las que se eliminaron
+                            'id_amlacen' => $id_almacen
                         ));
                         if (!$obj_mercancia) {
                             $new_mercancia = new Mercancia();
@@ -237,7 +222,7 @@ class TransferenciaController extends AbstractController
                                 ->setIdMercancia($new_mercancia)
                                 ->setExistencia($cantidad_mercancia);
                         } else {
-                            if($obj_mercancia->getCuenta() == $cuenta_inventario){
+                            if ($obj_mercancia->getCuenta() == $cuenta_inventario) {
                                 if ($obj_mercancia->getActivo() == false) {
                                     $obj_mercancia
                                         ->setExistencia(0)
@@ -260,9 +245,8 @@ class TransferenciaController extends AbstractController
                                         ->setImporte($importe_actualizado);
                                 }
                                 $em->persist($obj_mercancia);
-                            }
-                            else{
-                                return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
+                            } else {
+                                return new JsonResponse(['success' => false, 'msg' => 'El producto ' . $obj_mercancia->getCodigo() . ' está relacionada a una cuenta de inventario diferente a la especificada.']);
                             }
                             $movimiento_mercancia
                                 ->setIdMercancia($obj_mercancia)
@@ -297,9 +281,9 @@ class TransferenciaController extends AbstractController
     /**
      * @Route("/getMercancia/{params}", name="contabilidad_inventario_transferencia_entrada_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request,$params)
+    public function getMercancia(Request $request, $params)
     {
-        $arr = explode(',',$params);
+        $arr = explode(',', $params);
         $codigo = $arr[0];
         $cuenta = $arr[1];
         $em = $this->getDoctrine()->getManager();
@@ -307,7 +291,7 @@ class TransferenciaController extends AbstractController
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'activo' => true,
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'cuenta'=>$cuenta
+                'cuenta' => $cuenta
             ));
         else
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
@@ -433,11 +417,11 @@ class TransferenciaController extends AbstractController
         $em = $this->getDoctrine()->getManager();
 
         $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->find($id);
-        $msg = 'No se pudo eliminar el transferencia seleccionado';
+        $msg = 'No se pudo eliminar el transferencia seleccionada';
         $success = 'error';
         if ($obj_transferencia_entrada) {
             /**@var $obj_transferencia_entrada Transferencia** */
-            $obligacion_er = $em->getRepository(ObligacionPago::class);
+//            $obligacion_er = $em->getRepository(ObligacionPago::class);
 
             //SI EN OBLIGACION DE PAGO NO SE HA PAGADO NADA DE LA OBLIGACION DE PAGO QUE EL transferencia GENERO, ENTONCES ELIMINO
             $importe_transferencia = $obj_transferencia_entrada->getIdDocumento()->getImporteTotal();
@@ -490,7 +474,7 @@ class TransferenciaController extends AbstractController
                 $em->persist($obj_documento);
                 $em->flush();
                 $success = 'success';
-                $msg = 'Transferencia de entrada eliminado satisfactoriamente';
+                $msg = 'Transferencia de Entrada eliminada satisfactoriamente';
 
             } catch
             (FileException $exception) {
@@ -526,18 +510,18 @@ class TransferenciaController extends AbstractController
         ));
         $rows = [];
         $almacen = '';
-        $cod_proveedor = '';
-        $proveedor = '';
+        $unidad_origen = '';
+        $almacen_origen = '';
         $importe_total = 0;
         $unidad = '';
         $nro_solicitud = '';
         $fecha_transferencia = '';
         if ($transferencia_obj && $obj_tipo_documento) {
-            /** @var  $transferencia_obj Transferencia*/
+            /** @var  $transferencia_obj Transferencia */
             $almacen = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
-            $cod_proveedor = $transferencia_obj->getIdProveedor()->getCodigo();
-            $proveedor = $transferencia_obj->getIdProveedor()->getNombre();
             $fecha_transferencia = $transferencia_obj->getIdDocumento()->getFecha()->format('d/m/Y');
+            $unidad_origen = $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '';
+            $almacen_origen = $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '';
             $nro_solicitud = $transferencia_obj->getNroConcecutivo();
             $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
                 'id_tipo_documento' => $obj_tipo_documento->getId(),
@@ -575,9 +559,11 @@ class TransferenciaController extends AbstractController
             'datos' => array(
                 'importe_total' => number_format($importe_total, 2, '.', ''),
                 'almacen' => $almacen,
-                'cod_proveedor' => $cod_proveedor,
-                'proveedor' => $proveedor,
+                'cod_proveedor' => '$cod_proveedor',
+                'proveedor' => '$proveedor',
                 'unidad' => $unidad,
+                'unidad_origen'=>$unidad_origen,
+                'almacen_origen'=>$almacen_origen,
                 'fecha_transferencia' => $fecha_transferencia,
                 'nro_solicitud' => $nro_solicitud
             ),

@@ -160,7 +160,7 @@
                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitAjuste">contabilizar</button>
+                        <button class='my-0 btn btn-secondary' id="btnSubbmitTransferencia">contabilizar</button>
                     </div>
                 </div>
 
@@ -179,7 +179,7 @@
 
         $(document).ready(function () {
             $.ajax({
-                url: '/contabilidad/inventario/ajuste-entrada/getCuentas',
+                url: '/contabilidad/inventario/transferencia-entrada/getCuentas',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -201,7 +201,7 @@
                 let codigo = $('#transferencia_mercancia_codigo').val() != '' ? $('#transferencia_mercancia_codigo').val() : -1
                 let cuenta = $('#transferencia_nro_cuenta_inventario').val() != '' ? $('#transferencia_nro_cuenta_inventario').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + cuenta,
+                    url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + cuenta,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -263,6 +263,14 @@
                 })
             })
 
+            $('#transferencia_id_unidad').on('change',function(){
+                $('#transferencia_id_almacen').val(0)
+            })
+
+            $('#transferencia_id_almacen').on('change',function(){
+                $('#transferencia_id_unidad').val(0)
+            })
+
             const form_transferencia_entrada = $('#transferencia_entrada')
 
             form_transferencia_entrada.validate({
@@ -308,14 +316,14 @@
                 }
             })
 
-            $("#btnSubbmitAjuste").click(function (e) {
+            $("#btnSubbmitTransferencia").click(function (e) {
                 if (form_transferencia_entrada.valid()) {
                     if (list_mercancia.length) {
                         let data = form_transferencia_entrada.serializeArray()
                         loadingModal.show()
                         data.push({name: 'transferencia_entrada[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
-                            url: '/contabilidad/inventario/ajuste-entrada/form-add',
+                            url: '/contabilidad/inventario/transferencia-entrada/form-add',
                             method: 'POST',
                             data: data,
                             dataType: 'json',
@@ -331,7 +339,7 @@
                             }
                         })
                     } else {
-                        alertTemplate('El Ajuste de Entrada debe contener algunas mercancias', 'danger')
+                        alertTemplate('La Transferencia de Entrada debe contener algunas mercancias', 'danger')
                     }
                 }
             });

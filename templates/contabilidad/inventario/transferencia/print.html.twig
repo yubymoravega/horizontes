@@ -18,11 +18,15 @@
     <table border="1" width="960px" class="mt-1">
         <tbody>
         <tr>
-            <td  colspan="7" height="70px" class="font-weight-bold text-center">AJUSTE DE ENTRADA</td>
+            <td colspan="7" height="70px" class="font-weight-bold text-center">TRANSFERENCIA DE ENTRADA</td>
         </tr>
         <tr>
             <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>
-            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_ajuste }}</td>
+            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_transferencia }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>
         </tr>
         </tbody>
     </table>
@@ -31,16 +35,18 @@
         <tr>
             <td class="text-center font-weight-bold" colspan="7">Datos del proveedor</td>
         </tr>
-        <tr>
-            <td colspan="5"><strong>Nombre: </strong>{{ datos.proveedor }}</td>
-            <td colspan="2"><strong>Código: </strong>{{ datos.cod_proveedor }}</td>
-        </tr>
-        <tr>
-            <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>
-        </tr>
+        {% if datos.unidad_origen == '' %}
+            <tr>
+                <td colspan="7"><strong>Nombre del almacén: </strong>{{ datos.almacen_origen }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7"><strong>Nombre de la unidad: </strong>{{ datos.unidad_origen }}</td>
+            </tr>
+        {% endif %}
         </tbody>
     </table>
-    <table  border="1" width="960px">
+    <table border="1" width="960px">
         <tbody>
         <tr>
             <td width="80" class="text-center"><strong>Código</strong></td>
@@ -66,18 +72,18 @@
             <td class="font-weight-bold text-center" style="background-color: #aaaeb7"></td>
         </tr>
         </tbody>
-     <table  border="1" class="mt-4" width="960px" height="70px">
-        <tbody>
-        <tr>
-            <td width="155"><strong>Jefe de Almacén</strong></td>
-            <td colspan="2"><strong>Transportador</strong></td>
-            <td width="155"><strong>Recepciona</strong></td>
-            <td width="155"><strong>Contabiliza</strong></td>
-            <td width="165"><strong>Submayor</strong></td>
-            <td width="100" class="text-center"><strong> AE-{{ datos.nro_solicitud }}</strong></td>
-        </tr>
-        </tbody>
-    </table>
+        <table border="1" class="mt-4" width="960px" height="70px">
+            <tbody>
+            <tr>
+                <td width="155"><strong>Jefe de Almacén</strong></td>
+                <td colspan="2"><strong>Transportador</strong></td>
+                <td width="155"><strong>Recepciona</strong></td>
+                <td width="155"><strong>Contabiliza</strong></td>
+                <td width="165"><strong>Submayor</strong></td>
+                <td width="100" class="text-center"><strong> TE-{{ datos.nro_solicitud }}</strong></td>
+            </tr>
+            </tbody>
+        </table>
 </div>
 
 {#JavaScript#}

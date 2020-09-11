@@ -27,7 +27,7 @@ class Transferencia
 
     /**
      * @ORM\ManyToOne(targetEntity=Unidad::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_unidad;
     /**
@@ -67,7 +67,7 @@ class Transferencia
 
     /**
      * @ORM\ManyToOne(targetEntity=Almacen::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_almacen;
 
