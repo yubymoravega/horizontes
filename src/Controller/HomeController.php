@@ -45,11 +45,13 @@ class HomeController extends AbstractController
     public function carrito()
     {
         $dataBase = $this->getDoctrine()->getManager();
-        $data = $dataBase->getRepository(Carrito::class)->findAll();
+        $user =  $this->getUser();
+        
+        $data = $dataBase->getRepository(Carrito::class)->findBY(['empleado' => $user->getUsername()]);
         $json = null;
         $con = count( $data);
         $contador = 0;
-
+       
         while($contador < $con){
 
             $json[$contador] = array(

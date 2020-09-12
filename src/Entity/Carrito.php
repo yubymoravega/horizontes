@@ -22,6 +22,11 @@ class Carrito
      */
     private $json;
 
+      /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $empleado;
+
 
     public function getId(): ?int
     {
@@ -39,5 +44,16 @@ class Carrito
 
         return $this;
     }
-  
+
+    public function getEmpleado(): ?string
+    {
+        return $this->empleado;
+    }
+
+    public function setEmpleado(string $empleado): self
+    {
+        $this->empleado = $empleado;
+
+        return $this;
+    }
 }

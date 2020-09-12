@@ -601,15 +601,11 @@ a.rd-navbar-cart.mdi.icon-carrito.fas.toggle-original {
     font-size: 33px;
 }
 
-svg.iconCarritoEdit{
-    width: 20px;
-   
-}
 svg.iconCarritoDelete{
     width: 20px;
     
 }
 .svgCarrito{
     float: right;
-    margin-right: 7%;
+    margin-right: 10%;
 }

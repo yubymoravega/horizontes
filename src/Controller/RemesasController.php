@@ -225,24 +225,80 @@ class RemesasController extends AbstractController
         'reparto' => $ClienteBeneficiario->getReparto(),
         'provincia' => $ClienteBeneficiario->getProvincia(),
         'municipio' => $ClienteBeneficiario->getMunicipio(),
-        'idCliente	' => $ClienteBeneficiario->getId(),
+        'idCliente' => $ClienteBeneficiario->getIdCliente(),
         'fecha' => $date->format('Y-m-d H:i:s'),
         'empleado' => $user->getUsername(),
         'monto' => $monto,
         'servicio' => 'Remesa',
         'orden' => uniqid());
 
+        $carrito->setEmpleado($user->getUsername()); 
         $carrito->setJson(json_encode($json)); 
         $dataBase->persist($carrito);
         $dataBase->flush();
 
         $this->addFlash(
-            'notice',
+            'success',
             'Remesa Agregada Al Carrito'
         );
     
         return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $idCliente]);
 
+    }
+
+   /**
+     * @Route("/remesas.json.editar/{id}", name="remesas.json.editar")
+     */
+    public function jsonEditar($id)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Carrito::class)->find($id);
+
+        $beneficiario = json_decode($data->getJson());
+
+        return $this->render(
+            'remesas/carrito-beneficiario.html.twig',
+            ['beneficiario'=> $beneficiario,'id'=> $id]
+        );
+       
+    }
+
+    /**
+     * @Route("/remesas.json.editar.save/{id}", name="remesas.json.editar.save")
+     */
+    public function jsonSave($id,Request $request)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Carrito::class)->find($id);
+
+        $data->setJson($request->get('json'));
+        $dataBase->flush();
+        $this->addFlash(
+            'success',
+            'Remesa editada'
+        );
+
+        return new response (200);
+       
+    }
+
+    /**
+     * @Route("/remesas.json.borrar/{id}", name="emesas.json.borrar")
+     */
+    public function jsonBorrar($id)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Carrito::class)->find($id);
+
+        $dataBase->remove($data);
+        $dataBase->flush();
+
+        $this->addFlash(
+            'success',
+            'Remesa Editada'
+        );
+     
+        return new response (200);
     }
 
 }
