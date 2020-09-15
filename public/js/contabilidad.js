@@ -7,6 +7,15 @@ $(document).ready(function () {
         $('#alert__success').addClass('transition-right')
         // $('#alert__success').hide(9000)
     }, 5000)
+
+
+    /**
+     * ADD Validations to --- Validator.JS ---
+     */
+    jQuery.validator.addMethod("num-letter", function(value, element) {
+        // allow any non-whitespace characters as the host part
+        return this.optional( element ) || /^[A-Za-z0-9]+$/g.test( value );
+    }, 'Please enter a valid email address.')
 });
 
 /**
@@ -20,6 +29,7 @@ const CONTAB_MSG = {
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
     REQUIRED_OBLIGATORIO: 'El campo obligatorio!',
+    FORMAT_NO_CUENTA: 'el No. de la cuenta solo acepta letras y números',
 }
 
 

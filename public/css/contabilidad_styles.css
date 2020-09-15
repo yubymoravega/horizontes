@@ -43,6 +43,7 @@ body {
     color: white !important;
 
 }
+
 .nabvar-navegation ul > a:hover {
     background: transparent;
 }
@@ -52,6 +53,16 @@ body {
 }
 
 /*********************** MY redefinicion de stilos ****************************/
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 
 .bg-dark-app {
     background: #2f2f2f
