@@ -134,7 +134,8 @@
                     {{ form_end(formulario.mercancia) }}
 
                     <div class="col-2 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR</button>
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -196,9 +197,10 @@
             })
 
             $('#btnSearchMercancia').on('click', function () {
+                console.info('asasa')
                 $('#rows_table').find('tr').remove();
-                let codigo = $('#transferencia_mercancia_codigo').val() != '' ? $('#transferencia_mercancia_codigo').val() : -1
-                let cuenta = $('#transferencia_nro_cuenta_inventario').val() != '' ? $('#transferencia_nro_cuenta_inventario').val() : ''
+                let codigo = $('#transferencia_mercancia_codigo').val()
+                let cuenta = $('#transferencia_nro_cuenta_inventario').val()
                 $.ajax({
                     url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + cuenta,
                     method: 'POST',
@@ -222,30 +224,33 @@
             })
 
             $('#transferencia_mercancia_codigo').on('keyup', function (e) {
-                if (e.which == 13){
-                    let codigo = $('#transferencia_mercancia_codigo').val() != '' ? $('#transferencia_mercancia_codigo').val() : -1
-                    let cuenta = $('#transferencia_nro_cuenta_inventario').val() != '' ? $('#transferencia_nro_cuenta_inventario').val() : ''
-                    $.ajax({
-                        url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + cuenta,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function (result) {
-                            mercancias = result.mercancias
-                            if(mercancias.length>0){
-                                $('#transferencia_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                $('#transferencia_mercancia_existencia').val(mercancias[0]['existencia'])
-                                $('#transferencia_mercancia_precio').val(mercancias[0]['precio_compra'])
+                if (e.which == 13) {
+                    let codigo = $('#transferencia_mercancia_codigo').val()
+                    let cuenta = $('#transferencia_nro_cuenta_inventario').val()
+                    if (cuenta != '' && codigo != '') {
+                        $.ajax({
+                            url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + cuenta,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    $('#transferencia_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#transferencia_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#transferencia_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código')
+                                }
+                            },
+                            error: function () {
                             }
-                            else{
-                                alert('no existen mercancias con ese código')
-                            }
-                        },
-                        error: function () {
-                        }
-                    })
+                        })
+                    } else {
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                    }
                 }
             })
-            
+
             $('#transferencia_documento_importe_mercancia').on('keyup', function () {
                 let importe = parseFloat($('#transferencia_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#transferencia_documento_cantidad_mercancia').val())
@@ -287,11 +292,11 @@
                 })
             })
 
-            $('#transferencia_id_unidad').on('change',function(){
+            $('#transferencia_id_unidad').on('change', function () {
                 $('#transferencia_id_almacen').val(0)
             })
 
-            $('#transferencia_id_almacen').on('change',function(){
+            $('#transferencia_id_almacen').on('change', function () {
                 $('#transferencia_id_unidad').val(0)
             })
 
@@ -345,7 +350,10 @@
                     if (list_mercancia.length) {
                         let data = form_transferencia_entrada.serializeArray()
                         loadingModal.show()
-                        data.push({name: 'transferencia_entrada[list_mercancia]', value: JSON.stringify(list_mercancia)})
+                        data.push({
+                            name: 'transferencia_entrada[list_mercancia]',
+                            value: JSON.stringify(list_mercancia)
+                        })
                         $.ajax({
                             url: '/contabilidad/inventario/transferencia-entrada/form-add',
                             method: 'POST',

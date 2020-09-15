@@ -320,7 +320,6 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/getMercancia/{params}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})
      */
-
     public function getMercancia(Request $request,$params)
     {
         $arr = explode(',',$params);
@@ -410,8 +409,7 @@ class InformeRecepcionController extends AbstractController
         return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
     }
 
-    public
-    function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
+    public function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
     {
         $obj_cuenta = $cuenta_er->findOneBy(array(
             'activo' => true,
@@ -449,8 +447,7 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/delete/{id}", name="contabilidad_inventario_informe_recepcion_delete", methods={"DELETE"})
      */
-    public
-    function deleteInforme(Request $request, $id)
+    public function deleteInforme(Request $request, $id)
     {
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();

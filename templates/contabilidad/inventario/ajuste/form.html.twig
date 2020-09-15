@@ -129,7 +129,8 @@
                     {{ form_end(formulario.mercancia) }}
 
                     <div class="col-2 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR</button>
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -217,30 +218,33 @@
             })
 
             $('#ajuste_mercancia_codigo').on('keyup', function (e) {
-                if (e.which == 13){
-                    let codigo = $('#ajuste_mercancia_codigo').val() != '' ? $('#ajuste_mercancia_codigo').val() : -1
-                    let cuenta = $('#ajuste_nro_cuenta_inventario').val() != '' ? $('#ajuste_nro_cuenta_inventario').val() : ''
-                    $.ajax({
-                        url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + cuenta,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function (result) {
-                            mercancias = result.mercancias
-                            if(mercancias.length>0){
-                                $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
-                                $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
+                if (e.which == 13) {
+                    let codigo = $('#ajuste_mercancia_codigo').val()
+                    let cuenta = $('#ajuste_nro_cuenta_inventario').val()
+                    if (cuenta != '' && codigo != '') {
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + cuenta,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código')
+                                }
+                            },
+                            error: function () {
                             }
-                            else{
-                                alert('no existen mercancias con ese código')
-                            }
-                        },
-                        error: function () {
-                        }
-                    })
+                        })
+                    } else {
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                    }
                 }
             })
-            
+
             $('#ajuste_documento_importe_mercancia').on('keyup', function () {
                 let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
