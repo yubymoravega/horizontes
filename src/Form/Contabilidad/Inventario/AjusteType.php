@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class AjusteType extends AbstractType
@@ -38,16 +39,10 @@ class AjusteType extends AbstractType
                 'label'=>'Cuenta acreedora',
                 'choice_label' => 'nro_cuenta',
             ))
-            ->add('id_proveedor', EntityType::class, [
-                'class' => Proveedor::class,
-                'label'=>'Proveedor',
-                'attr' => ['class' => 'w-100'],
-                'choice_label' => 'nombre',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
+            ->add('observacion', TextareaType::class, [
+                'label'=>'Observaciones',
+                'mapped'=>true,
+                'attr' => ['class' => 'w-100']
             ])
             ->add('list_mercancia',HiddenType::class)
         ;

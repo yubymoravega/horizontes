@@ -9,7 +9,15 @@
     {#Style#}
     <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
-
+    <style>
+        @media print {
+            #footer{
+                position: fixed;
+                display: block;
+                bottom: 0;
+            }
+        }
+    </style>
 
     <title>Imprimir Informe</title>
 </head>
@@ -18,7 +26,7 @@
     <table border="1" width="960px" class="mt-1">
         <tbody>
         <tr>
-            <td  colspan="7" height="70px" class="font-weight-bold text-center">INFORME DE RECEPCION</td>
+            <td colspan="7" height="70px" class="font-weight-bold text-center">INFORME DE RECEPCION</td>
         </tr>
         <tr>
             <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>
@@ -43,7 +51,7 @@
         </tr>
         </tbody>
     </table>
-    <table  border="1" width="960px">
+    <table border="1" width="960px">
         <tbody>
         <tr>
             <td width="80" class="text-center"><strong>Código</strong></td>
@@ -53,32 +61,45 @@
             <td width="100" class="text-center"><strong>Importe</strong></td>
             <td width="100" class="text-center"><strong>Existencia</strong></td>
         </tr>
+        </tbody>
+    </table>
+    <table border="0px;" width="960px">
+        <tbody>
         {% for item in mercancias %}
             <tr>
-                <td>{{ item.codigo }}</td>
+                <td width="80">{{ item.codigo }}</td>
                 <td colspan="2">{{ item.descripcion }}</td>
-                <td class="text-right">{{ item.cantidad }}</td>
-                <td class="text-right">{{ item.precio }}</td>
-                <td class="text-right">{{ item.importe }}</td>
-                <td class="text-right">{{ item.existencia }}</td>
+                <td width="100" class="text-right">{{ item.cantidad }}</td>
+                <td width="100" class="text-right">{{ item.precio }}</td>
+                <td width="100" class="text-right">{{ item.importe }}</td>
+                <td width="100" class="text-right">{{ item.existencia }}</td>
             </tr>
         {% endfor %}
-        <tr>
-            <td class="font-weight-bold text-center" colspan="5">IMPORTE TOTAL</td>
-            <td class="font-weight-bold text-right">{{ datos.importe_total }}</td>
-            <td class="font-weight-bold text-center" style="background-color: #aaaeb7"></td>
-        </tr>
         </tbody>
-     <table  border="1" class="mt-4" width="960px" height="70px">
+    </table>
+    <table border="0px" class="mt-5" width="960px" height="70px">
         <tbody>
         <tr>
-            <td width="155"><strong>Jefe de Almacén</strong></td>
-            <td colspan="2"><strong>Transportador</strong></td>
-            <td width="155"><strong>Recepciona</strong></td>
-            <td width="155"><strong>Contabiliza</strong></td>
-            <td width="165"><strong>Submayor</strong></td>
-            <td width="100" class="text-center"><strong> IR-{{ datos.nro_solicitud }}</strong></td>
+            <td class="font-weight-bold text-center"colspan="5">IMPORTE TOTAL</td>
+            <td width="100" class="font-weight-bold text-right">{{ datos.importe_total }}</td>
+            <td width="100" class="font-weight-bold text-center"></td>
         </tr>
+        <tr class="p-3">
+            <td style="border: 0px !important;" colspan="7" height="30px;"></td>
+        </tr>
+        </tbody>
+    </table>
+    <table border="1px" width="960px" id="footer">
+        <tbody>
+        <tr class="mt-1">
+            <td valign="TOP" width="155" height="75px;" class="text-capitalize"><strong>Jefe de Almacén</strong>
+            </td>
+            <td valign="TOP" width="230"><strong>Transportador</strong></td>
+            <td valign="TOP" width="155"><strong>Recepciona</strong></td>
+            <td valign="TOP" width="155"><strong>Contabiliza</strong></td>
+            <td valign="TOP" width="165"><strong>Submayor</strong></td>
+            <td valign="TOP" width="100" class="text-center"><strong> IR-{{ datos.nro_solicitud }}</strong></td>
+            </tr>
         </tbody>
     </table>
 </div>

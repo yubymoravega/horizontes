@@ -7,15 +7,15 @@ configuraciones:
     - id: 2
       name: "AJUSTE DE ENTRADA"
     - id: 3
-      name: "AJUSTE DE ENTRADA"
-    - id: 4
       name: "AJUSTE DE SALIDA"
-    - id: 5
+    - id: 4
       name: "TRANSFERENCIA DE ENTRADA"
-    - id: 6
+    - id: 5
       name: "TRANSFERENCIA DE SALIDA"
-    - id: 7
+    - id: 6
       name: "VALE DE SALIDA"
+    - id: 7
+      name: "DEVOLUCION"
 
   modulo:
     - id: 1

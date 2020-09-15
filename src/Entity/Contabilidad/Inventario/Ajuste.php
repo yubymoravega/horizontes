@@ -24,15 +24,14 @@ class Ajuste
     private $id_documento;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Proveedor::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=255)
      */
-    private $id_proveedor;
+    private $nro_cuenta_inventario;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $nro_cuenta_inventario;
+    private $observacion;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -43,11 +42,6 @@ class Ajuste
      * @ORM\Column(type="string", length=255)
      */
     private $nro_cuenta_acreedora;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $nro_subcuenta_acreedora;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -134,18 +128,6 @@ class Ajuste
         return $this;
     }
 
-    public function getIdProveedor(): ?Proveedor
-    {
-        return $this->id_proveedor;
-    }
-
-    public function setIdProveedor(?Proveedor $id_proveedor): self
-    {
-        $this->id_proveedor = $id_proveedor;
-
-        return $this;
-    }
-
     public function getNroCuentaInventario(): ?string
     {
         return $this->nro_cuenta_inventario;
@@ -154,6 +136,18 @@ class Ajuste
     public function setNroCuentaInventario(string $nro_cuenta_inventario): self
     {
         $this->nro_cuenta_inventario = $nro_cuenta_inventario;
+
+        return $this;
+    }
+
+    public function getObservacion(): ?string
+    {
+        return $this->observacion;
+    }
+
+    public function setObservacion(string $observacion): self
+    {
+        $this->observacion = $observacion;
 
         return $this;
     }
@@ -178,18 +172,6 @@ class Ajuste
     public function setNroCuentaAcreedora(string $nro_cuenta_acreedora): self
     {
         $this->nro_cuenta_acreedora = $nro_cuenta_acreedora;
-
-        return $this;
-    }
-
-    public function getNroSubcuentaAcreedora(): ?string
-    {
-        return $this->nro_subcuenta_acreedora;
-    }
-
-    public function setNroSubcuentaAcreedora(string $nro_subcuenta_acreedora): self
-    {
-        $this->nro_subcuenta_acreedora = $nro_subcuenta_acreedora;
 
         return $this;
     }
