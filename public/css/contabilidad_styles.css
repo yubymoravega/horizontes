@@ -72,6 +72,15 @@ input[type=number] {
     color: white;
 }
 
+.bg-loading-modal {
+    background-color: rgba(10, 10, 10, 0.7);
+}
+
+.table-small-rows td {
+    padding-top: .2rem;
+    padding-bottom: .2rem;
+}
+
 /* estilo impuesto por espesificidad */
 .invalid-label-orange {
     /*margin-left: 10px;*/

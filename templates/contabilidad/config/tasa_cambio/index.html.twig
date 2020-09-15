@@ -27,7 +27,7 @@
         {# Modal de adicionar#}
         {{ include('contabilidad/config/tasa_cambio/form_modal.html.twig',{ title: 'add' }) }}
         {# list #}
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Año</th>
             <th scope="col-1">Mes</th>
@@ -145,6 +145,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/tasa-cambio/add`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -153,6 +154,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/tasa-cambio/upd/${id_taza_cambio}`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__form__id').on('show.bs.modal', function (event) {

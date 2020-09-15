@@ -35,7 +35,7 @@ class InventarioController extends AbstractController
         $row = [];
         $obj_user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
-        $empleado = $em->getRepository(Empleado::class)->findBy(array(
+        $empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'baja'=>false,
             'id_usuario'=>$obj_user->getId()
         ));
@@ -43,7 +43,7 @@ class InventarioController extends AbstractController
             /**@var $empleado Empleado***/
             $almacenes = $em->getRepository(Almacen::class)->findBy(array(
                 'activo'=>true,
-//                'id_unidad'=>$empleado->getIdUnidad()->getId()
+                'id_unidad'=>$empleado->getIdUnidad()->getId()
             ));
             foreach ($almacenes as $almacen){
                 /**@var $almacen Almacen**/
@@ -53,6 +53,7 @@ class InventarioController extends AbstractController
                 );
             }
         }
+        //verifico si cerro el ultimo dia, o sea si tiene operaciones por liquidar
         return $this->render('contabilidad/inventario/selalmacen.html.twig', [
             'controller_name' => 'Dashboard',
             'almacenes'=>$row

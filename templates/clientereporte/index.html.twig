@@ -2,6 +2,7 @@
 
 {% block content %}
 {% set total = null %}
+{% include 'breadcrumbs.html.twig' %}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <section class="section novi-background section-66 section-sm-bottom-110">
         <div class="container">
@@ -27,10 +28,7 @@
   </select>
 
   <div class="input-group-prepend">
- 
   </div>
-
- 
 
   <select class="custom-select" name='empleado' id="empleado">
   <option value=0 selected>Empleado</option>
@@ -54,7 +52,7 @@
                   <tbody><tr>
                   <th>Fecha</th> 
                     <th>Teléfono</th>
-                    <th>Tarjeta</th>
+                    <th>Metodo de Pago</th>
                     <th class = "th-monto">Monto</th>                  
                     <th>Estado</th>
                     <th>Empleado</th>
@@ -62,19 +60,26 @@
                  {# table body #}
     {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ data.fecha | date('d-M-y') }} </br> {{ data.fecha | date('H:i a') }}</td>
-            <td> {{ data.idCliente }} </td>     
-            <td>{{ data.bram }} - {{ data.last4  }} </br>  </td>       
-            <td>{{ data.monto }} </td> {% set total = total + data.monto %}
-            <td><a  onClick="caja('{{ data.estado }}','{{ data.auth }}');" > 
-            {% if data.estado == 'succeeded' %}
+            <td>{{ data[0].fecha | date('d-M-y') }} </br> {{ data[0].fecha | date('h:i a') }}</td>
+            <td > {{ data[0].idCliente }} </td>     
+            <td>
+            {% if data[0].bram != '$' %}
+                <img height="40" src="/images/iconos/{{ data[0].bram }}.svg" >
+                - {{ data[0].last4  }} </br>{{data.nombre}} {{data.apellidos}} 
+           {% else %}  
+           <a  onClick="cajaEfectivo('{{ data[0].efectivo }}','{{ data[0].monto }}');" > 
+            {{data[0].bram}} - {{ data[0].last4  }} </br>{{data.nombre}} {{data.apellidos}}</a>
+            {% endif %}
+              </td>       
+            <td>{{ data[0].monto }} </td> {% set total = total + data[0].monto %}
+            <td><a  onClick="caja('{{ data[0].estado }}','{{ data[0].auth }}');" > 
+            {% if data[0].estado == 'succeeded' %}
                 Exitoso
             {% else %}    
               Declinado
             {% endif %}
-            
              </a></td>
-             <td>{{ data.user }}</td>
+             <td>{{ data[0].user }}</td>
         </tr>
     {% endfor %}    
                 </tbody></table> <hr style="background-color: white; margin-top: 0px;">
@@ -87,13 +92,28 @@
         </div>
       </section>
 
-<div id="dialog"  title="Facturador Stripe">
+<div id="dialog" class="modal"  title="Facturador Stripe">
   <p>
     <b>Auth:</b> <span id="Auth"></span>
   </p>
 
   <p>
     <b>Estado:</b> <span id="Estado"></span>
+  </p>
+
+</div>
+
+<div id="dialogEfectivo" class="modal" title="Detalle efectivo">
+  <p>
+    <b>Efectivo:</b>$ <span id="efectivo"></span>
+  </p>
+
+  <p>
+    <b>Factura:</b>$ <span id="factura"></span>
+  </p>
+
+  <p>
+    <b>Cambio:</b>$ <span id="cambio"></span>
   </p>
 
 </div>
@@ -164,6 +184,18 @@ input#telefono {
     $( "#dialog" ).dialog( "open" );
   }; 
 
+  function cajaEfectivo(efectivo,factura) {
+   $("#efectivo").text(parseFloat(efectivo).toFixed(2));
+   $("#factura").text(parseFloat(factura).toFixed(2)); 
+   var cambio = efectivo-factura;
+   $("#cambio").text(parseFloat(cambio).toFixed(2));
+
+   
+   
+   $( "#dialogEfectivo" ).dialog({width: 500});
+    $( "#dialogEfectivo" ).dialog( "open" );
+  }; 
+
 
  
     $( "#dialog" ).dialog({
@@ -214,6 +246,35 @@ input#telefono {
  $('#telefono').on('input', function () { 
     this.value = this.value.replace(/[^0-9]/g,'');
 });   
+
+function getCliente($tel) {
+ let response = '';
+ let ajax = $.ajax({
+          url:
+            window.location.protocol +
+            "//" +
+            location.hostname +
+            ":" +
+            window.location.port +
+            "/index.php/paymentreport.get",
+          method: "post",
+          dataType: "json",
+          data: { data: JSON.parse($tel) },
+            async: false,
+            success : function(text)
+            {
+                response = text;
+            }
+        }).responseText;
+
+        //console.log(ajax);
+
+         
+        
+}
+
+  
+
 
   </script>
  

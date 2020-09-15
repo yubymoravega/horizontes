@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block title %} Contabilidad | Activo Fijo {% endblock %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block navBar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a class="navbar-brand text-white" href="{{ url ('activo_fijo') }}">Activo Fijo</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav mr-auto">
+            <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_registrar') }}">Registrar</a>
+            <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_movimiento') }}">Movimiento</a>
+            <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_depreciacion') }}">Depreciación</a>
+        </ul>
+        {#        </div>#}
+    </nav>
+{% endblock %}

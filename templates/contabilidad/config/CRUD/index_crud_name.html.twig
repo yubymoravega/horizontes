@@ -16,7 +16,7 @@
     <script>
         $(document).ready(function () {
 
-            $('#form_crud_add_name').validate({
+            const validateForm = $('#form_crud_add_name').validate({
                 rules: {
                     'crud_add_descripcion[descripcion]': "required",
                     'crud_add_name[nombre]': "required"
@@ -43,6 +43,12 @@
                 unhighlight: function (element, errorClass, validClass) {
                     $(element).removeClass("is-invalid");
                 }
+            })
+
+            $('#crud_add_name_adicionar').on('click', function (event) {
+                event.preventDefault();
+                $('#form_crud_add_name').submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
         })
     </script>

@@ -27,7 +27,7 @@
         {{ include('contabilidad/config/centro_costo/form_modal.html.twig', {title: 'Adicionar Centro de Costo'}) }}
 
         {# list #}
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-6">Descripción</th>
             <th scope="col-1">Código</th>
@@ -157,6 +157,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/add`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -165,6 +166,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/${id_centro_costo}`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__form__id').on('show.bs.modal', function (event) {

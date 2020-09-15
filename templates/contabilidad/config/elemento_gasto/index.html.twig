@@ -29,7 +29,7 @@
         {{ include('contabilidad/config/elemento_gasto/form_modal.html.twig',{title: 'Adicionar'}) }}
 
         {# list #}
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Descripción</th>
             <th scope="col-3">Código</th>
@@ -139,6 +139,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/elemento-gasto/add`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -148,6 +149,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/elemento-gasto/upd/${id_elemento_gasto}`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
 

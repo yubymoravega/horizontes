@@ -14,7 +14,7 @@ class ProveedorType extends AbstractType
     {
         $builder
             ->add('nombre', TextType::class, [
-                'attr' => ['class' => 'w-100']
+                'attr' => ['class' => 'w-100'],
             ])
             ->add('codigo', TextType::class, [
                 'attr' => ['class' => 'w-100']

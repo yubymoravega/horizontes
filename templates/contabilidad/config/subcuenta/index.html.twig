@@ -28,7 +28,7 @@
         {{ include('./contabilidad/config/subcuenta/form_modal.html.twig', {title:'Crear Sub Cuenta'}) }}
 
         {# list #}
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">Nro. subcuenta</th>
             <th scope="col-3">Descripción</th>
@@ -132,6 +132,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/subcuenta/{{ id_cuenta }}/add`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -140,6 +141,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/subcuenta/{{ id_cuenta }}/upd/${id_subcuenta}`)
                 formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
 

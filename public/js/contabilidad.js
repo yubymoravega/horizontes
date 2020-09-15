@@ -54,6 +54,7 @@ const onDeleteConfirm = function (config) {
     $('#confirm__modal__btn_ok').click(function () {
         const form = $('#form__confirm__modal')
         $('#confirm__modal').modal('hide')
+        loadingModal.show('Eliminando...')
         form.attr('action', url)
         form.submit()
     })
@@ -82,12 +83,16 @@ const alertTemplate = (msg, type = 'success', time = 4000) => {
     }, time)
 }
 
-const loadingModal = {
-    show: (msg = 'Procesando...') => {
+loadingModal = {
+    show: function (msg = 'Procesando...') {
         $('#loading-modal').modal('show')
         $('#loading-modal-msg').text(msg)
     },
-    close: () => $('#loading-modal').modal('hide')
+    close: function () {
+        setTimeout(function () {
+            $('#loading-modal').modal('hide');
+        }, 500)
+    }
 
 }
 
@@ -115,6 +120,7 @@ var contableAsyncLoads = {
          * @param select_index `<options>` seleccionada por defecto
          */
         loadSubcuentaByCuenta: function (id_cuenta, select_input, select_index = 0) {
+            loadingModal.show('Cargando subcuentas...')
             $.ajax({
                 url: '/contabilidad/config/centro-costo/getsubcuenta/' + id_cuenta,
                 method: 'POST',
@@ -127,10 +133,12 @@ var contableAsyncLoads = {
                     })
                     select_input.prop('disabled', false);
                     select_input.val(select_index)
+                    loadingModal.close()
                 },
                 error: function () {
                     alert('Ha ocurrido un error en el servidor');
                     select_input.prop('disabled', true);
+                    loadingModal.close()
                 }
             })
         }

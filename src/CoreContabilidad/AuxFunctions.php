@@ -1,17 +1,14 @@
 <?php
 
-
 namespace App\CoreContabilidad;
 
 
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Yaml\Yaml;
-use Twig\Environment;
 
 
 class AuxFunctions
@@ -147,5 +144,21 @@ class AuxFunctions
                     ->orderBy('u.descripcion', 'ASC');
             }
         ]);
+    }
+
+    /**
+     * Obtener la unidad del usuario
+     */
+
+    public static function getUnidad($em, $user)
+    {
+        $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $user
+        ));
+        if ($obj_empleado) {
+            return $obj_empleado->getIdUnidad();
+        }
+        return null;
     }
 }

@@ -27,6 +27,11 @@ class Mercancia
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $cuenta;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $descripcion;
 
     /**
@@ -69,6 +74,18 @@ class Mercancia
     public function setCodigo(string $codigo): self
     {
         $this->codigo = $codigo;
+
+        return $this;
+    }
+
+    public function getCuenta(): ?string
+    {
+        return $this->cuenta;
+    }
+
+    public function setCuenta(string $cuenta): self
+    {
+        $this->cuenta = $cuenta;
 
         return $this;
     }

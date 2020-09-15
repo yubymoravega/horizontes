@@ -57576,3 +57576,9 @@ a{font-family: "Raleway", Helvetica, Arial, sans-serif !important;}
         min-height: 720px;
   }
 }
+
+
+a.boton-login.btn.btn-light {
+    background-color: #fff;
+}
+
