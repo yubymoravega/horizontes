@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
@@ -65,6 +66,18 @@ class AjusteController extends AbstractController
             'controller_name' => 'AjusteEntradaController',
             'ajustes' => $rows
         ]);
+    }
+
+    /**
+     * @Route("/get-nros-ajustes", name="contabilidad_inventario_ajuste_entrada_get_nros", methods={"POST"})
+     */
+    public function getNros(EntityManagerInterface $em, Request $request){
+        $ajuste_er = $em->getRepository(Ajuste::class);
+        $id_usuario = $this->getUser()->getId();
+        $year_ = Date('Y');
+        $idalmacen = $request->getSession()->get('selected_almacen/id');
+        $row = AuxFunctions::getConsecutivos($em,$ajuste_er,$year_,$id_usuario,$idalmacen);
+        return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
     /**

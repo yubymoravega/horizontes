@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
@@ -488,6 +489,18 @@ class TransferenciaController extends AbstractController
         $this->addFlash($success, $msg);
         // }
         return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada');
+    }
+
+    /**
+     * @Route("/get-nros-transferencias", name="contabilidad_inventario_transferencia_entrada_get_nros", methods={"POST"})
+     */
+    public function getNros(EntityManagerInterface $em, Request $request){
+        $transferencia_er = $em->getRepository(Transferencia::class);
+        $id_usuario = $this->getUser()->getId();
+        $year_ = Date('Y');
+        $idalmacen = $request->getSession()->get('selected_almacen/id');
+        $row = AuxFunctions::getConsecutivos($em,$transferencia_er,$year_,$id_usuario,$idalmacen);
+        return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
     /**

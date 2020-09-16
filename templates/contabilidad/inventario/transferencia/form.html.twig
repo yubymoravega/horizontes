@@ -47,7 +47,14 @@
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
-                <h1 class="text-reporte"> Adicionar Transferencia de Entrada</h1>
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Transferencia de Entrada #</h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'transferencia_entrada'}}) }}
@@ -160,6 +167,9 @@
                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
                     </div>
                     <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
+                    </div>
+                    <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmitTransferencia">contabilizar</button>
                     </div>
                 </div>
@@ -173,11 +183,59 @@
     <script>
         let mercancias_seleccionada = [];
         let mercancias = [];
+        let consecutivo = 0;
         let cuentas_inventarios = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
         $(document).ready(function () {
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/transferencia-entrada/get-nros-transferencias',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max',consecutivo)
+                    $('#select_nros').prop('min',1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change',function(){
+                if($('#select_nros').val()==consecutivo){
+                    $('#btnSubbmitTransferencia').show()
+                }
+                else{
+                    $('#btnSubbmitTransferencia').hide()
+                }
+            })
+            $('#select_nros').on('keyup',function(){
+                if($('#select_nros').val()==consecutivo){
+                    $('#btnSubbmitTransferencia').show()
+                    $('#btnImprimir').show()
+                }
+                else if ($('#select_nros').val()>consecutivo){
+                    $('#btnSubbmitTransferencia').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('El mayor número permitido es '+consecutivo,'danger')
+                }
+                else if($('#select_nros').val() == ''){
+                    $('#btnSubbmitTransferencia').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('Debe introducir el número del documento a vizualizar.','danger')
+                }
+                else{
+                    $('#btnImprimir').show()
+                    $('#btnSubbmitTransferencia').hide()
+                }
+            })
+
+
             $.ajax({
                 url: '/contabilidad/inventario/transferencia-entrada/getCuentas',
                 method: 'POST',

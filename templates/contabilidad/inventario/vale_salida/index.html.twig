@@ -33,28 +33,28 @@
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
-            {% for item in vales %}
-                <tr>
-                    <td style="font-weight:400;">{{ item.concecutivo }}</td>
-                    <td style="font-weight:400;">{{ item.importe }}</td>
-                    <td style="font-weight:400;">{{ item.fecha }}</td>
-                    <td style="font-weight:400;">{{ item.inventario }}</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Cancelar"
-                                onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea cancelar el vale de salida {{ item.concecutivo }} ?',
-                                        url:'{{ path('contabilidad_inventario_vale_salida_delete',{id: item.id}) }}'
-                                        })">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                        <button type="button" class="btn ml-2 btn-warning btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Imprimir">
-                            <i class="fa fa-print" onclick="Print_Vale('{{ path('contabilidad_inventario_vale_salida_print',{id: item.id}) }}')"></i>
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
+{#            {% for item in vales %}#}
+{#                <tr>#}
+{#                    <td style="font-weight:400;">{{ item.concecutivo }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.importe }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.fecha }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.inventario }}</td>#}
+{#                    <td>#}
+{#                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"#}
+{#                                data-placement="bottom" title="Cancelar"#}
+{#                                onclick="onDeleteConfirm({#}
+{#                                        message:'Está seguro que desea cancelar el vale de salida {{ item.concecutivo }} ?',#}
+{#                                        url:'{{ path('contabilidad_inventario_vale_salida_delete',{id: item.id}) }}'#}
+{#                                        })">#}
+{#                            <i class="fa fa-trash"></i>#}
+{#                        </button>#}
+{#                        <button type="button" class="btn ml-2 btn-warning btn-sm" data-toggle="tooltip"#}
+{#                                data-placement="bottom" title="Imprimir">#}
+{#                            <i class="fa fa-print" onclick="Print_Vale('{{ path('contabilidad_inventario_vale_salida_print',{id: item.id}) }}')"></i>#}
+{#                        </button>#}
+{#                    </td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
             </tbody>
         </table>
         {# end list #}

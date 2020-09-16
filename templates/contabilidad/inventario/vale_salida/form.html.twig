@@ -47,8 +47,16 @@
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
-                <h1 class="text-reporte"> Adicionar Vale de Salida</h1>
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Vale de Salida #</h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
             </div>
+
             <div class="card-body">
                 {{ form_start(formulario, {'attr':{'id':'vale_salida'}}) }}
                 <div class="row mt-0 p-0">
@@ -122,8 +130,8 @@
                         {{ form_widget(formulario.mercancia.existencia) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
-                        {{ form_label(formulario.mercancia.existencia_incremento) }}
-                        {{ form_widget(formulario.mercancia.existencia_incremento) }}
+                        {{ form_label(formulario.mercancia.existencia_decremento) }}
+                        {{ form_widget(formulario.mercancia.existencia_decremento) }}
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
@@ -163,7 +171,10 @@
                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">contabilizar</button>
+                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnSubbmitValeSalida">contabilizar</button>
                     </div>
                 </div>
 
@@ -176,11 +187,60 @@
     <script>
         let mercancias_seleccionada = [];
         let mercancias = [];
+        let consecutivo = 0;
         let cuentas_inventarios = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
         $(document).ready(function () {
+            $('#vale_salida_documento_importe_mercancia').prop('disabled',true)
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/vale-salida/get-nros-vales-salida',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max',consecutivo)
+                    $('#select_nros').prop('min',1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change',function(){
+                if($('#select_nros').val()==consecutivo){
+                    $('#btnSubbmitValeSalida').show()
+                }
+                else{
+                    $('#btnSubbmitValeSalida').hide()
+                }
+            })
+            $('#select_nros').on('keyup',function(){
+                if($('#select_nros').val()==consecutivo){
+                    $('#btnSubbmitValeSalida').show()
+                    $('#btnImprimir').show()
+                }
+                else if ($('#select_nros').val()>consecutivo){
+                    $('#btnSubbmitValeSalida').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('El mayor número permitido es '+consecutivo,'danger')
+                }
+                else if($('#select_nros').val() == ''){
+                    $('#btnSubbmitValeSalida').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('Debe introducir el número del documento a vizualizar.','danger')
+                }
+                else{
+                    $('#btnImprimir').show()
+                    $('#btnSubbmitValeSalida').hide()
+                }
+            })
+
+
             $.ajax({
                 url: '/contabilidad/inventario/vale-salida/getCuentas',
                 method: 'POST',
@@ -271,7 +331,7 @@
                     $('#vale_salida_mercancia_precio').val(0)
                 }
                 let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
-                $('#vale_salida_mercancia_existencia_incremento').val(existencia_inicial + parseFloat($('#vale_salida_documento_cantidad_mercancia').val()))
+                $('#vale_salida_mercancia_existencia_decremento').val(existencia_inicial - parseFloat($('#vale_salida_documento_cantidad_mercancia').val()))
             })
 
             $('#vale_salida_mercancia_codigo').on('keyup', function () {
@@ -378,7 +438,7 @@
                     let cant = $('#vale_salida_documento_cantidad_mercancia').val()
                     let importe = $('#vale_salida_documento_importe_mercancia').val()
                     let precio = $('#vale_salida_mercancia_precio').val()
-                    let nueva_existencia = $('#vale_salida_mercancia_existencia_incremento').val()
+                    let nueva_existencia = $('#vale_salida_mercancia_existencia_decremento').val()
                     let um = $('#vale_salida_mercancia_id_unidad_medida').val()
                     let descripcion = $('#vale_salida_mercancia_descripcion').val()
 
@@ -410,7 +470,7 @@
                         $('#vale_salida_documento_cantidad_mercancia').val('')
                         $('#vale_salida_documento_importe_mercancia').val('')
                         $('#vale_salida_mercancia_precio').val('')
-                        $('#vale_salida_mercancia_existencia_incremento').val('')
+                        $('#vale_salida_mercancia_existencia_decremento').val('')
                     }
 
                 }
