@@ -161,11 +161,14 @@
                     }
                 },
                 rules: {
-                    'cuenta[nro_cuenta]': "required",
+                    'cuenta[nro_cuenta]': {required: true, 'num-letter': true},
                     'cuenta[descripcion]': "required",
                 },
                 messages: {
-                    'cuenta[nro_cuenta]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'cuenta[nro_cuenta]': {
+                        required: CONTAB_MSG.REQUIRED_NOT_BLANK,
+                        'num-letter': CONTAB_MSG.FORMAT_NO_CUENTA
+                    },
                     'cuenta[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })

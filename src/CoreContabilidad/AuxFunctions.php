@@ -4,6 +4,7 @@ namespace App\CoreContabilidad;
 
 
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -175,6 +176,28 @@ class AuxFunctions
         $form->add('id_subcuenta', EntityType::class, [
             'class' => Subcuenta::class,
             'label' => 'Subcuenta',
+            'choice_label' => 'descripcion',
+            'query_builder' => function (EntityRepository $er) use ($cuenta) {
+                return $er->createQueryBuilder('u')
+                    ->where('u.activo = true')
+                    ->andWhere('u.id_cuenta = :id_cuenta')
+                    ->setParameter('id_cuenta', $cuenta)
+                    ->orderBy('u.descripcion', 'ASC');
+            }
+        ]);
+    }
+
+/**
+     * Creacion dinamica del campo id_elemento_gasto para el formulario dependiendo de una cuenta seleccionada
+     * @param FormInterface $form
+     * @param string $cuenta
+     */
+
+    public static function formModifierElementoGasto(FormInterface $form, $cuenta = '')
+    {
+        $form->add('id_elemento_gasto', EntityType::class, [
+            'class' => ElementoGasto::class,
+            'label' => 'Elemnto Gasto',
             'choice_label' => 'descripcion',
             'query_builder' => function (EntityRepository $er) use ($cuenta) {
                 return $er->createQueryBuilder('u')

@@ -1,6 +1,7 @@
 {% extends 'utils/modal_form.html.twig' %}
-
 {% block modalbody %}
+    {#    {{ include('utils/input_multiselect_modal.twig') }}#}
+
     {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
 
     <div class="form-group input-group input-group-sm d-block">
@@ -18,6 +19,15 @@
     <div class="form-group input-group input-group-sm d-block">
         <label for="centro_costo_id_subcuenta" class="font-weight-bold">Subcuenta</label>
         {{ form_widget(form.id_subcuenta,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="id_elemento_gasto" class="font-weight-bold">Elemento de Gasto</label>
+        <input type="text" name="centro_costo_id_elemento_gasto"
+               id="id_elemento_gasto"
+               input-multiselect-modal-type
+               immt-parent="#centro_costo_id_cuenta"
+               immt-url="/contabilidad/config/elemento-gasto/getbycuenta"
+               class="form-control w-100" data-toggle="modal">
     </div>
     <input type="text" id="id_centro_costo" hidden>
     {{ form_end(form) }}

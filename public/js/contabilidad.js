@@ -1,4 +1,15 @@
+
+// conseloe.log() function
+var cl = console.log
+
 $(document).ready(function () {
+
+    /**
+     * Enable popovers everywhere
+     */
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    })
 
     /**
      * ocultando la Alerta - app.flashes(success|error)
@@ -7,6 +18,75 @@ $(document).ready(function () {
         $('#alert__success').addClass('transition-right')
         // $('#alert__success').hide(9000)
     }, 5000)
+
+
+    /**
+     * ADD Validations to --- Validator.JS ---
+     */
+    jQuery.validator.addMethod("num-letter", function (value, element) {
+        // allow any non-whitespace characters as the host part
+        return this.optional(element) || /^[A-Za-z0-9]+$/g.test(value);
+    }, 'Please enter a valid email address.')
+
+    /**
+     * Code JS to <component> `input-multiselect-modal-type` -
+     */
+    $('[input-multiselect-modal-type]').on('click', function () {
+        const parent_id = $(this).attr('immt-parent')
+        const parent =  $(parent_id).val() || '';
+        const url = $(this).attr('immt-url')+'/'+ parent
+        const modal = $('#input-multiselt-modal')
+        const table = modal.find('table')
+
+       /* if (parent_id && parent === '')
+        {
+            alertTemplate('Debe llenar los campos previos', 'danger')
+            return
+        }*/
+        // eliminar datos tabla
+        table.find('tr').remove();
+
+
+        console.log($(this).attr('immt-parent'), url)
+        // $('#rows_table_elemento_gasto').find('tr').remove();
+        // let cuentas_str = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+        loadingModal.show()
+        $.ajax({
+            url,
+            method: 'POST',
+            dataType: 'json',
+            success: function (result) {
+                loadingModal.close()
+                cl(12233333)
+                cl(result)
+                data = result
+                /*$(result.elemento_gasto).each(function (pos, valor) {
+                    if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
+                        $('#rows_table_elemento_gasto').append('<tr>' +
+                            '<td style="font-weight:400;"> ' +
+                            '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
+                            '</td>' +
+                            '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                            '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                        );
+                    else {
+                        $('#rows_table_elemento_gasto').append('<tr>' +
+                            '<td style="font-weight:400;"> ' +
+                            '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                            '</td>' +
+                            '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                            '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                        );
+                    }
+                })*/
+                modal.modal('show')
+            },
+            error: function (err) {
+                console.log("error-----",err)
+            }
+        })
+    })
+
 });
 
 /**
@@ -20,6 +100,7 @@ const CONTAB_MSG = {
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
     REQUIRED_OBLIGATORIO: 'El campo obligatorio!',
+    FORMAT_NO_CUENTA: 'el No. de la cuenta solo acepta letras y números',
 }
 
 

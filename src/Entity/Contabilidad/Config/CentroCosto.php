@@ -47,6 +47,11 @@ class CentroCosto
      */
     private $id_subcuenta;
 
+    /**
+     * @ORM\Column(type="array")
+     */
+    private $id_elemento_gasto;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,6 +113,18 @@ class CentroCosto
     public function setIdSubcuenta(?Subcuenta $id_subcuenta): self
     {
         $this->id_subcuenta = $id_subcuenta;
+
+        return $this;
+    }
+
+    public function getIdElementoGasto()
+    {
+        return $this->id_elemento_gasto;
+    }
+
+    public function setIdElemntoGasto($id_elemento_gasto): self
+    {
+        $this->id_elemento_gasto = $id_elemento_gasto;
 
         return $this;
     }
