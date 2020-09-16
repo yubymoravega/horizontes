@@ -2,25 +2,25 @@
 
 namespace App\Repository\Contabilidad\Inventario;
 
-use App\Entity\Contabilidad\Inventario\AlamcenOcupado;
+use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method AlamcenOcupado|null find($id, $lockMode = null, $lockVersion = null)
- * @method AlamcenOcupado|null findOneBy(array $criteria, array $orderBy = null)
- * @method AlamcenOcupado[]    findAll()
- * @method AlamcenOcupado[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method AlmacenOcupado|null find($id, $lockMode = null, $lockVersion = null)
+ * @method AlmacenOcupado|null findOneBy(array $criteria, array $orderBy = null)
+ * @method AlmacenOcupado[]    findAll()
+ * @method AlmacenOcupado[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AlamcenOcupadoRepository extends ServiceEntityRepository
+class AlmacenOcupadoRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, AlamcenOcupado::class);
+        parent::__construct($registry, AlmacenOcupado::class);
     }
 
     // /**
-    //  * @return AlamcenOcupado[] Returns an array of AlamcenOcupado objects
+    //  * @return AlmacenOcupado[] Returns an array of AlmacenOcupado objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class AlamcenOcupadoRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?AlamcenOcupado
+    public function findOneBySomeField($value): ?AlmacenOcupado
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.exampleField = :val')

@@ -4,13 +4,13 @@ namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\User;
-use App\Repository\Contabilidad\Inventario\AlamcenOcupadoRepository;
+use App\Repository\Contabilidad\Inventario\AlmacenOcupadoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=AlamcenOcupadoRepository::class)
+ * @ORM\Entity(repositoryClass=AlmacenOcupadoRepository::class)
  */
-class AlamcenOcupado
+class AlmacenOcupado
 {
     /**
      * @ORM\Id()
@@ -23,7 +23,7 @@ class AlamcenOcupado
      * @ORM\ManyToOne(targetEntity=Almacen::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $id_almaceh;
+    private $id_almacen;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class)
@@ -36,14 +36,14 @@ class AlamcenOcupado
         return $this->id;
     }
 
-    public function getIdAlmaceh(): ?Almacen
+    public function getIdAlmacen(): ?Almacen
     {
-        return $this->id_almaceh;
+        return $this->id_almacen;
     }
 
-    public function setIdAlmaceh(?Almacen $id_almaceh): self
+    public function setIdAlmacen(?Almacen $id_almacen): self
     {
-        $this->id_almaceh = $id_almaceh;
+        $this->id_almacen = $id_almacen;
 
         return $this;
     }
