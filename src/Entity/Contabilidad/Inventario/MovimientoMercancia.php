@@ -2,6 +2,8 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\User;
 use App\Repository\Contabilidad\Inventario\EntradaMercanciaRepository;
@@ -71,6 +73,16 @@ class MovimientoMercancia
      * @ORM\ManyToOne(targetEntity=User::class, cascade={"persist", "remove"})
      */
     private $id_usuario;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CentroCosto::class)
+     */
+    private $id_centro_costo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
+     */
+    private $id_elemento_gasto;
 
     public function getId(): ?int
     {
@@ -193,6 +205,30 @@ class MovimientoMercancia
     public function setIdUsuario(?User $id_usuario): self
     {
         $this->id_usuario = $id_usuario;
+
+        return $this;
+    }
+
+    public function getIdCentroCosto(): ?CentroCosto
+    {
+        return $this->id_centro_costo;
+    }
+
+    public function setIdCentroCosto(?CentroCosto $id_centro_costo): self
+    {
+        $this->id_centro_costo = $id_centro_costo;
+
+        return $this;
+    }
+
+    public function getIdElementoGasto(): ?ElementoGasto
+    {
+        return $this->id_elemento_gasto;
+    }
+
+    public function setIdElementoGasto(?ElementoGasto $id_elemento_gasto): self
+    {
+        $this->id_elemento_gasto = $id_elemento_gasto;
 
         return $this;
     }

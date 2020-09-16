@@ -47,41 +47,31 @@
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
-                <h1 class="text-reporte"> Adicionar Informe de Recepción</h1>
+                <h1 class="text-reporte"> Adicionar Vale de Salida</h1>
             </div>
             <div class="card-body">
-                {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'informe_recepcion'}}) }}
+                {{ form_start(formulario, {'attr':{'id':'vale_salida'}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.fecha_factura) }}
-                        {{ form_widget(formulario.fecha_factura) }}
+                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.fecha_solicitud) }}
+                        {{ form_widget(formulario.fecha_solicitud) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
-                        {{ form_label(formulario.codigo_factura) }}
-                        {{ form_widget(formulario.codigo_factura) }}
-                    </div>
-
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block ">
-                        {{ form_label(formulario.id_proveedor) }}
-                        {{ form_widget(formulario.id_proveedor) }}
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.nro_solicitud) }}
+                        {{ form_widget(formulario.nro_solicitud) }}
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.nro_cuenta_inventario) }}
-                        {{ form_widget(formulario.nro_cuenta_inventario) }}
+                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.nro_cuenta_deudora) }}
+                        {{ form_widget(formulario.nro_cuenta_deudora) }}
                     </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
-                        {{ form_label(formulario.nro_subcuenta_inventario) }}
-                        {{ form_widget(formulario.nro_subcuenta_inventario) }}
-                    </div>
-                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_cuenta_acreedora) }}
-                        {{ form_widget(formulario.nro_cuenta_acreedora) }}
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.nro_subcuenta_deudora) }}
+                        {{ form_widget(formulario.nro_subcuenta_deudora) }}
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
-                {{ form_end(formulario.nro_cuenta_acreedora) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
@@ -91,7 +81,6 @@
                 </div>
                 <hr color="dimgray" class="my-1 ml-2" size=3>
 
-                {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia'}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
                         {{ form_label(formulario.mercancia.codigo) }}
@@ -116,11 +105,11 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.documento.cantidad_mercancia) }}
                         {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
                     </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.documento.importe_mercancia) }}
                         {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
                     </div>
@@ -136,11 +125,21 @@
                         {{ form_label(formulario.mercancia.existencia_incremento) }}
                         {{ form_widget(formulario.mercancia.existencia_incremento) }}
                     </div>
-                    {{ form_end(formulario.mercancia) }}
-
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-5 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.id_centro_costo) }}
+                        {{ form_widget(formulario.id_centro_costo) }}
+                    </div>
+                    <div class="col-5 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.id_elemento_gasto) }}
+                        {{ form_widget(formulario.id_elemento_gasto) }}
+                    </div>
                     <div class="col-2 pt-2 pl-1 mt-4">
                         <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR</button>
                     </div>
+                </div>
+                {{ form_end(formulario) }}
                 </div>
                 <div>
                     <table class="table-small-rows table table-hover text-light">
@@ -160,7 +159,7 @@
                 </div>
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('contabilidad_inventario_informe_recepcion') }}"
+                        <a href="{{ url('contabilidad_inventario_vale_salida') }}"
                            class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
                     </div>
                     <div class="ml-2">
@@ -183,16 +182,16 @@
 
         $(document).ready(function () {
             $.ajax({
-                url: '/contabilidad/inventario/informe-recepcion/getCuentas',
+                url: '/contabilidad/inventario/vale-salida/getCuentas',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
                     cuentas_inventarios = result.cuentas_inventario
                     $(result.cuentas_inventario).each(function (pos, valor) {
-                        $('#informe_recepcion_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        $('#vale_salida_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
                     $(result.cuentas_acrredoras).each(function (pos, valor) {
-                        $('#informe_recepcion_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        $('#vale_salida_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
                     loadingModal.close()
                 },
@@ -202,10 +201,10 @@
 
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
-                let codigo = $('#informe_recepcion_mercancia_codigo').val() != '' ? $('#informe_recepcion_mercancia_codigo').val() : -1
-                let cuenta = $('#informe_recepcion_nro_cuenta_inventario').val() != '' ? $('#informe_recepcion_nro_cuenta_inventario').val() : ''
+                let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
+                let cuenta = $('#vale_salida_nro_cuenta_inventario').val() != '' ? $('#vale_salida_nro_cuenta_inventario').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo +','+ cuenta,
+                    url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo +','+ cuenta,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -226,100 +225,95 @@
                 })
             })
 
-            $('#informe_recepcion_mercancia_codigo').on('keyup', function (e) {
+            $('#vale_salida_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13){
-                    let codigo = $('#informe_recepcion_mercancia_codigo').val()
-                    let cuenta = $('#informe_recepcion_nro_cuenta_inventario').val()
-                    if(cuenta != '' && codigo != ''){
-                        $.ajax({
-                            url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo +','+ cuenta,
-                            method: 'POST',
-                            dataType: 'json',
-                            success: function (result) {
-                                mercancias = result.mercancias
-                                if(mercancias.length>0){
-                                    $('#informe_recepcion_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                    $('#informe_recepcion_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#informe_recepcion_mercancia_precio').val(mercancias[0]['precio_compra'])
-                                }
-                                else{
-                                    alertTemplate('No existen mercancias con ese código')
-                                }
-                            },
-                            error: function () {
+                    let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
+                    let cuenta = $('#vale_salida_nro_cuenta_inventario').val() != '' ? $('#vale_salida_nro_cuenta_inventario').val() : ''
+                    $.ajax({
+                        url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo +','+ cuenta,
+                        method: 'POST',
+                        dataType: 'json',
+                        success: function (result) {
+                            mercancias = result.mercancias
+                            if(mercancias.length>0){
+                                $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
+                                $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
                             }
-                        })
-                    }
-                    else{
-                        alertTemplate('El campo código y cuenta no deben estar vacios.','danger')
-                    }
+                            else{
+                                alert('no existen mercancias con ese código')
+                            }
+                        },
+                        error: function () {
+                        }
+                    })
                 }
             })
 
-            $('#informe_recepcion_documento_importe_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#informe_recepcion_documento_importe_mercancia').val())
-                let cantidad = parseFloat($('#informe_recepcion_documento_cantidad_mercancia').val())
+            $('#vale_salida_documento_importe_mercancia').on('keyup', function () {
+                let importe = parseFloat($('#vale_salida_documento_importe_mercancia').val())
+                let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (importe > 0) {
                     let precio_final = parseFloat(importe / cantidad).toFixed(3)
-                    $('#informe_recepcion_mercancia_precio').val(precio_final)
+                    $('#vale_salida_mercancia_precio').val(precio_final)
                 } else {
-                    $('#informe_recepcion_mercancia_precio').val(0)
+                    $('#vale_salida_mercancia_precio').val(0)
                 }
             })
 
-            $('#informe_recepcion_documento_cantidad_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#informe_recepcion_documento_importe_mercancia').val())
-                let cantidad = parseFloat($('#informe_recepcion_documento_cantidad_mercancia').val())
+            $('#vale_salida_documento_cantidad_mercancia').on('keyup', function () {
+                let importe = parseFloat($('#vale_salida_documento_importe_mercancia').val())
+                let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (importe > 0) {
                     let precio_final = parseFloat(importe / cantidad).toFixed(3)
-                    $('#informe_recepcion_mercancia_precio').val(precio_final)
+                    $('#vale_salida_mercancia_precio').val(precio_final)
                 } else {
-                    $('#informe_recepcion_mercancia_precio').val(0)
+                    $('#vale_salida_mercancia_precio').val(0)
                 }
-                let existencia_inicial = (parseFloat($('#informe_recepcion_mercancia_existencia').val()) > 0 || $('#informe_recepcion_mercancia_existencia').val() != '') ? parseFloat($('#informe_recepcion_mercancia_existencia').val()) : 0
-                $('#informe_recepcion_mercancia_existencia_incremento').val(existencia_inicial + parseFloat($('#informe_recepcion_documento_cantidad_mercancia').val()))
+                let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
+                $('#vale_salida_mercancia_existencia_incremento').val(existencia_inicial + parseFloat($('#vale_salida_documento_cantidad_mercancia').val()))
             })
 
-            $('#informe_recepcion_mercancia_codigo').on('keyup', function () {
-                $('#informe_recepcion_mercancia_descripcion').val('')
-                $('#informe_recepcion_mercancia_precio').val('')
-                $('#informe_recepcion_mercancia_existencia').val('')
+            $('#vale_salida_mercancia_codigo').on('keyup', function () {
+                $('#vale_salida_mercancia_descripcion').val('')
+                $('#vale_salida_mercancia_precio').val('')
+                $('#vale_salida_mercancia_existencia').val('')
             })
 
-            $('#informe_recepcion_nro_cuenta_inventario').on('change', function () {
-                $('#informe_recepcion_nro_subcuenta_inventario').find('option').remove()
+            $('#vale_salida_nro_cuenta_inventario').on('change', function () {
+                $('#vale_salida_nro_subcuenta_inventario').find('option').remove()
                 cuentas_inventarios.forEach(function (valor, pos) {
-                    if ($('#informe_recepcion_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                    if ($('#vale_salida_nro_cuenta_inventario').val() == valor.nro_cuenta) {
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                            $('#informe_recepcion_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            $('#vale_salida_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })
             })
 
-            const form_informe_recepcion = $('#informe_recepcion')
+            const form_vale_salida = $('#vale_salida')
 
-            form_informe_recepcion.validate({
+            form_vale_salida.validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
                     error.attr('style', 'font-size: .8rem;')
                     error.insertAfter(element);
                 },
                 rules: {
-                    'informe_recepcion[codigo_factura]': "required",
-                    'informe_recepcion[fecha_factura]': "required",
-                    'informe_recepcion[id_proveedor]': "required",
-                    'informe_recepcion[nro_cuenta_inventario]': "required",
-                    'informe_recepcion[nro_subcuenta_inventario]': "required",
-                    'informe_recepcion[nro_cuenta_acreedora]': "required",
+                    'vale_salida[codigo_factura]': "required",
+                    'vale_salida[fecha_factura]': "required",
+                    'vale_salida[id_proveedor]': "required",
+                    'vale_salida[nro_cuenta_inventario]': "required",
+                    'vale_salida[nro_subcuenta_inventario]': "required",
+                    'vale_salida[nro_cuenta_acreedora]': "required",
                 },
                 messages: {
-                    'informe_recepcion[codigo_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[codigo_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
@@ -331,36 +325,36 @@
                     error.insertAfter(element);
                 },
                 rules: {
-                    'informe_recepcion[mercancia][codigo]': "required",
-                    'informe_recepcion[mercancia][descripcion]': "required",
-                    'informe_recepcion[mercancia][id_unidad_medida]': "required",
-                    'informe_recepcion[documento][cantidad_mercancia]': "required",
-                    'informe_recepcion[documento][importe_mercancia]': "required",
+                    'vale_salida[mercancia][codigo]': "required",
+                    'vale_salida[mercancia][descripcion]': "required",
+                    'vale_salida[mercancia][id_unidad_medida]': "required",
+                    'vale_salida[documento][cantidad_mercancia]': "required",
+                    'vale_salida[documento][importe_mercancia]': "required",
                 },
                 messages: {
-                    'informe_recepcion[mercancia][codigo]': 'Obligatorio!',
-                    'informe_recepcion[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[mercancia][id_unidad_medida]': 'Obligatorio!',
-                    'informe_recepcion[documento][cantidad_mercancia]': 'Obligatorio!',
-                    'informe_recepcion[documento][importe_mercancia]': 'Obligatorio!',
+                    'vale_salida[mercancia][codigo]': 'Obligatorio!',
+                    'vale_salida[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
+                    'vale_salida[documento][cantidad_mercancia]': 'Obligatorio!',
+                    'vale_salida[documento][importe_mercancia]': 'Obligatorio!',
                 }
             })
 
             $("#btnSubbmitInforme").click(function (e) {
-                if (form_informe_recepcion.valid()) {
+                if (form_vale_salida.valid()) {
                     if (list_mercancia.length) {
-                        let data = form_informe_recepcion.serializeArray()
+                        let data = form_vale_salida.serializeArray()
                         console.log(data)
                         loadingModal.show()
-                        data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
+                        data.push({name: 'vale_salida[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
-                            url: '/contabilidad/inventario/informe-recepcion/form-add',
+                            url: '/contabilidad/inventario/vale-salida/form-add',
                             method: 'POST',
                             data: data,
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_informe_recepcion') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_vale_salida') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)
@@ -380,13 +374,13 @@
 
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
-                    let codigo = $('#informe_recepcion_mercancia_codigo').val()
-                    let cant = $('#informe_recepcion_documento_cantidad_mercancia').val()
-                    let importe = $('#informe_recepcion_documento_importe_mercancia').val()
-                    let precio = $('#informe_recepcion_mercancia_precio').val()
-                    let nueva_existencia = $('#informe_recepcion_mercancia_existencia_incremento').val()
-                    let um = $('#informe_recepcion_mercancia_id_unidad_medida').val()
-                    let descripcion = $('#informe_recepcion_mercancia_descripcion').val()
+                    let codigo = $('#vale_salida_mercancia_codigo').val()
+                    let cant = $('#vale_salida_documento_cantidad_mercancia').val()
+                    let importe = $('#vale_salida_documento_importe_mercancia').val()
+                    let precio = $('#vale_salida_mercancia_precio').val()
+                    let nueva_existencia = $('#vale_salida_mercancia_existencia_incremento').val()
+                    let um = $('#vale_salida_mercancia_id_unidad_medida').val()
+                    let descripcion = $('#vale_salida_mercancia_descripcion').val()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
@@ -410,13 +404,13 @@
                         </td>
                         <td style="font-weight:400;" hidden> ${um} </td> </tr>`
                         );
-                        $('#informe_recepcion_mercancia_codigo').val('')
-                        $('#informe_recepcion_mercancia_descripcion').val('')
-                        $('#informe_recepcion_mercancia_existencia').val('')
-                        $('#informe_recepcion_documento_cantidad_mercancia').val('')
-                        $('#informe_recepcion_documento_importe_mercancia').val('')
-                        $('#informe_recepcion_mercancia_precio').val('')
-                        $('#informe_recepcion_mercancia_existencia_incremento').val('')
+                        $('#vale_salida_mercancia_codigo').val('')
+                        $('#vale_salida_mercancia_descripcion').val('')
+                        $('#vale_salida_mercancia_existencia').val('')
+                        $('#vale_salida_documento_cantidad_mercancia').val('')
+                        $('#vale_salida_documento_importe_mercancia').val('')
+                        $('#vale_salida_mercancia_precio').val('')
+                        $('#vale_salida_mercancia_existencia_incremento').val('')
                     }
 
                 }
@@ -437,10 +431,10 @@
             for (var i = 0; i < mercancias.length; i++) {
                 let id = '#' + mercancias[i]['codigo']
                 if ($(id).prop('checked') == true) {
-                    $('#informe_recepcion_mercancia_codigo').val(mercancias[i]['codigo'])
-                    $('#informe_recepcion_mercancia_descripcion').val(mercancias[i]['descripcion'])
-                    $('#informe_recepcion_mercancia_precio').val(mercancias[i]['precio_compra'])
-                    $('#informe_recepcion_mercancia_existencia').val(mercancias[i]['existencia'])
+                    $('#vale_salida_mercancia_codigo').val(mercancias[i]['codigo'])
+                    $('#vale_salida_mercancia_descripcion').val(mercancias[i]['descripcion'])
+                    $('#vale_salida_mercancia_precio').val(mercancias[i]['precio_compra'])
+                    $('#vale_salida_mercancia_existencia').val(mercancias[i]['existencia'])
                     break
                 }
             }
