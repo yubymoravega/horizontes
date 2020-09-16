@@ -33,6 +33,7 @@
             <th scope="col-1">Código</th>
             <th scope="col-2">Cuenta</th>
             <th scope="col-2">Sub Cuenta</th>
+            <th scope="col-2">Elemento de Gasto</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
@@ -40,8 +41,12 @@
                 <tr>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
-                    <td style="font-weight:400;">{{ item.cuenta }}</td>
+                    <td style="font-weight:400;">
+                        <a href="#" data-toggle="popover" data-trigger="focus" data-placement="bottom"
+                           data-content="{{ item.cuenta }}">{{ item.nro_cuenta }}</a>
+                    </td>
                     <td style="font-weight:400;">{{ item.sub_cuenta }}</td>
+{#                    <td style="font-weight:400;">{{ item.elemnto_gasto }}</td>#}
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
@@ -122,6 +127,43 @@
                 }
             })
 
+           /* $('#id_elemento_gasto').on('click', function () {
+                $('#rows_table_elemento_gasto').find('tr').remove();
+                let cuentas_str = $('#centro_costo_id_cuenta').val()
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/config/conf-inicial/form-elemento-gasto/' + cuentas_str,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        loadingModal.close()
+                        elemento_gasto = result.elemento_gasto
+                        $(result.elemento_gasto).each(function (pos, valor) {
+                            if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
+                                $('#rows_table_elemento_gasto').append('<tr>' +
+                                    '<td style="font-weight:400;"> ' +
+                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
+                                    '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                                );
+                            else {
+                                $('#rows_table_elemento_gasto').append('<tr>' +
+                                    '<td style="font-weight:400;"> ' +
+                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                    '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
+                                );
+                            }
+                        })
+                        $('#listarElementoGastoModal').modal('show')
+                    },
+                    error: function () {
+                    }
+                })
+            })*/
+
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
                 errorClass: 'invalid-label-orange',
@@ -157,7 +199,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/add`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -166,7 +208,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/centro-costo/${id_centro_costo}`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__form__id').on('show.bs.modal', function (event) {

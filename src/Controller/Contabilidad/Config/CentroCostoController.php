@@ -36,6 +36,7 @@ class CentroCostoController extends AbstractController
                 'nombre' => $item->getNombre(),
                 'codigo' => $item->getCodigo(),
                 'id_cuenta' => $item->getIdCuenta() ? $item->getIdCuenta()->getId() : '',
+                'nro_cuenta' => $item->getIdCuenta() ? $item->getIdCuenta()->getNroCuenta() : '',
                 'id_sub_cuenta' => $item->getIdSubcuenta() ? $item->getIdSubcuenta()->getId() : '',
                 'cuenta' => $item->getIdCuenta()->getDescripcion(),
                 'sub_cuenta' => $item->getIdSubcuenta()->getDescripcion()

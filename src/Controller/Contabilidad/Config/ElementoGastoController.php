@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -51,6 +52,29 @@ class ElementoGastoController extends AbstractController
             'elemento_gasto' => $paginator,
             'form' => $form->createView()
         ]);
+    }
+
+    /**
+     * @Route("/getbycuenta/{id_cuenta}", name="contabilidad_config_elemtogasto_by_cuenta")
+     */
+    public function getElemntoGastoByCuenta(EntityManagerInterface $em, Request $request, $id_cuenta)
+    {
+        $elemnto = $em->getRepository(ElementoGasto::class)->findBy(['id_cuenta' => $id_cuenta]);
+//        dd("elemnto",$elemnto);
+        $row = [];
+        $success = false;
+        if ($elemnto) {
+            $success = true;
+            foreach ($elemnto as $item) {
+                /**@var $item ElementoGasto** */
+                $row[] = array(
+                    'id' => $item->getId(),
+                    'codigo' => $item->getCodigo(),
+                    'descripcion' => $item->getDescripcion()
+                );
+            }
+        }
+        return new JsonResponse(['success' => $success, 'data' => $row]);
     }
 
     /**
