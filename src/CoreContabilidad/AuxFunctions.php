@@ -6,9 +6,13 @@ namespace App\CoreContabilidad;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -32,6 +36,42 @@ class AuxFunctions
             return false;
         return true;
     }
+
+    /**
+     * @param EntityManagerInterface $em instancia del Doctrine EntityManagerInterface
+     * @param EntityRepository $er entidad sobre la qe se solicita la informacion
+     * @param int $anno numero de anno que se solicita
+     * @param int $id_usuario identificador del usuario que est realizando la peticion
+     * @param int $id_almacen identificador del usuario que est realizando la peticion
+     * @return array Arreglo de valores con todos los numeros concesutivos del anno incluyendo el siguiente, de forma invertida(Mayor a menor)
+     */
+    public static function getConsecutivos(EntityManagerInterface $em, EntityRepository $er, int $anno, int $id_usuario, int $id_almacen)
+    {
+        $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $id_usuario
+        ));
+        $rows = array();
+        if ($obj_empleado) {
+            $id_unidad = $obj_empleado->getIdUnidad()->getId();
+            $arreglo = $er->findBy(array(
+                'anno' => $anno,
+                'activo' => true
+            ));
+            $contador = 0;
+            foreach ($arreglo as $obj) {
+                if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad){
+                    $contador++;
+                    $rows[] = $contador;
+                }
+            }
+            $consecutivo = $contador + 1;
+            $rows[count($rows)]= $consecutivo;
+        }
+//        return array_reverse($rows);
+        return $consecutivo;
+    }
+
 
     /**
      * Indica si un objeto esta duplicado en BD,ya sea para 'adicionar' como `modificar`

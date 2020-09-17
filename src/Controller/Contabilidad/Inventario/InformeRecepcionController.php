@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
@@ -44,14 +45,14 @@ class InformeRecepcionController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
-
         $year_ = Date('Y');
+        $idalmacen = $request->getSession()->get('selected_almacen/id');
+
         $informe_arr = $informe_recepcion_er->findBy(array(
             'activo' => true,
             'anno' => $year_
         ));
         $rows = [];
-        $idalmacen = $request->getSession()->get('selected_almacen/id');
         foreach ($informe_arr as $obj_informe_recepcion) {
             /**@var $obj_informe_recepcion InformeRecepcion* */
 
@@ -71,6 +72,18 @@ class InformeRecepcionController extends AbstractController
             'controller_name' => 'InformeRecepcionController',
             'informes' => $rows
         ]);
+    }
+
+    /**
+     * @Route("/get-nros-informes", name="contabilidad_inventario_informe_recepcion_get_nros", methods={"POST"})
+     */
+    public function getNros(EntityManagerInterface $em, Request $request){
+        $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
+        $id_usuario = $this->getUser()->getId();
+        $year_ = Date('Y');
+        $idalmacen = $request->getSession()->get('selected_almacen/id');
+        $nro = AuxFunctions::getConsecutivos($em,$informe_recepcion_er,$year_,$id_usuario,$idalmacen);
+        return new JsonResponse(['nros' => $nro, 'success' => true]);
     }
 
     /**

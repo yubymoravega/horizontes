@@ -16,7 +16,7 @@ class ValeSalidaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('mercancia', MercanciaType::class, [
+            ->add('mercancia', MercanciaSalidaType::class, [
                 'mapped' => false,
                 'auto_initialize' => true
             ])
