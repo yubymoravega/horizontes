@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Elementos de Gastos
+                Criterios de análisis
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
@@ -26,26 +26,26 @@
 
         {# Modal de adicionar#}
 
-        {{ include('contabilidad/config/elemento_gasto/form_modal.html.twig',{title: 'Adicionar'}) }}
+        {{ include('contabilidad/config/criterio_analisis/form_modal.html.twig',{title: 'Adicionar'}) }}
 
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Descripción</th>
-            <th scope="col-3">Código</th>
+            <th scope="col-2">Nombre</th>
+            <th scope="col-3">Abreviatura</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
-            {% for item in elemento_gasto %}
+            {% for item in criterios %}
                 <tr>
-                    <td style="font-weight:400;">{{ item.descripcion }}</td>
-                    <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.abreviatura }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
-                                        codigo:'{{ item.codigo }}',
-                                        descripcion:'{{ item.descripcion }}' ,
+                                        nombre:'{{ item.nombre }}',
+                                        abreviatura:'{{ item.abreviatura }}' ,
                                         id: '{{ item.id }}'
                                         })">
                             <i class="fa fa-edit"></i>
@@ -53,8 +53,8 @@
                         <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar el elemento de gasto: {{ item.descripcion }} ?',
-                                        url:'{{ path('contabilidad_config_elemento_gasto_delete',{id: item.id}) }}',
+                                        message:'Está seguro que desea eliminar el criterio de análisis: {{ item.nombre }} ?',
+                                        url:'{{ path('contabilidad_config_criterio_analisis_delete',{id: item.id}) }}',
                                         _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
@@ -66,7 +66,7 @@
         </table>
         {# end list #}
         <div class="navigation">
-            {{ knp_pagination_render(elemento_gasto) }}
+            {{ knp_pagination_render(criterios) }}
         </div>
     </div>
 {% endblock %}
@@ -83,14 +83,14 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {id = '', codigo = '', descripcion = ''} = config
+            const {id = '', abreviatura = '', nombre = ''} = config
 
             $('#modal__form__id').modal('show')
-            $('#modal__form__label__id').text("Modificar " + descripcion)
+            $('#modal__form__label__id').text("Modificar " + nombre)
 
-            $('#elemento_gasto_descripcion').val(descripcion)
-            $('#elemento_gasto_codigo').val(codigo)
-            $('#id_elemento_gasto').val(id)
+            $('#criterio_analisis_nombre').val(nombre)
+            $('#criterio_analisis_abreviatura').val(abreviatura)
+            $('#id_criterio_analisis').val(id)
         }
 
         $(document).ready(function () {
@@ -114,37 +114,37 @@
                     }
                 },
                 rules: {
-                    'elemento_gasto[descripcion]': "required",
-                    'elemento_gasto[codigo]': "required",
+                    'criterio_analisis[nombre]': "required",
+                    'criterio_analisis[abreviatura]': "required",
                 },
                 messages: {
-                    'elemento_gasto[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'elemento_gasto[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'criterio_analisis[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'criterio_analisis[abreviatura]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
 
             $('#modal__btn__aceptar').on('click', function () {
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/elemento-gasto/add`)
+                formulario.attr('action', `/contabilidad/config/criterio-analisis/add`)
                 formulario.submit()
                 if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
 
-                const id_elemento_gasto = $('#id_elemento_gasto').val()
+                const id_criterio_analisis = $('#id_criterio_analisis').val()
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/elemento-gasto/upd/${id_elemento_gasto}`)
+                formulario.attr('action', `/contabilidad/config/criterio-analisis/upd/${id_criterio_analisis}`)
                 formulario.submit()
                 if(validateForm.errorList.length === 0) loadingModal.show()
             })
 
 
-            $('#gestionarElemento_gastoModal').on('show.bs.modal', function (event) {
+            $('#gestionarcriterio_analisisModal').on('show.bs.modal', function (event) {
                 validateForm.resetForm()
-                $('#modal__form__label__id').text('Adicionar elemento de gasto')
+                $('#modal__form__label__id').text('Adicionar criterio de análisis')
             })
         })
     </script>

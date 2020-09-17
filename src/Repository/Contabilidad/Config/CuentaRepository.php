@@ -2,52 +2,21 @@
 
 namespace App\Repository\Contabilidad\Config;
 
-use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Config\Cuenta;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class
- * @method Cuenta|null find($id, $paranoid = true)
- * @method Cuenta|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
- * @method Cuenta[]    findAll($paranoid = true)
- * @method Cuenta[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
+ * @method Cuenta|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Cuenta|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Cuenta[]    findAll()
+ * @method Cuenta[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CuentaRepository extends ParanoidEntityRepository
+class CuentaRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        $this->setEntityClass(Cuenta::class);
-        $this->setRegistry($registry);
-        parent::__construct();
-    }
-
-    /**
-     * @return Cuenta[] Returns an array of Cuenta objects
-     */
-
-    public function getCuentas()
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.activo = :val')
-            ->setParameter('val', true)
-            ->orderBy('c.id', 'ASC')
-            ->getQuery()
-            ->getResult()
-            ;
-    }
-
-    /**
-     * @return Cuenta[] Returns an array of Cuenta objects
-     */
-
-    public function getCuentasPagination()
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.activo = :val')
-            ->setParameter('val', true)
-            ->orderBy('c.id', 'ASC')
-            ->getQuery();
+        parent::__construct($registry, Cuenta::class);
     }
 
     // /**

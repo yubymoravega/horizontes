@@ -2,25 +2,25 @@
 
 namespace App\Repository\Contabilidad\Config;
 
-use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method CentroCosto|null find($id, $lockMode = null, $lockVersion = null)
- * @method CentroCosto|null findOneBy(array $criteria, array $orderBy = null)
- * @method CentroCosto[]    findAll()
- * @method CentroCosto[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method CriterioAnalisis|null find($id, $lockMode = null, $lockVersion = null)
+ * @method CriterioAnalisis|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CriterioAnalisis[]    findAll()
+ * @method CriterioAnalisis[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CentroCostoRepository extends ServiceEntityRepository
+class CriterioAnalisisRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, CentroCosto::class);
+        parent::__construct($registry, CriterioAnalisis::class);
     }
 
     // /**
-    //  * @return CentroCosto[] Returns an array of CentroCosto objects
+    //  * @return CriterioAnalisis[] Returns an array of CriterioAnalisis objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class CentroCostoRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?CentroCosto
+    public function findOneBySomeField($value): ?CriterioAnalisis
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.exampleField = :val')

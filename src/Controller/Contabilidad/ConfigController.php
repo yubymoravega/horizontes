@@ -2,9 +2,13 @@
 
 namespace App\Controller\Contabilidad;
 
+use App\Entity\Contabilidad\CapitalHumano\Cargo;
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -51,11 +55,37 @@ class ConfigController extends AbstractController
                 ->setStatus(true)
                 ->setPassword($passEncoder->encodePassword($user, '123'));
             $em->persist($user);
+            $cargo = new Cargo();
+            $cargo
+                ->setNombre('Administrador del Sistema')
+                ->setSalarioBase(1000)
+                ->setActivo(true);
+            $em->persist($cargo);
+            $unidad = new Unidad();
+            $unidad
+                ->setNombre('Grupo Horizontes Admin')
+                ->setActivo(true);
+            $em->persist($unidad);
+            $empleado = new Empleado();
+            $empleado
+                ->setNombre($user->getUsername())
+                ->setIdUnidad($unidad)
+                ->setIdUsuario($user)
+                ->setActivo(true)
+                ->setRol('ROLE_ADMIN')
+                ->setDireccionParticular('Calle A')
+                ->setIdCargo($cargo)
+                ->setSalarioXHora(100)
+                ->setCorreo('admin@solyag.com')
+                ->setTelefono('555555555')
+                ->setBaja(false)
+                ->setFechaAlta(\DateTime::createFromFormat('Y-m-d', '2020-10-28'));
+            $em->persist($empleado);
             $em->flush();
         } catch (\Exception $err) {
-            return $err;
+            return new JsonResponse(['msg'=>$err->getMessage()]);
         }
-
+        return new JsonResponse(['success'=>true]);
     }
 }
 

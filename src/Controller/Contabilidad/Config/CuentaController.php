@@ -5,6 +5,7 @@ namespace App\Controller\Contabilidad\Config;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\CuentaType;
+use App\Form\Contabilidad\Config\CuentaTypeFirst;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -79,7 +80,7 @@ class CuentaController extends AbstractController
      */
     public function addCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $form = $this->createForm(CuentaType::class);
+        $form = $this->createForm(CuentaTypeFirst::class);
         $form->handleRequest($request);
 
         /** @var Cuenta $cuenta */
@@ -106,7 +107,7 @@ class CuentaController extends AbstractController
      */
     public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Cuenta $cuenta)
     {
-        $form = $this->createForm(CuentaType::class, $cuenta);
+        $form = $this->createForm(CuentaTypeFirst::class, $cuenta);
         $form->handleRequest($request);
         $errors = $validator->validate($cuenta);
         if ($form->isValid() && $form->isSubmitted()) {

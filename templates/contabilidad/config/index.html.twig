@@ -20,24 +20,26 @@
                 <li class="nav-item dropdown ">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        General
+                        Nomencladores
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_config_conf_inicial') }}">Configuración
-                            inicial</a>
+{#                        <a class="dropdown-item" href="{{ url ('contabilidad_config_conf_inicial') }}">Configuración#}
+{#                            inicial</a>#}
                         <a class="dropdown-item" href="{{ url ('contabilidad_config_unidad') }}">Unidad</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Instrumento
                             de cobro</a>
                         <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_config_criterio_analisis') }}">Criterio de análisis</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_config_tipo_cuenta') }}">Tipo de Cuenta</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_config_cuenta') }}">Cuenta</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_config_elemento_gasto') }}">Elemento de
                             gasto</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ url ('contabilidad_config_moneda') }}">Moneda</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_config_tasa_cambio') }}">Taza de cambio</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_config_modulos') }}">Módulos</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_config_tipo_documento') }}">Tipo de
-                            documento</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_config_tasa_cambio') }}">Tasa de cambio</a>
+{#                        <a class="dropdown-item" href="{{ url ('contabilidad_config_modulos') }}">Módulos</a>#}
+{#                        <a class="dropdown-item" href="{{ url ('contabilidad_config_tipo_documento') }}">Tipo de#}
+{#                            documento</a>#}
                         <a class="dropdown-item" href="{{ url ('contabilidad_config_unidad_medida') }}">Unidad de
                             Medida</a>
                     </div>

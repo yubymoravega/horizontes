@@ -4,16 +4,12 @@
     {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
 
     <div class="form-group input-group input-group-sm d-block">
-        <label for="elemento_gasto_descripcion" class="font-weight-bold">Descripcion</label>
+        <label for="elemento_gasto_descripcion" class="font-weight-bold">Descripción</label>
         {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100','id':'nombre_field'}}) }}
     </div>
     <div class="form-group input-group input-group-sm d-block">
         <label for="elemento_gasto_codigo" class="font-weight-bold">Código</label>
         {{ form_widget(form.codigo,{'attr': {'class': 'form-control w-100','id':'codigo_field'}}) }}
-    </div>
-    <div class="form-group input-group input-group-sm d-block">
-        <label for="elemento_gasto_id_cuenta" class="font-weight-bold">Cuenta</label>
-        {{ form_widget(form.id_cuenta,{'attr': {'class': 'form-control w-100','id':'id_cuenta_field'}}) }}
     </div>
     <input type="text" id="id_elemento_gasto" hidden>
 

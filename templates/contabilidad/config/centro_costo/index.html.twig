@@ -31,9 +31,7 @@
             <thead class="thead-dark">
             <th scope="col-6">Descripción</th>
             <th scope="col-1">Código</th>
-            <th scope="col-2">Cuenta</th>
-            <th scope="col-2">Sub Cuenta</th>
-            <th scope="col-2">Elemento de Gasto</th>
+            <th scope="col-3">Unidad</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
@@ -41,20 +39,12 @@
                 <tr>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
-                    <td style="font-weight:400;">
-                        <a href="#" data-toggle="popover" data-trigger="focus" data-placement="bottom"
-                           data-content="{{ item.cuenta }}">{{ item.nro_cuenta }}</a>
-                    </td>
-                    <td style="font-weight:400;">{{ item.sub_cuenta }}</td>
-{#                    <td style="font-weight:400;">{{ item.elemnto_gasto }}</td>#}
+                    <td style="font-weight:400;">{{ item.unidad }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
-                                        id_cuenta: '{{ item.id_cuenta }}',
-                                        id_subcuenta: '{{ item.id_sub_cuenta }}',
-                                        cuenta:'{{ item.cuenta }}' ,
-                                        sub_cuenta:'{{ item.sub_cuenta }}' ,
+                                        id_unidad: '{{ item.id_unidad }}',
                                         codigo:'{{ item.codigo }}',
                                         nombre:'{{ item.nombre }}' ,
                                         id: '{{ item.id }}'
@@ -93,7 +83,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {id = '', codigo = '', nombre = '', id_cuenta = '', id_subcuenta = ''} = config
+            const {id = '', codigo = '', nombre = '',id_unidad = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
@@ -101,68 +91,13 @@
             // nombre, codigo, id
             $('#centro_costo_nombre').val(nombre)
             $('#centro_costo_codigo').val(codigo)
+            $('#centro_costo_id_unidad').val(id_unidad)
             $('#id_centro_costo').val(id)
-
-            // cuenta
-            $('#centro_costo_id_cuenta').val(id_cuenta)
-
-            //sub cuenta
-            contableAsyncLoads.config.loadSubcuentaByCuenta(id_cuenta, $('#centro_costo_id_subcuenta'), id_subcuenta)
         }
 
         $(document).ready(function () {
-
-            // init
             $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
             $('#modal__btn__actualizar').hide()
-
-            // cargar subcuenta por la cuenta seleccionada
-            var subcuenta = $('#centro_costo_id_subcuenta');
-            $('#centro_costo_id_cuenta').change(function (evernt) {
-                subcuenta.find('option').remove();
-                if (typeof ($(this).val()) != 'object') {
-                    contableAsyncLoads.config.loadSubcuentaByCuenta($(this).val(), subcuenta)
-                } else {
-                    subcuenta.prop('disabled', true);
-                }
-            })
-
-           /* $('#id_elemento_gasto').on('click', function () {
-                $('#rows_table_elemento_gasto').find('tr').remove();
-                let cuentas_str = $('#centro_costo_id_cuenta').val()
-                loadingModal.show()
-                $.ajax({
-                    url: '/contabilidad/config/conf-inicial/form-elemento-gasto/' + cuentas_str,
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        loadingModal.close()
-                        elemento_gasto = result.elemento_gasto
-                        $(result.elemento_gasto).each(function (pos, valor) {
-                            if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
-                                $('#rows_table_elemento_gasto').append('<tr>' +
-                                    '<td style="font-weight:400;"> ' +
-                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
-                                    '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
-                                );
-                            else {
-                                $('#rows_table_elemento_gasto').append('<tr>' +
-                                    '<td style="font-weight:400;"> ' +
-                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                                    '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
-                                );
-                            }
-                        })
-                        $('#listarElementoGastoModal').modal('show')
-                    },
-                    error: function () {
-                    }
-                })
-            })*/
 
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
@@ -183,14 +118,12 @@
                 rules: {
                     'centro_costo[nombre]': "required",
                     'centro_costo[codigo]': "required",
-                    'centro_costo[id_cuenta]': "required",
-                    'centro_costo[id_subcuenta]': "required",
+                    'centro_costo[id_unidad]': "required",
                 },
                 messages: {
                     'centro_costo[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'centro_costo[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'centro_costo[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
-                    'centro_costo[id_subcuenta]': CONTAB_MSG.REQUIRED_SUBCUENTA,
+                    'centro_costo[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
 
@@ -213,7 +146,6 @@
 
             $('#modal__form__id').on('show.bs.modal', function (event) {
                 validateForm.resetForm()
-                subcuenta.find('option').remove();
                 $('#modal__form__label__id').text('Adicionar Centro de Costo')
             })
         })

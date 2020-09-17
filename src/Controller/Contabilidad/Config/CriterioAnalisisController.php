@@ -2,41 +2,40 @@
 
 namespace App\Controller\Contabilidad\Config;
 
-use App\CoreContabilidad\AuxFunctions;
-use App\Entity\Contabilidad\Config\ElementoGasto;
-use App\Form\Contabilidad\Config\ElementoGastoType;
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
+use App\Form\Contabilidad\Config\CriterioAnalisisType;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class ElementoGastoController
+ * Class CriterioAnalisisController
  * @package App\Controller\Contabilidad\Config
- * @Route("/contabilidad/config/elemento-gasto")
+ * @Route("/contabilidad/config/criterio-analisis")
  */
-class ElementoGastoController extends AbstractController
+class CriterioAnalisisController extends AbstractController
 {
     /**
-     * @Route("/", name="contabilidad_config_elemento_gasto", methods={"GET"})
+     * @Route("/", name="contabilidad_config_criterio_analisis")
      */
     public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
-        $form = $this->createForm(ElementoGastoType::class);
 
-        $elementos_gastos_arr = $em->getRepository(ElementoGasto::class)->findByActivo(true);
+        $form = $this->createForm(CriterioAnalisisType::class);
+
+        $criterios_arr = $em->getRepository(CriterioAnalisis::class)->findByActivo(true);
         $row = [];
-        foreach ($elementos_gastos_arr as $item) {
-            /**@var $item ElementoGasto** */
+        foreach ($criterios_arr as $item) {
+            /**@var $item CriterioAnalisis** */
 
             $row [] = array(
                 'id' => $item->getId(),
-                'descripcion' => $item->getDescripcion(),
-                'codigo' => $item->getCodigo()
+                'nombre' => $item->getNombre(),
+                'abreviatura' => $item->getAbreviatura()
             );
         }
         $paginator = $pagination->paginate(
@@ -45,76 +44,77 @@ class ElementoGastoController extends AbstractController
             15, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
-        return $this->render('contabilidad/config/elemento_gasto/index.html.twig', [
-            'controller_name' => '| Elemento de Gasto',
-            'elemento_gasto' => $paginator,
+        return $this->render('contabilidad/config/criterio_analisis/index.html.twig', [
+            'controller_name' => '| Critero de Análisis',
+            'criterios' => $paginator,
             'form' => $form->createView()
         ]);
     }
+
     /**
-     * @Route("/add", name="contabilidad_config_elemento_gasto_add",methods={"POST"})
+     * @Route("/add", name="contabilidad_config_criterio_analisis_add",methods={"POST"})
      */
-    public function addElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function add(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $form = $this->createForm(ElementoGastoType::class);
+        $form = $this->createForm(CriterioAnalisisType::class);
         $form->handleRequest($request);
 
-        /** @var ElementoGasto $elemento */
-        $elemento = $form->getData();
-        $errors = $validator->validate($elemento);
+        /** @var CriterioAnalisis $criterio */
+        $criterio = $form->getData();
+        $errors = $validator->validate($criterio);
 
         if ($form->isValid() && $form->isSubmitted()) {
-            $elemento->setActivo(true);
+            $criterio->setActivo(true);
             try {
-                $em->persist($elemento);
+                $em->persist($criterio);
                 $em->flush();
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-            $this->addFlash('success', "Elemento de Gasto adicionado satisfactoriamente");
+            $this->addFlash('success', "Criterio de análisis adicionado satisfactoriamente");
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_elemento_gasto');
+        return $this->redirectToRoute('contabilidad_config_criterio_analisis');
     }
 
     /**
-     * @Route("/upd/{id}", name="contabilidad_config_elemento_gasto_update", methods={"POST"})
+     * @Route("/upd/{id}", name="contabilidad_config_criterio_analisis_update", methods={"POST"})
      */
-    public function updateElementoGasto(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, ElementoGasto $elementoGasto)
+    public function update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CriterioAnalisis $criterio)
     {
-        $form = $this->createForm(ElementoGastoType::class, $elementoGasto);
+        $form = $this->createForm(CriterioAnalisisType::class, $criterio);
         $form->handleRequest($request);
-        $errors = $validator->validate($elementoGasto);
+        $errors = $validator->validate($criterio);
         if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $em->persist($elementoGasto);
+                $em->persist($criterio);
                 $em->flush();
-                $this->addFlash('success', 'Elemento de gasto actualizado satisfactoriamente');
+                $this->addFlash('success', 'Criterio de análisis actualizado satisfactoriamente');
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_elemento_gasto');
+        return $this->redirectToRoute('contabilidad_config_criterio_analisis');
     }
 
     /**
-     * @Route("/delete/{id}", name="contabilidad_config_elemento_gasto_delete", methods={"DELETE"})
+     * @Route("/delete/{id}", name="contabilidad_config_criterio_analisis_delete", methods={"DELETE"})
      */
     public function delete(EntityManagerInterface $em, Request $request, $id)
     {
         if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
-            $elgasto_obj = $em->getRepository(ElementoGasto::class)->find($id);
-            $msg = 'No se pudo eliminar el Elemento de gasto';
+            $elgasto_obj = $em->getRepository(CriterioAnalisis::class)->find($id);
+            $msg = 'No se pudo eliminar el criterio de análisis';
             $success = 'error';
             if ($elgasto_obj) {
-                /**@var $elgasto_obj ElementoGasto** */
+                /**@var $elgasto_obj CriterioAnalisis** */
                 $elgasto_obj->setActivo(false);
                 try {
                     $em->persist($elgasto_obj);
                     $em->flush();
                     $success = 'success';
-                    $msg = 'Elemento de gasto eliminado satisfactoriamente';
+                    $msg = 'Criterio de análisis eliminado satisfactoriamente';
                 } catch
                 (FileException $exception) {
                     return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
@@ -122,6 +122,6 @@ class ElementoGastoController extends AbstractController
             }
             $this->addFlash($success, $msg);
         }
-        return $this->redirectToRoute('contabilidad_config_elemento_gasto');
+        return $this->redirectToRoute('contabilidad_config_criterio_analisis');
     }
 }

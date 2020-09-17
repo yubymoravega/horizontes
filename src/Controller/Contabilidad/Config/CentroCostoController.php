@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\CentroCostoType;
@@ -35,11 +36,8 @@ class CentroCostoController extends AbstractController
                 'id' => $item->getId(),
                 'nombre' => $item->getNombre(),
                 'codigo' => $item->getCodigo(),
-                'id_cuenta' => $item->getIdCuenta() ? $item->getIdCuenta()->getId() : '',
-                'nro_cuenta' => $item->getIdCuenta() ? $item->getIdCuenta()->getNroCuenta() : '',
-                'id_sub_cuenta' => $item->getIdSubcuenta() ? $item->getIdSubcuenta()->getId() : '',
-                'cuenta' => $item->getIdCuenta()->getDescripcion(),
-                'sub_cuenta' => $item->getIdSubcuenta()->getDescripcion()
+                'id_unidad'=>$item->getIdUnidad()->getId(),
+                'unidad'=>$item->getIdUnidad()->getNombre()
             );
         }
         return $this->render('contabilidad/config/centro_costo/index.html.twig', [
@@ -61,10 +59,20 @@ class CentroCostoController extends AbstractController
         $errors = $validator->validate($centro_costo);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $centro_costo->setActivo(true);
-                $em->persist($centro_costo);
-                $em->flush();
-                $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");
+                $id_usuario = $this->getUser();
+                $empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+                    'id_usuario' => $id_usuario
+                ));
+                if ($empleado) {
+                    $centro_costo
+                        ->setIdUnidad($empleado->getIdUnidad())
+                        ->setActivo(true);
+                    $em->persist($centro_costo);
+                    $em->flush();
+                    $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");
+                } else {
+                    $this->addFlash('error', "Usted no es empleado de la empresa");
+                }
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
@@ -119,29 +127,5 @@ class CentroCostoController extends AbstractController
 
         }
         return $this->redirectToRoute('contabilidad_config_centro_costo');
-    }
-
-    /**
-     * @Route("/getsubcuenta/{idcuenta}", name="contabilidad_config_centro_costo_getsubcuenta", methods={"POST"})
-     */
-    public function getSubcuentas($idcuenta)
-    {
-        $subcuenta_er = $this->getDoctrine()->getManager()->getRepository(Subcuenta::class);
-        $arr_subcuenta_obj = $subcuenta_er->findBy(array(
-            'id_cuenta' => $idcuenta,
-            'activo' => true
-        ));
-        $row = [];
-        if (!empty($arr_subcuenta_obj)) {
-            foreach ($arr_subcuenta_obj as $item) {
-                /**@var $item Subcuenta** */
-                $row[] = array(
-                    'id' => $item->getId(),
-                    'nro_subcuenta' => $item->getNroSubcuenta(),
-                    'subcuenta' => $item->getDescripcion()
-                );
-            }
-        }
-        return new JsonResponse(['subcuentas' => $row]);
     }
 }
