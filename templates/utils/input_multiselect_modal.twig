@@ -1,6 +1,6 @@
 {# ------------- Modal Inputs ----------------- #}
 <div class="modal fade" id="input-multiselt-modal" role="dialog" data-backdrop="static" data-keyboard="false"
-     aria-hidden="true">
+     aria-hidden="true" style="z-index: 1060">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
         <div class="modal-content">
             <div class="modal-header bg-dark">
@@ -12,13 +12,6 @@
             <div class="modal-body bg-dark-app d-flex flex-column">
                 <div style="height: 450px; overflow-y: auto;">
                     <table class="table-small-rows table table-hover text-light">
-                        {#<thead class="thead-dark">
-                        <th scope="col-1" style="width: 10px">Sel.</th>
-                        <th scope="col-1" style="width: 190px">Código</th>
-                        <th scope="col-6">Descripción</th>
-                        </thead>
-                        <tbody id="rows_table_elemento_gasto">
-                        </tbody>#}
                     </table>
                 </div>
                 <div class="d-flex mt-4">
@@ -28,8 +21,7 @@
                     </button>
                     <div class="ml-2">
                         <button type="button" class="my-0 btn btn-outline-secondary"
-                                id="btnok-input-multiselt-modal"
-                                data-dismiss="modal">Seleccionar
+                                id="btnok-input-multiselt-modal">Seleccionar
                         </button>
                     </div>
                 </div>

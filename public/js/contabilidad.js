@@ -1,4 +1,3 @@
-
 // conseloe.log() function
 var cl = console.log
 
@@ -32,62 +31,76 @@ $(document).ready(function () {
      * Code JS to <component> `input-multiselect-modal-type` -
      */
     $('[input-multiselect-modal-type]').on('click', function () {
+
         const parent_id = $(this).attr('immt-parent')
-        const parent =  $(parent_id).val() || '';
-        const url = $(this).attr('immt-url')+'/'+ parent
+        const parent = $(parent_id).val() || '';
+        const url = $(this).attr('immt-url') + '/' + parent
         const modal = $('#input-multiselt-modal')
         const table = modal.find('table')
+        const input_parent = $(this)
+        const key_checks = $(this).attr('immt-key') || 'id'
 
-       /* if (parent_id && parent === '')
-        {
+        if (parent_id && parent === '') {
             alertTemplate('Debe llenar los campos previos', 'danger')
             return
-        }*/
-        // eliminar datos tabla
-        table.find('tr').remove();
-
-
-        console.log($(this).attr('immt-parent'), url)
-        // $('#rows_table_elemento_gasto').find('tr').remove();
-        // let cuentas_str = $('#configuracion_inicial_id_cuenta_contrapartida').val() == '' ? 'sin datos' : $('#configuracion_inicial_id_cuenta_contrapartida').val()
+        }
         loadingModal.show()
+        // eliminar datos tabla
+        modal.find('h4').text($(this).attr('immt-title'))
+
         $.ajax({
             url,
             method: 'POST',
             dataType: 'json',
             success: function (result) {
                 loadingModal.close()
-                cl(12233333)
-                cl(result)
-                data = result
-                /*$(result.elemento_gasto).each(function (pos, valor) {
-                    if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
-                        $('#rows_table_elemento_gasto').append('<tr>' +
-                            '<td style="font-weight:400;"> ' +
-                            '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '" checked>' +
-                            '</td>' +
-                            '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                            '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
-                        );
-                    else {
-                        $('#rows_table_elemento_gasto').append('<tr>' +
-                            '<td style="font-weight:400;"> ' +
-                            '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                            '</td>' +
-                            '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                            '<td style="font-weight:400;"> ' + valor.descripcion + '</td> </tr>'
-                        );
+                table.find('tr').remove();
+                const data = result.data
+                let th_create = false;
+                $(data).each((poss, valor) => {
+                    const keys = Object.keys(valor)
+
+                    let keysToTd = ''
+                    let ckecked = input_parent.val().includes(valor[key_checks]) ? 'checked' : ''
+                    let ths = ''
+                    for (const key of keys) {
+                        keysToTd += `<td style="font-weight:400;"> ${valor[key]} </td>`
+                        if (!th_create)
+                            ths += `<th>${key} </th>`
                     }
-                })*/
+                    if (!th_create) {
+                        table.append(`<thead class="thead-dark"> <th scope="col-1" style="width: 10px">Sel.</th> ${ths}</thead>`)
+                        th_create = true
+                    }
+
+                    table.append(
+                        `<tr> 
+                            <td style="font-weight:400;"> 
+                                <input type="checkbox" ${ckecked} style="margin-left: auto;" data="${valor[key_checks]}">
+                            </td>
+                            ${keysToTd}
+                        </tr>
+                        `)
+                })
                 modal.modal('show')
-            },
-            error: function (err) {
-                console.log("error-----",err)
             }
         })
-    })
 
-});
+        // Click en el boton de seleccionar y asiganar los valores al imput
+        $('#btnok-input-multiselt-modal').one('click', function () {
+
+            const checks = $(table).find('input:checked')
+            let data = ''
+            for (let i = 0; i < checks.length; i++) {
+                data += $(checks[i]).attr('data') + ' - '
+            }
+            input_parent.val(data.substr(0, data.length - 2))
+            modal.modal('hide')
+        })
+
+    })
+})
+;
 
 /**
  * Object Msg - Constantes del subsistema de contabilidad

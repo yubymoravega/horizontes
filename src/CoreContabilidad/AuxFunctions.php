@@ -195,7 +195,7 @@ class AuxFunctions
 
     public static function formModifierElementoGasto(FormInterface $form, $cuenta = '')
     {
-        $form->add('id_elemento_gasto', EntityType::class, [
+        $form->add('id_elemento_gasto'/*, EntityType::class, [
             'class' => ElementoGasto::class,
             'label' => 'Elemnto Gasto',
             'choice_label' => 'descripcion',
@@ -206,7 +206,7 @@ class AuxFunctions
                     ->setParameter('id_cuenta', $cuenta)
                     ->orderBy('u.descripcion', 'ASC');
             }
-        ]);
+        ]*/);
     }
 
     /**

@@ -31,8 +31,7 @@ class CentroCostoType extends AbstractType
                         ->where('u.activo = true')
                         ->orderBy('u.nombre', 'ASC');
                 }
-            ])
-            ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
