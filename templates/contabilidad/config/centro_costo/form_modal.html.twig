@@ -22,9 +22,10 @@
     </div>
     <div class="form-group input-group input-group-sm d-block">
         <label for="id_elemento_gasto" class="font-weight-bold">Elemento de Gasto</label>
-        <input type="text" name="centro_costo_id_elemento_gasto"
+        <input type="text" name="centro_costo[id_elemento_gasto]"
                id="id_elemento_gasto"
                input-multiselect-modal-type
+               immt-title="Seleccionar los Elementos de Gastos"
                immt-parent="#centro_costo_id_cuenta"
                immt-url="/contabilidad/config/elemento-gasto/getbycuenta"
                class="form-control w-100" data-toggle="modal">

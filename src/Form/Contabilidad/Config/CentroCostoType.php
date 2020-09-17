@@ -32,6 +32,7 @@ class CentroCostoType extends AbstractType
                         ->orderBy('u.descripcion', 'ASC');
                 }
             ])
+            ->add('id_elemento_gasto')
             ->addEventListener(FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) {
                     AuxFunctions::formModifierSubcuenta($event->getForm());
@@ -43,7 +44,7 @@ class CentroCostoType extends AbstractType
                     $cuenta = $event->getForm()->getData();
                     $id_cuenta = $cuenta === null ? '' : $cuenta->getId();
                     AuxFunctions::formModifierSubcuenta($event->getForm()->getParent(), $id_cuenta);
-                    AuxFunctions::formModifierElementoGasto($event->getForm()->getParent(), $id_cuenta);
+//                    AuxFunctions::formModifierElementoGasto($event->getForm()->getParent(), $id_cuenta);
                 });
     }
 

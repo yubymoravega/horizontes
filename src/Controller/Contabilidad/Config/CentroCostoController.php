@@ -59,6 +59,7 @@ class CentroCostoController extends AbstractController
         /** @var CentroCosto $centro_costo */
         $centro_costo = $form->getData();
         $errors = $validator->validate($centro_costo);
+        dd($centro_costo, $form, $request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $centro_costo->setActivo(true);
