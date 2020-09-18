@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Inventario\Documento;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -25,6 +26,17 @@ class DocumentoType extends AbstractType
                 'required' => false,
                 'label' => 'Importe',
                 'attr' => ['class' => 'w-100']
+            ])
+            ->add('id_moneda', EntityType::class, [
+                'label' => 'Moneda',
+                'class' => Moneda::class,
+                'choice_label' => 'nombre',
+                'attr' => ['class' => 'w-100'],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
             ])
 //            ->add('importe_total', TextType::class, [
 //                'required' => true,
