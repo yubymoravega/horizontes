@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
     <style>
         @media print {
-            #footer{
+            #footer {
                 position: fixed;
                 display: block;
                 bottom: 0;
@@ -24,19 +24,44 @@
 <body>
 <div class="container-fluid mt-3 d-flex flex-column align-items-center" style="height: 1000px;">
     <h3>Plan de cuentas</h3>
-    <table border="1" width="960px" class="mt-1">
+    <table border="1" width="1000px" class="mt-1 text-center">
         <tbody>
-{#        <tr>#}
-{#            <td colspan="7" height="70px" class="font-weight-bold text-center">INFORME DE RECEPCION</td>#}
-{#        </tr>#}
-{#        <tr>#}
-{#            <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>#}
-{#            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_informe }}</td>#}
-{#        </tr>#}
-{#        <tr>#}
-{#            <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>#}
-{#        </tr>#}
+        <tr>
+            <td width="90" class="text-left"><strong>Cuenta</strong></td>
+            <td width="180" class="text-left"><strong>Nombre</strong></td>
+            <td width="40"><strong>Nat.</strong></td>
+            <td width="40"><strong>E. Gasto</strong></td>
+            <td width="100"><strong>Oblg. Deudora</strong></td>
+            <td width="100"><strong>Oblg. Acreedora</strong></td>
+            <td width="180" class="text-left"><strong>Tipo</strong></td>
+            {% for i in range(1,maximo_criterios) %}
+                <td width="75"><strong>Análisis {{ i }}</strong></td>
+            {% endfor %}
+        </tr>
         </tbody>
+    </table>
+    <table width="1000px" class="text-center">
+        {% for item in cuentas %}
+            <tr>
+                <td width="90" class="text-left">{{ item.nro_cuenta }}</td>
+                <td width="180" class="text-left">{{ item.nombre }}</td>
+                <td width="40">{{ item.naturaleza }}</td>
+                <td width="40">{{ item.elemento_gasto }}</td>
+                <td width="100">{{ item.obligacion_deudora }}</td>
+                <td width="100">{{ item.obligacion_aceedora }}</td>
+                <td width="180" class="text-left">{{ item.nombre_tipo_cuenta }}</td>
+                {% for criterio in item.abreviaturas %}
+                    <td width="75">{{ criterio.abreviatura }}</td>
+                {% endfor %}
+            </tr>
+            {% for subcuenta in item.subcuentas %}
+                <tr>
+                    <td width="90" class="text-left">{{ item.nro_cuenta }}/{{ subcuenta.nro_subcuenta }}</td>
+                    <td width="180" class="text-left">{{ subcuenta.nombre }}</td>
+                    <td width="40">{{ subcuenta.naturaleza }}</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
     </table>
 
 </div>

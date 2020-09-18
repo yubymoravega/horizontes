@@ -80,6 +80,7 @@ class CuentaController extends AbstractController
         $row = [];
         $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $valor_maximo_criterios = 0;
         foreach ($cuentas_arr as $item) {
             $arr_criterios_asociados = $cuenta_criterio_er->findBy(array(
                 'id_cuenta' => $item
@@ -88,10 +89,10 @@ class CuentaController extends AbstractController
                 'id_cuenta' => $item
             ));
             $arr_abreviaturas = [];
-            $valor_maximo_criterios = 0;
             if (!empty($arr_criterios_asociados)) {
-                if ($valor_maximo_criterios < count($arr_criterios_asociados))
+                if ($valor_maximo_criterios < count($arr_criterios_asociados)){
                     $valor_maximo_criterios = count($arr_criterios_asociados);
+                }
                     foreach ($arr_criterios_asociados as $criterios_asociados) {
                         $abreviatura = $criterios_asociados->getIdCriterioAnalisis()->getAbreviatura();
                         $arr_abreviaturas[] = array(
@@ -126,7 +127,8 @@ class CuentaController extends AbstractController
         }
         return $this->render('contabilidad/config/cuenta/print.html.twig', [
             'controller_name' => 'CuentaControllerPrint',
-            'cuentas' => $row
+            'cuentas' => $row,
+            'maximo_criterios'=>$valor_maximo_criterios
         ]);
     }
 
