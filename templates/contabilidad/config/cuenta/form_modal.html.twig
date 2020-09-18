@@ -14,21 +14,12 @@
             {{ form_label(form.deudora) }}
             {{ form_widget(form.deudora,{'attr': {'class': 'form-control w-100'}}) }}
         </div>
-        <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+        <div class="col-6 form-group input-group input-group-sm mt-0 d-block d-flex align-items-center">
             {{ form_label(form.elemento_gasto) }}
             {{ form_widget(form.elemento_gasto) }}
         </div>
     </div>
-    <div class="row mt-0 p-0">
-        <div class="col-6 form-group input-group input-group-sm pa-2 d-block mb-0">
-            {{ form_label(form.obligacion_acreedora) }}
-            {{ form_widget(form.obligacion_acreedora) }}
-        </div>
-        <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
-            {{ form_label(form.obligacion_deudora) }}
-            {{ form_widget(form.obligacion_deudora) }}
-        </div>
-    </div>
+
     <div class="form-group input-group input-group-sm d-block">
         {{ form_label(form.id_tipo_cuenta) }}
         {{ form_widget(form.id_tipo_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
@@ -43,7 +34,16 @@
                immt-key="abreviatura"
                class="form-control w-100" data-toggle="modal">
     </div>
-
+    <div class="row mt-0 p-0">
+        <div class="col-6 form-group input-group input-group-sm pa-2 d-block mb-0">
+            {{ form_label(form.obligacion_acreedora) }}
+            {{ form_widget(form.obligacion_acreedora) }}
+        </div>
+        <div class="col-6 form-group input-group input-group-sm mt-0 d-block">
+            {{ form_label(form.obligacion_deudora) }}
+            {{ form_widget(form.obligacion_deudora) }}
+        </div>
+    </div>
     <input type="text" id="id_cuenta" hidden>
     {{ form_end(form) }}
 {% endblock %}

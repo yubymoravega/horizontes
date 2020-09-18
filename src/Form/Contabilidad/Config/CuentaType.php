@@ -31,14 +31,17 @@ class CuentaType extends AbstractType
             ])
             ->add('elemento_gasto', CheckboxType::class, [
                 'required' => false,
+                'attr' => ['class' => 'mt-1'],
                 'label'=>'Elemento de gasto',
             ])
             ->add('obligacion_deudora',CheckboxType::class, [
                 'required' => false,
+                'attr' => ['class' => 'mt-1'],
                 'label'=>'Obligación deudora',
             ])
             ->add('obligacion_acreedora',CheckboxType::class, [
                 'required' => false,
+                'attr' => ['class' => 'mt-1'],
                 'label'=>'Obligación acreedora',
             ])
             ->add('id_tipo_cuenta', EntityType::class, [

@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
