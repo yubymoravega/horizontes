@@ -33,7 +33,6 @@
             <thead class="thead-dark">
             <th scope="col-2">Descripción</th>
             <th scope="col-3">Código</th>
-            <th scope="col-3">Cuenta</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
@@ -41,13 +40,10 @@
                 <tr>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
-                    <td style="font-weight:400;">{{ item.cuenta }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
-                                        id_cuenta: '{{ item.id_cuenta }}',
-                                        cuenta:'{{ item.cuenta }}' ,
                                         codigo:'{{ item.codigo }}',
                                         descripcion:'{{ item.descripcion }}' ,
                                         id: '{{ item.id }}'
@@ -78,9 +74,6 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-
-        const TEXT_SELECT = 'Seleccione la cuenta...';
-
         function mostrarBtn() {
             $('#modal__btn__actualizar').hide()
             $('#modal__btn__aceptar').show()
@@ -90,12 +83,11 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {id = '', codigo = '', descripcion = '', id_cuenta = '', cuenta = ''} = config
+            const {id = '', codigo = '', descripcion = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + descripcion)
 
-            $('#elemento_gasto_id_cuenta').val(id_cuenta)
             $('#elemento_gasto_descripcion').val(descripcion)
             $('#elemento_gasto_codigo').val(codigo)
             $('#id_elemento_gasto').val(id)
@@ -103,7 +95,6 @@
 
         $(document).ready(function () {
             // init
-            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
             $('#modal__btn__actualizar').hide()
 
             // validacion del formulario
@@ -125,12 +116,10 @@
                 rules: {
                     'elemento_gasto[descripcion]': "required",
                     'elemento_gasto[codigo]': "required",
-                    'elemento_gasto[id_cuenta]': "required",
                 },
                 messages: {
                     'elemento_gasto[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'elemento_gasto[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'elemento_gasto[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
                 }
             })
 

@@ -1,4 +1,14 @@
+// conseloe.log() function
+var cl = console.log
+
 $(document).ready(function () {
+
+    /**
+     * Enable popovers everywhere
+     */
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    })
 
     /**
      * ocultando la Alerta - app.flashes(success|error)
@@ -7,7 +17,89 @@ $(document).ready(function () {
         $('#alert__success').addClass('transition-right')
         // $('#alert__success').hide(9000)
     }, 5000)
-});
+
+
+    /**
+     * ADD Validations to --- Validator.JS ---
+     */
+    jQuery.validator.addMethod("num-letter", function (value, element) {
+        // allow any non-whitespace characters as the host part
+        return this.optional(element) || /^[A-Za-z0-9]+$/g.test(value);
+    }, 'Please enter a valid email address.')
+
+    /**
+     * Code JS to <component> `input-multiselect-modal-type` -
+     */
+    $('[input-multiselect-modal-type]').on('click', function () {
+
+        const parent_id = $(this).attr('immt-parent')
+        const parent = $(parent_id).val() || '';
+        const url = $(this).attr('immt-url') + '/' + parent
+        const modal = $('#input-multiselt-modal')
+        const table = modal.find('table')
+        const input_parent = $(this)
+        const key_checks = $(this).attr('immt-key') || 'id'
+
+        if (parent_id && parent === '') {
+            alertTemplate('Debe llenar los campos previos', 'danger')
+            return
+        }
+        loadingModal.show()
+        // eliminar datos tabla
+        modal.find('h4').text($(this).attr('immt-title'))
+
+        $.ajax({
+            url,
+            method: 'POST',
+            dataType: 'json',
+            success: function (result) {
+                loadingModal.close()
+                table.find('tr').remove();
+                const data = result.data
+                let th_create = false;
+                $(data).each((poss, valor) => {
+                    const keys = Object.keys(valor)
+                    let keysToTd = ''
+                    let ckecked = input_parent.val().includes(valor[key_checks]) ? 'checked' : ''
+                    let ths = ''
+                    for (const key of keys) {
+                        keysToTd += `<td style="font-weight:400;"> ${valor[key]} </td>`
+                        if (!th_create)
+                            ths += `<th>${key} </th>`
+                    }
+                    if (!th_create) {
+                        table.append(`<thead class="thead-dark"> <th scope="col-1" style="width: 10px">Sel.</th> ${ths}</thead>`)
+                        th_create = true
+                    }
+
+                    table.append(
+                        `<tr> 
+                            <td style="font-weight:400;"> 
+                                <input type="checkbox" ${ckecked} style="margin-left: auto;" data="${valor[key_checks]}">
+                            </td>
+                            ${keysToTd}
+                        </tr>
+                        `)
+                })
+                modal.modal('show')
+            }
+        })
+
+        // Click en el boton de seleccionar y asiganar los valores al imput
+        $('#btnok-input-multiselt-modal').one('click', function () {
+
+            const checks = $(table).find('input:checked')
+            let data = ''
+            for (let i = 0; i < checks.length; i++) {
+                data += $(checks[i]).attr('data') + ' - '
+            }
+            input_parent.val(data.substr(0, data.length - 2))
+            modal.modal('hide')
+        })
+
+    })
+})
+;
 
 /**
  * Object Msg - Constantes del subsistema de contabilidad
@@ -20,6 +112,7 @@ const CONTAB_MSG = {
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
     REQUIRED_OBLIGATORIO: 'El campo obligatorio!',
+    FORMAT_NO_CUENTA: 'el No. de la cuenta solo acepta letras y números',
 }
 
 
@@ -73,12 +166,16 @@ const alertTemplate = (msg, type = 'success', time = 4000) => {
     }, time)
 }
 
-const loadingModal = {
-    show: (msg = 'Procesando...') => {
+loadingModal = {
+    show: function (msg = 'Procesando...') {
         $('#loading-modal').modal('show')
         $('#loading-modal-msg').text(msg)
     },
-    close: () => $('#loading-modal').modal('hide')
+    close: function () {
+        setTimeout(function () {
+            $('#loading-modal').modal('hide');
+        }, 500)
+    }
 
 }
 

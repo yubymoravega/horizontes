@@ -4,12 +4,9 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\CuentaRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CuentaRepository::class)
- * @UniqueEntity(fields={"nro_cuenta"}, message="contabilidad.config.cuenta_nro_unique")
  */
 class Cuenta
 {
@@ -27,30 +24,34 @@ class Cuenta
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="contabilidad.config.cuenta_nro_not_blank")
      */
-    private $descripcion;
+    private $nombre;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $deudora;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\ManyToOne(targetEntity=TipoCuenta::class)
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $produccion;
+    private $id_tipo_cuenta;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $patrimonio;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean")
      */
     private $elemento_gasto;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $obligacion_deudora;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $obligacion_acreedora;
 
     /**
      * @ORM\Column(type="boolean")
@@ -74,50 +75,38 @@ class Cuenta
         return $this;
     }
 
-    public function getDescripcion(): ?string
+    public function getNombre(): ?string
     {
-        return $this->descripcion;
+        return $this->nombre;
     }
 
-    public function setDescripcion(string $descripcion): self
+    public function setNombre(string $nombre): self
     {
-        $this->descripcion = $descripcion;
+        $this->nombre = $nombre;
 
         return $this;
     }
 
-    public function getNaturaleza(): ?string
+    public function getDeudora(): ?bool
     {
-        return $this->naturaleza;
+        return $this->deudora;
     }
 
-    public function setNaturaleza(string $naturaleza): self
+    public function setDeudora(bool $deudora): self
     {
-        $this->naturaleza = $naturaleza;
+        $this->deudora = $deudora;
 
         return $this;
     }
 
-    public function getProduccion(): ?bool
+    public function getIdTipoCuenta(): ?TipoCuenta
     {
-        return $this->produccion;
+        return $this->id_tipo_cuenta;
     }
 
-    public function setProduccion(?bool $produccion): self
+    public function setIdTipoCuenta(?TipoCuenta $id_tipo_cuenta): self
     {
-        $this->produccion = $produccion;
-
-        return $this;
-    }
-
-    public function getPatrimonio(): ?bool
-    {
-        return $this->patrimonio;
-    }
-
-    public function setPatrimonio(?bool $patrimonio): self
-    {
-        $this->patrimonio = $patrimonio;
+        $this->id_tipo_cuenta = $id_tipo_cuenta;
 
         return $this;
     }
@@ -127,9 +116,33 @@ class Cuenta
         return $this->elemento_gasto;
     }
 
-    public function setElementoGasto(?bool $elemento_gasto): self
+    public function setElementoGasto(bool $elemento_gasto): self
     {
         $this->elemento_gasto = $elemento_gasto;
+
+        return $this;
+    }
+
+    public function getObligacionDeudora(): ?bool
+    {
+        return $this->obligacion_deudora;
+    }
+
+    public function setObligacionDeudora(bool $obligacion_deudora): self
+    {
+        $this->obligacion_deudora = $obligacion_deudora;
+
+        return $this;
+    }
+
+    public function getObligacionAcreedora(): ?bool
+    {
+        return $this->obligacion_acreedora;
+    }
+
+    public function setObligacionAcreedora(bool $obligacion_acreedora): self
+    {
+        $this->obligacion_acreedora = $obligacion_acreedora;
 
         return $this;
     }
@@ -143,17 +156,6 @@ class Cuenta
     {
         $this->activo = $activo;
 
-        return $this;
-    }
-
-    public function getDeudora(): ?bool
-    {
-        return $this->deudora;
-    }
-
-    public function setDeudora(bool $deudora): self
-    {
-        $this->deudora = $deudora;
         return $this;
     }
 }

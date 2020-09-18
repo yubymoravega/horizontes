@@ -25,7 +25,6 @@ class MercanciaType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Descripción',
                 'required' => false,
-
             ])
             ->add('precio', TextType::class, [
                 'attr' => ['class' => 'w-100'],
@@ -39,7 +38,7 @@ class MercanciaType extends AbstractType
             ])
             ->add('existencia_incremento', TextType::class, [
                 'required' => false,
-                'label' => 'Existencia + Incremento',
+                'label' => 'Exist. + Cant.',
                 'disabled' => true,
                 'mapped' => false,
                 'attr' => ['class' => 'w-100']

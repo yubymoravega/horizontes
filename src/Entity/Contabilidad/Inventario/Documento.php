@@ -3,6 +3,7 @@
 namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Repository\Contabilidad\Inventario\DocumentoRepository;
@@ -46,6 +47,12 @@ class Documento
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Moneda::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_moneda;
 
     public function getId(): ?int
     {
@@ -108,6 +115,18 @@ class Documento
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getIdMoneda(): ?Moneda
+    {
+        return $this->id_moneda;
+    }
+
+    public function setIdMoneda(?Moneda $id_moneda): self
+    {
+        $this->id_moneda = $id_moneda;
 
         return $this;
     }

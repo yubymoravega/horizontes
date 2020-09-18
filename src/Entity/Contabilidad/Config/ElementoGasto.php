@@ -37,13 +37,6 @@ class ElementoGasto
      */
     private $activo;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Cuenta::class)
-     * @ORM\JoinColumn(nullable=false)
-     * @Assert\NotNull(message="contabilidad.config.cuenta_not_blank")
-     */
-    private $id_cuenta;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -81,18 +74,6 @@ class ElementoGasto
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
-
-        return $this;
-    }
-
-    public function getIdCuenta(): ?Cuenta
-    {
-        return $this->id_cuenta;
-    }
-
-    public function setIdCuenta(?Cuenta $id_cuenta): self
-    {
-        $this->id_cuenta = $id_cuenta;
 
         return $this;
     }

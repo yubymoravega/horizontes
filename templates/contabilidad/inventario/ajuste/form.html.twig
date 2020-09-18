@@ -47,14 +47,17 @@
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
-                <h1 class="text-reporte"> Adicionar Ajuste de Entrada</h1>
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Ajuste de Entrada </h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'ajuste_entrada'}}) }}
-                <div class="form-group input-group input-group-sm pa-2 d-block">
-                    {{ form_label(formulario.id_proveedor) }}
-                    {{ form_widget(formulario.id_proveedor) }}
-                </div>
                 <div class="row mt-0 p-0">
                     <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.nro_cuenta_inventario) }}
@@ -70,7 +73,19 @@
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-8 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
+                        {{ form_label(formulario.observacion) }}
+                        {{ form_widget(formulario.observacion) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.documento.id_moneda) }}
+                        {{ form_widget(formulario.documento.id_moneda) }}
+                    </div>
+                </div>
+
                 {{ form_end(formulario.nro_cuenta_acreedora) }}
+
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
@@ -121,15 +136,15 @@
                         {{ form_label(formulario.mercancia.existencia) }}
                         {{ form_widget(formulario.mercancia.existencia) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.existencia_incremento) }}
                         {{ form_widget(formulario.mercancia.existencia_incremento) }}
                     </div>
                     {{ form_end(formulario.mercancia) }}
 
-                    <div class="col-1 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">
-                            <i class="fa fa-plus"></i></button>
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -150,8 +165,14 @@
                 </div>
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('contabilidad_inventario_ajuste_entrada') }}"
-                           class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
+                        <a href="{{ url('inventario') }}"
+                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmitAjuste">contabilizar</button>
@@ -167,11 +188,55 @@
     <script>
         let mercancias_seleccionada = [];
         let mercancias = [];
+        let consecutivo = 0;
         let cuentas_inventarios = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
         $(document).ready(function () {
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/ajuste-entrada/get-nros-ajustes',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
+                    $('#btnSubbmitAjuste').show()
+                } else {
+                    $('#btnSubbmitAjuste').hide()
+                }
+            })
+            $('#select_nros').on('keyup', function () {
+                if ($('#select_nros').val() == consecutivo) {
+                    $('#btnSubbmitAjuste').show()
+                    $('#btnImprimir').show()
+                } else if ($('#select_nros').val() > consecutivo) {
+                    $('#btnSubbmitAjuste').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                } else if ($('#select_nros').val() == '') {
+                    $('#btnSubbmitAjuste').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                } else {
+                    $('#btnImprimir').show()
+                    $('#btnSubbmitAjuste').hide()
+                }
+            })
+
+
             $.ajax({
                 url: '/contabilidad/inventario/ajuste-entrada/getCuentas',
                 method: 'POST',
@@ -214,6 +279,34 @@
                     error: function () {
                     }
                 })
+            })
+
+            $('#ajuste_mercancia_codigo').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo = $('#ajuste_mercancia_codigo').val()
+                    let cuenta = $('#ajuste_nro_cuenta_inventario').val()
+                    if (cuenta != '' && codigo != '') {
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + cuenta,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código')
+                                }
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                    }
+                }
             })
 
             $('#ajuste_documento_importe_mercancia').on('keyup', function () {
@@ -266,13 +359,13 @@
                     error.insertAfter(element);
                 },
                 rules: {
-                    'ajuste[id_proveedor]': "required",
+                    'ajuste[observacion]': "required",
                     'ajuste[nro_cuenta_inventario]': "required",
                     'ajuste[nro_subcuenta_inventario]': "required",
                     'ajuste[nro_cuenta_acreedora]': "required",
                 },
                 messages: {
-                    'ajuste[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste[observacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,

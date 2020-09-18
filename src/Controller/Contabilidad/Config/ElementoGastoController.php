@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -35,9 +36,7 @@ class ElementoGastoController extends AbstractController
             $row [] = array(
                 'id' => $item->getId(),
                 'descripcion' => $item->getDescripcion(),
-                'codigo' => $item->getCodigo(),
-                'id_cuenta' => $item->getIdCuenta() ? $item->getIdCuenta()->getId() : '',
-                'cuenta' => $item->getIdCuenta()->getDescripcion()
+                'codigo' => $item->getCodigo()
             );
         }
         $paginator = $pagination->paginate(
@@ -52,7 +51,6 @@ class ElementoGastoController extends AbstractController
             'form' => $form->createView()
         ]);
     }
-
     /**
      * @Route("/add", name="contabilidad_config_elemento_gasto_add",methods={"POST"})
      */

@@ -15,7 +15,6 @@ class TipoDocumento
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -30,6 +29,13 @@ class TipoDocumento
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {

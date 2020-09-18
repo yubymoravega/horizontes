@@ -71,7 +71,3 @@ security:
             roles:
                 - ROLE_ADMIN
                 - ROLE_USER
-        -
-            path: ^/y
-            roles:
-                - 'y'

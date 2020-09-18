@@ -1,0 +1,32 @@
+# ENUM - tipos de documentos
+# moverlos posteriormente al fichero de traslation/es
+configuraciones:
+  tipo_documento:
+    - id: 1
+      name: "INFORME DE RECECIÓN"
+    - id: 2
+      name: "AJUSTE DE ENTRADA"
+    - id: 3
+      name: "AJUSTE DE SALIDA"
+    - id: 4
+      name: "TRANSFERENCIA DE ENTRADA"
+    - id: 5
+      name: "TRANSFERENCIA DE SALIDA"
+    - id: 6
+      name: "VALE DE SALIDA"
+    - id: 7
+      name: "DEVOLUCION"
+
+  modulo:
+    - id: 1
+      name: "CONFIGURACIÓN"
+    - id: 2
+      name: "INVENTARIO"
+    - id: 3
+      name: "VENTA"
+    - id: 4
+      name: "ACTIVO FIJO"
+    - id: 5
+      name: "CAPITAL HUMANO"
+    - id: 6
+      name: "GENERAL"

@@ -163,8 +163,7 @@
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="configuracion_inicial_id_cuenta" class="font-weight-bold">Cuenta</label>
                     <input type="text" name="configuracion_inicial_id_cuenta" class="form-control w-100"
-                           id="configuracion_inicial_id_cuenta" data-toggle="modal"
-                    >
+                           id="configuracion_inicial_id_cuenta" data-toggle="modal">
                 </div>
                 <div class="form-group input-group input-group-sm d-block">
                     <label for="configuracion_inicial_id_subcuenta" class="font-weight-bold" id="test">Subcuenta</label>
@@ -286,6 +285,7 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    loadingModal.close()
                     cuentas = result.cuentas
                     $(result.cuentas).each(function (pos, valor) {
                         if ($('#configuracion_inicial_id_cuenta').val().includes(valor.nro_cuenta + ' '))
@@ -306,7 +306,6 @@
                             );
                         }
                     })
-                    loadingModal.close()
                     $('#listarCuentasModal').modal('show')
                 },
                 error: function () {
@@ -324,6 +323,7 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    loadingModal.close()
                     cuentas_contrapartida = result.cuentas
                     $(result.cuentas).each(function (pos, valor) {
                         if ($('#configuracion_inicial_id_cuenta_contrapartida').val().includes(valor.nro_cuenta + ' '))
@@ -344,7 +344,6 @@
                             );
                         }
                     })
-                    loadingModal.close()
                     $('#listarCuentasModal').modal('show')
                 },
                 error: function () {
@@ -364,6 +363,7 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    loadingModal.close()
                     subcuentas = result.subcuentas
                     $(result.subcuentas).each(function (pos, valor) {
                         if ($('#configuracion_inicial_id_subcuenta').val().includes(valor.nro_subcuenta + ' '))
@@ -384,7 +384,6 @@
                             );
                         }
                     })
-                    loadingModal.close()
                     $('#listarSubcuentasModal').modal('show')
                 },
                 error: function () {
@@ -402,6 +401,7 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    loadingModal.close()
                     elemento_gasto = result.elemento_gasto
                     $(result.elemento_gasto).each(function (pos, valor) {
                         if ($('#configuracion_inicial_id_elemento_gasto').val().includes(valor.codigo + ' '))
@@ -422,7 +422,6 @@
                             );
                         }
                     })
-                    loadingModal.close()
                     $('#listarElementoGastoModal').modal('show')
                 },
                 error: function () {
@@ -440,6 +439,7 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    loadingModal.close()
                     subcuentas_contrapartida = result.subcuentas
                     $(result.subcuentas).each(function (pos, valor) {
                         if ($('#configuracion_inicial_id_subcuenta_contrapartida').val().includes(valor.nro_subcuenta + ' '))
@@ -460,7 +460,7 @@
                             );
                         }
                     })
-                    loadingModal.close()
+
                     $('#listarSubcuentasModal').modal('show')
                 },
                 error: function () {

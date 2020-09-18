@@ -1,0 +1,152 @@
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Criterios de análisis
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+
+        {{ include('contabilidad/config/criterio_analisis/form_modal.html.twig',{title: 'Adicionar'}) }}
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-2">Nombre</th>
+            <th scope="col-3">Abreviatura</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in criterios %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.abreviatura }}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
+                                data-placement="bottom" title="Editar"
+                                onclick="onUpdate({
+                                        nombre:'{{ item.nombre }}',
+                                        abreviatura:'{{ item.abreviatura }}' ,
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el criterio de análisis: {{ item.nombre }} ?',
+                                        url:'{{ path('contabilidad_config_criterio_analisis_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+        <div class="navigation">
+            {{ knp_pagination_render(criterios) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
+
+        const onUpdate = function (config) {
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {id = '', abreviatura = '', nombre = ''} = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar " + nombre)
+
+            $('#criterio_analisis_nombre').val(nombre)
+            $('#criterio_analisis_abreviatura').val(abreviatura)
+            $('#id_criterio_analisis').val(id)
+        }
+
+        $(document).ready(function () {
+            // init
+            $('#modal__btn__actualizar').hide()
+
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'criterio_analisis[nombre]': "required",
+                    'criterio_analisis[abreviatura]': "required",
+                },
+                messages: {
+                    'criterio_analisis[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'criterio_analisis[abreviatura]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                }
+            })
+
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/criterio-analisis/add`)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+            $('#modal__btn__actualizar').on('click', function () {
+
+                const id_criterio_analisis = $('#id_criterio_analisis').val()
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/config/criterio-analisis/upd/${id_criterio_analisis}`)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+
+            $('#gestionarcriterio_analisisModal').on('show.bs.modal', function (event) {
+                validateForm.resetForm()
+                $('#modal__form__label__id').text('Adicionar criterio de análisis')
+            })
+        })
+    </script>
+{% endblock %}
+

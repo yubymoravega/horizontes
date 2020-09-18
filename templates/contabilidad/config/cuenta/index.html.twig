@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h5 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Cuentas
+                Plan de cuentas
             </h5>
             <div>
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
@@ -20,7 +20,8 @@
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
-                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir">
+                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir"
+                        onclick="Print('{{ path('contabilidad_config_cuenta_print') }}')">
                     <i class="fa fa-print"></i>
                 </button>
             </div>
@@ -35,22 +36,26 @@
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="row" style="width: 160px">Nro. cuenta</th>
-            <th scope="row">Descripción</th>
+            <th scope="row">Nombre</th>
             <th scope="row" style="width: 100px">Naturaleza</th>
-            <th scope="row" style="width: 100px">Producción</th>
-            <th scope="row" style="width: 100px">Patrimonio</th>
-            <th scope="row" style="width: 130px">E. Gasto</th>
+            <th scope="row" style="width: 100px">Obligación Aceedora</th>
+            <th scope="row" style="width: 100px">Obligación Deudora</th>
+            <th scope="row" style="width: 130px">Elemento de Gasto</th>
+            <th scope="row" style="width: 130px">Tipo de cuenta</th>
+            <th scope="row" style="width: 130px">Criterios de análisis</th>
             <th scope="row" style="width: 200px">Acciones</th>
             </thead>
             <tbody>
             {% for item in cuentas %}
                 <tr>
                     <td style="font-weight:400;">{{ item.nro_cuenta }}</td>
-                    <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.deudora }}</td>
-                    <td style="font-weight:400;">{{ item.produccion }}</td>
-                    <td style="font-weight:400;">{{ item.patrimonio }}</td>
+                    <td style="font-weight:400;">{{ item.obligacion_aceedora }}</td>
+                    <td style="font-weight:400;">{{ item.obligacion_deudora }}</td>
                     <td style="font-weight:400;">{{ item.elemento_gasto }}</td>
+                    <td style="font-weight:400;">{{ item.nombre_tipo_cuenta }}</td>
+                    <td style="font-weight:400;">{{ item.criterios }}</td>
                     <td>
                         <div style="width: max-content;">
                             <a type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
@@ -62,11 +67,13 @@
                                     data-placement="bottom" title="Modificar"
                                     onclick="onUpdate({
                                             nro_cuenta: '{{ item.nro_cuenta }}',
-                                            descripcion:'{{ item.descripcion }}',
+                                            nombre:'{{ item.nombre }}',
+                                            obligacion_acreedora:'{{ item.obligacion_aceedora }}' ,
+                                            obligacion_deudora:'{{ item.obligacion_deudora }}' ,
                                             deudora:'{{ item.deudora }}' ,
-                                            patrimonio:'{{ item.patrimonio }}' ,
-                                            produccion:'{{ item.produccion }}' ,
+                                            nombre_tipo_cuenta:'{{ item.nombre_tipo_cuenta }}' ,
                                             elemento_gasto:'{{ item.elemento_gasto }}' ,
+                                            criterios:'{{ item.criterios }}' ,
                                             id: '{{ item.id }}'
                                             })">
                                 <i class="fa fa-edit"></i>
@@ -98,7 +105,9 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
         function mostrarBtn() {
             $('#modal__btn__actualizar').hide()
             $('#modal__btn__aceptar').show()
@@ -113,8 +122,8 @@
             $('#modal__btn__aceptar').hide()
 
             const {
-                nro_cuenta = '', id = '', deudora = '', descripcion = '',
-                produccion = '', patrimonio = '', elemento_gasto = ''
+                nro_cuenta = '', id = '', deudora = '', nombre = '',
+                obligacion_deudora = '', obligacion_acreedora = '', elemento_gasto = '', criterios = ''
             } = config
 
             $('#modal__form__id').modal('show')
@@ -122,22 +131,25 @@
 
             $('#id_cuenta').val(id)
             $('#cuenta_nro_cuenta').val(nro_cuenta)
-            $('#cuenta_descripcion').val(descripcion)
-            if (produccion == 'SI')
-                $('#cuenta_produccion').prop('checked', true)
+            $('#cuenta_nombre').val(nombre)
+            $('#id_criterio').val(criterios)
+            if (obligacion_deudora == 'SI')
+                $('#cuenta_obligacion_deudora').prop('checked', true)
             else
-                $('#cuenta_produccion').prop('checked', false)
-            if (patrimonio == 'SI')
-                $('#cuenta_patrimonio').prop('checked', true)
+                $('#cuenta_obligacion_deudora').prop('checked', false)
+            if (obligacion_acreedora == 'SI')
+                $('#cuenta_obligacion_acreedora').prop('checked', true)
             else
-                $('#cuenta_patrimonio').prop('checked', false)
+                $('#cuenta_obligacion_acreedora').prop('checked', false)
             if (elemento_gasto == 'SI')
                 $('#cuenta_elemento_gasto').prop('checked', true)
             else
                 $('#cuenta_elemento_gasto').prop('checked', false)
 
-            if (deudora == 'Deudora') $('#naturaleza_cuenta').val(1)
-            else $('#naturaleza_cuenta').val(0)
+            if (deudora == 'Deudora')
+                $('#cuenta_deudora').val(1)
+            else
+                $('#cuenta_deudora').val(0)
 
         }
         $(document).ready(function () {
@@ -161,11 +173,14 @@
                     }
                 },
                 rules: {
-                    'cuenta[nro_cuenta]': "required",
+                    'cuenta[nro_cuenta]': {required: true, 'num-letter': true},
                     'cuenta[descripcion]': "required",
                 },
                 messages: {
-                    'cuenta[nro_cuenta]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'cuenta[nro_cuenta]': {
+                        required: CONTAB_MSG.REQUIRED_NOT_BLANK,
+                        'num-letter': CONTAB_MSG.FORMAT_NO_CUENTA
+                    },
                     'cuenta[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
@@ -194,13 +209,13 @@
             /**
              * Eventos para validar que no seleccione los dos tipos de cuentas(patrimonio y producción) a la vez
              */
-            $('#cuenta_patrimonio').on('change', function () {
-                if ($('#cuenta_patrimonio').is(':checked'))
-                    $('#cuenta_produccion').prop('checked', false)
+            $('#cuenta_obligacion_acreedora').on('change', function () {
+                if ($('#cuenta_obligacion_acreedora').is(':checked'))
+                    $('#cuenta_obligacion_deudora').prop('checked', false)
             })
-            $('#cuenta_produccion').on('change', function () {
-                if ($('#cuenta_produccion').is(':checked'))
-                    $('#cuenta_patrimonio').prop('checked', false)
+            $('#cuenta_obligacion_deudora').on('change', function () {
+                if ($('#cuenta_obligacion_deudora').is(':checked'))
+                    $('#cuenta_obligacion_acreedora').prop('checked', false)
             })
 
         })

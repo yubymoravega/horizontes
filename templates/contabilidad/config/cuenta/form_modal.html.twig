@@ -1,32 +1,49 @@
 {% extends 'utils/modal_form.html.twig' %}
-
 {% block modalbody %}
     {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
-
     <div class="form-group input-group input-group-sm d-block">
-        <label for="cuenta_nro_cuenta" class="font-weight-bold">No. Cuenta</label>
+        {{ form_label(form.nro_cuenta) }}
         {{ form_widget(form.nro_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
     <div class="form-group input-group input-group-sm d-block">
-        <label for="cuenta_descripcion" class="font-weight-bold">Descripción</label>
-        {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100'}}) }}
+        {{ form_label(form.nombre) }}
+        {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="row mt-0 p-0">
+        <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+            {{ form_label(form.deudora) }}
+            {{ form_widget(form.deudora,{'attr': {'class': 'form-control w-100'}}) }}
+        </div>
+        <div class="col-6 form-group input-group input-group-sm mt-0 d-block d-flex align-items-center">
+            {{ form_label(form.elemento_gasto) }}
+            {{ form_widget(form.elemento_gasto) }}
+        </div>
+    </div>
+
+    <div class="form-group input-group input-group-sm d-block">
+        {{ form_label(form.id_tipo_cuenta) }}
+        {{ form_widget(form.id_tipo_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
     <div class="form-group input-group input-group-sm d-block">
-        <label for="naturaleza_cuenta" class="font-weight-bold">Naturaleza</label>
-        {{ form_widget(form.deudora,{'attr': {'class': 'form-control w-100'}}) }}
+        <label for="id_criterio" class="font-weight-bold">Criterio de análisis</label>
+        <input type="text" name="criterio_analisis[abreviatura]"
+               id="id_criterio"
+               input-multiselect-modal-type
+               immt-title="Seleccionar los criterios de análisis"
+               immt-url="/contabilidad/config/criterio-analisis/getAllActive"
+               immt-key="abreviatura"
+               class="form-control w-100" data-toggle="modal">
     </div>
-    <div>
-        <div class="form-check form-check-inline">
-            {{ form_widget(form.produccion,{'attr': {'class': 'form-check-input'}}) }}
+    <div class="row mt-0 p-0">
+        <div class="col-6 form-group input-group input-group-sm pa-2 d-block mb-0">
+            {{ form_label(form.obligacion_acreedora) }}
+            {{ form_widget(form.obligacion_acreedora) }}
         </div>
-        <div class="form-check form-check-inline">
-            {{ form_widget(form.patrimonio,{'attr': {'class': 'form-check-input'}}) }}
-        </div>
-        <div class="form-check form-check-inline ml-4">
-            {{ form_widget(form.elemento_gasto,{'attr': {'class': 'form-check-input'}}) }}
+        <div class="col-6 form-group input-group input-group-sm mt-0 d-block">
+            {{ form_label(form.obligacion_deudora) }}
+            {{ form_widget(form.obligacion_deudora) }}
         </div>
     </div>
     <input type="text" id="id_cuenta" hidden>
-
     {{ form_end(form) }}
 {% endblock %}

@@ -2,62 +2,58 @@
 
 namespace App\Controller\Contabilidad\Config;
 
-use App\CoreContabilidad\CrudController;
 use App\Entity\Contabilidad\Config\TipoDocumento;
-use App\Form\Contabilidad\Config\TipoDocumentoType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class TipoDocumentoController
  * @package App\Controller\Contabilidad\Config
  * @Route("/contabilidad/config/tipo-documento")
  */
-class TipoDocumentoController extends CrudController
+class TipoDocumentoController extends AbstractController
 {
-
-    public function __construct()
-    {
-        $this->setTitle('Tipo de Documento');
-        $this->setLabel('nombre');
-        $this->setClassTypeName(TipoDocumentoType::class);
-        $this->setClassEntity(TipoDocumento::class);
-        $this->setMessages([
-            'add' => 'Datos guardados satisfactoriamente',
-            'edit' => 'Datos actualizados satisfactoriamente',
-            'delete' => $this->getTitle() . ' eliminado satisfactoriamente',
-            'not_exist' => 'El ' . $this->getTitle() . ' no pudo ser editado, no existe',
-        ]);
-        $this->setPaths([
-            'index' => 'contabilidad_config_tipo_documento',
-            'edit' => 'contabilidad_config_tipo_documento_edit',
-            'delete' => 'contabilidad_config_tipo_documento_delete',
-        ]);
-    }
 
     /**
      * @Route("/", name="contabilidad_config_tipo_documento", methods={"GET", "POST"})
      */
-    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function index(EntityManagerInterface $em)
     {
-        return parent::index($em, $request, $validator);
-    }
-
-    /**
-     * @Route("/{id}/edit",name="contabilidad_config_tipo_documento_edit", methods={"GET", "POST"})
-     */
-    public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
-    {
-        return parent::Update($em, $request, $validator, $id);
-    }
-
-    /**
-     * @Route("/{id}",name="contabilidad_config_tipo_documento_delete", methods={"DELETE"})
-     */
-    public function Delete(EntityManagerInterface $em, Request $request, $id)
-    {
-        return parent::Delete($em, $request, $id);
+        $tipo_documento_arr = $em->getRepository(TipoDocumento::class)->findAll();
+        if (empty($tipo_documento_arr)) {
+            $config = Yaml::parse(file_get_contents('../src/Data/contabilidad.yml'));
+            $tipos_documentos_yml = $config['configuraciones']['tipo_documento'];
+            foreach ($tipos_documentos_yml as $tipos) {
+                $new_tipo = new TipoDocumento();
+                $new_tipo
+                    ->setNombre($tipos['name'])
+                    ->setActivo(true)
+                    ->setId($tipos['id']);
+                $em->persist($new_tipo);
+            }
+            try {
+                $em->flush();
+            } catch (FileException $exception) {
+                return $exception->getMessage();
+            }
+        }
+        $tipo_documento_arr = $em->getRepository(TipoDocumento::class)->findAll();
+        $row = [];
+        foreach ($tipo_documento_arr as $tipoDocumento) {
+            /**@var $tipoDocumento TipoDocumento */
+            $row[] = array(
+                'nombre' => $tipoDocumento->getNombre(),
+                'numero' => $tipoDocumento->getId()
+            );
+        }
+        return $this->render('contabilidad/config/tipo_documento/index.html.twig', [
+            'controller_name' => 'ConfInicialController',
+            'tipo_documento' => $row
+        ]);
     }
 }

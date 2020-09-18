@@ -47,7 +47,14 @@
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
-                <h1 class="text-reporte"> Adicionar Informe de Recepción</h1>
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Informe de Recepción</h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'informe_recepcion'}}) }}
@@ -67,17 +74,21 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.nro_cuenta_inventario) }}
                         {{ form_widget(formulario.nro_cuenta_inventario) }}
                     </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.nro_subcuenta_inventario) }}
                         {{ form_widget(formulario.nro_subcuenta_inventario) }}
                     </div>
-                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pr-0 d-block">
+                        {{ form_label(formulario.documento.id_moneda) }}
+                        {{ form_widget(formulario.documento.id_moneda) }}
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
@@ -132,15 +143,15 @@
                         {{ form_label(formulario.mercancia.existencia) }}
                         {{ form_widget(formulario.mercancia.existencia) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.existencia_incremento) }}
                         {{ form_widget(formulario.mercancia.existencia_incremento) }}
                     </div>
                     {{ form_end(formulario.mercancia) }}
 
-                    <div class="col-1 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">
-                            <i class="fa fa-plus"></i></button>
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -161,8 +172,14 @@
                 </div>
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('contabilidad_inventario_informe_recepcion') }}"
-                           class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
+                        <a href="{{ url('inventario') }}"
+                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">contabilizar</button>
@@ -178,11 +195,58 @@
     <script>
         let mercancias_seleccionada = [];
         let mercancias = [];
+        let consecutivo = 0;
         let cuentas_inventarios = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
         $(document).ready(function () {
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/informe-recepcion/get-nros-informes',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max',consecutivo)
+                    $('#select_nros').prop('min',1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change',function(){
+                if($('#select_nros').val()==consecutivo){
+                    $('#btnSubbmitInforme').show()
+                }
+                else{
+                    $('#btnSubbmitInforme').hide()
+                }
+            })
+            $('#select_nros').on('keyup',function(){
+                if($('#select_nros').val()==consecutivo){
+                    $('#btnSubbmitInforme').show()
+                    $('#btnImprimir').show()
+                }
+                else if ($('#select_nros').val()>consecutivo){
+                    $('#btnSubbmitInforme').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('El mayor número permitido es '+consecutivo,'danger')
+                }
+                else if($('#select_nros').val() == ''){
+                    $('#btnSubbmitInforme').hide()
+                    $('#btnImprimir').hide()
+                    alertTemplate('Debe introducir el número del documento a vizualizar.','danger')
+                }
+                else{
+                    $('#btnImprimir').show()
+                    $('#btnSubbmitInforme').hide()
+                }
+            })
+
             $.ajax({
                 url: '/contabilidad/inventario/informe-recepcion/getCuentas',
                 method: 'POST',
@@ -206,7 +270,7 @@
                 let codigo = $('#informe_recepcion_mercancia_codigo').val() != '' ? $('#informe_recepcion_mercancia_codigo').val() : -1
                 let cuenta = $('#informe_recepcion_nro_cuenta_inventario').val() != '' ? $('#informe_recepcion_nro_cuenta_inventario').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo +','+ cuenta,
+                    url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo + ',' + cuenta,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -225,6 +289,34 @@
                     error: function () {
                     }
                 })
+            })
+
+            $('#informe_recepcion_mercancia_codigo').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo = $('#informe_recepcion_mercancia_codigo').val()
+                    let cuenta = $('#informe_recepcion_nro_cuenta_inventario').val()
+                    if (cuenta != '' && codigo != '') {
+                        $.ajax({
+                            url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo + ',' + cuenta,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    $('#informe_recepcion_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#informe_recepcion_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#informe_recepcion_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código')
+                                }
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                    }
+                }
             })
 
             $('#informe_recepcion_documento_importe_mercancia').on('keyup', function () {
@@ -322,7 +414,7 @@
                     if (list_mercancia.length) {
                         let data = form_informe_recepcion.serializeArray()
                         console.log(data)
-                        // loadingModal.show()
+                        loadingModal.show()
                         data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
                             url: '/contabilidad/inventario/informe-recepcion/form-add',
