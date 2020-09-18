@@ -21,6 +21,10 @@
     - [x] Tipo Movimiento `u`
     - [x] Unidad
     - [x] Unidad Medida `u`
+    
+    -- vale  salida, informe res, trasnferencia y ajuste
+    - # - Nro
+    - Moneda
 
 ### Inventario
 - [ ] { Tipo Documento, Modulos } -> resolver el tema de los valores estaticos con un JSON, YAML u otro tipo de config

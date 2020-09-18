@@ -10,7 +10,7 @@
 
 {% block navBar %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
-        <a class="navbar-brand text-white" data-toggle="modal" data-target="#GetOutAlmacenModal">Inventario</a>
+        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal" data-target="#GetOutAlmacenModal">Inventario</a>
         <button class="navbar-toggler order-md-2" type="button" data-toggle="collapse"
                 data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,9 +35,9 @@
                         Entrada
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">Ajuste</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Transferencia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion') }}">Informe
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada_gestionar') }}">Ajuste</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada_gestionar') }}">Transferencia</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Informe
                             de recepción</a>
                     </div>
                 </li>
@@ -49,7 +49,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">Ajuste</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Transferencia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida') }}">Vale de
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Vale de
                             salida</a>
                     </div>
                 </li>
@@ -78,7 +78,7 @@
             </ul>
         </div>
         <span class="text-light p-1 order-md-1"
-              style="border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal" data-target="#GetOutAlmacenModal">Almacén: {{ app.session.get('selected_almacen/name') }}</a></span>
+              style="cursor: pointer;border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal" data-target="#GetOutAlmacenModal">Almacén: {{ app.session.get('selected_almacen/name') }}</a></span>
     </nav>
 {% endblock %}
 

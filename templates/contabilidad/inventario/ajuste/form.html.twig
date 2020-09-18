@@ -49,10 +49,10 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Ajuste de Entrada #</h1>
+                        <h1 class="text-reporte text-right mr-0">Ajuste de Entrada </h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
-                        <input type="number" id="select_nros" class="w-25">
+                        <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
                     </div>
                 </div>
             </div>
@@ -73,10 +73,17 @@
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
-                <div class="form-group input-group input-group-sm pa-2 d-block">
-                    {{ form_label(formulario.observacion) }}
-                    {{ form_widget(formulario.observacion) }}
+                <div class="row mt-0 p-0">
+                    <div class="col-8 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
+                        {{ form_label(formulario.observacion) }}
+                        {{ form_widget(formulario.observacion) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.documento.id_moneda) }}
+                        {{ form_widget(formulario.documento.id_moneda) }}
+                    </div>
                 </div>
+
                 {{ form_end(formulario.nro_cuenta_acreedora) }}
 
                 <div class="d-flex align-items-center mt-3 pl-2">
@@ -158,8 +165,11 @@
                 </div>
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('contabilidad_inventario_ajuste_entrada') }}"
-                           class="btn btn-outline-secondary" id="btn_cancelar">Cancelar</a>
+                        <a href="{{ url('inventario') }}"
+                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
@@ -192,8 +202,8 @@
                 success: function (result) {
                     consecutivo = result.nros
                     $('#select_nros').val(consecutivo)
-                    $('#select_nros').prop('max',consecutivo)
-                    $('#select_nros').prop('min',1)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
                     loadingModal.close()
                 },
                 error: function () {
@@ -201,30 +211,26 @@
             })
 
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
-            $('#select_nros').on('change',function(){
-                if($('#select_nros').val()==consecutivo){
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
                     $('#btnSubbmitAjuste').show()
-                }
-                else{
+                } else {
                     $('#btnSubbmitAjuste').hide()
                 }
             })
-            $('#select_nros').on('keyup',function(){
-                if($('#select_nros').val()==consecutivo){
+            $('#select_nros').on('keyup', function () {
+                if ($('#select_nros').val() == consecutivo) {
                     $('#btnSubbmitAjuste').show()
                     $('#btnImprimir').show()
-                }
-                else if ($('#select_nros').val()>consecutivo){
+                } else if ($('#select_nros').val() > consecutivo) {
                     $('#btnSubbmitAjuste').hide()
                     $('#btnImprimir').hide()
-                    alertTemplate('El mayor número permitido es '+consecutivo,'danger')
-                }
-                else if($('#select_nros').val() == ''){
+                    alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                } else if ($('#select_nros').val() == '') {
                     $('#btnSubbmitAjuste').hide()
                     $('#btnImprimir').hide()
-                    alertTemplate('Debe introducir el número del documento a vizualizar.','danger')
-                }
-                else{
+                    alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                } else {
                     $('#btnImprimir').show()
                     $('#btnSubbmitAjuste').hide()
                 }
