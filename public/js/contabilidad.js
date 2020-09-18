@@ -59,7 +59,6 @@ $(document).ready(function () {
                 let th_create = false;
                 $(data).each((poss, valor) => {
                     const keys = Object.keys(valor)
-
                     let keysToTd = ''
                     let ckecked = input_parent.val().includes(valor[key_checks]) ? 'checked' : ''
                     let ths = ''

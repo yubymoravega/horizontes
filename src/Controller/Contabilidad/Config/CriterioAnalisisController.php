@@ -6,8 +6,10 @@ use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Form\Contabilidad\Config\CriterioAnalisisType;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -50,6 +52,25 @@ class CriterioAnalisisController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
+    /**
+     * @Route ("/getAllActive/", name="contabilidad_config_criterio_analisis_getAll",methods={"POST"})
+     */
+    public function getAllActive(EntityManagerInterface $em, Request $request)
+    {
+        $criterios_arr = $em->getRepository(CriterioAnalisis::class)->findByActivo(true);
+        $row = [];
+        foreach ($criterios_arr as $item) {
+            /**@var $item CriterioAnalisis** */
+            $row [] = array(
+//                'id' => $item->getId(),
+                'nombre' => $item->getNombre(),
+                'abreviatura' => $item->getAbreviatura()
+            );
+        }
+        return new JsonResponse(['data'=>$row,'success'=>true]);
+    }
+
 
     /**
      * @Route("/add", name="contabilidad_config_criterio_analisis_add",methods={"POST"})

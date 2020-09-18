@@ -38,10 +38,10 @@ class SubcuentaController extends AbstractController
         $row = [];
 
         if (!empty($subcuentas_arr)) {
-            $descripcion = '(' . $subcuentas_arr[0]->getIdCuenta()->getNroCuenta() . ') ' . $subcuentas_arr[0]->getIdCuenta()->getDescripcion();
+            $descripcion = '(' . $subcuentas_arr[0]->getIdCuenta()->getNroCuenta() . ') ' . $subcuentas_arr[0]->getIdCuenta()->getNombre();
         } else {
             $obj_cuenta = $em->getRepository(Cuenta::class)->find($id_cuenta);
-            $descripcion = '(' . $obj_cuenta->getNroCuenta() . ') ' . $obj_cuenta->getDescripcion();
+            $descripcion = '(' . $obj_cuenta->getNroCuenta() . ') ' . $obj_cuenta->getNombre();
         }
         foreach ($subcuentas_arr as $item) {
             /**@var $item Subcuenta** */
