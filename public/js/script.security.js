@@ -96,7 +96,7 @@ fetch(
             $("#espere").css({ display: "none" });
             $("#diclinada").css({ display: "" });
             history.pushState({}, null, "injjn32522mnmn");
-            console.log(result);
+           
           } else {
             intent.json.mStatus = result.paymentIntent.status;
             intent.json.pi = result.paymentIntent.id;

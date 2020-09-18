@@ -1,0 +1,276 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+
+	<!-- Section Input Groups-->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<section class="section novi-background section-66 section-sm-bottom-110">
+		<div class="container">
+			<h1 class="text-reporte">Beneficiarios de {{ nombre}} {{ apellido}}
+			</h1>
+			<hr class="divider bg-mantis">
+			<button id="add" class="btn btn-sm btn-outline-dark" type="submit">Agregar Beneficiario</button>
+		<!-- Bootstrap Table-->
+		<div class="table-responsive clearfix">
+			<table class="table table-striped tabla-reporte">
+				<tbody>
+					<tr>
+						<th>Nombre</th>
+						<th>Dirección</th>
+						
+						<th>Accion</th>
+					</tr>
+					{# table body #}
+        {% for data in pagination %}
+        <tr {% if loop.index is odd %}class="color"{% endif %}>
+            <td>{{data.primerNombre}} {{data.primerApellido}} {{data.segundoApellido}}</td>
+            <td> {{data.calle}} #{{data.no}} 
+			
+			{% if data.entre != null %}
+				/ {{data.entre}}
+            {% endif %}
+
+			{% if data.y != null %}
+				Y.  {{data.y}} 
+            {% endif %}
+
+			{% if data.apto != null %}
+				Apto. {{data.apto}}  
+            {% endif %}
+
+			{% if data.edificio != null %}
+				Edificio. {{data.edificio}}  
+            {% endif %} </br>
+
+				{% if data.reparto != null %}
+				Reparto. {{data.reparto}}  
+            {% endif %}
+			
+			      </td>           
+			<td>
+
+	<a  onClick="remesa('{{ data.id }}','{{ data.primerNombre }}',
+	'{{ data.primerApellido }}','{{ data.segundoApellido }}','{{ data.telefono }}','{{ data.telefonoCasa }}'
+	,'{{ data.identificacion }}' ,'{{ data.alternativoNombre }}','{{ data.alternativoApellido }}','{{ data.alternativoSegundoApellido }}'
+	,'{{ data.calle }}','{{ data.no }}','{{ data.entre }}','{{ data.y }}','{{ data.apto }}','{{ data.edificio }}','{{ data.reparto }}'
+	,'{{ data.provincia }}','{{ data.municipio }}','{{ data.idCliente }}');" >  
+	 <svg width="1em" height="1em" viewBox="0 0 16 16" class="box bi bi-plus-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+  <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+</svg>	 </a>
+			<a  onClick="editarBeneficiario('{{ data.id }}');" > 
+<svg width="1em" height="1em" viewbox="0 0 16 16" class=" box bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+	<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+	<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg> </a>
+<a  onClick="eliminarBeneficiario('{{ id }}','{{ data.telefono }}');" > 
+<svg width="1em" height="1em" viewbox="0 0 16 16" class=" box bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+	<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+	<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+</svg>
+</a>
+            </td>
+        </tr>
+    {% endfor %}    
+				</tbody>
+			</table>
+			<hr style="background-color: white; margin-top: 0px;">
+			{# display navigation #}
+			<div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+      <div class="count contador">Transacciones: {{ pagination.getTotalItemCount }} </div>
+	</div>
+</div></div></div></section>
+
+<div id="dialog-confirm" class="modal" title="Confirmacion">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Estas seguro que deceas Borrar al Beneficiario?</p>
+</div>
+
+<div id="dialog-monto" class="modal" title="Datos del beneficiario">
+	<b>Beneficiario:</b> <span id="primerNombre">  </span> </br>
+	<b>Alternativo:</b> <span id="alternativo">  </span> </br>
+	<b>Telefono:</b> <span id="telefono">  </span> <b>Tel Adicional:</b> <span id="casa"> </span></br>
+	<b>Identificacion:</b> <span id="identificacion">  </span> </br>
+	<b>Calle:</b> <span id="calle">  </span> </br>
+	<b>Entre:</b> <span id="entre">  </span> </br>
+	<b>Y:</b> <span id="y">  </span> </br>
+	<b>Apto:</b> <span id="apto">  </span> </br>
+	<b>Edificio:</b> <span id="edificio">  </span> </br>
+	<b>Reparto:</b> <span id="reparto">  </span> </br>
+	<b>Municipio:</b> <span id="municipio">  </span> </br>
+	<b>Provincia:</b> <span id="provincia">  </span> </br>
+	
+	
+
+  <div class="form-row text-center">
+  <div class="col-md-4 mb-3">
+     
+	  <input type="text" class="form-control" id="total" placeholder="A pagar">
+      <input type="text" class="form-control" id="monto" placeholder="Recibir">
+
+      <div id='mensaje-monto'>
+       
+      </div>
+	  
+    </div>
+	 <div class="col-md-4 mb-3">
+    <button id='boton-enviar' type="button" class="btn btn-dark">Agregar Al Carrito</button>
+    </div>
+	</div>
+</div>
+
+<style>
+
+.box {
+    width: 20%;
+    height: 150%;
+}
+
+</style>
+
+ {% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+
+$( "#add" ).click(function() {
+	 var split = window.location.pathname.split("/");
+
+  window.location.href = "/remesas.add/"+split[2];
+});
+
+	function editarBeneficiario(id) {
+		window.location.href = "/remesas.edit/"+id;
+      };
+
+	  function remesa(id,primerNombre,primerApellido,segundoApellido,telefono,
+	  telefonoCasa,identificacion,alternativoNombre,alternativoApellido,alternativoSegundoApellido,
+	  calle,no,entre,y,apto,edificio,reparto,provincia,municipio,idCliente) {
+
+		    $("#primerNombre").text(primerNombre+' '+primerApellido+' '+primerApellido);
+		    $("#telefono").text(telefono);
+			$("#casa").text(telefonoCasa);
+			$("#identificacion").text(identificacion);
+			$("#alternativo").text(alternativoNombre+' '+alternativoApellido+' '+alternativoSegundoApellido );
+		  	$("#calle").text(calle+" No."+no);
+			$("#entre").text(entre);
+			$("#y").text(y);
+			$("#apto").text(apto);
+			$("#edificio").text(edificio);
+			$("#reparto").text(reparto);
+
+		$.ajax({
+            type: 'POST',
+            data: {'provincia' : provincia,'municipio':municipio},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas.dialog",
+            dataType: 'html',
+            success: function (data) {
+				data = JSON.parse(data);
+				$("#provincia").text(data.provincia);
+				$("#municipio").text(data.municipio);
+            }
+        });
+
+			$( "#monto" ).change(function() {
+				
+				if($( "#monto" ).val() <= 100){
+								
+				if($("#provincia").text() == 'LA HABANA'){
+
+					$( "#total" ).val(Number($( "#monto" ).val()) + Number(5));
+				
+					}else{ 
+									
+					$( "#total" ).val(Number($( "#monto" ).val()) + Number(8));
+				
+				}}else{ 
+				
+					if($("#provincia").text() == 'LA HABANA'){
+
+					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.05 ));
+				
+					}else{ 
+									
+					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.08 ));
+
+				}}
+
+            });
+
+
+			$( "#total" ).change(function() {
+
+				if($( "#total" ).val() <= 100){
+								
+				if($("#provincia").text() == 'LA HABANA'){
+
+					$( "#monto" ).val(Number($( "#total" ).val()) - Number(5));
+				
+					}else{ 
+									
+					$( "#monto" ).val(Number($( "#total" ).val()) - Number(8));
+				
+				}}else{ 
+				
+					if($("#provincia").text() == 'LA HABANA'){
+
+					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.05 ));
+				
+					}else{ 
+									
+					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.08 ));
+
+				}}
+
+            });
+
+
+		    $( "#dialog-monto" ).dialog({width: 500});
+            $( "#dialdialog-monto" ).dialog( "open" );
+
+			$( "#boton-enviar" ).click(function() {
+
+				if($( "#total" ).val() > 0){
+
+					let monto =	$( "#total" ).val();
+					window.location.href = "/remesas.carrito/"+id+"/"+monto+"/"+idCliente;
+				}else {
+
+					 $("#mensaje-monto").text("Ingrese un Monto");
+					  $("#mensaje-monto").css({"color": "red"});
+				}
+       });
+           
+		
+      };
+
+	 $('#monto').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+     });    
+
+	  $('#total').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+     });  
+
+	function eliminarBeneficiario(id, tel) {
+	$("#dialog-confirm").dialog({
+	resizable: false,
+	height: "auto",
+	width: 400,
+	modal: true,
+	buttons: {
+	"Eliminar": function () {
+
+	window.location.href = "/remesas.beneficiarios.delete/"+id+"/"+tel;
+	},
+	Cancel: function () {
+	$(this).dialog("close");}}});};
+</script>
+
+
+{% endblock %}
+

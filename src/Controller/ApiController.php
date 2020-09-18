@@ -637,7 +637,7 @@ class ApiController extends AbstractController
     $dataBase->flush();
 
 
-    return $this->redirectToRoute('estatus', ["code" => "succeeded"]);
+    return $this->redirectToRoute('estatus', ["code" => "succeeded", 'tel' => $tel, 'monto' => $monto]);
   }
 
   /**

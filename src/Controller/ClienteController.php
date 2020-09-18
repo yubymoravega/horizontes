@@ -63,8 +63,6 @@ class ClienteController extends AbstractController
             $dataBase->persist($cliente);
             $dataBase->flush();
 
-            sleep(1);
-
             return $this->redirectToRoute('cliente-monto', ['tel' => $tel]);
         } else {
 
