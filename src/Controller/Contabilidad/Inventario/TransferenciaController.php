@@ -8,6 +8,7 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Modulo;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
@@ -131,7 +132,9 @@ class TransferenciaController extends AbstractController
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
+                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+                    ->setIdMoneda($em->getRepository(Moneda::class)->find($transferencia_entrada['documento']['id_moneda']));
+
                 $em->persist($documento);
 
                 //3.1-adicionar en transferencia de entrada

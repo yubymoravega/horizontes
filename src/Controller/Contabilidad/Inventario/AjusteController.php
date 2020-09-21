@@ -8,6 +8,7 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Modulo;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
@@ -20,6 +21,7 @@ use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -132,7 +134,8 @@ class AjusteController extends AbstractController
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
+                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+                    ->setIdMoneda($em->getRepository(Moneda::class)->find($ajuste_entrada['documento']['id_moneda']));
                 $em->persist($documento);
 
                 //3.1-adicionar en ajuste de entrada

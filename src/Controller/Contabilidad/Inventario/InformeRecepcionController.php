@@ -10,6 +10,7 @@ use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\Modulo;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
@@ -166,7 +167,8 @@ class InformeRecepcionController extends AbstractController
                         ->setActivo(true)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
+                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+                    ->setIdMoneda($em->getRepository(Moneda::class)->find($informe_recepcion['documento']['id_moneda']));
                     $em->persist($documento);
 
                     //3.1-adicionar en informe de recepcion
@@ -331,6 +333,15 @@ class InformeRecepcionController extends AbstractController
             'formulario' => $form->createView()
         ]);
     }
+
+//    /**
+//     * @Route("/manage-producto", name="contabilidad_inventario_informe_recepcion_manage_producto", methods={"GET", "POST"})
+//     */
+//    public function manageInformeRecepcionProducto(EntityManagerInterface $entityManager, Req)
+//    {
+//
+//    }
+
 
     /**
      * @Route("/getMercancia/{params}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})
