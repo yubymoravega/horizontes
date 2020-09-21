@@ -39,6 +39,11 @@ class CuentaType extends AbstractType
                 'attr' => ['class' => 'mt-1'],
                 'label'=>'Obligación deudora',
             ])
+            ->add('produccion',CheckboxType::class, [
+                'required' => false,
+                'attr' => ['class' => 'mt-1'],
+                'label'=>'Producción',
+            ])
             ->add('obligacion_acreedora',CheckboxType::class, [
                 'required' => false,
                 'attr' => ['class' => 'mt-1'],

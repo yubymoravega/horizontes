@@ -6,6 +6,7 @@ namespace App\EventListener;
 
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -22,14 +23,19 @@ class GlobalEventListener
         $this->em_ = $em;
     }
 
+    /**
+     * Cerrar el almacen cuando la navegacion salga del modulo de inventario
+     * @param RequestEvent $event
+     * @return string
+     */
     public function onCloseAlmacen(RequestEvent $event)
     {
         $uri = $event->getRequest()->getRequestUri();
-
         $is_inventario = strpos($uri, 'contabilidad/inventario');
         $almacen_id = $event->getRequest()->getSession()->get('selected_almacen/id');
-        $name_almacen = $event->getRequest()->getSession()->get('selected_almacen/name');
-        if (!$is_inventario)
+
+        // validar que la navegacion sea 'contabilidad/inventario' y que no sea por AJAX
+        if (!$is_inventario && !$event->getRequest()->isXmlHttpRequest()) {
             if ($almacen_id || $almacen_id != '') {
                 $id_usuario = $this->security->getUser();
                 $almacen_obj = $this->em_->getRepository(Almacen::class)->find($almacen_id);
@@ -52,6 +58,6 @@ class GlobalEventListener
                     }
                 }
             }
-
+        }
     }
 }

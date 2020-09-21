@@ -4,6 +4,9 @@ namespace App\CoreContabilidad;
 
 
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
+use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use Doctrine\ORM\EntityManager;
@@ -223,5 +226,70 @@ class AuxFunctions
             return $obj_empleado->getIdUnidad();
         }
         return null;
+    }
+
+    public static function getCuentasInventario($em)
+    {
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+
+        $row_inventario = array();
+
+        $criterio_obj = $em->getRepository(CriterioAnalisis::class)->findOneBy(array(
+            'abreviatura' => 'ALM',
+            'activo' => true
+        ));
+        /**@var $criterio_obj CriterioAnalisis */
+        if ($criterio_obj) {
+            $arr_cuentas_criterio = $em->getRepository(CuentaCriterioAnalisis::class)->findBy(array(
+                'id_criterio_analisis' => $criterio_obj->getId()
+            ));
+
+            foreach ($arr_cuentas_criterio as $item) {
+                /**@var $item CuentaCriterioAnalisis */
+                 //------aqui cargo las subcuentas de la cuenta
+                $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                    'activo' => true,
+                    'id_cuenta' => $item->getIdCuenta()->getId()
+                ));
+                $rows = [];
+                if (!empty($arr_obj_subcuentas)) {
+                    foreach ($arr_obj_subcuentas as $subcuenta) {
+                        /**@var $subcuenta Subcuenta* */
+                        $rows [] = array(
+                            'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                            'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                            'id' => $subcuenta->getId()
+                        );
+                    }
+                }
+
+                $row_inventario [] = array(
+                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()),
+                    'id_cuenta' => trim($item->getIdCuenta()->getId()),
+                    'sub_cuenta' => $rows
+                );
+            }
+        }
+        return $row_inventario;
+    }
+    public static function getCuentasAcreedoras($em)
+    {
+        $cuenta_er = $em->getRepository(Cuenta::class);
+
+        $row_inventario = array();
+        $row_acreedoras = array();
+
+        $arr_cuentas_acreedoras = $cuenta_er->findBy(array(
+            'activo'=>true,
+            'obligacion_acreedora'=>true
+        ));
+        foreach ($arr_cuentas_acreedoras as $cuenta) {
+            /**@var $cuenta Cuenta*/
+            $row_acreedoras [] = array(
+                'nro_cuenta' => trim($cuenta->getNroCuenta()),
+                'id'=>$cuenta->getId()
+            );
+        }
+        return $row_acreedoras;
     }
 }

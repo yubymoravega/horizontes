@@ -58,6 +58,11 @@ class Cuenta
      */
     private $activo;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $produccion;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -155,6 +160,17 @@ class Cuenta
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+    public function getProduccion(): ?bool
+    {
+        return $this->produccion;
+    }
+
+    public function setProduccion(bool $produccion): self
+    {
+        $this->produccion = $produccion;
 
         return $this;
     }

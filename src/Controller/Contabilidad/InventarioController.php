@@ -73,13 +73,15 @@ class InventarioController extends AbstractController
     public function seleccionarAlmacen(Request $request)
     {
         $session = $request->getSession();
-        $almacen_id = $request->get('id_almacen');
-        $name_almacen = $request->get('name_almacen');
+        $almacen_id = $request->get('almacenes_select');
+//        dd($request->get('almacenes_select'));
+//        $name_almacen = $request->get('name_almacen');
         $session->set('selected_almacen/id', $almacen_id);
-        $session->set('selected_almacen/name', $name_almacen);
         $id_usuario = $this->getUser();
         $em = $this->getDoctrine()->getManager();
         $almacen_obj = $em->getRepository(Almacen::class)->find($almacen_id);
+        $name_almacen = $almacen_obj->getDescripcion();
+        $session->set('selected_almacen/name', $name_almacen);
         if ($almacen_obj && $id_usuario) {
             //buscar nuevamente que ningun usuario este usando el almacen
             $almacen_ocupado_er = $em->getRepository(AlmacenOcupado::class);
@@ -87,6 +89,7 @@ class InventarioController extends AbstractController
                 'id_almacen' => $almacen_obj
             ));
             if (!$obj_almacen_ocupado) {
+//                dd('add');
                 $nuevo_almacen_ocupado = new AlmacenOcupado();
                 $nuevo_almacen_ocupado
                     ->setIdAlmacen($almacen_obj)
@@ -94,13 +97,15 @@ class InventarioController extends AbstractController
                 try {
                     $em->persist($nuevo_almacen_ocupado);
                     $em->flush();
+//                    dd('sasa');
                     $this->addFlash('success', 'Usted se encuentra trabajando dento del almacén ' . $name_almacen);
                 } catch (FileException $e) {
                     return $e->getMessage();
                 }
             }
         }
-        return new JsonResponse(['success' => true]);
+//        return new JsonResponse(['success' => true]);
+        return $this->redirectToRoute('inventario');
     }
 
     /**

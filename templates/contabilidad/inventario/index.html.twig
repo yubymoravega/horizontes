@@ -34,11 +34,14 @@
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Entrada
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="width: 180px;">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada_gestionar') }}">Ajuste</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada_gestionar') }}">Transferencia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Informe
-                            de recepción</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center text-danger">Informe de Recepción</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Mercancía</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Producto</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">

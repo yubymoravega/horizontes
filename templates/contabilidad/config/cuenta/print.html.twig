@@ -30,13 +30,10 @@
             <td width="90" class="text-left"><strong>Cuenta</strong></td>
             <td width="180" class="text-left"><strong>Nombre</strong></td>
             <td width="40"><strong>Nat.</strong></td>
-            <td width="40"><strong>E. Gasto</strong></td>
-            <td width="100"><strong>Oblg. Deudora</strong></td>
-            <td width="100"><strong>Oblg. Acreedora</strong></td>
-            <td width="180" class="text-left"><strong>Tipo</strong></td>
             {% for i in range(1,maximo_criterios) %}
                 <td width="75"><strong>Análisis {{ i }}</strong></td>
             {% endfor %}
+            <td width="50" class="text-center"><strong>Obligación</strong></td>
         </tr>
         </tbody>
     </table>
@@ -46,13 +43,10 @@
                 <td width="90" class="text-left">{{ item.nro_cuenta }}</td>
                 <td width="180" class="text-left">{{ item.nombre }}</td>
                 <td width="40">{{ item.naturaleza }}</td>
-                <td width="40">{{ item.elemento_gasto }}</td>
-                <td width="100">{{ item.obligacion_deudora }}</td>
-                <td width="100">{{ item.obligacion_aceedora }}</td>
-                <td width="180" class="text-left">{{ item.nombre_tipo_cuenta }}</td>
                 {% for criterio in item.abreviaturas %}
                     <td width="75">{{ criterio.abreviatura }}</td>
                 {% endfor %}
+                <td width="50" class="text-center">{{ item.obligacion }}</td>
             </tr>
             {% for subcuenta in item.subcuentas %}
                 <tr>

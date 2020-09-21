@@ -6,7 +6,9 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\Modulo;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
@@ -77,12 +79,13 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/get-nros-informes", name="contabilidad_inventario_informe_recepcion_get_nros", methods={"POST"})
      */
-    public function getNros(EntityManagerInterface $em, Request $request){
+    public function getNros(EntityManagerInterface $em, Request $request)
+    {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $nro = AuxFunctions::getConsecutivos($em,$informe_recepcion_er,$year_,$id_usuario,$idalmacen);
+        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen);
         return new JsonResponse(['nros' => $nro, 'success' => true]);
     }
 
@@ -273,7 +276,7 @@ class InformeRecepcionController extends AbstractController
                                         ->setImporte($importe_actualizado);
                                 }
                                 $em->persist($obj_mercancia);
-                                if($obj_mercancia->getCuenta() == $cuenta_inventario){
+                                if ($obj_mercancia->getCuenta() == $cuenta_inventario) {
                                     if ($obj_mercancia->getActivo() == false) {
                                         $obj_mercancia
                                             ->setExistencia(0)
@@ -296,8 +299,7 @@ class InformeRecepcionController extends AbstractController
                                             ->setImporte($importe_actualizado);
                                     }
                                     $em->persist($obj_mercancia);
-                                }
-                                else{
+                                } else {
                                     return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
                                 }
                                 $movimiento_mercancia
@@ -333,9 +335,9 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/getMercancia/{params}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request,$params)
+    public function getMercancia(Request $request, $params)
     {
-        $arr = explode(',',$params);
+        $arr = explode(',', $params);
         $codigo = $arr[0];
         $cuenta = $arr[1];
         $em = $this->getDoctrine()->getManager();
@@ -343,14 +345,14 @@ class InformeRecepcionController extends AbstractController
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'activo' => true,
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'cuenta'=>$cuenta
+                'cuenta' => $cuenta
             ));
         else
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
                 'codigo' => $codigo,
-                'cuenta'=>$cuenta
+                'cuenta' => $cuenta
             ));
 
         $row = array();
@@ -374,88 +376,12 @@ class InformeRecepcionController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
+        $row_inventario = AuxFunctions::getCuentasInventario($em);
+        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
 
-        //MODULO INVENTARIO
-        //TIPO DE DOCUMENTO "INFORME DE RECEPCION"
-        $conf_inicial_er = $em->getRepository(ConfiguracionInicial::class);
-        $modulo_er = $em->getRepository(Modulo::class);
-        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $subcuenta_er = $em->getRepository(Subcuenta::class);
-        $cuenta_er = $em->getRepository(Cuenta::class);
-
-        $obj_tipo_documento = $tipo_documento_er->find(1);
-        $obj_modulo = $modulo_er->findOneBy(array(
-            'nombre' => strtoupper('inventario'),
-            'activo' => true
-        ));
-        $row_inventario = array();
-        $row_acreedoras = array();
-
-        if ($obj_modulo && $obj_tipo_documento) {
-            $obj_conf_inicial = $conf_inicial_er->findOneBy(array(
-                'id_modulo' => $obj_modulo->getId(),
-                'id_tipo_documento' => $obj_tipo_documento->getId(),
-                'activo' => true
-            ));
-
-            if ($obj_conf_inicial) {
-                /**@var $obj_conf_inicial ConfiguracionInicial* */
-                $str_cuentas = $obj_conf_inicial->getStrCuentas();
-                $str_cuentas_acreedoras = $obj_conf_inicial->getStrCuentasContrapartida();
-
-                $cuentas_inventario = explode('-', $str_cuentas);
-                $cuentas_acreedoras = explode('-', $str_cuentas_acreedoras);
-
-                foreach ($cuentas_inventario as $cuentas) {
-                    $row_inventario [] = array(
-                        'nro_cuenta' => trim($cuentas),
-                        'sub_cuenta' => $this->getSubcuentas($obj_conf_inicial->getStrSubcuentas(), trim($cuentas), $subcuenta_er, $cuenta_er)
-                    );
-                }
-                foreach ($cuentas_acreedoras as $cuentas) {
-                    $row_acreedoras [] = array(
-                        'nro_cuenta' => trim($cuentas)
-                    );
-                }
-            }
-        }
         return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
     }
 
-    public function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
-    {
-        $obj_cuenta = $cuenta_er->findOneBy(array(
-            'activo' => true,
-            'nro_cuenta' => $nro_cuenta
-        ));
-        if ($obj_cuenta) {
-            /**@var $obj_cuenta Cuenta* */
-            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
-                'activo' => true,
-                'id_cuenta' => $obj_cuenta->getId()
-            ));
-            if (!empty($arr_obj_subcuentas)) {
-                $rows = [];
-                $subcuentas_array = explode('-', $str_subcuentas);
-                foreach ($arr_obj_subcuentas as $subcuenta) {
-                    /**@var $subcuenta Subcuenta* */
-                    foreach ($subcuentas_array as $nro_subcuenta) {
-                        if ($subcuenta->getNroSubcuenta() == trim($nro_subcuenta))
-                            $rows [] = array(
-                                'nro_cuenta' => $nro_cuenta,
-                                'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
-                                'id' => $subcuenta->getId()
-                            );
-                    }
-                }
-                return $rows;
-            } else {
-                return '';
-            }
-        } else {
-            return '';
-        }
-    }
 
     /**
      * @Route("/delete/{id}", name="contabilidad_inventario_informe_recepcion_delete", methods={"DELETE"})

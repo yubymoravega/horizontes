@@ -20,28 +20,30 @@
                     </button>
                 </div>
                 <div class="modal-body bg-dark-app">
-                    <div class="form-group input-group input-group-sm">
-                        <select name="almacenes_select" id="almacenes_select" class="form-control">
-                            {% for item in almacenes %}
-                                {% if item.disable %}
-                                    <option value="{{ item.id }}" disabled>{{ item.descripcion }} (ocupado)</option>
-                                {% else %}
-                                    <option value="{{ item.id }}">{{ item.descripcion }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="d-flex mt-4">
-                        <div class="mr-auto">
-                            <a href="{{ url('home') }}" class="btn btn-outline-secondary" type="button"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </a>
+                    <form action="/contabilidad/inventario/seleccionarAlmacen" method="post">
+                        <div class="form-group input-group input-group-sm">
+                            <select name="almacenes_select" id="almacenes_select" class="form-control">
+                                {% for item in almacenes %}
+                                    {% if item.disable %}
+                                        <option value="{{ item.id }}" disabled>{{ item.descripcion }} (ocupado)</option>
+                                    {% else %}
+                                        <option value="{{ item.id }}">{{ item.descripcion }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <a href="{{ url('home') }}" class="btn btn-outline-secondary" type="button"
+                                   aria-label="Cerrar">
+                                    <span aria-hidden="true">Cancelar</span>
+                                </a>
+                            </div>
+                            <div class="ml-2">
+                                <button type="submit" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -53,18 +55,6 @@
     <script>
         $(document).ready(function () {
             $('#selecionarAlmacen').modal('show')
-        })
-        $('#btnAceptar').on('click', function () {
-            $.ajax({
-                url: '/contabilidad/inventario/seleccionarAlmacen',
-                method: "POST",
-                data: {
-                    id_almacen: $('#almacenes_select').val(),
-                    name_almacen: $('#almacenes_select option:selected').text()
-                }
-            }).then(res => {
-                window.location.replace('/contabilidad/inventario');
-            })
         })
     </script>
 {% endblock %}
