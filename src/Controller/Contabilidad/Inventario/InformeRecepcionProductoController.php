@@ -16,6 +16,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\InformeRecepcionProductoType;
@@ -69,7 +70,7 @@ class InformeRecepcionProductoController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-            $list_mercancia = json_decode($request->get('informe_recepcion_producto')['list_mercancia'], true);
+            $list_mercancia = json_decode($request->get('informe_recepcion')['list_mercancia'], true);
             if ($this->isCsrfTokenValid('authenticate', $request->get('_token'))) {
                 $informe_recepcion = $request->get('informe_recepcion_producto');
 
@@ -92,7 +93,7 @@ class InformeRecepcionProductoController extends AbstractController
                     $informes_recepcion_arr = $em->getRepository(InformeRecepcion::class)->findBy(array(
                         'anno' => $year_,
                         'activo' => true,
-                        'producto'=>true
+                        'producto' => true
                     ));
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
@@ -137,7 +138,7 @@ class InformeRecepcionProductoController extends AbstractController
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $producto_er = $em->getRepository(Producto::class);
                     $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->find(1);
+                    $obj_tipo_documento = $tipo_documento_er->find(2);
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $producto) {
@@ -149,9 +150,9 @@ class InformeRecepcionProductoController extends AbstractController
 
                             $importe_total += floatval($importe_mercancia);
 
-                            //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
-                            $movimiento_mercancia = new MovimientoMercancia();
-                            $movimiento_mercancia
+                            //------ADICIONANDO EN LA TABLA DE MOVIMIENTOPRODUCTO
+                            $movimiento_producto = new MovimientoProducto();
+                            $movimiento_producto
                                 ->setActivo(true)
                                 ->setImporte(floatval($importe_mercancia))
                                 ->setEntrada(true)
@@ -161,15 +162,14 @@ class InformeRecepcionProductoController extends AbstractController
                                 ->setIdTipoDocumento($obj_tipo_documento)
                                 ->setIdUsuario($this->getUser());
 
-                            //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
-                            $obj_mercancia = $producto_er->findOneBy(array(
+                            //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE PRODUCTO
+                            $obj_producto = $producto_er->findOneBy(array(
                                 'codigo' => $codigo_mercancia,
-                                'id_amlacen' => $id_almacen,
-//                            'activo' => true //-----Para que traiga tanto las mercancias con existencia como las que se eliminaron
+                                'id_amlacen' => $id_almacen
                             ));
-                            if (!$obj_mercancia) {
-                                $new_mercancia = new Mercancia();
-                                $new_mercancia
+                            if (!$obj_producto) {
+                                $new_producto = new Producto();
+                                $new_producto
                                     ->setIdUnidadMedida($em->getRepository(UnidadMedida::class)->find($unidad_medida))
                                     ->setActivo(true)
                                     ->setDescripcion($descripcion)
@@ -178,61 +178,57 @@ class InformeRecepcionProductoController extends AbstractController
                                     ->setCodigo($codigo_mercancia)
                                     ->setCuenta($cuenta_inventario)
                                     ->setImporte(floatval($importe_mercancia));
-                                $em->persist($new_mercancia);
-                                $movimiento_mercancia
-                                    ->setIdMercancia($new_mercancia)
+                                $em->persist($new_producto);
+                                $movimiento_producto
+                                    ->setIdProducto($new_producto)
                                     ->setExistencia($cantidad_mercancia);
                             } else {
-                                if ($obj_mercancia->getActivo() == false) {
-                                    $obj_mercancia
-                                        ->setExistencia(0)
-                                        ->setImporte(0);
-                                    $em->persist($obj_mercancia);
-                                }
-                                /**@var $obj_mercancia Mercancia* */
-                                if ($obj_mercancia->getExistencia() == 0) {
-                                    $obj_mercancia
+                                /**@var $obj_producto Producto* */
+                                if ($obj_producto->getExistencia() == 0) {
+                                    $obj_producto
                                         ->setExistencia($cantidad_mercancia)
-                                        ->setImporte($importe_mercancia);
+                                        ->setImporte($importe_mercancia)
+                                        ->setActivo(true);
                                 } else {
-                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                    $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
-                                    $obj_mercancia
+                                    $existencia_actualizada = $obj_producto->getExistencia() + $cantidad_mercancia;
+                                    $importe_actualizado = floatval($obj_producto->getImporte() + floatval($importe_mercancia));
+                                    $obj_producto
                                         ->setExistencia($existencia_actualizada)
-                                        ->setImporte($importe_actualizado);
+                                        ->setImporte($importe_actualizado)
+                                        ->setActivo(true);
                                 }
-                                $em->persist($obj_mercancia);
-                                if ($obj_mercancia->getCuenta() == $cuenta_inventario) {
-                                    if ($obj_mercancia->getActivo() == false) {
-                                        $obj_mercancia
+                                $em->persist($obj_producto);
+                                if ($obj_producto->getCuenta() == $cuenta_inventario) {
+                                    if ($obj_producto->getActivo() == false) {
+                                        $obj_producto
                                             ->setExistencia(0)
                                             ->setActivo(true)
                                             ->setImporte(0);
-                                        $em->persist($obj_mercancia);
+                                        $em->persist($obj_producto);
                                     }
-                                    /**@var $obj_mercancia Mercancia* */
-                                    if ($obj_mercancia->getExistencia() == 0) {
-                                        $obj_mercancia
+                                    /**@var $obj_producto Producto* */
+                                    if ($obj_producto->getExistencia() == 0) {
+                                        $obj_producto
                                             ->setExistencia($cantidad_mercancia)
                                             ->setActivo(true)
                                             ->setImporte($importe_mercancia);
                                     } else {
-                                        $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                        $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
-                                        $obj_mercancia
+                                        $existencia_actualizada = $obj_producto->getExistencia() + $cantidad_mercancia;
+                                        $importe_actualizado = floatval($obj_producto->getImporte() + floatval($importe_mercancia));
+                                        $obj_producto
                                             ->setExistencia($existencia_actualizada)
                                             ->setActivo(true)
                                             ->setImporte($importe_actualizado);
                                     }
-                                    $em->persist($obj_mercancia);
+                                    $em->persist($obj_producto);
                                 } else {
                                     return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
                                 }
-                                $movimiento_mercancia
-                                    ->setIdMercancia($obj_mercancia)
-                                    ->setExistencia($obj_mercancia->getExistencia());
+                                $movimiento_producto
+                                    ->setIdProducto($obj_producto)
+                                    ->setExistencia($obj_producto->getExistencia());
                             }
-                            $em->persist($movimiento_mercancia);
+                            $em->persist($movimiento_producto);
                         }
                     }
 
@@ -268,7 +264,7 @@ class InformeRecepcionProductoController extends AbstractController
         $codigo = $arr[0];
         $cuenta = $arr[1];
 //        dd($cuenta);
-        if($cuenta != "null"){
+        if ($cuenta != "null") {
             $em = $this->getDoctrine()->getManager();
             if ($codigo == -1 || $codigo == '-1')
                 $productos_arr = $em->getRepository(Producto::class)->findBy(array(
@@ -478,4 +474,58 @@ class InformeRecepcionProductoController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/getInforme/{nro}", name="contabilidad_inventario_informe_recepcion_producto_get_informe",methods={"POST"})
+     */
+    public function getInforme(EntityManagerInterface $em, $nro)
+    {
+        $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+
+        $informe_obj = $informe_recepcion_er->findOneBy(array(
+            'activo' => true,
+            'nro_concecutivo' => $nro,
+            'producto' => true
+        ));
+
+        if (!$informe_obj) {
+            return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El nro de informe no existe.']);
+        }
+
+        $importe_total = 0;
+        $rows_movimientos = [];
+
+        $arr_movimiento_producto = $movimiento_producto_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(2),
+            'id_documento' => $informe_obj->getIdDocumento()
+        ));
+
+        foreach ($arr_movimiento_producto as $obj) {
+            /**@var $obj MovimientoProducto* */
+            $rows_movimientos[] = array(
+                'id' => $obj->getIdProducto()->getId(),
+                'codigo' => $obj->getIdProducto()->getCodigo(),
+                'descripcion' => $obj->getIdProducto()->getDescripcion(),
+                'existencia' => $obj->getExistencia(),
+                'cantidad' => $obj->getCantidad(),
+                'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                'importe' => number_format($obj->getImporte(), 2, '.', ''),
+            );
+            $importe_total += $obj->getImporte();
+        }
+
+        $rows = array(
+            'id'=>$informe_obj->getId(),
+            'nro_cuenta_inventario'=>$informe_obj->getNroCuentaInventario(),
+            'nro_cuenta_acreedora'=>$informe_obj->getNroCuentaAcreedora(),
+            'nro_subcuenta_cuenta_inventario'=>$informe_obj->getNroSubcuentaInventario(),
+            'nro_subcuenta_acreedora'=>$informe_obj->getNroSubcuentaAcreedora(),
+            'id_moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total'=>$importe_total,
+            'productos'=>$rows_movimientos
+        );
+        return new JsonResponse([['informe' => $rows, 'success' => true, 'msg' => 'Informe recuperado con éxito.']]);
+    }
 }

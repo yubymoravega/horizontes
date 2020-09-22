@@ -50,11 +50,4 @@ class InformeRecepcionProductoType extends AbstractType
             ->add('list_mercancia',HiddenType::class)
         ;
     }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'data_class' => InformeRecepcion::class,
-        ]);
-    }
 }
