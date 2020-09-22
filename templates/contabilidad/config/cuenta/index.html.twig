@@ -166,6 +166,7 @@
                         error_label.removeClass('hide')
                     } else {
                         error.addClass('ml-3')
+                        error.css('position','fixed')
                         $(element)
                             .closest("form")
                             .find("label[for='" + element.attr("id") + "']")
@@ -174,14 +175,16 @@
                 },
                 rules: {
                     'cuenta[nro_cuenta]': {required: true, 'num-letter': true},
-                    'cuenta[descripcion]': "required",
+                    'cuenta[nombre]': "required",
+                    'criterio_analisis[abreviatura]': "required",
                 },
                 messages: {
                     'cuenta[nro_cuenta]': {
                         required: CONTAB_MSG.REQUIRED_NOT_BLANK,
                         'num-letter': CONTAB_MSG.FORMAT_NO_CUENTA
                     },
-                    'cuenta[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'cuenta[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'criterio_analisis[abreviatura]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
 
