@@ -218,21 +218,48 @@
                     $('#btnSubbmitAjuste').hide()
                 }
             })
-            $('#select_nros').on('keyup', function () {
-                if ($('#select_nros').val() == consecutivo) {
-                    $('#btnSubbmitAjuste').show()
-                    $('#btnImprimir').show()
-                } else if ($('#select_nros').val() > consecutivo) {
-                    $('#btnSubbmitAjuste').hide()
-                    $('#btnImprimir').hide()
-                    alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
-                } else if ($('#select_nros').val() == '') {
-                    $('#btnSubbmitAjuste').hide()
-                    $('#btnImprimir').hide()
-                    alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
-                } else {
-                    $('#btnImprimir').show()
-                    $('#btnSubbmitAjuste').hide()
+            $('#select_nros').on('keyup', function (event) {
+                if (event.which == 13) {
+                    $('#ajuste_entrada').resetForm()
+                    $('#form_mercancia').resetForm()
+
+                    if ($('#select_nros').val() == consecutivo) {
+                        // si es el consecutivo
+                        $('#btnSubbmitAjuste').show()
+                        $('#btnImprimir').show()
+                    } else if ($('#select_nros').val() > consecutivo) {
+                        // si es mayor
+                        $('#btnSubbmitAjuste').hide()
+                        $('#btnImprimir').hide()
+                        alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                    } else if ($('#select_nros').val() == '') {
+                        // si no hay numero
+                        $('#btnSubbmitAjuste').hide()
+                        $('#btnImprimir').hide()
+                        alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                    } else {
+                        // si es un Numero valido para cargar
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-entrada/load-ajuste',
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                cuentas_inventarios = result.cuentas_inventario
+                                $(result.cuentas_inventario).each(function (pos, valor) {
+                                    $('#ajuste_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                                })
+                                $(result.cuentas_acrredoras).each(function (pos, valor) {
+                                    $('#ajuste_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                                })
+                                loadingModal.close()
+                            },
+                            error: function () {
+                            }
+                        })
+
+                        $('#btnImprimir').show()
+                        $('#btnSubbmitAjuste').hide()
+                    }
                 }
             })
 
@@ -343,6 +370,7 @@
                 $('#ajuste_nro_subcuenta_inventario').find('option').remove()
                 cuentas_inventarios.forEach(function (valor, pos) {
                     if ($('#ajuste_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                        $('#ajuste_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
                             $('#ajuste_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
@@ -408,7 +436,7 @@
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_ajuste_entrada') }}')
+                                    window3.location.replace('{{ path('contabilidad_inventario_ajuste_entrada') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)

@@ -34,6 +34,9 @@ class InventarioController extends AbstractController
      */
     public function selAlmacen(Request $request)
     {
+        if ($request->getSession()->get('selected_almacen/id'))
+            return $this->redirectToRoute('inventario');
+
         $row = [];
         $obj_user = $this->getUser();
         $em = $this->getDoctrine()->getManager();

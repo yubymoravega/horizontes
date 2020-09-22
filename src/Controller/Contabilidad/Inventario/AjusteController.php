@@ -474,4 +474,27 @@ class AjusteController extends AbstractController
             'id' => $id
         ]);
     }
+
+    /**
+     * @Route("/load-ajuste/{id}", name="contabilidad_inventario_load_ajuste",methods={"POST"})
+     */
+    public function loadAjuste(EntityManagerInterface $em, $id)
+    {
+        $ajuste_entrada_er = $em->getRepository(Ajuste::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+
+        $ajuste_obj = $ajuste_entrada_er->findOneBy(array(
+            'activo' => true,
+            'id' => $id
+        ));
+
+        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
+//            'nombre' => 'AJUSTE DE ENTRADA',
+            'id' => 2,
+            'activo' => true
+        ));
+
+
+    }
 }
