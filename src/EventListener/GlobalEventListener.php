@@ -9,8 +9,10 @@ use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Security;
+use Twig\Environment;
 
 class GlobalEventListener
 {
@@ -20,7 +22,7 @@ class GlobalEventListener
     public function __construct(Security $security, EntityManagerInterface $em)
     {
         $this->security = $security;
-        $this->em_ = $em;
+        $this->em_ = $em;;
     }
 
     /**
@@ -59,5 +61,15 @@ class GlobalEventListener
                 }
             }
         }
+
+        // redireccionar al select almacen si no existe la variable en la session
+        // si esta en 'contabilidad/inventario' y no hay almacen el la session - redirec to select almacen
+        else if($is_inventario && !$event->getRequest()->getSession()->get('selected_almacen/id')){
+//            return new RedirectResponse('/contabilidad/inventario/selAlmacen', 200);
+//            $this->response->red('contabilidad/inventario/selalmacen.html.twig',['almacenes'=>[]]);
+
+        }
+//        dd($is_inventario && !$event->getRequest()->getSession()->get('selected_almacen/id'));
+
     }
 }

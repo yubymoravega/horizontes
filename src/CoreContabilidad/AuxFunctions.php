@@ -63,13 +63,13 @@ class AuxFunctions
             ));
             $contador = 0;
             foreach ($arreglo as $obj) {
-                if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad){
+                if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad) {
                     $contador++;
                     $rows[] = $contador;
                 }
             }
             $consecutivo = $contador + 1;
-            $rows[count($rows)]= $consecutivo;
+            $rows[count($rows)] = $consecutivo;
         }
 //        return array_reverse($rows);
         return $consecutivo;
@@ -190,7 +190,7 @@ class AuxFunctions
         ]);
     }
 
-/**
+    /**
      * Creacion dinamica del campo id_elemento_gasto para el formulario dependiendo de una cuenta seleccionada
      * @param FormInterface $form
      * @param string $cuenta
@@ -246,7 +246,7 @@ class AuxFunctions
 
             foreach ($arr_cuentas_criterio as $item) {
                 /**@var $item CuentaCriterioAnalisis */
-                 //------aqui cargo las subcuentas de la cuenta
+                //------aqui cargo las subcuentas de la cuenta
                 $arr_obj_subcuentas = $subcuenta_er->findBy(array(
                     'activo' => true,
                     'id_cuenta' => $item->getIdCuenta()->getId()
@@ -272,6 +272,7 @@ class AuxFunctions
         }
         return $row_inventario;
     }
+
     public static function getCuentasAcreedoras($em)
     {
         $cuenta_er = $em->getRepository(Cuenta::class);
@@ -280,16 +281,54 @@ class AuxFunctions
         $row_acreedoras = array();
 
         $arr_cuentas_acreedoras = $cuenta_er->findBy(array(
-            'activo'=>true,
-            'obligacion_acreedora'=>true
+            'activo' => true,
+            'obligacion_acreedora' => true
         ));
         foreach ($arr_cuentas_acreedoras as $cuenta) {
-            /**@var $cuenta Cuenta*/
+            /**@var $cuenta Cuenta */
             $row_acreedoras [] = array(
                 'nro_cuenta' => trim($cuenta->getNroCuenta()),
-                'id'=>$cuenta->getId()
+                'id' => $cuenta->getId()
             );
         }
         return $row_acreedoras;
+    }
+
+    public static function getCuentasProduccion($em)
+    {
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+
+        $row_inventario = array();
+        $arr_cuentas_produccion = $em->getRepository(Cuenta::class)->findBy(array(
+            'produccion' => true,
+            'activo'=>true
+        ));
+        foreach ($arr_cuentas_produccion as $item) {
+            /**@var $item Cuenta */
+            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                'activo' => true,
+                'id_cuenta' => $item->getId()
+            ));
+            $rows = [];
+            if (!empty($arr_obj_subcuentas)) {
+                foreach ($arr_obj_subcuentas as $subcuenta) {
+                    /**@var $subcuenta Subcuenta* */
+                    $rows [] = array(
+                        'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                        'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                        'id' => $subcuenta->getId()
+                    );
+                }
+            }
+
+            $row_inventario [] = array(
+                'nro_cuenta' => trim($item->getNroCuenta()),
+                'id_cuenta' => trim($item->getId()),
+                'sub_cuenta' => $rows
+            );
+        }
+
+        return $row_inventario;
     }
 }

@@ -25,7 +25,7 @@ class InformeRecepcion
 
     /**
      * @ORM\ManyToOne(targetEntity=Proveedor::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_proveedor;
 
@@ -60,12 +60,12 @@ class InformeRecepcion
     private $anno;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $codigo_factura;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     private $fecha_factura;
 
@@ -73,6 +73,11 @@ class InformeRecepcion
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $producto;
 
     public function getActivo(): ?bool
     {
@@ -82,6 +87,18 @@ class InformeRecepcion
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getProducto(): ?bool
+    {
+        return $this->producto;
+    }
+
+    public function setProduco(bool $producto): self
+    {
+        $this->producto = $producto;
 
         return $this;
     }
