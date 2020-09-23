@@ -5,11 +5,8 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
-use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
-use App\Entity\Contabilidad\Config\Modulo;
 use App\Entity\Contabilidad\Config\Moneda;
-use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
@@ -21,7 +18,6 @@ use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,6 +32,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class AjusteController extends AbstractController
 {
+    private static int $TIPO_DOC_AJUSTE_ENTRADA = 3;
+
     /**
      * @Route("/", name="contabilidad_inventario_ajuste_entrada",methods={"GET"})
      */
@@ -162,11 +160,10 @@ class AjusteController extends AbstractController
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-                    'nombre' => 'AJUSTE DE ENTRADA',
-                    'activo' => true
-                ));
+                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_ENTRADA);
+//                dd($obj_tipo_documento);
                 $importe_total = 0;
+
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
                         $codigo_mercancia = $mercancia['codigo'];
@@ -314,6 +311,26 @@ class AjusteController extends AbstractController
         $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
 
         return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
+    }
+
+    /**
+     * @Route("/getMonedas", name="contabilidad_inventario_getMonedas", methods={"POST"})
+     */
+    public function getMonedas()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $monedas = $em->getRepository(Moneda::class)->findAll();
+        $rows = [];
+        if ($monedas) {
+            foreach ($monedas as $item) {
+                /**@var $item Moneda */
+                $rows [] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getNombre()
+                );
+            }
+        }
+        return new JsonResponse(['monedas' => $rows, 'success' => true]);
     }
 
     /**
@@ -476,9 +493,9 @@ class AjusteController extends AbstractController
     }
 
     /**
-     * @Route("/load-ajuste/{id}", name="contabilidad_inventario_load_ajuste",methods={"POST"})
+     * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_ajuste",methods={"GET","POST"})
      */
-    public function loadAjuste(EntityManagerInterface $em, $id)
+    public function loadAjuste(EntityManagerInterface $em, $nro)
     {
         $ajuste_entrada_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -486,15 +503,48 @@ class AjusteController extends AbstractController
 
         $ajuste_obj = $ajuste_entrada_er->findOneBy(array(
             'activo' => true,
-            'id' => $id
+            'nro_concecutivo' => $nro,
+            'entrada' => true
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-//            'nombre' => 'AJUSTE DE ENTRADA',
-            'id' => 2,
-            'activo' => true
+        if (!$ajuste_obj) {
+            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de entrada no existe.']);
+        }
+
+        $importe_total = 0;
+        $rows_movimientos = [];
+
+        $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_ENTRADA),
+            'id_documento' => $ajuste_obj->getIdDocumento()
         ));
 
+        foreach ($arr_movimiento_mercancia as $obj) {
+            /**@var $obj MovimientoMercancia* */
+            $rows_movimientos[] = array(
+                'id' => $obj->getIdMercancia()->getId(),
+                'codigo' => $obj->getIdMercancia()->getCodigo(),
+                'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'existencia' => $obj->getExistencia(),
+                'cantidad' => $obj->getCantidad(),
+                'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                'importe' => number_format($obj->getImporte(), 2, '.', ''),
+            );
+            $importe_total += $obj->getImporte();
+        }
 
+        $rows = array(
+            'id' => $ajuste_obj->getId(),
+            'nro_cuenta_inventario' => $ajuste_obj->getNroCuentaInventario(),
+            'nro_cuenta_acreedora' => $ajuste_obj->getNroCuentaAcreedora(),
+            'nro_subcuenta_cuenta_inventario' => $ajuste_obj->getNroSubcuentaInventario(),
+//            'nro_subcuenta_acreedora' => $ajuste_obj->getNroSubcuentaAcreedora(),
+            'id_moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total' => $importe_total,
+            'observaciones' => $ajuste_obj->getObservacion(),
+            'mercancias' => $rows_movimientos
+        );
+        return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'ajuste de entrada cargado con éxito.']);
     }
 }
