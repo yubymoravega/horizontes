@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Yaml\Yaml;
+use function Sodium\add;
 
 
 class AuxFunctions
@@ -46,10 +47,13 @@ class AuxFunctions
      * @param int $anno numero de anno que se solicita
      * @param int $id_usuario identificador del usuario que est realizando la peticion
      * @param int $id_almacen identificador del usuario que est realizando la peticion
+     * @param array $criterio arreglo de clave-valor con los criterios de busqueda
+     * @param string $entidad entidad a la que se relaciona
      * @return array Arreglo de valores con todos los numeros concesutivos del anno incluyendo el siguiente, de forma invertida(Mayor a menor)
      */
-    public static function getConsecutivos(EntityManagerInterface $em, EntityRepository $er, int $anno, int $id_usuario, int $id_almacen)
+    public static function getConsecutivos(EntityManagerInterface $em, EntityRepository $er, int $anno, int $id_usuario, int $id_almacen, array $criterio = [], string $entidad = '')
     {
+
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,
             'id_usuario' => $id_usuario
@@ -57,10 +61,14 @@ class AuxFunctions
         $rows = array();
         if ($obj_empleado) {
             $id_unidad = $obj_empleado->getIdUnidad()->getId();
-            $arreglo = $er->findBy(array(
-                'anno' => $anno,
-                'activo' => true
-            ));
+            if ($entidad == 'InformeRecepcion' || $entidad == 'Ajuste' || $entidad == 'Transferencia') {
+                $condicionales = array_merge($criterio,['anno' => $anno]);
+                $arreglo = $er->findBy($condicionales);
+            } else {
+                $arreglo = $er->findBy(array(
+                    'anno' => $anno
+                ));
+            }
             $contador = 0;
             foreach ($arreglo as $obj) {
                 if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad) {
@@ -302,7 +310,7 @@ class AuxFunctions
         $row_inventario = array();
         $arr_cuentas_produccion = $em->getRepository(Cuenta::class)->findBy(array(
             'produccion' => true,
-            'activo'=>true
+            'activo' => true
         ));
         foreach ($arr_cuentas_produccion as $item) {
             /**@var $item Cuenta */

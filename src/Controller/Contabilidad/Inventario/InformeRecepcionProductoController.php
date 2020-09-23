@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use function Sodium\add;
 
 /**
  * Class InformeRecepcionProductoController
@@ -56,8 +57,17 @@ class InformeRecepcionProductoController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen);
-        return new JsonResponse(['nros' => $nro, 'success' => true]);
+        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen,['producto'=>true],'InformeRecepcion');
+        $arr_obj_eliminado = $informe_recepcion_er->findBy(array(
+            'anno'=>$year_,
+            'activo'=>false
+        ));
+        $arr_eliminados = [];
+        foreach ($arr_obj_eliminado as $key=>$eliminado){
+            /**@var $eliminado InformeRecepcion***/
+            $arr_eliminados[$key]=$eliminado->getNroConcecutivo();
+        }
+        return new JsonResponse(['nros' => $nro, 'eliminados'=>$arr_eliminados, 'success' => true]);
     }
 
     /**
@@ -305,20 +315,33 @@ class InformeRecepcionProductoController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $row_inventario = AuxFunctions::getCuentasInventario($em);
         $row_acreedoras = AuxFunctions::getCuentasProduccion($em);
-
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
+        $row_moneda = $em->getRepository(Moneda::class)->findAll();
+        $monedas = [];
+        foreach ($row_moneda as $moneda){
+            /**@var $moneda Moneda**/
+            $monedas[] = array(
+                'nombre'=>$moneda->getNombre(),
+                'id'=>$moneda->getId(),
+            );
+        }
+        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas'=>$monedas, 'success' => true]);
     }
 
 
     /**
-     * @Route("/delete/{id}", name="contabilidad_inventario_informe_recepcion_producto_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_informe_recepcion_producto_delete", methods={"DELETE"})
      */
-    public function deleteInforme(Request $request, $id)
+    public function deleteInforme(Request $request, $nro)
     {
+        $form = $this->createForm(InformeRecepcionProductoType::class);
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->find($id);
+        $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
+            'activo' => true,
+            'nro_concecutivo' => $nro,
+            'producto'=>true
+        ));
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
         if ($obj_informe_recepcion) {
@@ -345,29 +368,29 @@ class InformeRecepcionProductoController extends AbstractController
 
 
             //eliminar la entrada de la tabla de movimiento_mercancia
-            $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
+            $arr_movimientos_productos = $em->getRepository(MovimientoProducto::class)->findBy(array(
                 'id_documento' => $obj_documento->getId(),
                 'activo' => true
             ));
 
             //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
-            if (!empty($arr_movimientos_mercancia)) {
-                foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
-                    /**@var $obj_movimiento_mercancia MovimientoMercancia* */
-                    $obj_movimiento_mercancia
+            if (!empty($arr_movimientos_productos)) {
+                foreach ($arr_movimientos_productos as $obj_movimiento_producto) {
+                    /**@var $obj_movimiento_producto MovimientoProducto* */
+                    $obj_movimiento_producto
                         ->setActivo(false);
-                    $em->persist($obj_movimiento_mercancia);
+                    $em->persist($obj_movimiento_producto);
 
-                    /**@var $obj_mercancia Mercancia* */
-                    $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
-                    $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
-                    $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
-                    $obj_mercancia->setExistencia($nueva_existencia);
-                    $obj_mercancia->setImporte($nuevo_importe);
+                    /**@var $obj_producto Producto**/
+                    $obj_producto = $obj_movimiento_producto->getIdProducto();
+                    $nueva_existencia = $obj_producto->getExistencia() - $obj_movimiento_producto->getCantidad();
+                    $nuevo_importe = $obj_producto->getImporte() - $obj_movimiento_producto->getImporte();
+                    $obj_producto->setExistencia($nueva_existencia);
+                    $obj_producto->setImporte($nuevo_importe);
                     if ($nueva_existencia == 0) {
-                        $obj_mercancia->setActivo(false);
+                        $obj_producto->setActivo(false);
                     }
-                    $em->persist($obj_mercancia);
+                    $em->persist($obj_producto);
                 }
             }
             try {
@@ -389,63 +412,59 @@ class InformeRecepcionProductoController extends AbstractController
         }
         $this->addFlash($success, $msg);
         // }
-        return $this->redirectToRoute('contabilidad_inventario_informe_recepcion');
+        return $this->render('contabilidad/inventario/informe_recepcion_producto/form.html.twig', [
+            'controller_name' => 'CRUDInformeRecepcionProducto',
+            'formulario' => $form->createView()
+        ]);
     }
 
     /**
-     * @Route("/print_report/{id}", name="contabilidad_inventario_informe_recepcion_producto_print",methods={"GET"})
+     * @Route("/print-report/{nro}", name="contabilidad_inventario_informe_recepcion_producto_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $id)
+    public function print(EntityManagerInterface $em, $nro)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
-        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'activo' => true,
-            'id' => $id
+            'nro_concecutivo' => $nro,
+            'producto'=>true
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->find(1);
+        $obj_tipo_documento = $tipo_documento_er->find(2);
         $rows = [];
         $almacen = '';
-        $cod_proveedor = '';
-        $proveedor = '';
-        $fecha_factura = '';
-        $numero_factura = '';
         $importe_total = 0;
         $unidad = '';
         $nro_solicitud = '';
         $fecha_informe = '';
         if ($informe_obj && $obj_tipo_documento) {
             $almacen = $informe_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
-            $cod_proveedor = $informe_obj->getIdProveedor()->getCodigo();
-            $proveedor = $informe_obj->getIdProveedor()->getNombre();
-            $fecha_factura = $informe_obj->getFechaFactura()->format('d/m/Y');
-            $numero_factura = $informe_obj->getCodigoFactura();
             $fecha_informe = $informe_obj->getIdDocumento()->getFecha()->format('d/m/Y');
             $nro_solicitud = $informe_obj->getNroConcecutivo();
-            $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            $arr_movimiento_producto = $movimiento_producto_er->findBy(array(
                 'id_tipo_documento' => $obj_tipo_documento->getId(),
                 'id_documento' => $informe_obj->getIdDocumento()->getId(),
                 'activo' => true
             ));
 
-            if (!empty($arr_movimiento_mercancia)) {
-                /** @var  $mov_mercancia MovimientoMercancia */
-                $mov_mercancia = $arr_movimiento_mercancia[0];
-                $id_usuario_movimiento = $mov_mercancia->getIdUsuario()->getId();
+            if (!empty($arr_movimiento_producto)) {
+                /** @var  $mov_producto MovimientoProducto */
+                $mov_producto = $arr_movimiento_producto[0];
+                $id_usuario_movimiento = $mov_producto->getIdUsuario()->getId();
                 /** @var Empleado $obj_empleado */
                 $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
                     'id_usuario' => $id_usuario_movimiento
                 ));
                 $unidad = $obj_empleado->getIdUnidad()->getNombre();
-                foreach ($arr_movimiento_mercancia as $obj) {
-                    /**@var $obj MovimientoMercancia* */
+                foreach ($arr_movimiento_producto as $obj) {
+                    /**@var $obj MovimientoProducto* */
                     $rows[] = array(
-                        'id' => $obj->getIdMercancia()->getId(),
-                        'codigo' => $obj->getIdMercancia()->getCodigo(),
-                        'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                        'id' => $obj->getIdProducto()->getId(),
+                        'codigo' => $obj->getIdProducto()->getCodigo(),
+                        'descripcion' => $obj->getIdProducto()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
@@ -456,21 +475,17 @@ class InformeRecepcionProductoController extends AbstractController
             }
 
         }
-        return $this->render('contabilidad/inventario/informe_recepcion/print.html.twig', [
+        return $this->render('contabilidad/inventario/informe_recepcion_producto/print.html.twig', [
             'controller_name' => 'InformeRecepcionControllerPrint',
             'datos' => array(
                 'importe_total' => number_format($importe_total, 2, '.', ''),
                 'almacen' => $almacen,
-                'cod_proveedor' => $cod_proveedor,
-                'proveedor' => $proveedor,
-                'fecha' => $fecha_factura,
-                'cod_factura' => $numero_factura,
                 'unidad' => $unidad,
                 'fecha_informe' => $fecha_informe,
                 'nro_solicitud' => $nro_solicitud
             ),
             'mercancias' => $rows,
-            'id' => $id
+            'nro' => $nro
         ]);
     }
 
@@ -484,7 +499,6 @@ class InformeRecepcionProductoController extends AbstractController
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
         $informe_obj = $informe_recepcion_er->findOneBy(array(
-            'activo' => true,
             'nro_concecutivo' => $nro,
             'producto' => true
         ));
@@ -492,6 +506,9 @@ class InformeRecepcionProductoController extends AbstractController
         if (!$informe_obj) {
             return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El nro de informe no existe.']);
         }
+        /**@var $informe_obj InformeRecepcion**/
+        if($informe_obj->getActivo()==false)
+            return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El informe ha sido eliminado.']);
 
         $importe_total = 0;
         $rows_movimientos = [];
@@ -519,7 +536,7 @@ class InformeRecepcionProductoController extends AbstractController
             'id'=>$informe_obj->getId(),
             'nro_cuenta_inventario'=>$informe_obj->getNroCuentaInventario(),
             'nro_cuenta_acreedora'=>$informe_obj->getNroCuentaAcreedora(),
-            'nro_subcuenta_cuenta_inventario'=>$informe_obj->getNroSubcuentaInventario(),
+            'nro_subcuenta_inventario'=>$informe_obj->getNroSubcuentaInventario(),
             'nro_subcuenta_acreedora'=>$informe_obj->getNroSubcuentaAcreedora(),
             'id_moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
