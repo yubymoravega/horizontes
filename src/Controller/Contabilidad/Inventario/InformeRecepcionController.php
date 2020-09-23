@@ -423,11 +423,12 @@ class InformeRecepcionController extends AbstractController
         $form = $this->createForm(InformeRecepcionType::class);
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
-
+        $year_ = Date('Y');
         $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>false
+            'producto'=>false,
+            'anno'=>$year_
         ));
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
@@ -513,11 +514,12 @@ class InformeRecepcionController extends AbstractController
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-
+        $year_ = Date('Y');
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>false
+            'producto'=>false,
+            'anno'=>$year_
         ));
 
         $obj_tipo_documento = $tipo_documento_er->find(1);
