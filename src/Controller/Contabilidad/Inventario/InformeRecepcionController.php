@@ -86,7 +86,7 @@ class InformeRecepcionController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen);
+        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen,['producto'=>false],'InformeRecepcion');
         return new JsonResponse(['nros' => $nro, 'success' => true]);
     }
 
@@ -333,15 +333,6 @@ class InformeRecepcionController extends AbstractController
             'formulario' => $form->createView()
         ]);
     }
-
-//    /**
-//     * @Route("/manage-producto", name="contabilidad_inventario_informe_recepcion_manage_producto", methods={"GET", "POST"})
-//     */
-//    public function manageInformeRecepcionProducto(EntityManagerInterface $entityManager, Req)
-//    {
-//
-//    }
-
 
     /**
      * @Route("/getMercancia/{params}", name="contabilidad_inventario_informe_recepcion_gestionar_getMercancia", methods={"POST"})

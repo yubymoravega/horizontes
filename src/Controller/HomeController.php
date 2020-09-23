@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use App\Entity\User;
 use App\Entity\Carrito;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +21,18 @@ class HomeController extends AbstractController
      */
     public function home()
     {
+        //Código del módulo de CONTABILIDAD, NO BORRAR
+        $user = $this->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $almacen_ocupado_er = $em->getRepository(AlmacenOcupado::class);
+        $obj_almacen_ocupado = $almacen_ocupado_er->findOneBy(array(
+            'id_usuario'=>$user
+        ));
+        if($obj_almacen_ocupado){
+            $em->remove($obj_almacen_ocupado);
+            $em->flush();
+        }
+        //Fin del código
         return $this->render('home/index.html.twig');
     }
 
