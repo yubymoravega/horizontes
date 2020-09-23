@@ -108,7 +108,7 @@ class InformeRecepcionProductoController extends AbstractController
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
                         /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == 1 && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
                             $contador++;
                     }
                     $consecutivo = $contador + 1;

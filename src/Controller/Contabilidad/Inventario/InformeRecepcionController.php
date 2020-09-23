@@ -20,6 +20,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\InformeRecepcionType;
 use App\Form\Contabilidad\Inventario\InformeRecepcionTypeOriginal;
@@ -87,7 +88,17 @@ class InformeRecepcionController extends AbstractController
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
         $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen,['producto'=>false],'InformeRecepcion');
-        return new JsonResponse(['nros' => $nro, 'success' => true]);
+        $arr_obj_eliminado = $informe_recepcion_er->findBy(array(
+            'anno'=>$year_,
+            'activo'=>false,
+            'producto'=>false
+        ));
+        $arr_eliminados = [];
+        foreach ($arr_obj_eliminado as $key=>$eliminado){
+            /**@var $eliminado InformeRecepcion***/
+            $arr_eliminados[$key]=$eliminado->getNroConcecutivo();
+        }
+        return new JsonResponse(['nros' => $nro, 'eliminados'=>$arr_eliminados, 'success' => true]);
     }
 
     /**
@@ -126,11 +137,12 @@ class InformeRecepcionController extends AbstractController
                     $informes_recepcion_arr = $em->getRepository(InformeRecepcion::class)->findBy(array(
                         'anno' => $year_,
                         'activo' => true,
+                        'producto'=>false
                     ));
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
                         /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == 1 && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto()!= true)
+                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto()!= true)
                             $contador++;
                     }
                     $consecutivo = $contador + 1;
@@ -184,6 +196,7 @@ class InformeRecepcionController extends AbstractController
                         ->setNroCuentaInventario($cuenta_inventario)
                         ->setNroSubcuentaInventario($subcuenta_inventario)
                         ->setActivo(true)
+                        ->setProduco(false)
                         ->setNroSubcuentaAcreedora($proveedor_obj->getCodigo());
                     $em->persist($informe_recepcion);
 
@@ -380,20 +393,42 @@ class InformeRecepcionController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $row_inventario = AuxFunctions::getCuentasInventario($em);
         $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
+        $row_moneda = $em->getRepository(Moneda::class)->findAll();
+        $row_proveedores = $em->getRepository(Proveedor::class)->findBy(array('activo'=>true));
+        $monedas = [];
+        $proveedores = [];
+        foreach ($row_moneda as $moneda){
+            /**@var $moneda Moneda**/
+            $monedas[] = array(
+                'nombre'=>$moneda->getNombre(),
+                'id'=>$moneda->getId(),
+            );
+        }
 
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
+        foreach ($row_proveedores as $proveedor){
+            /**@var $proveedor Proveedor**/
+            $proveedores[] = array(
+                'nombre'=>$proveedor->getNombre(),
+                'id'=>$proveedor->getId(),
+            );
+        }
+        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas'=>$monedas, 'proveedores'=>$proveedores,'success' => true]);
     }
 
-
     /**
-     * @Route("/delete/{id}", name="contabilidad_inventario_informe_recepcion_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_informe_recepcion_delete", methods={"DELETE"})
      */
-    public function deleteInforme(Request $request, $id)
+    public function deleteInforme(Request $request, $nro)
     {
+        $form = $this->createForm(InformeRecepcionType::class);
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->find($id);
+        $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
+            'activo' => true,
+            'nro_concecutivo' => $nro,
+            'producto'=>false
+        ));
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
         if ($obj_informe_recepcion) {
@@ -433,7 +468,7 @@ class InformeRecepcionController extends AbstractController
                         ->setActivo(false);
                     $em->persist($obj_movimiento_mercancia);
 
-                    /**@var $obj_mercancia Mercancia* */
+                    /**@var $obj_mercancia Mercancia**/
                     $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
                     $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
                     $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
@@ -455,7 +490,7 @@ class InformeRecepcionController extends AbstractController
 
             } catch
             (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+                return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
             }
 //            } else {
 //                $msg = 'El informe de recepcion no se puede eliminar, porque existen pagos asociados.';
@@ -464,13 +499,16 @@ class InformeRecepcionController extends AbstractController
         }
         $this->addFlash($success, $msg);
         // }
-        return $this->redirectToRoute('contabilidad_inventario_informe_recepcion');
+        return $this->render('contabilidad/inventario/informe_recepcion/form.html.twig', [
+            'controller_name' => 'CRUDInformeRecepcion',
+            'formulario' => $form->createView()
+        ]);
     }
 
     /**
-     * @Route("/print_report/{id}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
+     * @Route("/print-report/{nro}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $id)
+    public function print(EntityManagerInterface $em, $nro)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -478,7 +516,8 @@ class InformeRecepcionController extends AbstractController
 
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'activo' => true,
-            'id' => $id
+            'nro_concecutivo' => $nro,
+            'producto'=>false
         ));
 
         $obj_tipo_documento = $tipo_documento_er->find(1);
@@ -492,6 +531,7 @@ class InformeRecepcionController extends AbstractController
         $unidad = '';
         $nro_solicitud = '';
         $fecha_informe = '';
+//            dd('sdasd');
         if ($informe_obj && $obj_tipo_documento) {
             $almacen = $informe_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $cod_proveedor = $informe_obj->getIdProveedor()->getCodigo();
@@ -545,8 +585,71 @@ class InformeRecepcionController extends AbstractController
                 'nro_solicitud' => $nro_solicitud
             ),
             'mercancias' => $rows,
-            'id' => $id
+            'id' => $nro
         ]);
     }
 
+    /**
+     * @Route("/getInforme/{nro}", name="contabilidad_inventario_informe_recepcion_get_informe",methods={"POST"})
+     */
+    public function getInforme(EntityManagerInterface $em, $nro)
+    {
+        $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+        $proveedor_er = $em->getRepository(Proveedor::class);
+
+        $informe_obj = $informe_recepcion_er->findOneBy(array(
+            'nro_concecutivo' => $nro,
+            'producto' => false
+        ));
+
+        if (!$informe_obj) {
+            return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de informe no existe.']);
+        }
+        /**@var $informe_obj InformeRecepcion**/
+        if($informe_obj->getActivo()==false)
+            return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El informe ha sido eliminado.']);
+
+        $importe_total = 0;
+        $rows_movimientos = [];
+
+        $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(1),
+            'id_documento' => $informe_obj->getIdDocumento()
+        ));
+
+        foreach ($arr_movimiento_mercancia as $obj) {
+            /**@var $obj MovimientoMercancia* */
+            $rows_movimientos[] = array(
+                'id' => $obj->getIdMercancia()->getId(),
+                'codigo' => $obj->getIdMercancia()->getCodigo(),
+                'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'existencia' => $obj->getExistencia(),
+                'cantidad' => $obj->getCantidad(),
+                'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                'importe' => number_format($obj->getImporte(), 2, '.', ''),
+            );
+            $importe_total += $obj->getImporte();
+        }
+
+        $rows = array(
+            'id'=>$informe_obj->getId(),
+            'nro_cuenta_inventario'=>$informe_obj->getNroCuentaInventario(),
+            'nro_cuenta_acreedora'=>$informe_obj->getNroCuentaAcreedora(),
+            'nro_subcuenta_inventario'=>$informe_obj->getNroSubcuentaInventario(),
+            'proveedor'=>$informe_obj->getNroSubcuentaAcreedora(),
+            'nombre_proveedor'=>$proveedor_er->findOneBy(array(
+                'codigo'=>$informe_obj->getNroSubcuentaAcreedora(),
+                'activo'=>true
+            ))->getNombre(),
+            'codigo_factura'=>$informe_obj->getCodigoFactura(),
+            'fecha_factura'=>$informe_obj->getFechaFactura()->format('d/m/Y'),
+            'id_moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total'=>$importe_total,
+            'mercancias'=>$rows_movimientos
+        );
+        return new JsonResponse([['informe' => $rows, 'success' => true, 'msg' => 'Informe recuperado con éxito.']]);
+    }
 }

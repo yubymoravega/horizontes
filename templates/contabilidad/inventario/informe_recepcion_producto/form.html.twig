@@ -199,15 +199,6 @@
         $(document).ready(function () {
             cargarDatosIniciales()
 
-
-            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
-            $('#select_nros').on('change', function () {
-                if ($('#select_nros').val() == consecutivo) {
-                    $('#btnSubbmitInforme').show()
-                } else {
-                    $('#btnSubbmitInforme').hide()
-                }
-            })
             $('#select_nros').on('keyup', function (e) {
                 if (e.which == 13) {
                     if (eliminados.includes($('#select_nros').val())) {
@@ -237,6 +228,7 @@
                         } else {
                             $('#btnImprimir').show()
                             $('#btnSubbmitInforme').hide()
+                            $('#form_mercancia').css('display', 'none')
                             $('#btnCancelar').show()
                             llenarFormulario($('#select_nros').val())
                         }
@@ -503,6 +495,8 @@
         }
 
         function resetFormulario() {
+            $('#btnCancelar').hide()
+            $('#form_mercancia').css('display', 'block')
             $('#informe_recepcion')[0].reset()
             $('#form_mercancia')[0].reset()
             let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_nro_subcuenta_acreedora', '_documento_id_moneda']
@@ -517,28 +511,33 @@
         }
 
         function llenarFormulario(nro_informe) {
-            $.ajax({
-                url: '/contabilidad/inventario/informe-recepcion-productos/getInforme/' + nro_informe,
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    if (result[0].success) {
-                        let informe = result[0].informe;
-                        let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_nro_subcuenta_acreedora', '_documento_id_moneda']
-                        for (let i = 0; i < ids.length; i++) {
-                            $("#informe_recepcion_producto" + ids[i]).find('option').remove()
-                        }
-                        $('#rows_mercancias').find('tr').remove();
-                        $('#informe_recepcion_producto_nro_cuenta_inventario').prepend('<option selected value = ' + informe.nro_cuenta_inventario + '>' + informe.nro_cuenta_inventario + '</option>');
-                        $('#informe_recepcion_producto_nro_subcuenta_inventario').prepend('<option selected value = ' + informe.nro_subcuenta_inventario + '>' + informe.nro_subcuenta_inventario + '</option>');
-                        $('#informe_recepcion_producto_nro_cuenta_acreedora').prepend('<option selected value = ' + informe.nro_cuenta_acreedora + '>' + informe.nro_cuenta_acreedora + '</option>');
-                        $('#informe_recepcion_producto_nro_subcuenta_acreedora').prepend('<option selected value = ' + informe.nro_subcuenta_acreedora + '>' + informe.nro_subcuenta_acreedora + '</option>');
-                        $('#informe_recepcion_producto_documento_id_moneda').prepend('<option selected value = ' + informe.moneda + '>' + informe.moneda + '</option>');
+            if(nro_informe<1){
+                alertTemplate('El menor número permitido es 1', 'danger')
+                resetFormulario()
+            }
+            else{
+                $.ajax({
+                    url: '/contabilidad/inventario/informe-recepcion-productos/getInforme/' + nro_informe,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result[0].success) {
+                            let informe = result[0].informe;
+                            let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_nro_subcuenta_acreedora', '_documento_id_moneda']
+                            for (let i = 0; i < ids.length; i++) {
+                                $("#informe_recepcion_producto" + ids[i]).find('option').remove()
+                            }
+                            $('#rows_mercancias').find('tr').remove();
+                            $('#informe_recepcion_producto_nro_cuenta_inventario').prepend('<option selected value = ' + informe.nro_cuenta_inventario + '>' + informe.nro_cuenta_inventario + '</option>');
+                            $('#informe_recepcion_producto_nro_subcuenta_inventario').prepend('<option selected value = ' + informe.nro_subcuenta_inventario + '>' + informe.nro_subcuenta_inventario + '</option>');
+                            $('#informe_recepcion_producto_nro_cuenta_acreedora').prepend('<option selected value = ' + informe.nro_cuenta_acreedora + '>' + informe.nro_cuenta_acreedora + '</option>');
+                            $('#informe_recepcion_producto_nro_subcuenta_acreedora').prepend('<option selected value = ' + informe.nro_subcuenta_acreedora + '>' + informe.nro_subcuenta_acreedora + '</option>');
+                            $('#informe_recepcion_producto_documento_id_moneda').prepend('<option selected value = ' + informe.moneda + '>' + informe.moneda + '</option>');
 
-                        let productos = informe.productos
-                        $("#importe-total").text('$' + informe.importe_total)
-                        for (var i = 0; i < productos.length; i++) {
-                            $('#rows_mercancias').append(`<tr>
+                            let productos = informe.productos
+                            $("#importe-total").text('$' + informe.importe_total)
+                            for (var i = 0; i < productos.length; i++) {
+                                $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${productos[i]['codigo']} </td>
                                     <td style="font-weight:400;"> ${productos[i]['cantidad']}</td>
                                     <td style="font-weight:400;"> ${productos[i]['importe']}</td>
@@ -546,21 +545,23 @@
                                     <td style="font-weight:400;">${productos[i]['existencia']}</td>
                                     <td></td>
                                    </tr>`
-                            );
+                                );
+                            }
+                            loadingModal.close()
+                        } else {
+                            loadingModal.close()
+                            alertTemplate(result.msg, 'danger')
                         }
-                        loadingModal.close()
-                    } else {
-                        loadingModal.close()
-                        alertTemplate(result.msg, 'danger')
+                    },
+                    error: function (result) {
+                        console.info('asasas')
                     }
-                },
-                error: function (result) {
-                    console.info('asasas')
-                }
-            })
+                })
+            }
         }
 
         function cargarDatosIniciales() {
+            $('#btnCancelar').hide()
             $.ajax({
                 url: '/contabilidad/inventario/informe-recepcion-productos/getCuentas',
                 method: 'POST',
@@ -606,7 +607,7 @@
         const myOnDeleteConfirm = function () {
             $('#confirm__modal').modal('show')
             $('#confirm__modal__title').html('Cancelar')
-            $('#confirm__modal__body').text('Está seguro que desea cancelar el informa de recepción Nro.' + $('#select_nros').val() + '?')
+            $('#confirm__modal__body').text('Está seguro que desea cancelar el informe de recepción Nro.' + $('#select_nros').val() + '?')
 
             $('#_token__confirm__modal').val($('#__token').val())
 

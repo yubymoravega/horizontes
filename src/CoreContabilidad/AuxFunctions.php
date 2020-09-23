@@ -79,7 +79,6 @@ class AuxFunctions
             $consecutivo = $contador + 1;
             $rows[count($rows)] = $consecutivo;
         }
-//        return array_reverse($rows);
         return $consecutivo;
     }
 
