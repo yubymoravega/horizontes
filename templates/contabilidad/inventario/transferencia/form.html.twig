@@ -171,13 +171,15 @@
                            class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
+                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
+                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
+                        </button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitTransferencia">contabilizar</button>
+                        <button class='my-0 btn btn-secondary' id="btnSubbmitTransferencia">contabilizar
+                        </button>
                     </div>
                 </div>
 
@@ -188,6 +190,20 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+
+        function Print_Ajuste() {
+            const url = '/contabilidad/inventario/transferencia-entrada/print_report/' + $('#select_nros').val()
+            window.open(url, 'blank_')
+        }
+
+        function cancelar() {
+            const url = '/contabilidad/inventario/transferencia-entrada/delete/' + $('#select_nros').val()
+            onDeleteConfirm({
+                message: 'Está seguro que desea cancelar la transferencia?',
+                url
+            })
+        }
+
         let mercancias_seleccionada = [];
         let mercancias = [];
         let consecutivo = 0;
@@ -204,8 +220,8 @@
                 success: function (result) {
                     consecutivo = result.nros
                     $('#select_nros').val(consecutivo)
-                    $('#select_nros').prop('max',consecutivo)
-                    $('#select_nros').prop('min',1)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
                     loadingModal.close()
                 },
                 error: function () {
@@ -213,53 +229,133 @@
             })
 
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
-            $('#select_nros').on('change',function(){
-                if($('#select_nros').val()==consecutivo){
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
                     $('#btnSubbmitTransferencia').show()
-                }
-                else{
+                } else {
                     $('#btnSubbmitTransferencia').hide()
                 }
             })
-            $('#select_nros').on('keyup',function(){
-                if($('#select_nros').val()==consecutivo){
-                    $('#btnSubbmitTransferencia').show()
-                    $('#btnImprimir').show()
-                }
-                else if ($('#select_nros').val()>consecutivo){
-                    $('#btnSubbmitTransferencia').hide()
-                    $('#btnImprimir').hide()
-                    alertTemplate('El mayor número permitido es '+consecutivo,'danger')
-                }
-                else if($('#select_nros').val() == ''){
-                    $('#btnSubbmitTransferencia').hide()
-                    $('#btnImprimir').hide()
-                    alertTemplate('Debe introducir el número del documento a vizualizar.','danger')
-                }
-                else{
-                    $('#btnImprimir').show()
-                    $('#btnSubbmitTransferencia').hide()
+            $('#select_nros').on('keyup', function (event) {
+                if (event.which == 13) {
+                    $('#transferencia_entrada').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+
+                    if ($('#select_nros').val() == consecutivo) {
+                        $('#btnSubbmitTransferencia').show()
+                        $('#btnImprimir').show()
+                        $('#btnCancelar').hide()
+                        loadingData()
+                    } else if ($('#select_nros').val() > consecutivo) {
+                        $('#btnSubbmitTransferencia').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        $('#transferencia_entrada select').find('option').remove()
+                        alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                    } else if ($('#select_nros').val() == '') {
+                        $('#btnSubbmitTransferencia').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                    } else {
+                        $('#btnImprimir').show()
+                        $('#btnSubbmitTransferencia').hide()
+                        $('#btnCancelar').show()
+                        llenarFormulario($('#select_nros').val())
+                    }
                 }
             })
 
+            function llenarFormulario(nro) {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/inventario/transferencia-entrada/load-tranferencia/' + nro,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            let data = result.data;
+                            const cuenta = $('#transferencia_nro_cuenta_inventario')
+                            const subcuenta = $('#transferencia_nro_subcuenta_inventario')
+                            const cuenta_acreedora = $('#transferencia_nro_cuenta_acreedora')
+                            const moneda = $('#transferencia_documento_id_moneda')
+                            const unidad = $('#transferencia_id_unidad')
+                            const almacen = $('#transferencia_id_almacen')
 
-            $.ajax({
-                url: '/contabilidad/inventario/transferencia-entrada/getCuentas',
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    cuentas_inventarios = result.cuentas_inventario
-                    $(result.cuentas_inventario).each(function (pos, valor) {
-                        $('#transferencia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
-                    })
-                    $(result.cuentas_acrredoras).each(function (pos, valor) {
-                        $('#transferencia_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
-                    })
-                    loadingModal.close()
-                },
-                error: function () {
-                }
-            })
+                            // datos del Formulario
+                            $('#transferencia_entrada select').find('option').remove()
+                            cuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_inventario} </option>`);
+                            subcuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_cuenta_inventario} </option>`);
+                            cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
+                            moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
+                            unidad.prepend(`<option selected = "false" value = "0" disabled> ${data.unidad} </option>`);
+                            almacen.prepend(`<option selected = "false" value = "0" disabled> ${data.almacen} </option>`);
+
+                            $('#form_mercancia').css('display', 'none')
+                            // datos de la mercancia
+                            let mercancias = data.mercancias
+                            $("#importe-total").text('$' + data.importe_total)
+                            for (var i = 0; i < mercancias.length; i++) {
+
+                                $('#rows_mercancias').append(`<tr>
+                                    <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['importe']}</td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['precio']} </td>
+                                    <td style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td></td>
+                                   </tr>`
+                                );
+                            }
+                            loadingModal.close()
+                        } else {
+                            loadingModal.close()
+                            alertTemplate(result.msg, 'danger')
+                            // $('#select_nros').val(consecutivo)
+                        }
+                    },
+                    error: function () {
+                    }
+                })
+            }
+
+            const loadingData = function () {
+                loadingModal.show()
+                $('#transferencia_entrada select').find('option').remove()
+                $('#transferencia_entrada select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $('#form_mercancia').css('display', 'block')
+
+                $.ajax({
+                    url: '/contabilidad/inventario/transferencia-entrada/getChoices',
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        cuentas_inventarios = result.cuentas_inventario
+                        $(result.cuentas_inventario).each(function (pos, valor) {
+                            $('#transferencia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        })
+                        $(result.cuentas_acrredoras).each(function (pos, valor) {
+                            $('#transferencia_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        })
+                        $(result.monedas).each(function (pos, valor) {
+                            $('#transferencia_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.unidades).each(function (pos, valor) {
+                            $('#transferencia_id_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.almacenes).each(function (pos, valor) {
+                            $('#transferencia_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        loadingModal.close()
+                    },
+                    error: function () {
+                    }
+                })
+            }
+            loadingData()
+
 
             $('#btnSearchMercancia').on('click', function () {
                 console.info('asasa')
@@ -378,12 +474,14 @@
                     'transferencia[nro_cuenta_inventario]': "required",
                     'transferencia[nro_subcuenta_inventario]': "required",
                     'transferencia[nro_cuenta_acreedora]': "required",
+                    'transferencia[documento][id_moneda]': "required",
                 },
                 messages: {
                     'transferencia[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'transferencia[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
@@ -426,7 +524,7 @@
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_transferencia_entrada') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_transferencia_entrada_gestionar') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)

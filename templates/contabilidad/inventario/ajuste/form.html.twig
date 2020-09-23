@@ -169,10 +169,11 @@
                            class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
+                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
+                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
+                        </button>
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmitAjuste">contabilizar</button>
@@ -186,6 +187,19 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        function Print_Ajuste() {
+            const url = '/contabilidad/inventario/ajuste-entrada/print_report/' + $('#select_nros').val()
+            window.open(url, 'blank_')
+        }
+
+        function cancelar() {
+            const url = '/contabilidad/inventario/ajuste-entrada/delete/' + $('#select_nros').val()
+            onDeleteConfirm({
+                message: 'Está seguro que desea cancelar el Ajuste de entrada?',
+                url
+            })
+        }
+
         let mercancias_seleccionada = [];
         let mercancias = [];
         let consecutivo = 0;
@@ -242,7 +256,7 @@
                         alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
                     } else {// si es un Numero valido para cargar
                         $('#btnImprimir').show()
-                        $('#btnSubbmitInforme').hide()
+                        $('#btnSubbmitAjuste').hide()
                         $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
@@ -299,6 +313,7 @@
             }
 
             const loadingData = function () {
+                loadingModal.show()
                 $('#ajuste_entrada select').find('option').remove()
                 $('#ajuste_entrada select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                 $('#form_mercancia').css('display', 'block')
@@ -315,19 +330,7 @@
                         $(result.cuentas_acrredoras).each(function (pos, valor) {
                             $('#ajuste_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
-                        loadingModal.close()
-                    },
-                    error: function () {
-                    }
-                })
-
-                $.ajax({
-                    url: '/contabilidad/inventario/ajuste-entrada/getMonedas',
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        monedas = result.monedas
-                        $(monedas).each(function (pos, valor) {
+                        $(result.monedas).each(function (pos, valor) {
                             $('#ajuste_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                         })
                         loadingModal.close()
@@ -335,8 +338,6 @@
                     error: function () {
                     }
                 })
-
-
             }
             loadingData()
 
@@ -449,12 +450,14 @@
                     'ajuste[nro_cuenta_inventario]': "required",
                     'ajuste[nro_subcuenta_inventario]': "required",
                     'ajuste[nro_cuenta_acreedora]': "required",
+                    'ajuste[documento][id_moneda]': "required",
                 },
                 messages: {
                     'ajuste[observacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
@@ -494,7 +497,7 @@
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_ajuste_entrada') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_ajuste_entrada_gestionar') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)

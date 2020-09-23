@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -36,6 +37,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class TransferenciaController extends AbstractController
 {
+    private static int $TIPO_DOC_RANSFERENCIA_ENTRADA = 5;
+
     /**
      * @Route("/", name="contabilidad_inventario_transferencia_entrada",methods={"GET"})
      */
@@ -320,26 +323,73 @@ class TransferenciaController extends AbstractController
     }
 
     /**
-     * @Route("/getCuentas", name="contabilidad_inventario_transferencia_entrada_gestionar_getCuentas", methods={"POST"})
+     * @Route("/getChoices", name="contabilidad_inventario_transferencia_entrada_gestionar_getChoices", methods={"POST"})
      */
-    public function getCuentas()
+    public function getChoices()
     {
         $em = $this->getDoctrine()->getManager();
         $row_inventario = AuxFunctions::getCuentasInventario($em);
         $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
 
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
+        $monedas = $em->getRepository(Moneda::class)->findAll();
+        $rows = [];
+        if ($monedas) {
+            foreach ($monedas as $item) {
+                /**@var $item Moneda */
+                $rows [] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getNombre()
+                );
+            }
+        }
+
+        $unidades = $em->getRepository(Unidad::class)->findAllNotMe(1);
+        $rows_unidades = [];
+        if ($unidades) {
+            foreach ($unidades as $item) {
+                /**@var $item Unidad */
+                $rows_unidades [] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getNombre()
+                );
+            }
+        }
+
+        $almacen = $em->getRepository(Almacen::class)->findBy(['id_unidad' => 1]);
+        $rows_almcen = [];
+        if ($almacen) {
+            foreach ($almacen as $item) {
+                /**@var $item Almacen */
+                $rows_almcen [] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getDescripcion()
+                );
+            }
+        }
+
+        return new JsonResponse([
+            'cuentas_inventario' => $row_inventario,
+            'cuentas_acrredoras' => $row_acreedoras,
+            'monedas' => $rows,
+            'unidades' => $rows_unidades,
+            'almacenes' => $rows_almcen,
+            'success' => true
+        ]);
     }
 
     /**
-     * @Route("/delete/{id}", name="contabilidad_inventario_transferencia_entrada_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_transferencia_entrada_delete", methods={"DELETE"})
      */
-    public function deleteTransferencia(Request $request, $id)
+    public function deleteTransferencia(Request $request, $nro)
     {
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->find($id);
+        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy([
+            'nro_concecutivo' => $nro,
+            'entrada' => true,
+            'anno' => Date('Y')
+        ]);
         $msg = 'No se pudo eliminar el transferencia seleccionada';
         $success = 'error';
         if ($obj_transferencia_entrada) {
@@ -410,25 +460,26 @@ class TransferenciaController extends AbstractController
         }
         $this->addFlash($success, $msg);
         // }
-        return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada');
+        return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada_gestionar');
     }
 
     /**
      * @Route("/get-nros-transferencias", name="contabilidad_inventario_transferencia_entrada_get_nros", methods={"POST"})
      */
-    public function getNros(EntityManagerInterface $em, Request $request){
+    public function getNros(EntityManagerInterface $em, Request $request)
+    {
         $transferencia_er = $em->getRepository(Transferencia::class);
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em,$transferencia_er,$year_,$id_usuario,$idalmacen);
+        $row = AuxFunctions::getConsecutivos($em, $transferencia_er, $year_, $id_usuario, $idalmacen);
         return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
     /**
-     * @Route("/print_report/{id}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
+     * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $id)
+    public function print(EntityManagerInterface $em, $nro)
     {
         $transferencia_entrada_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -436,7 +487,8 @@ class TransferenciaController extends AbstractController
 
         $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
             'activo' => true,
-            'id' => $id
+            'nro_concecutivo' => $nro,
+            'entrada' => true
         ));
 
         $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
@@ -497,13 +549,70 @@ class TransferenciaController extends AbstractController
                 'cod_proveedor' => '$cod_proveedor',
                 'proveedor' => '$proveedor',
                 'unidad' => $unidad,
-                'unidad_origen'=>$unidad_origen,
-                'almacen_origen'=>$almacen_origen,
+                'unidad_origen' => $unidad_origen,
+                'almacen_origen' => $almacen_origen,
                 'fecha_transferencia' => $fecha_transferencia,
                 'nro_solicitud' => $nro_solicitud
             ),
             'mercancias' => $rows,
-            'id' => $id
+            'nro' => $nro
         ]);
+    }
+
+
+    /**
+     * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia",methods={"GET","POST"})
+     */
+    public function loadTranferencia(EntityManagerInterface $em, $nro)
+    {
+        $transferencia_entrada_er = $em->getRepository(Transferencia::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+
+        $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
+            'activo' => true,
+            'nro_concecutivo' => $nro,
+            'entrada' => true
+        ));
+
+        if (!$transferencia_obj) {
+            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro de la Tranferencia no existe o fue Cancelada.']);
+        }
+
+        $importe_total = 0;
+        $rows_movimientos = [];
+
+        $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA),
+            'id_documento' => $transferencia_obj->getIdDocumento()
+        ));
+
+        foreach ($arr_movimiento_mercancia as $obj) {
+            /**@var $obj MovimientoMercancia* */
+            $rows_movimientos[] = array(
+                'id' => $obj->getIdMercancia()->getId(),
+                'codigo' => $obj->getIdMercancia()->getCodigo(),
+                'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'existencia' => $obj->getExistencia(),
+                'cantidad' => $obj->getCantidad(),
+                'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                'importe' => number_format($obj->getImporte(), 2, '.', ''),
+            );
+            $importe_total += $obj->getImporte();
+        }
+
+        $rows = array(
+            'id' => $transferencia_obj->getId(),
+            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario(),
+            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora(),
+            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario(),
+            'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '',
+            'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
+            'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total' => $importe_total,
+            'mercancias' => $rows_movimientos
+        );
+        return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'ajuste de entrada cargado con éxito.']);
     }
 }

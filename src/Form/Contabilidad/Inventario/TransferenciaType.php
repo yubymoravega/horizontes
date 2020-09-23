@@ -58,33 +58,15 @@ class TransferenciaType extends AbstractType
                 'label' => 'Cuenta acreedora',
                 'choice_label' => 'nro_cuenta',
             ))
-            ->add('id_unidad', EntityType::class, [
-                'class' => Unidad::class,
+            ->add('id_unidad', ChoiceType::class, [
                 'label' => 'Unidad',
                 'attr' => ['class' => 'w-100'],
                 'choice_label' => 'nombre',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.id != :val')
-                        ->setParameter('val', $this->id_unidad)
-                        ->orderBy('u.nombre', 'ASC');
-                }
             ])
-            ->add('id_almacen', EntityType::class, [
-                'class' => Almacen::class,
+            ->add('id_almacen', ChoiceType::class, [
                 'label' => 'Almacen',
                 'attr' => ['class' => 'w-100'],
                 'choice_label' => 'descripcion',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.id_unidad = :val')
-                        ->setParameter('val', $this->id_unidad)
-//                        ->andWhere('u.id != :val')
-//                        ->setParameter('val', $this->id_almacen)
-                        ->orderBy('u.descripcion', 'ASC');
-                }
             ])
             ->add('list_mercancia', HiddenType::class);
     }

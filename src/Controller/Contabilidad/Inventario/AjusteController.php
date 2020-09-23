@@ -310,15 +310,6 @@ class AjusteController extends AbstractController
         $row_inventario = AuxFunctions::getCuentasInventario($em);
         $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
 
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
-    }
-
-    /**
-     * @Route("/getMonedas", name="contabilidad_inventario_getMonedas", methods={"POST"})
-     */
-    public function getMonedas()
-    {
-        $em = $this->getDoctrine()->getManager();
         $monedas = $em->getRepository(Moneda::class)->findAll();
         $rows = [];
         if ($monedas) {
@@ -330,18 +321,27 @@ class AjusteController extends AbstractController
                 );
             }
         }
-        return new JsonResponse(['monedas' => $rows, 'success' => true]);
+        return new JsonResponse([
+            'cuentas_inventario' => $row_inventario,
+            'cuentas_acrredoras' => $row_acreedoras,
+            'monedas' => $rows,
+            'success' => true
+        ]);
     }
 
     /**
-     * @Route("/delete/{id}", name="contabilidad_inventario_ajuste_entrada_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_ajuste_entrada_delete", methods={"DELETE"})
      */
-    public function deleteAjuste(Request $request, $id)
+    public function deleteAjuste(Request $request, $nro)
     {
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_ajuste_entrada = $em->getRepository(Ajuste::class)->find($id);
+        $obj_ajuste_entrada = $em->getRepository(Ajuste::class)->findOneBy([
+            'nro_concecutivo' => $nro,
+            'entrada' => true,
+            'anno' => Date('Y')
+        ]);
         $msg = 'No se pudo eliminar el ajuste seleccionado';
         $success = 'error';
         if ($obj_ajuste_entrada) {
@@ -412,13 +412,13 @@ class AjusteController extends AbstractController
         }
         $this->addFlash($success, $msg);
         // }
-        return $this->redirectToRoute('contabilidad_inventario_ajuste_entrada');
+        return $this->redirectToRoute('contabilidad_inventario_ajuste_entrada_gestionar');
     }
 
     /**
-     * @Route("/print_report/{id}", name="contabilidad_inventario_ajuste_entrada_print",methods={"GET"})
+     * @Route("/print_report/{nro}", name="contabilidad_inventario_ajuste_entrada_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $id)
+    public function print(EntityManagerInterface $em, $nro)
     {
         $ajuste_entrada_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -426,7 +426,8 @@ class AjusteController extends AbstractController
 
         $ajuste_obj = $ajuste_entrada_er->findOneBy(array(
             'activo' => true,
-            'id' => $id
+            'nro_concecutivo' => $nro,
+            'entrada' => true
         ));
 
         $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
@@ -488,7 +489,7 @@ class AjusteController extends AbstractController
                 'nro_solicitud' => $nro_solicitud
             ),
             'mercancias' => $rows,
-            'id' => $id
+            'nro' => $nro
         ]);
     }
 
@@ -508,7 +509,7 @@ class AjusteController extends AbstractController
         ));
 
         if (!$ajuste_obj) {
-            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de entrada no existe.']);
+            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de entrada no existe o fue cancelado.']);
         }
 
         $importe_total = 0;
