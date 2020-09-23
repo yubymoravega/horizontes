@@ -108,7 +108,7 @@ class InformeRecepcionProductoController extends AbstractController
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
                         /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == 1 && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
                             $contador++;
                     }
                     $consecutivo = $contador + 1;
@@ -264,7 +264,6 @@ class InformeRecepcionProductoController extends AbstractController
         ]);
     }
 
-
     /**
      * @Route("/getProductos/{params}", name="contabilidad_inventario_informe_recepcion_producto_gestionar_getMercancia", methods={"POST"})
      */
@@ -327,7 +326,6 @@ class InformeRecepcionProductoController extends AbstractController
         return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas'=>$monedas, 'success' => true]);
     }
 
-
     /**
      * @Route("/delete/{nro}", name="contabilidad_inventario_informe_recepcion_producto_delete", methods={"DELETE"})
      */
@@ -336,11 +334,12 @@ class InformeRecepcionProductoController extends AbstractController
         $form = $this->createForm(InformeRecepcionProductoType::class);
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
-
+        $year_ = Date('Y');
         $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>true
+            'producto'=>true,
+            'anno'=>$year_
         ));
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
@@ -426,11 +425,12 @@ class InformeRecepcionProductoController extends AbstractController
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-
+        $year_ = Date('Y');
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>true
+            'producto'=>true,
+            'anno'=>$year_
         ));
 
         $obj_tipo_documento = $tipo_documento_er->find(2);
