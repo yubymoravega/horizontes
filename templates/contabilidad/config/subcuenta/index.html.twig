@@ -64,7 +64,8 @@
                                 onclick="onDeleteConfirm({
                                         message:'Está seguro que desea eliminar la subcuenta {{ item.nro_subcuenta }} ?',
                                         url:'{{ path('contabilidad_config_subcuenta_delete',{id: item.id, id_cuenta: id_cuenta }) }}',
-                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}',
+                                        page: '{{ subcuentas.currentPageNumber }}',
                                         })">
                             <i class="fa fa-trash"></i>
                         </button>

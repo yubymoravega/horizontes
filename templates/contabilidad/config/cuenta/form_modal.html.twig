@@ -20,7 +20,7 @@
             {{ form_label(form.deudora) }}
             {{ form_widget(form.deudora,{'attr': {'class': 'form-control w-100'}}) }}
         </div>
-        <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block d-flex align-items-center">
+        <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">
             {{ form_label(form.id_tipo_cuenta) }}
             {{ form_widget(form.id_tipo_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
         </div>
@@ -46,5 +46,6 @@
         </div>
     </div>
     <input type="text" id="id_cuenta" hidden>
+    <input type="text" name="page" id="page" value="{{ cuentas.currentPageNumber }}" hidden>
     {{ form_end(form) }}
 {% endblock %}

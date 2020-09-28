@@ -72,7 +72,7 @@ class SubcuentaController extends AbstractController
         }
         $paginator = $pagination->paginate(
             $row,
-            $request->query->getInt('page', 1), /*page number*/
+            $request->query->getInt('page', $request->get("page") || 1), /*page number*/
             15, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
@@ -136,7 +136,7 @@ class SubcuentaController extends AbstractController
                     $this->addFlash('error', "Existe una subcuenta con el mismo nro.");
                 } elseif ($obj_duplicado_descripcion) {
                     $this->addFlash('error', "Existe una subcuenta con la misma descripción.");
-                } else{
+                } else {
                     $em->flush();
                     $this->addFlash('success', "Subcuenta adicionada satisfactoriamente");
                 }
@@ -146,7 +146,11 @@ class SubcuentaController extends AbstractController
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id_cuenta' => $id_cuenta->getId()]);
+        return $this->redirectToRoute('contabilidad_config_subcuenta',
+            [
+                'id_cuenta' => $id_cuenta->getId(),
+                'page' => $request->get("page")
+            ]);
     }
 
     /**
@@ -205,10 +209,9 @@ class SubcuentaController extends AbstractController
                 ));
                 if ($obj_duplicado_nro_cuenta && $obj_duplicado_nro_cuenta->getId() != $subcuenta->getId()) {
                     $this->addFlash('error', "Existe una subcuenta con el mismo nro.");
-                }
-                elseif ($obj_duplicado_descripcion && $obj_duplicado_nro_cuenta->getId() != $subcuenta->getId()) {
+                } elseif ($obj_duplicado_descripcion && $obj_duplicado_nro_cuenta->getId() != $subcuenta->getId()) {
                     $this->addFlash('error', "Existe una subcuenta con la misma descripción.");
-                } else{
+                } else {
                     $em->flush();
                     $this->addFlash('success', "Subcuenta actualizada satisfactoriamente");
                 }
@@ -218,7 +221,11 @@ class SubcuentaController extends AbstractController
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id_cuenta' => $id_cuenta->getId()]);
+        return $this->redirectToRoute('contabilidad_config_subcuenta',
+            [
+                'id_cuenta' => $id_cuenta->getId(),
+                'page' => $request->get("page")
+            ]);
     }
 
     /**
@@ -248,6 +255,10 @@ class SubcuentaController extends AbstractController
             }
             $this->addFlash($success, $msg);
         }
-        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id_cuenta' => $id_cuenta]);
+        return $this->redirectToRoute('contabilidad_config_subcuenta',
+            [
+                'id_cuenta' => $id_cuenta->getId(),
+                'page' => $request->get("page")
+            ]);
     }
 }
