@@ -6,10 +6,10 @@
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<section class="section novi-background section-66 section-sm-bottom-110">
 		<div class="container">
-			<h1 class="text-reporte">Reporte de Facturas Stripe
+			<h1 class="text-reporte">Reporte de Facturas
 			</h1>
 			<hr class="divider bg-mantis">
-			<form id="payment-form" name='payment-form' action="{{ path('paymentreport.factura') }}" method="GET">
+			<form id="payment-form" name='payment-form' action="{{ path('factura/reporte') }}" method="GET">
 				<div class="input-group input-group-sm mb-3">
 
 					<div class="input-group-prepend"></div>
@@ -19,15 +19,16 @@
 					<div class="input-group-prepend"></div>
 					<select name="estado" class="custom-select" id="estado">
 						<option value="0" selected>Estado</option>
-						<option value="paid">Paid</option>
-						<option value="open">Open</option>
+						<option value="Pagado">Pagado</option>
+						<option value="Abierta">Abierta</option>
+                        <option value="Cancelada">Cancelada</option>
 					</select>
 					<div class="input-group-prepend"></div>
 					<select class="custom-select" name='empleado' id="empleado">
 						<option value="0" selected>Empleado</option>
 						{% for data in user %}
 							<option value="{{data.username}}">{{data.username}}</option>
-						{% endfor %}
+						{% endfor %} 
 					</select>
 					<div class="input-group-prepend"></div>
 					<input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text" class="form-control">
@@ -40,26 +41,35 @@
 			<table class="table table-striped tabla-reporte">
 				<tbody>
 					<tr>
+                       <th>No</th>
 						<th>Fecha</th>
-						<th>Teléfono</th>
-						<th class="th-monto">Monto</th>
+						<th>Cliente</th>
+						<th class="th-monto">Total</th>
 						<th>Estado</th>
 						<th>Empleado</th>
+                        <th>Acciones</th>
 					</tr>
 					{# table body #}
         {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ data[0].fecha | date('d-M-y') }} </br> {{ data[0].fecha | date('h:i a') }}</td>
-            <td >{{ data[0].clienteId }} <br>{{ data.nombre }} {{ data.apellidos }}</td>     
-            <td>{{ data[0].monto }} </td> {% set total = total + data[0].monto %}
-            <td> 
-			{% if data[0].estatus == 'paid' %}			 
-              <button type="button"  onclick="procesar('{{ data[0].auth }}');"  class="btn btn-sm btn-outline-dark" >Pagado</button>			  
-			{% else %}
-			<a  onClick="caja('{{ data[0].estatus }}','{{ data[0].auth }}');" > {{ data[0].estatus }} </a> 
-            {% endif %}
-			</td>
-            <td>{{ data[0].idEmpleado }}</td>   
+            <td> {{ data.id }}</td>     
+            <td>{{ data.datetime | date('d-M-y') }} </br> {{ data.datetime | date('h:i a') }}</td>
+            <td>{{ data.nombreCliente }} </br> {{ data.idCliente }}</td>     
+            <td>{{ data.total }} </td> {% set total = total + data.total %}
+            <td> {{ data.estado }}</td>
+            <td>{{ data.empleado }}</td>   
+            <td><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
+  <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+</svg>
+
+<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cash-stack" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M14 3H1a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1h-1z"/>
+  <path fill-rule="evenodd" d="M15 5H1v8h14V5zM1 4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H1z"/>
+  <path d="M13 5a2 2 0 0 0 2 2V5h-2zM3 5a2 2 0 0 1-2 2V5h2zm10 8a2 2 0 0 1 2-2v2h-2zM3 13a2 2 0 0 0-2-2v2h2zm7-4a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
+</svg>
+
+</td>   
         </tr>
     {% endfor %}    
 				</tbody>

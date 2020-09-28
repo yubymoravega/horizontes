@@ -197,6 +197,12 @@ h1.text-reporte {
     text-align: center;
     font-weight: 100;
 }
+
+h3.text-reporte {
+    color: #fff;
+    text-align: center;
+    font-weight: 100;
+}
 table.table.table-striped a {
     color: #fff;
 }
