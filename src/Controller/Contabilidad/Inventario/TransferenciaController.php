@@ -146,30 +146,14 @@ class TransferenciaController extends AbstractController
                     ->setAnno($year_)
                     ->setIdDocumento($documento)
                     ->setNroConcecutivo($consecutivo)
-                    ->setNroCuentaAcreedora($cuenta_acreedora)
-                    ->setNroCuentaInventario($cuenta_inventario)
-                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                    ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
+                    ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
+                    ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
                     ->setIdUnidad($id_unidad_origen != '' ? $em->getRepository(Unidad::class)->find($id_unidad_origen) : null)
                     ->setIdAlmacen($id_almacen_origen != '' ? $em->getRepository(Almacen::class)->find($id_almacen_origen) : null)
                     ->setActivo(true)
                     ->setEntrada(true);
                 $em->persist($transferencia_entrada);
-
-                //4-crear la obligacion de pago con el proveedor(crear la tabla)
-//                    $obligacion_pago = new ObligacionPago();
-//                    $obligacion_pago
-//                        ->setIdProveedor($proveedor_obj)
-//                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-//                        ->setIdDocumento($documento)
-//                        ->setActivo(true)
-//                        ->setNroSubcuenta($proveedor_obj->getCodigo())
-//                        ->setNroCuenta($cuenta_acreedora)
-//                        ->setLiquidado(false)
-//                        ->setResto(floatval($importe_total))
-//                        ->setValorPagado(0)
-//                        ->setCodigoFactura($codigo_factura)
-//                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
-//                    $em->persist($obligacion_pago);
 
                 /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                  * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /

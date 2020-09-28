@@ -192,9 +192,9 @@ class InformeRecepcionController extends AbstractController
                         ->setIdDocumento($documento)
                         ->setIdProveedor($proveedor_obj)
                         ->setNroConcecutivo($consecutivo)
-                        ->setNroCuentaAcreedora($cuenta_acreedora)
-                        ->setNroCuentaInventario($cuenta_inventario)
-                        ->setNroSubcuentaInventario($subcuenta_inventario)
+                        ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
+                        ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
+                        ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
                         ->setActivo(true)
                         ->setProduco(false)
                         ->setNroSubcuentaAcreedora($proveedor_obj->getCodigo());

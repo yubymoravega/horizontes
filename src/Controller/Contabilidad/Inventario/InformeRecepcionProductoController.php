@@ -130,12 +130,12 @@ class InformeRecepcionProductoController extends AbstractController
                         ->setAnno($year_)
                         ->setIdDocumento($documento)
                         ->setNroConcecutivo($consecutivo)
-                        ->setNroCuentaAcreedora($cuenta_acreedora)
-                        ->setNroCuentaInventario($cuenta_inventario)
-                        ->setNroSubcuentaInventario($subcuenta_inventario)
+                        ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
+                        ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
+                        ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
                         ->setActivo(true)
                         ->setProduco(true)
-                        ->setNroSubcuentaAcreedora($subcuenta_acreedora);
+                        ->setNroSubcuentaAcreedora(AuxFunctions::getNro($subcuenta_acreedora));
                     $em->persist($informe_recepcion);
 
                     /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio

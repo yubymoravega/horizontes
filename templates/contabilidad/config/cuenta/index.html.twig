@@ -40,7 +40,6 @@
             <th scope="row" style="width: 100px">Naturaleza</th>
             <th scope="row" style="width: 100px">Obligación Aceedora</th>
             <th scope="row" style="width: 100px">Obligación Deudora</th>
-            <th scope="row" style="width: 130px">Elemento de Gasto</th>
             <th scope="row" style="width: 130px">Tipo de cuenta</th>
             <th scope="row" style="width: 130px">Criterios de análisis</th>
             <th scope="row" style="width: 200px">Acciones</th>
@@ -53,7 +52,6 @@
                     <td style="font-weight:400;">{{ item.deudora }}</td>
                     <td style="font-weight:400;">{{ item.obligacion_aceedora }}</td>
                     <td style="font-weight:400;">{{ item.obligacion_deudora }}</td>
-                    <td style="font-weight:400;">{{ item.elemento_gasto }}</td>
                     <td style="font-weight:400;">{{ item.nombre_tipo_cuenta }}</td>
                     <td style="font-weight:400;">{{ item.criterios }}</td>
                     <td>
@@ -72,7 +70,6 @@
                                             obligacion_deudora:'{{ item.obligacion_deudora }}' ,
                                             deudora:'{{ item.deudora }}' ,
                                             nombre_tipo_cuenta:'{{ item.nombre_tipo_cuenta }}' ,
-                                            elemento_gasto:'{{ item.elemento_gasto }}' ,
                                             criterios:'{{ item.criterios }}' ,
                                             id: '{{ item.id }}'
                                             })">
@@ -123,7 +120,7 @@
 
             const {
                 nro_cuenta = '', id = '', deudora = '', nombre = '',
-                obligacion_deudora = '', obligacion_acreedora = '', elemento_gasto = '', criterios = ''
+                obligacion_deudora = '', obligacion_acreedora = '', criterios = ''
             } = config
 
             $('#modal__form__id').modal('show')
@@ -141,11 +138,6 @@
                 $('#cuenta_obligacion_acreedora').prop('checked', true)
             else
                 $('#cuenta_obligacion_acreedora').prop('checked', false)
-            if (elemento_gasto == 'SI')
-                $('#cuenta_elemento_gasto').prop('checked', true)
-            else
-                $('#cuenta_elemento_gasto').prop('checked', false)
-
             if (deudora == 'Deudora')
                 $('#cuenta_deudora').val(1)
             else
@@ -176,7 +168,7 @@
                 rules: {
                     'cuenta[nro_cuenta]': {required: true, 'num-letter': true},
                     'cuenta[nombre]': "required",
-                    'criterio_analisis[abreviatura]': "required",
+                    // 'criterio_analisis[abreviatura]': "required",
                 },
                 messages: {
                     'cuenta[nro_cuenta]': {
@@ -184,7 +176,7 @@
                         'num-letter': CONTAB_MSG.FORMAT_NO_CUENTA
                     },
                     'cuenta[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'criterio_analisis[abreviatura]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    // 'criterio_analisis[abreviatura]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
 

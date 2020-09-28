@@ -30,9 +30,11 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Nro. subcuenta</th>
-            <th scope="col-3">Descripción</th>
-            <th scope="col-3" width="120px">Naturaleza</th>
+            <th scope="col-1">Nro. subcuenta</th>
+            <th scope="col-2">Descripción</th>
+            <th scope="col-1">Naturaleza</th>
+            <th scope="col-1">Elemento de Gasto</th>
+            <th scope="col-3">Criterios de análisis</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
@@ -41,13 +43,18 @@
                     <td style="font-weight:400;">{{ item.nro_subcuenta }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td style="font-weight:400;">{{ item.deudora }}</td>
+                    <td style="font-weight:400;">{{ item.elemento_gasto }}</td>
+                    {#                    <td style="font-weight:400;">{{ item.deudora }}</td>#}
+                    <td style="font-weight:400;">{{ item.criterios }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
-                                data-placement="bottom" title="Eliminar"
+                                data-placement="bottom" title="Modificar"
                                 onclick="onUpdate({
                                         nro_subcuenta: '{{ item.nro_subcuenta }}',
                                         descripcion:'{{ item.descripcion }}',
-                                        deudora:'{{ item.deudora }}' ,
+                                        deudora:'{{ item.deudora }}',
+                                        criterios:'{{ item.criterios }}',
+                                        elemento_gasto:'{{ item.elemento_gasto }}' ,
                                         id_subcuenta: '{{ item.id }}'
                                         })">
                             <i class="fa fa-edit"></i>
@@ -86,7 +93,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {nro_subcuenta = '', descripcion = '', deudora = '', id_subcuenta = ''} = config
+            const {nro_subcuenta = '', descripcion = '', criterios = '', deudora = '', elemento_gasto = '', id_subcuenta = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').html("Modificar " + nro_subcuenta)
@@ -94,9 +101,15 @@
             $('#subcuenta_nro_subcuenta').val(nro_subcuenta)
             $('#subcuenta_descripcion').val(descripcion)
             $('#id_subcuenta').val(id_subcuenta)
+            $('#id_criterio').val(criterios)
 
             if (deudora == 'Deudora') $('#naturaleza_cuenta').val(1)
-            else $('#naturaleza_cuenta').val(0)
+            else
+                $('#naturaleza_cuenta').val(0)
+            if (elemento_gasto == 'SI')
+                $('#subcuenta_elemento_gasto').prop('checked', true)
+            else
+                $('#subcuenta_elemento_gasto').prop('checked', false)
         }
 
         $(document).ready(function () {
@@ -132,7 +145,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/subcuenta/{{ id_cuenta }}/add`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -141,7 +154,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/subcuenta/{{ id_cuenta }}/upd/${id_subcuenta}`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
 

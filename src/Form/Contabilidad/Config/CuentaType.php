@@ -26,13 +26,8 @@ class CuentaType extends AbstractType
                 'label'=>'Nombre',
             ])
             ->add('deudora', ChoiceType::class, [
-                'choices' => ['Deudora' => 1, 'Acreedora' => 0],
+                'choices' => ['Deudora' => 1, 'Acreedora' => 0, 'Mixta' => 2],
                 'label'=>'Naturaleza',
-            ])
-            ->add('elemento_gasto', CheckboxType::class, [
-                'required' => false,
-                'attr' => ['class' => 'mt-1'],
-                'label'=>'Elemento de gasto',
             ])
             ->add('obligacion_deudora',CheckboxType::class, [
                 'required' => false,

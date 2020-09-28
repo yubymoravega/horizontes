@@ -4,13 +4,16 @@ namespace App\Controller\Contabilidad;
 
 use App\Entity\Contabilidad\CapitalHumano\Cargo;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class ConfigController extends AbstractController
 {
@@ -44,7 +47,7 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/rootuser",name="register-dev-rootuser")
+     * @Route("/init",name="register-dev-rootuser")
      */
     public function UserRoot(EntityManagerInterface $em, UserPasswordEncoderInterface $passEncoder)
     {
@@ -81,11 +84,26 @@ class ConfigController extends AbstractController
                 ->setBaja(false)
                 ->setFechaAlta(\DateTime::createFromFormat('Y-m-d', '2020-10-28'));
             $em->persist($empleado);
+
+            // ------- tipo documento -------
+            $tipo_documento_arr = $em->getRepository(TipoDocumento::class)->findAll();
+            if (empty($tipo_documento_arr)) {
+                $config = Yaml::parse(file_get_contents('../src/Data/contabilidad.yml'));
+                $tipos_documentos_yml = $config['configuraciones']['tipo_documento'];
+                foreach ($tipos_documentos_yml as $tipos) {
+                    $new_tipo = new TipoDocumento();
+                    $new_tipo
+                        ->setNombre($tipos['name'])
+                        ->setActivo(true)
+                        ->setId($tipos['id']);
+                    $em->persist($new_tipo);
+                }
+            }
             $em->flush();
         } catch (\Exception $err) {
-            return new JsonResponse(['msg'=>$err->getMessage()]);
+            return new JsonResponse(['msg' => $err->getMessage()]);
         }
-        return new JsonResponse(['success'=>true]);
+        return new JsonResponse(['success' => true]);
     }
 }
 

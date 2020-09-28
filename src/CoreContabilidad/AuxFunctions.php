@@ -264,14 +264,14 @@ class AuxFunctions
                         /**@var $subcuenta Subcuenta* */
                         $rows [] = array(
                             'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                            'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                            'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '. trim($subcuenta->getDescripcion()),
                             'id' => $subcuenta->getId()
                         );
                     }
                 }
 
                 $row_inventario [] = array(
-                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()),
+                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()).' - '.trim($item->getIdCuenta()->getNombre()),
                     'id_cuenta' => trim($item->getIdCuenta()->getId()),
                     'sub_cuenta' => $rows
                 );
@@ -284,7 +284,6 @@ class AuxFunctions
     {
         $cuenta_er = $em->getRepository(Cuenta::class);
 
-        $row_inventario = array();
         $row_acreedoras = array();
 
         $arr_cuentas_acreedoras = $cuenta_er->findBy(array(
@@ -294,7 +293,7 @@ class AuxFunctions
         foreach ($arr_cuentas_acreedoras as $cuenta) {
             /**@var $cuenta Cuenta */
             $row_acreedoras [] = array(
-                'nro_cuenta' => trim($cuenta->getNroCuenta()),
+                'nro_cuenta' => trim($cuenta->getNroCuenta()).' - '.trim($cuenta->getNombre()),
                 'id' => $cuenta->getId()
             );
         }
@@ -323,19 +322,26 @@ class AuxFunctions
                     /**@var $subcuenta Subcuenta* */
                     $rows [] = array(
                         'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                        'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '.trim($subcuenta->getDescripcion()),
                         'id' => $subcuenta->getId()
                     );
                 }
             }
 
             $row_inventario [] = array(
-                'nro_cuenta' => trim($item->getNroCuenta()),
+                'nro_cuenta' => trim($item->getNroCuenta()) .' - '.trim($item->getNombre()),
                 'id_cuenta' => trim($item->getId()),
                 'sub_cuenta' => $rows
             );
         }
 
         return $row_inventario;
+    }
+
+    public static function getNro($numero){
+        $arr = explode(' - ',$numero);
+        if(!empty($arr))
+            return $arr[0];
+        return '';
     }
 }

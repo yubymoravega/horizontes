@@ -143,9 +143,9 @@ class AjusteController extends AbstractController
                     ->setIdDocumento($documento)
                     ->setObservacion($observacion)
                     ->setNroConcecutivo($consecutivo)
-                    ->setNroCuentaAcreedora($cuenta_acreedora)
-                    ->setNroCuentaInventario($cuenta_inventario)
-                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                    ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
+                    ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
+                    ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
                     ->setActivo(true)
                     ->setEntrada(true);
                 $em->persist($ajuste_entrada);

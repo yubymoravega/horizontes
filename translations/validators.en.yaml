@@ -2,6 +2,7 @@
 #author.name.not_blank: Please enter an author name.
 contabilidad:
   config:
+    nro_cuenta_unique: El numero de cuenta ya esta registrado !
     descripcion_not_blank: El campo descripción está vacio !
     descripcion_unique: El nombre ya está en uso !
     modulo_not_blank: Debe seleccionar el módulo !

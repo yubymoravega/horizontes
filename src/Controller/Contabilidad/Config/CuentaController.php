@@ -30,7 +30,7 @@ class CuentaController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         $form = $this->createForm(CuentaType::class);
-        $cuentas_arr = $em->getRepository(Cuenta::class)->findByActivo(true);
+        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array('activo'=>true),array('nro_cuenta'=>'ASC'));
         $row = [];
         $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
         foreach ($cuentas_arr as $item) {
@@ -45,15 +45,23 @@ class CuentaController extends AbstractController
                     $str_criterios = $str_criterios . $abreviatura . ' - ';
                 }
             }
+
+            if ($item->getMixta() == true)
+                $naturaleza = 'Mixta';
+            elseif ($item->getDeudora() == true)
+                $naturaleza = 'Deudora';
+            else
+                $naturaleza = 'Acreedora';
+
             $row [] = array(
                 'id' => $item->getId(),
                 'nro_cuenta' => $item->getNroCuenta(),
                 'nombre' => $item->getNombre(),
-                'deudora' => $item->getDeudora() == true ? 'Deudora' : 'Acreedora',
-                'produccion' => $item->getProduccion() == true ? 'SI' : 'NO',
-                'obligacion_aceedora' => $item->getObligacionAcreedora() == true ? 'SI' : 'NO',
-                'obligacion_deudora' => $item->getObligacionDeudora() == true ? 'SI' : 'NO',
-                'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : 'NO',
+                'deudora' => $naturaleza,
+                'produccion' => $item->getProduccion() == true ? 'SI' : '',
+                'obligacion_aceedora' => $item->getObligacionAcreedora() == true ? 'SI' : '',
+                'obligacion_deudora' => $item->getObligacionDeudora() == true ? 'SI' : '',
+//                'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : 'NO',
                 'tipo_cuenta' => $item->getIdTipoCuenta()->getId(),
                 'nombre_tipo_cuenta' => $item->getIdTipoCuenta()->getNombre(),
                 'criterios' => $str_criterios == '' ? '' : substr($str_criterios, 0, -2)
@@ -77,7 +85,7 @@ class CuentaController extends AbstractController
      */
     public function print(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
-        $cuentas_arr = $em->getRepository(Cuenta::class)->findByActivo(true);
+        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array('activo'=>true),array('nro_cuenta'=>'ASC'));
         $row = [];
         $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
@@ -91,15 +99,15 @@ class CuentaController extends AbstractController
             ));
             $arr_abreviaturas = [];
             if (!empty($arr_criterios_asociados)) {
-                if ($valor_maximo_criterios < count($arr_criterios_asociados)){
+                if ($valor_maximo_criterios < count($arr_criterios_asociados)) {
                     $valor_maximo_criterios = count($arr_criterios_asociados);
                 }
-                    foreach ($arr_criterios_asociados as $criterios_asociados) {
-                        $abreviatura = $criterios_asociados->getIdCriterioAnalisis()->getAbreviatura();
-                        $arr_abreviaturas[] = array(
-                            'abreviatura' => $abreviatura
-                        );
-                    }
+                foreach ($arr_criterios_asociados as $criterios_asociados) {
+                    $abreviatura = $criterios_asociados->getIdCriterioAnalisis()->getAbreviatura();
+                    $arr_abreviaturas[] = array(
+                        'abreviatura' => $abreviatura
+                    );
+                }
             }
             $subcuentas = [];
             if (!empty($arr_subcuentas)) {
@@ -108,18 +116,25 @@ class CuentaController extends AbstractController
                     $subcuentas[] = array(
                         'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
                         'nombre' => $subcuenta->getDescripcion(),
-                        'naturaleza' => $subcuenta->getDeudora() == true ? 'D' : 'A'
+                        'naturaleza' => $subcuenta->getDeudora() == true ? 'D' : 'A',
+                        'elemento_gasto' => $subcuenta->getElementoGasto() == true ? 'SI' : 'NO',
                     );
                 }
             }
+            if ($item->getMixta() == true)
+                $naturaleza = 'M';
+            elseif ($item->getDeudora() == true)
+                $naturaleza = 'D';
+            else
+                $naturaleza = 'A';
             $row [] = array(
                 'id' => $item->getId(),
                 'nro_cuenta' => $item->getNroCuenta(),
                 'nombre' => $item->getNombre(),
-                'naturaleza' => $item->getDeudora() == true ? 'D' : 'A',
-                'obligacion' => ($item->getObligacionAcreedora() == true || $item->getObligacionDeudora() == true)? 'SI' : '',
+                'naturaleza' => $naturaleza,
+                'obligacion' => ($item->getObligacionAcreedora() == true || $item->getObligacionDeudora() == true) ? 'SI' : '',
 //                'obligacion_deudora' => $item->getObligacionDeudora() == true ? 'SI' : 'NO',
-                'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : 'NO',
+//                'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : 'NO',
                 'tipo_cuenta' => $item->getIdTipoCuenta()->getId(),
                 'nombre_tipo_cuenta' => $item->getIdTipoCuenta()->getNombre(),
                 'abreviaturas' => $arr_abreviaturas,
@@ -129,7 +144,7 @@ class CuentaController extends AbstractController
         return $this->render('contabilidad/config/cuenta/print.html.twig', [
             'controller_name' => 'CuentaControllerPrint',
             'cuentas' => $row,
-            'maximo_criterios'=>$valor_maximo_criterios
+            'maximo_criterios' => $valor_maximo_criterios
         ]);
     }
 
@@ -166,22 +181,36 @@ class CuentaController extends AbstractController
         $errors = $validator->validate($cuenta);
         if ($form->isValid() && $form->isSubmitted()) {
             try {
-                $cuenta->setActivo(true);
+                $naturaleza = $request->get('cuenta')['deudora'];
+                $field_deudora = true;
+                $field_mixta = false;
+                if ($naturaleza == 0) {
+                    $field_deudora = false;
+                } elseif ($naturaleza == 2) {
+                    $field_deudora = false;
+                    $field_mixta = true;
+                }
+                $cuenta
+                    ->setActivo(true)
+                    ->setDeudora($field_deudora)
+                    ->setMixta($field_mixta);
                 $em->persist($cuenta);
                 $abreviaturas = $request->get('criterio_analisis')['abreviatura'];
-                $arr_abreviaturas = explode(' - ', $abreviaturas);
-                $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
-                foreach ($arr_abreviaturas as $abreviatura_) {
-                    $obj_criterio = $criterio_analisis_er->findOneBy(array(
-                        'abreviatura' => $abreviatura_,
-                        'activo' => true
-                    ));
-                    if ($obj_criterio) {
-                        $cuenta_criterio = new CuentaCriterioAnalisis();
-                        $cuenta_criterio
-                            ->setIdCuenta($cuenta)
-                            ->setIdCriterioAnalisis($obj_criterio);
-                        $em->persist($cuenta_criterio);
+                if (!empty($abreviaturas)) {
+                    $arr_abreviaturas = explode(' - ', $abreviaturas);
+                    $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+                    foreach ($arr_abreviaturas as $abreviatura_) {
+                        $obj_criterio = $criterio_analisis_er->findOneBy(array(
+                            'abreviatura' => $abreviatura_,
+                            'activo' => true
+                        ));
+                        if ($obj_criterio) {
+                            $cuenta_criterio = new CuentaCriterioAnalisis();
+                            $cuenta_criterio
+                                ->setIdCuenta($cuenta)
+                                ->setIdCriterioAnalisis($obj_criterio);
+                            $em->persist($cuenta_criterio);
+                        }
                     }
                 }
                 $em->flush();
@@ -206,6 +235,19 @@ class CuentaController extends AbstractController
         $errors = $validator->validate($cuenta);
         if ($form->isValid() && $form->isSubmitted()) {
             try {
+                $naturaleza = $request->get('cuenta')['deudora'];
+                $field_deudora = true;
+                $field_mixta = false;
+                if ($naturaleza == 0) {
+                    $field_deudora = false;
+                } elseif ($naturaleza == 2) {
+                    $field_deudora = false;
+                    $field_mixta = true;
+                }
+                $cuenta
+                    ->setActivo(true)
+                    ->setDeudora($field_deudora)
+                    ->setMixta($field_mixta);
                 $em->persist($cuenta);
                 $cuenta_criterio_analisis_er = $em->getRepository(CuentaCriterioAnalisis::class);
                 //elimino los registros de criterios y cuentas de la tabla CuentaCriterioAnalisis
@@ -218,21 +260,23 @@ class CuentaController extends AbstractController
                     }
                 }
                 //adiciono los nuevos criterios asociados a las cuentas
-                $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+
                 $abreviaturas = $request->get('criterio_analisis')['abreviatura'];
-                $arr_abreviaturas = explode(' - ', $abreviaturas);
-                $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
-                foreach ($arr_abreviaturas as $abreviatura_) {
-                    $obj_criterio = $criterio_analisis_er->findOneBy(array(
-                        'abreviatura' => $abreviatura_,
-                        'activo' => true
-                    ));
-                    if ($obj_criterio) {
-                        $cuenta_criterio = new CuentaCriterioAnalisis();
-                        $cuenta_criterio
-                            ->setIdCuenta($cuenta)
-                            ->setIdCriterioAnalisis($obj_criterio);
-                        $em->persist($cuenta_criterio);
+                if (!empty($abreviaturas)) {
+                    $arr_abreviaturas = explode(' - ', $abreviaturas);
+                    $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+                    foreach ($arr_abreviaturas as $abreviatura_) {
+                        $obj_criterio = $criterio_analisis_er->findOneBy(array(
+                            'abreviatura' => $abreviatura_,
+                            'activo' => true
+                        ));
+                        if ($obj_criterio) {
+                            $cuenta_criterio = new CuentaCriterioAnalisis();
+                            $cuenta_criterio
+                                ->setIdCuenta($cuenta)
+                                ->setIdCriterioAnalisis($obj_criterio);
+                            $em->persist($cuenta_criterio);
+                        }
                     }
                 }
                 $em->flush();
@@ -280,4 +324,28 @@ class CuentaController extends AbstractController
         }
         return $this->redirectToRoute('contabilidad_config_cuenta');
     }
+
+    /**
+     * @Route("/get-subcuentas/{id_cuenta}", name="contabilidad_config_cuenta_get_subcuentas", methods={"POST"})
+     */
+    public function getSubcuentas(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination, $id_cuenta)
+    {
+        $subcuentas_arr = $em->getRepository(Subcuenta::class)->findBy(array(
+            'id_cuenta' => $id_cuenta,
+            'activo' => true
+        ));
+
+        $row = [];
+        foreach ($subcuentas_arr as $item) {
+            /**@var $item Subcuenta** */
+            $row [] = array(
+                'id' => $item->getId(),
+                'nro_subcuenta' => $item->getNroSubcuenta(),
+                'descripcion' => $item->getDescripcion(),
+                'deudora' => $item->getDeudora() == true ? 'Deudora' : 'Acreedora',
+            );
+        }
+        return new JsonResponse(['subcuentas' => $row]);
+    }
+
 }
