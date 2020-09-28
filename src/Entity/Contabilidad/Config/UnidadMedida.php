@@ -27,6 +27,12 @@ class UnidadMedida
     private $nombre;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
+     */
+    private $abreviatura;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $activo;
@@ -44,6 +50,18 @@ class UnidadMedida
     public function setNombre(string $nombre): self
     {
         $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    public function getAbreviatura(): ?string
+    {
+        return $this->abreviatura;
+    }
+
+    public function setAbreviatura(string $abreviatura): self
+    {
+        $this->abreviatura = $abreviatura;
 
         return $this;
     }

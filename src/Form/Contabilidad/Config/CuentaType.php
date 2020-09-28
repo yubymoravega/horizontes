@@ -19,34 +19,34 @@ class CuentaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nro_cuenta', TextType::class,[
-                'label'=>'Nro. cuenta',
+            ->add('nro_cuenta', TextType::class, [
+                'label' => 'Nro. cuenta',
             ])
-            ->add('nombre', TextareaType::class,[
-                'label'=>'Nombre',
+            ->add('nombre', TextareaType::class, [
+                'label' => 'Nombre',
             ])
             ->add('deudora', ChoiceType::class, [
                 'choices' => ['Deudora' => 1, 'Acreedora' => 0, 'Mixta' => 2],
-                'label'=>'Naturaleza',
+                'label' => 'Naturaleza',
             ])
-            ->add('obligacion_deudora',CheckboxType::class, [
+            ->add('obligacion_deudora', CheckboxType::class, [
                 'required' => false,
                 'attr' => ['class' => 'mt-1'],
-                'label'=>'Obligación deudora',
+                'label' => 'Obligación deudora',
             ])
-            ->add('produccion',CheckboxType::class, [
+            ->add('produccion', CheckboxType::class, [
                 'required' => false,
                 'attr' => ['class' => 'mt-1'],
-                'label'=>'Producción',
+                'label' => 'Producción',
             ])
-            ->add('obligacion_acreedora',CheckboxType::class, [
+            ->add('obligacion_acreedora', CheckboxType::class, [
                 'required' => false,
                 'attr' => ['class' => 'mt-1'],
-                'label'=>'Obligación acreedora',
+                'label' => 'Obligación acreedora',
             ])
             ->add('id_tipo_cuenta', EntityType::class, [
                 'class' => TipoCuenta::class,
-                'label'=>'Tipo de cuenta',
+                'label' => 'Tipo de cuenta',
                 'choice_label' => 'nombre',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')

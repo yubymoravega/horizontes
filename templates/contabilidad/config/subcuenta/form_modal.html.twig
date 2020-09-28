@@ -31,6 +31,7 @@
     </div>
     <input type="text" id="id_subcuenta"  hidden>
     <input type="text" id="id_cuenta" hidden value="{{ id_cuenta }}">
+    <input type="text" name="page" id="page" value="{{ subcuentas.currentPageNumber }}" hidden>
 
     {{ form_end(form) }}
 {% endblock %}

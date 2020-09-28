@@ -127,12 +127,13 @@ const CONTAB_MSG = {
  *
  */
 const onDeleteConfirm = function (config) {
-    const {title = '', message = '', url, _token} = config
+    const {title = '', message = '', url, _token, page = null} = config
     $('#confirm__modal').modal('show')
     if (title !== '') $('#confirm__modal__title').html(title)
     if (message !== '') $('#confirm__modal__body').text(message)
 
     $('#_token__confirm__modal').val(_token)
+    $('#page__confirm__modal').val(page)
 
     $('#confirm__modal__btn_ok').click(function () {
         const form = $('#form__confirm__modal')

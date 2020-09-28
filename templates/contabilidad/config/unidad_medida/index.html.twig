@@ -1,20 +1,40 @@
-{% extends 'base.html.twig' %}
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
 
-{% block title %}Hello UnidadMedidaController!{% endblock %}
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Unidades de Medidas
+            </h4>
+        </div>
+        {# end header #}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/xampp/htdocs/app/src/Controller/Contabilidad/Config/UnidadMedidaController.php'|file_link(0) }}">src/Controller/Contabilidad/Config/UnidadMedidaController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/app/templates/contabilidad/config/unidad_medida/index.html.twig'|file_link(0) }}">templates/contabilidad/config/unidad_medida/index.html.twig</a></code></li>
-    </ul>
-</div>
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="10px">#</th>
+            <th scope="col-1">Nombre</th>
+            <th scope="col-1">Abreviatura</th>
+            </thead>
+            <tbody>
+            {% for item in unidad_medida %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.id }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.abreviatura }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
 {% endblock %}

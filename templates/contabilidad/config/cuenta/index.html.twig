@@ -80,7 +80,8 @@
                                     onclick="onDeleteConfirm({
                                             message:'Está seguro que desea eliminar la cuenta {{ item.nro_cuenta }} ?',
                                             url:'{{ path('contabilidad_config_cuenta_delete',{id: item.id}) }}',
-                                            _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                            _token: '{{ csrf_token('delete' ~ item.id) }}',
+                                            page: '{{ cuentas.currentPageNumber }}',
                                             })">
                                 <i class="fa fa-trash"></i>
                             </button>

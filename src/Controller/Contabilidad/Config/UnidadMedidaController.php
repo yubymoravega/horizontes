@@ -2,65 +2,57 @@
 
 namespace App\Controller\Contabilidad\Config;
 
-use App\CoreContabilidad\CrudController;
 use App\Entity\Contabilidad\Config\UnidadMedida;
-use App\Form\Contabilidad\Config\UnidadMedidaType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UnidadMedidaController
  * @package App\Controller\Contabilidad\Config
  * @Route("/contabilidad/config/unidad-medida")
  */
-class UnidadMedidaController extends CrudController
+class UnidadMedidaController extends AbstractController
 {
-
-    public function __construct()
-    {
-        $this->setTitle('Unidad de Medida');
-        $this->setLabel('nombre');
-        $this->setClassTypeName(UnidadMedidaType::class);
-        $this->setClassEntity(UnidadMedida::class);
-        $this->setMessages([
-            'add' => 'Datos guardados satisfactoriamente',
-            'edit' => 'Datos actualizados satisfactoriamente',
-            'delete' => $this->getTitle() . ' eliminado satisfactoriamente',
-            'not_exist' => 'El ' . $this->getTitle() . ' no pudo ser editado, no existe',
-        ]);
-        $this->setPaths([
-            'index' => 'contabilidad_config_unidad_medida',
-            'edit' => 'contabilidad_config_unidad_medida_edit',
-            'delete' => 'contabilidad_config_unidad_medida_delete',
-        ]);
-    }
 
     /**
      * @Route("/", name="contabilidad_config_unidad_medida", methods={"GET", "POST"})
      */
-    public
-    function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function index(EntityManagerInterface $em)
     {
-        return parent::index($em, $request, $validator);
+        $unidad_medida_arr = $em->getRepository(UnidadMedida::class)->findAll();
+        if (empty($unidad_medida_arr)) {
+            $config = Yaml::parse(file_get_contents('../src/Data/unidad_medida.yml'));
+            $um_yml = $config['unidad_medida'];
+            foreach ($um_yml as $tipos) {
+                $new_tipo = new UnidadMedida();
+                $new_tipo
+                    ->setNombre($tipos['nombre'])
+                    ->setActivo(true)
+                    ->getAbreviatura($tipos['abreviatura'])
+                    ->setId($tipos['id']);
+                $em->persist($new_tipo);
+            }
+            try {
+                $em->flush();
+            } catch (FileException $exception) {
+                return $exception->getMessage();
+            }
+        }
+        $unidad_medida_arr = $em->getRepository(UnidadMedida::class)->findAll();
+        $row = [];
+        foreach ($unidad_medida_arr as $unidadMedida) {
+            /**@var $unidadMedida UnidadMedida */
+            $row[] = array(
+                'nombre' => $unidadMedida->getNombre(),
+                'id' => $unidadMedida->getId(),
+                'abreviatura' => $unidadMedida->getAbreviatura()
+            );
+        }
+         return $this->render('contabilidad/config/unidad_medida/index.html.twig', [
+             'controller_name' => 'ConfInicialController',
+             'unidad_medida' => $row
+         ]);
     }
 
-    /**
-     * @Route("/{id}/edit",name="contabilidad_config_unidad_medida_edit", methods={"GET", "POST"})
-     */
-    public
-    function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
-    {
-        return parent::Update($em, $request, $validator, $id);
-    }
-
-    /**
-     * @Route("/{id}",name="contabilidad_config_unidad_medida_delete", methods={"DELETE"})
-     */
-    public
-    function Delete(EntityManagerInterface $em, Request $request, $id)
-    {
-        return parent::Delete($em, $request, $id);
-    }
 }

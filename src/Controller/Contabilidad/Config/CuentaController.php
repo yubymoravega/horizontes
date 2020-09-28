@@ -30,7 +30,7 @@ class CuentaController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         $form = $this->createForm(CuentaType::class);
-        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array('activo'=>true),array('nro_cuenta'=>'ASC'));
+        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array('activo' => true), array('nro_cuenta' => 'ASC'));
         $row = [];
         $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
         foreach ($cuentas_arr as $item) {
@@ -67,9 +67,10 @@ class CuentaController extends AbstractController
                 'criterios' => $str_criterios == '' ? '' : substr($str_criterios, 0, -2)
             );
         }
+
         $paginator = $pagination->paginate(
             $row,
-            $request->query->getInt('page', 1), /*page number*/
+            $request->query->getInt('page', $request->get("page") || 1), /*page number*/
             15, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
@@ -85,7 +86,7 @@ class CuentaController extends AbstractController
      */
     public function print(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
-        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array('activo'=>true),array('nro_cuenta'=>'ASC'));
+        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array('activo' => true), array('nro_cuenta' => 'ASC'));
         $row = [];
         $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
@@ -222,14 +223,19 @@ class CuentaController extends AbstractController
 
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
 
-        return $this->redirectToRoute('contabilidad_config_cuenta');
+        return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
     }
 
     /**
      * @Route("/upd/{id}", name="contabilidad_config_cuenta_upd", methods={"POST"})
      */
-    public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Cuenta $cuenta)
+    public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
+        $cuenta = $em->getRepository(Cuenta::class)->find($id);
+        $cuenta
+            ->setNroCuenta($request->get('cuenta')['nro_cuenta'])
+            ->setNombre($request->get('cuenta')['nombre'])
+            ->setDeudora($request->get('cuenta')['deudora']);
 
         $form = $this->createForm(CuentaType::class, $cuenta);
         $form->handleRequest($request);
@@ -288,7 +294,7 @@ class CuentaController extends AbstractController
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_cuenta');
+        return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
     }
 
     /**
@@ -324,7 +330,8 @@ class CuentaController extends AbstractController
             }
             $this->addFlash($success, $msg);
         }
-        return $this->redirectToRoute('contabilidad_config_cuenta');
+//        dd($request->get('page'));
+        return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
     }
 
     /**
