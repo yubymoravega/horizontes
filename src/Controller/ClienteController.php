@@ -62,8 +62,13 @@ class ClienteController extends AbstractController
 
             $dataBase->persist($cliente);
             $dataBase->flush();
+          
+            $this->addFlash(
+                'success',
+                'Cliente Agregado'
+            );
 
-            return $this->redirectToRoute('cliente-monto', ['tel' => $tel]);
+            return $this->redirectToRoute('categorias', ['tel' => $tel]);
         } else {
 
             return $this->render('cliente/registrar.html.twig', [
@@ -154,7 +159,12 @@ class ClienteController extends AbstractController
         }
     
     }
+
+    $this->addFlash(
+        'success',
+        'Cliente Editado'
+    );
    
-        return $this->redirectToRoute('cliente-monto', ['tel' => $tel]);
+        return $this->redirectToRoute('categorias', ['tel' => $tel]);
     }
 }

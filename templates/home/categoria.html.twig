@@ -7,7 +7,7 @@
 
 		<div class="card 1">
 			<div class="card_image">
-				<img src=""/>
+				<img src="{{ asset('images/servicios/TELECOMUNICACIONES.jpg') }}"/>
 			</div>
 			<div class="card_title title-white">
 				<p class="texto-servicio">Telecomunicaciones</p>
@@ -16,16 +16,16 @@
 
 		<div class="card 2">
 			<div class="card_image">
-				<img src=""/>
+				<img src="{{ asset('images/servicios/multiservicios.jpg') }}"/>
 			</div>
 			<div class="card_title title-white">
-				<p class="texto-servicio">Multi Servicios</p>
+				<p class="texto-servicio">Multi Servicios</p> 
 			</div>
 		</div>
 
 		<div class="card 3">
 			<div class="card_image">
-				<img src=""/>
+				<img src="{{ asset('images/servicios/TURISMO.jpg') }}"/>
 			</div>
 			<div class="card_title">
 				<p class="texto-servicio">Turismo</p>
@@ -34,6 +34,36 @@
 
 	</div>
 
+	<div class="cards-list">
+	
+		<div class="card 1">
+			<div class="card_image">
+				<img src="{{ asset('images/servicios/REMESAS.jpg') }}"/>
+			</div>
+			<div class="card_title title-white">
+				<a href="{{ path('remesas.beneficiarios', {'tel': tel}) }}"><p class="texto-servicio">Remesas</p></a>
+			</div>
+		</div>
+
+		<div class="card 2">
+			<div class="card_image">
+				<img src="{{ asset('images/servicios/paquetera.jpg') }}"/>
+			</div>
+			<div class="card_title title-white">
+				<p class="texto-servicio" style="color:black;" >Envios de Paquetes</p>
+			</div>
+		</div>
+
+		<div class="card 3">
+			<div class="card_image">
+				<img src=""/>
+			</div>
+			<div class="card_title">
+				<p class="texto-servicio"></p>
+			</div>
+		</div>
+
+	</div>
 
 	<style>
 

@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+	<!-- Classic Breadcrumbs-->
+
+	<section class="section novi-background section-66 section-sm-bottom-110">
+		
+        <div class="container">
+			<h1 class="text-reporte">{{titulo}}
+			</h1>
+			<hr class="divider bg-mantis">
+
+  <form id="payment-form" name='payment-form' action="{{ path('home/pais') }}" method="GET" >        
+  <div class="input-group input-group-sm mb-3">
+
+ <div class="input-group-prepend">
+  
+  </div>
+  <select name="pais" class="custom-select" >
+  <option value=0 selected>Pais</option>
+    
+    {% for pais in paises %}
+        <option value="{{pais.id}}">{{pais.nombre}}</option>
+    {% endfor %}
+
+  </select>
+
+  <div class="input-group-prepend">
+  </div>
+
+   <div class="input-group-prepend">
+  </div>
+ 
+<button  class="btn btn-sm btn-outline-dark" type="submit" >Filtrar</button>
+ 
+</div></form>
+
+
+  <button class="btn btn-sm btn-outline-dark" id="agregar" data-toggle="modal" data-target="#monedas">Monedas</button>
+ <div class="table-responsive clearfix">
+                <table class="table table-striped tabla-reporte">
+                  <tbody><tr>
+                  
+                  <th>Moneda</th> 
+                   <th>Accion</th> 
+                  </tr>
+                 {# table body #}
+        <tr>
+          {% for data in pagination %}
+              <tr {% if loop.index is odd %}class="color"{% endif %}>
+          
+          <td>{{ data[0].nombre }} </td>
+           <td> 
+           <a  onClick="reglas('{{ data.id }}');" > 		 
+<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
+  <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+</svg></a>
+
+<a  onClick="eliminar('{{ data.id }}');" > 
+<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+  <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+</svg>  </a>
+
+
+</td>
+     </tr>
+    {% endfor %}  
+             
+        </tr>
+                </tbody></table> <hr style="background-color: white; margin-top: 0px;">
+                {# display navigation #}
+                <div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+                <div class="count contador">Monedas: {{ pagination.getTotalItemCount }}</div>
+             
+              </div>
+	</div>
+    </section>
+
+    <!-- Modal -->
+<div class="modal fade" id="monedas" tabindex="-1" role="dialog" aria-labelledby="monedas" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Monedas</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+  <div class="input-group input-group-sm mb-3">
+
+ <div class="input-group-prepend">
+  
+  </div>
+  <select id="monedas" name="monedas" class="custom-select" >
+  <option value=0 selected>Monedas</option>
+    
+    {% for moneda in monedas %}
+        <option value="{{moneda.id}}">{{moneda.nombre}}</option>
+    {% endfor %}
+
+  </select>
+
+</div> 
+        
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="guardar-moneda" data-dismiss="modal">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+ {% block javascripts %} 
+{{parent()}}
+
+  <script>
+
+let params = new URLSearchParams(location.search);
+
+let pais = params.get('pais');
+
+if(pais > 0){
+
+     $('#agregar').css('border-radius', '25px');
+     $("#agregar").css("display","");
+}else{
+   $("#agregar").css("display","none"); 
+}
+
+$( "#guardar-moneda" ).click(function() {
+
+let moneda = $("#monedas option:selected").val();
+
+ $.ajax({
+            type: 'POST',
+            data: {'json' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/home/moneda/pais/"+moneda+'/'+pais,
+            dataType: 'json',
+            success: function (data) {
+              
+              window.location.href = "/home/pais?pais="+pais;
+				 
+            }
+        });
+});
+
+function eliminar(id) {
+
+   $('#confirm__modal').modal('show')
+
+    $( "#confirm__modal__btn_ok" ).click(function() {
+
+        $.ajax({
+            type: 'POST',
+            data: {'code' : '200'},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/home/moneda/delete/"+id,
+            dataType: 'html',
+            success: function (data) {
+
+               window.location.href = "/home/pais?pais="+pais;
+                
+            }}); 
+      });
+  }; 
+
+  function reglas(id) {
+
+    window.location.href = "/remesas/reglas/"+id;
+
+  }; 
+
+
+
+  </script>
+ 
+
+{% endblock %}

@@ -74,6 +74,7 @@
                                 </div>
                                 <!-- RD Navbar Nav-->
                                 <ul class="rd-navbar-nav">
+                            
                                    {# ------------ reporteCliente ------------------- #}
                                     {% include 'layout/reportecliente.html.twig' %}
 
@@ -130,8 +131,8 @@
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="shop-cart.html"><span class="icon novi-icon mdi mdi-lock"></span>Go
-                                        to
+                                            href="{{ url ('checkout') }}"><span class="icon novi-icon mdi mdi-lock"></span>Ir
+                                        a
                                         checkout</a></div>
                             </div>
 
@@ -143,6 +144,7 @@
                                     </div>
                                     <div class="col-10">
                                         <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                        <h5 class="rd-navbar-cart-total-title" id="monedaSys"></h5>
                                     </div>
                                 </div>
                                 <div class="text-center"><a

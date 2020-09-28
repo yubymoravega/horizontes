@@ -250,8 +250,8 @@ form#form_add_beneficiario {
 
 <script>
 
-let codeProvincia = {{beneficiario.provincia}};
-let codeMunicipio = {{beneficiario.municipio}};
+let codeProvincia = "{{beneficiario.provincia}}";
+let codeMunicipio = "{{beneficiario.municipio}}";
 
 
 
@@ -265,7 +265,9 @@ $( document ).ready(function() {
 
 	}
 
-   $('#cliente_beneficiario_provincias option[value="'+codeProvincia+'"]').attr("selected",true);
+$("#cliente_beneficiario_provincias option:contains("+codeProvincia+")").attr('selected', true);
+
+   
    let code = $('#cliente_beneficiario_provincias').find('option:selected').val() 
    let municipio = codeMunicipio;
 $.ajax({
@@ -295,7 +297,9 @@ $.ajax({
 						 $('#cliente_beneficiario_municipios').append("<option selected value="+ "'" +data[i].code+"'"+">"+data[i].nombre+"</option>");
 				}
           
-                         }          
+                         }    
+
+                         $("#cliente_beneficiario_municipios option:contains("+codeMunicipio+")").attr('selected', true);      
             }
         });
 
@@ -465,7 +469,7 @@ let respuestaForm =  validator.form();
 
 if(respuestaForm){
 
-	let idCarrito = {{id}};
+	let idCotizacion = {{id}};
 
 	let array = {};
 
@@ -486,8 +490,8 @@ if(respuestaForm){
 	array['apto'] = ($( "#cliente_beneficiario_apto" ).val() == "") ? null : $( "#cliente_beneficiario_apto" ).val();
 	array['edificio'] = ($( "#cliente_beneficiario_edificio" ).val() == "") ? null : $( "#cliente_beneficiario_edificio" ).val() ;
 	array['reparto'] = ($( "#cliente_beneficiario_reparto" ).val() == "") ? null : $( "#cliente_beneficiario_reparto" ).val();
-	array['provincia'] = $( "#cliente_beneficiario_provincias  option:selected" ).val();
-	array['municipio'] = $( "#cliente_beneficiario_municipios  option:selected" ).val();
+	array['provincia'] = $( "#cliente_beneficiario_provincias  option:selected" ).text();
+	array['municipio'] = $( "#cliente_beneficiario_municipios  option:selected" ).text();
 	array['idCliente'] = "{{beneficiario.idCliente}}";
 	array['fecha'] = "{{beneficiario.fecha}}";
 	array['empleado'] = "{{beneficiario.empleado}}";
@@ -501,15 +505,16 @@ if(respuestaForm){
 	array['comentario'] = ($( "#comentario" ).val() == "") ? null : $( "#comentario" ).val() ;
 
   let jsonString = JSON.stringify(array);
+ // jsonString = jsonString.replace(/\"/g, "");
 
   $.ajax({
             type: 'POST',
             data: {'json' : jsonString},
-            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas.json.editar.save/"+idCarrito,
-            dataType: 'html',
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/checkout/cotizacion/save/"+{{id}}+"/"+"{{beneficiario.orden}}",
+            dataType: 'json',
             success: function (data) {
 				
-				 window.location.href = "/remesas.beneficiarios/"+"{{beneficiario.idCliente}}";
+				 window.location.href = "/checkout/cotizacion/"+{{id}};
             }
         });
 
