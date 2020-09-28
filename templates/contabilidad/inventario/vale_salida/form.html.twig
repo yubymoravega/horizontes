@@ -49,7 +49,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Vale de Salida</h1>
+                        <h3 class="text-reporte text-right mr-0 text-white mt-2">Vale de salida de Mercancias</h3>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -58,7 +58,7 @@
             </div>
 
             <div class="card-body">
-                {{ form_start(formulario, {'attr':{'id':'vale_salida'}}) }}
+                {{ form_start(formulario.fecha_solicitud, {'attr':{'id':'vale_salida'}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.fecha_solicitud) }}
@@ -84,6 +84,7 @@
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
+                {{ form_end(formulario.fecha_solicitud) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
@@ -92,7 +93,7 @@
                     </div>
                 </div>
                 <hr color="dimgray" class="my-1 ml-2" size=3>
-
+                {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia'}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
                         {{ form_label(formulario.mercancia.codigo) }}
@@ -148,45 +149,46 @@
                         {{ form_widget(formulario.id_elemento_gasto) }}
                     </div>
                     <div class="col-2 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR</button>
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
                     </div>
                 </div>
-                {{ form_end(formulario) }}
-                </div>
-                <div>
-                    <table class="table-small-rows table table-hover text-light">
-                        <thead class="thead-dark">
-                        <th width="120px">Cod.</th>
-                        <th width="110px">Cant.</th>
-                        <th width="110px">Importe</th>
-                        <th width="110px">Precio</th>
-                        <th scope="col-1">Nueva Exist</th>
-                        <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
-                        <th scope="col-1" hidden>UM</th>
-                        <th scope="col-1" hidden>Descripcion</th>
-                        </thead>
-                        <tbody id="rows_mercancias">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="d-flex mt-2">
-                    <div class="mr-auto">
-                        <a href="{{ url('inventario') }}"
-                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
-                    </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
-                    </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
-                    </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitValeSalida">contabilizar</button>
-                    </div>
-                </div>
-
+                {{ form_end(formulario.mercancia) }}
             </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th width="120px">Cod.</th>
+                    <th width="110px">Cant.</th>
+                    <th width="110px">Importe</th>
+                    <th width="110px">Precio</th>
+                    <th scope="col-1">Nueva Exist</th>
+                    <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+                    <th scope="col-1" hidden>UM</th>
+                    <th scope="col-1" hidden>Descripcion</th>
+                    </thead>
+                    <tbody id="rows_mercancias">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a href="{{ url('inventario') }}"
+                       class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir</button>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitValeSalida">contabilizar</button>
+                </div>
+            </div>
+
         </div>
+    </div>
     </div>
 {% endblock %}
 {% block javascripts %}
@@ -200,7 +202,7 @@
         loadingModal.show()
 
         $(document).ready(function () {
-            $('#vale_salida_documento_importe_mercancia').prop('disabled',true)
+            $('#vale_salida_documento_importe_mercancia').prop('disabled', true)
             /** Ajax para obtener los nros consecutivos**/
             $.ajax({
                 url: '/contabilidad/inventario/vale-salida/get-nros-vales-salida',
@@ -209,8 +211,8 @@
                 success: function (result) {
                     consecutivo = result.nros
                     $('#select_nros').val(consecutivo)
-                    $('#select_nros').prop('max',consecutivo)
-                    $('#select_nros').prop('min',1)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
                     loadingModal.close()
                 },
                 error: function () {
@@ -218,30 +220,26 @@
             })
 
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
-            $('#select_nros').on('change',function(){
-                if($('#select_nros').val()==consecutivo){
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
                     $('#btnSubbmitValeSalida').show()
-                }
-                else{
+                } else {
                     $('#btnSubbmitValeSalida').hide()
                 }
             })
-            $('#select_nros').on('keyup',function(){
-                if($('#select_nros').val()==consecutivo){
+            $('#select_nros').on('keyup', function () {
+                if ($('#select_nros').val() == consecutivo) {
                     $('#btnSubbmitValeSalida').show()
                     $('#btnImprimir').show()
-                }
-                else if ($('#select_nros').val()>consecutivo){
+                } else if ($('#select_nros').val() > consecutivo) {
                     $('#btnSubbmitValeSalida').hide()
                     $('#btnImprimir').hide()
-                    alertTemplate('El mayor número permitido es '+consecutivo,'danger')
-                }
-                else if($('#select_nros').val() == ''){
+                    alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                } else if ($('#select_nros').val() == '') {
                     $('#btnSubbmitValeSalida').hide()
                     $('#btnImprimir').hide()
-                    alertTemplate('Debe introducir el número del documento a vizualizar.','danger')
-                }
-                else{
+                    alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                } else {
                     $('#btnImprimir').show()
                     $('#btnSubbmitValeSalida').hide()
                 }
@@ -255,10 +253,16 @@
                 success: function (result) {
                     cuentas_inventarios = result.cuentas_inventario
                     $(result.cuentas_inventario).each(function (pos, valor) {
-                        $('#vale_salida_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        $('#vale_salida_nro_cuenta_deudora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
-                    $(result.cuentas_acrredoras).each(function (pos, valor) {
-                        $('#vale_salida_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                    $(result.monedas).each(function (pos, valor) {
+                        $('#vale_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.cento_costo).each(function (pos, valor) {
+                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.elemento_gasto).each(function (pos, valor) {
+                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
                     loadingModal.close()
                 },
@@ -269,9 +273,9 @@
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
                 let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
-                let cuenta = $('#vale_salida_nro_cuenta_inventario').val() != '' ? $('#vale_salida_nro_cuenta_inventario').val() : ''
+                let cuenta = $('#vale_salida_nro_cuenta_deudora').val() != '' ? $('#vale_salida_nro_cuenta_deudora').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo +','+ cuenta,
+                    url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo + ',' + cuenta,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -293,22 +297,20 @@
             })
 
             $('#vale_salida_mercancia_codigo').on('keyup', function (e) {
-                if (e.which == 13){
+                if (e.which == 13) {
                     let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
-                    let cuenta = $('#vale_salida_nro_cuenta_inventario').val() != '' ? $('#vale_salida_nro_cuenta_inventario').val() : ''
                     $.ajax({
-                        url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo +','+ cuenta,
+                        url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo,
                         method: 'POST',
                         dataType: 'json',
                         success: function (result) {
                             mercancias = result.mercancias
-                            if(mercancias.length>0){
+                            if (mercancias.length > 0) {
                                 $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                 $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
                                 $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
-                            }
-                            else{
-                                alert('no existen mercancias con ese código')
+                            } else {
+                                alertTemplate('No existen mercancias con ese código', 'danger')
                             }
                         },
                         error: function () {
@@ -317,28 +319,28 @@
                 }
             })
 
-            $('#vale_salida_documento_importe_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#vale_salida_documento_importe_mercancia').val())
-                let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
-                if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(3)
-                    $('#vale_salida_mercancia_precio').val(precio_final)
-                } else {
-                    $('#vale_salida_mercancia_precio').val(0)
-                }
-            })
-
             $('#vale_salida_documento_cantidad_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#vale_salida_documento_importe_mercancia').val())
+                let precio = parseFloat($('#vale_salida_mercancia_precio').val())
+                let existencia = parseFloat($('#vale_salida_mercancia_existencia').val())
                 let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
-                if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(3)
-                    $('#vale_salida_mercancia_precio').val(precio_final)
+                if (cantidad <= existencia) {
+                    if (cantidad > 0) {
+                        let importe = parseFloat(precio * cantidad).toFixed(3)
+                        $('#vale_salida_documento_importe_mercancia').val(importe)
+                    } else {
+                        $('#vale_salida_documento_importe_mercancia').val(0)
+                    }
+                    if (cantidad == 0 || cantidad == '') {
+                        $('#vale_salida_mercancia_existencia_decremento').val(0)
+                    } else {
+                        let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
+                        $('#vale_salida_mercancia_existencia_decremento').val(existencia_inicial - parseFloat($('#vale_salida_documento_cantidad_mercancia').val()))
+                    }
                 } else {
-                    $('#vale_salida_mercancia_precio').val(0)
+                    if (cantidad > 0)
+                        alertTemplate('La cantidas supera la existencia', 'danger')
+                    $('#vale_salida_documento_cantidad_mercancia').val('')
                 }
-                let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
-                $('#vale_salida_mercancia_existencia_decremento').val(existencia_inicial - parseFloat($('#vale_salida_documento_cantidad_mercancia').val()))
             })
 
             $('#vale_salida_mercancia_codigo').on('keyup', function () {
@@ -347,12 +349,12 @@
                 $('#vale_salida_mercancia_existencia').val('')
             })
 
-            $('#vale_salida_nro_cuenta_inventario').on('change', function () {
-                $('#vale_salida_nro_subcuenta_inventario').find('option').remove()
+            $('#vale_salida_nro_cuenta_deudora').on('change', function () {
+                $('#vale_salida_nro_subcuenta_deudora').find('option').remove()
                 cuentas_inventarios.forEach(function (valor, pos) {
-                    if ($('#vale_salida_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                    if ($('#vale_salida_nro_cuenta_deudora').val() == valor.nro_cuenta) {
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                            $('#vale_salida_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            $('#vale_salida_nro_subcuenta_deudora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })
@@ -407,7 +409,7 @@
                 }
             })
 
-            $("#btnSubbmitInforme").click(function (e) {
+            $("#btnSubbmitValeSalida").click(function (e) {
                 if (form_vale_salida.valid()) {
                     if (list_mercancia.length) {
                         let data = form_vale_salida.serializeArray()
@@ -421,7 +423,7 @@
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_vale_salida') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_vale_salida_gestionar') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)
@@ -448,12 +450,14 @@
                     let nueva_existencia = $('#vale_salida_mercancia_existencia_decremento').val()
                     let um = $('#vale_salida_mercancia_id_unidad_medida').val()
                     let descripcion = $('#vale_salida_mercancia_descripcion').val()
+                    let centro_costo = $('#vale_salida_id_centro_costo').val()
+                    let elemento_gasto = $('#vale_salida_id_elemento_gasto').val()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
-                        list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
+                        list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion,centro_costo,elemento_gasto})
                         importe_total += Number.parseFloat(importe)
 
                         $("#importe-total").text('$' + importe_total)
@@ -478,6 +482,8 @@
                         $('#vale_salida_documento_importe_mercancia').val('')
                         $('#vale_salida_mercancia_precio').val('')
                         $('#vale_salida_mercancia_existencia_decremento').val('')
+                        $('#vale_salida_id_centro_costo').val(0)
+                        $('#vale_salida_id_elemento_gasto').val(0)
                     }
 
                 }

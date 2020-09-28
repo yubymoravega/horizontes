@@ -15,8 +15,10 @@ configuraciones:
     - id: 6
       name: "TRANSFERENCIA DE SALIDA"
     - id: 7
-      name: "VALE DE SALIDA"
+      name: "VALE DE SALIDA MERCANCIA"
     - id: 8
+      name: "VALE DE SALIDA PRODUCTO"
+    - id: 9
       name: "DEVOLUCION"
 
   modulo:

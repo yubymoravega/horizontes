@@ -52,8 +52,11 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">Ajuste</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Transferencia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Vale de
-                            salida</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center" style="font-weight:300">Vale de salida</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Mercancia</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Producto</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">

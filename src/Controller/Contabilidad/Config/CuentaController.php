@@ -230,11 +230,13 @@ class CuentaController extends AbstractController
      */
     public function updCuenta(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Cuenta $cuenta)
     {
+
         $form = $this->createForm(CuentaType::class, $cuenta);
         $form->handleRequest($request);
         $errors = $validator->validate($cuenta);
         if ($form->isValid() && $form->isSubmitted()) {
             try {
+                dd($request->get('cuenta'),$request );
                 $naturaleza = $request->get('cuenta')['deudora'];
                 $field_deudora = true;
                 $field_mixta = false;
