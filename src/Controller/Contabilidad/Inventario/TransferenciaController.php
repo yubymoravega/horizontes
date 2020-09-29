@@ -94,7 +94,6 @@ class TransferenciaController extends AbstractController
             $subcuenta_acreedora = $transferencia_entrada['nro_subcuenta_acreedora'];
             $id_unidad_origen = isset($transferencia_entrada['id_unidad']) ? $transferencia_entrada['id_unidad'] : '';
             $id_almacen_origen = isset($transferencia_entrada['id_almacen']) ? $transferencia_entrada['id_almacen'] : '';
-            $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
 
             ////0-obtengo el numero consecutivo de documento
             /// aqui va la fecha del cierre pero como aun no esta hecho cojo la del servidor, para ir trabajando
@@ -118,15 +117,6 @@ class TransferenciaController extends AbstractController
                         $contador++;
                 }
                 $consecutivo = $contador + 1;
-
-
-                //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
-                $sub_cuenta_er = $em->getRepository(Subcuenta::class);
-                $cuenta_er = $em->getRepository(Cuenta::class);
-                $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
-                    'nro_cuenta' => $cuenta_acreedora,
-                    'activo' => true
-                ));
 
                 //2-adicionar en documento
                 $today = Date('Y-m-d');
@@ -255,7 +245,7 @@ class TransferenciaController extends AbstractController
                 } catch (FileException $e) {
                     return $e->getMessage();
                 }
-                return new JsonResponse(['success' => true, 'msg' => 'Transferencia de entrada adicionado satisfactoriamente.']);
+                return new JsonResponse(['success' => true, 'msg' => 'Transferencia realizada satisfactoriamente.']);
             } else {
                 return new JsonResponse(['success' => false, 'msg' => 'Usted no es empleado de la empresa.']);
             }
