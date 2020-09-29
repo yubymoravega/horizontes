@@ -53,6 +53,11 @@ class TransferenciaType extends AbstractType
                 'label' => 'Subcuenta de inventario',
                 'choice_label' => 'nro_subcuenta',
             ))
+            ->add('nro_subcuenta_acreedora', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Subcuenta acreedora',
+                'choice_label' => 'nro_subcuenta',
+            ))
             ->add('nro_cuenta_acreedora', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Cuenta acreedora',

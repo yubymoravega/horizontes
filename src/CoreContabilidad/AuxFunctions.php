@@ -283,7 +283,7 @@ class AuxFunctions
     public static function getCuentasAcreedoras($em)
     {
         $cuenta_er = $em->getRepository(Cuenta::class);
-
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
         $row_acreedoras = array();
 
         $arr_cuentas_acreedoras = $cuenta_er->findBy(array(
@@ -292,9 +292,28 @@ class AuxFunctions
         ));
         foreach ($arr_cuentas_acreedoras as $cuenta) {
             /**@var $cuenta Cuenta */
+
+            //------aqui cargo las subcuentas de la cuenta
+            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                'activo' => true,
+                'id_cuenta' => $cuenta->getId()
+            ));
+            $rows = [];
+            if (!empty($arr_obj_subcuentas)) {
+                foreach ($arr_obj_subcuentas as $subcuenta) {
+                    /**@var $subcuenta Subcuenta* */
+                    $rows [] = array(
+                        'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '. trim($subcuenta->getDescripcion()),
+                        'id' => $subcuenta->getId()
+                    );
+                }
+            }
+
             $row_acreedoras [] = array(
                 'nro_cuenta' => trim($cuenta->getNroCuenta()).' - '.trim($cuenta->getNombre()),
-                'id' => $cuenta->getId()
+                'id' => $cuenta->getId(),
+                'sub_cuenta' => $rows
             );
         }
         return $row_acreedoras;
