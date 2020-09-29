@@ -33,14 +33,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class ValeSalidaController
+ * Class ValeSalidaProductoController
  * @package App\Controller\Contabilidad\Inventario
- * @Route("/contabilidad/inventario/vale-salida")
+ * @Route("/contabilidad/inventario/vale-salida-producto")
  */
-class ValeSalidaController extends AbstractController
+class ValeSalidaProductoController extends AbstractController
 {
     /**
-     * @Route("/", name="contabilidad_inventario_vale_salida", methods={"GET"})
+     * @Route("/", name="contabilidad_inventario_vale_salida_producto", methods={"GET"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -67,14 +67,14 @@ class ValeSalidaController extends AbstractController
                 );
             }
         }
-        return $this->render('contabilidad/inventario/vale_salida/index.html.twig', [
+        return $this->render('contabilidad/inventario/vale_salida_producto/index.html.twig', [
             'controller_name' => 'ValeSalidaController',
             'vales' => $rows
         ]);
     }
 
     /**
-     * @Route("/get-nros-vales-salida", name="contabilidad_inventario_vale_salida_get_nros", methods={"POST"})
+     * @Route("/get-nros-vales-salida", name="contabilidad_inventario_vale_salida_producto_get_nros", methods={"POST"})
      */
     public function getNros(EntityManagerInterface $em, Request $request)
     {
@@ -82,11 +82,11 @@ class ValeSalidaController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em, $vale_salida_er, $year_, $id_usuario, $idalmacen,['producto'=>false],'ValeSalida');
+        $row = AuxFunctions::getConsecutivos($em, $vale_salida_er, $year_, $id_usuario, $idalmacen,['producto'=>true],'ValeSalida');
         $arr_obj_eliminado = $vale_salida_er->findBy(array(
             'anno'=>$year_,
             'activo'=>false,
-            'producto'=>false
+            'producto'=>true
         ));
         $arr_eliminados = [];
         foreach ($arr_obj_eliminado as $key=>$eliminado){
@@ -97,7 +97,7 @@ class ValeSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_vale_salida_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_vale_salida_producto_gestionar_getMercancia", methods={"POST"})
      */
     public function getMercancia(Request $request, $codigo)
     {
@@ -130,7 +130,7 @@ class ValeSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/getCuentas", name="contabilidad_inventario_vale_salida_gestionar_getCuentas", methods={"POST"})
+     * @Route("/getCuentas", name="contabilidad_inventario_vale_salida_producto_gestionar_getCuentas", methods={"POST"})
      */
     public function getCuentas()
     {
@@ -213,7 +213,7 @@ class ValeSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/form-add", name="contabilidad_inventario_vale_salida_gestionar", methods={"GET","POST"})
+     * @Route("/form-add", name="contabilidad_inventario_vale_salida_producto_gestionar", methods={"GET","POST"})
      */
     public function gestionarVale(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -355,7 +355,7 @@ class ValeSalidaController extends AbstractController
                 }
             }
         }
-        return $this->render('contabilidad/inventario/vale_salida/form.html.twig', [
+        return $this->render('contabilidad/inventario/vale_salida_producto/form.html.twig', [
             'controller_name' => 'CRUDValeSalida',
             'formulario' => $form->createView()
         ]);
@@ -363,7 +363,7 @@ class ValeSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/getVale/{nro}", name="contabilidad_inventario_vale_salida_get_vale",methods={"POST"})
+     * @Route("/getVale/{nro}", name="contabilidad_inventario_vale_salida_producto_get_vale",methods={"POST"})
      */
     public function getVale(EntityManagerInterface $em, $nro)
     {
@@ -421,7 +421,7 @@ class ValeSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{nro}", name="contabilidad_inventario_vale_salida_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_vale_salida_producto_delete", methods={"DELETE"})
      */
     public function deleteInforme(Request $request, $nro)
     {
@@ -430,7 +430,7 @@ class ValeSalidaController extends AbstractController
         $year_ = Date('Y');
         $obj_vale = $em->getRepository(ValeSalida::class)->findOneBy(array(
             'nro_consecutivo' => $nro,
-            'producto' => false,
+            'producto' => true,
             'anno' => $year_
         ));
         $msg = 'No se pudo eliminar el vale de salida seleccionado';
@@ -480,11 +480,11 @@ class ValeSalidaController extends AbstractController
             }
         }
         $this->addFlash($success, $msg);
-        return $this->redirectToRoute('contabilidad_inventario_vale_salida_gestionar');
+        return $this->redirectToRoute('contabilidad_inventario_vale_salida_producto_gestionar');
     }
 
     /**
-     * @Route("/print-report/{nro}", name="contabilidad_inventario_vale_salida_print",methods={"GET"})
+     * @Route("/print-report/{nro}", name="contabilidad_inventario_vale_salida_producto_print",methods={"GET"})
      */
     public function print(EntityManagerInterface $em, $nro)
     {
@@ -494,7 +494,7 @@ class ValeSalidaController extends AbstractController
         $year_ = Date('Y');
         $vale_salida_obj = $vale_salida_er->findOneBy(array(
             'nro_consecutivo' => $nro,
-            'producto'=>false,
+            'producto'=>true,
             'anno'=>$year_
         ));
 
@@ -544,7 +544,7 @@ class ValeSalidaController extends AbstractController
             }
 
         }
-        return $this->render('contabilidad/inventario/vale_salida/print.html.twig', [
+        return $this->render('contabilidad/inventario/vale_salida_producto/print.html.twig', [
             'controller_name' => 'ValeSalidaControllerPrint',
             'datos' => array(
                 'importe_total' => number_format($importe_total, 2, '.', ''),

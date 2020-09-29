@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 {% block content %}
     {# Modal de Cuentas#}
-    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
+    <div class="modal fade" id="listarProductosModal" tabindex="-1" role="dialog" data-backdrop="static"
          data-keyboard="false"
-         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
+         aria-labelledby="listarProductosModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-dark">
-                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias</h4>
+                    <h4 class="modal-title text-light" id="listarProductosModalLabel">Listado de productos</h4>
                     <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -34,7 +34,7 @@
                         </div>
                         <div class="ml-2">
                             <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
-                                    onclick="SeleccionarMercancia()"
+                                    onclick="SeleccionarProducto()"
                                     data-dismiss="modal">Seleccionar
                             </button>
                         </div>
@@ -49,7 +49,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h3 class="text-reporte text-right mr-0 text-white mt-2">Vale de salida de Mercancias</h3>
+                        <h3 class="text-reporte text-right mr-0 text-white mt-2">Vale de salida de Productos</h3>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -86,7 +86,7 @@
                 </div>
                 {{ form_end(formulario.fecha_solicitud) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
-                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Productos</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
                         <span class="pr-1">Importe Total : </span>
                         <span id="importe-total">0</span>
@@ -103,7 +103,7 @@
                             </div>
                             <div class="col-1 mt-0 p-0">
                                 <button class="btn btn-secondary btn-sm" data-toggle="modal" type="button"
-                                        data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
+                                        data-target="#listarProductosModal" id="btnSearchProducto"><i
                                             class="fa fa-search"></i></button>
                             </div>
                         </div>
@@ -149,7 +149,7 @@
                         {{ form_widget(formulario.id_elemento_gasto) }}
                     </div>
                     <div class="col-2 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarProducto">ADICIONAR
                         </button>
                     </div>
                 </div>
@@ -256,7 +256,7 @@
                     if ($('#vale_salida_mercancia_codigo').val() !== '') {
                         let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
                         $.ajax({
-                            url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo,
+                            url: '/contabilidad/inventario/vale-salida-producto/getProducto/' + codigo,
                             method: 'POST',
                             dataType: 'json',
                             success: function (result) {
@@ -284,12 +284,12 @@
                     $('#vale_salida_mercancia_existencia').val('')
                 }
             })
-            $('#btnSearchMercancia').on('click', function () {
+            $('#btnSearchProducto').on('click', function () {
                 $('#rows_table').find('tr').remove();
                 let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
                 let cuenta = $('#vale_salida_nro_cuenta_deudora').val() != '' ? $('#vale_salida_nro_cuenta_deudora').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo + ',' + cuenta,
+                    url: '/contabilidad/inventario/vale-salida-producto/getProducto/' + codigo + ',' + cuenta,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -405,7 +405,7 @@
                         loadingModal.show()
                         data.push({name: 'vale_salida[list_mercancia]', value: JSON.stringify(list_mercancia)})
                         $.ajax({
-                            url: '/contabilidad/inventario/vale-salida/form-add',
+                            url: '/contabilidad/inventario/vale-salida-producto/form-add',
                             method: 'POST',
                             data: data,
                             dataType: 'json',
@@ -427,7 +427,7 @@
             });
             let list_mercancia = []
             let importe_total = 0;
-            $('#btnAplicarMercancia').on('click', function () {
+            $('#btnAplicarProducto').on('click', function () {
                 if (form_mercancia.valid()) {
                     let codigo = $('#vale_salida_mercancia_codigo').val()
                     let cant = $('#vale_salida_documento_cantidad_mercancia').val()
@@ -496,7 +496,7 @@
             })
         })
 
-        function SeleccionarMercancia() {
+        function SeleccionarProducto() {
             for (var i = 0; i < mercancias.length; i++) {
                 let id = '#' + mercancias[i]['codigo']
                 if ($(id).prop('checked') == true) {
@@ -534,7 +534,7 @@
             } else {
                 loadingModal.show()
                 $.ajax({
-                    url: '/contabilidad/inventario/vale-salida/getVale/' + nro_vale,
+                    url: '/contabilidad/inventario/vale-salida-producto/getVale/' + nro_vale,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
@@ -584,7 +584,7 @@
             $('#vale_salida_documento_importe_mercancia').prop('disabled', true)
             /** Ajax para obtener los nros consecutivos**/
             $.ajax({
-                url: '/contabilidad/inventario/vale-salida/get-nros-vales-salida',
+                url: '/contabilidad/inventario/vale-salida-producto/get-nros-vales-salida',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -599,7 +599,7 @@
                 }
             })
             $.ajax({
-                url: '/contabilidad/inventario/vale-salida/getCuentas',
+                url: '/contabilidad/inventario/vale-salida-producto/getCuentas',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -635,14 +635,14 @@
                 const form = $('#form__confirm__modal')
                 $('#confirm__modal').modal('hide')
                 loadingModal.show('Cancelando...')
-                let url = '/contabilidad/inventario/vale-salida/delete/' + $('#select_nros').val()
+                let url = '/contabilidad/inventario/vale-salida-producto/delete/' + $('#select_nros').val()
                 form.attr('action', url)
                 form.submit()
             })
         }
 
         function Print_Vale() {
-            let url = '/contabilidad/inventario/vale-salida/print-report/' + $('#select_nros').val()
+            let url = '/contabilidad/inventario/vale-salida-producto/print-report/' + $('#select_nros').val()
             window.open(url, 'blank_')
         }
     </script>

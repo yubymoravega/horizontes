@@ -53,7 +53,6 @@ class AuxFunctions
      */
     public static function getConsecutivos(EntityManagerInterface $em, EntityRepository $er, int $anno, int $id_usuario, int $id_almacen, array $criterio = [], string $entidad = '')
     {
-
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,
             'id_usuario' => $id_usuario
@@ -61,7 +60,7 @@ class AuxFunctions
         $rows = array();
         if ($obj_empleado) {
             $id_unidad = $obj_empleado->getIdUnidad()->getId();
-            if ($entidad == 'InformeRecepcion' || $entidad == 'Ajuste' || $entidad == 'Transferencia') {
+            if ($entidad == 'InformeRecepcion' || $entidad == 'Ajuste' || $entidad == 'Transferencia' || $entidad == 'ValeSalida') {
                 $condicionales = array_merge($criterio,['anno' => $anno]);
                 $arreglo = $er->findBy($condicionales);
             } else {
