@@ -102,7 +102,6 @@ class InformeRecepcionProductoController extends AbstractController
                     $id_unidad = $obj_empleado->getIdUnidad()->getId();
                     $informes_recepcion_arr = $em->getRepository(InformeRecepcion::class)->findBy(array(
                         'anno' => $year_,
-                        'activo' => true,
                         'producto' => true
                     ));
                     $contador = 0;
