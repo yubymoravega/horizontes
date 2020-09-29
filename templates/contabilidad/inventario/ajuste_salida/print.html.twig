@@ -19,42 +19,22 @@
         }
     </style>
 
-    <title>Imprimir Transferencia de Entrada</title>
+    <title>Imprimir Ajuste Entrada</title>
 </head>
 <body>
 <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
     <table border="1" width="960px" class="mt-1">
         <tbody>
         <tr>
-            <td colspan="7" height="70px" class="font-weight-bold text-center">TRANSFERENCIA DE ENTRADA</td>
+            <td colspan="7" height="70px" class="font-weight-bold text-center">AJUSTE DE ENTRADA</td>
         </tr>
         <tr>
             <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>
-            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_transferencia }}
-            </td>
+            <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_ajuste }}</td>
         </tr>
         <tr>
             <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>
         </tr>
-        </tbody>
-    </table>
-    <table border="1" width="960px">
-        <tbody>
-        {% if datos.unidad_origen == '' %}
-            <tr>
-                <td colspan="7" class="text-center"><strong>Almacén de Origen </strong></td>
-            </tr>
-            <tr>
-                <td colspan="7">{{ datos.almacen_origen }}</td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7" class="text-center"><strong>Unidad de Origen</strong></td>
-            </tr>
-            <tr>
-                <td colspan="7">{{ datos.unidad_origen }}</td>
-            </tr>
-        {% endif %}
         </tbody>
     </table>
     <table border="1" width="960px">
@@ -90,12 +70,15 @@
             <td width="100" class="font-weight-bold text-right">{{ datos.importe_total }}</td>
             <td width="100" class="font-weight-bold text-center"></td>
         </tr>
-        <tr class="p-3">
-            <td style="border: 0px !important;" colspan="7" height="30px;"></td>
+        <tr>
+            <td colspan="7" class="font-weight-bold">Observación:</td>
+        </tr>
+        <tr>
+            <td colspan="7">{{ datos.observacion }}</td>
         </tr>
         </tbody>
     </table>
-    <table border="1px" width="960px" id="footer">
+    <table border="1px" width="960px" id="footer" class="mt-1">
         <tbody>
         <tr class="mt-1">
             <td valign="TOP" width="155" height="75px;" class="text-capitalize"><strong>Jefe de Almacén</strong>
@@ -104,7 +87,7 @@
             <td valign="TOP" width="155"><strong>Recepciona</strong></td>
             <td valign="TOP" width="155"><strong>Contabiliza</strong></td>
             <td valign="TOP" width="165"><strong>Submayor</strong></td>
-            <td valign="TOP" width="100" class="text-center"><strong> TE-{{ datos.nro_solicitud }}</strong></td>
+            <td valign="TOP" width="100" class="text-center"><strong> AE-{{ datos.nro_solicitud }}</strong></td>
         </tr>
         </tbody>
     </table>

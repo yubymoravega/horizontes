@@ -242,7 +242,6 @@ class CuentaController extends AbstractController
         $errors = $validator->validate($cuenta);
         if ($form->isValid() && $form->isSubmitted()) {
             try {
-                dd($request->get('cuenta'),$request );
                 $naturaleza = $request->get('cuenta')['deudora'];
                 $field_deudora = true;
                 $field_mixta = false;

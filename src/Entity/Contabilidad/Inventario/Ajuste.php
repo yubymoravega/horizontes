@@ -46,6 +46,11 @@ class Ajuste
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $nro_subcuenta_acreedora;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $nro_concecutivo;
 
     /**
@@ -160,6 +165,17 @@ class Ajuste
     public function setNroSubcuentaInventario(string $nro_subcuenta_inventario): self
     {
         $this->nro_subcuenta_inventario = $nro_subcuenta_inventario;
+
+        return $this;
+    }
+    public function getNroSubcuentanroAcreedora(): ?string
+    {
+        return $this->nro_subcuenta_acreedora;
+    }
+
+    public function setNroSubcuentaAcreedora(string $nro_subcuenta_acreedora): self
+    {
+        $this->nro_subcuenta_acreedora = $nro_subcuenta_acreedora;
 
         return $this;
     }

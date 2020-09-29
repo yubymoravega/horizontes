@@ -35,7 +35,7 @@
                         <div class="ml-2">
                             <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
                                     onclick="SeleccionarMercancia()"
-                                    data-dismiss="modal">Aceptar
+                                    data-dismiss="modal">Seleccionar
                             </button>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Ajuste de Entrada </h1>
+                        <h1 class="text-reporte text-right mr-0">Ajuste de Salida </h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -60,24 +60,14 @@
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'ajuste_entrada'}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-6 pr-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_cuenta_inventario) }}
-                        {{ form_widget(formulario.nro_cuenta_inventario) }}
+                        {{ form_label(formulario.nro_cuenta_deudora) }}
+                        {{ form_widget(formulario.nro_cuenta_deudora) }}
                     </div>
                     <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_subcuenta_inventario) }}
-                        {{ form_widget(formulario.nro_subcuenta_inventario) }}
+                        {{ form_label(formulario.nro_subcuenta_deudora) }}
+                        {{ form_widget(formulario.nro_subcuenta_deudora) }}
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
-                </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_cuenta_acreedora) }}
-                        {{ form_widget(formulario.nro_cuenta_acreedora) }}
-                    </div>
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_subcuenta_acreedora) }}
-                        {{ form_widget(formulario.nro_subcuenta_acreedora) }}
-                    </div>
                 </div>
                 <div class="row mt-0 p-0">
                     <div class="col-8 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">

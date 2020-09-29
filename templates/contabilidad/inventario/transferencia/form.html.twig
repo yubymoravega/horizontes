@@ -73,17 +73,23 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.nro_cuenta_inventario) }}
                         {{ form_widget(formulario.nro_cuenta_inventario) }}
                     </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.nro_subcuenta_inventario) }}
                         {{ form_widget(formulario.nro_subcuenta_inventario) }}
                     </div>
-                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_subcuenta_acreedora) }}
+                        {{ form_widget(formulario.nro_subcuenta_acreedora) }}
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
@@ -208,6 +214,7 @@
         let mercancias = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
+        let cuentas_acreedoras = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -280,6 +287,7 @@
                             const cuenta = $('#transferencia_nro_cuenta_inventario')
                             const subcuenta = $('#transferencia_nro_subcuenta_inventario')
                             const cuenta_acreedora = $('#transferencia_nro_cuenta_acreedora')
+                            const subcuenta_acreedora = $('#transferencia_nro_subcuenta_acreedora')
                             const moneda = $('#transferencia_documento_id_moneda')
                             const unidad = $('#transferencia_id_unidad')
                             const almacen = $('#transferencia_id_almacen')
@@ -289,6 +297,7 @@
                             cuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_inventario} </option>`);
                             subcuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_cuenta_inventario} </option>`);
                             cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
+                            subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_acreedora} </option>`);
                             moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
                             unidad.prepend(`<option selected = "false" value = "0" disabled> ${data.unidad} </option>`);
                             almacen.prepend(`<option selected = "false" value = "0" disabled> ${data.almacen} </option>`);
@@ -313,7 +322,6 @@
                         } else {
                             loadingModal.close()
                             alertTemplate(result.msg, 'danger')
-                            // $('#select_nros').val(consecutivo)
                         }
                     },
                     error: function () {
@@ -333,6 +341,7 @@
                     dataType: 'json',
                     success: function (result) {
                         cuentas_inventarios = result.cuentas_inventario
+                        cuentas_acreedoras = result.cuentas_acreedoras
                         $(result.cuentas_inventario).each(function (pos, valor) {
                             $('#transferencia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
@@ -347,6 +356,9 @@
                         })
                         $(result.almacenes).each(function (pos, valor) {
                             $('#transferencia_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.cuentas_acreedoras).each(function (pos, valor) {
+                            $('#transferencia_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
                         loadingModal.close()
                     },
@@ -453,6 +465,18 @@
                 })
             })
 
+            $('#transferencia_nro_cuenta_acreedora').on('change', function () {
+                $('#transferencia_nro_subcuenta_acreedora').find('option').remove()
+                cuentas_acreedoras.forEach(function (valor, pos) {
+                    if ($('#transferencia_nro_cuenta_acreedora').val() == valor.nro_cuenta) {
+                        $('#transferencia_nro_subcuenta_acreedora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            $('#transferencia_nro_subcuenta_acreedora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+            })
+
             $('#transferencia_id_unidad').on('change', function () {
                 $('#transferencia_id_almacen').val(0)
             })
@@ -474,6 +498,7 @@
                     'transferencia[nro_cuenta_inventario]': "required",
                     'transferencia[nro_subcuenta_inventario]': "required",
                     'transferencia[nro_cuenta_acreedora]': "required",
+                    'transferencia[nro_subcuenta_acreedora]': "required",
                     'transferencia[documento][id_moneda]': "required",
                 },
                 messages: {
@@ -481,6 +506,7 @@
                     'transferencia[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'transferencia[nro_subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })

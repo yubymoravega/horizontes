@@ -10,11 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-<<<<<<< HEAD:migrations/Version20200929194227.php
-final class Version20200929194227 extends AbstractMigration
-=======
-final class Version20200929155818 extends AbstractMigration
->>>>>>> 2f84ba1b106e51ef88e7543ce00d8f9d50ab1ff2:migrations/Version20200929155818.php
+final class Version20200929150917 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -24,20 +20,16 @@ final class Version20200929155818 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-<<<<<<< HEAD:migrations/Version20200929194227.php
+        $this->addSql('ALTER TABLE ajuste ADD nro_subcuenta_acreedora VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE unidad_medida CHANGE id id INT NOT NULL');
-=======
-        $this->addSql('ALTER TABLE transferencia ADD nro_subcuenta_acreedora VARCHAR(255) NOT NULL');
->>>>>>> 2f84ba1b106e51ef88e7543ce00d8f9d50ab1ff2:migrations/Version20200929155818.php
+        $this->addSql('ALTER TABLE vale_salida ADD producto TINYINT(1) NOT NULL');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-<<<<<<< HEAD:migrations/Version20200929194227.php
+        $this->addSql('ALTER TABLE ajuste DROP nro_subcuenta_acreedora');
         $this->addSql('ALTER TABLE unidad_medida CHANGE id id INT AUTO_INCREMENT NOT NULL');
-=======
-        $this->addSql('ALTER TABLE transferencia DROP nro_subcuenta_acreedora');
->>>>>>> 2f84ba1b106e51ef88e7543ce00d8f9d50ab1ff2:migrations/Version20200929155818.php
+        $this->addSql('ALTER TABLE vale_salida DROP producto');
     }
 }
