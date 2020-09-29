@@ -5,6 +5,7 @@ namespace App\Controller\Contabilidad\Config;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Yaml\Yaml;
 
@@ -21,17 +22,25 @@ class UnidadMedidaController extends AbstractController
      */
     public function index(EntityManagerInterface $em)
     {
-        $unidad_medida_arr = $em->getRepository(UnidadMedida::class)->findAll();
-        if (empty($unidad_medida_arr)) {
-            $config = Yaml::parse(file_get_contents('../src/Data/unidad_medida.yml'));
-            $um_yml = $config['unidad_medida'];
-            foreach ($um_yml as $tipos) {
+        $um_er = $em->getRepository(UnidadMedida::class);
+        $config = Yaml::parse(file_get_contents('../src/Data/unidad_medida.yml'));
+        $um_yml = $config['unidad_medida'];
+        foreach ($um_yml as $item) {
+            $um = $um_er->find($item['id']);
+            if ($um) {
+                /**@var $um UnidadMedida* */
+                $um
+                    ->setNombre($item['nombre'])
+                    ->setAbreviatura($item['abreviatura'])
+                    ->setActivo(true);
+                $em->persist($um);
+            } else {
                 $new_tipo = new UnidadMedida();
                 $new_tipo
-                    ->setNombre($tipos['nombre'])
+                    ->setNombre($item['nombre'])
                     ->setActivo(true)
-                    ->setAbreviatura($tipos['abreviatura'])
-                    ->setId($tipos['id']);
+                    ->setAbreviatura($item['abreviatura'])
+                    ->setId($item['id']);
                 $em->persist($new_tipo);
             }
             try {
