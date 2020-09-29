@@ -13,7 +13,7 @@ class AjusteSalidaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('mercancia', MercanciaType::class, [
+            ->add('mercancia', MercanciaSalidaType::class, [
                 'mapped' => false,
                 'auto_initialize' => true
             ])
@@ -36,6 +36,16 @@ class AjusteSalidaType extends AbstractType
                 'mapped' => true,
                 'attr' => ['class' => 'w-100']
             ])
+            ->add('id_centro_costo', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Centro costo',
+                'choice_label' => 'codigo',
+            ))
+            ->add('id_elemento_gasto', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Elemento de gasto',
+                'choice_label' => 'codigo',
+            ))
             ->add('list_mercancia', HiddenType::class);
     }
 }
