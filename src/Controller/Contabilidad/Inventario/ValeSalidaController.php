@@ -202,11 +202,10 @@ class ValeSalidaController extends AbstractController
         }
     }
 
-
     /**
      * @Route("/form-add", name="contabilidad_inventario_vale_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarInforme(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function gestionarVale(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
         $form = $this->createForm(ValeSalidaType::class);
         $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
@@ -354,5 +353,64 @@ class ValeSalidaController extends AbstractController
         ]);
 
     }
+
+    /**
+     * @Route("/getVale/{nro}", name="contabilidad_inventario_vale_salida_get_vale",methods={"POST"})
+     */
+    public function getVale(EntityManagerInterface $em, $nro)
+    {
+        $vale_salida_er = $em->getRepository(ValeSalida::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+        $year_ = Date('Y');
+        $vale_obj = $vale_salida_er->findOneBy(array(
+            'nro_consecutivo' => $nro,
+            'producto' => false,
+            'anno'=>$year_
+        ));
+
+        if (!$vale_obj) {
+            return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de vale no existe.']);
+        }
+        /**@var $vale_obj ValeSalida**/
+        if($vale_obj->getActivo()==false)
+            return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El vale ha sido eliminado.']);
+
+        $importe_total = 0;
+        $rows_movimientos = [];
+
+        $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(7),
+            'id_documento' => $vale_obj->getIdDocumento()
+        ));
+
+        foreach ($arr_movimiento_mercancia as $obj) {
+            /**@var $obj MovimientoMercancia* */
+            $rows_movimientos[] = array(
+                'id' => $obj->getIdMercancia()->getId(),
+                'codigo' => $obj->getIdMercancia()->getCodigo(),
+                'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'existencia' => $obj->getExistencia(),
+                'cantidad' => $obj->getCantidad(),
+                'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                'importe' => number_format($obj->getImporte(), 2, '.', ''),
+            );
+            $importe_total += $obj->getImporte();
+        }
+
+        $rows = array(
+            'id'=>$vale_obj->getId(),
+            'nro_cuenta_deudora'=>$vale_obj->getNroCuentaDeudora(),
+            'nro_subcuenta_deudora'=>$vale_obj->getNroSubcuentaDeudora(),
+            'nro_solicitud'=>$vale_obj->getNroSolicitud(),
+            'fecha_solicitud'=>$vale_obj->getFechaSolicitud()->format('d/m/Y'),
+            'id_moneda'=>$vale_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda'=>$vale_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total'=>$importe_total,
+            'mercancias'=>$rows_movimientos
+        );
+        return new JsonResponse([['vale' => $rows, 'success' => true, 'msg' => 'Vale de salida recuperado con éxito.']]);
+    }
+
 
 }

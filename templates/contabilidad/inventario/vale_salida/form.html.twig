@@ -186,11 +186,10 @@
                     <button class='my-0 btn btn-secondary' id="btnSubbmitValeSalida">contabilizar</button>
                 </div>
             </div>
-
         </div>
     </div>
-    </div>
 {% endblock %}
+
 {% block javascripts %}
     {{ parent() }}
     <script>
@@ -198,78 +197,93 @@
         let mercancias = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
+        let eliminados = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
         $(document).ready(function () {
-            $('#vale_salida_documento_importe_mercancia').prop('disabled', true)
-            /** Ajax para obtener los nros consecutivos**/
-            $.ajax({
-                url: '/contabilidad/inventario/vale-salida/get-nros-vales-salida',
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    consecutivo = result.nros
-                    $('#select_nros').val(consecutivo)
-                    $('#select_nros').prop('max', consecutivo)
-                    $('#select_nros').prop('min', 1)
-                    loadingModal.close()
-                },
-                error: function () {
+            cargarDatosIniciales()
+
+            /** BLOQUE JQuery DEL SELECTOR DE NUMEROS CONSECUTIVOS DEL DOCUMENTO**/
+            $('#select_nros').on('keyup', function (e) {
+                if (e.which == 13) {
+                    if ($('#select_nros').val() != '') {
+                        if (eliminados.includes($('#select_nros').val())) {
+                            $('#btnSubbmitValeSalida').hide()
+                            $('#btnImprimir').hide()
+                            $('#btnCancelar').hide()
+                            resetFormulario()
+                            alertTemplate('El vale de salida solicitado se encuentra cancelado', 'danger')
+                        } else {
+                            if ($('#select_nros').val() == consecutivo) {
+                                $('#btnSubbmitValeSalida').show()
+                                $('#btnImprimir').show()
+                                $('#btnCancelar').hide()
+                                resetFormulario()
+                            } else if ($('#select_nros').val() > consecutivo) {
+                                $('#btnSubbmitValeSalida').hide()
+                                $('#btnImprimir').hide()
+                                $('#btnCancelar').hide()
+                                resetFormulario()
+                                alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                            } else if ($('#select_nros').val() == '') {
+                                $('#btnSubbmitValeSalida').hide()
+                                $('#btnImprimir').hide()
+                                $('#btnCancelar').hide()
+                                resetFormulario()
+                                alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                            } else {
+                                $('#btnImprimir').show()
+                                $('#btnSubbmitValeSalida').hide()
+                                $('#form_mercancia').css('display', 'none')
+                                $('#btnCancelar').show()
+                                llenarFormulario($('#select_nros').val())
+                            }
+                        }
+                    } else {
+                        $('#btnImprimir').hide()
+                        $('#btnSubbmitValeSalida').hide()
+                        $('#btnCancelar').hide()
+                        alertTemplate('Tiene que introducir el número del vale de salida','danger')
+                    }
                 }
             })
+            /** FIN BLOQUE JQuery DEL SELECTOR DE NUMEROS CONSECUTIVOS DEL DOCUMENTO**/
 
-            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
-            $('#select_nros').on('change', function () {
-                if ($('#select_nros').val() == consecutivo) {
-                    $('#btnSubbmitValeSalida').show()
+            /*** BLOQUE DE JQuery DE MERCANCIA ***/
+            $('#vale_salida_mercancia_codigo').on('keyup', function (e) {
+                if (e.which == 13) {
+                    if ($('#vale_salida_mercancia_codigo').val() !== '') {
+                        let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
+                        $.ajax({
+                            url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código', 'danger')
+                                }
+                            },
+                            error: function () {
+                                $('#vale_salida_mercancia_descripcion').val('')
+                                $('#vale_salida_mercancia_existencia').val('')
+                                $('#vale_salida_mercancia_precio').val('')
+                            }
+                        })
+                    } else {
+                        alertTemplate('Debe ingresar el codigo de la mercancía a buscar.', 'danger')
+                    }
                 } else {
-                    $('#btnSubbmitValeSalida').hide()
+                    $('#vale_salida_mercancia_descripcion').val('')
+                    $('#vale_salida_mercancia_precio').val('')
+                    $('#vale_salida_mercancia_existencia').val('')
                 }
             })
-            $('#select_nros').on('keyup', function () {
-                if ($('#select_nros').val() == consecutivo) {
-                    $('#btnSubbmitValeSalida').show()
-                    $('#btnImprimir').show()
-                } else if ($('#select_nros').val() > consecutivo) {
-                    $('#btnSubbmitValeSalida').hide()
-                    $('#btnImprimir').hide()
-                    alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
-                } else if ($('#select_nros').val() == '') {
-                    $('#btnSubbmitValeSalida').hide()
-                    $('#btnImprimir').hide()
-                    alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
-                } else {
-                    $('#btnImprimir').show()
-                    $('#btnSubbmitValeSalida').hide()
-                }
-            })
-
-
-            $.ajax({
-                url: '/contabilidad/inventario/vale-salida/getCuentas',
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    cuentas_inventarios = result.cuentas_inventario
-                    $(result.cuentas_inventario).each(function (pos, valor) {
-                        $('#vale_salida_nro_cuenta_deudora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
-                    })
-                    $(result.monedas).each(function (pos, valor) {
-                        $('#vale_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                    })
-                    $(result.cento_costo).each(function (pos, valor) {
-                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                    })
-                    $(result.elemento_gasto).each(function (pos, valor) {
-                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                    })
-                    loadingModal.close()
-                },
-                error: function () {
-                }
-            })
-
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
                 let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
@@ -295,30 +309,6 @@
                     }
                 })
             })
-
-            $('#vale_salida_mercancia_codigo').on('keyup', function (e) {
-                if (e.which == 13) {
-                    let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
-                    $.ajax({
-                        url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function (result) {
-                            mercancias = result.mercancias
-                            if (mercancias.length > 0) {
-                                $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
-                                $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
-                            } else {
-                                alertTemplate('No existen mercancias con ese código', 'danger')
-                            }
-                        },
-                        error: function () {
-                        }
-                    })
-                }
-            })
-
             $('#vale_salida_documento_cantidad_mercancia').on('keyup', function () {
                 let precio = parseFloat($('#vale_salida_mercancia_precio').val())
                 let existencia = parseFloat($('#vale_salida_mercancia_existencia').val())
@@ -342,12 +332,8 @@
                     $('#vale_salida_documento_cantidad_mercancia').val('')
                 }
             })
+            /*** FIN BLOQUE DE JQuery DE MERCANCIA ***/
 
-            $('#vale_salida_mercancia_codigo').on('keyup', function () {
-                $('#vale_salida_mercancia_descripcion').val('')
-                $('#vale_salida_mercancia_precio').val('')
-                $('#vale_salida_mercancia_existencia').val('')
-            })
 
             $('#vale_salida_nro_cuenta_deudora').on('change', function () {
                 $('#vale_salida_nro_subcuenta_deudora').find('option').remove()
@@ -360,8 +346,9 @@
                 })
             })
 
+            /*** BLOQUE DE VALIDACIONES(CAMPOS OBLIGATORIOS)*********/
             const form_vale_salida = $('#vale_salida')
-
+            const form_mercancia = $('#form_mercancia')
             form_vale_salida.validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
@@ -369,24 +356,20 @@
                     error.insertAfter(element);
                 },
                 rules: {
-                    'vale_salida[codigo_factura]': "required",
-                    'vale_salida[fecha_factura]': "required",
-                    'vale_salida[id_proveedor]': "required",
-                    'vale_salida[nro_cuenta_inventario]': "required",
-                    'vale_salida[nro_subcuenta_inventario]': "required",
-                    'vale_salida[nro_cuenta_acreedora]': "required",
+                    'vale_salida[fecha_solicitud]': "required",
+                    'vale_salida[nro_solicitud]': "required",
+                    'vale_salida[nro_cuenta_deudora]': "required",
+                    'vale_salida[nro_subcuenta_deudora]': "required",
+                    'vale_salida[documento][id_moneda]': "required",
                 },
                 messages: {
-                    'vale_salida[codigo_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[fecha_solicitud]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[nro_solicitud]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[nro_cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[nro_subcuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
-
-            const form_mercancia = $('#form_mercancia')
             form_mercancia.validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
@@ -399,15 +382,20 @@
                     'vale_salida[mercancia][id_unidad_medida]': "required",
                     'vale_salida[documento][cantidad_mercancia]': "required",
                     'vale_salida[documento][importe_mercancia]': "required",
+                    'vale_salida[id_centro_costo]': "required",
+                    'vale_salida[id_elemento_gasto]': "required",
                 },
                 messages: {
                     'vale_salida[mercancia][codigo]': 'Obligatorio!',
                     'vale_salida[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[id_centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[id_elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'vale_salida[documento][cantidad_mercancia]': 'Obligatorio!',
                     'vale_salida[documento][importe_mercancia]': 'Obligatorio!',
                 }
             })
+            /*** FIN BLOQUE DE VALIDACIONES(CAMPOS OBLIGATORIOS)*********/
 
             $("#btnSubbmitValeSalida").click(function (e) {
                 if (form_vale_salida.valid()) {
@@ -433,14 +421,12 @@
                             }
                         })
                     } else {
-                        alertTemplate('El Informe de Recepción debe contener algunas mercancias', 'danger')
+                        alertTemplate('El Vale de Salida debe contener alguna mercancia', 'danger')
                     }
                 }
             });
-
             let list_mercancia = []
             let importe_total = 0;
-
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
                     let codigo = $('#vale_salida_mercancia_codigo').val()
@@ -457,7 +443,17 @@
                     if (list_mercancia.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
-                        list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion,centro_costo,elemento_gasto})
+                        list_mercancia.push({
+                            codigo,
+                            cant,
+                            importe,
+                            precio,
+                            nueva_existencia,
+                            um,
+                            descripcion,
+                            centro_costo,
+                            elemento_gasto
+                        })
                         importe_total += Number.parseFloat(importe)
 
                         $("#importe-total").text('$' + importe_total)
@@ -513,7 +509,119 @@
             }
         }
 
+        /////////////////////////////////////////////
+        function resetFormulario() {
+            $('#btnCancelar').hide()
+            $('#vale_salida_fecha_solicitud').attr('type', 'date')
+            $('#form_mercancia').css('display', 'block')
+            $('#vale_salida')[0].reset()
+            $('#form_mercancia')[0].reset()
+            let ids = ['_nro_cuenta_deudora', '_nro_subcuenta_deudora', '_documento_id_moneda','_id_centro_costo','_id_elemento_gasto']
+            for (let i = 0; i < ids.length; i++) {
+                $("#vale_salida" + ids[i]).find('option').remove()
+                $("#vale_salida" + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            }
+
+            $("#importe-total").text('$ 0.00')
+            $('#rows_mercancias').find('tr').remove()
+            cargarDatosIniciales()
+        }
+
+        function llenarFormulario(nro_vale) {
+            if (nro_vale < 1) {
+                alertTemplate('El menor número permitido es 1', 'danger')
+                resetFormulario()
+            } else {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/inventario/vale-salida/getVale/' + nro_vale,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result[0].success == true) {
+                            let vale = result[0].vale;
+                            let ids = ['_nro_cuenta_deudora', '_nro_subcuenta_deudora', '_documento_id_moneda']
+                            for (let i = 0; i < ids.length; i++) {
+                                $("#vale_salida" + ids[i]).find('option').remove()
+                            }
+                            $('#rows_mercancias').find('tr').remove();
+                            $('#vale_salida_nro_cuenta_deudora').prepend('<option selected value = ' + vale.nro_cuenta_deudora + '>' + vale.nro_cuenta_deudora + '</option>');
+                            $('#vale_salida_nro_subcuenta_deudora').prepend('<option selected value = ' + vale.nro_subcuenta_deudora + '>' + vale.nro_subcuenta_deudora + '</option>');
+                            $('#vale_salida_documento_id_moneda').prepend('<option selected value = ' + vale.id_moneda + '>' + vale.moneda + '</option>');
+                            $('#vale_salida_nro_solicitud').val(vale.nro_solicitud);
+                            $('#vale_salida_fecha_solicitud').attr('type', 'text')
+                            $('#vale_salida_fecha_solicitud').val(vale.fecha_solicitud);
+
+                            let mercancias = vale.mercancias
+                            $("#importe-total").text('$' + vale.importe_total)
+                            for (var i = 0; i < mercancias.length; i++) {
+                                $('#rows_mercancias').append(`<tr>
+                                    <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['importe']}</td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['precio']} </td>
+                                    <td style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td></td>
+                                   </tr>`
+                                );
+                            }
+                            loadingModal.close()
+                        }
+                        if (result[0].success == false) {
+                            loadingModal.close()
+                            alertTemplate(result.msg, 'danger')
+                        }
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+        }
+
+        function cargarDatosIniciales() {
+            $('#btnCancelar').hide()
+            $('#vale_salida_fecha_solicitud').attr('type', 'date')
+            $('#vale_salida_documento_importe_mercancia').prop('disabled', true)
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/vale-salida/get-nros-vales-salida',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+            $.ajax({
+                url: '/contabilidad/inventario/vale-salida/getCuentas',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    cuentas_inventarios = result.cuentas_inventario
+                    $(result.cuentas_inventario).each(function (pos, valor) {
+                        $('#vale_salida_nro_cuenta_deudora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                    })
+                    $(result.monedas).each(function (pos, valor) {
+                        $('#vale_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.cento_costo).each(function (pos, valor) {
+                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.elemento_gasto).each(function (pos, valor) {
+                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+        }
 
     </script>
 {% endblock %}
-

@@ -600,9 +600,10 @@ class InformeRecepcionController extends AbstractController
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
         $proveedor_er = $em->getRepository(Proveedor::class);
-
+        $year_ = Date('Y');
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'nro_concecutivo' => $nro,
+            'anno'=>$year_,
             'producto' => false
         ));
 
