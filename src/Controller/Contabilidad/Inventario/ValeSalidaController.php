@@ -177,41 +177,6 @@ class ValeSalidaController extends AbstractController
         return new JsonResponse(['cuentas_inventario' => $row_inventario, 'monedas' => $monedas, 'proveedores' => $proveedores, 'cento_costo' => $centro_costo, 'elemento_gasto' => $elemento, 'success' => true]);
     }
 
-    public function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
-    {
-        $obj_cuenta = $cuenta_er->findOneBy(array(
-            'activo' => true,
-            'nro_cuenta' => $nro_cuenta
-        ));
-        if ($obj_cuenta) {
-            /**@var $obj_cuenta Cuenta* */
-            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
-                'activo' => true,
-                'id_cuenta' => $obj_cuenta->getId()
-            ));
-            if (!empty($arr_obj_subcuentas)) {
-                $rows = [];
-                $subcuentas_array = explode('-', $str_subcuentas);
-                foreach ($arr_obj_subcuentas as $subcuenta) {
-                    /**@var $subcuenta Subcuenta* */
-                    foreach ($subcuentas_array as $nro_subcuenta) {
-                        if ($subcuenta->getNroSubcuenta() == trim($nro_subcuenta))
-                            $rows [] = array(
-                                'nro_cuenta' => $nro_cuenta,
-                                'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
-                                'id' => $subcuenta->getId()
-                            );
-                    }
-                }
-                return $rows;
-            } else {
-                return '';
-            }
-        } else {
-            return '';
-        }
-    }
-
     /**
      * @Route("/form-add", name="contabilidad_inventario_vale_salida_gestionar", methods={"GET","POST"})
      */
@@ -247,6 +212,7 @@ class ValeSalidaController extends AbstractController
                     $id_unidad = $obj_empleado->getIdUnidad()->getId();
                     $vale_salida_arr = $em->getRepository(ValeSalida::class)->findBy(array(
                         'anno' => $year_,
+                        'producto'=>false
                     ));
                     $contador = 0;
                     foreach ($vale_salida_arr as $obj) {

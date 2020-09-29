@@ -20,6 +20,8 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\InformeRecepcionType;
@@ -82,41 +84,42 @@ class ValeSalidaProductoController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em, $vale_salida_er, $year_, $id_usuario, $idalmacen,['producto'=>true],'ValeSalida');
+        $row = AuxFunctions::getConsecutivos($em, $vale_salida_er, $year_, $id_usuario, $idalmacen, ['producto' => true], 'ValeSalida');
         $arr_obj_eliminado = $vale_salida_er->findBy(array(
-            'anno'=>$year_,
-            'activo'=>false,
-            'producto'=>true
+            'anno' => $year_,
+            'activo' => false,
+            'producto' => true
         ));
         $arr_eliminados = [];
-        foreach ($arr_obj_eliminado as $key=>$eliminado){
-            /**@var $eliminado ValeSalida***/
-            $arr_eliminados[$key]=$eliminado->getNroConsecutivo();
+        foreach ($arr_obj_eliminado as $key => $eliminado) {
+            /**@var $eliminado ValeSalida** */
+            $arr_eliminados[$key] = $eliminado->getNroConsecutivo();
         }
-        return new JsonResponse(['nros' => $row, 'eliminados'=>$arr_eliminados,'success' => true]);
+        return new JsonResponse(['nros' => $row, 'eliminados' => $arr_eliminados, 'success' => true]);
     }
 
     /**
-     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_vale_salida_producto_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getProductos/{codigo}", name="contabilidad_inventario_vale_salida_producto_gestionar_getProductos", methods={"POST"})
      */
-    public function getMercancia(Request $request, $codigo)
+    public function getProductos(Request $request, $codigo)
     {
+
         $em = $this->getDoctrine()->getManager();
-        if ($codigo == -1)
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
+        if ($codigo == -1 || $codigo == '-1')
+            $productos_arr = $em->getRepository(Producto::class)->findBy(array(
                 'activo' => true,
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
             ));
         else
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
+            $productos_arr = $em->getRepository(Producto::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
-                'codigo' => $codigo
+                'codigo' => $codigo,
             ));
 
         $row = array();
-        foreach ($mercancia_arr as $obj) {
-            /**@var $obj Mercancia* */
+        foreach ($productos_arr as $obj) {
+            /**@var $obj Producto* */
             $row [] = array(
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
@@ -126,7 +129,7 @@ class ValeSalidaProductoController extends AbstractController
                 'existencia' => $obj->getExistencia()
             );
         }
-        return new JsonResponse(['mercancias' => $row, 'success' => true]);
+        return new JsonResponse(['productos' => $row, 'success' => true]);
     }
 
     /**
@@ -177,41 +180,6 @@ class ValeSalidaProductoController extends AbstractController
         return new JsonResponse(['cuentas_inventario' => $row_inventario, 'monedas' => $monedas, 'proveedores' => $proveedores, 'cento_costo' => $centro_costo, 'elemento_gasto' => $elemento, 'success' => true]);
     }
 
-    public function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
-    {
-        $obj_cuenta = $cuenta_er->findOneBy(array(
-            'activo' => true,
-            'nro_cuenta' => $nro_cuenta
-        ));
-        if ($obj_cuenta) {
-            /**@var $obj_cuenta Cuenta* */
-            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
-                'activo' => true,
-                'id_cuenta' => $obj_cuenta->getId()
-            ));
-            if (!empty($arr_obj_subcuentas)) {
-                $rows = [];
-                $subcuentas_array = explode('-', $str_subcuentas);
-                foreach ($arr_obj_subcuentas as $subcuenta) {
-                    /**@var $subcuenta Subcuenta* */
-                    foreach ($subcuentas_array as $nro_subcuenta) {
-                        if ($subcuenta->getNroSubcuenta() == trim($nro_subcuenta))
-                            $rows [] = array(
-                                'nro_cuenta' => $nro_cuenta,
-                                'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
-                                'id' => $subcuenta->getId()
-                            );
-                    }
-                }
-                return $rows;
-            } else {
-                return '';
-            }
-        } else {
-            return '';
-        }
-    }
-
     /**
      * @Route("/form-add", name="contabilidad_inventario_vale_salida_producto_gestionar", methods={"GET","POST"})
      */
@@ -247,6 +215,7 @@ class ValeSalidaProductoController extends AbstractController
                     $id_unidad = $obj_empleado->getIdUnidad()->getId();
                     $vale_salida_arr = $em->getRepository(ValeSalida::class)->findBy(array(
                         'anno' => $year_,
+                        'producto'=>true
                     ));
                     $contador = 0;
                     foreach ($vale_salida_arr as $obj) {
@@ -278,29 +247,27 @@ class ValeSalidaProductoController extends AbstractController
                         ->setNroSolicitud($nro_solicitud)
                         ->setNroCuentaDeudora(AuxFunctions::getNro($nro_cuenta_deudora))
                         ->setNroSubcuentaDeudora(AuxFunctions::getNro($nro_subcuenta_deudora))
-                        ->setProducto(false);
+                        ->setProducto(true);
                     $em->persist($vale_salida);
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
-                    $mercancia_er = $em->getRepository(Mercancia::class);
+                    $producto_er = $em->getRepository(Producto::class);
                     $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->find(7);
+                    $obj_tipo_documento = $tipo_documento_er->find(8);
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $mercancia) {
                             $codigo_mercancia = $mercancia['codigo'];
                             $cantidad_mercancia = $mercancia['cant'];
-                            $descripcion = $mercancia['descripcion'];
                             $importe_mercancia = $mercancia['importe'];
-                            $unidad_medida = $mercancia['um'];
                             $centro_costo = $mercancia['centro_costo'];
                             $elemento_gasto = $mercancia['elemento_gasto'];
 
                             $importe_total += floatval($importe_mercancia);
 
                             //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
-                            $movimiento_mercancia = new MovimientoMercancia();
-                            $movimiento_mercancia
+                            $movimiento_producto = new MovimientoProducto();
+                            $movimiento_producto
                                 ->setActivo(true)
                                 ->setImporte(floatval($importe_mercancia))
                                 ->setEntrada(false)
@@ -313,7 +280,7 @@ class ValeSalidaProductoController extends AbstractController
                                 ->setIdUsuario($this->getUser());
 
                             //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
-                            $obj_mercancia = $mercancia_er->findOneBy(array(
+                            $obj_mercancia = $producto_er->findOneBy(array(
                                 'codigo' => $codigo_mercancia,
                                 'id_amlacen' => $id_almacen,
                                 'activo' => true
@@ -331,11 +298,11 @@ class ValeSalidaProductoController extends AbstractController
                                     $obj_mercancia->setActivo(false);
                                 $em->persist($obj_mercancia);
 
-                                $movimiento_mercancia
-                                    ->setIdMercancia($obj_mercancia)
+                                $movimiento_producto
+                                    ->setIdProducto($obj_mercancia)
                                     ->setExistencia($obj_mercancia->getExistencia());
                             }
-                            $em->persist($movimiento_mercancia);
+                            $em->persist($movimiento_producto);
                         }
                     }
 
@@ -368,12 +335,12 @@ class ValeSalidaProductoController extends AbstractController
     public function getVale(EntityManagerInterface $em, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
-        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
         $year_ = Date('Y');
         $vale_obj = $vale_salida_er->findOneBy(array(
             'nro_consecutivo' => $nro,
-            'producto' => false,
+            'producto' => true,
             'anno' => $year_
         ));
 
@@ -387,17 +354,17 @@ class ValeSalidaProductoController extends AbstractController
         $importe_total = 0;
         $rows_movimientos = [];
 
-        $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
-            'id_tipo_documento' => $tipo_documento_er->find(7),
+        $movimiento_productos_arr = $movimiento_producto_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(8),
             'id_documento' => $vale_obj->getIdDocumento()
         ));
 
-        foreach ($arr_movimiento_mercancia as $obj) {
-            /**@var $obj MovimientoMercancia* */
+        foreach ($movimiento_productos_arr as $obj) {
+            /**@var $obj MovimientoProducto* */
             $rows_movimientos[] = array(
-                'id' => $obj->getIdMercancia()->getId(),
-                'codigo' => $obj->getIdMercancia()->getCodigo(),
-                'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'id' => $obj->getIdProducto()->getId(),
+                'codigo' => $obj->getIdProducto()->getCodigo(),
+                'descripcion' => $obj->getIdProducto()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
@@ -415,7 +382,7 @@ class ValeSalidaProductoController extends AbstractController
             'id_moneda' => $vale_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $vale_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,
-            'mercancias' => $rows_movimientos
+            'productos' => $rows_movimientos
         );
         return new JsonResponse([['vale' => $rows, 'success' => true, 'msg' => 'Vale de salida recuperado con éxito.']]);
     }
@@ -442,29 +409,29 @@ class ValeSalidaProductoController extends AbstractController
             /**@var $obj_documento Documento* */
             $obj_documento->setActivo(false);
 
-            $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
+            $arr_movimientos_productos = $em->getRepository(MovimientoProducto::class)->findBy(array(
                 'id_documento' => $obj_documento->getId(),
                 'activo' => true
             ));
 
             //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
-            if (!empty($arr_movimientos_mercancia)) {
-                foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
-                    /**@var $obj_movimiento_mercancia MovimientoMercancia* */
-                    $obj_movimiento_mercancia
+            if (!empty($arr_movimientos_productos)) {
+                foreach ($arr_movimientos_productos as $obj_movimiento_producto) {
+                    /**@var $obj_movimiento_producto Producto* */
+                    $obj_movimiento_producto
                         ->setActivo(false);
-                    $em->persist($obj_movimiento_mercancia);
+                    $em->persist($obj_movimiento_producto);
 
-                    /**@var $obj_mercancia Mercancia* */
-                    $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
-                    $nueva_existencia = $obj_mercancia->getExistencia() + $obj_movimiento_mercancia->getCantidad();
-                    $nuevo_importe = $obj_mercancia->getImporte() + $obj_movimiento_mercancia->getImporte();
-                    $obj_mercancia
+                    /**@var $obj_producto Producto* */
+                    $obj_producto = $obj_movimiento_producto->getIdProducto();
+                    $nueva_existencia = $obj_producto->getExistencia() + $obj_movimiento_producto->getCantidad();
+                    $nuevo_importe = $obj_producto->getImporte() + $obj_movimiento_producto->getImporte();
+                    $obj_producto
                         ->setExistencia($nueva_existencia)
                         ->setImporte($nuevo_importe)
                         ->setActivo(true);
 
-                    $em->persist($obj_mercancia);
+                    $em->persist($obj_producto);
                 }
             }
             try {
@@ -489,16 +456,16 @@ class ValeSalidaProductoController extends AbstractController
     public function print(EntityManagerInterface $em, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
-        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
         $year_ = Date('Y');
         $vale_salida_obj = $vale_salida_er->findOneBy(array(
             'nro_consecutivo' => $nro,
-            'producto'=>true,
-            'anno'=>$year_
+            'producto' => true,
+            'anno' => $year_
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->find(7);
+        $obj_tipo_documento = $tipo_documento_er->find(8);
         $rows = [];
         $almacen = '';
         $fecha_solicitud = '';
@@ -513,27 +480,27 @@ class ValeSalidaProductoController extends AbstractController
             $nro_solicitud = $vale_salida_obj->getNroSolicitud();
             $fecha_vale = $vale_salida_obj->getIdDocumento()->getFecha()->format('d/m/Y');
             $nro_consecutivo = $vale_salida_obj->getNroConsecutivo();
-            $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            $arr_movimiento_producto = $movimiento_producto_er->findBy(array(
                 'id_tipo_documento' => $obj_tipo_documento->getId(),
                 'id_documento' => $vale_salida_obj->getIdDocumento()->getId(),
                 'activo' => true
             ));
 
-            if (!empty($arr_movimiento_mercancia)) {
-                /** @var  $mov_mercancia MovimientoMercancia */
-                $mov_mercancia = $arr_movimiento_mercancia[0];
-                $id_usuario_movimiento = $mov_mercancia->getIdUsuario()->getId();
+            if (!empty($arr_movimiento_producto)) {
+                /** @var  $mov_producto MovimientoProducto */
+                $mov_producto = $arr_movimiento_producto[0];
+                $id_usuario_movimiento = $mov_producto->getIdUsuario()->getId();
                 /** @var Empleado $obj_empleado */
                 $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
                     'id_usuario' => $id_usuario_movimiento
                 ));
                 $unidad = $obj_empleado->getIdUnidad()->getNombre();
-                foreach ($arr_movimiento_mercancia as $obj) {
-                    /**@var $obj MovimientoMercancia* */
+                foreach ($arr_movimiento_producto as $obj) {
+                    /**@var $obj MovimientoProducto* */
                     $rows[] = array(
-                        'id' => $obj->getIdMercancia()->getId(),
-                        'codigo' => $obj->getIdMercancia()->getCodigo(),
-                        'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                        'id' => $obj->getIdProducto()->getId(),
+                        'codigo' => $obj->getIdProducto()->getCodigo(),
+                        'descripcion' => $obj->getIdProducto()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
@@ -555,7 +522,7 @@ class ValeSalidaProductoController extends AbstractController
                 'fecha_vale' => $fecha_vale,
                 'nro_consecutivo' => $nro_consecutivo
             ),
-            'mercancias' => $rows,
+            'productos' => $rows,
             'id' => $nro
         ]);
     }

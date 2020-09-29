@@ -35,7 +35,7 @@
                         <div class="ml-2">
                             <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
                                     onclick="SeleccionarProducto()"
-                                    data-dismiss="modal">Seleccionar
+                                    data-dismiss="modal">Aceptar
                             </button>
                         </div>
                     </div>
@@ -194,7 +194,7 @@
     {{ parent() }}
     <script>
         let mercancias_seleccionada = [];
-        let mercancias = [];
+        let productos = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
         let eliminados = [];
@@ -256,17 +256,17 @@
                     if ($('#vale_salida_mercancia_codigo').val() !== '') {
                         let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
                         $.ajax({
-                            url: '/contabilidad/inventario/vale-salida-producto/getProducto/' + codigo,
+                            url: '/contabilidad/inventario/vale-salida-producto/getProductos/' + codigo,
                             method: 'POST',
                             dataType: 'json',
                             success: function (result) {
-                                mercancias = result.mercancias
-                                if (mercancias.length > 0) {
-                                    $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                    $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                productos = result.productos
+                                if (productos.length > 0) {
+                                    $('#vale_salida_mercancia_descripcion').val(productos[0]['descripcion'])
+                                    $('#vale_salida_mercancia_existencia').val(productos[0]['existencia'])
+                                    $('#vale_salida_mercancia_precio').val(productos[0]['precio_compra'])
                                 } else {
-                                    alertTemplate('No existen mercancias con ese código', 'danger')
+                                    alertTemplate('No existen productos con ese código', 'danger')
                                 }
                             },
                             error: function () {
@@ -289,12 +289,12 @@
                 let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
                 let cuenta = $('#vale_salida_nro_cuenta_deudora').val() != '' ? $('#vale_salida_nro_cuenta_deudora').val() : ''
                 $.ajax({
-                    url: '/contabilidad/inventario/vale-salida-producto/getProducto/' + codigo + ',' + cuenta,
+                    url: '/contabilidad/inventario/vale-salida-producto/getProductos/' + codigo + ',' + cuenta,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
-                        mercancias = result.mercancias
-                        $(result.mercancias).each(function (pos, valor) {
+                        productos = result.productos
+                        $(result.productos).each(function (pos, valor) {
                             $('#rows_table').append('<tr>' +
                                 '<td style="font-weight:400;"> ' +
                                 '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
@@ -411,7 +411,7 @@
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_vale_salida_gestionar') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_vale_salida_producto_gestionar') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)
@@ -497,13 +497,13 @@
         })
 
         function SeleccionarProducto() {
-            for (var i = 0; i < mercancias.length; i++) {
-                let id = '#' + mercancias[i]['codigo']
+            for (var i = 0; i < productos.length; i++) {
+                let id = '#' + productos[i]['codigo']
                 if ($(id).prop('checked') == true) {
-                    $('#vale_salida_mercancia_codigo').val(mercancias[i]['codigo'])
-                    $('#vale_salida_mercancia_descripcion').val(mercancias[i]['descripcion'])
-                    $('#vale_salida_mercancia_precio').val(mercancias[i]['precio_compra'])
-                    $('#vale_salida_mercancia_existencia').val(mercancias[i]['existencia'])
+                    $('#vale_salida_mercancia_codigo').val(productos[i]['codigo'])
+                    $('#vale_salida_mercancia_descripcion').val(productos[i]['descripcion'])
+                    $('#vale_salida_mercancia_precio').val(productos[i]['precio_compra'])
+                    $('#vale_salida_mercancia_existencia').val(productos[i]['existencia'])
                     break
                 }
             }
@@ -552,15 +552,15 @@
                             $('#vale_salida_fecha_solicitud').attr('type', 'text')
                             $('#vale_salida_fecha_solicitud').val(vale.fecha_solicitud);
 
-                            let mercancias = vale.mercancias
+                            let productos = vale.productos
                             $("#importe-total").text('$' + vale.importe_total)
-                            for (var i = 0; i < mercancias.length; i++) {
+                            for (var i = 0; i < productos.length; i++) {
                                 $('#rows_mercancias').append(`<tr>
-                                    <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['importe']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['precio']} </td>
-                                    <td style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td style="font-weight:400;"> ${productos[i]['codigo']} </td>
+                                    <td style="font-weight:400;"> ${productos[i]['cantidad']}</td>
+                                    <td style="font-weight:400;"> ${productos[i]['importe']}</td>
+                                    <td style="font-weight:400;"> ${productos[i]['precio']} </td>
+                                    <td style="font-weight:400;">${productos[i]['existencia']}</td>
                                     <td></td>
                                    </tr>`
                                 );

@@ -30,17 +30,17 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class TransferenciaController
- * CRUD DE TRANSFERENCIA DE ENTRADA
+ * Class TransferenciaSalidaController
+ * CRUD DE TRANSFERENCIA DE SALIDA
  * @package App\Controller\Contabilidad\Inventario
- * @Route("/contabilidad/inventario/transferencia-entrada")
+ * @Route("/contabilidad/inventario/transferencia-salida")
  */
-class TransferenciaController extends AbstractController
+class TransferenciaSalidaController extends AbstractController
 {
-    private static int $TIPO_DOC_RANSFERENCIA_ENTRADA = 5;
+    private static int $TIPO_DOC_RANSFERENCIA_SALIDA = 6;
 
     /**
-     * @Route("/", name="contabilidad_inventario_transferencia_entrada",methods={"GET"})
+     * @Route("/", name="contabilidad_inventario_transferencia_salida",methods={"GET"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -50,7 +50,7 @@ class TransferenciaController extends AbstractController
         $transferencia_arr = $transferencia_er->findBy(array(
             'activo' => true,
             'anno' => $year_,
-            'entrada' => true
+            'entrada' => false
         ));
         $rows = [];
         foreach ($transferencia_arr as $obj_transferencia) {
@@ -74,7 +74,7 @@ class TransferenciaController extends AbstractController
     }
 
     /**
-     * @Route("/form-add", name="contabilidad_inventario_transferencia_entrada_gestionar", methods={"GET","POST"})
+     * @Route("/form-add", name="contabilidad_inventario_transferencia_salida_gestionar", methods={"GET","POST"})
      */
     public function gestionarTransferencia(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -109,7 +109,7 @@ class TransferenciaController extends AbstractController
                 $transferencias_entrada_arr = $em->getRepository(Transferencia::class)->findBy(array(
                     'anno' => $year_,
                     'activo' => true,
-                    'entrada' => true
+                    'entrada' => false
                 ));
                 $contador = 0;
                 foreach ($transferencias_entrada_arr as $obj) {
@@ -165,7 +165,7 @@ class TransferenciaController extends AbstractController
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(5);
+                $obj_tipo_documento = $tipo_documento_er->find(6);
                 $importe_total = 0;
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
@@ -267,7 +267,7 @@ class TransferenciaController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{params}", name="contabilidad_inventario_transferencia_entrada_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{params}", name="contabilidad_inventario_transferencia_salida_gestionar_getMercancia", methods={"POST"})
      */
     public function getMercancia(Request $request, $params)
     {
@@ -304,7 +304,7 @@ class TransferenciaController extends AbstractController
     }
 
     /**
-     * @Route("/getChoices", name="contabilidad_inventario_transferencia_entrada_gestionar_getChoices", methods={"POST"})
+     * @Route("/getChoices", name="contabilidad_inventario_transferencia_salida_gestionar_getChoices", methods={"POST"})
      */
     public function getChoices()
     {
@@ -359,7 +359,7 @@ class TransferenciaController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{nro}", name="contabilidad_inventario_transferencia_entrada_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_transferencia_salida_delete", methods={"DELETE"})
      */
     public function deleteTransferencia(Request $request, $nro)
     {
@@ -368,7 +368,7 @@ class TransferenciaController extends AbstractController
 
         $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy([
             'nro_concecutivo' => $nro,
-            'entrada' => true,
+            'entrada' => false,
             'anno' => Date('Y')
         ]);
         $msg = 'No se pudo eliminar el transferencia seleccionada';
@@ -441,11 +441,11 @@ class TransferenciaController extends AbstractController
         }
         $this->addFlash($success, $msg);
         // }
-        return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada_gestionar');
+        return $this->redirectToRoute('contabilidad_inventario_transferencia_salida_gestionar');
     }
 
     /**
-     * @Route("/get-nros-transferencias", name="contabilidad_inventario_transferencia_entrada_get_nros", methods={"POST"})
+     * @Route("/get-nros-transferencias", name="contabilidad_inventario_transferencia_salida_get_nros", methods={"POST"})
      */
     public function getNros(EntityManagerInterface $em, Request $request)
     {
@@ -453,12 +453,12 @@ class TransferenciaController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em, $transferencia_er, $year_, $id_usuario, $idalmacen,['entrada' => true], 'Transferencia');
+        $row = AuxFunctions::getConsecutivos($em, $transferencia_er, $year_, $id_usuario, $idalmacen,['entrada' => false], 'Transferencia');
         return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
     /**
-     * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
+     * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_salida_print",methods={"GET"})
      */
     public function print(EntityManagerInterface $em, $nro)
     {
@@ -469,10 +469,10 @@ class TransferenciaController extends AbstractController
         $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => false
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->find(5);
+        $obj_tipo_documento = $tipo_documento_er->find(6);
         $rows = [];
         $almacen = '';
         $unidad_origen = '';
@@ -550,7 +550,7 @@ class TransferenciaController extends AbstractController
         $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => false
         ));
 
         if (!$transferencia_obj) {
@@ -561,7 +561,7 @@ class TransferenciaController extends AbstractController
         $rows_movimientos = [];
 
         $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
-            'id_tipo_documento' => $tipo_documento_er->find(5),
+            'id_tipo_documento' => $tipo_documento_er->find(6),
             'id_documento' => $transferencia_obj->getIdDocumento()
         ));
 
