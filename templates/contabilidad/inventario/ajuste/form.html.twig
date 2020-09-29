@@ -59,19 +59,25 @@
             <div class="card-body">
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'ajuste_entrada'}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-6 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_inventario) }}
                         {{ form_widget(formulario.nro_cuenta_inventario) }}
                     </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_subcuenta_inventario) }}
                         {{ form_widget(formulario.nro_subcuenta_inventario) }}
                     </div>
-                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
                     </div>
-                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_subcuenta_acreedora) }}
+                        {{ form_widget(formulario.nro_subcuenta_acreedora) }}
+                    </div>
                 </div>
                 <div class="row mt-0 p-0">
                     <div class="col-8 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
@@ -204,6 +210,7 @@
         let mercancias = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
+        let cuentas_acreedoras = [];
         loadingModal.show()
 
         $(document).ready(function () {
@@ -324,10 +331,11 @@
                     dataType: 'json',
                     success: function (result) {
                         cuentas_inventarios = result.cuentas_inventario
+                        cuentas_acreedoras = result.cuentas_acreedoras
                         $(result.cuentas_inventario).each(function (pos, valor) {
                             $('#ajuste_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
-                        $(result.cuentas_acrredoras).each(function (pos, valor) {
+                        $(result.cuentas_acredoras).each(function (pos, valor) {
                             $('#ajuste_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
                         $(result.monedas).each(function (pos, valor) {
@@ -432,6 +440,18 @@
                         $('#ajuste_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
                             $('#ajuste_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+            })
+
+            $('#ajuste_nro_cuenta_acreedora').on('change', function () {
+                $('#ajuste_nro_subcuenta_acreedora').find('option').remove()
+                cuentas_acreedoras.forEach(function (valor, pos) {
+                    if ($(this).val() == valor.nro_cuenta) {
+                        $('#ajuste_nro_subcuenta_acreedora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            $('#ajuste_nro_subcuenta_acreedora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })

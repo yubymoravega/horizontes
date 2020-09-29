@@ -6,6 +6,7 @@ use App\Entity\Contabilidad\Config\UnidadMedida;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class UnidadMedidaController
@@ -29,7 +30,7 @@ class UnidadMedidaController extends AbstractController
                 $new_tipo
                     ->setNombre($tipos['nombre'])
                     ->setActivo(true)
-                    ->getAbreviatura($tipos['abreviatura'])
+                    ->setAbreviatura($tipos['abreviatura'])
                     ->setId($tipos['id']);
                 $em->persist($new_tipo);
             }
@@ -49,10 +50,10 @@ class UnidadMedidaController extends AbstractController
                 'abreviatura' => $unidadMedida->getAbreviatura()
             );
         }
-         return $this->render('contabilidad/config/unidad_medida/index.html.twig', [
-             'controller_name' => 'ConfInicialController',
-             'unidad_medida' => $row
-         ]);
+        return $this->render('contabilidad/config/unidad_medida/index.html.twig', [
+            'controller_name' => 'ConfInicialController',
+            'unidad_medida' => $row
+        ]);
     }
 
 }

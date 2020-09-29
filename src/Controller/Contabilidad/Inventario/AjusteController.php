@@ -323,7 +323,7 @@ class AjusteController extends AbstractController
         }
         return new JsonResponse([
             'cuentas_inventario' => $row_inventario,
-            'cuentas_acrredoras' => $row_acreedoras,
+            'cuentas_acreedoras' => $row_acreedoras,
             'monedas' => $rows,
             'success' => true
         ]);
