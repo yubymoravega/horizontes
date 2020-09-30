@@ -124,9 +124,11 @@ class ValeSalidaProductoController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
+                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 15),
                 'id_almacen' => $obj->getIdAmlacen(),
-                'existencia' => $obj->getExistencia()
+                'existencia' => $obj->getExistencia(),
+                'importe' => $obj->getImporte(),
+                'unidad_medida' => $obj->getIdUnidadMedida()->getNombre()
             );
         }
         return new JsonResponse(['productos' => $row, 'success' => true]);
@@ -215,7 +217,7 @@ class ValeSalidaProductoController extends AbstractController
                     $id_unidad = $obj_empleado->getIdUnidad()->getId();
                     $vale_salida_arr = $em->getRepository(ValeSalida::class)->findBy(array(
                         'anno' => $year_,
-                        'producto'=>true
+                        'producto' => true
                     ));
                     $contador = 0;
                     foreach ($vale_salida_arr as $obj) {

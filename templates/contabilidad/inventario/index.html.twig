@@ -18,17 +18,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Nomencladores
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_mercancia') }}">Mercancia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_producto') }}">Producto</a>
-                    </div>
-                </li>
+                <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>
+{#                <li class="nav-item dropdown">#}
+{#                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"#}
+{#                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#                        Nomencladores#}
+{#                    </a>#}
+{#                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
+{#                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>#}
+{#                    </div>#}
+{#                </li>#}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -38,10 +37,10 @@
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada_gestionar') }}">Ajuste</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada_gestionar') }}">Transferencia</a>
                         <div class="dropdown-divider"></div>
-                        <h6 class="text-center" style="font-weight:300">Informe de Recepción</h6>
+                        <h6 class="text-center">Informe de Recepción</h6>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Mercancía</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_producto_gestionar') }}">Producto</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Mercancía</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_producto_gestionar') }}">Producto</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -53,10 +52,10 @@
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_salida_gestionar') }}">Ajuste</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_salida_gestionar') }}">Transferencia</a>
                         <div class="dropdown-divider"></div>
-                        <h6 class="text-center" style="font-weight:300">Vale de salida</h6>
+                        <h6 class="text-center" >Vale de salida</h6>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Mercancia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_producto_gestionar') }}">Producto</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Mercancia</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_producto_gestionar') }}">Producto</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -78,7 +77,11 @@
                         Reportes
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">INF</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Existencia Almacén</h6>
+                        <div class="dropdown-divider"></div>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_inventario_mercancia') }}">Mercancia</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_inventario_producto') }}">Producto</a>
                     </div>
                 </li>
             </ul>

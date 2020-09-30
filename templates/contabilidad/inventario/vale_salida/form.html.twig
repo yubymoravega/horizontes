@@ -118,11 +118,11 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.documento.cantidad_mercancia) }}
                         {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.documento.importe_mercancia) }}
                         {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
                     </div>
@@ -137,6 +137,10 @@
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.existencia_decremento) }}
                         {{ form_widget(formulario.mercancia.existencia_decremento) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        <label for="">Resto Importe</label>
+                        <input type="text" id="resto_importe" class="w-100 form-control">
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
@@ -177,7 +181,8 @@
                        class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                 </div>
                 <div class="ml-2">
-                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="myOnDeleteConfirm()">cancelar</button>
+                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="myOnDeleteConfirm()">cancelar
+                    </button>
                 </div>
                 <div class="ml-2">
                     <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Vale()">imprimir</button>
@@ -198,6 +203,7 @@
         let consecutivo = 0;
         let cuentas_inventarios = [];
         let eliminados = [];
+        let importe_total = 0;
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -244,7 +250,7 @@
                         $('#btnImprimir').hide()
                         $('#btnSubbmitValeSalida').hide()
                         $('#btnCancelar').hide()
-                        alertTemplate('Tiene que introducir el número del vale de salida','danger')
+                        alertTemplate('Tiene que introducir el número del vale de salida', 'danger')
                     }
                 }
             })
@@ -265,23 +271,25 @@
                                     $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
                                     $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                    $('#vale_salida_mercancia_id_unidad_medida').find('option').remove()
+                                    $('#vale_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>'+mercancias[0]['unidad_medida']+'</option>');
+                                    importe_total = parseFloat(mercancias[0]['importe'])
                                 } else {
+                                    importe_total = 0
+                                    resetFormMercancia()
                                     alertTemplate('No existen mercancias con ese código', 'danger')
                                 }
                             },
                             error: function () {
-                                $('#vale_salida_mercancia_descripcion').val('')
-                                $('#vale_salida_mercancia_existencia').val('')
-                                $('#vale_salida_mercancia_precio').val('')
+                                importe_total = 0
+                                resetFormMercancia()
                             }
                         })
                     } else {
                         alertTemplate('Debe ingresar el codigo de la mercancía a buscar.', 'danger')
                     }
                 } else {
-                    $('#vale_salida_mercancia_descripcion').val('')
-                    $('#vale_salida_mercancia_precio').val('')
-                    $('#vale_salida_mercancia_existencia').val('')
+                    resetFormMercancia()
                 }
             })
             $('#btnSearchMercancia').on('click', function () {
@@ -315,21 +323,24 @@
                 let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
-                        let importe = parseFloat(precio * cantidad).toFixed(3)
+                        let importe = parseFloat(precio * cantidad).toFixed(5)
+                        let resto = parseFloat(importe_total - importe)
                         $('#vale_salida_documento_importe_mercancia').val(importe)
-                    } else {
-                        $('#vale_salida_documento_importe_mercancia').val(0)
-                    }
-                    if (cantidad == 0 || cantidad == '') {
-                        $('#vale_salida_mercancia_existencia_decremento').val(0)
-                    } else {
+                        $('#resto_importe').val(resto)
                         let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
                         $('#vale_salida_mercancia_existencia_decremento').val(existencia_inicial - parseFloat($('#vale_salida_documento_cantidad_mercancia').val()))
+                    } else {
+                        $('#vale_salida_documento_importe_mercancia').val(0)
+                        // }
+                        // if (cantidad == 0 || cantidad == '') {
+                        $('#vale_salida_mercancia_existencia_decremento').val(0)
+                        $('#resto_importe').val('')
                     }
                 } else {
-                    if (cantidad > 0)
-                        alertTemplate('La cantidas supera la existencia', 'danger')
+                    alertTemplate('La cantidas supera la existencia', 'danger')
                     $('#vale_salida_documento_cantidad_mercancia').val('')
+                    $('#vale_salida_mercancia_existencia_decremento').val(0)
+                    $('#resto_importe').val('')
                 }
             })
             /*** FIN BLOQUE DE JQuery DE MERCANCIA ***/
@@ -508,13 +519,24 @@
         }
 
         /////////////////////////////////////////////
+        function resetFormMercancia() {
+            $('#vale_salida_mercancia_descripcion').val('')
+            $('#vale_salida_mercancia_precio').val('')
+            $('#vale_salida_mercancia_existencia').val('')
+            $('#vale_salida_mercancia_existencia_decremento').val('')
+            $('#vale_salida_documento_importe_mercancia').val('')
+            $('#vale_salida_documento_cantidad_mercancia').val('')
+            $('#resto_importe').val('')
+            $('#vale_salida_mercancia_id_unidad_medida').find('option').remove()
+        }
+
         function resetFormulario() {
             $('#btnCancelar').hide()
             $('#vale_salida_fecha_solicitud').attr('type', 'date')
             $('#form_mercancia').css('display', 'block')
             $('#vale_salida')[0].reset()
             $('#form_mercancia')[0].reset()
-            let ids = ['_nro_cuenta_deudora', '_nro_subcuenta_deudora', '_documento_id_moneda','_id_centro_costo','_id_elemento_gasto']
+            let ids = ['_nro_cuenta_deudora', '_nro_subcuenta_deudora', '_documento_id_moneda', '_id_centro_costo', '_id_elemento_gasto']
             for (let i = 0; i < ids.length; i++) {
                 $("#vale_salida" + ids[i]).find('option').remove()
                 $("#vale_salida" + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');

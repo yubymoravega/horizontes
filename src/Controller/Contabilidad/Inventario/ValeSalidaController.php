@@ -123,7 +123,9 @@ class ValeSalidaController extends AbstractController
                 'descripcion' => $obj->getDescripcion(),
                 'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 15),
                 'id_almacen' => $obj->getIdAmlacen(),
-                'existencia' => $obj->getExistencia()
+                'existencia' => $obj->getExistencia(),
+                'importe' => $obj->getImporte(),
+                'unidad_medida'=>$obj->getIdUnidadMedida()->getNombre()
             );
         }
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
