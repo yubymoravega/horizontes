@@ -121,7 +121,7 @@ class ValeSalidaController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
+                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 15),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia()
             );
@@ -137,7 +137,7 @@ class ValeSalidaController extends AbstractController
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
         $unidad = AuxFunctions::getUnidad($em, $user);
-        $row_inventario = AuxFunctions::getCuentasInventario($em);
+        $row_inventario = AuxFunctions::getCuentasProduccion($em);
 //        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
@@ -145,6 +145,7 @@ class ValeSalidaController extends AbstractController
         $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(array('activo' => true, 'id_unidad' => $unidad));
         $monedas = [];
         $proveedores = [];
+        $centro_costo = [];
         foreach ($row_moneda as $moneda) {
             /**@var $moneda Moneda* */
             $monedas[] = array(
@@ -195,7 +196,7 @@ class ValeSalidaController extends AbstractController
                 $fecha_solicitud = $vale_salida['fecha_solicitud'];
                 $nro_solicitud = $vale_salida['nro_solicitud'];
                 $nro_cuenta_deudora = $vale_salida['nro_cuenta_deudora'];
-                $nro_subcuenta_deudora = $vale_salida['nro_subcuenta_deudora'];
+                $nro_subcuenta_deudora = isset($vale_salida['nro_subcuenta_deudora'])?$vale_salida['nro_subcuenta_deudora']:'nosubcuenta - desc';
                 $id_moneda = $vale_salida['documento']['id_moneda'];
 
 
@@ -243,7 +244,8 @@ class ValeSalidaController extends AbstractController
                         ->setFechaSolicitud(\DateTime::createFromFormat('Y-m-d', $fecha_solicitud))
                         ->setNroSolicitud($nro_solicitud)
                         ->setNroCuentaDeudora(AuxFunctions::getNro($nro_cuenta_deudora))
-                        ->setNroSubcuentaDeudora(AuxFunctions::getNro($nro_subcuenta_deudora))
+                        //->setNroSubcuentaDeudora(AuxFunctions::getNro($vale_salida['nro_subcuenta_deudora']))
+                        ->setNroSubcuentaDeudora('000')
                         ->setProducto(false);
                     $em->persist($vale_salida);
 

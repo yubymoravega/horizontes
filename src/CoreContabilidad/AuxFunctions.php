@@ -368,7 +368,6 @@ class AuxFunctions
             'activo' => true
         ));
         foreach ($arr_cuentas_produccion as $item) {
-            /**@var $item Cuenta */
             $arr_obj_subcuentas = $subcuenta_er->findBy(array(
                 'activo' => true,
                 'id_cuenta' => $item->getId()
@@ -391,6 +390,42 @@ class AuxFunctions
                 'sub_cuenta' => $rows
             );
         }
+		
+		//cuentas de gasto
+		$obj_criterio = $em->getRepository(CriterioAnalisis::class)->findOneBy(array(
+			'abreviatura'=>'GAT',
+			'activo'=>true
+		));
+		
+		$rows_gasto = [];
+		if($obj_criterio){
+			$arr_cuentas_criterio = $em->getRepository(CuentaCriterioAnalisis::class)->findBy(array(
+				'id_criterio_analisis'=>$obj_criterio
+			));
+			foreach($arr_cuentas_criterio as $item){
+				$arr_obj_subcuentas = $subcuenta_er->findBy(array(
+					'activo' => true,
+					'id_cuenta' => $item->getIdCuenta()
+				));
+				$rows = [];
+				if (!empty($arr_obj_subcuentas)) {
+					foreach ($arr_obj_subcuentas as $subcuenta) {
+						/**@var $subcuenta Subcuenta* */
+						$rows [] = array(
+							'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+							'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '.trim($subcuenta->getDescripcion()),
+							'id' => $subcuenta->getId()
+						);
+					}
+				}
+	
+				$row_inventario [] = array(
+                  'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()).' - '.trim($item->getIdCuenta()->getNombre()),
+                  'id_cuenta' => trim($item->getIdCuenta()->getId()),
+                   'sub_cuenta' => $rows
+				);		
+			}
+		}
 
         return $row_inventario;
     }
