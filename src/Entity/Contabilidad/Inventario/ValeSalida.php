@@ -61,6 +61,7 @@ class ValeSalida
 
     /**
      * @ORM\Column(type="string", length=255)
+	 * @ORM\JoinColumn(nullable=false)
      */
     private $nro_subcuenta_deudora;
 

@@ -166,6 +166,7 @@ class InformeRecepcionController extends AbstractController
                                 ->setDescripcion($proveedor_obj->getNombre())
                                 ->setIdCuenta($cuenta_acreedora_obj)
                                 ->setDeudora(false)
+                                ->setElementoGasto(false)
                                 ->setActivo(true);
                             $em->persist($new_Subcuenta);
                         }
