@@ -86,13 +86,10 @@
         <span class="text-light p-1 order-md-1"
               style="cursor: pointer;border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal" data-target="#GetOutAlmacenModal">Almacén: {{ app.session.get('selected_almacen/name') }}</a></span>
     </nav>
-{% endblock %}
-
-{% block content %}
     <!-- Modal -->
     <div class="modal fade" id="GetOutAlmacenModal" tabindex="-1" aria-labelledby="GetOutAlmacenModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+            <div class="modal-content">
                 <div class="modal-header bg-dark">
                     <h5 class="modal-title text-light" id="GetOutAlmacenModalLabel"><i class="fa fa-warning"></i> Atención</h5>
                     <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
@@ -103,18 +100,17 @@
                     <p>¿Está seguro que desae salir del almacén?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="btnAceptar" data-dismiss="modal">Salir</button>
+                    <button type="button" class="btn btn-secondary" id="btnAceptar__salir" data-dismiss="modal">Salir</button>
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
 
-
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $('#btnAceptar').on('click', function () {
+        $('#btnAceptar__salir').on('click', function () {
             $.ajax({
                 url: '/contabilidad/inventario/salirAlmacen',
                 method: "POST",

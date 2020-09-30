@@ -20,6 +20,8 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteSalidaType;
 use App\Form\Contabilidad\Inventario\AjusteType;
+use App\Repository\Contabilidad\Config\CentroCostoRepository;
+use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -62,7 +64,7 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_ajuste_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarAjuste(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function gestionarAjuste(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCostoRepository $repo_centro_costyo, ElementoGastoRepository $repo_elemeto_gasto)
     {
         $form = $this->createForm(AjusteSalidaType::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
@@ -121,6 +123,8 @@ class AjusteSalidaController extends AbstractController
                     ->setNroConcecutivo($consecutivo)
                     ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario)) // cuenta DEUDORA ******
                     ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario)) // subcuenta DEUDORA *****
+                    ->setNroCuentaAcreedora("")
+                    ->setNroSubcuentaAcreedora("")
                     ->setActivo(true)
                     ->setEntrada(false);
                 $em->persist($ajuste_salida);
@@ -148,6 +152,7 @@ class AjusteSalidaController extends AbstractController
                             'codigo' => $mercancia['codigo'],
                             'id_amlacen' => $id_almacen,
                         ));
+//                        dd($mercancia);
                         //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
                         $movimiento_mercancia = new MovimientoMercancia();
                         $movimiento_mercancia
@@ -158,6 +163,8 @@ class AjusteSalidaController extends AbstractController
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
+                            ->setIdCentroCosto($repo_centro_costyo->find($mercancia['centro_costo']))
+                            ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
                             ->setIdUsuario($this->getUser());
 
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
@@ -232,7 +239,9 @@ class AjusteSalidaController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
+                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 15),
+                'importe_real' => $obj->getImporte(),
+                'um' => $obj->getIdUnidadMedida()->getNombre(),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia()
             );
@@ -388,11 +397,11 @@ class AjusteSalidaController extends AbstractController
         $ajuste_obj = $ajuste_salida_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => false
         ));
 
         $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'AJUSTE DE ENTRADA',
+            'id' => self::$TIPO_DOC_AJUSTE_SALIDA,
             'activo' => true
         ));
         $rows = [];
@@ -431,6 +440,8 @@ class AjusteSalidaController extends AbstractController
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
+                        'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
+                        'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                         'importe' => number_format($obj->getImporte(), 2, '.', ''),
                     );
@@ -439,7 +450,8 @@ class AjusteSalidaController extends AbstractController
             }
 
         }
-        return $this->render('contabilidad/inventario/ajuste/print.html.twig', [
+//        dd($rows);
+        return $this->render('contabilidad/inventario/ajuste_salida/print.html.twig', [
             'controller_name' => 'AjusteEntradaControllerPrint',
             'datos' => array(
                 'importe_total' => number_format($importe_total, 2, '.', ''),
@@ -468,18 +480,18 @@ class AjusteSalidaController extends AbstractController
         $ajuste_obj = $ajuste_salida_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => false
         ));
 
         if (!$ajuste_obj) {
-            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de entrada no existe o fue cancelado.']);
+            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de salida no existe o fue cancelado.']);
         }
 
         $importe_total = 0;
         $rows_movimientos = [];
 
         $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
-            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_ajuste_salida),
+            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_SALIDA),
             'id_documento' => $ajuste_obj->getIdDocumento()
         ));
 
@@ -489,6 +501,8 @@ class AjusteSalidaController extends AbstractController
                 'id' => $obj->getIdMercancia()->getId(),
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
+                'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
@@ -499,10 +513,8 @@ class AjusteSalidaController extends AbstractController
 
         $rows = array(
             'id' => $ajuste_obj->getId(),
-            'nro_cuenta_inventario' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaInventario()])->getNombre(),
-            'nro_cuenta_acreedora' => $ajuste_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaAcreedora()])->getNombre(),
-            'nro_subcuenta_cuenta_inventario' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
-            'nro_subcuenta_acreedora' => $ajuste_obj->getNroSubcuentanroAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $ajuste_obj->getNroSubcuentanroAcreedora()])->getDescripcion(),
+            'nro_cuenta_deudora' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaInventario()])->getNombre(),
+            'nro_subcuenta_deudora' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
             'id_moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,
