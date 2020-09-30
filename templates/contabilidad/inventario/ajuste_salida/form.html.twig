@@ -136,6 +136,11 @@
                         {{ form_label(formulario.mercancia.existencia_decremento) }}
                         {{ form_widget(formulario.mercancia.existencia_decremento) }}
                     </div>
+                    <div class="col-2 pl-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                        <label for="resto_importe">Resto Importe</label>
+                        <input type="text" name="resto" id="resto_importe" disabled="disabled"
+                               class="w-100 form-control">
+                    </div>
                 </div>
                 <div class="row mt-0 p-0">
                     <div class="col-5 mt-0 form-group input-group input-group-sm d-block">
@@ -157,14 +162,16 @@
             <div>
                 <table class="table-small-rows table table-hover text-light">
                     <thead class="thead-dark">
-                    <th width="120px">Cod.</th>
-                    <th width="110px">Cant.</th>
-                    <th width="110px">Importe</th>
-                    <th width="110px">Precio</th>
-                    <th scope="col-1">Nueva Exist</th>
-                    <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
-                    <th scope="col-1" hidden>UM</th>
-                    <th scope="col-1" hidden>Descripcion</th>
+                    <th class="px-2" width="100px">Cod.</th>
+                    <th class="px-2" width="100px">Cant.</th>
+                    <th class="px-2" width="100px">Importe</th>
+                    <th class="px-2" width="100px">Precio</th>
+                    <th class="px-2" width="100px">N. Exist</th>
+                    <th class="px-2" width="110px">C. costo</th>
+                    <th class="px-2" style="width:110px;">E. Gasto</th>
+                    <th class="px-2" width="20px"><i class="fa fa-minus-circle text-danger"></i></th>
+                    <th hidden>UM</th>
+                    <th hidden>Descripcion</th>
                     </thead>
                     <tbody id="rows_mercancias">
                     </tbody>
@@ -280,19 +287,15 @@
                     success: function (result) {
                         if (result.success) {
                             let data = result.data;
-                            const cuenta = $('#ajuste_salida_nro_cuenta_deudora')
-                            const subcuenta = $('#ajuste_nro_subcuenta_deudora')
-                            const cuenta_acreedora = $('#ajuste_nro_cuenta_acreedora')
-                            const subcuenta_acreedora = $('#ajuste_nro_subcuenta_acreedora')
+                            const cuenta_acreedora = $('#ajuste_salida_nro_cuenta_deudora')
+                            const subcuenta_acreedora = $('#ajuste_salida_nro_subcuenta_deudora')
                             const moneda = $('#ajuste_salida_documento_id_moneda')
-                            $('#ajuste_observacion').text(data.observaciones)
+                            $('#ajuste_salida_observacion').text(data.observaciones)
 
                             // datos del Formulario
                             $('#ajuste_salida select').find('option').remove()
-                            cuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_deudora} </option>`);
-                            subcuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_cuenta_deudora} </option>`);
-                            cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
-                            subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_acreedora} </option>`);
+                            cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_deudora} </option>`);
+                            subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_deudora} </option>`);
                             moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
 
                             $('#form_mercancia').css('display', 'none')
@@ -302,11 +305,14 @@
                             for (var i = 0; i < mercancias.length; i++) {
 
                                 $('#rows_mercancias').append(`<tr>
-                                    <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['importe']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['precio']} </td>
-                                    <td style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
+                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
+                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['importe']}</td>
+                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['precio']} </td>
+                                    <td class="px-2" style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td class="px-2" style="font-weight:400;">${mercancias[i]['centro_costo']}</td>
+                                    <td class="px-2" style="font-weight:400;">${mercancias[i]['elemento_gasto']}</td>
+
                                     <td></td>
                                    </tr>`
                                 );
@@ -382,7 +388,7 @@
                     }
                 })
             })
-
+            let importe_real = 0
             $('#ajuste_salida_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
                     let codigo = $('#ajuste_salida_mercancia_codigo').val()
@@ -395,9 +401,14 @@
                             success: function (result) {
                                 mercancias = result.mercancias
                                 if (mercancias.length > 0) {
+                                    importe_real = mercancias[0]['importe_real']
                                     $('#ajuste_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#ajuste_salida_mercancia_existencia').val(mercancias[0]['existencia'])
                                     $('#ajuste_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                    $('#ajuste_salida_mercancia_id_unidad_medida').find('option').remove()
+                                    $('#ajuste_salida_mercancia_id_unidad_medida').prepend('<option selected = "false" value = "0" disabled>' + mercancias[0]['um'] + ' </option>');
+
+
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
                                 }
@@ -406,6 +417,12 @@
                                 $('#ajuste_salida_mercancia_descripcion').val('')
                                 $('#ajuste_salida_mercancia_existencia').val('')
                                 $('#ajuste_salida_mercancia_precio').val('')
+                                $('#ajuste_salida_mercancia_id_unidad_medida').val('')
+                                $('#ajuste_salida_documento_importe_mercancia').val('')
+                                $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                                $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                                $('#resto_importe').val('')
+                                importe_real = 0
                             }
                         })
                     } else {
@@ -415,19 +432,14 @@
                     $('#ajuste_salida_mercancia_descripcion').val('')
                     $('#ajuste_salida_mercancia_existencia').val('')
                     $('#ajuste_salida_mercancia_precio').val('')
+                    $('#ajuste_salida_mercancia_id_unidad_medida').val('')
+                    $('#ajuste_salida_documento_importe_mercancia').val('')
+                    $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                    $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                    $('#resto_importe').val('')
+                    importe_real = 0
                 }
             })
-
-            /* $('#ajuste_documento_importe_mercancia').on('keyup', function () {
-                 let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
-                 let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
-                 if (importe > 0) {
-                     let precio_final = parseFloat(importe / cantidad).toFixed(3)
-                     $('#ajuste_salida_mercancia_precio').val(precio_final)
-                 } else {
-                     $('#ajuste_salida_mercancia_precio').val(0)
-                 }
-             })*/
 
             $('#ajuste_salida_documento_cantidad_mercancia').on('keyup', function () {
                 let importe = parseFloat($('#ajuste_salida_documento_importe_mercancia').val())
@@ -439,6 +451,7 @@
                     if (cantidad > 0) {
                         let importe = parseFloat(precio * cantidad).toFixed(3)
                         $('#ajuste_salida_documento_importe_mercancia').val(importe)
+                        $('#resto_importe').val(importe_real - importe)
                     } else {
                         $('#ajuste_salida_documento_importe_mercancia').val(0)
                     }
@@ -562,8 +575,10 @@
                     let nueva_existencia = $('#ajuste_salida_mercancia_existencia_decremento').val()
                     let um = $('#ajuste_salida_mercancia_id_unidad_medida').val()
                     let descripcion = $('#ajuste_salida_mercancia_descripcion').val()
-                    let centro_costo = $('#vale_salida_id_centro_costo').val()
-                    let elemento_gasto = $('#vale_salida_id_elemento_gasto').val()
+                    let centro_costo = $('#ajuste_salida_id_centro_costo').val()
+                    let centro_costo_text = $('#ajuste_salida_id_centro_costo option:selected').text()
+                    let elemento_gasto = $('#ajuste_salida_id_elemento_gasto').val()
+                    let elemento_gasto_text = $('#ajuste_salida_id_elemento_gasto option:selected').text()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
@@ -585,13 +600,15 @@
 
                         $("#importe-total").text('$' + importe_total)
                         $('#rows_mercancias').append(`<tr>
-                        <td style="font-weight:400;"> ${codigo}</td>
-                        <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${importe}</td>
-                        <td style="font-weight:400;"> ${precio} </td>
-                        <td style="font-weight:400;">${nueva_existencia}</td>
-                        <td style="font-weight:400;" hidden> ${descripcion}</td>
-                        <td> <button type="button"
+                        <td class="px-2" style="font-weight:400;"> ${codigo}</td>
+                        <td class="px-2" style="font-weight:400;"> ${cant}</td>
+                        <td class="px-2" style="font-weight:400;"> ${importe}</td>
+                        <td class="px-2" style="font-weight:400;"> ${precio} </td>
+                        <td class="px-2" style="font-weight:400;">${nueva_existencia}</td>
+                        <td class="px-2" style="font-weight:400;">${centro_costo_text}</td>
+                        <td class="px-2" style="font-weight:400;">${elemento_gasto_text}</td>
+                        <td class="px-2" style="font-weight:400;" hidden> ${descripcion}</td>
+                        <td class="px-2"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
                             <i class="fa fa-minus-circle"></i>
                         </button>
