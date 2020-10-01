@@ -311,8 +311,8 @@ class InformeRecepcionProductoController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasInventario($em);
-        $row_acreedoras = AuxFunctions::getCuentasProduccion($em);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em,['ALM']);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $monedas = [];
         foreach ($row_moneda as $moneda){
