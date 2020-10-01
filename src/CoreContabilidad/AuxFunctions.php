@@ -439,11 +439,13 @@ class AuxFunctions
     /**
      * @param EntityManagerInterface $em instancia del Doctrine EntityManagerInterface
      * @param array $criterios arreglo de abreviaturas de los criterios de analisis a incluir en la busqueda
+     * @param array $condiciones arreglo de abreviaturas de los criterios de analisis a incluir en la busqueda
      * @return array Arreglo de las cuentas con todos sus datos incluyendo array de subcuentas asociadas que cumplan con los criterios y condicionales
      */
-    public static function getCuentasByCriterio(EntityManagerInterface $em, array $criterios)
+    public static function getCuentasByCriterio(EntityManagerInterface $em, array $criterios, array $condiciones = [])
     {
         $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
         $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
         $cuenta_criterio_analisis = $em->getRepository(CuentaCriterioAnalisis::class);
 
@@ -461,28 +463,45 @@ class AuxFunctions
                     ));
                     if (!empty($arr_cuentas_criterio)) {
                         foreach ($arr_cuentas_criterio as $item) {
-                            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
-                                'activo' => true,
-                                'id_cuenta' => $item->getIdCuenta()
-                            ));
-                            $rows = [];
-                            if (!empty($arr_obj_subcuentas)) {
-                                foreach ($arr_obj_subcuentas as $subcuenta) {
-                                    /**@var $subcuenta Subcuenta* */
-                                    $rows [] = array(
-                                        'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
-                                        'id' => $subcuenta->getId()
-                                    );
+                            $flag = false;
+                            //voy  aver si la cuenta cumple con las codicionales que paso por parametro para de ser asi seguir
+                            $obj_cuenta = $item->getIdCuenta();
+                            if (!empty($condiciones)) {
+                                $arr_cuentas_condicionadas = $cuenta_er->findBy($condiciones);
+                                if (in_array($obj_cuenta, $arr_cuentas_condicionadas)) {
+                                    $flag = true;
                                 }
+                            } else {
+                                $flag = true;
                             }
-                            $array_to_insert = array(
-                                'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()) . ' - ' . trim($item->getIdCuenta()->getNombre()),
-                                'id_cuenta' => trim($item->getIdCuenta()->getId()),
-                                'sub_cuenta' => $rows
-                            );
+                            if ($flag == true) {
+                                //busco las subcuentas de la cuenta seleccionada
+                                $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                                    'activo' => true,
+                                    'id_cuenta' => $obj_cuenta
+                                ));
+                                $rows = [];
+                                if (!empty($arr_obj_subcuentas)) {
+                                    foreach ($arr_obj_subcuentas as $subcuenta) {
+                                        /**@var $subcuenta Subcuenta* */
+                                        $rows [] = array(
+                                            'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                                            'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                                            'id' => $subcuenta->getId()
+                                        );
+                                    }
+                                }
+                                // en rows tengo todas las subcuentas
+
+                                //verifico que no este repetida
+                                $array_to_insert = array(
+                                    'nro_cuenta' => trim($obj_cuenta->getNroCuenta()) . ' - ' . trim($obj_cuenta->getNombre()),
+                                    'id_cuenta' => trim($obj_cuenta->getId()),
+                                    'sub_cuenta' => $rows
+                                );
                                 if (!in_array($array_to_insert, $cuentas_by_criterios))
-                            $cuentas_by_criterios [] = $array_to_insert;
+                                    $cuentas_by_criterios [] = $array_to_insert;
+                            }
                         }
                     }
                 }

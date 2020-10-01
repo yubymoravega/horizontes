@@ -284,7 +284,8 @@ class TransferenciaSalidaController extends AbstractController
         $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
             array('activo' => true, 'id_unidad' => $unidad)
         );
-        $row_deudoras = AuxFunctions::getCuentasDeudoras($em);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em,['GAT','EG']/*,['deudora'=>1]*/);
+
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
         $rows = [];
