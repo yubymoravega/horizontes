@@ -59,18 +59,27 @@
             <div class="card-body">
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'informe_recepcion'}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.fecha_factura) }}
                         {{ form_widget(formulario.fecha_factura) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.codigo_factura) }}
                         {{ form_widget(formulario.codigo_factura) }}
                     </div>
-
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block ">
-                        {{ form_label(formulario.id_proveedor) }}
-                        {{ form_widget(formulario.id_proveedor) }}
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pr-0 d-block">
+                        {{ form_label(formulario.documento.id_moneda) }}
+                        {{ form_widget(formulario.documento.id_moneda) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block ">
+                        {{ form_label(formulario.cod_proveedor) }}
+                        {{ form_widget(formulario.cod_proveedor) }}
+                    </div>
+                    <div class="col-9 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block ">
+                        {{ form_label(formulario.nombre_proveedor) }}
+                        {{ form_widget(formulario.nombre_proveedor) }}
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
@@ -86,9 +95,9 @@
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm pr-0 d-block">
-                        {{ form_label(formulario.documento.id_moneda) }}
-                        {{ form_widget(formulario.documento.id_moneda) }}
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_subcuenta_acreedora) }}
+                        {{ form_widget(formulario.nro_subcuenta_acreedora) }}
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
@@ -176,10 +185,12 @@
                            class="btn btn-outline-secondary">Salir</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="myOnDeleteConfirm()">cancelar</button>
+                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="myOnDeleteConfirm()">cancelar
+                        </button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Informe()">imprimir</button>
+                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Informe()">imprimir
+                        </button>
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">contabilizar</button>
@@ -198,6 +209,7 @@
         let eliminados = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
+        let cuentas_acreedoras  = [];
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -295,6 +307,34 @@
                 }
             })
 
+            $('#informe_recepcion_cod_proveedor').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo_proveedor = $('#informe_recepcion_cod_proveedor').val()
+                    if (codigo_proveedor != '') {
+                        $.ajax({
+                            url: '/contabilidad/inventario/informe-recepcion/getProveedorByCod/' + codigo_proveedor,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                let proveedor = result.nombre
+                                if (proveedor != '') {
+                                    $('#informe_recepcion_nombre_proveedor').val(proveedor)
+                                } else {
+                                    alertTemplate('No existe nigun proveedor con ese código')
+                                    $('#informe_recepcion_nombre_proveedor').val('')
+                                }
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El campo código no debe estar vacio.', 'danger')
+                    }
+                } else {
+                    $('#informe_recepcion_nombre_proveedor').val('')
+                }
+            })
+
             $('#informe_recepcion_documento_importe_mercancia').on('keyup', function () {
                 let importe = parseFloat($('#informe_recepcion_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#informe_recepcion_documento_cantidad_mercancia').val())
@@ -335,6 +375,17 @@
                     }
                 })
             })
+            $('#informe_recepcion_nro_cuenta_acreedora').on('change', function () {
+                $('#informe_recepcion_nro_subcuenta_acreedora').find('option').remove()
+                cuentas_acreedoras.forEach(function (valor, pos) {
+                    if ($('#informe_recepcion_nro_cuenta_acreedora').val() == valor.nro_cuenta) {
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            console.info(valor)
+                            $('#informe_recepcion_nro_subcuenta_acreedora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+            })
 
             const form_informe_recepcion = $('#informe_recepcion')
 
@@ -347,18 +398,22 @@
                 rules: {
                     'informe_recepcion[codigo_factura]': "required",
                     'informe_recepcion[fecha_factura]': "required",
-                    'informe_recepcion[id_proveedor]': "required",
+                    'informe_recepcion[cod_proveedor]': "required",
+                    'informe_recepcion[nombre_proveedor]': "required",
                     'informe_recepcion[nro_cuenta_inventario]': "required",
                     'informe_recepcion[nro_subcuenta_inventario]': "required",
                     'informe_recepcion[nro_cuenta_acreedora]': "required",
+                    'informe_recepcion[documento][id_moneda]': "required",
                 },
                 messages: {
                     'informe_recepcion[codigo_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'informe_recepcion[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'informe_recepcion[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'informe_recepcion[nombre_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'informe_recepcion[cod_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'informe_recepcion[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'informe_recepcion[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'informe_recepcion[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'informe_recepcion[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
@@ -397,7 +452,7 @@
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                        window.location.replace('{{ path('contabilidad_inventario_informe_recepcion_gestionar') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_informe_recepcion_gestionar') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)
@@ -485,11 +540,11 @@
 
         function resetFormulario() {
             $('#btnCancelar').hide()
-            $('#informe_recepcion_fecha_factura').attr('type','date')
+            $('#informe_recepcion_fecha_factura').attr('type', 'date')
             $('#form_mercancia').css('display', 'block')
             $('#informe_recepcion')[0].reset()
             $('#form_mercancia')[0].reset()
-            let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_id_proveedor', '_documento_id_moneda']
+            let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_nro_subcuenta_acreedora', '_documento_id_moneda']
             for (let i = 0; i < ids.length; i++) {
                 $("#informe_recepcion" + ids[i]).find('option').remove()
                 $("#informe_recepcion" + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
@@ -501,11 +556,10 @@
         }
 
         function llenarFormulario(nro_informe) {
-            if(nro_informe<1){
+            if (nro_informe < 1) {
                 alertTemplate('El menor número permitido es 1', 'danger')
                 resetFormulario()
-            }
-            else{
+            } else {
                 loadingModal.show()
                 $.ajax({
                     url: '/contabilidad/inventario/informe-recepcion/getInforme/' + nro_informe,
@@ -514,7 +568,7 @@
                     success: function (result) {
                         if (result[0].success == true) {
                             let informe = result[0].informe;
-                            let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_id_proveedor', '_documento_id_moneda']
+                            let ids = ['_nro_cuenta_inventario', '_nro_subcuenta_inventario', '_nro_cuenta_acreedora', '_nro_subcuenta_acreedora', '_documento_id_moneda']
                             for (let i = 0; i < ids.length; i++) {
                                 $("#informe_recepcion" + ids[i]).find('option').remove()
                             }
@@ -522,12 +576,13 @@
                             $('#informe_recepcion_nro_cuenta_inventario').prepend('<option selected value = ' + informe.nro_cuenta_inventario + '>' + informe.nro_cuenta_inventario + '</option>');
                             $('#informe_recepcion_nro_subcuenta_inventario').prepend('<option selected value = ' + informe.nro_subcuenta_inventario + '>' + informe.nro_subcuenta_inventario + '</option>');
                             $('#informe_recepcion_nro_cuenta_acreedora').prepend('<option selected value = ' + informe.nro_cuenta_acreedora + '>' + informe.nro_cuenta_acreedora + '</option>');
-                            $('#informe_recepcion_id_proveedor').prepend('<option selected value = ' + informe.nombre_proveedor + '>' + informe.nombre_proveedor + '</option>');
                             $('#informe_recepcion_documento_id_moneda').prepend('<option selected value = ' + informe.moneda + '>' + informe.moneda + '</option>');
                             $('#informe_recepcion_codigo_factura').val(informe.codigo_factura);
-                            $('#informe_recepcion_fecha_factura').attr('type','text')
+                            $('#informe_recepcion_fecha_factura').attr('type', 'text')
                             $('#informe_recepcion_fecha_factura').val(informe.fecha_factura);
-
+                            $('#informe_recepcion_cod_proveedor').val(informe.cod_proveedor);
+                            $('#informe_recepcion_nombre_proveedor').val(informe.nombre_proveedor);
+                            $('#informe_recepcion_nro_subcuenta_acreedora').prepend('<option selected value = ' + informe.nro_subcuenta_acreedora + '>' + informe.nro_subcuenta_acreedora + '</option>');
                             let mercancias = informe.mercancias
                             $("#importe-total").text('$' + informe.importe_total)
                             for (var i = 0; i < mercancias.length; i++) {
@@ -543,7 +598,7 @@
                             }
                             loadingModal.close()
                         }
-                        if(result[0].success == false) {
+                        if (result[0].success == false) {
                             loadingModal.close()
                             alertTemplate(result.msg, 'danger')
                         }
@@ -556,14 +611,14 @@
 
         function cargarDatosIniciales() {
             $('#btnCancelar').hide()
-            $('#informe_recepcion_fecha_factura').attr('type','date')
+            $('#informe_recepcion_fecha_factura').attr('type', 'date')
             $.ajax({
                 url: '/contabilidad/inventario/informe-recepcion/getCuentas',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
                     cuentas_inventarios = result.cuentas_inventario
-                    $('#informe_recepcion_id_proveedor').find('option').remove()
+                    cuentas_acreedoras = result.cuentas_acrredoras
                     $(result.cuentas_inventario).each(function (pos, valor) {
                         $('#informe_recepcion_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
@@ -572,9 +627,6 @@
                     })
                     $(result.monedas).each(function (pos, valor) {
                         $('#informe_recepcion_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                    })
-                    $(result.proveedores).each(function (pos, valor) {
-                        $('#informe_recepcion_id_proveedor').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
                     loadingModal.close()
                 },
@@ -590,8 +642,8 @@
                     consecutivo = result.nros
                     eliminados = result.eliminados
                     $('#select_nros').val(consecutivo)
-                    $('#select_nros').prop('max',consecutivo)
-                    $('#select_nros').prop('min',1)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
                     loadingModal.close()
                 },
                 error: function () {

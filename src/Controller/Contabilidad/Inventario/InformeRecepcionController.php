@@ -22,6 +22,7 @@ use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
+use App\Entity\Contabilidad\Inventario\SubcuentaProveedor;
 use App\Form\Contabilidad\Inventario\InformeRecepcionType;
 use App\Form\Contabilidad\Inventario\InformeRecepcionTypeOriginal;
 use Doctrine\ORM\EntityManagerInterface;
@@ -87,18 +88,33 @@ class InformeRecepcionController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen,['producto'=>false],'InformeRecepcion');
+        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen, ['producto' => false], 'InformeRecepcion');
         $arr_obj_eliminado = $informe_recepcion_er->findBy(array(
-            'anno'=>$year_,
-            'activo'=>false,
-            'producto'=>false
+            'anno' => $year_,
+            'activo' => false,
+            'producto' => false
         ));
         $arr_eliminados = [];
-        foreach ($arr_obj_eliminado as $key=>$eliminado){
-            /**@var $eliminado InformeRecepcion***/
-            $arr_eliminados[$key]=$eliminado->getNroConcecutivo();
+        foreach ($arr_obj_eliminado as $key => $eliminado) {
+            /**@var $eliminado InformeRecepcion** */
+            $arr_eliminados[$key] = $eliminado->getNroConcecutivo();
         }
-        return new JsonResponse(['nros' => $nro, 'eliminados'=>$arr_eliminados, 'success' => true]);
+        return new JsonResponse(['nros' => $nro, 'eliminados' => $arr_eliminados, 'success' => true]);
+    }
+
+    /**
+     * @Route("/getProveedorByCod/{codigo}", name="contabilidad_inventario_informe_recepcion_get_proveedor_by_cod", methods={"POST"})
+     */
+    public function getProveedorByCod(EntityManagerInterface $em, Request $request, $codigo)
+    {
+        $proveedor_er = $em->getRepository(Proveedor::class);
+        $obj_proveedor = $proveedor_er->findOneBy(array(
+            'activo' => true,
+            'codigo' => $codigo
+        ));
+        if ($obj_proveedor)
+            return new JsonResponse(['nombre' => $obj_proveedor->getNombre(), 'success' => true]);
+        return new JsonResponse(['nombre' => '', 'success' => true]);
     }
 
     /**
@@ -116,10 +132,11 @@ class InformeRecepcionController extends AbstractController
                 $informe_recepcion = $request->get('informe_recepcion');
 
                 /**  datos de InformeRecepcionType **/
-                $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
-                $cuenta_inventario = $informe_recepcion['nro_cuenta_inventario'];
-                $proveedor = $informe_recepcion['id_proveedor'];
-                $subcuenta_inventario = $informe_recepcion['nro_subcuenta_inventario'];
+                $cuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_cuenta_acreedora']);
+                $cuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_cuenta_inventario']);
+                $proveedor = $informe_recepcion['cod_proveedor'];
+                $subcuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_inventario']);
+                $subcuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_acreedora']);
                 $fecha_factura = $informe_recepcion['fecha_factura'];
                 $codigo_factura = $informe_recepcion['codigo_factura'];
 
@@ -136,40 +153,48 @@ class InformeRecepcionController extends AbstractController
                     $id_unidad = $obj_empleado->getIdUnidad()->getId();
                     $informes_recepcion_arr = $em->getRepository(InformeRecepcion::class)->findBy(array(
                         'anno' => $year_,
-                        'producto'=>false
+                        'producto' => false
                     ));
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
                         /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto()!= true)
+                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto() != true)
                             $contador++;
                     }
                     $consecutivo = $contador + 1;
                     //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
                     $sub_cuenta_er = $em->getRepository(Subcuenta::class);
                     $cuenta_er = $em->getRepository(Cuenta::class);
-                    $proveedor_obj = $em->getRepository(Proveedor::class)->find($proveedor);
+                    $proveedor_obj = $em->getRepository(Proveedor::class)->findOneBy(array(
+                        'codigo' => $proveedor,
+                        'activo' => true
+                    ));
                     $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
                         'nro_cuenta' => $cuenta_acreedora,
                         'activo' => true
                     ));
-                    if ($cuenta_acreedora_obj && $proveedor_obj) {
-                        $obj_subcuenta_acreedora = $sub_cuenta_er->findOneBy(array(
-                            'nro_subcuenta' => $proveedor_obj->getCodigo(),
-                            'activo' => true,
-                            'id_cuenta' => $cuenta_acreedora_obj->getId()
+
+                    $obj_subcuenta_acreedora = $sub_cuenta_er->findOneBy(array(
+                        'nro_subcuenta' => $subcuenta_acreedora,
+                        'activo' => true,
+                        'id_cuenta' => $cuenta_acreedora_obj->getId()
+                    ));
+                    if ($obj_subcuenta_acreedora && $proveedor_obj) {
+                        //busco en la tabla de las relaciones de subcuenta y proveedor, en caso de no existi lo agrego
+                        $obj_sucuenta_proveedor = $em->getRepository(SubcuentaProveedor::class)->findOneBy(array(
+                            'id_subcuenta' => $obj_subcuenta_acreedora,
+                            'id_proveedor' => $proveedor_obj
                         ));
-                        if (!$obj_subcuenta_acreedora) {
-                            $new_Subcuenta = new Subcuenta();
-                            $new_Subcuenta
-                                ->setNroSubcuenta($proveedor_obj->getCodigo())
-                                ->setDescripcion($proveedor_obj->getNombre())
-                                ->setIdCuenta($cuenta_acreedora_obj)
-                                ->setDeudora(false)
-                                ->setElementoGasto(false)
-                                ->setActivo(true);
-                            $em->persist($new_Subcuenta);
+                        if (!$obj_sucuenta_proveedor) {
+                            $new_SubcuentaProveedor = new SubcuentaProveedor();
+                            $new_SubcuentaProveedor
+                                ->setIdProveedor($proveedor_obj)
+                                ->setIdSubcuenta($obj_subcuenta_acreedora);
+                            $em->persist($new_SubcuentaProveedor);
                         }
+
+                    } else {
+                        return new JsonResponse(['error' => true, 'success' => false, 'message' => 'No existe la subcuenta acreedora o el proveedor.']);
                     }
 
                     //2-adicionar en documento
@@ -180,7 +205,7 @@ class InformeRecepcionController extends AbstractController
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                         ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                    ->setIdMoneda($em->getRepository(Moneda::class)->find($informe_recepcion['documento']['id_moneda']));
+                        ->setIdMoneda($em->getRepository(Moneda::class)->find($informe_recepcion['documento']['id_moneda']));
                     $em->persist($documento);
 
                     //3.1-adicionar en informe de recepcion
@@ -192,12 +217,12 @@ class InformeRecepcionController extends AbstractController
                         ->setIdDocumento($documento)
                         ->setIdProveedor($proveedor_obj)
                         ->setNroConcecutivo($consecutivo)
-                        ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
-                        ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
-                        ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
+                        ->setNroCuentaAcreedora($cuenta_acreedora)
+                        ->setNroCuentaInventario($cuenta_inventario)
+                        ->setNroSubcuentaInventario($subcuenta_inventario)
                         ->setActivo(true)
                         ->setProduco(false)
-                        ->setNroSubcuentaAcreedora($proveedor_obj->getCodigo());
+                        ->setNroSubcuentaAcreedora($subcuenta_acreedora);
                     $em->persist($informe_recepcion);
 
                     //4-crear la obligacion de pago con el proveedor(crear la tabla)
@@ -391,28 +416,28 @@ class InformeRecepcionController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasInventario($em);
-        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em,['ALM']);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
-        $row_proveedores = $em->getRepository(Proveedor::class)->findBy(array('activo'=>true));
+        $row_proveedores = $em->getRepository(Proveedor::class)->findBy(array('activo' => true));
         $monedas = [];
         $proveedores = [];
-        foreach ($row_moneda as $moneda){
-            /**@var $moneda Moneda**/
+        foreach ($row_moneda as $moneda) {
+            /**@var $moneda Moneda* */
             $monedas[] = array(
-                'nombre'=>$moneda->getNombre(),
-                'id'=>$moneda->getId(),
+                'nombre' => $moneda->getNombre(),
+                'id' => $moneda->getId(),
             );
         }
 
-        foreach ($row_proveedores as $proveedor){
-            /**@var $proveedor Proveedor**/
+        foreach ($row_proveedores as $proveedor) {
+            /**@var $proveedor Proveedor* */
             $proveedores[] = array(
-                'nombre'=>$proveedor->getNombre(),
-                'id'=>$proveedor->getId(),
+                'nombre' => $proveedor->getNombre(),
+                'id' => $proveedor->getId(),
             );
         }
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas'=>$monedas, 'proveedores'=>$proveedores,'success' => true]);
+        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas' => $monedas, 'proveedores' => $proveedores, 'success' => true]);
     }
 
     /**
@@ -427,8 +452,8 @@ class InformeRecepcionController extends AbstractController
         $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>false,
-            'anno'=>$year_
+            'producto' => false,
+            'anno' => $year_
         ));
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
@@ -469,7 +494,7 @@ class InformeRecepcionController extends AbstractController
                         ->setActivo(false);
                     $em->persist($obj_movimiento_mercancia);
 
-                    /**@var $obj_mercancia Mercancia**/
+                    /**@var $obj_mercancia Mercancia* */
                     $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
                     $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
                     $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
@@ -518,8 +543,8 @@ class InformeRecepcionController extends AbstractController
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>false,
-            'anno'=>$year_
+            'producto' => false,
+            'anno' => $year_
         ));
 
         $obj_tipo_documento = $tipo_documento_er->find(1);
@@ -599,19 +624,20 @@ class InformeRecepcionController extends AbstractController
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $proveedor_er = $em->getRepository(Proveedor::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
         $year_ = Date('Y');
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'nro_concecutivo' => $nro,
-            'anno'=>$year_,
+            'anno' => $year_,
             'producto' => false
         ));
 
         if (!$informe_obj) {
             return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de informe no existe.']);
         }
-        /**@var $informe_obj InformeRecepcion**/
-        if($informe_obj->getActivo()==false)
+        /**@var $informe_obj InformeRecepcion* */
+        if ($informe_obj->getActivo() == false)
             return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El informe ha sido eliminado.']);
 
         $importe_total = 0;
@@ -637,22 +663,40 @@ class InformeRecepcionController extends AbstractController
         }
 
         $rows = array(
-            'id'=>$informe_obj->getId(),
-            'nro_cuenta_inventario'=>$informe_obj->getNroCuentaInventario(),
-            'nro_cuenta_acreedora'=>$informe_obj->getNroCuentaAcreedora(),
-            'nro_subcuenta_inventario'=>$informe_obj->getNroSubcuentaInventario(),
-            'proveedor'=>$informe_obj->getNroSubcuentaAcreedora(),
-            'nombre_proveedor'=>$proveedor_er->findOneBy(array(
-                'codigo'=>$informe_obj->getNroSubcuentaAcreedora(),
-                'activo'=>true
-            ))->getNombre(),
-            'codigo_factura'=>$informe_obj->getCodigoFactura(),
-            'fecha_factura'=>$informe_obj->getFechaFactura()->format('d/m/Y'),
-            'id_moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getId(),
-            'moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
-            'importe_total'=>$importe_total,
-            'mercancias'=>$rows_movimientos
+            'id' => $informe_obj->getId(),
+            'nro_cuenta_inventario' => $informe_obj->getNroCuentaInventario().' - '.$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaInventario())->getNombre(),
+            'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora().' - '.$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaAcreedora())->getNombre(),
+            'nro_subcuenta_inventario' => $informe_obj->getNroSubcuentaInventario().' - '.$this->getSubcuenta($subcuenta_er,$informe_obj->getNroSubcuentaInventario(),$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaInventario()))->getDescripcion(),
+            'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora().' - '.$this->getSubcuenta($subcuenta_er,$informe_obj->getNroSubcuentaAcreedora(),$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaAcreedora()))->getDescripcion(),
+            'cod_proveedor' => $informe_obj->getIdProveedor()->getCodigo(),
+            'nombre_proveedor' => $informe_obj->getIdProveedor()->getNombre(),
+            'codigo_factura' => $informe_obj->getCodigoFactura(),
+            'fecha_factura' => $informe_obj->getFechaFactura()->format('d/m/Y'),
+            'id_moneda' => $informe_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda' => $informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total' => $importe_total,
+            'mercancias' => $rows_movimientos
         );
         return new JsonResponse([['informe' => $rows, 'success' => true, 'msg' => 'Informe recuperado con éxito.']]);
+    }
+
+    public function getCuenta($cuenta_er,$nro){
+        $obj_cuenta = $cuenta_er->findOneBy(array(
+            'nro_cuenta'=>$nro,
+            'activo'=>true
+        ));
+        if(!$obj_cuenta)
+            return null;
+        return $obj_cuenta;
+    }
+    public function getSubcuenta($subcuenta_er, $nro, $obj_cuenta){
+        $obj_subcuenta = $subcuenta_er->findOneBy(array(
+            'nro_subcuenta'=>$nro,
+            'activo'=>true,
+            'id_cuenta'=>$obj_cuenta
+        ));
+        if(!$obj_subcuenta)
+            return null;
+        return $obj_subcuenta;
     }
 }
