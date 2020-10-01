@@ -156,7 +156,7 @@ class TransferenciaController extends AbstractController
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(5);
+                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
                 $importe_total = 0;
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
@@ -463,7 +463,7 @@ class TransferenciaController extends AbstractController
             'entrada' => true
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->find(5);
+        $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
         $rows = [];
         $almacen = '';
         $unidad_origen = '';
@@ -554,7 +554,7 @@ class TransferenciaController extends AbstractController
         $rows_movimientos = [];
 
         $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
-            'id_tipo_documento' => $tipo_documento_er->find(5),
+            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA),
             'id_documento' => $transferencia_obj->getIdDocumento()
         ));
 

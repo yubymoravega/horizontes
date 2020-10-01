@@ -78,7 +78,7 @@ class AjusteController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em, $ajuste_er, $year_, $id_usuario, $idalmacen,['entrada'=>true],'Ajuste');
+        $row = AuxFunctions::getConsecutivos($em, $ajuste_er, $year_, $id_usuario, $idalmacen, ['entrada' => true], 'Ajuste');
         return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
@@ -495,7 +495,7 @@ class AjusteController extends AbstractController
     }
 
     /**
-     * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_ajuste",methods={"GET","POST"})
+     * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_entrada_ajuste",methods={"GET","POST"})
      */
     public function loadAjuste(EntityManagerInterface $em, $nro)
     {
@@ -539,10 +539,10 @@ class AjusteController extends AbstractController
 
         $rows = array(
             'id' => $ajuste_obj->getId(),
-            'nro_cuenta_inventario' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta'=>$ajuste_obj->getNroCuentaInventario()])->getNombre(),
-            'nro_cuenta_acreedora' => $ajuste_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta'=>$ajuste_obj->getNroCuentaAcreedora()])->getNombre(),
-            'nro_subcuenta_cuenta_inventario' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta'=>$ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
-            'nro_subcuenta_acreedora' => $ajuste_obj->getNroSubcuentanroAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta'=>$ajuste_obj->getNroSubcuentanroAcreedora()])->getDescripcion(),
+            'nro_cuenta_inventario' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaInventario()])->getNombre(),
+            'nro_cuenta_acreedora' => $ajuste_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaAcreedora()])->getNombre(),
+            'nro_subcuenta_cuenta_inventario' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
+            'nro_subcuenta_acreedora' => $ajuste_obj->getNroSubcuentanroAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $ajuste_obj->getNroSubcuentanroAcreedora()])->getDescripcion(),
             'id_moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,

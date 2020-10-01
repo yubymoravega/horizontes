@@ -460,7 +460,7 @@ class AjusteSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_ajuste",methods={"GET","POST"})
+     * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_salida_ajuste",methods={"GET","POST"})
      */
     public function loadAjuste(EntityManagerInterface $em, $nro)
     {
