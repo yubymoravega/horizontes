@@ -22,8 +22,6 @@ use function Sodium\add;
 
 class AuxFunctions
 {
-
-    //private static $em = new Doctri
     public static $ACTION_ADD = 'add';
     public static $ACTION_UPD = 'upd';
 
@@ -61,7 +59,7 @@ class AuxFunctions
         if ($obj_empleado) {
             $id_unidad = $obj_empleado->getIdUnidad()->getId();
             if ($entidad == 'InformeRecepcion' || $entidad == 'Ajuste' || $entidad == 'Transferencia' || $entidad == 'ValeSalida') {
-                $condicionales = array_merge($criterio,['anno' => $anno]);
+                $condicionales = array_merge($criterio, ['anno' => $anno]);
                 $arreglo = $er->findBy($condicionales);
             } else {
                 $arreglo = $er->findBy(array(
@@ -263,14 +261,14 @@ class AuxFunctions
                         /**@var $subcuenta Subcuenta* */
                         $rows [] = array(
                             'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                            'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '. trim($subcuenta->getDescripcion()),
+                            'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
                             'id' => $subcuenta->getId()
                         );
                     }
                 }
 
                 $row_inventario [] = array(
-                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()).' - '.trim($item->getIdCuenta()->getNombre()),
+                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()) . ' - ' . trim($item->getIdCuenta()->getNombre()),
                     'id_cuenta' => trim($item->getIdCuenta()->getId()),
                     'sub_cuenta' => $rows
                 );
@@ -303,14 +301,14 @@ class AuxFunctions
                     /**@var $subcuenta Subcuenta* */
                     $rows [] = array(
                         'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '. trim($subcuenta->getDescripcion()),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
                         'id' => $subcuenta->getId()
                     );
                 }
             }
 
             $row_acreedoras [] = array(
-                'nro_cuenta' => trim($cuenta->getNroCuenta()).' - '.trim($cuenta->getNombre()),
+                'nro_cuenta' => trim($cuenta->getNroCuenta()) . ' - ' . trim($cuenta->getNombre()),
                 'id' => $cuenta->getId(),
                 'sub_cuenta' => $rows
             );
@@ -342,14 +340,14 @@ class AuxFunctions
                     /**@var $subcuenta Subcuenta* */
                     $rows [] = array(
                         'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '. trim($subcuenta->getDescripcion()),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
                         'id' => $subcuenta->getId()
                     );
                 }
             }
 
             $row_acreedoras [] = array(
-                'nro_cuenta' => trim($cuenta->getNroCuenta()).' - '.trim($cuenta->getNombre()),
+                'nro_cuenta' => trim($cuenta->getNroCuenta()) . ' - ' . trim($cuenta->getNombre()),
                 'id' => $cuenta->getId(),
                 'sub_cuenta' => $rows
             );
@@ -378,62 +376,118 @@ class AuxFunctions
                     /**@var $subcuenta Subcuenta* */
                     $rows [] = array(
                         'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '.trim($subcuenta->getDescripcion()),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
                         'id' => $subcuenta->getId()
                     );
                 }
             }
 
             $row_inventario [] = array(
-                'nro_cuenta' => trim($item->getNroCuenta()) .' - '.trim($item->getNombre()),
+                'nro_cuenta' => trim($item->getNroCuenta()) . ' - ' . trim($item->getNombre()),
                 'id_cuenta' => trim($item->getId()),
                 'sub_cuenta' => $rows
             );
         }
-		
-		//cuentas de gasto
-		$obj_criterio = $em->getRepository(CriterioAnalisis::class)->findOneBy(array(
-			'abreviatura'=>'GAT',
-			'activo'=>true
-		));
-		
-		$rows_gasto = [];
-		if($obj_criterio){
-			$arr_cuentas_criterio = $em->getRepository(CuentaCriterioAnalisis::class)->findBy(array(
-				'id_criterio_analisis'=>$obj_criterio
-			));
-			foreach($arr_cuentas_criterio as $item){
-				$arr_obj_subcuentas = $subcuenta_er->findBy(array(
-					'activo' => true,
-					'id_cuenta' => $item->getIdCuenta()
-				));
-				$rows = [];
-				if (!empty($arr_obj_subcuentas)) {
-					foreach ($arr_obj_subcuentas as $subcuenta) {
-						/**@var $subcuenta Subcuenta* */
-						$rows [] = array(
-							'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
-							'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()).' - '.trim($subcuenta->getDescripcion()),
-							'id' => $subcuenta->getId()
-						);
-					}
-				}
-	
-				$row_inventario [] = array(
-                  'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()).' - '.trim($item->getIdCuenta()->getNombre()),
-                  'id_cuenta' => trim($item->getIdCuenta()->getId()),
-                   'sub_cuenta' => $rows
-				);		
-			}
-		}
+
+        //cuentas de gasto
+        $obj_criterio = $em->getRepository(CriterioAnalisis::class)->findOneBy(array(
+            'abreviatura' => 'GAT',
+            'activo' => true
+        ));
+
+        $rows_gasto = [];
+        if ($obj_criterio) {
+            $arr_cuentas_criterio = $em->getRepository(CuentaCriterioAnalisis::class)->findBy(array(
+                'id_criterio_analisis' => $obj_criterio
+            ));
+            foreach ($arr_cuentas_criterio as $item) {
+                $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                    'activo' => true,
+                    'id_cuenta' => $item->getIdCuenta()
+                ));
+                $rows = [];
+                if (!empty($arr_obj_subcuentas)) {
+                    foreach ($arr_obj_subcuentas as $subcuenta) {
+                        /**@var $subcuenta Subcuenta* */
+                        $rows [] = array(
+                            'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                            'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                            'id' => $subcuenta->getId()
+                        );
+                    }
+                }
+
+                $row_inventario [] = array(
+                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()) . ' - ' . trim($item->getIdCuenta()->getNombre()),
+                    'id_cuenta' => trim($item->getIdCuenta()->getId()),
+                    'sub_cuenta' => $rows
+                );
+            }
+        }
 
         return $row_inventario;
     }
 
-    public static function getNro($numero){
-        $arr = explode(' - ',$numero);
-        if(!empty($arr))
+    public static function getNro($numero)
+    {
+        $arr = explode(' - ', $numero);
+        if (!empty($arr))
             return $arr[0];
         return '';
+    }
+
+    /**
+     * @param EntityManagerInterface $em instancia del Doctrine EntityManagerInterface
+     * @param array $criterios arreglo de abreviaturas de los criterios de analisis a incluir en la busqueda
+     * @return array Arreglo de las cuentas con todos sus datos incluyendo array de subcuentas asociadas que cumplan con los criterios y condicionales
+     */
+    public static function getCuentasByCriterio(EntityManagerInterface $em, array $criterios)
+    {
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+        $cuenta_criterio_analisis = $em->getRepository(CuentaCriterioAnalisis::class);
+
+        /** 1- Obtener las cuentas que cumplan con al menos 1 criterio de los contenidos en $criterios ***/
+        $cuentas_by_criterios = [];
+        if (!empty($criterios)) {
+            foreach ($criterios as $abreviatura) {
+                $obj_criterio_analisis = $criterio_analisis_er->findOneBy(array(
+                    'abreviatura' => $abreviatura,
+                    'activo' => true
+                ));
+                if ($obj_criterio_analisis) {
+                    $arr_cuentas_criterio = $cuenta_criterio_analisis->findBy(array(
+                        'id_criterio_analisis' => $obj_criterio_analisis
+                    ));
+                    if (!empty($arr_cuentas_criterio)) {
+                        foreach ($arr_cuentas_criterio as $item) {
+                            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                                'activo' => true,
+                                'id_cuenta' => $item->getIdCuenta()
+                            ));
+                            $rows = [];
+                            if (!empty($arr_obj_subcuentas)) {
+                                foreach ($arr_obj_subcuentas as $subcuenta) {
+                                    /**@var $subcuenta Subcuenta* */
+                                    $rows [] = array(
+                                        'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                                        'id' => $subcuenta->getId()
+                                    );
+                                }
+                            }
+                            $array_to_insert = array(
+                                'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()) . ' - ' . trim($item->getIdCuenta()->getNombre()),
+                                'id_cuenta' => trim($item->getIdCuenta()->getId()),
+                                'sub_cuenta' => $rows
+                            );
+                                if (!in_array($array_to_insert, $cuentas_by_criterios))
+                            $cuentas_by_criterios [] = $array_to_insert;
+                        }
+                    }
+                }
+            }
+        }
+        return $cuentas_by_criterios;
     }
 }
