@@ -5,8 +5,10 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Modulo;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
@@ -21,6 +23,10 @@ use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\TransferenciaSalidaType;
 use App\Form\Contabilidad\Inventario\TransferenciaType;
+use App\Repository\Contabilidad\Config\CentroCostoRepository;
+use App\Repository\Contabilidad\Config\CuentaRepository;
+use App\Repository\Contabilidad\Config\ElementoGastoRepository;
+use App\Repository\Contabilidad\Config\SubcuentaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -77,7 +83,7 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_transferencia_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarTransferencia(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function gestionarTransferencia(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCostoRepository $repo_centro_costo, ElementoGastoRepository $repo_elemeto_gasto)
     {
         $form = $this->createForm(TransferenciaSalidaType::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
@@ -86,9 +92,10 @@ class TransferenciaSalidaController extends AbstractController
         if ($form->isSubmitted()) {
             $list_mercancia = json_decode($request->get('transferencia_salida')['list_mercancia'], true);
 //            if ($form->isValid()) {
-            $transferencia_salida = $request->get('transferencia');
+            $transferencia_salida = $request->get('transferencia_salida');
 
             /**  datos de TransferenciaEntradaType **/
+//            dd($transferencia_salida);
             $cuenta_inventario = $transferencia_salida['nro_cuenta_inventario'];
             $subcuenta_inventario = $transferencia_salida['nro_subcuenta_inventario'];
             $id_unidad_origen = isset($transferencia_salida['id_unidad']) ? $transferencia_salida['id_unidad'] : '';
@@ -135,8 +142,10 @@ class TransferenciaSalidaController extends AbstractController
                     ->setAnno($year_)
                     ->setIdDocumento($documento)
                     ->setNroConcecutivo($consecutivo)
-                    ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
-                    ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
+                    ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))  // cuenta DEUDORA ******
+                    ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))  // subcuenta DEUDORA *****
+                    ->setNroCuentaAcreedora("")
+                    ->setNroSubcuentaAcreedora("")
                     ->setIdUnidad($id_unidad_origen != '' ? $em->getRepository(Unidad::class)->find($id_unidad_origen) : null)
                     ->setIdAlmacen($id_almacen_origen != '' ? $em->getRepository(Almacen::class)->find($id_almacen_origen) : null)
                     ->setActivo(true)
@@ -153,7 +162,7 @@ class TransferenciaSalidaController extends AbstractController
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(6);
+                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_SALIDA);
                 $importe_total = 0;
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
@@ -175,6 +184,8 @@ class TransferenciaSalidaController extends AbstractController
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
+                            ->setIdCentroCosto($repo_centro_costo->find($mercancia['centro_costo']))
+                            ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
                             ->setIdUsuario($this->getUser());
 
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
@@ -188,8 +199,9 @@ class TransferenciaSalidaController extends AbstractController
                         $importe_actualizado = floatval($obj_mercancia->getImporte() - floatval($importe_mercancia));
                         $obj_mercancia
                             ->setExistencia($existencia_actualizada)
-                            ->setActivo(true)
                             ->setImporte($importe_actualizado);
+                        if ($obj_mercancia->getExistencia() == 0)
+                            $obj_mercancia->setActivo(false);
                         $em->persist($obj_mercancia);
 
                         $movimiento_mercancia
@@ -199,7 +211,6 @@ class TransferenciaSalidaController extends AbstractController
                         $em->persist($movimiento_mercancia);
                     }
                 }
-
                 //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
                 $documento
                     ->setImporteTotal($importe_total);
@@ -251,7 +262,9 @@ class TransferenciaSalidaController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
+                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 15),
+                'importe_real' => $obj->getImporte(),
+                'um' => $obj->getIdUnidadMedida()->getNombre(),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia()
             );
@@ -265,10 +278,19 @@ class TransferenciaSalidaController extends AbstractController
     public function getChoices()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasInventario($em);
-
+        $user = $this->getUser();
+        $unidad = AuxFunctions::getUnidad($em, $user);
+        $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
+        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
+            array('activo' => true, 'id_unidad' => $unidad)
+        );
+        $row_deudoras = AuxFunctions::getCuentasDeudoras($em);
         $monedas = $em->getRepository(Moneda::class)->findAll();
+
         $rows = [];
+        $centro_costo = [];
+        $elemento = [];
+
         if ($monedas) {
             foreach ($monedas as $item) {
                 /**@var $item Moneda */
@@ -291,7 +313,7 @@ class TransferenciaSalidaController extends AbstractController
             }
         }
 
-        $almacen = $em->getRepository(Almacen::class)->findBy(['id_unidad' => 1]);
+        $almacen = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $unidad]);
         $rows_almcen = [];
         if ($almacen) {
             foreach ($almacen as $item) {
@@ -303,11 +325,27 @@ class TransferenciaSalidaController extends AbstractController
             }
         }
 
+        foreach ($row_centro_costo as $centro) {
+            /**@var $centro CentroCosto* */
+            $centro_costo[] = array(
+                'nombre' => $centro->getNombre(),
+                'id' => $centro->getId(),
+            );
+        }
+        foreach ($row_elemento_gasto as $item) {
+            /**@var $item ElementoGasto* */
+            $elemento[] = array(
+                'nombre' => $item->getDescripcion(),
+                'id' => $item->getId(),
+            );
+        }
         return new JsonResponse([
-            'cuentas_inventario' => $row_inventario,
+            'cuentas_inventario' => $row_deudoras, // realmente es Deudora
             'monedas' => $rows,
             'unidades' => $rows_unidades,
             'almacenes' => $rows_almcen,
+            'centro_costo' => $centro_costo,
+            'elemento_gasto' => $elemento,
             'success' => true
         ]);
     }
@@ -333,13 +371,7 @@ class TransferenciaSalidaController extends AbstractController
 
             //SI EN OBLIGACION DE PAGO NO SE HA PAGADO NADA DE LA OBLIGACION DE PAGO QUE EL transferencia GENERO, ENTONCES ELIMINO
             $importe_transferencia = $obj_transferencia_salida->getIdDocumento()->getImporteTotal();
-//            $obj_obligacion = $obligacion_er->findOneBy(array(
-//                    'id_documento' => $obj_transferencia_salida->getIdDocumento()
-//                )
-//            );
-//            /**@var $obj_obligacion ObligacionPago* */
-//            $importe_obligacion = $obj_obligacion->getResto();
-//            if (floatval($importe_transferencia) - floatval($importe_obligacion) == 0) {
+
             //voy a transferencia de entrada y lo elimino
             $obj_transferencia_salida->setActivo(false);
             //voy a obligacion de pago y la elimino
@@ -426,7 +458,7 @@ class TransferenciaSalidaController extends AbstractController
             'entrada' => false
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->find(6);
+        $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_SALIDA);
         $rows = [];
         $almacen = '';
         $unidad_origen = '';
@@ -465,6 +497,8 @@ class TransferenciaSalidaController extends AbstractController
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
+                        'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
+                        'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                         'importe' => number_format($obj->getImporte(), 2, '.', ''),
                     );
@@ -473,7 +507,7 @@ class TransferenciaSalidaController extends AbstractController
             }
 
         }
-        return $this->render('contabilidad/inventario/transferencia/print.html.twig', [
+        return $this->render('contabilidad/inventario/transferencia_salida/print.html.twig', [
             'controller_name' => 'TransferenciaEntradaControllerPrint',
             'datos' => array(
                 'importe_total' => number_format($importe_total, 2, '.', ''),
@@ -495,7 +529,8 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia",methods={"GET","POST"})
      */
-    public function loadTranferencia(EntityManagerInterface $em, $nro)
+    public function loadTranferencia(EntityManagerInterface $em, $nro,
+                                     CuentaRepository $cuentas, SubcuentaRepository $subcuentas)
     {
         $transferencia_salida_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -515,7 +550,7 @@ class TransferenciaSalidaController extends AbstractController
         $rows_movimientos = [];
 
         $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
-            'id_tipo_documento' => $tipo_documento_er->find(6),
+            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_SALIDA),
             'id_documento' => $transferencia_obj->getIdDocumento()
         ));
 
@@ -526,6 +561,8 @@ class TransferenciaSalidaController extends AbstractController
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
+                'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
+                'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
@@ -535,9 +572,8 @@ class TransferenciaSalidaController extends AbstractController
 
         $rows = array(
             'id' => $transferencia_obj->getId(),
-            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario(),
-            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora(),
-            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario(),
+            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaInventario()])->getNombre(),
+            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
             'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '',
             'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
             'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),

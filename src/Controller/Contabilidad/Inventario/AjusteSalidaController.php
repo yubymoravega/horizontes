@@ -64,7 +64,7 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_ajuste_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarAjuste(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCostoRepository $repo_centro_costyo, ElementoGastoRepository $repo_elemeto_gasto)
+    public function gestionarAjuste(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCostoRepository $repo_centro_costo, ElementoGastoRepository $repo_elemeto_gasto)
     {
         $form = $this->createForm(AjusteSalidaType::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
@@ -163,7 +163,7 @@ class AjusteSalidaController extends AbstractController
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
-                            ->setIdCentroCosto($repo_centro_costyo->find($mercancia['centro_costo']))
+                            ->setIdCentroCosto($repo_centro_costo->find($mercancia['centro_costo']))
                             ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
                             ->setIdUsuario($this->getUser());
 
@@ -175,9 +175,9 @@ class AjusteSalidaController extends AbstractController
                         $importe_actualizado = floatval($obj_mercancia->getImporte() - floatval($importe_mercancia));
                         $obj_mercancia
                             ->setExistencia($existencia_actualizada)
-                            ->setActivo(true)
                             ->setImporte($importe_actualizado);
-
+                        if ($obj_mercancia->getExistencia() == 0)
+                            $obj_mercancia->setActivo(false);
                         $em->persist($obj_mercancia);
 
                         $movimiento_mercancia
@@ -309,7 +309,7 @@ class AjusteSalidaController extends AbstractController
 
         $obj_ajuste_salida = $em->getRepository(Ajuste::class)->findOneBy([
             'nro_concecutivo' => $nro,
-            'entrada' => true,
+            'entrada' => false,
             'anno' => Date('Y')
         ]);
         $msg = 'No se pudo eliminar el ajuste seleccionado';
@@ -320,13 +320,6 @@ class AjusteSalidaController extends AbstractController
 
             //SI EN OBLIGACION DE PAGO NO SE HA PAGADO NADA DE LA OBLIGACION DE PAGO QUE EL AJUSTE GENERO, ENTONCES ELIMINO
             $importe_ajuste = $obj_ajuste_salida->getIdDocumento()->getImporteTotal();
-//            $obj_obligacion = $obligacion_er->findOneBy(array(
-//                    'id_documento' => $obj_ajuste_salida->getIdDocumento()
-//                )
-//            );
-//            /**@var $obj_obligacion ObligacionPago* */
-//            $importe_obligacion = $obj_obligacion->getResto();
-//            if (floatval($importe_ajuste) - floatval($importe_obligacion) == 0) {
             //voy a ajuste de entrada y lo elimino
             $obj_ajuste_salida->setActivo(false);
             //voy a obligacion de pago y la elimino

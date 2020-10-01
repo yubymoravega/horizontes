@@ -22,9 +22,9 @@
     - [x] Unidad
     - [x] Unidad Medida `u`
     
-    -- vale  salida, informe res, trasnferencia y ajuste
-    - # - Nro
-    - Moneda
+    - Si Alguna de las Salidas es `eliminada` reestablecer la cantidad de Mercancia Restante ????
+    - Unidad avilitar el combo para deselccionar la unidad subordinada
+    - Nro. - para las ENtradas y salidas validar que no se puedan contabilizar las Elimnadas
 
 ### Inventario
 - [ ] { Tipo Documento, Modulos } -> resolver el tema de los valores estaticos con un JSON, YAML u otro tipo de config

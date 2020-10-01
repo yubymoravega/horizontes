@@ -17,6 +17,13 @@
                 bottom: 0;
             }
         }
+
+        th {
+            padding: .6rem 0;
+        }
+        td {
+            padding: 0 .3rem;
+        }
     </style>
 
     <title>Imprimir Ajuste Entrada</title>
@@ -37,32 +44,32 @@
         </tr>
         </tbody>
     </table>
-    <table border="1" width="960px">
-        <tbody>
-        <th>
-            <td width="100" class="text-center"><strong>Código</strong></td>
-            <td width="100" class="text-center"><strong>Descripción</strong></td>
-            <td width="100" class="text-center"><strong>Centro Costo</strong></td>
-            <td width="100" class="text-center"><strong>Elemento Gasto</strong></td>
-            <td width="100" class="text-center"><strong>Cantidad</strong></td>
-            <td width="100" class="text-center"><strong>Precio</strong></td>
-            <td width="100" class="text-center"><strong>Importe</strong></td>
-            <td width="100" class="text-center"><strong>Existencia</strong></td>
-        </th>
-        </tbody>
-    </table>
-    <table border="0px;" width="960px">
+    <table border="0" width="960px">
+        {#        <tbody>#}
+        <thead>
+        <th style="border: solid black 1px; width:80px;"  class="text-center"><strong>Código</strong></th>
+        <th style="border: solid black 1px; width:100px;"  class="text-center"><strong>Descripción</strong></th>
+        <th style="border: solid black 1px; width:100px;"  class="text-center"><strong>Centro Costo</strong></th>
+        <th style="border: solid black 1px; width:100px;"  class="text-center"><strong>Elemento Gasto</strong></th>
+        <th style="border: solid black 1px; width:70px;"  class="text-center"><strong>Cantidad</strong></th>
+        <th style="border: solid black 1px; width:70px;"  class="text-center"><strong>Precio</strong></th>
+        <th style="border: solid black 1px; width:70px;"  class="text-center"><strong>Importe</strong></th>
+        <th style="border: solid black 1px; width:70px;"  class="text-center"><strong>Existencia</strong></th>
+        </thead>
+        {#        </tbody>#}
+        {#    </table>#}
+        {#    <table border="0px;" width="960px">#}
         <tbody>
         {% for item in mercancias %}
             <tr>
-                <td width="80">{{ item.codigo }}</td>
-                <td width="100">{{ item.descripcion }}</td>
-                <td width="100">{{ item.centro_costo }}</td>
-                <td width="100">{{ item.elemento_gasto }}</td>
-                <td width="100" class="text-right">{{ item.cantidad }}</td>
-                <td width="100" class="text-right">{{ item.precio }}</td>
-                <td width="100" class="text-right">{{ item.importe }}</td>
-                <td width="100" class="text-right">{{ item.existencia }}</td>
+                <td>{{ item.codigo }}</td>
+                <td>{{ item.descripcion }}</td>
+                <td>{{ item.centro_costo }}</td>
+                <td>{{ item.elemento_gasto }}</td>
+                <td class="text-right">{{ item.cantidad }}</td>
+                <td class="text-right">{{ item.precio }}</td>
+                <td class="text-right">{{ item.importe }}</td>
+                <td class="text-right">{{ item.existencia }}</td>
             </tr>
         {% endfor %}
         </tbody>

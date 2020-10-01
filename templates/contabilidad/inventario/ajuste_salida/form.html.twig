@@ -286,6 +286,7 @@
                     dataType: 'json',
                     success: function (result) {
                         if (result.success) {
+                            $('#rows_mercancias').find('tr').remove()
                             let data = result.data;
                             const cuenta_acreedora = $('#ajuste_salida_nro_cuenta_deudora')
                             const subcuenta_acreedora = $('#ajuste_salida_nro_subcuenta_deudora')
@@ -406,7 +407,7 @@
                                     $('#ajuste_salida_mercancia_existencia').val(mercancias[0]['existencia'])
                                     $('#ajuste_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
                                     $('#ajuste_salida_mercancia_id_unidad_medida').find('option').remove()
-                                    $('#ajuste_salida_mercancia_id_unidad_medida').prepend('<option selected = "false" value = "0" disabled>' + mercancias[0]['um'] + ' </option>');
+                                    $('#ajuste_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "1">' + mercancias[0]['um'] + ' </option>');
 
 
                                 } else {
@@ -442,7 +443,6 @@
             })
 
             $('#ajuste_salida_documento_cantidad_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#ajuste_salida_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#ajuste_salida_documento_cantidad_mercancia').val())
                 let precio = parseFloat($('#ajuste_salida_mercancia_precio').val())
                 let existencia = parseFloat($('#ajuste_salida_mercancia_existencia').val())
@@ -456,7 +456,7 @@
                         $('#ajuste_salida_documento_importe_mercancia').val(0)
                     }
                     if (cantidad == 0 || cantidad == '') {
-                        $('#vale_salida_mercancia_existencia_decremento').val(0)
+                        $('#ajuste_salida_mercancia_existencia_decremento').val(0)
                     } else {
                         let existencia_inicial = (parseFloat($('#ajuste_salida_mercancia_existencia').val()) > 0 || $('#ajuste_salida_mercancia_existencia').val() != '') ? parseFloat($('#ajuste_salida_mercancia_existencia').val()) : 0
                         $('#ajuste_salida_mercancia_existencia_decremento').val(existencia_inicial - cantidad)
