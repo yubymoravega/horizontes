@@ -29,16 +29,16 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-6">Nombre</th>
             <th scope="col-1">Código</th>
+            <th scope="col-6">Nombre</th>
             <th scope="col-3">Unidad</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in centro_costo %}
                 <tr>
-                    <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.unidad }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
