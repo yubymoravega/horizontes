@@ -52,6 +52,13 @@ body {
     color: white !important;
 }
 
+.row-group-conta {
+    font-weight: 600;
+    background-color: black;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+}
+
 /*********************** MY redefinicion de stilos ****************************/
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {
