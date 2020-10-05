@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ContratosCliente{% endblock %}
+
+{% block body %}
+    <h1>ContratosCliente</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ contratos_cliente.id }}</td>
+            </tr>
+            <tr>
+                <th>Nro_contrato</th>
+                <td>{{ contratos_cliente.nroContrato }}</td>
+            </tr>
+            <tr>
+                <th>Anno</th>
+                <td>{{ contratos_cliente.anno }}</td>
+            </tr>
+            <tr>
+                <th>Fecha_aprobado</th>
+                <td>{{ contratos_cliente.fechaAprobado ? contratos_cliente.fechaAprobado|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Fecha_vencimiento</th>
+                <td>{{ contratos_cliente.fechaVencimiento ? contratos_cliente.fechaVencimiento|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Activo</th>
+                <td>{{ contratos_cliente.activo ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Importe</th>
+                <td>{{ contratos_cliente.importe }}</td>
+            </tr>
+            <tr>
+                <th>Resto</th>
+                <td>{{ contratos_cliente.resto }}</td>
+            </tr>
+            <tr>
+                <th>Id_padre</th>
+                <td>{{ contratos_cliente.idPadre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('contabilidad_venta_contratos_cliente_index') }}">back to list</a>
+
+    <a href="{{ path('contabilidad_venta_contratos_cliente_edit', {'id': contratos_cliente.id}) }}">edit</a>
+
+    {{ include('contabilidad_venta_contratos_cliente/_delete_form.html.twig') }}
+{% endblock %}

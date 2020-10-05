@@ -2,23 +2,26 @@
 
 namespace App\Repository\Contabilidad\Venta;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Venta\ContratosCliente;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method ContratosCliente|null find($id, $lockMode = null, $lockVersion = null)
- * @method ContratosCliente|null findOneBy(array $criteria, array $orderBy = null)
- * @method ContratosCliente[]    findAll()
- * @method ContratosCliente[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method ContratosCliente|null find($id, $paranoid = true)
+ * @method ContratosCliente|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method ContratosCliente[]    findAll($paranoid = true)
+ * @method ContratosCliente[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class ContratosClienteRepository extends ServiceEntityRepository
+class ContratosClienteRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ContratosCliente::class);
+        $this->setEntityClass(ContratosCliente::class);
+        $this->setRegistry($registry);
+        parent::__construct();
     }
-
     // /**
     //  * @return ContratosCliente[] Returns an array of ContratosCliente objects
     //  */

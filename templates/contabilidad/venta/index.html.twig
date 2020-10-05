@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %} Contabilidad | Configuración {% endblock %}
+{% block title %} Contabilidad | Ventas {% endblock %}
 {% block style %}
     <style>
         label {
@@ -24,7 +24,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_venta_cliente_contabilidad') }}">Cliente</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_contratos_clientes') }}">Contratos</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_contratos_cliente_index') }}">Contratos</a>
                     </div>
                 </li>
             </ul>

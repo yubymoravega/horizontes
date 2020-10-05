@@ -1,20 +1,122 @@
-{% extends 'base.html.twig' %}
+{% extends 'contabilidad/venta/index.html.twig' %}
 
-{% block title %}Hello ContratosClienteController!{% endblock %}
+{% block title %}ContratosCliente index{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% block content %}
+    <div class="container-fluid">
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de Contratos
+            </h4>
+            <div>
+                <a role="button" class="btn btn-primary" href="{{ url('contabilidad_venta_contratos_cliente_new') }}">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </a>
+            </div>
+        </div>
+        {# end header #}
+        {{ include('contabilidad/venta/contratos_cliente/suplemento.html.twig') }}
+        {# list #}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th>Nro. Contrato</th>
+            <th>Cliente</th>
+            <th>Fecha aprobado</th>
+            <th>Fecha vencimiento</th>
+            <th>Importe</th>
+            <th>Resto</th>
+            <th scope="col-1" width="200x">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in contratos_clientes %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nroContrato }}</td>
+                    <td style="font-weight:400;">{{ item.idCliente.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.fechaAprobado|date("d/m/Y") }}</td>
+                    <td style="font-weight:400;">{{ item.fechaVencimiento|date("d/m/Y") }}</td>
+                    <td style="font-weight:400;">{{ item.importe }}</td>
+                    <td style="font-weight:400;">{{ item.resto }}</td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Suplementar"
+                                onclick="onSuplementar({
+                                        nro_contrato: '{{ item.nroContrato }}',
+                                        cliente: '{{ item.idCliente.nombre }}',
+                                        fecha_aprobado: '{{ item.fechaAprobado|date("d/m/Y") }}',
+                                        fecha_vencimiento: '{{ item.fechaVencimiento|date("Y-m-d") }}',
+                                        importe: '{{ item.importe }}',
+                                        resto: '{{ item.resto }}',
+                                        })">
+                            <i class="fa fa-signal"></i>
+                        </button>
+                        <a role="button" class="btn btn-warning btn-sm px-1" title="Editar"
+                           href="{{ path('contabilidad_venta_contratos_cliente_edit', {id: item.id}) }}">
+                            <i class="fa fa-edit"></i></i>
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        title:'Eliminar',
+                                        message:'Está seguro que desea eliminar el cliente {{ item.nroContrato }}  ?',
+                                        url:'{{ path('contabilidad_venta_contratos_cliente_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'F:/sistemas/TIM/app/src/Controller/Contabilidad/Venta/ContratosClienteController.php'|file_link(0) }}">src/Controller/Contabilidad/Venta/ContratosClienteController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'F:/sistemas/TIM/app/templates/contabilidad/venta/contratos_cliente/index.html.twig'|file_link(0) }}">templates/contabilidad/venta/contratos_cliente/index.html.twig</a></code></li>
-    </ul>
-</div>
+        function onSuplementar(contrato) {
+            console.log(contrato)
+            $('#data_contrato').html(`
+                <div class="mb-2 text-light">
+                    Nro. Contrato: ${contrato.nro_contrato}
+                    <br>Fecha aprobación: ${contrato.fecha_aprobado}
+                    <br>
+                    Cliente: ${contrato.cliente}
+                </div>
+
+            `)
+            $('#importe_suplemento_id').val(contrato.importe)
+            $('#fecha_vencimiento_suplemento_id').val(contrato.fecha_vencimiento)
+            modal.modal('show')
+        }
+
+        const modal = $('#modal_suplemento_id')
+        const form_suplemento = $('#form_suplemento_id')
+        form_suplemento.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'contratos_cliente[nro_contrato]': "required",
+                'contratos_cliente[id_cliente]': "required",
+                'contratos_cliente[importe]': "required",
+                'contratos_cliente[id_moneda]': "required",
+                'contratos_cliente[fecha_aprobado]': "required",
+                'contratos_cliente[fecha_vencimiento]': "required",
+            },
+            messages: {
+                'contratos_cliente[nro_contrato]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[importe]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[fecha_aprobado]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[fecha_vencimiento]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+            }
+        })
+    </script>
 {% endblock %}

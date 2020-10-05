@@ -5,9 +5,11 @@ namespace App\Entity\Contabilidad\Venta;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Repository\Contabilidad\Venta\ContratosClienteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ContratosClienteRepository::class)
+ * @UniqueEntity(fields={"nro_contrato"}, message="contabilidad.config.nro_contrato_unique")
  */
 class ContratosCliente
 {
@@ -59,6 +61,16 @@ class ContratosCliente
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_moneda;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $resto;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_padre;
 
     public function getId(): ?int
     {
@@ -157,6 +169,30 @@ class ContratosCliente
     public function setIdMoneda(?Moneda $id_moneda): self
     {
         $this->id_moneda = $id_moneda;
+
+        return $this;
+    }
+
+    public function getResto(): ?float
+    {
+        return $this->resto;
+    }
+
+    public function setResto(?float $resto): self
+    {
+        $this->resto = $resto;
+
+        return $this;
+    }
+
+    public function getIdPadre(): ?int
+    {
+        return $this->id_padre;
+    }
+
+    public function setIdPadre(?int $id_padre): self
+    {
+        $this->id_padre = $id_padre;
 
         return $this;
     }
