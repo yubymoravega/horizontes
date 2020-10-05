@@ -135,7 +135,7 @@
                                     <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nro_cuenta']} </td>
                                     <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_moneda']}</td>
                                     <td><button type="button"
-                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${id}">
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${list_cuentas_cliente[i]['nro_cuenta']}">
                             <i class="fa fa-minus-circle"></i>
                         </button></td>
                                    </tr>`
@@ -183,7 +183,7 @@
                     <td style="font-weight:400;"> ${nro_cuenta}</td>
                     <td style="font-weight:400;"> ${nombre_moneda}</td>
                     <td> <button type="button"
-                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${moneda}">
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${nro_cuenta}">
                         <i class="fa fa-minus-circle"></i>
                     </button>
                     </td></tr>`
@@ -245,18 +245,16 @@
                 rules: {
                     'cliente_contabilidad[nombre]': "required",
                     'cliente_contabilidad[codigo]': "required",
-                    'cliente_contabilidad[fax]': "required",
                     'cliente_contabilidad[telefonos]': "required",
                     'cliente_contabilidad[correos]': "required",
                     'cliente_contabilidad[direccion]': "required"
                 },
                 messages: {
-                    'cliente_contabilidad[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'cliente_contabilidad[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'cliente_contabilidad[fax]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'cliente_contabilidad[telefonos]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'cliente_contabilidad[correos]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'cliente_contabilidad[direccion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'cliente_contabilidad[nombre]': 'Obligratorio',
+                    'cliente_contabilidad[codigo]': 'Obligratorio',
+                    'cliente_contabilidad[telefonos]': 'Obligratorio',
+                    'cliente_contabilidad[correos]': 'Obligratorio',
+                    'cliente_contabilidad[direccion]': 'Obligratorio',
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {
@@ -280,8 +278,8 @@
             })
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
-                list_cuentas_cliente.find(e => e.codigo === $(this).attr('id-cuenta-cliente'))
-                list_cuentas_cliente = list_cuentas_cliente.filter(e => e.codigo !== $(this).attr('id-cuenta-cliente'))
+                list_cuentas_cliente.find(e => e.nro_cuenta === $(this).attr('id-cuenta-cliente'))
+                list_cuentas_cliente = list_cuentas_cliente.filter(e => e.nro_cuenta !== $(this).attr('id-cuenta-cliente'))
                 $(this).closest('tr').remove()
             })
         })

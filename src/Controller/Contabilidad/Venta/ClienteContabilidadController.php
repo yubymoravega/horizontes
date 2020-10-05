@@ -113,7 +113,42 @@ class ClienteContabilidadController extends AbstractController
                 $em->persist($new_cuenta_cliente);
             }
         } else {
+            foreach ($lista as $item) {
+                $moneda = $moneda_er->find($item['moneda']);
+                $nro = $item['nro_cuenta'];
+                /**@var $obj CuentasCliente**/
+                $flag = false;
+                foreach ($cuentas_cliente_arr as $obj){
+                    if($obj->getIdMoneda() == $moneda && $obj->getNroCuenta() == $nro)
+                        $flag = true;
+                }
+                if(!$flag){
+                    $new_cuenta_cliente = new CuentasCliente();
+                    $new_cuenta_cliente
+                        ->setNroCuenta($item['nro_cuenta'])
+                        ->setIdMoneda($moneda_er->find($item['moneda']))
+                        ->setIdCliente($cliente_er->find($id_cliente))
+                        ->setActivo(true);
+                    $em->persist($new_cuenta_cliente);
+                }
+            }
 
+            //Elimino las cuentas que el usuario quito
+            foreach ($cuentas_cliente_arr as $obj){
+                $delete_flag = true;
+                foreach ($lista as $item){
+                    $moneda = $moneda_er->find($item['moneda']);
+                    $nro = $item['nro_cuenta'];
+                    if($obj->getIdMoneda() == $moneda && $obj->getNroCuenta() == $nro){
+                        $delete_flag = false;
+                        break;
+                    }
+                }
+                if($delete_flag){
+                    $obj->setActivo(false);
+                    $em->persist($obj);
+                }
+            }
         }
         try {
             $em->flush();

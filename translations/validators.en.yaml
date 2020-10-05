@@ -17,6 +17,8 @@ contabilidad:
     centro_costo_unique: Centro de Costo ya se encuentra registrado
     grupo_activo_unique: Ya se encuentra registrado un grupo con esa descripción
     taza_cambio_unique: La tasa de cambio ya se encuentra registrada
+    nombre_cliente: Ya existe un cliente registrado con ese nombre
+    codigo_cliente: Ya existe un cliente registrado con ese código
     abreviatura_not_blank: El campo descripción está vacio !
     abreviatura_unique: La abreviatura ya está en uso !
 
