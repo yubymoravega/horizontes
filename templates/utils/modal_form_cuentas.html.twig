@@ -1,0 +1,31 @@
+{# Modal del formulario #}
+<div class="modal fade" id="modal__form__cuentas__id" tabindex="-1" role="dialog"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-labelledby="modal__form__cuentas__label__id" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark">
+                <h4 class="modal-title text-light" id="modal__form__cuentas__label__id">{{ title }}</h4>
+                <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-dark-app">
+
+                {# ----------- Body --------- #}
+                {% block modalbody %}  {% endblock %}
+
+                {# ----------- Footer --------- #}
+                {% block modalfooter %}
+                <div class="d-flex mt-4">
+                    <button class="btn btn-outline-secondary mr-auto" type="button" data-dismiss="modal"
+                            aria-hidden="true">Cancelar
+                    </button>
+                    <button type="button" class="my-0 btn btn-secondary" id="modal__btn__cuenta__aceptar" data-dismiss="modal">Aceptar</button>
+                </div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
