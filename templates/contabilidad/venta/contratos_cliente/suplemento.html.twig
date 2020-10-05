@@ -19,18 +19,19 @@
                 <form id="form_suplemento_id">
                     <div class="row pt-0 mt-0">
                         <div class="col-6 form-group input-group input-group-sm d-block">
-                            <label for="importe_suplemento_id">Importe</label>
+                            <label for="importe_suplemento_id">Nuevo Importe</label>
                             <input class="form-control w-100" type="number" name="suplemento[importe]"
                                    id="importe_suplemento_id" required="required">
                         </div>
                         <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
-                            <label for="importe_suplemento_id">Fecha vencimiento</label>
+                            <label for="importe_suplemento_id">Fecha de vencimiento</label>
                             <input type="date" id="fecha_vencimiento_suplemento_id"
                                    name="suplemento[fecha_vencimiento]" required="required"
                                    class="form-control w-100">
 
                         </div>
                     </div>
+                    <input type="hidden" name="id_contrato" id="supelemento_id_contrato">
                 </form>
                 <div class="d-flex mt-4">
                     <button class="btn btn-outline-secondary mr-auto" type="button" data-dismiss="modal"

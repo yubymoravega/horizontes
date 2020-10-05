@@ -44,7 +44,7 @@ class ContratosClienteController extends AbstractController
             $contratosCliente->setResto($contratosCliente->getImporte());
             $entityManager->persist($contratosCliente);
             $entityManager->flush();
-            $this->addFlash('success', 'Almacén creado satisfactoriamente');
+            $this->addFlash('success', 'Contrato creado satisfactoriamente');
             return $this->redirectToRoute('contabilidad_venta_contratos_cliente_index');
         }
 
@@ -57,13 +57,30 @@ class ContratosClienteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="contabilidad_venta_contratos_cliente_show", methods={"GET"})
+     * @Route("/suplemento/{id}", name="contabilidad_venta_contratos_cliente_suplemento", methods={"POST"})
      */
-    public function show(ContratosCliente $contratosCliente): Response
+    public function show(ContratosCliente $contratosCliente, Request $request, ContratosClienteRepository $repository): Response
     {
-        return $this->render('contabilidad/venta/contratos_cliente/show.html.twig', [
-            'contratos_cliente' => $contratosCliente,
-        ]);
+        // se esta trabajando con el importe del suplemento como el valor final del contrato
+
+        $importe_suplemento = $request->get('suplemento')['importe'];
+        $fecha_suplemento = $request->get('suplemento')['fecha_vencimiento'];
+
+        $contratoSuplemento = clone $contratosCliente;
+        $contratoSuplemento->setAnno(Date('Y'));
+        $contratoSuplemento->setResto($importe_suplemento - ($contratosCliente->getImporte() - $contratosCliente->getResto()));
+        $contratoSuplemento->setFechaVencimiento(\DateTime::createFromFormat('Y-m-d', $fecha_suplemento));
+        $contratoSuplemento->setImporte($importe_suplemento);
+        $contratoSuplemento->setIdPadre($contratosCliente->getId());
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($contratoSuplemento);
+
+        $contratosCliente->setActivo(false);
+        $entityManager->flush();
+        $this->addFlash('success', 'Contrato suplementado satisfactoriamente');
+
+        return $this->redirectToRoute('contabilidad_venta_contratos_cliente_index');
     }
 
     /**
@@ -77,7 +94,7 @@ class ContratosClienteController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $contratosCliente->setResto($contratosCliente->getImporte());
             $this->getDoctrine()->getManager()->flush();
-            $this->addFlash('success', 'Almacén actualizado satisfactoriamente');
+            $this->addFlash('success', 'Contrato actualizado satisfactoriamente');
             return $this->redirectToRoute('contabilidad_venta_contratos_cliente_index');
         }
         if ($error->count()) $this->addFlash('error', $error->get(0)->getMessage());
@@ -98,7 +115,7 @@ class ContratosClienteController extends AbstractController
                 $contratosCliente->setActivo(false);
                 $entityManager->persist($contratosCliente);
                 $entityManager->flush();
-                $this->addFlash('success', 'Almacén eliminado satisfactoriamente');
+                $this->addFlash('success', 'Contrato eliminado satisfactoriamente');
             } catch
             (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
