@@ -3,10 +3,17 @@
 namespace App\Entity\Contabilidad\Venta;
 
 use App\Repository\Contabilidad\Venta\ClienteContabilidadRepository;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=ClienteContabilidadRepository::class)
+ * @UniqueEntity(
+ *     fields={"codigo"},
+ *     message="contabilidad.config.codigo_cliente")
+ * @UniqueEntity(
+ *     fields={"nombre"},
+ *     message="contabilidad.config.nombre_cliente")
  */
 class ClienteContabilidad
 {
@@ -19,6 +26,7 @@ class ClienteContabilidad
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
      */
     private $codigo;
     /**
@@ -37,7 +45,7 @@ class ClienteContabilidad
     private $telefonos;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $fax;
 
