@@ -416,8 +416,8 @@ class InformeRecepcionController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em,['ALM']);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM']);
+        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $row_proveedores = $em->getRepository(Proveedor::class)->findBy(array('activo' => true));
         $monedas = [];

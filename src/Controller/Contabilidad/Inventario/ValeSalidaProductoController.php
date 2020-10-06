@@ -142,7 +142,7 @@ class ValeSalidaProductoController extends AbstractController
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
         $unidad = AuxFunctions::getUnidad($em, $user);
-        $row_inventario = AuxFunctions::getCuentasInventario($em);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['GAT']);;
 //        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
