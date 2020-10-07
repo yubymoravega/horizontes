@@ -496,6 +496,7 @@ class ValeSalidaProductoController extends AbstractController
                         'id' => $obj->getIdProducto()->getId(),
                         'codigo' => $obj->getIdProducto()->getCodigo(),
                         'descripcion' => $obj->getIdProducto()->getDescripcion(),
+                        'um' => $obj->getIdProducto()->getIdUnidadMedida()->getAbreviatura(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),

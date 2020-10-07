@@ -41,6 +41,7 @@
             <thead>
             <th style="border: solid black 1px; width:80px;" class="text-center"><strong>Código</strong></th>
             <th style="border: solid black 1px; width:100px;" class="text-center"><strong>Descripción</strong></th>
+            <th width="10" class="text-center"><strong>UM</strong></th>
             <th style="border: solid black 1px; width:100px;" class="text-center"><strong>Centro Costo</strong></th>
             <th style="border: solid black 1px; width:100px;" class="text-center"><strong>Elemento Gasto</strong></th>
             <th style="border: solid black 1px; width:70px;" class="text-center"><strong>Cantidad</strong></th>
@@ -53,6 +54,7 @@
                 <tr>
                     <td>{{ item.codigo }}</td>
                     <td>{{ item.descripcion }}</td>
+                    <td class="text-center">{{ item.um }}</td>
                     <td>{{ item.centro_costo }}</td>
                     <td>{{ item.elemento_gasto }}</td>
                     <td class="text-right">{{ item.cantidad }}</td>
