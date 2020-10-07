@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Provincias;
 use App\Entity\Municipios;
 use App\Entity\Carrito;
+use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\TasaDeCambio;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,8 +49,9 @@ class CheckoutController extends AbstractController
                 'id' => $data[$contador]->getId(),
                 'json' => \json_decode($data[$contador]->getJson()),
 
-            );
+            ); 
 
+ 
         $dataBase = $this->getDoctrine()->getManager();
         $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]['json']->provincia]);
         $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]['json']->municipio]); 
@@ -56,15 +59,26 @@ class CheckoutController extends AbstractController
         $json[$contador]['json']->provincia = $provincia[0]->getNombre();
         $json[$contador]['json']->municipio = $municipio[0]->getNombre();
 
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]['json']->montoMoneda]);
+
+        $dolares = $json[$contador]['json']->monto / $tasa[0]->getTasa();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+        $json[$contador]['json']->monto = $dolares * $tasa[0]->getTasa();
+        $json[$contador]['recibirMoneda'] = $dataBase->getRepository(Moneda::class)->find($json[$contador]['json']->recibirMoneda)->getNombre();
+
             $total = $total + $json[$contador]['json']->monto;
 
             $contador++;
         }
 
+        $user =  $this->getUser();
+
+        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
+
         //return new Response(var_dump($json ));
 
         return $this->render('checkout/index.html.twig', [
-            'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
+            'moneda' => $moneda,'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
         ]);
     }
 
@@ -87,12 +101,19 @@ class CheckoutController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
+        $monedaTasa = $dataBase->getRepository(Moneda::class)->findBy(['nombre'=> $data[0]->getIdMoneda()]);
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $monedaTasa[0]->getId()]);
+
+        $dolares = $data[0]->getTotal() / $tasa[0]->getTasa();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+        $total = $dolares * $tasa[0]->getTasa();
+        
         $json = json_decode($data[0]->getJson()); 
 
-        //return new Response(var_dump(json_decode( $json[1])));
+        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
 
         return $this->render('checkout/cotizacion.html.twig', [
-            'data' =>$data[0],  'itens' => $json, 'total' =>number_format($data[0]->getTotal(), 2, '.', '')
+           'moneda'=> $moneda ,'id' =>$id,  'data' =>$data[0],  'itens' => $json, 'total' =>number_format($total, 2, '.', '')
         ]);
     }
 
@@ -158,5 +179,43 @@ class CheckoutController extends AbstractController
         );
 
         return new response(200);
+    }
+
+    /**
+     * @Route("/checkout/cotizacion/carrito/{id}", name="checkout/cotizacion/carrito")
+     */
+    public function cotizacionCarrito($id, Request $request)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Cotizacion::class)->find($id);
+        $user =  $this->getUser();
+
+       $json = json_decode($data->getJson());
+
+       $con = count( $json);
+
+       $contador = 0;
+       
+       while($contador < $con){
+
+           $carrito = new Carrito();
+           $carrito->setJson(json_encode($json[$contador]));
+           $carrito->setEmpleado($user->getUsername());
+           
+           $dataBase->persist($carrito);
+           $dataBase->flush();
+
+           $contador++;
+       }
+
+       $dataBase->remove(  $data );
+            $dataBase->flush();
+
+        $this->addFlash(
+            'success',
+            'Carrito'
+        );
+
+        return $this->redirectToRoute('home');
     }
 }

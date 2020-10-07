@@ -88,12 +88,25 @@ class HomeController extends AbstractController
         $json = null;
         $con = count( $data);
         $contador = 0;
+        $decode = null;
        
         while($contador < $con){
+
+            $decode = json_decode($data[$contador]->getJson());
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$decode->montoMoneda]);
+
+            $dolares = $decode->monto / $tasa[0]->getTasa();
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+            $total = $dolares * $tasa[0]->getTasa();
+
+            $dataBase = $this->getDoctrine()->getManager();
+            $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
 
             $json[$contador] = array(
                 'id' => $data[$contador]->getId(),
                 'json' => $data[$contador]->getJson(),
+                'moneda' => $moneda->getNombre(),
+                'total' => $total,
             );
             $contador++;
         }
@@ -143,7 +156,7 @@ class HomeController extends AbstractController
         $user =  $this->getUser();
         $data = $dataBase->getRepository(Moneda::class)->findAll(false);
 
-
+        $array = null;
         $con = count($data);
         $contador = 0;
        
@@ -152,15 +165,21 @@ class HomeController extends AbstractController
 
         if($data[$contador]->getId() == $user->getIdMoneda()){
 
-            return new response ($data[$contador]->getNombre());
+            //return new response ($data[$contador]->getNombre());
+            $array[$contador] = array('code' => $data[$contador]->getId(),
+            'nombre' => $data[$contador]->getNombre(),'estatus' => 'selected');
 
+        }else{
+
+            $array[$contador] = array('code' => $data[$contador]->getId(),
+            'nombre' => $data[$contador]->getNombre());
         }
         
             $contador++;
         }
 
 
-        return new response ("No Moneda");
+        return new response (\json_encode($array));
 
     }
 
@@ -358,5 +377,34 @@ class HomeController extends AbstractController
     return new response (200);
 
 }
+
+ /**
+     * @Route("/home/moneda/select/{code}", name="home/moneda/select/")
+     */
+    public function monedaMenuSelect($code,Request $request)
+    {  
+        $dataBase = $this->getDoctrine()->getManager();
+
+        $user =  $this->getUser();
+        
+       if($code){
+        
+        $data = $dataBase->getRepository(User::class)->find($user->getId());
+
+        $data->setIdMoneda($code);
+
+        $dataBase->flush($data);
+
+        $this->addFlash(
+            'success',
+            'Moneda Seleccionada'
+        );
+
+       }
+       return new response (200);
+
+    }
+
+  
  
 }

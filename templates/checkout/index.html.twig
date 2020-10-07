@@ -32,7 +32,7 @@
 											</th>
 											<td class="big text-middle">
 												<h5 class="text-regular" style="color:white;"> </h5>
-													{{iten.json.servicio}} - ${{iten.json.recibir}}   </br></br>                                      
+													{{iten.json.servicio}} - {{iten.recibirMoneda}} ${{iten.json.recibir}}   </br></br>                                      
 	<a  data-toggle="collapse" href="#coll{{iten.id}}" role="button" aria-expanded="false" aria-controls="coll{{iten.id}}"> 
 		<span style="color:white;"> <b> {{iten.json.primerNombre}} {{iten.json.primerApellido}} {{iten.json.segundoApellido}} </b><span> </br>
 	</a>
@@ -55,7 +55,7 @@
 												
 											</td>
 											<td class="text-middle">1</td>
-											<td class="text-middle">{{iten.json.monto}}</td>
+											<td class="text-middle">{{iten.json.monto}} {{moneda}}</td>
                                             <td class="text-middle">
                                             
 			<a  onClick="editarIten('{{ iten.id }}');" > 
@@ -76,13 +76,12 @@
 								</table>
 							</div>
 							<div class="offset-top-10 text-right">
-								<p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp; &nbsp; ${{total}}</p>
-                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuesto: &nbsp; &nbsp; &nbsp; $0.00</p>
-                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp; &nbsp; ${{total}}</p>
+								<p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
+                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuesto: &nbsp; &nbsp; &nbsp; $0.00 {{moneda}}</p>
+                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
 								<a  onclick="cotizacion()" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
 									<span class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></span>Cotizacion</a>
-                                <a  class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
-									<span class="novi-icon icon mdi mdi-chevron-double-right"></span>Pre Factura</a>
+                                
                                      <a  class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
 									<span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
 							</div>

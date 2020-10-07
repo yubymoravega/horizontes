@@ -107,17 +107,16 @@
 			<div style="margin: 0px;" class="col-4"> 
  Moneda
     <select style="height: 42px;" class="form-control" id="monedasRecibir">
-      <option>1</option>
-      <option>2</option>
-      <option>3</option>
-      <option>4</option>
-      <option>5</option>
+      <option Selected value="0">Moneda</option>
+     {% for data in monedaPais %}
+         <option value="{{data.code}}">{{data.nombre}}</option>
+    {% endfor %}
     </select>
   </div>
 					</div>
         <div class="row" style="margin-top: -15px;">
 	        <div class="col-4"></div>
- 		    <div class="col-4"><button id='boton-enviar' type="button" class="btn btn-dark">Agregar</button></div>
+ 		    <div class="col-4"><button id='boton-enviar' type="button" class="btn btn-dark">Procesar</button></div>
 			<div class="col-4"></div>			
 		</div>
 
@@ -184,58 +183,64 @@ $( "#add" ).click(function() {
             }
         });
 
+			$( "#total" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
+            });
+
+
 			$( "#monto" ).change(function() {
 				
-				if($( "#monto" ).val() <= 100){
-								
-				if($("#provincia option:selected").text() == 'LA HABANA'){
+				if($('#monedasRecibir').val() == "0")
+				{}else{
 
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(5));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(8));
-				
-				}}else{ 
-				
-					if($("#provincia option:selected").text() == 'LA HABANA'){
-
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.08 ));
-
-				}}
-
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/recibir/"
+			+$('#monedasRecibir').val()+"/"+$('#monto').val()+"/"+{{pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#total').val(data);
+            }
+        });
+	}
             });
 
 
-			$( "#total" ).change(function() {
-
-				if($( "#total" ).val() <= 100){
-								
-				if($("#provincia option:selected").text() == 'LA HABANA'){
-
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(5));
+			$( "#monedasRecibir" ).change(function() {
 				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(8));
-				
-				}}else{ 
-				
-					if($("#provincia option:selected").text() == 'LA HABANA'){
+				if($('#monedasRecibir').val() == "0")
+				{}else{
 
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.08 ));
-
-				}}
-
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
             });
+
+
+			
 
 
 		    $( "#dialog-monto" ).dialog({width: 500});
@@ -247,11 +252,12 @@ $( "#add" ).click(function() {
 
 					let monto =	$( "#total" ).val();
 					let recibir =	$( "#monto" ).val();
-					window.location.href = "/remesas.carrito/"+id+"/"+monto+"/"+recibir+"/"+idCliente+"/"+nombre+'/'+apellido;
+					window.location.href = "/remesas.carrito/"+id+"/"+monto+"/"+recibir+"/"
+					+idCliente+"/"+nombre+'/'+apellido+'/'+$('#monedasRecibir').val()+'/'+{{pais}};
 				}else {
 
 					 $("#mensaje-monto").text("Monto Minimo A Pagar $18");
-					  $("#mensaje-monto").css({"color": "red"});
+					  $("#mensaje-monto").css({"color": "red"}); 
 				}
        });
            

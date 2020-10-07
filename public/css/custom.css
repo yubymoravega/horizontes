@@ -615,3 +615,11 @@ svg.iconCarritoDelete{
     float: right;
     margin-right: 10%;
 }
+.currency{
+
+    color: white;
+    border-color: black;
+    background-color: black;
+    margin-right: 385px;
+    margin-top: 20px;
+}

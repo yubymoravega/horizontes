@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Contabilidad\Config\Moneda;
 
 class FacturaController extends AbstractController
 {
@@ -146,8 +147,8 @@ class FacturaController extends AbstractController
         $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]->provincia]);
         $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]->municipio]); 
 
-        $json[$contador]->provincia = $provincia[0]->getNombre();
-        $json[$contador]->municipio = $municipio[0]->getNombre();
+        // $json[$contador]->provincia = $provincia[0]->getNombre();
+        //$json[$contador]->municipio = $municipio[0]->getNombre();
 
             $total = $total + $json[$contador]->monto;
 
@@ -164,6 +165,7 @@ class FacturaController extends AbstractController
         $Cotizacion->setDatetime($date);
         $Cotizacion->setTotal($total);
         $Cotizacion->setEdit(true);
+        $Cotizacion->setIdMoneda( $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre());
         $Cotizacion->setIdCliente($json[0]->idCliente);
         $Cotizacion->setNombreCliente($json[0]->nombreCliente);
         $dataBase->persist($Cotizacion);
