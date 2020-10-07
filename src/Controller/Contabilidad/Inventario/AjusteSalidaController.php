@@ -12,14 +12,12 @@ use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
-use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteSalidaType;
-use App\Form\Contabilidad\Inventario\AjusteType;
 use App\Repository\Contabilidad\Config\CentroCostoRepository;
 use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -280,6 +278,7 @@ class AjusteSalidaController extends AbstractController
             /**@var $centro CentroCosto* */
             $centro_costo[] = array(
                 'nombre' => $centro->getNombre(),
+                'codigo' => $centro->getCodigo(),
                 'id' => $centro->getId(),
             );
         }
@@ -287,6 +286,7 @@ class AjusteSalidaController extends AbstractController
             /**@var $item ElementoGasto* */
             $elemento[] = array(
                 'nombre' => $item->getDescripcion(),
+                'codigo' => $item->getCodigo(),
                 'id' => $item->getId(),
             );
         }
