@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20201006200013 extends AbstractMigration
+final class Version20201008125630 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -27,8 +27,7 @@ final class Version20201006200013 extends AbstractMigration
         $this->addSql('ALTER TABLE factura ADD CONSTRAINT FK_F9EBA0097EB2C349 FOREIGN KEY (id_usuario_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE movimiento_venta ADD CONSTRAINT FK_8E3F7AE555C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
         $this->addSql('ALTER TABLE obligacion_cobro ADD CONSTRAINT FK_807C726D55C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
-        $this->addSql('ALTER TABLE cliente_contabilidad CHANGE fax fax VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE contratos_cliente ADD resto DOUBLE PRECISION DEFAULT NULL, ADD id_padre INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE almacen_ocupado CHANGE id_almacen_id id_almacen_id INT NOT NULL, CHANGE id_usuario_id id_usuario_id INT NOT NULL');
     }
 
     public function down(Schema $schema) : void
@@ -39,7 +38,6 @@ final class Version20201006200013 extends AbstractMigration
         $this->addSql('DROP TABLE factura');
         $this->addSql('DROP TABLE movimiento_venta');
         $this->addSql('DROP TABLE obligacion_cobro');
-        $this->addSql('ALTER TABLE cliente_contabilidad CHANGE fax fax VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('ALTER TABLE contratos_cliente DROP resto, DROP id_padre');
+        $this->addSql('ALTER TABLE almacen_ocupado CHANGE id_almacen_id id_almacen_id INT DEFAULT NULL, CHANGE id_usuario_id id_usuario_id INT DEFAULT NULL');
     }
 }
