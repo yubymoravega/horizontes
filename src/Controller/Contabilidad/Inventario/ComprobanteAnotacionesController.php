@@ -45,7 +45,20 @@ class ComprobanteAnotacionesController extends AbstractController
             'activo'=>true
         ));
         foreach ($arr_obj_documentos as $obj_documento){
-
+            /**@var $obj_documento Documento**/
+            $id_tipo_documento = $obj_documento->getIdTipoDocumento()->getId();
+            if ($id_tipo_documento ==1 || $id_tipo_documento ==2 ){
+                //informe recepcion
+            }
+            elseif ($id_tipo_documento ==3 || $id_tipo_documento ==4){
+                //ajuste
+            }
+            elseif ($id_tipo_documento ==5 || $id_tipo_documento ==6){
+                //transferencia
+            }
+            elseif ($id_tipo_documento ==7 || $id_tipo_documento ==8){
+                
+            }
         }
 
 

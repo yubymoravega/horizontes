@@ -130,7 +130,8 @@ class InformeRecepcionController extends AbstractController
             $list_mercancia = json_decode($request->get('informe_recepcion')['list_mercancia'], true);
             if ($this->isCsrfTokenValid('authenticate', $request->get('_token'))) {
                 $informe_recepcion = $request->get('informe_recepcion');
-
+                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                $obj_tipo_documento = $tipo_documento_er->find(1);
                 /**  datos de InformeRecepcionType **/
                 $cuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_cuenta_acreedora']);
                 $cuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_cuenta_inventario']);
@@ -202,6 +203,8 @@ class InformeRecepcionController extends AbstractController
                     $documento = new Documento();
                     $documento
                         ->setActivo(true)
+                        ->setAnno($year_)
+                        ->setIdTipoDocumento($obj_tipo_documento)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                         ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
@@ -234,8 +237,6 @@ class InformeRecepcionController extends AbstractController
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $mercancia_er = $em->getRepository(Mercancia::class);
-                    $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->find(1);
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $mercancia) {
