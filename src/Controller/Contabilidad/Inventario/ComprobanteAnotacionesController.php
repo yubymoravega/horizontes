@@ -3,7 +3,6 @@
 namespace App\Controller\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
-use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
@@ -20,20 +19,111 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class SubmayorInventarioProductoController
+ * Class ComprobanteAnotacionesController
  * @package App\Controller\Contabilidad\Inventario
- * @Route("/contabilidad/inventario/submayor-inventario-producto")
+ * @Route("/contabilidad/inventario/comprobante-anotaciones")
  */
-class SubmayorInventarioProductoController extends AbstractController
+class ComprobanteAnotacionesController extends AbstractController
 {
     /**
-     * @Route("/", name="contabilidad_inventario_submayor_inventario_producto", methods={"GET"})
+     * @Route("/", name="contabilidad_inventario_comprobante_anotaciones")
      */
-    public function index()
+    public function index(Request $request, EntityManagerInterface $em)
     {
 
-        return $this->render('contabilidad/inventario/submayor_inventario_producto/index.html.twig', [
-            'controller_name' => 'SubmayorInventarioProductoController',
+        $mercancia_er = $em->getRepository(Mercancia::class);
+        $producto_er = $em->getRepository(Producto::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
+        $documento_er = $em->getRepository(Documento::class);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $rows = [];
+
+        //1. Recorro todos los documentos del almacen
+        $arr_obj_documentos = $documento_er->findBy(array(
+            'id_almacen'=>$id_almacen,
+            'activo'=>true
+        ));
+        foreach ($arr_obj_documentos as $obj_documento){
+
+        }
+
+
+//        $obj_mercancia = $mercancia_er->findOneBy(array(
+//            'codigo' => $cod,
+//            'id_amlacen' => $id_almacen
+//        ));
+//        if (!$obj_mercancia) {
+//            $obj_producto = $producto_er->findOneBy(array(
+//                'codigo' => $cod,
+//                'id_amlacen' => $id_almacen
+//            ));
+//            if (!$obj_producto)
+//                $msg = "No se encontró ningun producto con el código introducido";
+//            else {
+//                //imprimo el producto
+//                /**@var $obj_producto Producto* */
+//                $descripcion_producto = $obj_producto->getDescripcion();
+//                $um_producto = $obj_producto->getIdUnidadMedida()->getAbreviatura();
+//
+//                $arr_movimientos_producto = $movimiento_producto_er->findBy(array(
+//                    'id_producto' => $obj_producto,
+////                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
+//                ));
+//                foreach ($arr_movimientos_producto as $obj_mivimiento) {
+//                    /**@var $obj_mivimiento MovimientoProducto* */
+//                    $rows [] = array(
+//                        'fecha' => $obj_mivimiento->getFecha()->format('d/m/Y'),
+//                        'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
+//                        'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
+//                        'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
+//                        'cant_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getCantidad(),
+//                        'importe_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getImporte(),
+//                        'cant_existencia'=>$obj_mivimiento->getExistencia(),
+//                        'importe_existencia'=>round(($obj_mivimiento->getExistencia()*($obj_mivimiento->getImporte()/$obj_mivimiento->getCantidad())),2)
+//                    );
+//                }
+//            }
+//        } else {
+//            //imprimo la mercancia
+//            /**@var $obj_mercancia Mercancia* */
+//            $descripcion_producto = $obj_mercancia->getDescripcion();
+//            $um_producto = $obj_mercancia->getIdUnidadMedida()->getAbreviatura();
+//
+//            $arr_movimientos_mercancia = $movimiento_mercancia_er->findBy(array(
+//                'id_mercancia' => $obj_mercancia,
+////                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
+//            ));
+//            foreach ($arr_movimientos_mercancia as $obj_mivimiento) {
+//                /**@var $obj_mivimiento MovimientoMercancia* */
+//                $rows [] = array(
+//                    'fecha' => $this->getFecha($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
+//                    'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
+//                    'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
+//                    'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
+//                    'cant_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getCantidad(),
+//                    'importe_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getImporte(),
+//                    'cant_existencia'=>$obj_mivimiento->getExistencia(),
+//                    'importe_existencia'=>round(($obj_mivimiento->getExistencia()*($obj_mivimiento->getImporte()/$obj_mivimiento->getCantidad())),2)
+//                );
+//            }
+//
+//        }
+//        return $this->render('contabilidad/inventario/submayor_inventario_producto/print.html.twig', [
+//            'datos' => array(
+//                'codigo_producto' => $cod,
+//                'descripcion_producto' => $descripcion_producto,
+//                'um_producto' => strtoupper($um_producto),
+//                'codigo_unidad' => $codigo_unidad,
+//                'nombre_unidad' => $nombre_unidad,
+//                'nombre_almacen' => $nombre_almacen,
+//                'cant_movimientos'=>count($rows)
+//            ),
+//            'movimientos' => $rows,
+//        ]);
+        return $this->render('contabilidad/inventario/comprobante_anotaciones/index.html.twig', [
+            'movimientos' => $rows,
+            'controller_name' => 'ComprobanteAnotacionesController',
         ]);
     }
 
@@ -67,96 +157,6 @@ class SubmayorInventarioProductoController extends AbstractController
 
         return new JsonResponse(['success' => true, 'descripcion' => $descripcion, 'msg' => $msg]);
     }
-
-    /**
-     * @Route("/print/{cod}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
-     */
-    public function print(EntityManagerInterface $em, $cod, Request $request)
-    {
-        $mercancia_er = $em->getRepository(Mercancia::class);
-        $producto_er = $em->getRepository(Producto::class);
-        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
-        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
-        $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $rows = [];
-        $codigo_unidad = $em->getRepository(Almacen::class)->find($id_almacen)->getIdUnidad()->getCodigo();
-        $nombre_unidad = $em->getRepository(Almacen::class)->find($id_almacen)->getIdUnidad()->getNombre();
-        $nombre_almacen = $request->getSession()->get('selected_almacen/name');
-
-        $obj_mercancia = $mercancia_er->findOneBy(array(
-            'codigo' => $cod,
-            'id_amlacen' => $id_almacen
-        ));
-        if (!$obj_mercancia) {
-            $obj_producto = $producto_er->findOneBy(array(
-                'codigo' => $cod,
-                'id_amlacen' => $id_almacen
-            ));
-            if (!$obj_producto)
-                $msg = "No se encontró ningun producto con el código introducido";
-            else {
-                //imprimo el producto
-                /**@var $obj_producto Producto* */
-                $descripcion_producto = $obj_producto->getDescripcion();
-                $um_producto = $obj_producto->getIdUnidadMedida()->getAbreviatura();
-
-                $arr_movimientos_producto = $movimiento_producto_er->findBy(array(
-                    'id_producto' => $obj_producto,
-//                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
-                ));
-                foreach ($arr_movimientos_producto as $obj_mivimiento) {
-                    /**@var $obj_mivimiento MovimientoProducto* */
-                    $rows [] = array(
-                        'fecha' => $obj_mivimiento->getFecha()->format('d/m/Y'),
-                        'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
-                        'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
-                        'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
-                        'cant_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getCantidad(),
-                        'importe_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getImporte(),
-                        'cant_existencia'=>$obj_mivimiento->getExistencia(),
-                        'importe_existencia'=>round(($obj_mivimiento->getExistencia()*($obj_mivimiento->getImporte()/$obj_mivimiento->getCantidad())),2)
-                    );
-                }
-            }
-        } else {
-            //imprimo la mercancia
-            /**@var $obj_mercancia Mercancia* */
-            $descripcion_producto = $obj_mercancia->getDescripcion();
-            $um_producto = $obj_mercancia->getIdUnidadMedida()->getAbreviatura();
-
-            $arr_movimientos_mercancia = $movimiento_mercancia_er->findBy(array(
-                'id_mercancia' => $obj_mercancia,
-//                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
-            ));
-            foreach ($arr_movimientos_mercancia as $obj_mivimiento) {
-                /**@var $obj_mivimiento MovimientoMercancia* */
-                $rows [] = array(
-                    'fecha' => $this->getFecha($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
-                    'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
-                    'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
-                    'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
-                    'cant_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getCantidad(),
-                    'importe_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getImporte(),
-                    'cant_existencia'=>$obj_mivimiento->getExistencia(),
-                    'importe_existencia'=>round(($obj_mivimiento->getExistencia()*($obj_mivimiento->getImporte()/$obj_mivimiento->getCantidad())),2)
-                );
-            }
-
-        }
-        return $this->render('contabilidad/inventario/submayor_inventario_producto/print.html.twig', [
-            'datos' => array(
-                'codigo_producto' => $cod,
-                'descripcion_producto' => $descripcion_producto,
-                'um_producto' => strtoupper($um_producto),
-                'codigo_unidad' => $codigo_unidad,
-                'nombre_unidad' => $nombre_unidad,
-                'nombre_almacen' => $nombre_almacen,
-                'cant_movimientos'=>count($rows)
-            ),
-            'movimientos' => $rows,
-        ]);
-    }
-
     public function getPrefijo($id)
     {
         $prefijo = '';

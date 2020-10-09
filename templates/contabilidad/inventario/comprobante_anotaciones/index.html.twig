@@ -1,0 +1,43 @@
+{% extends 'contabilidad/inventario/index.html.twig' %}
+
+{% block title %}Economía | Comprobante de Operaciones{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Comprobante de Operaciones
+            </h4>
+        </div>
+        {# end header #}
+
+        {# list#}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="70px">Documento</th>
+            <th width="70px">Fecha</th>
+            <th width="175px">Cuenta</th>
+            <th width="120px">Subcuenta</th>
+            <th width="120px">Análisis 1</th>
+            <th width="120px">Análisis 2</th>
+            <th width="120px">Análisis 3</th>
+            <th width="120px">Débitos</th>
+            <th width="120px">Créditos</th>
+            </thead>
+            <tbody>
+{#            {% for item in ajustes %}#}
+{#                <tr>#}
+{#                    <td style="font-weight:400;">{{ item.concecutivo }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.importe }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.fecha }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.inventario }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.acreedora }}</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
