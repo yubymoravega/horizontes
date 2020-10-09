@@ -17,6 +17,7 @@ class UnidadType extends AbstractType
     {
         $builder
             ->add('nombre')
+            ->add('codigo')
             ->add('id_padre', EntityType::class, [
                 'class' => Unidad::class,
                 'choice_label' => 'nombre',

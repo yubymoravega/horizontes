@@ -15,6 +15,7 @@ class AlmacenType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('codigo')
             ->add('descripcion')
             ->add('id_unidad', EntityType::class, [
                 'class' => Unidad::class,

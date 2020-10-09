@@ -302,7 +302,7 @@
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
                             let mercancias = data.mercancias
-                            $("#importe-total").text('$' + data.importe_total)
+                            $("#importe-total").text('$' + parseFloat(data.importe_total).toFixed(2))
                             for (var i = 0; i < mercancias.length; i++) {
 
                                 $('#rows_mercancias').append(`<tr>
@@ -450,9 +450,10 @@
 
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
-                        let importe = parseFloat(precio * cantidad).toFixed(3)
+                        let importe = parseFloat(precio * cantidad).toFixed(2)
                         $('#ajuste_salida_documento_importe_mercancia').val(importe)
-                        $('#resto_importe').val(importe_real - importe)
+                        let resto = importe_real - importe
+                        $('#resto_importe').val(resto.toFixed(2))
                     } else {
                         $('#ajuste_salida_documento_importe_mercancia').val(0)
                     }
@@ -599,7 +600,7 @@
 
                         importe_total += Number.parseFloat(importe)
 
-                        $("#importe-total").text('$' + importe_total)
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td class="px-2" style="font-weight:400;"> ${codigo}</td>
                         <td class="px-2" style="font-weight:400;"> ${cant}</td>
@@ -635,7 +636,7 @@
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
                 importe_total -= Number.parseFloat(mercancia.importe)
-                $("#importe-total").text('$' + importe_total)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })

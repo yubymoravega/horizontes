@@ -5,6 +5,7 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Ajuste;
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
@@ -132,7 +133,7 @@ class SubmayorInventarioProductoController extends AbstractController
             foreach ($arr_movimientos_mercancia as $obj_mivimiento) {
                 /**@var $obj_mivimiento MovimientoMercancia* */
                 $rows [] = array(
-                    'fecha' => $obj_mivimiento->getFecha()->format('d/m/Y'),
+                    'fecha' => $this->getFecha($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
                     'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
                     'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
                     'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
@@ -223,6 +224,38 @@ class SubmayorInventarioProductoController extends AbstractController
                 'id_documento'=>$id_documento
             ));
             return $vale_salida ?$vale_salida->getNroConsecutivo():'-';
+        }
+        return 0;
+    }
+
+    public function getFecha(EntityManagerInterface $em,$id_documento, $id_tipo_documento)
+    {
+        if ($id_tipo_documento == 1 || $id_tipo_documento == 2){
+            //informe de recepcion
+            $inf_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
+                'id_documento'=>$id_documento
+            ));
+            return $inf_recepcion ?$inf_recepcion->getFechaFactura()->format('d/m/Y'):'';
+        }
+        elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4){
+            //ajuste
+            $ajuste = $em->getRepository(Ajuste::class)->findOneBy(array(
+                'id_documento'=>$id_documento
+            ));
+            return $ajuste ?$ajuste->getFechaFactura()->format('d/m/Y'):'';
+        }
+        elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6){
+            //transferencia
+            $documento = $em->getRepository(Documento::class)->find($id_documento);
+            return $documento ?$documento->getFecha()->format('d/m/Y'):'';
+        }
+        elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8){
+            //vale de salida
+            $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(array(
+                'id_documento'=>$id_documento
+            ));
+            /**@var $vale_salida ValeSalida*/
+            return $vale_salida ?$vale_salida->getFechaSolicitud()->format('d/m/Y'):'';
         }
         return 0;
     }

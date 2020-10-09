@@ -297,7 +297,7 @@
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
                             let mercancias = data.mercancias
-                            $("#importe-total").text('$' + data.importe_total)
+                            $("#importe-total").text('$' + parseFloat(data.importe_total).toFixed(2))
                             for (var i = 0; i < mercancias.length; i++) {
 
                                 $('#rows_mercancias').append(`<tr>
@@ -410,7 +410,7 @@
                 let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(3)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
                     $('#ajuste_mercancia_precio').val(precio_final)
                 } else {
                     $('#ajuste_mercancia_precio').val(0)
@@ -421,7 +421,7 @@
                 let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(3)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
                     $('#ajuste_mercancia_precio').val(precio_final)
                 } else {
                     $('#ajuste_mercancia_precio').val(0)
@@ -557,7 +557,7 @@
                         list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
                         importe_total += Number.parseFloat(importe)
 
-                        $("#importe-total").text('$' + importe_total)
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
@@ -589,7 +589,7 @@
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
                 importe_total -= Number.parseFloat(mercancia.importe)
-                $("#importe-total").text('$' + importe_total)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })

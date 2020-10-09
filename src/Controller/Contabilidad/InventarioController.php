@@ -58,7 +58,7 @@ class InventarioController extends AbstractController
                 ));
                 $row[] = array(
                     'id' => $almacen->getId(),
-                    'descripcion' => $almacen->getDescripcion(),
+                    'descripcion' => $almacen->getCodigo().' - '.$almacen->getDescripcion(),
                     'disable' => !$obj_almacen_ocupado ? false : true
                 );
             }

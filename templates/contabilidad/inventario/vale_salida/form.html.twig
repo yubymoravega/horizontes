@@ -323,8 +323,8 @@
                 let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
-                        let importe = parseFloat(precio * cantidad).toFixed(5)
-                        let resto = parseFloat(importe_total - importe)
+                        let importe = parseFloat(precio * cantidad).toFixed(2)
+                        let resto = parseFloat(importe_total - importe).toFixed(2)
                         $('#vale_salida_documento_importe_mercancia').val(importe)
                         $('#resto_importe').val(resto)
                         let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
@@ -463,7 +463,7 @@
                         })
                         importe_total += Number.parseFloat(importe)
 
-                        $("#importe-total").text('$' + importe_total)
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
@@ -499,7 +499,7 @@
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
                 importe_total -= Number.parseFloat(mercancia.importe)
-                $("#importe-total").text('$' + importe_total)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })
@@ -573,7 +573,7 @@
                             $('#vale_salida_fecha_solicitud').val(vale.fecha_solicitud);
 
                             let mercancias = vale.mercancias
-                            $("#importe-total").text('$' + vale.importe_total)
+                            $("#importe-total").text('$' + parseFloat(vale.importe_total).toFixed(2))
                             for (var i = 0; i < mercancias.length; i++) {
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>

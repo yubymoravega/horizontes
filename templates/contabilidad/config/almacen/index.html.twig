@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Alamcen
+                Listado de Alamcenes
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
@@ -29,6 +29,7 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
+            <th scope="col-2">Codigo</th>
             <th scope="col-2">Descripción</th>
             <th scope="col-3">Unidad</th>
             <th scope="col-1" width="150px">Acciones</th>
@@ -36,6 +37,7 @@
             <tbody>
             {% for item in almacenes %}
                 <tr>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td style="font-weight:400;">{{ item.unidad }}</td>
                     <td>
@@ -44,6 +46,7 @@
                                 onclick="onUpdate({
                                         id_unidad: '{{ item.id_unidad }}',
                                         descripcion:'{{ item.descripcion }}' ,
+                                        codigo:'{{ item.codigo }}' ,
                                         id: '{{ item.id }}'
                                         })">
                             <i class="fa fa-edit"></i>
@@ -82,7 +85,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {descripcion = '', id = '', id_unidad = ''} = config
+            const {descripcion = '', id = '',codigo='', id_unidad = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + descripcion)
@@ -90,6 +93,7 @@
 
             $('#almacen_id_unidad').val(id_unidad)
             $('#almacen_descripcion').val(descripcion)
+            $('#almacen_codigo').val(codigo)
             $('#id_alamcen').val(id)
         }
 
@@ -117,10 +121,12 @@
                 rules: {
                     'almacen[descripcion]': "required",
                     'almacen[id_unidad]': "required",
+                    'almacen[codigo]': "required",
                 },
                 messages: {
                     'almacen[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'almacen[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'almacen[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {
