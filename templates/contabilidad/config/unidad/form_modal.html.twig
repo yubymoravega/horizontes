@@ -1,7 +1,7 @@
 {% extends 'utils/modal_form.html.twig' %}
 
 {% block modalbody %}
-    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
     <div class="form-group input-group input-group-sm d-block">
         <label for="unidad_codigo" class="font-weight-bold">Código</label>
         {{ form_widget(form.codigo,{'attr': {'class': 'form-control w-100'}}) }}

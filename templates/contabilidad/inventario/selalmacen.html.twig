@@ -20,7 +20,7 @@
                     </button>
                 </div>
                 <div class="modal-body bg-dark-app">
-                    <form action="/contabilidad/inventario/seleccionarAlmacen" method="post">
+                    <form action="/contabilidad/inventario/seleccionarAlmacen" method="post" autocomplete="off">
                         <div class="form-group input-group input-group-sm">
                             <select name="almacenes_select" id="almacenes_select" class="form-control">
                                 {% for item in almacenes %}

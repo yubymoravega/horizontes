@@ -1,7 +1,7 @@
 {% extends 'utils/modal_form.html.twig' %}
 
 {% block modalbody %}
-    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
 
     <div class="form-group input-group input-group-sm d-block">
         <label for="subcuenta_nro_subcuenta" class="font-weight-bold">Nro. Subcuenta</label>

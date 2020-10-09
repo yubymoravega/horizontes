@@ -1,6 +1,6 @@
 {% extends 'utils/modal_form.html.twig' %}
 {% block modalbody %}
-    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
     <div class="row mt-0 p-0">
         <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
             {{ form_label(form.nro_cuenta) }}

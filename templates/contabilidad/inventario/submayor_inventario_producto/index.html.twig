@@ -20,16 +20,17 @@
                     </button>
                 </div>
                 <div class="modal-body bg-dark-app">
-                    {#                    <form action="/contabilidad/inventario/" method="post">#}
-                    <div class="form-group input-group input-group-sm">
-                        <label for="codigo">Código</label>
-                        <input type="text" name="codigo" id="codigo"
-                               placeholder="Introduzca el código del producto y presione la tecla Enter para buscar"
-                               class="w-100 form-control">
-                        <label for="descripcion" class="mt-3">Descripción</label>
-                        <input type="text" disabled name="descripcion" id="descripcion"
-                               placeholder="Descripción del producto" class="w-100 form-control">
-                    </div>
+                    <form method="post" autocomplete="off">
+                        <div class="form-group input-group input-group-sm">
+                            <label for="codigo">Código</label>
+                            <input type="text" name="codigo" id="codigo"
+                                   placeholder="Introduzca el código del producto y presione la tecla Enter para buscar"
+                                   class="w-100 form-control">
+                            <label for="descripcion" class="mt-3">Descripción</label>
+                            <input type="text" disabled name="descripcion" id="descripcion"
+                                   placeholder="Descripción del producto" class="w-100 form-control">
+                        </div>
+                    </form>
                     <div class="d-flex mt-4">
                         <div class="mr-auto">
                             <a class="btn btn-outline-secondary text-white" type="button"
@@ -38,12 +39,12 @@
                             </a>
                         </div>
                         <div class="ml-2">
-                            <button class="my-0 btn btn-secondary" onclick="PrintSubmayor()" id="btnAceptarPrintSubmayor">
+                            <button class="my-0 btn btn-secondary" onclick="PrintSubmayor()"
+                                    id="btnAceptarPrintSubmayor">
                                 Aceptar
                             </button>
                         </div>
                     </div>
-                    {#                    </form>#}
                 </div>
             </div>
         </div>
@@ -54,13 +55,13 @@
     {{ parent() }}
     <script>
         function PrintSubmayor() {
-            if($('#codigo').val()!= '' && $('#descripcion').val()!=''){
+            if ($('#codigo').val() != '' && $('#descripcion').val() != '') {
                 let url = '/contabilidad/inventario/submayor-inventario-producto/print/' + $('#codigo').val()
                 window.open(url, 'blank_')
-            }
-            else
-                alertTemplate('Introducir el código del producto a buscar','danger')
+            } else
+                alertTemplate('Introducir el código del producto a buscar', 'danger')
         }
+
         $(document).ready(function () {
             $('#seleccionarProducto').modal('show')
         })

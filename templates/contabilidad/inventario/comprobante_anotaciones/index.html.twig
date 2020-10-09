@@ -10,6 +10,10 @@
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Comprobante de Operaciones
             </h4>
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir"
+                    onclick="Print('{{ path('contabilidad_inventario_comprobante_anotaciones_print') }}')">
+                <i class="fa fa-print"></i>
+            </button>
         </div>
         {# end header #}
 
@@ -42,4 +46,13 @@
         </table>
         {# end list #}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+    </script>
 {% endblock %}

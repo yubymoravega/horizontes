@@ -32,8 +32,13 @@ class ComprobanteAnotacionesController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em)
     {
 
-        $mercancia_er = $em->getRepository(Mercancia::class);
-        $producto_er = $em->getRepository(Producto::class);
+        return $this->render('contabilidad/inventario/comprobante_anotaciones/index.html.twig', [
+            'datos' => $this->getData($request,$em),
+            'controller_name' => 'ComprobanteAnotacionesController',
+        ]);
+    }
+
+    public function getData($request, $em){
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $documento_er = $em->getRepository(Documento::class);
@@ -103,7 +108,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'debito' => $total,
                     'credito' => $total
                 );
-            } elseif ($id_tipo_documento == 2) {
+            }
+            elseif ($id_tipo_documento == 2) {
                 //informe recepcion producto
                 $obj_informe = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -158,7 +164,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'debito' => $total,
                     'credito' => $total
                 );
-            } elseif ($id_tipo_documento == 3) {
+            }
+            elseif ($id_tipo_documento == 3) {
                 //ajuste de entrada
                 $obj_informe = $em->getRepository(Ajuste::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -194,7 +201,8 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Transferencia* */
                 $nro_doc = 'TS' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            } elseif ($id_tipo_documento == 7) {
+            }
+            elseif ($id_tipo_documento == 7) {
                 //vale salida de mercancia
                 $obj_informe = $em->getRepository(ValeSalida::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -202,20 +210,16 @@ class ComprobanteAnotacionesController extends AbstractController
                 ));
                 /**@var $obj_informe ValeSalida* */
                 $nro_doc = 'VSM' . '-' . $obj_informe->getNroConsecutivo();
-                $nro_cuenta_deudora = $obj_informe->getNroCuentaDeudora();
-                $nro_subcuenta_deudora = $obj_informe->getNroSubcuentaDeudora();
-                /*$nro_cuenta_acreedora = $obj_informe->getNroCuentaAcreedora();
-                $nro_subcuenta_acreedora = $obj_informe->getNroSubcuentaAcreedora();*/
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
 
                 $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
                     'id_documento' => $obj_documento,
                     'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
                 ));
-                $total = 0;
                 //totalizar importe
                 $rep_arr = [];
                 $i = 0;
+                $total_general=0;
                 foreach ($arr_obj_movimiento_mercancia as $d) {
                     $cc = $d->getIdCentroCosto()->getId() . '-' . $d->getIdElementoGasto()->getId();
                     if (!in_array($cc, $rep_arr)) {
@@ -238,6 +242,33 @@ class ComprobanteAnotacionesController extends AbstractController
                             'debito' => $total,
                             'credito' => ''
                         );
+                        $total_general += $total;
+                    }
+                }
+
+                $i = 0;
+                foreach ($arr_obj_movimiento_mercancia as $d) {
+                    $cc = $d->getIdMercancia()->getNroCuentaAcreedora() . '-' . $d->getIdMercancia()->getNroSubcuentaAcreedora();
+                    if (!in_array($cc, $rep_arr)) {
+                        $rep_arr[$i] = $cc;
+                        $i++;
+                        $total = 0;
+                        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                            /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                            if ($obj_movimiento_mercancia->getIdMercancia()->getNroCuentaAcreedora() == $d->getIdMercancia()->getNroCuentaAcreedora() &&
+                                $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaAcreedora() == $d->getIdMercancia()->getNroSubcuentaAcreedora())
+                                $total += floatval($obj_movimiento_mercancia->getImporte());
+                        }
+                        $rows[] = array(
+                            'nro_doc' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => $d->getIdMercancia()->getNroCuentaAcreedora(),
+                            'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaAcreedora(),
+                            'analisis_1' => $obj_informe->getIdDocumento()->getIdAlmacen()->getCodigo(),
+                            'analisis_2' => '',
+                            'debito' => '',
+                            'credito' => $total
+                        );
                     }
                 }
 
@@ -248,10 +279,11 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => 100,
-                    'credito' => 100
+                    'debito' => $total_general,
+                    'credito' => $total_general
                 );
-            } elseif ($id_tipo_documento == 8) {
+            }
+            elseif ($id_tipo_documento == 8) {
                 //vale salida de producto
                 $obj_informe = $em->getRepository(ValeSalida::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -260,139 +292,95 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe ValeSalida* */
                 $nro_doc = 'VSP' . '-' . $obj_informe->getNroConsecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+                $arr_obj_movimiento_producto = $movimiento_producto_er->findBy(array(
+                    'id_documento' => $obj_documento,
+                    'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+                ));
+                //totalizar importe
+                $rep_arr = [];
+                $i = 0;
+                $total_general=0;
+                foreach ($arr_obj_movimiento_producto as $d) {
+                    $cc = $d->getIdCentroCosto()->getId() . '-' . $d->getIdElementoGasto()->getId();
+                    if (!in_array($cc, $rep_arr)) {
+                        $rep_arr[$i] = $cc;
+                        $i++;
+                        $total = 0;
+                        foreach ($arr_obj_movimiento_producto as $obj_movimiento_producto) {
+                            /**@var $obj_movimiento_producto MovimientoProducto */
+                            if ($obj_movimiento_producto->getIdCentroCosto()->getId() == $d->getIdCentroCosto()->getId() &&
+                                $obj_movimiento_producto->getIdElementoGasto()->getId() == $d->getIdElementoGasto()->getId())
+                                $total += floatval($obj_movimiento_producto->getImporte());
+                        }
+                        $rows[] = array(
+                            'nro_doc' => $i == 1 ? $nro_doc : '',
+                            'fecha' => $i == 1 ? $fecha_doc : '',
+                            'nro_cuenta' => $obj_informe->getNroCuentaDeudora(),
+                            'nro_subcuenta' => $obj_informe->getNroSubcuentaDeudora(),
+                            'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
+                            'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
+                            'debito' => $total,
+                            'credito' => ''
+                        );
+                        $total_general += $total;
+                    }
+                }
+
+                $i = 0;
+                foreach ($arr_obj_movimiento_producto as $d) {
+                    $cc = $d->getIdMercancia()->getNroCuentaAcreedora() . '-' . $d->getIdMercancia()->getNroSubcuentaAcreedora();
+                    if (!in_array($cc, $rep_arr)) {
+                        $rep_arr[$i] = $cc;
+                        $i++;
+                        $total = 0;
+                        foreach ($arr_obj_movimiento_producto as $obj_movimiento_producto) {
+                            /**@var $obj_movimiento_producto MovimientoProducto */
+                            if ($obj_movimiento_producto->getIdProducto()->getNroCuentaAcreedora() == $d->getIdMercancia()->getNroCuentaAcreedora() &&
+                                $obj_movimiento_producto->getIdProducto()->getNroSubcuentaAcreedora() == $d->getIdMercancia()->getNroSubcuentaAcreedora())
+                                $total += floatval($obj_movimiento_producto->getImporte());
+                        }
+                        $rows[] = array(
+                            'nro_doc' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => $d->getIdMercancia()->getNroCuentaAcreedora(),
+                            'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaAcreedora(),
+                            'analisis_1' => $obj_informe->getIdDocumento()->getIdAlmacen()->getCodigo(),
+                            'analisis_2' => '',
+                            'debito' => '',
+                            'credito' => $total
+                        );
+                    }
+                }
+
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => '',
+                    'nro_subcuenta' => '',
+                    'analisis_1' => '',
+                    'analisis_2' => '',
+                    'debito' => $total_general,
+                    'credito' => $total_general
+                );
             }
         }
+        return $rows;
+    }
 
-        return $this->render('contabilidad/inventario/comprobante_anotaciones/index.html.twig', [
-            'datos' => $rows,
-            'controller_name' => 'ComprobanteAnotacionesController',
+    /**
+     * @Route("/print", name="contabilidad_inventario_comprobante_anotaciones_print")
+     */
+    public function print(Request $request, EntityManagerInterface $em)
+    {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        /** @var Almacen $almacen_obj */
+        $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
+        return $this->render('contabilidad/inventario/comprobante_anotaciones/print.html.twig', [
+            'datos' => $this->getData($request,$em),
+            'almacen'=>$almacen_obj->getCodigo().': '.$almacen_obj->getDescripcion(),
+            'unidad'=>$almacen_obj->getIdUnidad()->getCodigo().': '.$almacen_obj->getIdUnidad()->getNombre()
         ]);
     }
 
-
-    /**
-     * @Route("/getProducto/{codigo}", name="contabilidad_inventario_submayor_inventario_producto_get", methods={"POST"})
-     */
-    public function getProducto(EntityManagerInterface $em, Request $request, $codigo)
-    {
-        $descripcion = '';
-        $mercancia_er = $em->getRepository(Mercancia::class);
-        $producto_er = $em->getRepository(Producto::class);
-        $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $msg = 'Producto encontrado con éxito';
-        $obj_mercancia = $mercancia_er->findOneBy(array(
-            'codigo' => $codigo,
-            'id_amlacen' => $id_almacen,
-//            'activo'=>true
-        ));
-        if (!$obj_mercancia) {
-            $obj_producto = $producto_er->findOneBy(array(
-                'codigo' => $codigo,
-                'id_amlacen' => $id_almacen
-            ));
-            if (!$obj_producto)
-                $msg = "No se encontró ningun producto con el código introducido";
-            else
-                $descripcion = $obj_producto->getDescripcion();
-        } else {
-            $descripcion = $obj_mercancia->getDescripcion();
-        }
-
-        return new JsonResponse(['success' => true, 'descripcion' => $descripcion, 'msg' => $msg]);
-    }
-
-    public function getPrefijo($id)
-    {
-        $prefijo = '';
-        switch ($id) {
-            case 1:
-                $prefijo = 'IRM';
-                break;
-            case 2:
-                $prefijo = 'IRP';
-                break;
-            case 3:
-                $prefijo = 'AE';
-                break;
-            case 4:
-                $prefijo = 'AS';
-                break;
-            case 5:
-                $prefijo = 'TE';
-                break;
-            case 6:
-                $prefijo = 'TS';
-                break;
-            case 7:
-                $prefijo = 'VSM';
-                break;
-            case 8:
-                $prefijo = 'VSP';
-                break;
-            case 9:
-                $prefijo = 'DEV';
-                break;
-        }
-        return $prefijo;
-    }
-
-    public function getNroConsecutivo(EntityManagerInterface $em, $id_documento, $id_tipo_documento)
-    {
-        $consecutivo = '';
-        if ($id_tipo_documento == 1 || $id_tipo_documento == 2) {
-            //informe de recepcion
-            $inf_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            return $inf_recepcion ? $inf_recepcion->getNroConcecutivo() : '-';
-        } elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4) {
-            //ajuste
-            $ajuste = $em->getRepository(Ajuste::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            return $ajuste ? $ajuste->getNroConcecutivo() : '-';
-        } elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6) {
-            //transferencia
-            $transferencia = $em->getRepository(Transferencia::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            return $transferencia ? $transferencia->getNroConcecutivo() : '-';
-        } elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8) {
-            //vale de salida
-            $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            return $vale_salida ? $vale_salida->getNroConsecutivo() : '-';
-        }
-        return 0;
-    }
-
-    public function getFecha(EntityManagerInterface $em, $id_documento, $id_tipo_documento)
-    {
-        if ($id_tipo_documento == 1 || $id_tipo_documento == 2) {
-            //informe de recepcion
-            $inf_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            return $inf_recepcion ? $inf_recepcion->getFechaFactura()->format('d/m/Y') : '';
-        } elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4) {
-            //ajuste
-            $ajuste = $em->getRepository(Ajuste::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            return $ajuste ? $ajuste->getFechaFactura()->format('d/m/Y') : '';
-        } elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6) {
-            //transferencia
-            $documento = $em->getRepository(Documento::class)->find($id_documento);
-            return $documento ? $documento->getFecha()->format('d/m/Y') : '';
-        } elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8) {
-            //vale de salida
-            $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(array(
-                'id_documento' => $id_documento
-            ));
-            /**@var $vale_salida ValeSalida */
-            return $vale_salida ? $vale_salida->getFechaSolicitud()->format('d/m/Y') : '';
-        }
-        return 0;
-    }
 }
