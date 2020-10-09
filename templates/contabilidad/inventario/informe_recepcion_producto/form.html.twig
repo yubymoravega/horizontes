@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="card-body">
-                {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'informe_recepcion'}}) }}
+                {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'informe_recepcion','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.nro_cuenta_inventario) }}
@@ -93,7 +93,7 @@
                 </div>
                 <hr color="dimgray" class="my-1 ml-2" size=3>
 
-                {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia'}}) }}
+                {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
                     <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
                         {{ form_label(formulario.mercancia.codigo) }}
