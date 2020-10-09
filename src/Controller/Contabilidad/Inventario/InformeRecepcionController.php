@@ -276,6 +276,9 @@ class InformeRecepcionController extends AbstractController
                                     ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
                                     ->setCodigo($codigo_mercancia)
                                     ->setCuenta($cuenta_inventario)
+                                    ->setNroCuentaAcreedora($cuenta_acreedora)
+                                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                                    ->setNroSubcuentaAcreedora($subcuenta_acreedora)
                                     ->setImporte(floatval($importe_mercancia));
                                 $em->persist($new_mercancia);
                                 $movimiento_mercancia

@@ -87,10 +87,10 @@ class InformeRecepcionProductoController extends AbstractController
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
                 $obj_tipo_documento = $tipo_documento_er->find(2);
                 /**  datos de InformeRecepcionType **/
-                $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
-                $cuenta_inventario = $informe_recepcion['nro_cuenta_inventario'];
-                $subcuenta_inventario = $informe_recepcion['nro_subcuenta_inventario'];
-                $subcuenta_acreedora = $informe_recepcion['nro_subcuenta_acreedora'];
+                $cuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_cuenta_acreedora']);
+                $cuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_cuenta_inventario']);
+                $subcuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_inventario']);
+                $subcuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_acreedora']);
                 $year_ = Date('Y');
 
                 ////0-obtengo el numero consecutivo de documento
@@ -189,6 +189,9 @@ class InformeRecepcionProductoController extends AbstractController
                                     ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
                                     ->setCodigo($codigo_mercancia)
                                     ->setCuenta($cuenta_inventario)
+                                    ->setNroCuentaAcreedora($cuenta_acreedora)
+                                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                                    ->setNroSubcuentaAcreedora($subcuenta_acreedora)
                                     ->setImporte(floatval($importe_mercancia));
                                 $em->persist($new_producto);
                                 $movimiento_producto

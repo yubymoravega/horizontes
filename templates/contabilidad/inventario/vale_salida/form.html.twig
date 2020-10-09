@@ -126,6 +126,7 @@
                         {{ form_label(formulario.mercancia.precio) }}
                         {{ form_widget(formulario.mercancia.precio) }}
                     </div>
+                    <input type="hidden" id="true_precio_mercancia" name="">
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.documento.importe_mercancia) }}
                         {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
@@ -261,6 +262,7 @@
                 if (e.which == 13) {
                     if ($('#vale_salida_mercancia_codigo').val() !== '') {
                         let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
+                        loadingModal.show("cargando mercancia...")
                         $.ajax({
                             url: '/contabilidad/inventario/vale-salida/getMercancia/' + codigo,
                             method: 'POST',
@@ -270,7 +272,8 @@
                                 if (mercancias.length > 0) {
                                     $('#vale_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#vale_salida_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#vale_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                    $('#vale_salida_mercancia_precio').val(parseFloat(mercancias[0]['precio_compra']).toFixed(5))
+                                    $('#true_precio_mercancia').val(mercancias[0]['precio_compra'])
                                     $('#vale_salida_mercancia_id_unidad_medida').find('option').remove()
                                     $('#vale_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>'+mercancias[0]['unidad_medida']+'</option>');
                                     importe_total = parseFloat(mercancias[0]['importe'])
@@ -279,6 +282,7 @@
                                     resetFormMercancia()
                                     alertTemplate('No existen mercancias con ese código', 'danger')
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                                 importe_total = 0
@@ -318,7 +322,7 @@
                 })
             })
             $('#vale_salida_documento_cantidad_mercancia').on('keyup', function () {
-                let precio = parseFloat($('#vale_salida_mercancia_precio').val())
+                let precio = parseFloat($('#true_precio_mercancia').val())
                 let existencia = parseFloat($('#vale_salida_mercancia_existencia').val())
                 let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (cantidad <= existencia) {
@@ -484,6 +488,7 @@
                         $('#vale_salida_documento_cantidad_mercancia').val('')
                         $('#vale_salida_documento_importe_mercancia').val('')
                         $('#vale_salida_mercancia_precio').val('')
+                        $('#true_precio_mercancia').val('')
                         $('#vale_salida_mercancia_existencia_decremento').val('')
                         $('#vale_salida_mercancia_id_unidad_medida').val('')
                         $('#resto_importe').val('')
@@ -511,7 +516,8 @@
                 if ($(id).prop('checked') == true) {
                     $('#vale_salida_mercancia_codigo').val(mercancias[i]['codigo'])
                     $('#vale_salida_mercancia_descripcion').val(mercancias[i]['descripcion'])
-                    $('#vale_salida_mercancia_precio').val(mercancias[i]['precio_compra'])
+                    $('#vale_salida_mercancia_precio').val(parseFloat(mercancias[i]['precio_compra']).toFixed(5))
+                    $('#true_precio_mercancia').val(mercancias[i]['precio_compra'])
                     $('#vale_salida_mercancia_existencia').val(mercancias[i]['existencia'])
                     break
                 }
@@ -522,6 +528,7 @@
         function resetFormMercancia() {
             $('#vale_salida_mercancia_descripcion').val('')
             $('#vale_salida_mercancia_precio').val('')
+            $('#true_precio_mercancia').val('')
             $('#vale_salida_mercancia_existencia').val('')
             $('#vale_salida_mercancia_existencia_decremento').val('')
             $('#vale_salida_documento_importe_mercancia').val('')

@@ -71,10 +71,12 @@ class AjusteSalidaController extends AbstractController
         if ($form->isSubmitted()) {
             $list_mercancia = json_decode($request->get('ajuste_salida')['list_mercancia'], true);
 //            if ($form->isValid()) {
+            $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+            $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_SALIDA);
             $ajuste_salida = $request->get('ajuste_salida');
             /**  datos de AjusteEntradaType **/
-            $cuenta_inventario = $ajuste_salida['nro_cuenta_deudora'];
-            $subcuenta_inventario = $ajuste_salida['nro_subcuenta_deudora'];
+            $cuenta_inventario = AuxFunctions::getNro($ajuste_salida['nro_cuenta_deudora']);
+            $subcuenta_inventario = AuxFunctions::getNro($ajuste_salida['nro_subcuenta_deudora']);
             $observacion = $ajuste_salida['observacion'];
 
             ////0-obtengo el numero consecutivo de documento
@@ -107,6 +109,8 @@ class AjusteSalidaController extends AbstractController
                 $documento
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setAnno($year_)
+                    ->setIdTipoDocumento($obj_tipo_documento)
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                     ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                     ->setIdMoneda($em->getRepository(Moneda::class)->find($ajuste_salida['documento']['id_moneda']));
@@ -136,8 +140,7 @@ class AjusteSalidaController extends AbstractController
 
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
-                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_SALIDA);
+
 //                dd($obj_tipo_documento);
                 $importe_total = 0;
 
@@ -181,9 +184,9 @@ class AjusteSalidaController extends AbstractController
                         $movimiento_mercancia
                             ->setIdMercancia($obj_mercancia)
                             ->setExistencia($obj_mercancia->getExistencia());
-                    }
-                    $em->persist($movimiento_mercancia);
 
+                        $em->persist($movimiento_mercancia);
+                    }
                 }
 
                 //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
@@ -259,7 +262,7 @@ class AjusteSalidaController extends AbstractController
         $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
             array('activo' => true, 'id_unidad' => $unidad)
         );
-        $row_deudoras= AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
         $rows = [];
@@ -505,10 +508,11 @@ class AjusteSalidaController extends AbstractController
             $importe_total += $obj->getImporte();
         }
 
+        $cuenta_obj = $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaInventario()]);
         $rows = array(
             'id' => $ajuste_obj->getId(),
-            'nro_cuenta_deudora' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaInventario()])->getNombre(),
-            'nro_subcuenta_deudora' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
+            'nro_cuenta_deudora' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuenta_obj->getNombre(),
+            'nro_subcuenta_deudora' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['id_cuenta' => $cuenta_obj, 'nro_subcuenta' => $ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
             'id_moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,

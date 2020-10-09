@@ -126,6 +126,7 @@
                         {{ form_label(formulario.mercancia.precio) }}
                         {{ form_widget(formulario.mercancia.precio) }}
                     </div>
+                    <input type="hidden" id="true_precio_mercancia" name="">
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.documento.importe_mercancia) }}
                         {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
@@ -270,7 +271,8 @@
                                 if (productos.length > 0) {
                                     $('#vale_salida_mercancia_descripcion').val(productos[0]['descripcion'])
                                     $('#vale_salida_mercancia_existencia').val(productos[0]['existencia'])
-                                    $('#vale_salida_mercancia_precio').val(productos[0]['precio_compra'])
+                                    $('#vale_salida_mercancia_precio').val(parseFloat(productos[0]['precio_compra']).toFixed(5))
+                                    $('#true_precio_mercancia').val(productos[0]['precio_compra'])
                                     $('#vale_salida_mercancia_id_unidad_medida').find('option').remove()
                                     $('#vale_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>' + productos[0]['unidad_medida'] + '</option>');
                                     importe_total = parseFloat(productos[0]['importe'])
@@ -318,7 +320,7 @@
                 })
             })
             $('#vale_salida_documento_cantidad_mercancia').on('keyup', function () {
-                let precio = parseFloat($('#vale_salida_mercancia_precio').val())
+                let precio = parseFloat($('#true_precio_mercancia').val())
                 let existencia = parseFloat($('#vale_salida_mercancia_existencia').val())
                 let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (cantidad <= existencia) {

@@ -90,10 +90,10 @@ class TransferenciaController extends AbstractController
             $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
 
             /**  datos de TransferenciaEntradaType **/
-            $cuenta_acreedora = $transferencia_entrada['nro_cuenta_acreedora'];
-            $cuenta_inventario = $transferencia_entrada['nro_cuenta_inventario'];
-            $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
-            $subcuenta_acreedora = $transferencia_entrada['nro_subcuenta_acreedora'];
+            $cuenta_acreedora = AuxFunctions::getNro($transferencia_entrada['nro_cuenta_acreedora']);
+            $cuenta_inventario = AuxFunctions::getNro($transferencia_entrada['nro_cuenta_inventario']);
+            $subcuenta_inventario = AuxFunctions::getNro($transferencia_entrada['nro_subcuenta_inventario']);
+            $subcuenta_acreedora = AuxFunctions::getNro($transferencia_entrada['nro_subcuenta_acreedora']);
             $id_unidad_origen = isset($transferencia_entrada['id_unidad']) ? $transferencia_entrada['id_unidad'] : '';
             $id_almacen_origen = isset($transferencia_entrada['id_almacen']) ? $transferencia_entrada['id_almacen'] : '';
 
@@ -197,6 +197,9 @@ class TransferenciaController extends AbstractController
                                 ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
                                 ->setCodigo($codigo_mercancia)
                                 ->setCuenta($cuenta_inventario)
+                                ->setNroCuentaAcreedora($cuenta_acreedora)
+                                ->setNroSubcuentaInventario($subcuenta_inventario)
+                                ->setNroSubcuentaAcreedora($subcuenta_acreedora)
                                 ->setImporte(floatval($importe_mercancia));
                             $em->persist($new_mercancia);
                             $movimiento_mercancia

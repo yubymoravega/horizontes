@@ -124,6 +124,7 @@
                         {{ form_label(formulario.mercancia.precio) }}
                         {{ form_widget(formulario.mercancia.precio) }}
                     </div>
+                    <input type="hidden" id="true_precio_mercancia" name="">
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.documento.importe_mercancia) }}
                         {{ form_widget(formulario.documento.importe_mercancia,{'type':'number', 'disabled': true}) }}
@@ -396,6 +397,7 @@
                     let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val()
                     if (cuenta != '' && codigo != '') {
                         let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando mercancia...")
                         $.ajax({
                             url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + nro,
                             method: 'POST',
@@ -406,19 +408,21 @@
                                     importe_real = mercancias[0]['importe_real']
                                     $('#ajuste_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#ajuste_salida_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#ajuste_salida_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                    $('#ajuste_salida_mercancia_precio').val(parseFloat(mercancias[0]['precio_compra']).toFixed(5))
+                                    $('#true_precio_mercancia').val(mercancias[0]['precio_compra'])
                                     $('#ajuste_salida_mercancia_id_unidad_medida').find('option').remove()
                                     $('#ajuste_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "1">' + mercancias[0]['um'] + ' </option>');
-
 
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                                 $('#ajuste_salida_mercancia_descripcion').val('')
                                 $('#ajuste_salida_mercancia_existencia').val('')
                                 $('#ajuste_salida_mercancia_precio').val('')
+                                $('#true_precio_mercancia').val('')
                                 $('#ajuste_salida_mercancia_id_unidad_medida').val('')
                                 $('#ajuste_salida_documento_importe_mercancia').val('')
                                 $('#ajuste_salida_mercancia_existencia_decremento').val('')
@@ -434,6 +438,7 @@
                     $('#ajuste_salida_mercancia_descripcion').val('')
                     $('#ajuste_salida_mercancia_existencia').val('')
                     $('#ajuste_salida_mercancia_precio').val('')
+                    $('#true_precio_mercancia').val('')
                     $('#ajuste_salida_mercancia_id_unidad_medida').val('')
                     $('#ajuste_salida_documento_importe_mercancia').val('')
                     $('#ajuste_salida_mercancia_existencia_decremento').val('')
@@ -445,7 +450,7 @@
 
             $('#ajuste_salida_documento_cantidad_mercancia').on('keyup', function () {
                 let cantidad = parseFloat($('#ajuste_salida_documento_cantidad_mercancia').val())
-                let precio = parseFloat($('#ajuste_salida_mercancia_precio').val())
+                let precio = parseFloat($('#true_precio_mercancia').val())
                 let existencia = parseFloat($('#ajuste_salida_mercancia_existencia').val())
 
                 if (cantidad <= existencia) {
@@ -473,6 +478,7 @@
             $('#ajuste_mercancia_codigo').on('keyup', function () {
                 $('#ajuste_salida_mercancia_descripcion').val('')
                 $('#ajuste_salida_mercancia_precio').val('')
+                $('#true_precio_mercancia').val('')
                 $('#ajuste_salida_mercancia_existencia').val('')
             })
 
@@ -623,6 +629,7 @@
                         $('#ajuste_salida_documento_cantidad_mercancia').val('')
                         $('#ajuste_salida_documento_importe_mercancia').val('')
                         $('#ajuste_salida_mercancia_precio').val('')
+                        $('#true_precio_mercancia').val('')
                         $('#ajuste_salida_mercancia_existencia_decremento').val('')
                         $('#ajuste_salida_id_centro_costo').val(0)
                         $('#ajuste_salida_id_elemento_gasto').val(0)

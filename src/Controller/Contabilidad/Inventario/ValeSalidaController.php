@@ -6,8 +6,10 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Documento;
@@ -74,18 +76,18 @@ class ValeSalidaController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em, $vale_salida_er, $year_, $id_usuario, $idalmacen,['producto'=>false],'ValeSalida');
+        $row = AuxFunctions::getConsecutivos($em, $vale_salida_er, $year_, $id_usuario, $idalmacen, ['producto' => false], 'ValeSalida');
         $arr_obj_eliminado = $vale_salida_er->findBy(array(
-            'anno'=>$year_,
-            'activo'=>false,
-            'producto'=>false
+            'anno' => $year_,
+            'activo' => false,
+            'producto' => false
         ));
         $arr_eliminados = [];
-        foreach ($arr_obj_eliminado as $key=>$eliminado){
-            /**@var $eliminado ValeSalida***/
-            $arr_eliminados[$key]=$eliminado->getNroConsecutivo();
+        foreach ($arr_obj_eliminado as $key => $eliminado) {
+            /**@var $eliminado ValeSalida** */
+            $arr_eliminados[$key] = $eliminado->getNroConsecutivo();
         }
-        return new JsonResponse(['nros' => $row, 'eliminados'=>$arr_eliminados,'success' => true]);
+        return new JsonResponse(['nros' => $row, 'eliminados' => $arr_eliminados, 'success' => true]);
     }
 
     /**
@@ -117,7 +119,7 @@ class ValeSalidaController extends AbstractController
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia(),
                 'importe' => $obj->getImporte(),
-                'unidad_medida'=>$obj->getIdUnidadMedida()->getNombre()
+                'unidad_medida' => $obj->getIdUnidadMedida()->getNombre()
             );
         }
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
@@ -159,7 +161,7 @@ class ValeSalidaController extends AbstractController
             /**@var $centro CentroCosto* */
             $centro_costo[] = array(
                 'nombre' => $centro->getNombre(),
-                'codigo'=>$centro->getCodigo(),
+                'codigo' => $centro->getCodigo(),
                 'id' => $centro->getId(),
             );
         }
@@ -187,12 +189,14 @@ class ValeSalidaController extends AbstractController
             $list_mercancia = json_decode($request->get('vale_salida')['list_mercancia'], true);
             if ($this->isCsrfTokenValid('authenticate', $request->get('_token'))) {
                 $vale_salida = $request->get('vale_salida');
-
+                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                $obj_tipo_documento = $tipo_documento_er->find(7);
                 /**  datos de InformeRecepcionType **/
                 $fecha_solicitud = $vale_salida['fecha_solicitud'];
                 $nro_solicitud = $vale_salida['nro_solicitud'];
-                $nro_cuenta_deudora = $vale_salida['nro_cuenta_deudora'];
-                $nro_subcuenta_deudora = isset($vale_salida['nro_subcuenta_deudora'])?$vale_salida['nro_subcuenta_deudora']:'nosubcuenta - desc';
+                $nro_cuenta_deudora = AuxFunctions::getNro($vale_salida['nro_cuenta_deudora']);
+                $nro_subcuenta_deudora = isset($vale_salida['nro_subcuenta_deudora'])
+                    ? AuxFunctions::getNro($vale_salida['nro_subcuenta_deudora']) : '';
                 $id_moneda = $vale_salida['documento']['id_moneda'];
 
 
@@ -209,7 +213,7 @@ class ValeSalidaController extends AbstractController
                     $id_unidad = $obj_empleado->getIdUnidad()->getId();
                     $vale_salida_arr = $em->getRepository(ValeSalida::class)->findBy(array(
                         'anno' => $year_,
-                        'producto'=>false
+                        'producto' => false
                     ));
                     $contador = 0;
                     foreach ($vale_salida_arr as $obj) {
@@ -226,6 +230,8 @@ class ValeSalidaController extends AbstractController
                     $documento
                         ->setActivo(true)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                        ->setAnno($year_)
+                        ->setIdTipoDocumento($obj_tipo_documento)
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                         ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                         ->setIdMoneda($em->getRepository(Moneda::class)->find($id_moneda));
@@ -239,16 +245,14 @@ class ValeSalidaController extends AbstractController
                         ->setAnno($year_)
                         ->setFechaSolicitud(\DateTime::createFromFormat('Y-m-d', $fecha_solicitud))
                         ->setNroSolicitud($nro_solicitud)
-                        ->setNroCuentaDeudora(AuxFunctions::getNro($nro_cuenta_deudora))
-                        //->setNroSubcuentaDeudora(AuxFunctions::getNro($vale_salida['nro_subcuenta_deudora']))
-                        ->setNroSubcuentaDeudora('000')
+                        ->setNroCuentaDeudora($nro_cuenta_deudora)
+                        ->setNroSubcuentaDeudora($nro_subcuenta_deudora)
                         ->setProducto(false);
                     $em->persist($vale_salida);
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $mercancia_er = $em->getRepository(Mercancia::class);
-                    $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->find(7);
+
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $mercancia) {
@@ -329,17 +333,22 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/getVale/{nro}", name="contabilidad_inventario_vale_salida_get_vale",methods={"POST"})
      */
-    public function getVale(EntityManagerInterface $em, $nro)
+    public function getVale(EntityManagerInterface $em, Request $request, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+        $documento_er = $em->getRepository(Documento::class);
+        $almacen_er = $em->getRepository(Almacen::class);
         $year_ = Date('Y');
+        $alamcen = $request->getSession()->get('alamcen/id');
+        $documento_obj = $documento_er->findBy(['id_almacen' => $almacen_er->find($alamcen), 'id_tipo_documento' => $tipo_documento_er->find(7), 'anno' => $year_]);
         $vale_obj = $vale_salida_er->findOneBy(array(
             'nro_consecutivo' => $nro,
             'producto' => false,
             'anno' => $year_
         ));
+
 
         if (!$vale_obj) {
             return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de vale no existe.']);
@@ -370,10 +379,16 @@ class ValeSalidaController extends AbstractController
             $importe_total += $obj->getImporte();
         }
 
+        $cuentas = $em->getRepository(Cuenta::class);
+        $subcuentas = $em->getRepository(Subcuenta::class);
+        $cuentainv_obj = $cuentas->findOneBy(['nro_cuenta' => $vale_obj->getNroCuentaDeudora()]);
+        $subcuenta_desc = $subcuentas->findOneBy(['id_cuenta' => $cuentainv_obj, 'nro_subcuenta' => $vale_obj->getNroSubcuentaDeudora()]);
+
+//        dd($cuentainv_obj, $subcuenta_desc, $vale_obj);
         $rows = array(
             'id' => $vale_obj->getId(),
-            'nro_cuenta_deudora' => $vale_obj->getNroCuentaDeudora(),
-            'nro_subcuenta_deudora' => $vale_obj->getNroSubcuentaDeudora(),
+            'nro_cuenta_deudora' => $vale_obj->getNroCuentaDeudora() . ' - ' . $cuentainv_obj->getNombre(),
+            'nro_subcuenta_deudora' => $vale_obj->getNroSubcuentaDeudora() . ' - ' . $subcuenta_desc->getDescripcion(),
             'nro_solicitud' => $vale_obj->getNroSolicitud(),
             'fecha_solicitud' => $vale_obj->getFechaSolicitud()->format('d/m/Y'),
             'id_moneda' => $vale_obj->getIdDocumento()->getIdMoneda()->getId(),
@@ -458,8 +473,8 @@ class ValeSalidaController extends AbstractController
         $year_ = Date('Y');
         $vale_salida_obj = $vale_salida_er->findOneBy(array(
             'nro_consecutivo' => $nro,
-            'producto'=>false,
-            'anno'=>$year_
+            'producto' => false,
+            'anno' => $year_
         ));
 
         $obj_tipo_documento = $tipo_documento_er->find(7);

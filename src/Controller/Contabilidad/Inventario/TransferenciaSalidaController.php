@@ -87,8 +87,8 @@ class TransferenciaSalidaController extends AbstractController
 
             /**  datos de TransferenciaEntradaType **/
 //            dd($transferencia_salida);
-            $cuenta_inventario = $transferencia_salida['nro_cuenta_inventario'];
-            $subcuenta_inventario = $transferencia_salida['nro_subcuenta_inventario'];
+            $cuenta_inventario = AuxFunctions::getNro($transferencia_salida['nro_cuenta_inventario']);
+            $subcuenta_inventario = AuxFunctions::getNro($transferencia_salida['nro_subcuenta_inventario']);
             $id_unidad_origen = isset($transferencia_salida['id_unidad']) ? $transferencia_salida['id_unidad'] : '';
             $id_almacen_origen = isset($transferencia_salida['id_almacen']) ? $transferencia_salida['id_almacen'] : '';
 
@@ -272,7 +272,7 @@ class TransferenciaSalidaController extends AbstractController
         $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
             array('activo' => true, 'id_unidad' => $unidad)
         );
-        $row_deudoras = AuxFunctions::getCuentasByCriterio($em,['ALM']/*,['deudora'=>1]*/);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']/*,['deudora'=>1]*/);
 
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
@@ -561,11 +561,11 @@ class TransferenciaSalidaController extends AbstractController
             );
             $importe_total += $obj->getImporte();
         }
-
+        $cuentainv_obj = $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaInventario()]);
         $rows = array(
             'id' => $transferencia_obj->getId(),
-            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaInventario()])->getNombre(),
-            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
+            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentainv_obj->getNombre(),
+            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['id_cuenta' => $cuentainv_obj, 'nro_subcuenta' => $transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
             'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '',
             'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
             'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),
