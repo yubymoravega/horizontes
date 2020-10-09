@@ -19,7 +19,7 @@ class MercanciaType extends AbstractType
             ->add('codigo', TextType::class, [
                 'required' => false,
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Código',
+                'label' => 'Código',
             ])
             ->add('descripcion', TextType::class, [
                 'attr' => ['class' => 'w-100'],
@@ -45,11 +45,12 @@ class MercanciaType extends AbstractType
             ])
             ->add('id_unidad_medida', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
-                'label'=>'UM',
+                'label' => 'UM',
                 'class' => UnidadMedida::class,
                 'choice_label' => 'nombre',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
+//                        ->select(array('u.id','u.nombre','u.abreviatura'))
                         ->where('u.activo = true')
                         ->orderBy('u.nombre', 'ASC');
                 }

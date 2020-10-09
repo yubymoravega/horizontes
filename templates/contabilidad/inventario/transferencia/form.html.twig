@@ -399,6 +399,7 @@
                     let cuenta = $('#transferencia_nro_cuenta_inventario').val()
                     if (cuenta != '' && codigo != '') {
                         let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando mercancia...")
                         $.ajax({
                             url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + nro,
                             method: 'POST',
@@ -412,6 +413,7 @@
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                             }
@@ -426,7 +428,7 @@
                 let importe = parseFloat($('#transferencia_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#transferencia_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#transferencia_mercancia_precio').val(precio_final)
                 } else {
                     $('#transferencia_mercancia_precio').val(0)
@@ -437,7 +439,7 @@
                 let importe = parseFloat($('#transferencia_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#transferencia_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#transferencia_mercancia_precio').val(precio_final)
                 } else {
                     $('#transferencia_mercancia_precio').val(0)

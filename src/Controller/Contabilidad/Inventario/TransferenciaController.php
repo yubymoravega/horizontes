@@ -86,6 +86,8 @@ class TransferenciaController extends AbstractController
             $list_mercancia = json_decode($request->get('transferencia_entrada')['list_mercancia'], true);
 //            if ($form->isValid()) {
             $transferencia_entrada = $request->get('transferencia');
+            $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+            $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
 
             /**  datos de TransferenciaEntradaType **/
             $cuenta_acreedora = $transferencia_entrada['nro_cuenta_acreedora'];
@@ -124,6 +126,8 @@ class TransferenciaController extends AbstractController
                 $documento
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setAnno($year_)
+                    ->setIdTipoDocumento($obj_tipo_documento)
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                     ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                     ->setIdMoneda($em->getRepository(Moneda::class)->find($transferencia_entrada['documento']['id_moneda']));
@@ -155,8 +159,6 @@ class TransferenciaController extends AbstractController
 
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
-                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
                 $importe_total = 0;
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
@@ -300,8 +302,8 @@ class TransferenciaController extends AbstractController
     public function getChoices()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em,['ALM']);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
 
         $monedas = $em->getRepository(Moneda::class)->findAll();
         $rows = [];
@@ -444,7 +446,7 @@ class TransferenciaController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em, $transferencia_er, $year_, $id_usuario, $idalmacen,['entrada' => true], 'Transferencia');
+        $row = AuxFunctions::getConsecutivos($em, $transferencia_er, $year_, $id_usuario, $idalmacen, ['entrada' => true], 'Transferencia');
         return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
@@ -575,10 +577,10 @@ class TransferenciaController extends AbstractController
 
         $rows = array(
             'id' => $transferencia_obj->getId(),
-            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta'=>$transferencia_obj->getNroCuentaInventario()])->getNombre(),
-            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta'=>$transferencia_obj->getNroCuentaAcreedora()])->getNombre(),
-            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta'=>$transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
-            'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta'=>$transferencia_obj->getNroSubcuentaAcreedora()])->getDescripcion(),
+            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaInventario()])->getNombre(),
+            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaAcreedora()])->getNombre(),
+            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
+            'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaAcreedora()])->getDescripcion(),
             'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '',
             'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
             'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),

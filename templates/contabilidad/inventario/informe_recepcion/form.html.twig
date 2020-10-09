@@ -285,6 +285,7 @@
                     let cuenta = $('#informe_recepcion_nro_cuenta_inventario').val()
                     if (cuenta != '' && codigo != '') {
                         let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando mercancia...")
                         $.ajax({
                             url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo + ',' + nro,
                             method: 'POST',
@@ -298,6 +299,7 @@
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                             }
@@ -340,7 +342,7 @@
                 let importe = parseFloat($('#informe_recepcion_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#informe_recepcion_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#informe_recepcion_mercancia_precio').val(precio_final)
                 } else {
                     $('#informe_recepcion_mercancia_precio').val(0)
@@ -351,7 +353,7 @@
                 let importe = parseFloat($('#informe_recepcion_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#informe_recepcion_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#informe_recepcion_mercancia_precio').val(precio_final)
                 } else {
                     $('#informe_recepcion_mercancia_precio').val(0)
@@ -446,6 +448,7 @@
                     if (list_mercancia.length) {
                         let data = form_informe_recepcion.serializeArray()
                         data.push({name: 'informe_recepcion[list_mercancia]', value: JSON.stringify(list_mercancia)})
+                        loadingModal.show()
                         $.ajax({
                             url: '/contabilidad/inventario/informe-recepcion/form-add',
                             method: 'POST',
@@ -455,9 +458,9 @@
                                 if (result.success) {
                                     window.location.replace('{{ path('contabilidad_inventario_informe_recepcion_gestionar') }}')
                                 } else {
-                                    loadingModal.close()
                                     alertTemplate(result.msg)
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                             }

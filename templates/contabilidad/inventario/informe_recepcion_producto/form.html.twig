@@ -268,6 +268,7 @@
                     let cuenta = $('#informe_recepcion_producto_nro_cuenta_inventario').val()
                     if (cuenta != null && codigo != '') {
                         let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando producto...")
                         $.ajax({
                             url: '/contabilidad/inventario/informe-recepcion-productos/getProductos/' + codigo + ',' + nro,
                             method: 'POST',
@@ -282,6 +283,7 @@
                                     } else {
                                         alertTemplate('No existen productos con ese código')
                                     }
+                                    loadingModal.close()
                                 } else {
                                     alertTemplate('Debe seleccionar la cuenta de inventario.', 'danger')
                                 }
@@ -300,7 +302,7 @@
                 let importe = parseFloat($('#informe_recepcion_producto_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#informe_recepcion_producto_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#informe_recepcion_producto_mercancia_precio').val(precio_final)
                 } else {
                     $('#informe_recepcion_producto_mercancia_precio').val(0)
@@ -311,7 +313,7 @@
                 let importe = parseFloat($('#informe_recepcion_producto_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#informe_recepcion_producto_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#informe_recepcion_producto_mercancia_precio').val(precio_final)
                 } else {
                     $('#informe_recepcion_producto_mercancia_precio').val(0)
@@ -517,6 +519,7 @@
                 resetFormulario()
             }
             else{
+                loadingModal.show()
                 $.ajax({
                     url: '/contabilidad/inventario/informe-recepcion-productos/getInforme/' + nro_informe,
                     method: 'POST',

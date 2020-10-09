@@ -383,6 +383,7 @@
                     let cuenta = $('#ajuste_nro_cuenta_inventario').val()
                     if (cuenta != '' && codigo != '') {
                         let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando mercancia...")
                         $.ajax({
                             url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + nro,
                             method: 'POST',
@@ -396,6 +397,7 @@
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                             }
@@ -410,7 +412,7 @@
                 let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#ajuste_mercancia_precio').val(precio_final)
                 } else {
                     $('#ajuste_mercancia_precio').val(0)
@@ -421,7 +423,7 @@
                 let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
                     $('#ajuste_mercancia_precio').val(precio_final)
                 } else {
                     $('#ajuste_mercancia_precio').val(0)

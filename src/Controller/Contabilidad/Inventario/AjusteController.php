@@ -95,12 +95,14 @@ class AjusteController extends AbstractController
             $list_mercancia = json_decode($request->get('ajuste_entrada')['list_mercancia'], true);
 //            if ($form->isValid()) {
             $ajuste_entrada = $request->get('ajuste');
+            $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+            $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_ENTRADA);
             /**  datos de AjusteEntradaType **/
-            $cuenta_acreedora = $ajuste_entrada['nro_cuenta_acreedora'];
-            $cuenta_inventario = $ajuste_entrada['nro_cuenta_inventario'];
+            $cuenta_acreedora = AuxFunctions::getNro($ajuste_entrada['nro_cuenta_acreedora']);
+            $cuenta_inventario = AuxFunctions::getNro($ajuste_entrada['nro_cuenta_inventario']);
             $observacion = $ajuste_entrada['observacion'];
-            $subcuenta_inventario = $ajuste_entrada['nro_subcuenta_inventario'];
-            $subcuenta_acreedora = $ajuste_entrada['nro_subcuenta_acreedora'];
+            $subcuenta_inventario = AuxFunctions::getNro($ajuste_entrada['nro_subcuenta_inventario']);
+            $subcuenta_acreedora = AuxFunctions::getNro($ajuste_entrada['nro_subcuenta_acreedora']);
 
             ////0-obtengo el numero consecutivo de documento
             /// aqui va la fecha del cierre pero como aun no esta hecho cojo la del servidor, para ir trabajando
@@ -132,6 +134,8 @@ class AjusteController extends AbstractController
                 $documento
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setAnno($year_)
+                    ->setIdTipoDocumento($obj_tipo_documento)
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                     ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                     ->setIdMoneda($em->getRepository(Moneda::class)->find($ajuste_entrada['documento']['id_moneda']));
@@ -161,8 +165,6 @@ class AjusteController extends AbstractController
 
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
-                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_ENTRADA);
                 $importe_total = 0;
 
                 if ($obj_tipo_documento) {

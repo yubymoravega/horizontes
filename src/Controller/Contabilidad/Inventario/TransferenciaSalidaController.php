@@ -519,7 +519,7 @@ class TransferenciaSalidaController extends AbstractController
 
 
     /**
-     * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia",methods={"GET","POST"})
+     * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia_salida",methods={"GET","POST"})
      */
     public function loadTranferencia(EntityManagerInterface $em, $nro,
                                      CuentaRepository $cuentas, SubcuentaRepository $subcuentas)

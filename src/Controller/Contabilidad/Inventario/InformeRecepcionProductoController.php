@@ -57,17 +57,17 @@ class InformeRecepcionProductoController extends AbstractController
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen,['producto'=>true],'InformeRecepcion');
+        $nro = AuxFunctions::getConsecutivos($em, $informe_recepcion_er, $year_, $id_usuario, $idalmacen, ['producto' => true], 'InformeRecepcion');
         $arr_obj_eliminado = $informe_recepcion_er->findBy(array(
-            'anno'=>$year_,
-            'activo'=>false
+            'anno' => $year_,
+            'activo' => false
         ));
         $arr_eliminados = [];
-        foreach ($arr_obj_eliminado as $key=>$eliminado){
-            /**@var $eliminado InformeRecepcion***/
-            $arr_eliminados[$key]=$eliminado->getNroConcecutivo();
+        foreach ($arr_obj_eliminado as $key => $eliminado) {
+            /**@var $eliminado InformeRecepcion** */
+            $arr_eliminados[$key] = $eliminado->getNroConcecutivo();
         }
-        return new JsonResponse(['nros' => $nro, 'eliminados'=>$arr_eliminados, 'success' => true]);
+        return new JsonResponse(['nros' => $nro, 'eliminados' => $arr_eliminados, 'success' => true]);
     }
 
     /**
@@ -84,6 +84,8 @@ class InformeRecepcionProductoController extends AbstractController
             if ($this->isCsrfTokenValid('authenticate', $request->get('_token'))) {
                 $informe_recepcion = $request->get('informe_recepcion_producto');
 
+                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                $obj_tipo_documento = $tipo_documento_er->find(2);
                 /**  datos de InformeRecepcionType **/
                 $cuenta_acreedora = $informe_recepcion['nro_cuenta_acreedora'];
                 $cuenta_inventario = $informe_recepcion['nro_cuenta_inventario'];
@@ -118,6 +120,8 @@ class InformeRecepcionProductoController extends AbstractController
                     $documento
                         ->setActivo(true)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                        ->setAnno($year_)
+                        ->setIdTipoDocumento($obj_tipo_documento)
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                         ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                         ->setIdMoneda($em->getRepository(Moneda::class)->find($informe_recepcion['documento']['id_moneda']));
@@ -146,8 +150,7 @@ class InformeRecepcionProductoController extends AbstractController
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $producto_er = $em->getRepository(Producto::class);
-                    $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->find(2);
+
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $producto) {
@@ -311,18 +314,18 @@ class InformeRecepcionProductoController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em,['ALM']);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $monedas = [];
-        foreach ($row_moneda as $moneda){
-            /**@var $moneda Moneda**/
+        foreach ($row_moneda as $moneda) {
+            /**@var $moneda Moneda* */
             $monedas[] = array(
-                'nombre'=>$moneda->getNombre(),
-                'id'=>$moneda->getId(),
+                'nombre' => $moneda->getNombre(),
+                'id' => $moneda->getId(),
             );
         }
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas'=>$monedas, 'success' => true]);
+        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas' => $monedas, 'success' => true]);
     }
 
     /**
@@ -337,8 +340,8 @@ class InformeRecepcionProductoController extends AbstractController
         $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>true,
-            'anno'=>$year_
+            'producto' => true,
+            'anno' => $year_
         ));
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
@@ -379,7 +382,7 @@ class InformeRecepcionProductoController extends AbstractController
                         ->setActivo(false);
                     $em->persist($obj_movimiento_producto);
 
-                    /**@var $obj_producto Producto**/
+                    /**@var $obj_producto Producto* */
                     $obj_producto = $obj_movimiento_producto->getIdProducto();
                     $nueva_existencia = $obj_producto->getExistencia() - $obj_movimiento_producto->getCantidad();
                     $nuevo_importe = $obj_producto->getImporte() - $obj_movimiento_producto->getImporte();
@@ -428,8 +431,8 @@ class InformeRecepcionProductoController extends AbstractController
         $informe_obj = $informe_recepcion_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'producto'=>true,
-            'anno'=>$year_
+            'producto' => true,
+            'anno' => $year_
         ));
 
         $obj_tipo_documento = $tipo_documento_er->find(2);
@@ -506,8 +509,8 @@ class InformeRecepcionProductoController extends AbstractController
         if (!$informe_obj) {
             return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El nro de informe no existe.']);
         }
-        /**@var $informe_obj InformeRecepcion**/
-        if($informe_obj->getActivo()==false)
+        /**@var $informe_obj InformeRecepcion* */
+        if ($informe_obj->getActivo() == false)
             return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El informe ha sido eliminado.']);
 
         $importe_total = 0;
@@ -532,16 +535,19 @@ class InformeRecepcionProductoController extends AbstractController
             $importe_total += $obj->getImporte();
         }
 
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+
         $rows = array(
-            'id'=>$informe_obj->getId(),
-            'nro_cuenta_inventario'=>$informe_obj->getNroCuentaInventario(),
-            'nro_cuenta_acreedora'=>$informe_obj->getNroCuentaAcreedora(),
-            'nro_subcuenta_inventario'=>$informe_obj->getNroSubcuentaInventario(),
-            'nro_subcuenta_acreedora'=>$informe_obj->getNroSubcuentaAcreedora(),
-            'id_moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getId(),
-            'moneda'=>$informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
-            'importe_total'=>$importe_total,
-            'productos'=>$rows_movimientos
+            'id' => $informe_obj->getId(),
+            'nro_cuenta_inventario' => $informe_obj->getNroCuentaInventario() . ' - ' . $cuenta_er->findOneBy(['nro_cuenta' => $informe_obj->getNroCuentaInventario()])->getNombre(),
+            'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora() . ' - ' . $cuenta_er->findOneBy(['nro_cuenta' => $informe_obj->getNroCuentaAcreedora()])->getNombre(),
+            'nro_subcuenta_inventario' => $informe_obj->getNroSubcuentaInventario() . ' - ' . $subcuenta_er->findOneBy(['nro_subcuenta' => $informe_obj->getNroSubcuentaInventario()])->getDescripcion(),
+            'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuenta_er->findOneBy(['nro_subcuenta' => $informe_obj->getNroSubcuentaAcreedora()])->getDescripcion(),
+            'id_moneda' => $informe_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda' => $informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total' => $importe_total,
+            'productos' => $rows_movimientos
         );
         return new JsonResponse([['informe' => $rows, 'success' => true, 'msg' => 'Informe recuperado con éxito.']]);
     }
