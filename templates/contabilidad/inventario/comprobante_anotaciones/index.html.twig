@@ -22,20 +22,22 @@
             <th width="120px">Subcuenta</th>
             <th width="120px">Análisis 1</th>
             <th width="120px">Análisis 2</th>
-            <th width="120px">Análisis 3</th>
             <th width="120px">Débitos</th>
             <th width="120px">Créditos</th>
             </thead>
             <tbody>
-{#            {% for item in ajustes %}#}
-{#                <tr>#}
-{#                    <td style="font-weight:400;">{{ item.concecutivo }}</td>#}
-{#                    <td style="font-weight:400;">{{ item.importe }}</td>#}
-{#                    <td style="font-weight:400;">{{ item.fecha }}</td>#}
-{#                    <td style="font-weight:400;">{{ item.inventario }}</td>#}
-{#                    <td style="font-weight:400;">{{ item.acreedora }}</td>#}
-{#                </tr>#}
-{#            {% endfor %}#}
+            {% for item in datos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nro_doc }}</td>
+                    <td style="font-weight:400;">{{ item.fecha }}</td>
+                    <td style="font-weight:400;">{{ item.nro_cuenta }}</td>
+                    <td style="font-weight:400;">{{ item.nro_subcuenta }}</td>
+                    <td style="font-weight:400;">{{ item.analisis_1 }}</td>
+                    <td style="font-weight:400;">{{ item.analisis_2 }}</td>
+                    <td style="font-weight:400;">{{ item.debito }}</td>
+                    <td style="font-weight:400;">{{ item.credito }}</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
         {# end list #}
