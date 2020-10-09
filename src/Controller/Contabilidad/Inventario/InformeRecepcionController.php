@@ -225,22 +225,6 @@ class InformeRecepcionController extends AbstractController
                         ->setNroSubcuentaAcreedora($subcuenta_acreedora);
                     $em->persist($informe_recepcion);
 
-                    //4-crear la obligacion de pago con el proveedor(crear la tabla)
-//                    $obligacion_pago = new ObligacionPago();
-//                    $obligacion_pago
-//                        ->setIdProveedor($proveedor_obj)
-//                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-//                        ->setIdDocumento($documento)
-//                        ->setActivo(true)
-//                        ->setNroSubcuenta($proveedor_obj->getCodigo())
-//                        ->setNroCuenta($cuenta_acreedora)
-//                        ->setLiquidado(false)
-//                        ->setResto(floatval($importe_total))
-//                        ->setValorPagado(0)
-//                        ->setCodigoFactura($codigo_factura)
-//                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
-//                    $em->persist($obligacion_pago);
-
                     /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                      * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
                      * entre la suma del importe de la mercancia + el importe adicionado,
@@ -297,49 +281,15 @@ class InformeRecepcionController extends AbstractController
                                     ->setIdMercancia($new_mercancia)
                                     ->setExistencia($cantidad_mercancia);
                             } else {
-                                if ($obj_mercancia->getActivo() == false) {
-                                    $obj_mercancia
-                                        ->setExistencia(0)
-                                        ->setImporte(0);
-                                    $em->persist($obj_mercancia);
-                                }
                                 /**@var $obj_mercancia Mercancia* */
-                                if ($obj_mercancia->getExistencia() == 0) {
-                                    $obj_mercancia
-                                        ->setExistencia($cantidad_mercancia)
-                                        ->setImporte($importe_mercancia);
-                                } else {
-                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                    $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
-                                    $obj_mercancia
-                                        ->setExistencia($existencia_actualizada)
-                                        ->setImporte($importe_actualizado);
-                                }
+                                $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                                $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
+                                $obj_mercancia
+                                    ->setExistencia($existencia_actualizada)
+                                    ->setActivo(true)
+                                    ->setImporte($importe_actualizado);
                                 $em->persist($obj_mercancia);
-                                if ($obj_mercancia->getCuenta() == $cuenta_inventario) {
-                                    if ($obj_mercancia->getActivo() == false) {
-                                        $obj_mercancia
-                                            ->setExistencia(0)
-                                            ->setActivo(true)
-                                            ->setImporte(0);
-                                        $em->persist($obj_mercancia);
-                                    }
-                                    /**@var $obj_mercancia Mercancia* */
-                                    if ($obj_mercancia->getExistencia() == 0) {
-                                        $obj_mercancia
-                                            ->setExistencia($cantidad_mercancia)
-                                            ->setActivo(true)
-                                            ->setImporte($importe_mercancia);
-                                    } else {
-                                        $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                        $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
-                                        $obj_mercancia
-                                            ->setExistencia($existencia_actualizada)
-                                            ->setActivo(true)
-                                            ->setImporte($importe_actualizado);
-                                    }
-                                    $em->persist($obj_mercancia);
-                                } else {
+                                if ($obj_mercancia->getCuenta() != $cuenta_inventario) {
                                     return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
                                 }
                                 $movimiento_mercancia
@@ -416,8 +366,8 @@ class InformeRecepcionController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['ALM','EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em,['ALM']);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
+        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $row_proveedores = $em->getRepository(Proveedor::class)->findBy(array('activo' => true));
         $monedas = [];
@@ -587,6 +537,7 @@ class InformeRecepcionController extends AbstractController
                     $rows[] = array(
                         'id' => $obj->getIdMercancia()->getId(),
                         'codigo' => $obj->getIdMercancia()->getCodigo(),
+                        'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
@@ -664,10 +615,10 @@ class InformeRecepcionController extends AbstractController
 
         $rows = array(
             'id' => $informe_obj->getId(),
-            'nro_cuenta_inventario' => $informe_obj->getNroCuentaInventario().' - '.$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaInventario())->getNombre(),
-            'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora().' - '.$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaAcreedora())->getNombre(),
-            'nro_subcuenta_inventario' => $informe_obj->getNroSubcuentaInventario().' - '.$this->getSubcuenta($subcuenta_er,$informe_obj->getNroSubcuentaInventario(),$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaInventario()))->getDescripcion(),
-            'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora().' - '.$this->getSubcuenta($subcuenta_er,$informe_obj->getNroSubcuentaAcreedora(),$this->getCuenta($cuenta_er,$informe_obj->getNroCuentaAcreedora()))->getDescripcion(),
+            'nro_cuenta_inventario' => $informe_obj->getNroCuentaInventario() . ' - ' . $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaInventario())->getNombre(),
+            'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora() . ' - ' . $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaAcreedora())->getNombre(),
+            'nro_subcuenta_inventario' => $informe_obj->getNroSubcuentaInventario() . ' - ' . $this->getSubcuenta($subcuenta_er, $informe_obj->getNroSubcuentaInventario(), $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaInventario()))->getDescripcion(),
+            'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora() . ' - ' . $this->getSubcuenta($subcuenta_er, $informe_obj->getNroSubcuentaAcreedora(), $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaAcreedora()))->getDescripcion(),
             'cod_proveedor' => $informe_obj->getIdProveedor()->getCodigo(),
             'nombre_proveedor' => $informe_obj->getIdProveedor()->getNombre(),
             'codigo_factura' => $informe_obj->getCodigoFactura(),
@@ -680,22 +631,25 @@ class InformeRecepcionController extends AbstractController
         return new JsonResponse([['informe' => $rows, 'success' => true, 'msg' => 'Informe recuperado con éxito.']]);
     }
 
-    public function getCuenta($cuenta_er,$nro){
+    public function getCuenta($cuenta_er, $nro)
+    {
         $obj_cuenta = $cuenta_er->findOneBy(array(
-            'nro_cuenta'=>$nro,
-            'activo'=>true
+            'nro_cuenta' => $nro,
+            'activo' => true
         ));
-        if(!$obj_cuenta)
+        if (!$obj_cuenta)
             return null;
         return $obj_cuenta;
     }
-    public function getSubcuenta($subcuenta_er, $nro, $obj_cuenta){
+
+    public function getSubcuenta($subcuenta_er, $nro, $obj_cuenta)
+    {
         $obj_subcuenta = $subcuenta_er->findOneBy(array(
-            'nro_subcuenta'=>$nro,
-            'activo'=>true,
-            'id_cuenta'=>$obj_cuenta
+            'nro_subcuenta' => $nro,
+            'activo' => true,
+            'id_cuenta' => $obj_cuenta
         ));
-        if(!$obj_subcuenta)
+        if (!$obj_subcuenta)
             return null;
         return $obj_subcuenta;
     }

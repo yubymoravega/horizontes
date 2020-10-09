@@ -29,13 +29,15 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Nombre de unidad</th>
+            <th scope="col-2">Código</th>
+            <th scope="col-2">Nombre</th>
             <th scope="col-3">Subordinada a</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in unidades %}
                 <tr>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.padre_nombre }}</td>
                     <td>
@@ -45,6 +47,7 @@
                                         id_padre: '{{ item.id_padre }}',
                                         padre_nombre:'{{ item.padre_nombre }}',
                                         nombre:'{{ item.nombre }}' ,
+                                        codigo:'{{ item.codigo }}' ,
                                         id: '{{ item.id }}'
                                         })">
                             <i class="fa fa-edit"></i>
@@ -83,13 +86,14 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {nombre = '', id = '', id_padre = ''} = config
+            const {nombre = '',codigo='', id = '', id_padre = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
 
 
             $('#unidad_id_padre').val(id_padre)
+            $('#unidad_codigo').val(codigo)
             $('#unidad_nombre').val(nombre)
             $('#id_unidad').val(id)
         }
@@ -117,9 +121,11 @@
                 },
                 rules: {
                     'unidad[nombre]': "required",
+                    'unidad[codigo]': "required",
                 },
                 messages: {
                     'unidad[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'unidad[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {

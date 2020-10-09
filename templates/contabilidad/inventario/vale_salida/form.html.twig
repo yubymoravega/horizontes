@@ -7,7 +7,7 @@
         <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-dark">
-                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias</h4>
+                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias o materiales</h4>
                     <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -86,7 +86,7 @@
                 </div>
                 {{ form_end(formulario.fecha_solicitud) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
-                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
                         <span class="pr-1">Importe Total : </span>
                         <span id="importe-total">0</span>
@@ -123,12 +123,12 @@
                         {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.documento.importe_mercancia) }}
-                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
-                    </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.precio) }}
                         {{ form_widget(formulario.mercancia.precio) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.documento.importe_mercancia) }}
+                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.mercancia.existencia) }}
@@ -323,8 +323,8 @@
                 let cantidad = parseFloat($('#vale_salida_documento_cantidad_mercancia').val())
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
-                        let importe = parseFloat(precio * cantidad).toFixed(5)
-                        let resto = parseFloat(importe_total - importe)
+                        let importe = parseFloat(precio * cantidad).toFixed(2)
+                        let resto = parseFloat(importe_total - importe).toFixed(2)
                         $('#vale_salida_documento_importe_mercancia').val(importe)
                         $('#resto_importe').val(resto)
                         let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
@@ -388,7 +388,6 @@
                 rules: {
                     'vale_salida[mercancia][codigo]': "required",
                     'vale_salida[mercancia][descripcion]': "required",
-                    'vale_salida[mercancia][id_unidad_medida]': "required",
                     'vale_salida[documento][cantidad_mercancia]': "required",
                     'vale_salida[documento][importe_mercancia]': "required",
                     'vale_salida[id_centro_costo]': "required",
@@ -399,7 +398,6 @@
                     'vale_salida[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[id_centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[id_elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'vale_salida[documento][cantidad_mercancia]': 'Obligatorio!',
                     'vale_salida[documento][importe_mercancia]': 'Obligatorio!',
                 }
@@ -465,7 +463,7 @@
                         })
                         importe_total += Number.parseFloat(importe)
 
-                        $("#importe-total").text('$' + importe_total)
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
@@ -487,6 +485,8 @@
                         $('#vale_salida_documento_importe_mercancia').val('')
                         $('#vale_salida_mercancia_precio').val('')
                         $('#vale_salida_mercancia_existencia_decremento').val('')
+                        $('#vale_salida_mercancia_id_unidad_medida').val('')
+                        $('#resto_importe').val('')
                         $('#vale_salida_id_centro_costo').val(0)
                         $('#vale_salida_id_elemento_gasto').val(0)
                     }
@@ -499,7 +499,7 @@
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
                 importe_total -= Number.parseFloat(mercancia.importe)
-                $("#importe-total").text('$' + importe_total)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })
@@ -573,7 +573,7 @@
                             $('#vale_salida_fecha_solicitud').val(vale.fecha_solicitud);
 
                             let mercancias = vale.mercancias
-                            $("#importe-total").text('$' + vale.importe_total)
+                            $("#importe-total").text('$' + parseFloat(vale.importe_total).toFixed(2))
                             for (var i = 0; i < mercancias.length; i++) {
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
@@ -631,10 +631,10 @@
                         $('#vale_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
                     $(result.cento_costo).each(function (pos, valor) {
-                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
                     })
                     $(result.elemento_gasto).each(function (pos, valor) {
-                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">'+ valor.codigo+' - '+ valor.nombre + '</option>');
                     })
                     loadingModal.close()
                 },

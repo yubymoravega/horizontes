@@ -463,6 +463,7 @@ class InformeRecepcionProductoController extends AbstractController
                     $rows[] = array(
                         'id' => $obj->getIdProducto()->getId(),
                         'codigo' => $obj->getIdProducto()->getCodigo(),
+                        'um' => $obj->getIdProducto()->getIdUnidadMedida()->getAbreviatura(),
                         'descripcion' => $obj->getIdProducto()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),

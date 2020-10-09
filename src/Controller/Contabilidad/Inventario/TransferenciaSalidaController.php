@@ -6,23 +6,15 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
-use App\Entity\Contabilidad\Config\ConfiguracionInicial;
-use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
-use App\Entity\Contabilidad\Config\Modulo;
 use App\Entity\Contabilidad\Config\Moneda;
-use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
-use App\Entity\Contabilidad\Config\UnidadMedida;
-use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
-use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\TransferenciaSalidaType;
-use App\Form\Contabilidad\Inventario\TransferenciaType;
 use App\Repository\Contabilidad\Config\CentroCostoRepository;
 use App\Repository\Contabilidad\Config\CuentaRepository;
 use App\Repository\Contabilidad\Config\ElementoGastoRepository;
@@ -33,7 +25,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -49,7 +40,7 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/", name="contabilidad_inventario_transferencia_salida",methods={"GET"})
      */
-    public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function index(EntityManagerInterface $em, Request $request/*, ValidatorInterface $validator*/)
     {
         $transferencia_er = $em->getRepository(Transferencia::class);
 
@@ -109,7 +100,6 @@ class TransferenciaSalidaController extends AbstractController
                 'activo' => true,
                 'id_usuario' => $id_user
             ));
-            $consecutivo = 0;
             if ($obj_empleado) {
                 $id_unidad = $obj_empleado->getIdUnidad()->getId();
                 $transferencias_entrada_arr = $em->getRepository(Transferencia::class)->findBy(array(
@@ -168,9 +158,7 @@ class TransferenciaSalidaController extends AbstractController
                     foreach ($list_mercancia as $mercancia) {
                         $codigo_mercancia = $mercancia['codigo'];
                         $cantidad_mercancia = $mercancia['cant'];
-                        $descripcion = $mercancia['descripcion'];
                         $importe_mercancia = $mercancia['importe'];
-                        $unidad_medida = $mercancia['um'];
 
                         $importe_total += floatval($importe_mercancia);
 
@@ -284,7 +272,7 @@ class TransferenciaSalidaController extends AbstractController
         $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
             array('activo' => true, 'id_unidad' => $unidad)
         );
-        $row_deudoras = AuxFunctions::getCuentasByCriterio($em,['GAT','EG']/*,['deudora'=>1]*/);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em,['ALM']/*,['deudora'=>1]*/);
 
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
@@ -330,6 +318,7 @@ class TransferenciaSalidaController extends AbstractController
             /**@var $centro CentroCosto* */
             $centro_costo[] = array(
                 'nombre' => $centro->getNombre(),
+                'codigo' => $centro->getCodigo(),
                 'id' => $centro->getId(),
             );
         }
@@ -337,6 +326,7 @@ class TransferenciaSalidaController extends AbstractController
             /**@var $item ElementoGasto* */
             $elemento[] = array(
                 'nombre' => $item->getDescripcion(),
+                'codigo' => $item->getCodigo(),
                 'id' => $item->getId(),
             );
         }
@@ -496,6 +486,7 @@ class TransferenciaSalidaController extends AbstractController
                         'id' => $obj->getIdMercancia()->getId(),
                         'codigo' => $obj->getIdMercancia()->getCodigo(),
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                        'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
                         'centro_costo' => $obj->getIdCentroCosto()->getNombre(),

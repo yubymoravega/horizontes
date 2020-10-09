@@ -499,6 +499,7 @@ class TransferenciaController extends AbstractController
                     $rows[] = array(
                         'id' => $obj->getIdMercancia()->getId(),
                         'codigo' => $obj->getIdMercancia()->getCodigo(),
+                        'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),

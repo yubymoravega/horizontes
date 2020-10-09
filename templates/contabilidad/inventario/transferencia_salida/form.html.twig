@@ -85,7 +85,7 @@
                 <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 {{ form_end(formulario.nro_cuenta_inventario) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
-                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
                         <span class="pr-1">Importe Total : </span>
                         <span id="importe-total">0</span>
@@ -123,12 +123,12 @@
                         {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.documento.importe_mercancia) }}
-                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
-                    </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.precio) }}
                         {{ form_widget(formulario.mercancia.precio) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.documento.importe_mercancia) }}
+                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.mercancia.existencia) }}
@@ -309,7 +309,7 @@
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
                             let mercancias = data.mercancias
-                            $("#importe-total").text('$' + data.importe_total)
+                            $("#importe-total").text('$' + parseFloat(data.importe_total).toFixed(2))
                             for (var i = 0; i < mercancias.length; i++) {
 
                                 $('#rows_mercancias').append(`<tr>
@@ -362,10 +362,10 @@
                             $('#transferencia_salida_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                         })
                         $(result.centro_costo).each(function (pos, valor) {
-                            $('#transferencia_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                            $('#transferencia_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
                         })
                         $(result.elemento_gasto).each(function (pos, valor) {
-                            $('#transferencia_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                            $('#transferencia_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
                         })
                         loadingModal.close()
                     },
@@ -407,8 +407,9 @@
                     let codigo = $('#transferencia_salida_mercancia_codigo').val()
                     let cuenta = $('#transferencia_salida_nro_cuenta_inventario').val()
                     if (cuenta != '' && codigo != '') {
+                        let nro = cuenta.split(' - ')[0];
                         $.ajax({
-                            url: '/contabilidad/inventario/transferencia-salida/getMercancia/' + codigo + ',' + cuenta,
+                            url: '/contabilidad/inventario/transferencia-salida/getMercancia/' + codigo + ',' + nro,
                             method: 'POST',
                             dataType: 'json',
                             success: function (result) {
@@ -459,9 +460,10 @@
 
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
-                        let importe = parseFloat(precio * cantidad).toFixed(3)
+                        let importe = parseFloat(precio * cantidad).toFixed(2)
                         $('#transferencia_salida_documento_importe_mercancia').val(importe)
-                        $('#resto_importe').val(importe_real - importe)
+                        let existencia = parseFloat(importe_real - importe).toFixed(2);
+                        $('#resto_importe').val(existencia)
                     } else {
                         $('#transferencia_salida_documento_importe_mercancia').val(0)
                     }
@@ -616,7 +618,7 @@
                         })
                         importe_total += Number.parseFloat(importe)
 
-                        $("#importe-total").text('$' + importe_total)
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                        <td class="px-2" style="font-weight:400;"> ${codigo}</td>
                         <td class="px-2" style="font-weight:400;"> ${cant}</td>
@@ -652,7 +654,7 @@
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
                 importe_total -= Number.parseFloat(mercancia.importe)
-                $("#importe-total").text('$' + importe_total)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })

@@ -95,7 +95,7 @@
                 </div>
                 {{ form_end(formulario.nro_cuenta_acreedora) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
-                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias</h3>
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
                         <span class="pr-1">Importe Total : </span>
                         <span id="importe-total">0</span>
@@ -133,12 +133,12 @@
                         {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.documento.importe_mercancia) }}
-                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
-                    </div>
-                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.precio) }}
                         {{ form_widget(formulario.mercancia.precio) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.documento.importe_mercancia) }}
+                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.mercancia.existencia) }}
@@ -305,7 +305,7 @@
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
                             let mercancias = data.mercancias
-                            $("#importe-total").text('$' + data.importe_total)
+                            $("#importe-total").text('$' + parseFloat(data.importe_total).toFixed(2))
                             for (var i = 0; i < mercancias.length; i++) {
 
                                 $('#rows_mercancias').append(`<tr>
@@ -398,8 +398,9 @@
                     let codigo = $('#transferencia_mercancia_codigo').val()
                     let cuenta = $('#transferencia_nro_cuenta_inventario').val()
                     if (cuenta != '' && codigo != '') {
+                        let nro = cuenta.split(' - ')[0];
                         $.ajax({
-                            url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + cuenta,
+                            url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + nro,
                             method: 'POST',
                             dataType: 'json',
                             success: function (result) {
@@ -425,7 +426,7 @@
                 let importe = parseFloat($('#transferencia_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#transferencia_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(3)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
                     $('#transferencia_mercancia_precio').val(precio_final)
                 } else {
                     $('#transferencia_mercancia_precio').val(0)
@@ -436,7 +437,7 @@
                 let importe = parseFloat($('#transferencia_documento_importe_mercancia').val())
                 let cantidad = parseFloat($('#transferencia_documento_cantidad_mercancia').val())
                 if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(3)
+                    let precio_final = parseFloat(importe / cantidad).toFixed(2)
                     $('#transferencia_mercancia_precio').val(precio_final)
                 } else {
                     $('#transferencia_mercancia_precio').val(0)
@@ -582,7 +583,7 @@
                         list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
                         importe_total += Number.parseFloat(importe)
 
-                        $("#importe-total").text('$' + importe_total)
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
@@ -614,7 +615,7 @@
                 event.preventDefault();
                 const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
                 importe_total -= Number.parseFloat(mercancia.importe)
-                $("#importe-total").text('$' + importe_total)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
                 list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
             })

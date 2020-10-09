@@ -40,3 +40,6 @@ unidad_medida:
   - id: 13
     nombre: "Unidad"
     abreviatura: "u"
+  - id: 14
+    nombre: "Blister"
+    abreviatura: "Blister"

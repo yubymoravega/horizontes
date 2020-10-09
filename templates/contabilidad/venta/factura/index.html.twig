@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target_cuentas','method':'POST'}}) }}
+{#    <div class="row pt-0 mt-0">#}
+{#        <div class="col-6 form-group input-group input-group-sm d-block">#}
+{#            {{ form_label(form_cuentas.nro_cuenta) }}#}
+{#            {{ form_widget(form_cuentas.nro_cuenta,{'attr': {'class': 'form- control w-100'}}) }}#}
+{#        </div>#}
+{#        <div class="col-3 mt-0 form-group input-group input-group-sm d-block">#}
+{#            {{ form_label(form_cuentas.id_moneda) }}#}
+{#            {{ form_widget(form_cuentas.id_moneda,{'attr': {'class': 'form- control w-100'}}) }}#}
+{#        </div>#}
+{#        <div class="col-3 mt-4 form-group input-group input-group-sm d-block">#}
+{#            <button class="btn btn-secondary btn-sm" type="button" id="btnAplicarCuenta">ADICIONAR#}
+{#            </button>#}
+{#        </div>#}
+{#    </div>#}
+    <input type="text" id="id_cliente_contabilidad" hidden>
+    {{ form_end(form) }}
+    <div>
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="200px">Nro. cuenta</th>
+            <th width="40px">Moneda</th>
+            <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+            </thead>
+            <tbody id="rows_cuentas">
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -6,25 +6,16 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
-use App\Entity\Contabilidad\Config\ConfiguracionInicial;
-use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
-use App\Entity\Contabilidad\Config\Modulo;
 use App\Entity\Contabilidad\Config\Moneda;
-use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
-use App\Entity\Contabilidad\Config\UnidadMedida;
-use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Documento;
-use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
-use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
-use App\Form\Contabilidad\Inventario\InformeRecepcionType;
 use App\Form\Contabilidad\Inventario\ValeSalidaType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -142,7 +133,7 @@ class ValeSalidaProductoController extends AbstractController
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
         $unidad = AuxFunctions::getUnidad($em, $user);
-        $row_inventario = AuxFunctions::getCuentasInventario($em);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em,['GAT']);;
 //        $row_acreedoras = AuxFunctions::getCuentasAcreedoras($em);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
@@ -169,6 +160,7 @@ class ValeSalidaProductoController extends AbstractController
             /**@var $centro CentroCosto* */
             $centro_costo[] = array(
                 'nombre' => $centro->getNombre(),
+                'codigo' => $centro->getCodigo(),
                 'id' => $centro->getId(),
             );
         }
@@ -176,6 +168,7 @@ class ValeSalidaProductoController extends AbstractController
             /**@var $item ElementoGasto* */
             $elemento[] = array(
                 'nombre' => $item->getDescripcion(),
+                'codigo' => $item->getCodigo(),
                 'id' => $item->getId(),
             );
         }
@@ -503,6 +496,7 @@ class ValeSalidaProductoController extends AbstractController
                         'id' => $obj->getIdProducto()->getId(),
                         'codigo' => $obj->getIdProducto()->getCodigo(),
                         'descripcion' => $obj->getIdProducto()->getDescripcion(),
+                        'um' => $obj->getIdProducto()->getIdUnidadMedida()->getAbreviatura(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),

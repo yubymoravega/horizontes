@@ -5,6 +5,10 @@
     {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
 
     <div class="form-group input-group input-group-sm d-block">
+        <label for="almacen_codigo" class="font-weight-bold">Código</label>
+        {{ form_widget(form.codigo,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
         <label for="almacen_descripcion" class="font-weight-bold">Descipción</label>
         {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100'}}) }}
     </div>

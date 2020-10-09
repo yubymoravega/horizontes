@@ -29,6 +29,7 @@ class AlmacenController extends AbstractController
             /**@var $item Almacen** */
             $row [] = array(
                 'id' => $item->getId(),
+                'codigo' => $item->getCodigo(),
                 'descripcion' => $item->getDescripcion(),
                 'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                 'unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : ''

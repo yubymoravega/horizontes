@@ -20,6 +20,7 @@ contabilidad:
     taza_cambio_unique: La tasa de cambio ya se encuentra registrada
     nombre_cliente: Ya existe un cliente registrado con ese nombre
     codigo_cliente: Ya existe un cliente registrado con ese código
+    codigo_almacen: Ya existe un almacén registrado con ese código
     abreviatura_not_blank: El campo descripción está vacio !
     abreviatura_unique: La abreviatura ya está en uso !
 

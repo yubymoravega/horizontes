@@ -68,7 +68,7 @@ class MercanciaController extends AbstractController
                 $row_mercancia[] = array(
                     'codigo' => $mercancia_obj->getCodigo(),
                     'descripcion' => $mercancia_obj->getDescripcion(),
-                    'unidad_medida' => $mercancia_obj->getIdUnidadMedida()->getNombre(),
+                    'unidad_medida' =>strtoupper($mercancia_obj->getIdUnidadMedida()->getAbreviatura()) ,
                     'existencia' => $mercancia_obj->getExistencia(),
                     'precio' => number_format(($mercancia_obj->getImporte() / $mercancia_obj->getExistencia()), 5, '.', ''),
                     'importe' => $mercancia_obj->getImporte()
