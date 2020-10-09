@@ -60,6 +60,11 @@ class Documento
      */
     private $id_tipo_documento;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $anno;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -145,6 +150,18 @@ class Documento
     public function setIdTipoDocumento(?TipoDocumento $id_tipo_documento): self
     {
         $this->id_tipo_documento = $id_tipo_documento;
+
+        return $this;
+    }
+
+    public function getAnno(): ?int
+    {
+        return $this->anno;
+    }
+
+    public function setAnno(?int $anno): self
+    {
+        $this->anno = $anno;
 
         return $this;
     }
