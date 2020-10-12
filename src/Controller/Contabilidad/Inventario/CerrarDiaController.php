@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
@@ -32,6 +33,7 @@ class CerrarDiaController extends AbstractController
     public function cerrar(EntityManagerInterface $em,Request $request)
     {
         $id_almacen = $request->getSession()->get('almacen/id');
+        $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $movimiento_mercancias_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         //1- obtener todos los debitos(entradas)
@@ -39,13 +41,15 @@ class CerrarDiaController extends AbstractController
             $movimientos_mercancias_arr = $movimiento_mercancias_er->findBy(array(
                 'fecha'=>'',
                 'entrada'=>true,
-                'activo'=>true
+                'activo'=>true,
+                'id_almacen'=>$almacen_obj
             ));
         //1.2 productos
         $movimientos_productos_arr = $movimiento_producto_er->findBy(array(
             'fecha'=>'',
             'entrada'=>true,
-            'activo'=>true
+            'activo'=>true,
+            'id'
         ));
 
         //obtener todos los creditos(salidas)
