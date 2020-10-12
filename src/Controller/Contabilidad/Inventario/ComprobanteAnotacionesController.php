@@ -85,7 +85,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => $nro_subcuenta_deudora,
                     'analisis_1' => $cod_almacen,
                     'analisis_2' => '',
-                    'debito' => $total,
+                    'debito' => number_format($total,2) ,
                     'credito' => ''
                 );
                 $rows[] = array(
@@ -96,7 +96,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'analisis_1' => $cod_proveedor,
                     'analisis_2' => '',
                     'debito' => '',
-                    'credito' => $total
+                    'credito' => number_format($total,2)
                 );
                 $rows[] = array(
                     'nro_doc' => '',
@@ -105,8 +105,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => $total,
-                    'credito' => $total
+                    'debito' => number_format($total,2) ,
+                    'credito' => number_format($total,2)
                 );
             }
             elseif ($id_tipo_documento == 2) {
@@ -141,7 +141,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => $nro_subcuenta_deudora,
                     'analisis_1' => $cod_almacen,
                     'analisis_2' => '',
-                    'debito' => $total,
+                    'debito' => number_format($total,2),
                     'credito' => ''
                 );
                 $rows[] = array(
@@ -152,7 +152,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'analisis_1' => $cod_proveedor,
                     'analisis_2' => '',
                     'debito' => '',
-                    'credito' => $total
+                    'credito' => number_format($total,2)
                 );
                 $rows[] = array(
                     'nro_doc' => '',
@@ -161,8 +161,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => $total,
-                    'credito' => $total
+                    'debito' => number_format($total,2),
+                    'credito' => number_format($total,2)
                 );
             }
             elseif ($id_tipo_documento == 3) {
@@ -174,7 +174,9 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Ajuste* */
                 $nro_doc = 'AJE' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            } elseif ($id_tipo_documento == 4) {
+            }
+            elseif ($id_tipo_documento == 4)
+            {
                 //Ajuste de salida
                 $obj_informe = $em->getRepository(Ajuste::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -183,7 +185,8 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Ajuste* */
                 $nro_doc = 'AJS' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            } elseif ($id_tipo_documento == 5) {
+            }
+            elseif ($id_tipo_documento == 5) {
                 //transferencia de entrada
                 $obj_informe = $em->getRepository(Transferencia::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -192,7 +195,8 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Transferencia* */
                 $nro_doc = 'TE' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            } elseif ($id_tipo_documento == 6) {
+            }
+            elseif ($id_tipo_documento == 6) {
                 //transferencia de salida
                 $obj_informe = $em->getRepository(Transferencia::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -239,7 +243,7 @@ class ComprobanteAnotacionesController extends AbstractController
                             'nro_subcuenta' => $obj_informe->getNroSubcuentaDeudora(),
                             'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
                             'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
-                            'debito' => $total,
+                            'debito' => number_format($total,2),
                             'credito' => ''
                         );
                         $total_general += $total;
@@ -248,7 +252,8 @@ class ComprobanteAnotacionesController extends AbstractController
 
                 $i = 0;
                 foreach ($arr_obj_movimiento_mercancia as $d) {
-                    $cc = $d->getIdMercancia()->getNroCuentaAcreedora() . '-' . $d->getIdMercancia()->getNroSubcuentaAcreedora();
+                    /** @var  $d  MovimientoMercancia*/
+                    $cc = $d->getIdMercancia()->getCuenta() . '-' . $d->getIdMercancia()->getNroSubcuentaInventario();
                     if (!in_array($cc, $rep_arr)) {
                         $rep_arr[$i] = $cc;
                         $i++;
@@ -262,12 +267,12 @@ class ComprobanteAnotacionesController extends AbstractController
                         $rows[] = array(
                             'nro_doc' => '',
                             'fecha' => '',
-                            'nro_cuenta' => $d->getIdMercancia()->getNroCuentaAcreedora(),
-                            'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaAcreedora(),
+                            'nro_cuenta' => $d->getIdMercancia()->getCuenta(),
+                            'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaInventario(),
                             'analisis_1' => $obj_informe->getIdDocumento()->getIdAlmacen()->getCodigo(),
                             'analisis_2' => '',
                             'debito' => '',
-                            'credito' => $total
+                            'credito' => number_format($total,2)
                         );
                     }
                 }
@@ -279,8 +284,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => $total_general,
-                    'credito' => $total_general
+                    'debito' => number_format($total_general,2),
+                    'credito' => number_format($total_general,2)
                 );
             }
             elseif ($id_tipo_documento == 8) {
@@ -320,7 +325,7 @@ class ComprobanteAnotacionesController extends AbstractController
                             'nro_subcuenta' => $obj_informe->getNroSubcuentaDeudora(),
                             'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
                             'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
-                            'debito' => $total,
+                            'debito' => number_format($total,2),
                             'credito' => ''
                         );
                         $total_general += $total;
@@ -348,7 +353,7 @@ class ComprobanteAnotacionesController extends AbstractController
                             'analisis_1' => $obj_informe->getIdDocumento()->getIdAlmacen()->getCodigo(),
                             'analisis_2' => '',
                             'debito' => '',
-                            'credito' => $total
+                            'credito' => number_format($total,2)
                         );
                     }
                 }
@@ -360,8 +365,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => $total_general,
-                    'credito' => $total_general
+                    'debito' => number_format($total_general,2),
+                    'credito' => number_format($total_general,2)
                 );
             }
         }

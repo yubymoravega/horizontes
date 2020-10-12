@@ -62,7 +62,7 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_ajuste_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarAjuste(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCostoRepository $repo_centro_costo, ElementoGastoRepository $repo_elemeto_gasto)
+    public function gestionarAjuste(EntityManagerInterface $em, Request $request)
     {
         $form = $this->createForm(AjusteSalidaType::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
@@ -164,8 +164,8 @@ class AjusteSalidaController extends AbstractController
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
-                            ->setIdCentroCosto($repo_centro_costo->find($mercancia['centro_costo']))
-                            ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
+//                            ->setIdCentroCosto($repo_centro_costo->find($mercancia['centro_costo']))
+//                            ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
                             ->setIdUsuario($this->getUser());
 
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
@@ -258,16 +258,16 @@ class AjusteSalidaController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $unidad = AuxFunctions::getUnidad($em, $user);
-        $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
-        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
-            array('activo' => true, 'id_unidad' => $unidad)
-        );
+//        $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
+//        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
+//            array('activo' => true, 'id_unidad' => $unidad)
+//        );
         $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
         $rows = [];
-        $centro_costo = [];
-        $elemento = [];
+//        $centro_costo = [];
+//        $elemento = [];
         if ($monedas) {
             foreach ($monedas as $item) {
                 /**@var $item Moneda */
@@ -277,27 +277,27 @@ class AjusteSalidaController extends AbstractController
                 );
             }
         }
-        foreach ($row_centro_costo as $centro) {
-            /**@var $centro CentroCosto* */
-            $centro_costo[] = array(
-                'nombre' => $centro->getNombre(),
-                'codigo' => $centro->getCodigo(),
-                'id' => $centro->getId(),
-            );
-        }
-        foreach ($row_elemento_gasto as $item) {
-            /**@var $item ElementoGasto* */
-            $elemento[] = array(
-                'nombre' => $item->getDescripcion(),
-                'codigo' => $item->getCodigo(),
-                'id' => $item->getId(),
-            );
-        }
+//        foreach ($row_centro_costo as $centro) {
+//            /**@var $centro CentroCosto* */
+//            $centro_costo[] = array(
+//                'nombre' => $centro->getNombre(),
+//                'codigo' => $centro->getCodigo(),
+//                'id' => $centro->getId(),
+//            );
+//        }
+//        foreach ($row_elemento_gasto as $item) {
+//            /**@var $item ElementoGasto* */
+//            $elemento[] = array(
+//                'nombre' => $item->getDescripcion(),
+//                'codigo' => $item->getCodigo(),
+//                'id' => $item->getId(),
+//            );
+//        }
         return new JsonResponse([
             'cuentas_deudoras' => $row_deudoras,
             'monedas' => $rows,
-            'centro_costo' => $centro_costo,
-            'elemento_gasto' => $elemento,
+//            'centro_costo' => $centro_costo,
+//            'elemento_gasto' => $elemento,
             'success' => true
         ]);
     }
@@ -325,47 +325,39 @@ class AjusteSalidaController extends AbstractController
             $importe_ajuste = $obj_ajuste_salida->getIdDocumento()->getImporteTotal();
             //voy a ajuste de entrada y lo elimino
             $obj_ajuste_salida->setActivo(false);
-            //voy a obligacion de pago y la elimino
-//                $obj_obligacion->setActivo(false);
+            $em->persist($obj_ajuste_salida);
             $obj_documento = $obj_ajuste_salida->getIdDocumento();
             /**@var $obj_documento Documento* */
             //voy a documento y lo elimino
             $obj_documento->setActivo(false);
-
+            $em->persist($obj_documento);
 
             //eliminar la entrada de la tabla de movimiento_mercancia
             $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
                 'id_documento' => $obj_documento->getId(),
                 'activo' => true
             ));
-
             //---RECORRO EL LISTADO DE MERCANCIAS DEL DOCUMENTO
-            if (!empty($arr_movimientos_mercancia)) {
-                foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
-                    /**@var $obj_movimiento_mercancia MovimientoMercancia* */
-                    $obj_movimiento_mercancia
-                        ->setActivo(false);
-                    $em->persist($obj_movimiento_mercancia);
-
-                    /**@var $obj_mercancia Mercancia* */
-                    $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
-                    $nueva_existencia = $obj_mercancia->getExistencia() - $obj_movimiento_mercancia->getCantidad();
-                    $nuevo_importe = $obj_mercancia->getImporte() - $obj_movimiento_mercancia->getImporte();
-                    $obj_mercancia->setExistencia($nueva_existencia);
-                    $obj_mercancia->setImporte($nuevo_importe);
-                    if ($nueva_existencia == 0) {
-                        $obj_mercancia->setActivo(false);
-                    }
-                    $em->persist($obj_mercancia);
+            foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoMercancia* */
+                $obj_movimiento_mercancia
+                    ->setActivo(false);
+                $em->persist($obj_movimiento_mercancia);
+                /**@var $obj_mercancia Mercancia* */
+                $obj_mercancia = $obj_movimiento_mercancia->getIdMercancia();
+                $nueva_existencia = $obj_mercancia->getExistencia() + $obj_movimiento_mercancia->getCantidad();
+                $nuevo_importe = $obj_mercancia->getImporte() + $obj_movimiento_mercancia->getImporte();
+                $obj_mercancia->setExistencia($nueva_existencia);
+                $obj_mercancia->setImporte($nuevo_importe);
+                if ($nueva_existencia == 0) {
+                    $obj_mercancia->setActivo(false);
                 }
+                $em->persist($obj_mercancia);
             }
             try {
-                $em->persist($obj_ajuste_salida);
-//                    $em->persist($obj_obligacion);
-                $em->persist($obj_documento);
                 $em->flush();
                 $success = 'success';
-                $msg = 'Ajuste de entrada eliminado satisfactoriamente';
+                $msg = 'Ajuste de entrada cancelado satisfactoriamente';
 
             } catch
             (FileException $exception) {
@@ -437,8 +429,8 @@ class AjusteSalidaController extends AbstractController
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
-                        'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
-                        'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
+//                        'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
+//                        'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                         'importe' => number_format($obj->getImporte(), 2, '.', ''),
                     );
@@ -498,8 +490,8 @@ class AjusteSalidaController extends AbstractController
                 'id' => $obj->getIdMercancia()->getId(),
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
-                'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
-                'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
+//                'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
+//                'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),

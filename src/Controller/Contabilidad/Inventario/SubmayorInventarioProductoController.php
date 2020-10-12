@@ -102,19 +102,20 @@ class SubmayorInventarioProductoController extends AbstractController
 
                 $arr_movimientos_producto = $movimiento_producto_er->findBy(array(
                     'id_producto' => $obj_producto,
+                    'activo'=>true
 //                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
                 ));
                 foreach ($arr_movimientos_producto as $obj_mivimiento) {
                     /**@var $obj_mivimiento MovimientoProducto* */
                     $rows [] = array(
                         'fecha' => $obj_mivimiento->getFecha()->format('d/m/Y'),
-                        'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
-                        'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
-                        'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
-                        'cant_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getCantidad(),
-                        'importe_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getImporte(),
-                        'cant_existencia'=>$obj_mivimiento->getExistencia(),
-                        'importe_existencia'=>round(($obj_mivimiento->getExistencia()*($obj_mivimiento->getImporte()/$obj_mivimiento->getCantidad())),2)
+                        'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                        'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                        'importe_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getImporte() : '',
+                        'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                        'importe_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getImporte(),
+                        'cant_existencia' => $obj_mivimiento->getExistencia(),
+                        'importe_existencia' => round(($obj_mivimiento->getExistencia() * ($obj_mivimiento->getImporte() / $obj_mivimiento->getCantidad())), 2)
                     );
                 }
             }
@@ -126,19 +127,20 @@ class SubmayorInventarioProductoController extends AbstractController
 
             $arr_movimientos_mercancia = $movimiento_mercancia_er->findBy(array(
                 'id_mercancia' => $obj_mercancia,
+                'activo' => true
 //                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
             ));
             foreach ($arr_movimientos_mercancia as $obj_mivimiento) {
                 /**@var $obj_mivimiento MovimientoMercancia* */
                 $rows [] = array(
-                    'fecha' => $this->getFecha($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
-                    'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em,$obj_mivimiento->getIdDocumento()->getId(),$obj_mivimiento->getIdTipoDocumento()->getId()),
-                    'cant_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getCantidad():'',
-                    'importe_entrada'=>$obj_mivimiento->getEntrada()?$obj_mivimiento->getImporte():'',
-                    'cant_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getCantidad(),
-                    'importe_salida'=>$obj_mivimiento->getEntrada()?'':$obj_mivimiento->getImporte(),
-                    'cant_existencia'=>$obj_mivimiento->getExistencia(),
-                    'importe_existencia'=>round(($obj_mivimiento->getExistencia()*($obj_mivimiento->getImporte()/$obj_mivimiento->getCantidad())),2)
+                    'fecha' => $this->getFecha($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                    'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                    'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                    'importe_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getImporte() : '',
+                    'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                    'importe_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getImporte(),
+                    'cant_existencia' => $obj_mivimiento->getExistencia(),
+                    'importe_existencia' => round(($obj_mivimiento->getExistencia() * ($obj_mivimiento->getImporte() / $obj_mivimiento->getCantidad())), 2)
                 );
             }
 
@@ -151,7 +153,7 @@ class SubmayorInventarioProductoController extends AbstractController
                 'codigo_unidad' => $codigo_unidad,
                 'nombre_unidad' => $nombre_unidad,
                 'nombre_almacen' => $nombre_almacen,
-                'cant_movimientos'=>count($rows)
+                'cant_movimientos' => count($rows)
             ),
             'movimientos' => $rows,
         ]);
@@ -192,68 +194,63 @@ class SubmayorInventarioProductoController extends AbstractController
         return $prefijo;
     }
 
-    public function getNroConsecutivo(EntityManagerInterface $em,$id_documento, $id_tipo_documento)
+    public function getNroConsecutivo(EntityManagerInterface $em, $id_documento, $id_tipo_documento)
     {
         $consecutivo = '';
-        if ($id_tipo_documento == 1 || $id_tipo_documento == 2){
+        if ($id_tipo_documento == 1 || $id_tipo_documento == 2) {
             //informe de recepcion
             $inf_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            return $inf_recepcion ?$inf_recepcion->getNroConcecutivo():'-';
-        }
-        elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4){
+            return $inf_recepcion ? $inf_recepcion->getNroConcecutivo() : '-';
+        } elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4) {
             //ajuste
             $ajuste = $em->getRepository(Ajuste::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            return $ajuste ?$ajuste->getNroConcecutivo():'-';
-        }
-        elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6){
+            return $ajuste ? $ajuste->getNroConcecutivo() : '-';
+        } elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6) {
             //transferencia
             $transferencia = $em->getRepository(Transferencia::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            return $transferencia ?$transferencia->getNroConcecutivo():'-';
-        }
-        elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8){
+            return $transferencia ? $transferencia->getNroConcecutivo() : '-';
+        } elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8) {
             //vale de salida
             $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            return $vale_salida ?$vale_salida->getNroConsecutivo():'-';
+            return $vale_salida ? $vale_salida->getNroConsecutivo() : '-';
         }
         return 0;
     }
 
-    public function getFecha(EntityManagerInterface $em,$id_documento, $id_tipo_documento)
+    public function getFecha(EntityManagerInterface $em, $id_documento, $id_tipo_documento)
     {
-        if ($id_tipo_documento == 1 || $id_tipo_documento == 2){
+        if ($id_tipo_documento == 1 || $id_tipo_documento == 2) {
             //informe de recepcion
             $inf_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            return $inf_recepcion ?$inf_recepcion->getFechaFactura()->format('d/m/Y'):'';
-        }
-        elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4){
+            return $inf_recepcion ? $inf_recepcion->getFechaFactura()->format('d/m/Y') : '';
+        } elseif ($id_tipo_documento == 3 || $id_tipo_documento == 4) {
             //ajuste
+            /** @var Ajuste $ajuste */
             $ajuste = $em->getRepository(Ajuste::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            return $ajuste ?$ajuste->getFechaFactura()->format('d/m/Y'):'';
-        }
-        elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6){
+            return $ajuste ? $ajuste->getIdDocumento()->getFecha()->format('d/m/Y') : '';
+        } elseif ($id_tipo_documento == 5 || $id_tipo_documento == 6) {
             //transferencia
             $documento = $em->getRepository(Documento::class)->find($id_documento);
-            return $documento ?$documento->getFecha()->format('d/m/Y'):'';
-        }
-        elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8){
+            return $documento ? $documento->getFecha()->format('d/m/Y') : '';
+        } elseif ($id_tipo_documento == 7 || $id_tipo_documento == 8) {
             //vale de salida
             $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(array(
-                'id_documento'=>$id_documento
+                'id_documento' => $id_documento
             ));
-            /**@var $vale_salida ValeSalida*/
-            return $vale_salida ?$vale_salida->getFechaSolicitud()->format('d/m/Y'):'';
+            /**@var $vale_salida ValeSalida */
+            return $vale_salida ? $vale_salida->getFechaSolicitud()->format('d/m/Y') : '';
         }
         return 0;
     }

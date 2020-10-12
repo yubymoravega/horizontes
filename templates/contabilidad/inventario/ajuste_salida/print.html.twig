@@ -21,8 +21,6 @@
             <th class="text-center"><strong>Código</strong></th>
             <th class="text-center"><strong>Descripción</strong></th>
             <th width="10" class="text-center"><strong>UM</strong></th>
-            <th class="text-center"><strong>Centro Costo</strong></th>
-            <th class="text-center"><strong>Elemento Gasto</strong></th>
             <th class="text-center"><strong>Cantidad</strong></th>
             <th class="text-center"><strong>Precio</strong></th>
             <th class="text-center"><strong>Importe</strong></th>
@@ -34,8 +32,6 @@
                     <td>{{ item.codigo }}</td>
                     <td>{{ item.descripcion }}</td>
                     <td width="10" class="text-center">{{ item.um }}</td>
-                    <td>{{ item.centro_costo }}</td>
-                    <td>{{ item.elemento_gasto }}</td>
                     <td class="text-right">{{ item.cantidad }}</td>
                     <td class="text-right">{{ item.precio }}</td>
                     <td class="text-right">{{ item.importe }}</td>
@@ -44,7 +40,7 @@
             {% endfor %}
             </tbody>
         </table>
-        <table border="0px" class="mt-5" width="960px" height="70px">
+        <table border="0px" class="mt-5" width="960px">
             <tbody>
             <tr>
                 <td class="font-weight-bold text-center" colspan="5">IMPORTE TOTAL</td>

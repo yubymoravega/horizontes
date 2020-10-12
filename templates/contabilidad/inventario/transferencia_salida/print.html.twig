@@ -42,8 +42,6 @@
             <th style="border: solid black 1px; width:80px;" class="text-center"><strong>Código</strong></th>
             <th style="border: solid black 1px; width:100px;" class="text-center"><strong>Descripción</strong></th>
             <th width="10" class="text-center"><strong>UM</strong></th>
-            <th style="border: solid black 1px; width:100px;" class="text-center"><strong>Centro Costo</strong></th>
-            <th style="border: solid black 1px; width:100px;" class="text-center"><strong>Elemento Gasto</strong></th>
             <th style="border: solid black 1px; width:70px;" class="text-center"><strong>Cantidad</strong></th>
             <th style="border: solid black 1px; width:70px;" class="text-center"><strong>Precio</strong></th>
             <th style="border: solid black 1px; width:70px;" class="text-center"><strong>Importe</strong></th>
@@ -55,8 +53,6 @@
                     <td>{{ item.codigo }}</td>
                     <td>{{ item.descripcion }}</td>
                     <td class="text-center">{{ item.um }}</td>
-                    <td>{{ item.centro_costo }}</td>
-                    <td>{{ item.elemento_gasto }}</td>
                     <td class="text-right">{{ item.cantidad }}</td>
                     <td class="text-right">{{ item.precio }}</td>
                     <td class="text-right">{{ item.importe }}</td>
@@ -68,7 +64,7 @@
         <table border="0px" class="mt-5" width="960px" height="70px">
             <tbody>
             <tr>
-                <td class="font-weight-bold text-center" colspan="5">IMPORTE TOTAL</td>
+                <td class="font-weight-bold text-center" colspan="3">IMPORTE TOTAL</td>
                 <td width="100" class="font-weight-bold text-right">{{ datos.importe_total }}</td>
                 <td width="100" class="font-weight-bold text-center"></td>
             </tr>

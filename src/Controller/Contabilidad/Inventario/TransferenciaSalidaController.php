@@ -5,8 +5,6 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
-use App\Entity\Contabilidad\Config\CentroCosto;
-use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
@@ -15,9 +13,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\TransferenciaSalidaType;
-use App\Repository\Contabilidad\Config\CentroCostoRepository;
 use App\Repository\Contabilidad\Config\CuentaRepository;
-use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use App\Repository\Contabilidad\Config\SubcuentaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -74,7 +70,7 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_transferencia_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarTransferencia(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, CentroCostoRepository $repo_centro_costo, ElementoGastoRepository $repo_elemeto_gasto)
+    public function gestionarTransferencia(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
         $form = $this->createForm(TransferenciaSalidaType::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
@@ -172,8 +168,6 @@ class TransferenciaSalidaController extends AbstractController
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
-                            ->setIdCentroCosto($repo_centro_costo->find($mercancia['centro_costo']))
-                            ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
                             ->setIdUsuario($this->getUser());
 
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
@@ -268,18 +262,9 @@ class TransferenciaSalidaController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $unidad = AuxFunctions::getUnidad($em, $user);
-        $row_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
-        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
-            array('activo' => true, 'id_unidad' => $unidad)
-        );
         $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']/*,['deudora'=>1]*/);
-
         $monedas = $em->getRepository(Moneda::class)->findAll();
-
         $rows = [];
-        $centro_costo = [];
-        $elemento = [];
-
         if ($monedas) {
             foreach ($monedas as $item) {
                 /**@var $item Moneda */
@@ -313,30 +298,11 @@ class TransferenciaSalidaController extends AbstractController
                 );
             }
         }
-
-        foreach ($row_centro_costo as $centro) {
-            /**@var $centro CentroCosto* */
-            $centro_costo[] = array(
-                'nombre' => $centro->getNombre(),
-                'codigo' => $centro->getCodigo(),
-                'id' => $centro->getId(),
-            );
-        }
-        foreach ($row_elemento_gasto as $item) {
-            /**@var $item ElementoGasto* */
-            $elemento[] = array(
-                'nombre' => $item->getDescripcion(),
-                'codigo' => $item->getCodigo(),
-                'id' => $item->getId(),
-            );
-        }
         return new JsonResponse([
             'cuentas_inventario' => $row_deudoras, // realmente es Deudora
             'monedas' => $rows,
             'unidades' => $rows_unidades,
             'almacenes' => $rows_almcen,
-            'centro_costo' => $centro_costo,
-            'elemento_gasto' => $elemento,
             'success' => true
         ]);
     }
@@ -489,8 +455,6 @@ class TransferenciaSalidaController extends AbstractController
                         'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
-                        'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
-                        'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                         'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                         'importe' => number_format($obj->getImporte(), 2, '.', ''),
                     );
@@ -553,8 +517,6 @@ class TransferenciaSalidaController extends AbstractController
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
-                'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
-                'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),

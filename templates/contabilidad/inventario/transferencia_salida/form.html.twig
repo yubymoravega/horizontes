@@ -145,66 +145,57 @@
                                class="w-100 form-control">
                     </div>
                 </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-5 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.id_centro_costo) }}
-                        {{ form_widget(formulario.id_centro_costo) }}
-                    </div>
-                    <div class="col-5 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.id_elemento_gasto) }}
-                        {{ form_widget(formulario.id_elemento_gasto) }}
-                    </div>
-                    <div class="col-2 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">
-                            ADICIONAR
-                        </button>
-                    </div>
-                </div>
-                {{ form_end(formulario.mercancia) }}
-                </div>
-                <div>
-                    <table class="table-small-rows table table-hover text-light">
-                        <thead class="thead-dark">
-                        <th class="px-2" width="100px">Cod.</th>
-                        <th class="px-2" width="100px">Cant.</th>
-                        <th class="px-2" width="100px">Importe</th>
-                        <th class="px-2" width="100px">Precio</th>
-                        <th class="px-2" width="100px">N. Exist</th>
-                        <th class="px-2" width="110px">C. costo</th>
-                        <th class="px-2" style="width:110px;">E. Gasto</th>
-                        <th class="px-2" width="20px"><i class="fa fa-minus-circle text-danger"></i></th>
-                        <th hidden>UM</th>
-                        <th hidden>Descripcion</th>
-                        </thead>
-                        <tbody id="rows_mercancias">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="d-flex mt-2">
-                    <div class="mr-auto">
-                        <a href="{{ url('inventario') }}"
-                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
-                    </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
-                    </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
-                        </button>
-                    </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitTransferencia">contabilizar
-                        </button>
-                    </div>
+                <div class="pt-0 pl-1 mt-0`">
+                    <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">
+                        ADICIONAR
+                    </button>
                 </div>
 
+                {{ form_end(formulario.mercancia) }}
             </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th class="px-2" width="100px">Código</th>
+                    <th class="px-2" width="100px">Cantidad</th>
+                    <th class="px-2" width="100px">Importe</th>
+                    <th class="px-2" width="100px">Precio</th>
+                    <th class="px-2" width="100px">Nueva Existencia</th>
+                    <th class="px-2" width="20px"><i class="fa fa-minus-circle text-danger"></i></th>
+                    <th hidden>UM</th>
+                    <th hidden>Descripcion</th>
+                    </thead>
+                    <tbody id="rows_mercancias">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a href="{{ url('inventario') }}"
+                       class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
+                    </button>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitTransferencia">contabilizar
+                    </button>
+                </div>
+            </div>
+
         </div>
+    </div>
     </div>
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
     <script>
+        $('#transferencia_salida_id_centro_costo').hide()
+        $('#transferencia_salida_id_elemento_gasto').hide()
         function Print_Ajuste() {
             const url = '/contabilidad/inventario/transferencia-salida/print_report/' + $('#select_nros').val()
             window.open(url, 'blank_')
@@ -319,8 +310,6 @@
                                     <td class="px-2" style="font-weight:400;"> ${mercancias[i]['importe']}</td>
                                     <td class="px-2" style="font-weight:400;"> ${mercancias[i]['precio']} </td>
                                     <td class="px-2" style="font-weight:400;">${mercancias[i]['existencia']}</td>
-                                    <td class="px-2" style="font-weight:400;">${mercancias[i]['centro_costo']}</td>
-                                    <td class="px-2" style="font-weight:400;">${mercancias[i]['elemento_gasto']}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -340,8 +329,6 @@
                 loadingModal.show()
                 $('#transferencia_salida select').find('option').remove()
                 $('#transferencia_salida select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-                $('#transferencia_salida_id_centro_costo, #transferencia_salida_id_elemento_gasto').find('option').remove()
-                $('#transferencia_salida_id_centro_costo, #transferencia_salida_id_elemento_gasto').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                 $('#form_mercancia').css('display', 'block')
 
                 $.ajax({
@@ -361,12 +348,6 @@
                         })
                         $(result.almacenes).each(function (pos, valor) {
                             $('#transferencia_salida_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                        })
-                        $(result.centro_costo).each(function (pos, valor) {
-                            $('#transferencia_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
-                        })
-                        $(result.elemento_gasto).each(function (pos, valor) {
-                            $('#transferencia_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
                         })
                         loadingModal.close()
                     },
@@ -540,8 +521,6 @@
                     'transferencia_salida[mercancia][id_unidad_medida]': "required",
                     'transferencia_salida[documento][cantidad_mercancia]': "required",
                     'transferencia_salida[documento][importe_mercancia]': "required",
-                    'transferencia_salida[id_centro_costo]': "required",
-                    'transferencia_salida[id_elemento_gasto]': "required",
                 },
                 messages: {
                     'transferencia_salida[mercancia][codigo]': 'Obligatorio!',
@@ -549,8 +528,6 @@
                     'transferencia_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'transferencia_salida[documento][cantidad_mercancia]': 'Obligatorio!',
                     'transferencia_salida[documento][importe_mercancia]': 'Obligatorio!',
-                    'transferencia_salida[id_centro_costo]': 'Obligatorio!',
-                    'transferencia_salida[id_elemento_gasto]': 'Obligatorio!',
                 }
             })
 
@@ -597,10 +574,6 @@
                     let nueva_existencia = $('#transferencia_salida_mercancia_existencia').val()
                     let um = $('#transferencia_salida_mercancia_id_unidad_medida').val()
                     let descripcion = $('#transferencia_salida_mercancia_descripcion').val()
-                    let centro_costo = $('#transferencia_salida_id_centro_costo').val()
-                    let centro_costo_text = $('#transferencia_salida_id_centro_costo option:selected').text()
-                    let elemento_gasto = $('#transferencia_salida_id_elemento_gasto').val()
-                    let elemento_gasto_text = $('#transferencia_salida_id_elemento_gasto option:selected').text()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
@@ -613,9 +586,7 @@
                             precio,
                             nueva_existencia,
                             um,
-                            descripcion,
-                            centro_costo,
-                            elemento_gasto
+                            descripcion
                         })
                         importe_total += Number.parseFloat(importe)
 
@@ -626,8 +597,6 @@
                         <td class="px-2" style="font-weight:400;"> ${importe}</td>
                         <td class="px-2" style="font-weight:400;"> ${precio} </td>
                         <td class="px-2" style="font-weight:400;">${nueva_existencia}</td>
-                        <td class="px-2" style="font-weight:400;">${centro_costo_text}</td>
-                        <td class="px-2" style="font-weight:400;">${elemento_gasto_text}</td>
                         <td class="px-2" style="font-weight:400;" hidden> ${descripcion}</td>
                         <td class="px-2"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -644,8 +613,6 @@
                         $('#transferencia_salida_mercancia_precio').val('')
                         $('#true_precio_mercancia').val('')
                         $('#transferencia_salida_mercancia_existencia_decremento').val('')
-                        $('#transferencia_salida_id_centro_costo').val(0)
-                        $('#transferencia_salida_id_elemento_gasto').val(0)
                     }
 
                 }

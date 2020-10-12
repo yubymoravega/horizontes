@@ -54,3 +54,15 @@ la suma de los saldos de las cuentas tiene que ser igual a la suma de los import
 
 OJO NUEVO
 verifica rque el producto tiene que estar asociado por cuentas(1 producto solo puede estar asociado a una sola cuenta), si trata de adicionar el mismo codigo de mercancia en diferente cuenta enviar alerta y no permitirlo
+
+
+####Tareas del dia de hoy(12/10/2020)
+-   ok*1- Quitar la seleccion de elemento de gasto y centro de costo en las trasnfereancias y vales de salida(leandro arreglar visual del btn y revisar la tabla de imprimir "total")
+-   2- Forzar al .00 en los listados de productos y mercancias
+-   ok*3- traer las abrebiaturas de las unidades de medida en los documentos
+-   ok*4- quitar los documentos cancelados en el submayor de inventario por producto
+-   ok*5- revisar por que no vienen las trasnferencias en el submayor de inventario por producto
+-   6- revisar a la hora de dar un consecutivo, si el ultimo esta cancelado, reasignarlo(cambia la logica de los consecutivos, en ves de contar solo preguntaremos por el ultimo)
+-   ok*7- en el listado de existencia por almacen traer por cuentas(ya lo hace) y subcuentas(hay que implementarlo)
+-   8- hacer un imprimir en los documentos tanto entrada como slaida que imprima el que se esta elaborando, si necesidad de guardar e ir atras
+-   9- revisar en todos los docuemtnos de entrada y salida que adicione el id_tipo_documento y el anno en la tabla documento

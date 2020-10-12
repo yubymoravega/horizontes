@@ -35,13 +35,19 @@
                 </tr>
                 {% for item in datos.existencia %}
                     <tr>
-                        <td style="font-weight:400;">{{ item.codigo }}</td>
-                        <td style="font-weight:400;">{{ item.descripcion }}</td>
-                        <td style="font-weight:400;">{{ item.unidad_medida }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.existencia }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.precio }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.importe }}</td>
+                        <td class="row-group-conta" colspan="5">{{ item.cuenta }}</td>
+                        <td class="row-group-conta text-right">{{ item.total }}</td>
                     </tr>
+                    {% for new_item in item.existencia %}
+                        <tr>
+                            <td style="font-weight:400;">{{ new_item.codigo }}</td>
+                            <td style="font-weight:400;">{{ new_item.descripcion }}</td>
+                            <td style="font-weight:400;">{{ new_item.unidad_medida }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.existencia }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.precio }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.importe }}</td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
             {% endfor %}
             </tbody>

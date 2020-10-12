@@ -47,12 +47,12 @@ class MercanciaType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'label' => 'UM',
                 'class' => UnidadMedida::class,
-                'choice_label' => 'nombre',
+                'choice_label' => 'abreviatura',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
 //                        ->select(array('u.id','u.nombre','u.abreviatura'))
                         ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
+                        ->orderBy('u.abreviatura', 'ASC');
                 }
             ]);
     }
