@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Contabilidad;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
@@ -62,6 +63,12 @@ class RegistroComprobantes
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_usuario;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_almacen;
 
     public function getId(): ?int
     {
@@ -160,6 +167,18 @@ class RegistroComprobantes
     public function setIdUsuario(?User $id_usuario): self
     {
         $this->id_usuario = $id_usuario;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
 
         return $this;
     }

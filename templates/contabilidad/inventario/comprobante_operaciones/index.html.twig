@@ -1,20 +1,76 @@
-{% extends 'base.html.twig' %}
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Comprobante de Operaciones {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Comprobante de
+                    operaciones
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td style="width: 180px"><strong>Fecha: </strong> {{ fecha }}</td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Almacén:</strong> {{ almacen }}</td>
+            </tr>
+            </tbody>
+        </table>
 
-{% block title %}Hello ComprobanteOperacionesController!{% endblock %}
+        {% for info in datos %}
+            <div>
+                <p><strong>Documento: </strong>{{ info.nro_doc }}</p>
+            </div>
+            <table border="0" width="960px" class="text-center">
+                <thead>
+                <th width="70px">Fecha</th>
+                <th width="175px">Cuenta</th>
+                <th width="120px">Subcuenta</th>
+                <th width="120px">Análisis 1</th>
+                <th width="120px">Análisis 2</th>
+                <th width="120px">Débitos</th>
+                <th width="120px">Créditos</th>
+                </thead>
+                <tbody>
+                {% for item in info.datos %}
+                    {% if item.nro_cuenta == '' %}
+                        <tr>
+                            <td style="font-weight:400;">{{ item.fecha }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.nro_cuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.nro_subcuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.analisis_1 }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.analisis_2 }}</td>
+                            <td style="font-weight:400;" class="text-right border-top pb-3">{{ item.debito }}</td>
+                            <td style="font-weight:400;" class="text-right border-top pb-3">{{ item.credito }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td style="font-weight:400;">{{ item.fecha }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.nro_cuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.nro_subcuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.analisis_1 }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.analisis_2 }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+        <div style="width: 960px" class="mt-5">
+            <label for="observacion" class="font-weight-bold">Observación:</label>
+            <textarea name="observacion" id="observacion" cols="120" rows="4" class="w-100"></textarea>
+        </div>
+        <div style="width: 960px">
 
-{% block content %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Cerro {{ controller_name }}! ✅</h1>
+            <button type="submit" name="btn_generar" class="btn btn-secondary text-uppercase mt-2 font-weight-bold">
+                Generar Comprobante
+            </button>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'F:/sistemas/TIM/app/src/Controller/Contabilidad/Inventario/ComprobanteOperacionesController.php'|file_link(0) }}">src/Controller/Contabilidad/Inventario/ComprobanteOperacionesController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'F:/sistemas/TIM/app/templates/contabilidad/inventario/comprobante_operaciones/index.html.twig'|file_link(0) }}">templates/contabilidad/inventario/comprobante_operaciones/index.html.twig</a></code></li>
-    </ul>
-</div>
+        </div>
+    </div>
 {% endblock %}

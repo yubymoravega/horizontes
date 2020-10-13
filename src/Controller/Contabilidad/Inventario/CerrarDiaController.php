@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Mercancia;
@@ -28,21 +29,33 @@ class CerrarDiaController extends AbstractController
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $cierre_er = $em->getRepository(Cierre::class);
-        $today = Date('Y-m-d');
-        /** @var Cierre $obj_cierre_abierto */
-        $obj_cierre_abierto = $cierre_er->findOneBy(array(
-            'id_almacen' => $almacen_obj,
-            'fecha' => \DateTime::createFromFormat('Y-m-d', $today)
-        ));
-//dd($obj_cierre_abierto,$today);
-        if (!$obj_cierre_abierto || $obj_cierre_abierto->getAbierto())
-            return $this->render('contabilidad/inventario/cerrar_dia/index.html.twig', [
-                'controller_name' => 'CerrarDiaController',
-                'message'=>'¿ Está seguro que desea cerrar el día?'
-            ]);
+        $today = AuxFunctions::getDateToClose($em,$id_almacen);
+        if($today != false){
+            /** @var Cierre $obj_cierre_abierto */
+            $obj_cierre_abierto = $cierre_er->findOneBy(array(
+                'id_almacen' => $almacen_obj,
+                'fecha' => \DateTime::createFromFormat('Y-m-d', $today)
+            ));
+            if (!$obj_cierre_abierto || $obj_cierre_abierto->getAbierto()){
+                $arr = explode('-',$today);
+
+                return $this->render('contabilidad/inventario/cerrar_dia/index.html.twig', [
+                    'controller_name' => 'CerrarDiaController',
+                    'message'=>'¿ Está seguro que desea cerrar el día '.$arr[2].'-'.$arr[1].'-'.$arr[0].' ?'
+                ]);
+            }
+            else
+                return $this->render('contabilidad/inventario/cerrar_dia/dia_cerrado.html.twig', [
+                    'controller_name' => 'CerrarDiaController',
+                    'message'=>'El Almacén ya se encuentra cerrado.',
+                    'ocultar'=>false
+                ]);
+        }
         else
             return $this->render('contabilidad/inventario/cerrar_dia/dia_cerrado.html.twig', [
                 'controller_name' => 'CerrarDiaController',
+                'message'=>'No puede cerrar el almacén con una fecha mayor a la actual.',
+                'ocultar'=>true
             ]);
     }
 
@@ -55,6 +68,7 @@ class CerrarDiaController extends AbstractController
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $year_ = Date('Y');
         $month = Date('m');
+        $user = $this->getUser();
 
         $movimiento_mercancias_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
@@ -67,8 +81,9 @@ class CerrarDiaController extends AbstractController
             'abierto' => true,
         ));
 
+        $fecha_cierre = AuxFunctions::getDateToClose($em,$id_almacen);
         /**@var Cierre $obj_cierre_abierto */
-        $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : Date('Y-m-d');
+        $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_cierre;
         $next_day = strtotime($today . "+ 1 days");
 
 
@@ -135,6 +150,7 @@ class CerrarDiaController extends AbstractController
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                     ->setMes($month)
                     ->setAbierto(false)
+                    ->setIdUsuario($user)
                     ->setSaldo(0)
                     ->setDiario(true)
                     ->setCredito($creditos)
@@ -151,6 +167,7 @@ class CerrarDiaController extends AbstractController
                     ->setAbierto(false)
                     ->setDiario(true)
                     ->setCredito($creditos)
+                    ->setIdUsuario($user)
                     ->setDebito($debitos);
                 $em->persist($obj_cierre_abierto);
             }
@@ -166,6 +183,7 @@ class CerrarDiaController extends AbstractController
                 ->setSaldo($nuevo_saldo)
                 ->setDiario(true)
                 ->setCredito(0)
+                ->setIdUsuario($user)
                 ->setDebito(0);
             $em->persist($new_cierre);
         } else {
@@ -177,8 +195,6 @@ class CerrarDiaController extends AbstractController
             ]);
         }
         $em->flush();
-        return $this->render('contabilidad/inventario/comprobante_operaciones/index.html.twig', [
-            'controller_name' => 'CerrarDiaController',
-        ]);
+        return $this->redirectToRoute('inventario');
     }
 }

@@ -4,11 +4,14 @@ namespace App\CoreContabilidad;
 
 
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\Documento;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -508,5 +511,40 @@ class AuxFunctions
             }
         }
         return $cuentas_by_criterios;
+    }
+
+    public static function getDateToClose(EntityManagerInterface $em, $id_almacen)
+    {
+        $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
+        $cierre_er = $em->getRepository(Cierre::class);
+
+        /** @var Cierre $obj_cierre_abierto */
+        $obj_cierre_abierto = $cierre_er->findOneBy(array(
+            'id_almacen' => $almacen_obj,
+            'abierto' => true
+        ));
+        /**caso que no exista cierre*/
+        if (!$obj_cierre_abierto) {
+            $arr_documento = $em->getRepository(Documento::class)->findBy(array(
+                'id_almacen' => $almacen_obj,
+                'activo' => true
+            ));
+            if (empty($arr_documento)) {
+                /**es el primer documento que se hace por lo que retorno la fecha del servidor**/
+                return Date('Y-m-d');
+            } else {
+                /**existen operaciones de entrada o salida, pero no se ha realizado el cierre,
+                 * por lo que todas las operaciones deben tener la misma fecha,
+                 * asi que retorno la fecha de cualquier operacion
+                 */
+                return $arr_documento[0]->getFecha()->format('Y-m-d');
+            }
+        } else {
+            if ($obj_cierre_abierto->getFecha() <= \DateTime::createFromFormat('Y-m-d', Date('Y-m-d')))
+                /**existe un cierre abierto, rretorno su fecha*/
+                return $obj_cierre_abierto->getFecha()->format('Y-m-d');
+            else
+                    return false;
+        }
     }
 }

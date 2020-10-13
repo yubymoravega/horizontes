@@ -20,7 +20,7 @@
                     </button>
                 </div>
                 <div class="modal-body" id="confirm_body">
-                    El Almacén ya se encuentra cerrado.
+                    {{ message }}
                 </div>
                 <form id="form_confirm_modal" method="post" action="{{ path('contabilidad_inventario_cerrar_dia_cerrar') }}">
                     <input type="hidden" name="_method" value="DELETE">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 01, 2020 at 02:11 PM
+-- Generation Time: Oct 13, 2020 at 05:09 AM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.8
 
@@ -78,6 +78,14 @@ CREATE TABLE `ajuste` (
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `ajuste`
+--
+
+INSERT INTO `ajuste` (`id`, `id_documento_id`, `nro_cuenta_inventario`, `observacion`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_concecutivo`, `anno`, `activo`, `entrada`, `nro_subcuenta_acreedora`) VALUES
+(2, 47, '183', 'Reunificando codigos de productos del mismo embalaje\r\n', '0010', '', '1', 2020, 1, 0, ''),
+(3, 48, '183', 'Runificando Codigos de Productos con el mismo embalaje', '0020', '183', '1', 2020, 1, 1, '0020');
+
 -- --------------------------------------------------------
 
 --
@@ -88,15 +96,17 @@ CREATE TABLE `almacen` (
   `id` int(11) NOT NULL,
   `id_unidad_id` int(11) NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `almacen`
 --
 
-INSERT INTO `almacen` (`id`, `id_unidad_id`, `descripcion`, `activo`) VALUES
-(1, 1, 'Almacen 1', 1);
+INSERT INTO `almacen` (`id`, `id_unidad_id`, `descripcion`, `activo`, `codigo`) VALUES
+(1, 1, 'Almacen de Matriales y Mercancias', 1, '01'),
+(2, 1, 'Almacen', 1, '02');
 
 -- --------------------------------------------------------
 
@@ -115,7 +125,7 @@ CREATE TABLE `almacen_ocupado` (
 --
 
 INSERT INTO `almacen_ocupado` (`id`, `id_almacen_id`, `id_usuario_id`) VALUES
-(16, 1, 1);
+(55, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -168,8 +178,38 @@ CREATE TABLE `centro_costo` (
 --
 
 INSERT INTO `centro_costo` (`id`, `id_unidad_id`, `activo`, `codigo`, `nombre`) VALUES
-(1, 1, 1, '01', 'Dirección'),
-(2, 1, 1, '02', 'Taller');
+(1, 1, 1, '01', 'Recargas'),
+(2, 1, 1, '02', 'Combo de Aseo'),
+(3, 1, 1, '03', 'Combo de Medicina'),
+(4, 1, 1, '04', 'Combo de Comida'),
+(5, 1, 1, '05', 'Articulos de Ferreteria');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cierre`
+--
+
+CREATE TABLE `cierre` (
+  `id` int(11) NOT NULL,
+  `id_almacen_id` int(11) NOT NULL,
+  `diario` tinyint(1) NOT NULL,
+  `mes` int(11) DEFAULT NULL,
+  `anno` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `saldo` double NOT NULL,
+  `abierto` tinyint(1) DEFAULT NULL,
+  `debito` double NOT NULL,
+  `credito` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cierre`
+--
+
+INSERT INTO `cierre` (`id`, `id_almacen_id`, `diario`, `mes`, `anno`, `fecha`, `saldo`, `abierto`, `debito`, `credito`) VALUES
+(8, 2, 1, 10, 2020, '2020-10-13', 0, 0, 57346.15, 960.95212),
+(9, 2, 1, 10, 2020, '2020-10-14', 56385.19788, 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -236,6 +276,30 @@ CREATE TABLE `cliente_beneficiario` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cliente_contabilidad`
+--
+
+CREATE TABLE `cliente_contabilidad` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `direccion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefonos` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fax` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `correos` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cliente_contabilidad`
+--
+
+INSERT INTO `cliente_contabilidad` (`id`, `codigo`, `nombre`, `direccion`, `telefonos`, `fax`, `correos`, `activo`) VALUES
+(1, '1123', 'sdffdsfds', 'dsadasdsa', '444444-55555-5555', NULL, 'aaa@aa.aa', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `cliente_reporte`
 --
 
@@ -270,6 +334,26 @@ CREATE TABLE `configuracion_inicial` (
   `str_elemento_gasto` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `str_cuentas_contrapartida` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `str_subcuentas_contrapartida` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contratos_cliente`
+--
+
+CREATE TABLE `contratos_cliente` (
+  `id` int(11) NOT NULL,
+  `id_cliente_id` int(11) NOT NULL,
+  `id_moneda_id` int(11) NOT NULL,
+  `nro_contrato` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `anno` int(11) NOT NULL,
+  `fecha_aprobado` date NOT NULL,
+  `fecha_vencimiento` date DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `importe` double NOT NULL,
+  `resto` double DEFAULT NULL,
+  `id_padre` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -394,14 +478,14 @@ INSERT INTO `cuenta` (`id`, `id_tipo_cuenta_id`, `nro_cuenta`, `nombre`, `deudor
 (60, 11, 640, 'Perdidas', 1, 0, 0, 1, 0, 0),
 (61, 11, 696, 'Operaciones entre Dependencias Activos', 1, 0, 0, 1, 0, 0),
 (62, 11, 697, 'Operaciones entre Dependencia Pasivo', 0, 0, 0, 1, 0, 0),
-(63, 12, 700, 'Producciones en Proceso', 1, 0, 0, 1, 0, 0),
+(63, 2, 700, 'Producciones en Proceso', 1, 0, 0, 1, 1, 0),
 (64, 12, 730, 'Reparaciones Capitales con Medios Propios', 1, 0, 0, 1, 0, 0),
 (65, 13, 800, 'Devoluciones en Ventas', 1, 0, 0, 1, 0, 0),
 (66, 13, 806, 'Impuestos por las Ventas', 1, 0, 0, 1, 0, 0),
-(67, 13, 810, 'Costo de Ventas de Produccion', 1, 0, 0, 1, 0, 0),
+(67, 2, 810, 'Costo de Ventas de Produccion', 1, 0, 0, 1, 0, 0),
 (68, 13, 815, 'Costo de Ventas de Mercancias', 1, 0, 0, 1, 0, 0),
 (69, 2, 823, 'Gastos de Administracion', 1, 0, 0, 1, 0, 0),
-(70, 13, 819, 'Gastos de Distribucion y Ventas', 1, 0, 0, 1, 0, 0),
+(70, 2, 819, 'Gastos de Distribucion y Ventas', 1, 0, 0, 1, 0, 0),
 (71, 13, 839, 'Gastos por Perdidas en Tasas de Cambio', 1, 0, 0, 1, 0, 0),
 (72, 13, 845, 'Gastos por Perdidas', 1, 0, 0, 1, 0, 0),
 (73, 13, 850, 'Gastos por Faltantes', 1, 0, 0, 1, 0, 0),
@@ -413,6 +497,28 @@ INSERT INTO `cuenta` (`id`, `id_tipo_cuenta_id`, `nro_cuenta`, `nombre`, `deudor
 (79, 14, 930, 'Ingresos por Sobrantes de Bienes', 0, 0, 0, 1, 0, 0),
 (80, 14, 950, 'Otros Ingresos', 0, 0, 0, 1, 0, 0),
 (81, 14, 953, 'Ingresos por Donaciones Recibidas', 0, 0, 0, 1, 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cuentas_cliente`
+--
+
+CREATE TABLE `cuentas_cliente` (
+  `id` int(11) NOT NULL,
+  `id_moneda_id` int(11) NOT NULL,
+  `id_cliente_id` int(11) NOT NULL,
+  `nro_cuenta` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cuentas_cliente`
+--
+
+INSERT INTO `cuentas_cliente` (`id`, `id_moneda_id`, `id_cliente_id`, `nro_cuenta`, `activo`) VALUES
+(1, 1, 1, 'fdsfsdfds', 1),
+(2, 2, 1, 'dfsdfdsfd', 1);
 
 -- --------------------------------------------------------
 
@@ -469,8 +575,6 @@ INSERT INTO `cuenta_criterio_analisis` (`id`, `id_cuenta_id`, `id_criterio_anali
 (67, 51, 6),
 (68, 52, 6),
 (69, 55, 15),
-(72, 70, 3),
-(73, 70, 5),
 (74, 15, 1),
 (75, 69, 3),
 (76, 69, 5),
@@ -482,15 +586,34 @@ INSERT INTO `cuenta_criterio_analisis` (`id`, `id_cuenta_id`, `id_criterio_anali
 (83, 31, 6),
 (84, 31, 8),
 (85, 56, 15),
-(86, 61, 2),
-(87, 61, 8),
-(88, 62, 2),
-(89, 62, 8),
 (90, 65, 17),
-(94, 63, 3),
-(95, 63, 5),
 (96, 64, 4),
-(97, 64, 5);
+(97, 64, 5),
+(98, 66, 17),
+(100, 68, 17),
+(101, 71, 17),
+(102, 72, 17),
+(103, 73, 17),
+(104, 74, 17),
+(109, 75, 16),
+(110, 77, 16),
+(111, 78, 16),
+(112, 79, 16),
+(113, 80, 16),
+(114, 81, 16),
+(115, 76, 3),
+(116, 76, 16),
+(120, 67, 3),
+(121, 67, 17),
+(122, 70, 3),
+(123, 70, 5),
+(124, 70, 17),
+(125, 61, 1),
+(126, 61, 2),
+(127, 62, 1),
+(128, 62, 2),
+(129, 63, 3),
+(130, 63, 5);
 
 -- --------------------------------------------------------
 
@@ -532,16 +655,6 @@ CREATE TABLE `doctrine_migration_versions` (
   `execution_time` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- Dumping data for table `doctrine_migration_versions`
---
-
-INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
-('DoctrineMigrations\\Version20110321021030', '2011-03-21 03:11:45', 3343),
-('DoctrineMigrations\\Version20110321204845', '2011-03-21 21:49:38', 1555),
-('DoctrineMigrations\\Version20110324022145', '2011-03-24 03:22:34', 1466),
-('DoctrineMigrations\\Version20200912214659', '2020-09-12 23:47:50', 127497);
-
 -- --------------------------------------------------------
 
 --
@@ -555,18 +668,38 @@ CREATE TABLE `documento` (
   `id_moneda_id` int(11) NOT NULL,
   `importe_total` double NOT NULL,
   `fecha` date NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `id_tipo_documento_id` int(11) DEFAULT NULL,
+  `anno` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `documento`
 --
 
-INSERT INTO `documento` (`id`, `id_almacen_id`, `id_unidad_id`, `id_moneda_id`, `importe_total`, `fecha`, `activo`) VALUES
-(4, 1, 1, 1, 1024.57, '2020-03-24', 1),
-(5, 1, 1, 1, 25227.37, '2020-03-24', 1),
-(6, 1, 1, 1, 16001.73, '2020-03-24', 1),
-(9, 1, 1, 1, 906.128, '2020-03-24', 1);
+INSERT INTO `documento` (`id`, `id_almacen_id`, `id_unidad_id`, `id_moneda_id`, `importe_total`, `fecha`, `activo`, `id_tipo_documento_id`, `anno`) VALUES
+(28, 2, 1, 1, 238.91, '2020-10-09', 1, 1, 2020),
+(29, 2, 1, 1, 128.5, '2020-10-09', 1, 1, 2020),
+(30, 2, 1, 1, 26.08556, '2020-10-09', 1, 7, 2020),
+(31, 2, 1, 1, 129.3, '2020-10-10', 1, 1, 2020),
+(32, 2, 1, 1, 45.73, '2020-10-10', 1, 1, 2020),
+(33, 2, 1, 1, 4399.35, '2020-10-10', 1, 1, 2020),
+(34, 2, 1, 1, 2370.4, '2020-10-10', 1, 1, 2020),
+(35, 2, 1, 1, 26.08556, '2020-10-10', 0, 7, 2020),
+(36, 2, 1, 1, 18.25, '2020-10-10', 1, 7, 2020),
+(37, 2, 1, 1, 311.64048, '2020-10-10', 1, 7, 2020),
+(38, 2, 1, 1, 18.25989, '2020-10-10', 1, 7, 2020),
+(39, 2, 1, 1, 21.80333, '2020-10-10', 1, 7, 2020),
+(40, 2, 1, 1, 560.95286, '2020-10-10', 1, 7, 2020),
+(41, 2, 1, 1, 30000, '2020-10-11', 0, 1, 2020),
+(42, 2, 1, 1, 30000, '2020-10-11', 1, 1, 2020),
+(43, 2, 1, 1, 3000, '2020-10-11', 1, 1, 2020),
+(44, 2, 1, 1, 6000, '2020-10-11', 1, 1, 2020),
+(45, 2, 1, 1, 1500, '2020-10-11', 1, 1, 2020),
+(46, 2, 1, 1, 7000, '2020-10-11', 1, 1, 2020),
+(47, 2, 1, 1, 3.96, '2020-10-11', 1, 4, 2020),
+(48, 2, 1, 1, 3.96, '2020-10-11', 1, 3, 2020),
+(49, 2, 1, 1, 2530, '2020-10-14', 1, 1, 2020);
 
 -- --------------------------------------------------------
 
@@ -646,6 +779,27 @@ INSERT INTO `empleado` (`id`, `id_unidad_id`, `id_cargo_id`, `id_usuario_id`, `n
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `factura`
+--
+
+CREATE TABLE `factura` (
+  `id` int(11) NOT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `id_usuario_id` int(11) NOT NULL,
+  `fecha_factura` date NOT NULL,
+  `tipo_cliente` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `nro_factura` int(11) NOT NULL,
+  `anno` int(11) NOT NULL,
+  `id_contrato` int(11) NOT NULL,
+  `cuenta_obligacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subcuenta_obligacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `grupo_activos`
 --
 
@@ -685,9 +839,19 @@ CREATE TABLE `informe_recepcion` (
 --
 
 INSERT INTO `informe_recepcion` (`id`, `id_documento_id`, `id_proveedor_id`, `nro_cuenta_inventario`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`, `nro_concecutivo`, `anno`, `codigo_factura`, `fecha_factura`, `activo`, `producto`) VALUES
-(4, 4, 1, '189', '0020', '405', '2015', '1', 2020, '01', '2020-03-01', 1, 0),
-(5, 5, 2, '189', '0010', '405', '0020', '2', 2020, '02', '2020-03-01', 1, 0),
-(6, 6, 2, '189', '0030', '405', '0020', '3', 2020, '03', '2020-03-01', 1, 0);
+(18, 28, 1, '183', '0010', '405', '0010', '1', 2020, '25', '2020-10-01', 1, 0),
+(19, 29, 2, '183', '0010', '405', '0010', '2', 2020, '152', '2020-10-01', 1, 0),
+(20, 31, 3, '183', '0020', '405', '0010', '3', 2020, '68', '2020-10-01', 1, 0),
+(21, 32, 4, '183', '0020', '405', '0010', '4', 2020, '3520', '2020-10-01', 1, 0),
+(22, 33, 5, '183', '0030', '405', '0010', '5', 2020, '45-152', '2020-10-01', 1, 0),
+(23, 34, 6, '183', '0030', '405', '0010', '6', 2020, '20381', '2020-10-01', 1, 0),
+(24, 41, 3, '189', '0040', '405', '0010', '7', 2020, '31', '2020-10-01', 0, 0),
+(25, 42, 9, '189', '0040', '405', '0010', '8', 2020, '31', '2020-10-01', 1, 0),
+(26, 43, 7, '189', '0040', '405', '0010', '9', 2020, '250', '2020-10-01', 1, 0),
+(27, 44, 8, '189', '0010', '405', '0010', '10', 2020, '1025', '2020-10-01', 1, 0),
+(28, 45, 7, '189', '0010', '405', '0010', '11', 2020, '295', '2020-10-01', 1, 0),
+(29, 46, 10, '189', '0040', '405', '0010', '12', 2020, '45-152', '2020-10-01', 1, 0),
+(30, 49, 1, '183', '0010', '405', '0010', '13', 2020, 'FI-123', '2020-10-13', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -716,20 +880,37 @@ CREATE TABLE `mercancia` (
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `existencia` double NOT NULL,
   `importe` double NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `nro_subcuenta_inventario` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `mercancia`
 --
 
-INSERT INTO `mercancia` (`id`, `id_amlacen_id`, `id_unidad_medida_id`, `codigo`, `cuenta`, `descripcion`, `existencia`, `importe`, `activo`) VALUES
-(7, 1, 5, '367203054488', '189 - Mercancias para la Venta', 'Detergenta', 112, 118.442, 1),
-(8, 1, 13, '8639001', '189 - Mercancias para la Venta', 'Jabón', 0, 0, 0),
-(9, 1, 13, '201703351', '189 - Mercancias para la Venta', 'Recarga', 1052039, 25227.37, 1),
-(10, 1, 8, '001-40', '189 - Mercancias para la Venta', 'Jamón', 7500, 5381, 1),
-(11, 1, 10, '2020240-2', '189 - Mercancias para la Venta', 'Aceite', 120844, 1256.95, 1),
-(12, 1, 8, '200055', '189 - Mercancias para la Venta', 'Arroz', 6743, 9363.78, 1);
+INSERT INTO `mercancia` (`id`, `id_amlacen_id`, `id_unidad_medida_id`, `codigo`, `cuenta`, `descripcion`, `existencia`, `importe`, `activo`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`) VALUES
+(29, 2, 13, '1046-01', '183', 'Detergente', 575, 116.728, 1, NULL, NULL, NULL),
+(30, 2, 13, '1046-51', '183', 'Jabón', 365, 36.68655, 1, NULL, NULL, NULL),
+(31, 2, 13, '1046-12', '183', 'Shampu', 365, 91.25, 1, NULL, NULL, NULL),
+(32, 2, 13, '108051', '183', 'Jabón', 200, 28.4, 1, NULL, NULL, NULL),
+(33, 2, 13, '1075-23', '183', 'Shampu', 200, 70, 1, NULL, NULL, NULL),
+(34, 2, 13, '1080-01', '183', 'Jamon 250 grs', 100, 50.25, 1, NULL, NULL, NULL),
+(35, 2, 8, '1080-010', '183', 'Arroz', 650, 33.8, 1, NULL, NULL, NULL),
+(36, 2, 10, '1080-025', '183', 'Aceite', 185, 27.21, 1, NULL, NULL, NULL),
+(37, 2, 8, '1070-02', '183', 'Jamon 250 grs', 45, 20.34, 1, NULL, NULL, NULL),
+(38, 2, 8, '1070-015', '183', 'Arroz', 75, 3.37667, 1, NULL, NULL, NULL),
+(39, 2, 10, '1070-030', '183', 'Aceite', 0, 0, 0, NULL, NULL, NULL),
+(40, 2, 13, '2571-02', '183', 'Dipirona', 680, 680.90667, 1, NULL, NULL, NULL),
+(41, 2, 13, '263543', '183', 'Omeprazol', 455, 4111.20666, 1, NULL, NULL, NULL),
+(42, 2, 13, '1070-040', '183', 'Vitamina C', 455, 1105.04333, 1, NULL, NULL, NULL),
+(43, 2, 13, '2013151', '189', 'Split de 2.0 Ton', 70, 17000, 1, '0040', '405', '0010'),
+(44, 2, 13, '20131453', '189', 'Split de 1.5 ', 50, 10000, 1, '0040', '405', '0010'),
+(45, 2, 13, '20131452', '189', 'Split de 1.0 Ton', 70, 10000, 1, '0040', '405', '0010'),
+(46, 2, 13, '2018340', '189', 'Reacargas', 250, 4500, 1, '0040', '405', '0010'),
+(47, 2, 13, '2018342', '189', 'Recargas 30 USD', 200, 6000, 1, '0010', '405', '0010'),
+(48, 2, 13, '1046-02', '183', 'Jabón de tocador Oasis', 12365, 2510, 1, '0010', '405', '0010');
 
 -- --------------------------------------------------------
 
@@ -772,8 +953,8 @@ CREATE TABLE `moneda` (
 --
 
 INSERT INTO `moneda` (`id`, `nombre`, `activo`) VALUES
-(1, 'DOLARES', 1),
-(2, 'EURO', 1);
+(1, 'USD', 1),
+(2, 'EUR', 1);
 
 -- --------------------------------------------------------
 
@@ -810,22 +991,69 @@ CREATE TABLE `movimiento_mercancia` (
   `existencia` double NOT NULL,
   `fecha` date NOT NULL,
   `activo` tinyint(1) NOT NULL,
-  `entrada` tinyint(1) NOT NULL
+  `entrada` tinyint(1) NOT NULL,
+  `id_almacen_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `movimiento_mercancia`
 --
 
-INSERT INTO `movimiento_mercancia` (`id`, `id_mercancia_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`) VALUES
-(7, 7, 4, 1, 1, NULL, NULL, 133, 140.66, 133, '2020-03-24', 1, 1),
-(8, 8, 4, 1, 1, NULL, NULL, 37100, 883.91, 37100, '2020-03-24', 1, 1),
-(9, 9, 5, 1, 1, NULL, NULL, 1052039, 25227.37, 1052039, '2020-03-24', 1, 1),
-(10, 10, 6, 1, 1, NULL, NULL, 7500, 5381, 7500, '2020-03-24', 1, 1),
-(11, 11, 6, 1, 1, NULL, NULL, 120844, 1256.95, 120844, '2020-03-24', 1, 1),
-(12, 12, 6, 1, 1, NULL, NULL, 6743, 9363.78, 6743, '2020-03-24', 1, 1),
-(13, 7, 9, 7, 1, 1, 2, 21, 22.218, 112, '2020-03-24', 1, 0),
-(14, 8, 9, 7, 1, 1, 2, 37100, 883.91, 0, '2020-03-24', 1, 0);
+INSERT INTO `movimiento_mercancia` (`id`, `id_mercancia_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`, `id_almacen_id`) VALUES
+(57, 29, 28, 1, 1, NULL, NULL, 450, 81.18, 450, '2020-10-13', 1, 1, 2),
+(58, 30, 28, 1, 1, NULL, NULL, 450, 45.23, 450, '2020-10-13', 1, 1, 2),
+(59, 31, 28, 1, 1, NULL, NULL, 450, 112.5, 450, '2020-10-13', 1, 1, 2),
+(60, 29, 29, 1, 1, NULL, NULL, 200, 30.1, 650, '2020-10-13', 1, 1, 2),
+(61, 32, 29, 1, 1, NULL, NULL, 200, 28.4, 200, '2020-10-13', 1, 1, 2),
+(62, 33, 29, 1, 1, NULL, NULL, 200, 70, 200, '2020-10-13', 1, 1, 2),
+(63, 29, 30, 7, 1, 2, 2, 50, 8.56, 600, '2020-10-13', 1, 0, 2),
+(64, 30, 30, 7, 1, 2, 2, 50, 5.02556, 400, '2020-10-13', 1, 0, 2),
+(65, 31, 30, 7, 1, 2, 2, 50, 12.5, 400, '2020-10-13', 1, 0, 2),
+(66, 34, 31, 1, 1, NULL, NULL, 120, 60.3, 120, '2020-10-13', 1, 1, 2),
+(67, 35, 31, 1, 1, NULL, NULL, 750, 39, 750, '2020-10-13', 1, 1, 2),
+(68, 36, 31, 1, 1, NULL, NULL, 200, 30, 200, '2020-10-13', 1, 1, 2),
+(69, 37, 32, 1, 1, NULL, NULL, 70, 31.64, 70, '2020-10-13', 1, 1, 2),
+(70, 38, 32, 1, 1, NULL, NULL, 225, 10.13, 225, '2020-10-13', 1, 1, 2),
+(71, 39, 32, 1, 1, NULL, NULL, 30, 3.96, 30, '2020-10-13', 1, 1, 2),
+(72, 40, 33, 1, 1, NULL, NULL, 550, 561, 550, '2020-10-13', 1, 1, 2),
+(73, 41, 33, 1, 1, NULL, NULL, 325, 3073.3, 325, '2020-10-13', 1, 1, 2),
+(74, 42, 33, 1, 1, NULL, NULL, 325, 765.05, 325, '2020-10-13', 1, 1, 2),
+(75, 40, 34, 1, 1, NULL, NULL, 200, 190, 750, '2020-10-13', 1, 1, 2),
+(76, 41, 34, 1, 1, NULL, NULL, 200, 1670.4, 525, '2020-10-13', 1, 1, 2),
+(77, 42, 34, 1, 1, NULL, NULL, 200, 510, 525, '2020-10-13', 1, 1, 2),
+(78, 29, 35, 7, 1, 2, 2, 50, 8.56, 550, '2020-10-13', 0, 0, 2),
+(79, 30, 35, 7, 1, 2, 2, 50, 5.02556, 350, '2020-10-13', 0, 0, 2),
+(80, 31, 35, 7, 1, 2, 2, 50, 12.5, 350, '2020-10-13', 0, 0, 2),
+(81, 34, 36, 7, 1, 4, 3, 20, 10.05, 100, '2020-10-13', 1, 0, 2),
+(82, 35, 36, 7, 1, 4, 3, 100, 5.2, 650, '2020-10-13', 1, 0, 2),
+(83, 36, 36, 7, 1, 4, 3, 20, 3, 180, '2020-10-13', 1, 0, 2),
+(84, 40, 37, 7, 1, 3, 7, 25, 25.03333, 725, '2020-10-13', 1, 0, 2),
+(85, 41, 37, 7, 1, 3, 7, 25, 225.89048, 500, '2020-10-13', 1, 0, 2),
+(86, 42, 37, 7, 1, 3, 7, 25, 60.71667, 500, '2020-10-13', 1, 0, 2),
+(87, 29, 38, 7, 1, 2, 2, 35, 5.992, 515, '2020-10-13', 1, 0, 2),
+(88, 30, 38, 7, 1, 2, 2, 35, 3.51789, 315, '2020-10-13', 1, 0, 2),
+(89, 31, 38, 7, 1, 2, 2, 35, 8.75, 315, '2020-10-13', 1, 0, 2),
+(90, 37, 39, 7, 1, 4, 3, 25, 11.3, 45, '2020-10-13', 1, 0, 2),
+(91, 38, 39, 7, 1, 4, 3, 150, 6.75333, 75, '2020-10-13', 1, 0, 2),
+(92, 36, 39, 7, 1, 4, 3, 25, 3.75, 155, '2020-10-13', 1, 0, 2),
+(93, 40, 40, 7, 1, 3, 7, 45, 45.06, 680, '2020-10-13', 1, 0, 2),
+(94, 41, 40, 7, 1, 3, 7, 45, 406.60286, 455, '2020-10-13', 1, 0, 2),
+(95, 42, 40, 7, 1, 3, 7, 45, 109.29, 455, '2020-10-13', 1, 0, 2),
+(96, 43, 41, 1, 1, NULL, NULL, 50, 12500, 50, '2020-10-13', 0, 1, 2),
+(97, 44, 41, 1, 1, NULL, NULL, 50, 10000, 50, '2020-10-13', 0, 1, 2),
+(98, 45, 41, 1, 1, NULL, NULL, 50, 7500, 50, '2020-10-13', 0, 1, 2),
+(99, 43, 42, 1, 1, NULL, NULL, 50, 12500, 50, '2020-10-13', 1, 1, 2),
+(100, 44, 42, 1, 1, NULL, NULL, 50, 10000, 50, '2020-10-13', 1, 1, 2),
+(101, 45, 42, 1, 1, NULL, NULL, 50, 7500, 50, '2020-10-13', 1, 1, 2),
+(102, 46, 43, 1, 1, NULL, NULL, 150, 3000, 150, '2020-10-13', 1, 1, 2),
+(103, 47, 44, 1, 1, NULL, NULL, 200, 6000, 200, '2020-10-13', 1, 1, 2),
+(104, 46, 45, 1, 1, NULL, NULL, 100, 1500, 250, '2020-10-13', 1, 1, 2),
+(105, 43, 46, 1, 1, NULL, NULL, 20, 4500, 70, '2020-10-13', 1, 1, 2),
+(106, 45, 46, 1, 1, NULL, NULL, 20, 2500, 70, '2020-10-13', 1, 1, 2),
+(107, 39, 47, 4, 1, NULL, NULL, 30, 3.96, 0, '2020-10-13', 1, 0, 2),
+(108, 36, 48, 3, 1, NULL, NULL, 30, 3.96, 185, '2020-10-13', 1, 1, 2),
+(109, 29, 49, 1, 1, NULL, NULL, 10, 20, 575, '2020-10-13', 1, 1, 2),
+(110, 48, 49, 1, 1, NULL, NULL, 12365, 2510, 12365, '2020-10-13', 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -846,7 +1074,30 @@ CREATE TABLE `movimiento_producto` (
   `existencia` double NOT NULL,
   `fecha` date NOT NULL,
   `activo` tinyint(1) NOT NULL,
-  `entrada` tinyint(1) NOT NULL
+  `entrada` tinyint(1) NOT NULL,
+  `id_almacen_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movimiento_venta`
+--
+
+CREATE TABLE `movimiento_venta` (
+  `id` int(11) NOT NULL,
+  `id_factura_id` int(11) NOT NULL,
+  `mercancia` tinyint(1) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` double NOT NULL,
+  `precio` double NOT NULL,
+  `descuento_recarga` double DEFAULT NULL,
+  `existencia` double DEFAULT NULL,
+  `cuenta_deudora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subcuenta_deudora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -859,6 +1110,26 @@ CREATE TABLE `municipios` (
   `id` int(11) NOT NULL,
   `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `obligacion_cobro`
+--
+
+CREATE TABLE `obligacion_cobro` (
+  `id` int(11) NOT NULL,
+  `id_factura_id` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `tipo_cliente` int(11) NOT NULL,
+  `fecha_factura` date NOT NULL,
+  `importe_factura` double NOT NULL,
+  `cuenta_obligacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subcuenta_obligacion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resto_pagar` double NOT NULL,
+  `liquidada` tinyint(1) NOT NULL,
+  `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -897,7 +1168,10 @@ CREATE TABLE `producto` (
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `existencia` double NOT NULL,
   `importe` double NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `nro_subcuenta_inventario` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -918,8 +1192,16 @@ CREATE TABLE `proveedor` (
 --
 
 INSERT INTO `proveedor` (`id`, `nombre`, `codigo`, `activo`) VALUES
-(1, 'Combinado Lacteo', '2015', 1),
-(2, 'Almacenes de Alimentos', '0020', 1);
+(1, 'Fabrica de Productos de Aseo Colombia', '4051', 1),
+(2, 'Fabrica de Productos de Aseo China', '2715', 1),
+(3, 'Almacenes de Alimentos del Puerto', '2780', 1),
+(4, 'Almacenes de Alimentos Ecuador', '3520', 1),
+(5, 'Laboratorio de Medicamentos de Cartagena', '45-152', 1),
+(6, 'Laboratorio de Medicamentos de Mexixo', '45-1523', 1),
+(7, 'Empresa Telecomunicaciones Mexico', '6225', 1),
+(8, 'Empresa Telecomunicaciones Dominicana', '6314', 1),
+(9, 'Empresa Artculos Domesticos Honduras', '27801', 1),
+(10, 'Empresa Articulos Domesticos Mexico', '20381', 1);
 
 -- --------------------------------------------------------
 
@@ -931,6 +1213,24 @@ CREATE TABLE `provincias` (
   `id` int(11) NOT NULL,
   `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `registro_comprobantes`
+--
+
+CREATE TABLE `registro_comprobantes` (
+  `id` int(11) NOT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `id_tipo_comprobante_id` int(11) NOT NULL,
+  `id_usuario_id` int(11) NOT NULL,
+  `nro_consecutivo` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `debito` double NOT NULL,
+  `credito` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1042,8 +1342,12 @@ INSERT INTO `subcuenta` (`id`, `id_cuenta_id`, `nro_subcuenta`, `descripcion`, `
 (60, 15, '0020', 'Productos de Aseo y Perfumeria', 1, 1, 0),
 (61, 15, '0030', 'Productos Alimenticios', 1, 1, 0),
 (62, 15, '0040', 'Otros Productos', 1, 1, 0),
-(63, 36, '0010', 'Proveedores Principales', 1, 1, 0),
-(64, 36, '0020', 'Otros Proveedores', 1, 1, 0);
+(63, 36, '0010', 'Proveedores Principales', 0, 1, 0),
+(64, 36, '0020', 'Otros Proveedores', 0, 1, 0),
+(65, 10, '0010', 'Materiales y Productos Aseo', 1, 1, 0),
+(66, 10, '0020', 'Materiales y Produtos de Alimentos', 1, 1, 0),
+(67, 10, '0030', 'Materiales y Productos de Medicamentos', 1, 1, 0),
+(68, 10, '0999', 'Otros Materiales', 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -1098,8 +1402,40 @@ INSERT INTO `subcuenta_criterio_analisis` (`id`, `id_subcuenta_id`, `id_criterio
 (45, 60, 1),
 (46, 61, 1),
 (47, 62, 1),
-(48, 63, 6),
-(49, 64, 6);
+(50, 63, 6),
+(51, 64, 6),
+(54, 66, 1),
+(55, 67, 1),
+(56, 68, 1),
+(57, 65, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subcuenta_proveedor`
+--
+
+CREATE TABLE `subcuenta_proveedor` (
+  `id` int(11) NOT NULL,
+  `id_subcuenta_id` int(11) NOT NULL,
+  `id_proveedor_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `subcuenta_proveedor`
+--
+
+INSERT INTO `subcuenta_proveedor` (`id`, `id_subcuenta_id`, `id_proveedor_id`) VALUES
+(1, 63, 1),
+(2, 63, 2),
+(3, 63, 3),
+(4, 63, 4),
+(5, 63, 5),
+(6, 63, 6),
+(7, 63, 9),
+(8, 63, 7),
+(9, 63, 8),
+(10, 63, 10);
 
 -- --------------------------------------------------------
 
@@ -1125,6 +1461,19 @@ CREATE TABLE `tasa_cambio` (
 
 CREATE TABLE `test_crud` (
   `id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tipo_comprobante`
+--
+
+CREATE TABLE `tipo_comprobante` (
+  `id` int(11) NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `boolean` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1183,8 +1532,9 @@ INSERT INTO `tipo_documento` (`id`, `nombre`, `activo`) VALUES
 (4, 'AJUSTE DE SALIDA', 1),
 (5, 'TRANSFERENCIA DE ENTRADA', 1),
 (6, 'TRANSFERENCIA DE SALIDA', 1),
-(7, 'VALE DE SALIDA', 1),
-(8, 'DEVOLUCION', 1);
+(7, 'VALE DE SALIDA MERCANCIA', 1),
+(8, 'VALE DE SALIDA PRODUCTO', 1),
+(9, 'DEVOLUCION', 1);
 
 -- --------------------------------------------------------
 
@@ -1241,15 +1591,16 @@ CREATE TABLE `unidad` (
   `id` int(11) NOT NULL,
   `id_padre_id` int(11) DEFAULT NULL,
   `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `unidad`
 --
 
-INSERT INTO `unidad` (`id`, `id_padre_id`, `nombre`, `activo`) VALUES
-(1, NULL, 'Grupo Horizontes Admin', 1);
+INSERT INTO `unidad` (`id`, `id_padre_id`, `nombre`, `activo`, `codigo`) VALUES
+(1, NULL, 'Grupo Horizontes Admin', 1, '01');
 
 -- --------------------------------------------------------
 
@@ -1281,7 +1632,8 @@ INSERT INTO `unidad_medida` (`id`, `nombre`, `activo`, `abreviatura`) VALUES
 (10, 'Litro', 1, 'l'),
 (11, 'Metro cuadrado', 1, 'm²'),
 (12, 'Metro cúbico', 1, 'm³'),
-(13, 'Unidad', 1, 'u');
+(13, 'Unidad', 1, 'u'),
+(14, 'Blister', 1, 'Blister');
 
 -- --------------------------------------------------------
 
@@ -1328,7 +1680,13 @@ CREATE TABLE `vale_salida` (
 --
 
 INSERT INTO `vale_salida` (`id`, `id_documento_id`, `activo`, `nro_consecutivo`, `anno`, `fecha_solicitud`, `nro_solicitud`, `nro_cuenta_deudora`, `nro_subcuenta_deudora`, `producto`) VALUES
-(1, 9, 1, '1', 2011, '2020-03-01', '001', '823-Gastos de Administracion', '000', 0);
+(8, 30, 1, '1', 2020, '2020-10-01', '1', '700', '0020', 0),
+(9, 35, 0, '2', 2020, '2020-10-01', '1', '700', '0020', 0),
+(10, 36, 1, '3', 2020, '2020-10-01', '2', '700', '0020', 0),
+(11, 37, 1, '4', 2020, '2020-10-01', '3', '700', '0020', 0),
+(12, 38, 1, '5', 2020, '2020-10-01', '4', '700', '0020', 0),
+(13, 39, 1, '6', 2020, '2020-10-01', '5', '700', '0020', 0),
+(14, 40, 1, '7', 2020, '2020-10-01', '6', '700', '0020', 0);
 
 --
 -- Indexes for dumped tables
@@ -1366,6 +1724,7 @@ ALTER TABLE `ajuste`
 --
 ALTER TABLE `almacen`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UNIQ_D5B2D25020332D99` (`codigo`),
   ADD KEY `IDX_D5B2D2501D34FA6B` (`id_unidad_id`);
 
 --
@@ -1396,6 +1755,13 @@ ALTER TABLE `centro_costo`
   ADD KEY `IDX_749608CE1D34FA6B` (`id_unidad_id`);
 
 --
+-- Indexes for table `cierre`
+--
+ALTER TABLE `cierre`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_D0DCFCC739161EBF` (`id_almacen_id`);
+
+--
 -- Indexes for table `cierre_diario`
 --
 ALTER TABLE `cierre_diario`
@@ -1416,6 +1782,12 @@ ALTER TABLE `cliente_beneficiario`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `cliente_contabilidad`
+--
+ALTER TABLE `cliente_contabilidad`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `cliente_reporte`
 --
 ALTER TABLE `cliente_reporte`
@@ -1430,6 +1802,14 @@ ALTER TABLE `configuracion_inicial`
   ADD KEY `IDX_8521BE247A4F962` (`id_tipo_documento_id`);
 
 --
+-- Indexes for table `contratos_cliente`
+--
+ALTER TABLE `contratos_cliente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_29A5BB477BF9CE86` (`id_cliente_id`),
+  ADD KEY `IDX_29A5BB47374388F5` (`id_moneda_id`);
+
+--
 -- Indexes for table `criterio_analisis`
 --
 ALTER TABLE `criterio_analisis`
@@ -1441,6 +1821,14 @@ ALTER TABLE `criterio_analisis`
 ALTER TABLE `cuenta`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_31C7BFCF45E7F350` (`id_tipo_cuenta_id`);
+
+--
+-- Indexes for table `cuentas_cliente`
+--
+ALTER TABLE `cuentas_cliente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_64653310374388F5` (`id_moneda_id`),
+  ADD KEY `IDX_646533107BF9CE86` (`id_cliente_id`);
 
 --
 -- Indexes for table `cuenta_criterio_analisis`
@@ -1477,7 +1865,8 @@ ALTER TABLE `documento`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_B6B12EC739161EBF` (`id_almacen_id`),
   ADD KEY `IDX_B6B12EC71D34FA6B` (`id_unidad_id`),
-  ADD KEY `IDX_B6B12EC7374388F5` (`id_moneda_id`);
+  ADD KEY `IDX_B6B12EC7374388F5` (`id_moneda_id`),
+  ADD KEY `IDX_B6B12EC77A4F962` (`id_tipo_documento_id`);
 
 --
 -- Indexes for table `elemento_gasto`
@@ -1493,6 +1882,14 @@ ALTER TABLE `empleado`
   ADD UNIQUE KEY `UNIQ_D9D9BF527EB2C349` (`id_usuario_id`),
   ADD KEY `IDX_D9D9BF521D34FA6B` (`id_unidad_id`),
   ADD KEY `IDX_D9D9BF52D1E12F15` (`id_cargo_id`);
+
+--
+-- Indexes for table `factura`
+--
+ALTER TABLE `factura`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_F9EBA0091D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_F9EBA0097EB2C349` (`id_usuario_id`);
 
 --
 -- Indexes for table `grupo_activos`
@@ -1564,7 +1961,8 @@ ALTER TABLE `movimiento_mercancia`
   ADD KEY `IDX_44876BD77A4F962` (`id_tipo_documento_id`),
   ADD KEY `IDX_44876BD77EB2C349` (`id_usuario_id`),
   ADD KEY `IDX_44876BD7C59B01FF` (`id_centro_costo_id`),
-  ADD KEY `IDX_44876BD7F66372E9` (`id_elemento_gasto_id`);
+  ADD KEY `IDX_44876BD7F66372E9` (`id_elemento_gasto_id`),
+  ADD KEY `IDX_44876BD739161EBF` (`id_almacen_id`);
 
 --
 -- Indexes for table `movimiento_producto`
@@ -1576,13 +1974,28 @@ ALTER TABLE `movimiento_producto`
   ADD KEY `IDX_FFC0EDFC7A4F962` (`id_tipo_documento_id`),
   ADD KEY `IDX_FFC0EDFC7EB2C349` (`id_usuario_id`),
   ADD KEY `IDX_FFC0EDFCC59B01FF` (`id_centro_costo_id`),
-  ADD KEY `IDX_FFC0EDFCF66372E9` (`id_elemento_gasto_id`);
+  ADD KEY `IDX_FFC0EDFCF66372E9` (`id_elemento_gasto_id`),
+  ADD KEY `IDX_FFC0EDFC39161EBF` (`id_almacen_id`);
+
+--
+-- Indexes for table `movimiento_venta`
+--
+ALTER TABLE `movimiento_venta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_8E3F7AE555C5F988` (`id_factura_id`);
 
 --
 -- Indexes for table `municipios`
 --
 ALTER TABLE `municipios`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `obligacion_cobro`
+--
+ALTER TABLE `obligacion_cobro`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_807C726D55C5F988` (`id_factura_id`);
 
 --
 -- Indexes for table `obligacion_pago`
@@ -1614,6 +2027,15 @@ ALTER TABLE `provincias`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `registro_comprobantes`
+--
+ALTER TABLE `registro_comprobantes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_B2D1B2B21D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_B2D1B2B2EF5F7851` (`id_tipo_comprobante_id`),
+  ADD KEY `IDX_B2D1B2B27EB2C349` (`id_usuario_id`);
+
+--
 -- Indexes for table `reset_password_request`
 --
 ALTER TABLE `reset_password_request`
@@ -1641,6 +2063,14 @@ ALTER TABLE `subcuenta_criterio_analisis`
   ADD KEY `IDX_52A4A7685ABBE5F6` (`id_criterio_analisis_id`);
 
 --
+-- Indexes for table `subcuenta_proveedor`
+--
+ALTER TABLE `subcuenta_proveedor`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_5C22E4B82D412F53` (`id_subcuenta_id`),
+  ADD KEY `IDX_5C22E4B8E8F12801` (`id_proveedor_id`);
+
+--
 -- Indexes for table `tasa_cambio`
 --
 ALTER TABLE `tasa_cambio`
@@ -1652,6 +2082,12 @@ ALTER TABLE `tasa_cambio`
 -- Indexes for table `test_crud`
 --
 ALTER TABLE `test_crud`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tipo_comprobante`
+--
+ALTER TABLE `tipo_comprobante`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -1692,6 +2128,8 @@ ALTER TABLE `transferencia`
 --
 ALTER TABLE `unidad`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UNIQ_F3E6D02F3A909126` (`nombre`),
+  ADD UNIQUE KEY `UNIQ_F3E6D02F20332D99` (`codigo`),
   ADD KEY `IDX_F3E6D02F31E700CD` (`id_padre_id`);
 
 --
@@ -1734,19 +2172,19 @@ ALTER TABLE `activo_fijo_movimiento_activo_fijo`
 -- AUTO_INCREMENT for table `ajuste`
 --
 ALTER TABLE `ajuste`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `almacen`
 --
 ALTER TABLE `almacen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `almacen_ocupado`
 --
 ALTER TABLE `almacen_ocupado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `cargo`
@@ -1764,7 +2202,13 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT for table `centro_costo`
 --
 ALTER TABLE `centro_costo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `cierre`
+--
+ALTER TABLE `cierre`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `cierre_diario`
@@ -1785,6 +2229,12 @@ ALTER TABLE `cliente_beneficiario`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `cliente_contabilidad`
+--
+ALTER TABLE `cliente_contabilidad`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `cliente_reporte`
 --
 ALTER TABLE `cliente_reporte`
@@ -1794,6 +2244,12 @@ ALTER TABLE `cliente_reporte`
 -- AUTO_INCREMENT for table `configuracion_inicial`
 --
 ALTER TABLE `configuracion_inicial`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contratos_cliente`
+--
+ALTER TABLE `contratos_cliente`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1809,10 +2265,16 @@ ALTER TABLE `cuenta`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
+-- AUTO_INCREMENT for table `cuentas_cliente`
+--
+ALTER TABLE `cuentas_cliente`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `cuenta_criterio_analisis`
 --
 ALTER TABLE `cuenta_criterio_analisis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
 
 --
 -- AUTO_INCREMENT for table `custom_user`
@@ -1830,7 +2292,7 @@ ALTER TABLE `depreciacion`
 -- AUTO_INCREMENT for table `documento`
 --
 ALTER TABLE `documento`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `elemento_gasto`
@@ -1845,6 +2307,12 @@ ALTER TABLE `empleado`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `factura`
+--
+ALTER TABLE `factura`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `grupo_activos`
 --
 ALTER TABLE `grupo_activos`
@@ -1854,7 +2322,7 @@ ALTER TABLE `grupo_activos`
 -- AUTO_INCREMENT for table `informe_recepcion`
 --
 ALTER TABLE `informe_recepcion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `instrumento_cobro`
@@ -1866,7 +2334,7 @@ ALTER TABLE `instrumento_cobro`
 -- AUTO_INCREMENT for table `mercancia`
 --
 ALTER TABLE `mercancia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `mercancia_producto`
@@ -1890,7 +2358,7 @@ ALTER TABLE `movimiento`
 -- AUTO_INCREMENT for table `movimiento_mercancia`
 --
 ALTER TABLE `movimiento_mercancia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `movimiento_producto`
@@ -1899,9 +2367,21 @@ ALTER TABLE `movimiento_producto`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `movimiento_venta`
+--
+ALTER TABLE `movimiento_venta`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `municipios`
 --
 ALTER TABLE `municipios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `obligacion_cobro`
+--
+ALTER TABLE `obligacion_cobro`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1920,12 +2400,18 @@ ALTER TABLE `producto`
 -- AUTO_INCREMENT for table `proveedor`
 --
 ALTER TABLE `proveedor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `provincias`
 --
 ALTER TABLE `provincias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `registro_comprobantes`
+--
+ALTER TABLE `registro_comprobantes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1944,13 +2430,19 @@ ALTER TABLE `stripe_factura`
 -- AUTO_INCREMENT for table `subcuenta`
 --
 ALTER TABLE `subcuenta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `subcuenta_criterio_analisis`
 --
 ALTER TABLE `subcuenta_criterio_analisis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+
+--
+-- AUTO_INCREMENT for table `subcuenta_proveedor`
+--
+ALTER TABLE `subcuenta_proveedor`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tasa_cambio`
@@ -1962,6 +2454,12 @@ ALTER TABLE `tasa_cambio`
 -- AUTO_INCREMENT for table `test_crud`
 --
 ALTER TABLE `test_crud`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tipo_comprobante`
+--
+ALTER TABLE `tipo_comprobante`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -2004,7 +2502,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `vale_salida`
 --
 ALTER TABLE `vale_salida`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables
@@ -2054,6 +2552,12 @@ ALTER TABLE `centro_costo`
   ADD CONSTRAINT `FK_749608CE1D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`);
 
 --
+-- Constraints for table `cierre`
+--
+ALTER TABLE `cierre`
+  ADD CONSTRAINT `FK_D0DCFCC739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`);
+
+--
 -- Constraints for table `cierre_diario`
 --
 ALTER TABLE `cierre_diario`
@@ -2068,10 +2572,24 @@ ALTER TABLE `configuracion_inicial`
   ADD CONSTRAINT `FK_8521BE247A4F962` FOREIGN KEY (`id_tipo_documento_id`) REFERENCES `tipo_documento` (`id`);
 
 --
+-- Constraints for table `contratos_cliente`
+--
+ALTER TABLE `contratos_cliente`
+  ADD CONSTRAINT `FK_29A5BB47374388F5` FOREIGN KEY (`id_moneda_id`) REFERENCES `moneda` (`id`),
+  ADD CONSTRAINT `FK_29A5BB477BF9CE86` FOREIGN KEY (`id_cliente_id`) REFERENCES `cliente_contabilidad` (`id`);
+
+--
 -- Constraints for table `cuenta`
 --
 ALTER TABLE `cuenta`
   ADD CONSTRAINT `FK_31C7BFCF45E7F350` FOREIGN KEY (`id_tipo_cuenta_id`) REFERENCES `tipo_cuenta` (`id`);
+
+--
+-- Constraints for table `cuentas_cliente`
+--
+ALTER TABLE `cuentas_cliente`
+  ADD CONSTRAINT `FK_64653310374388F5` FOREIGN KEY (`id_moneda_id`) REFERENCES `moneda` (`id`),
+  ADD CONSTRAINT `FK_646533107BF9CE86` FOREIGN KEY (`id_cliente_id`) REFERENCES `cliente_contabilidad` (`id`);
 
 --
 -- Constraints for table `cuenta_criterio_analisis`
@@ -2098,7 +2616,8 @@ ALTER TABLE `depreciacion`
 ALTER TABLE `documento`
   ADD CONSTRAINT `FK_B6B12EC71D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
   ADD CONSTRAINT `FK_B6B12EC7374388F5` FOREIGN KEY (`id_moneda_id`) REFERENCES `moneda` (`id`),
-  ADD CONSTRAINT `FK_B6B12EC739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`);
+  ADD CONSTRAINT `FK_B6B12EC739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
+  ADD CONSTRAINT `FK_B6B12EC77A4F962` FOREIGN KEY (`id_tipo_documento_id`) REFERENCES `tipo_documento` (`id`);
 
 --
 -- Constraints for table `empleado`
@@ -2107,6 +2626,13 @@ ALTER TABLE `empleado`
   ADD CONSTRAINT `FK_D9D9BF521D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
   ADD CONSTRAINT `FK_D9D9BF527EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
   ADD CONSTRAINT `FK_D9D9BF52D1E12F15` FOREIGN KEY (`id_cargo_id`) REFERENCES `cargo` (`id`);
+
+--
+-- Constraints for table `factura`
+--
+ALTER TABLE `factura`
+  ADD CONSTRAINT `FK_F9EBA0091D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_F9EBA0097EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `grupo_activos`
@@ -2149,6 +2675,7 @@ ALTER TABLE `movimiento`
 -- Constraints for table `movimiento_mercancia`
 --
 ALTER TABLE `movimiento_mercancia`
+  ADD CONSTRAINT `FK_44876BD739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_44876BD76601BA07` FOREIGN KEY (`id_documento_id`) REFERENCES `documento` (`id`),
   ADD CONSTRAINT `FK_44876BD77A4F962` FOREIGN KEY (`id_tipo_documento_id`) REFERENCES `tipo_documento` (`id`),
   ADD CONSTRAINT `FK_44876BD77EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
@@ -2160,12 +2687,25 @@ ALTER TABLE `movimiento_mercancia`
 -- Constraints for table `movimiento_producto`
 --
 ALTER TABLE `movimiento_producto`
+  ADD CONSTRAINT `FK_FFC0EDFC39161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC6601BA07` FOREIGN KEY (`id_documento_id`) REFERENCES `documento` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC6E57A479` FOREIGN KEY (`id_producto_id`) REFERENCES `producto` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC7A4F962` FOREIGN KEY (`id_tipo_documento_id`) REFERENCES `tipo_documento` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC7EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFCC59B01FF` FOREIGN KEY (`id_centro_costo_id`) REFERENCES `centro_costo` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFCF66372E9` FOREIGN KEY (`id_elemento_gasto_id`) REFERENCES `elemento_gasto` (`id`);
+
+--
+-- Constraints for table `movimiento_venta`
+--
+ALTER TABLE `movimiento_venta`
+  ADD CONSTRAINT `FK_8E3F7AE555C5F988` FOREIGN KEY (`id_factura_id`) REFERENCES `factura` (`id`);
+
+--
+-- Constraints for table `obligacion_cobro`
+--
+ALTER TABLE `obligacion_cobro`
+  ADD CONSTRAINT `FK_807C726D55C5F988` FOREIGN KEY (`id_factura_id`) REFERENCES `factura` (`id`);
 
 --
 -- Constraints for table `obligacion_pago`
@@ -2183,6 +2723,14 @@ ALTER TABLE `producto`
   ADD CONSTRAINT `FK_A7BB0615E2C70A62` FOREIGN KEY (`id_amlacen_id`) REFERENCES `almacen` (`id`);
 
 --
+-- Constraints for table `registro_comprobantes`
+--
+ALTER TABLE `registro_comprobantes`
+  ADD CONSTRAINT `FK_B2D1B2B21D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_B2D1B2B27EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_B2D1B2B2EF5F7851` FOREIGN KEY (`id_tipo_comprobante_id`) REFERENCES `tipo_comprobante` (`id`);
+
+--
 -- Constraints for table `subcuenta`
 --
 ALTER TABLE `subcuenta`
@@ -2194,6 +2742,13 @@ ALTER TABLE `subcuenta`
 ALTER TABLE `subcuenta_criterio_analisis`
   ADD CONSTRAINT `FK_52A4A7682D412F53` FOREIGN KEY (`id_subcuenta_id`) REFERENCES `subcuenta` (`id`),
   ADD CONSTRAINT `FK_52A4A7685ABBE5F6` FOREIGN KEY (`id_criterio_analisis_id`) REFERENCES `criterio_analisis` (`id`);
+
+--
+-- Constraints for table `subcuenta_proveedor`
+--
+ALTER TABLE `subcuenta_proveedor`
+  ADD CONSTRAINT `FK_5C22E4B82D412F53` FOREIGN KEY (`id_subcuenta_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_5C22E4B8E8F12801` FOREIGN KEY (`id_proveedor_id`) REFERENCES `proveedor` (`id`);
 
 --
 -- Constraints for table `tasa_cambio`

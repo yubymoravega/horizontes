@@ -3,6 +3,7 @@
 namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\User;
 use App\Repository\Contabilidad\Inventario\CierreRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -63,6 +64,11 @@ class Cierre
      * @ORM\Column(type="float")
      */
     private $credito;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     */
+    private $id_usuario;
 
     public function getId(): ?int
     {
@@ -173,6 +179,18 @@ class Cierre
     public function setCredito(float $credito): self
     {
         $this->credito = $credito;
+
+        return $this;
+    }
+
+    public function getIdUsuario(): ?User
+    {
+        return $this->id_usuario;
+    }
+
+    public function setIdUsuario(?User $id_usuario): self
+    {
+        $this->id_usuario = $id_usuario;
 
         return $this;
     }
