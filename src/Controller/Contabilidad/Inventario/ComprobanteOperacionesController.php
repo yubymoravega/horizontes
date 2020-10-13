@@ -3,15 +3,16 @@
 namespace App\Controller\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
-use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
-use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,18 +39,19 @@ class ComprobanteOperacionesController extends AbstractController
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $nombre_unidad = $almacen_obj->getIdUnidad()->getNombre();
 
-        $obj_cierre_abierto = $cierre_er->findOneBy(array(
+        $obj_cierre_abierto = $cierre_er->findBy(array(
             'id_almacen' => $almacen_obj,
-            'abierto' => true,
+            'abierto' => false,
         ));
-        if($obj_cierre_abierto){
-            $fecha = $obj_cierre_abierto->getFecha()->format('d-m-Y');
+        if(!empty($obj_cierre_abierto)){
+            $i = count($obj_cierre_abierto);
+            $fecha = $obj_cierre_abierto[$i-1]->getFecha();
             return $this->render('contabilidad/inventario/comprobante_operaciones/index.html.twig', [
                 'controller_name' => 'ComprobanteOperacionesController',
                 'almacen'=>$nombre_almacen,
                 'unidad'=>$nombre_unidad,
-                'fecha'=>$fecha,
-                'datos' => $this->getData($request,$em,)
+                'fecha'=>$fecha->format('d-m-Y'),
+                'datos' => $this->getData($request,$em,$fecha)
             ]);
         }
         else{
@@ -57,13 +59,14 @@ class ComprobanteOperacionesController extends AbstractController
                 'controller_name' => 'ComprobanteOperacionesController',
                 'almacen'=>$nombre_almacen,
                 'unidad'=>$nombre_unidad,
+                'title'=>'!!Error',
                 'message'=>'No existen cierres realizados en el almacén.'
             ]);
         }
 
     }
 
-    public function getData($request, $em){
+    public function getData($request, $em,$fecha){
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $documento_er = $em->getRepository(Documento::class);
@@ -74,7 +77,7 @@ class ComprobanteOperacionesController extends AbstractController
         $arr_obj_documentos = $documento_er->findBy(array(
             'id_almacen' => $id_almacen,
             'activo' => true,
-//            'fecha'=>$fecha
+            'fecha'=>$fecha
         ));
         foreach ($arr_obj_documentos as $obj_documento) {
             /**@var $obj_documento Documento**/
@@ -403,5 +406,76 @@ class ComprobanteOperacionesController extends AbstractController
             $rows = [];
         }
         return !empty($retur_rows)?$retur_rows:[];
+    }
+
+    /**
+     * @Route("/save", name="contabilidad_inventario_comprobante_operaciones_guardar")
+     */
+    public function save(EntityManagerInterface $em,Request $request){
+
+        $cierre_er = $em->getRepository(Cierre::class);
+        $fecha = $request->get('fecha');
+        $observacion = $request->get('observacion');
+        $usuario = $this->getUser();
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        /** @var Almacen $obj_almacen */
+        $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
+        /** @var Unidad $obj_unidad */
+        $obj_unidad = $obj_almacen->getIdUnidad();
+        /** @var TipoComprobante $tipo_comprobante */
+        $tipo_comprobante = $em->getRepository(TipoComprobante::class)->find(2);
+
+        /** @var Cierre $obj_cierre */
+        $obj_cierre = $cierre_er->findOneBy(array(
+            'id_almacen' => $obj_almacen,
+            'abierto' => false,
+            'fecha'=>\DateTime::createFromFormat('d-m-Y', $fecha),
+        ));
+        if($obj_cierre){
+            $debito = $obj_cierre->getDebito();
+            $credito = $obj_cierre->getCredito();
+            $arr = explode('-',$fecha);
+            $anno = $arr[2];
+
+            /** @var RegistroComprobantes $duplicate */
+            $duplicate = $em->getRepository(RegistroComprobantes::class)->findOneBy(array(
+                'anno'=>$anno,
+                'fecha'=>\DateTime::createFromFormat('d-m-Y', $fecha),
+                'id_tipo_comprobante'=>$tipo_comprobante,
+                'id_unidad'=>$obj_unidad
+            ));
+            if($duplicate){
+                return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
+                    'controller_name' => 'ComprobanteOperacionesController',
+                    'title'=>'!!Error duplicado',
+                    'message'=>'Ya existe un comprobante de operaciones registrado para la fecha seleccionada, su numero es '.$duplicate->getNroConsecutivo().'/'.$duplicate->getAnno().' .'
+                ]);
+            }
+            $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+                'id_unidad'=>$obj_unidad,
+                'anno'=>$anno
+            ));
+            $nro_consecutivo = count($arr_registros)+1;
+
+            $new_registro = new RegistroComprobantes();
+            $new_registro
+                ->setDescripcion($observacion)
+                ->setIdUsuario($usuario)
+                ->setFecha(\DateTime::createFromFormat('d-m-Y', $fecha))
+                ->setAnno($anno)
+                ->setCredito($credito)
+                ->setDebito($debito)
+                ->setIdAlmacen($obj_almacen)
+                ->setIdTipoComprobante($tipo_comprobante)
+                ->setIdUnidad($obj_unidad)
+                ->setNroConsecutivo($nro_consecutivo);
+            $em->persist($new_registro);
+            $em->flush();
+        }
+        return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
+            'controller_name' => 'ComprobanteOperacionesController',
+            'title'=>'!!Exito',
+            'message'=>'Comprobante de operaciones generado satisfactoriamente, su nro es '.$nro_consecutivo.'/'.$anno.', para ver detalles consulte el registro de comprobantes .'
+        ]);
     }
 }

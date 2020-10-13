@@ -70,6 +70,11 @@ class RegistroComprobantes
      */
     private $id_almacen;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $anno;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -179,6 +184,18 @@ class RegistroComprobantes
     public function setIdAlmacen(?Almacen $id_almacen): self
     {
         $this->id_almacen = $id_almacen;
+
+        return $this;
+    }
+
+    public function getAnno(): ?int
+    {
+        return $this->anno;
+    }
+
+    public function setAnno(int $anno): self
+    {
+        $this->anno = $anno;
 
         return $this;
     }
