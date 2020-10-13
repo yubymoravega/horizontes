@@ -54,6 +54,16 @@ class Cierre
      */
     private $id_almacen;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $debito;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $credito;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,6 +149,30 @@ class Cierre
     public function setIdAlmacen(?Almacen $id_almacen): self
     {
         $this->id_almacen = $id_almacen;
+
+        return $this;
+    }
+
+    public function getDebito(): ?float
+    {
+        return $this->debito;
+    }
+
+    public function setDebito(float $debito): self
+    {
+        $this->debito = $debito;
+
+        return $this;
+    }
+
+    public function getCredito(): ?float
+    {
+        return $this->credito;
+    }
+
+    public function setCredito(float $credito): self
+    {
+        $this->credito = $credito;
 
         return $this;
     }

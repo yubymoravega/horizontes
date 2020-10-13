@@ -85,7 +85,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => $nro_subcuenta_deudora,
                     'analisis_1' => $cod_almacen,
                     'analisis_2' => '',
-                    'debito' => number_format($total,2) ,
+                    'debito' => number_format($total, 2),
                     'credito' => ''
                 );
                 $rows[] = array(
@@ -96,7 +96,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'analisis_1' => $cod_proveedor,
                     'analisis_2' => '',
                     'debito' => '',
-                    'credito' => number_format($total,2)
+                    'credito' => number_format($total, 2)
                 );
                 $rows[] = array(
                     'nro_doc' => '',
@@ -105,8 +105,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => number_format($total,2) ,
-                    'credito' => number_format($total,2)
+                    'debito' => number_format($total, 2),
+                    'credito' => number_format($total, 2)
                 );
             }
             elseif ($id_tipo_documento == 2) {
