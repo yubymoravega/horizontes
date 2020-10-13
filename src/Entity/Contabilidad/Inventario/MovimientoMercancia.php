@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\TipoDocumento;
@@ -83,6 +84,11 @@ class MovimientoMercancia
      * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
      */
     private $id_elemento_gasto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     */
+    private $id_almacen;
 
     public function getId(): ?int
     {
@@ -229,6 +235,18 @@ class MovimientoMercancia
     public function setIdElementoGasto(?ElementoGasto $id_elemento_gasto): self
     {
         $this->id_elemento_gasto = $id_elemento_gasto;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
 
         return $this;
     }
