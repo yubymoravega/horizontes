@@ -205,6 +205,37 @@
         let cuentas_inventarios = [];
         let eliminados = [];
         let importe_total = 0;
+        let list_mercancia = []
+
+        function Print_Vale() {
+            if ($('#select_nros').val() == consecutivo) {
+                if (list_mercancia.length > 0) {
+                    const fecha_solicitud = $("#vale_salida_fecha_solicitud").val()
+                    const nro_solicitud = $("#vale_salida_nro_solicitud").val()
+
+                    const mercancia_json = JSON.stringify(list_mercancia)
+                    $('body').append(`
+                    <form action='/contabilidad/inventario/vale-salida-producto/print_report_current/'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[fecha_solicitud]' value='${fecha_solicitud}'/>
+                        <input type='text' hidden name='datos[nro_solicitud]' value='${nro_solicitud}'/>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                        <input type='text' hidden name='nro' value="${consecutivo}" />
+                    </form>`)
+
+                    const fomrulario = $('#form_print_current')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('No excisten mercancias para imprimir', 'danger')
+
+            } else {
+                let url = '/contabilidad/inventario/vale-salida-producto/print-report/' + $('#select_nros').val()
+                window.open(url, 'blank_')
+            }
+        }
+
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -262,6 +293,7 @@
                 if (e.which == 13) {
                     if ($('#vale_salida_mercancia_codigo').val() !== '') {
                         let codigo = $('#vale_salida_mercancia_codigo').val() != '' ? $('#vale_salida_mercancia_codigo').val() : -1
+                        loadingModal.show("cargando mercancia...")
                         $.ajax({
                             url: '/contabilidad/inventario/vale-salida-producto/getProductos/' + codigo,
                             method: 'POST',
@@ -275,12 +307,12 @@
                                     $('#true_precio_mercancia').val(productos[0]['precio_compra'])
                                     $('#vale_salida_mercancia_id_unidad_medida').find('option').remove()
                                     $('#vale_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>' + productos[0]['unidad_medida'] + '</option>');
-                                    importe_total = parseFloat(productos[0]['importe'])
+
                                 } else {
-                                    importe_total = 0
                                     resetFormMercancia()
                                     alertTemplate('No existen productos con ese código', 'danger')
                                 }
+                                loadingModal.close()
                             },
                             error: function () {
                                 importe_total = 0
@@ -392,7 +424,7 @@
                 rules: {
                     'vale_salida[mercancia][codigo]': "required",
                     'vale_salida[mercancia][descripcion]': "required",
-                    'vale_salida[mercancia][id_unidad_medida]': "required",
+                    // 'vale_salida[mercancia][id_unidad_medida]': "required",
                     'vale_salida[documento][cantidad_mercancia]': "required",
                     'vale_salida[documento][importe_mercancia]': "required",
                     'vale_salida[id_centro_costo]': "required",
@@ -403,7 +435,7 @@
                     'vale_salida[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[id_centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[id_elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'vale_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
+                    // 'vale_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'vale_salida[documento][cantidad_mercancia]': 'Obligatorio!',
                     'vale_salida[documento][importe_mercancia]': 'Obligatorio!',
                 }
@@ -438,8 +470,7 @@
                     }
                 }
             });
-            let list_mercancia = []
-            let importe_total = 0;
+
             $('#btnAplicarProducto').on('click', function () {
                 if (form_mercancia.valid()) {
                     let codigo = $('#vale_salida_mercancia_codigo').val()
@@ -473,9 +504,9 @@
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${importe}</td>
-                        <td style="font-weight:400;"> ${precio} </td>
-                        <td style="font-weight:400;">${nueva_existencia}</td>
+                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -490,6 +521,7 @@
                         $('#vale_salida_documento_cantidad_mercancia').val('')
                         $('#vale_salida_documento_importe_mercancia').val('')
                         $('#vale_salida_mercancia_precio').val('')
+                        $('#true_precio_mercancia').val('')
                         $('#vale_salida_mercancia_existencia_decremento').val('')
                         $('#vale_salida_id_centro_costo').val(0)
                         $('#vale_salida_id_elemento_gasto').val(0)
@@ -515,7 +547,8 @@
                 if ($(id).prop('checked') == true) {
                     $('#vale_salida_mercancia_codigo').val(productos[i]['codigo'])
                     $('#vale_salida_mercancia_descripcion').val(productos[i]['descripcion'])
-                    $('#vale_salida_mercancia_precio').val(productos[i]['precio_compra'])
+                    $('#vale_salida_mercancia_precio').val(parseFloat(productos[i]['precio_compra']).toFixed(5))
+                    $('#true_precio_mercancia').val(productos[i]['precio_compra'])
                     $('#vale_salida_mercancia_existencia').val(productos[i]['existencia'])
                     break
                 }
@@ -526,6 +559,7 @@
         function resetFormMercancia() {
             $('#vale_salida_mercancia_descripcion').val('')
             $('#vale_salida_mercancia_precio').val('')
+            $('#true_precio_mercancia').val('')
             $('#vale_salida_mercancia_existencia').val('')
             $('#vale_salida_mercancia_existencia_decremento').val('')
             $('#vale_salida_documento_importe_mercancia').val('')
@@ -582,8 +616,8 @@
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${productos[i]['codigo']} </td>
                                     <td style="font-weight:400;"> ${productos[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${productos[i]['importe']}</td>
-                                    <td style="font-weight:400;"> ${productos[i]['precio']} </td>
+                                    <td style="font-weight:400;"> ${parseFloat(productos[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(productos[i]['precio']).toFixed(2)} </td>
                                     <td style="font-weight:400;">${productos[i]['existencia']}</td>
                                     <td></td>
                                    </tr>`
@@ -635,10 +669,10 @@
                         $('#vale_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
                     $(result.cento_costo).each(function (pos, valor) {
-                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
+                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo + ' - ' + valor.nombre + '</option>');
                     })
                     $(result.elemento_gasto).each(function (pos, valor) {
-                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
+                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.codigo + ' - ' + valor.nombre + '</option>');
                     })
                     loadingModal.close()
                 },
@@ -665,9 +699,5 @@
             })
         }
 
-        function Print_Vale() {
-            let url = '/contabilidad/inventario/vale-salida-producto/print-report/' + $('#select_nros').val()
-            window.open(url, 'blank_')
-        }
     </script>
 {% endblock %}

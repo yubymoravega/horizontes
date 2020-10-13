@@ -7,7 +7,8 @@
         <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-dark">
-                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias o materiales</h4>
+                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias o
+                        materiales</h4>
                     <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -199,12 +200,44 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+
+        function Print_Vale() {
+            if ($('#select_nros').val() == consecutivo) {
+                if (list_mercancia.length > 0) {
+                    const fecha_solicitud = $("#vale_salida_fecha_solicitud").val()
+                    const nro_solicitud = $("#vale_salida_nro_solicitud").val()
+
+                    const mercancia_json = JSON.stringify(list_mercancia)
+                    $('body').append(`
+                    <form action='/contabilidad/inventario/vale-salida/print_report_current/'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='text' hidden name='datos[fecha_solicitud]' value='${fecha_solicitud}'/>
+                        <input type='text' hidden name='datos[nro_solicitud]' value='${nro_solicitud}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                        <input type='text' hidden name='nro' value="${consecutivo}" />
+                    </form>`)
+
+                    const fomrulario = $('#form_print_current')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('No excisten mercancias para imprimir', 'danger')
+
+            } else {
+                let url = '/contabilidad/inventario/vale-salida/print-report/' + $('#select_nros').val()
+                window.open(url, 'blank_')
+            }
+        }
+
         let mercancias_seleccionada = [];
         let mercancias = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
         let eliminados = [];
         let importe_total = 0;
+        let list_mercancia = []
+
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -275,10 +308,8 @@
                                     $('#vale_salida_mercancia_precio').val(parseFloat(mercancias[0]['precio_compra']).toFixed(5))
                                     $('#true_precio_mercancia').val(mercancias[0]['precio_compra'])
                                     $('#vale_salida_mercancia_id_unidad_medida').find('option').remove()
-                                    $('#vale_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>'+mercancias[0]['unidad_medida']+'</option>');
-                                    importe_total = parseFloat(mercancias[0]['importe'])
+                                    $('#vale_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "0" disabled>' + mercancias[0]['unidad_medida'] + '</option>');
                                 } else {
-                                    importe_total = 0
                                     resetFormMercancia()
                                     alertTemplate('No existen mercancias con ese código', 'danger')
                                 }
@@ -436,8 +467,7 @@
                     }
                 }
             });
-            let list_mercancia = []
-            let importe_total = 0;
+
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
                     let codigo = $('#vale_salida_mercancia_codigo').val()
@@ -445,7 +475,7 @@
                     let importe = $('#vale_salida_documento_importe_mercancia').val()
                     let precio = $('#vale_salida_mercancia_precio').val()
                     let nueva_existencia = $('#vale_salida_mercancia_existencia_decremento').val()
-                    let um = $('#vale_salida_mercancia_id_unidad_medida').val()
+                    let um = $('#vale_salida_mercancia_id_unidad_medida').text()
                     let descripcion = $('#vale_salida_mercancia_descripcion').val()
                     let centro_costo = $('#vale_salida_id_centro_costo').val()
                     let elemento_gasto = $('#vale_salida_id_elemento_gasto').val()
@@ -471,9 +501,9 @@
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${importe}</td>
-                        <td style="font-weight:400;"> ${precio} </td>
-                        <td style="font-weight:400;">${nueva_existencia}</td>
+                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -518,7 +548,7 @@
                     $('#vale_salida_mercancia_descripcion').val(mercancias[i]['descripcion'])
                     $('#vale_salida_mercancia_precio').val(parseFloat(mercancias[i]['precio_compra']).toFixed(5))
                     $('#true_precio_mercancia').val(mercancias[i]['precio_compra'])
-                    $('#vale_salida_mercancia_existencia').val(mercancias[i]['existencia'])
+                    $('#vale_salida_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
                     break
                 }
             }
@@ -585,9 +615,9 @@
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
                                     <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['importe']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['precio']} </td>
-                                    <td style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
+                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -638,10 +668,10 @@
                         $('#vale_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
                     $(result.cento_costo).each(function (pos, valor) {
-                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo+' - '+ valor.nombre + '</option>');
+                        $('#vale_salida_id_centro_costo').append('<option value = "' + valor.id + '">' + valor.codigo + ' - ' + valor.nombre + '</option>');
                     })
                     $(result.elemento_gasto).each(function (pos, valor) {
-                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">'+ valor.codigo+' - '+ valor.nombre + '</option>');
+                        $('#vale_salida_id_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.codigo + ' - ' + valor.nombre + '</option>');
                     })
                     loadingModal.close()
                 },
@@ -668,9 +698,5 @@
             })
         }
 
-        function Print_Vale() {
-            let url = '/contabilidad/inventario/vale-salida/print-report/' + $('#select_nros').val()
-            window.open(url, 'blank_')
-        }
     </script>
 {% endblock %}

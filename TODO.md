@@ -57,12 +57,19 @@ verifica rque el producto tiene que estar asociado por cuentas(1 producto solo p
 
 
 ####Tareas del dia de hoy(12/10/2020)
--   ok*1- Quitar la seleccion de elemento de gasto y centro de costo en las trasnfereancias y vales de salida(leandro arreglar visual del btn y revisar la tabla de imprimir "total")
--   2- Forzar al .00 en los listados de productos y mercancias
--   ok*3- traer las abrebiaturas de las unidades de medida en los documentos
--   ok*4- quitar los documentos cancelados en el submayor de inventario por producto
--   ok*5- revisar por que no vienen las trasnferencias en el submayor de inventario por producto
--   6- revisar a la hora de dar un consecutivo, si el ultimo esta cancelado, reasignarlo(cambia la logica de los consecutivos, en ves de contar solo preguntaremos por el ultimo)
--   ok*7- en el listado de existencia por almacen traer por cuentas(ya lo hace) y subcuentas(hay que implementarlo)
--   8- hacer un imprimir en los documentos tanto entrada como slaida que imprima el que se esta elaborando, si necesidad de guardar e ir atras
--   9- revisar en todos los docuemtnos de entrada y salida que adicione el id_tipo_documento y el anno en la tabla documento
+- [x] Quitar la seleccion de elemento de gasto y centro de costo en las trasnfereancias y vales de salida(leandro arreglar visual del btn y revisar la tabla de imprimir "total")
+- [x] traer las abrebiaturas de las unidades de medida en los documentos
+- [x] quitar los documentos cancelados en el submayor de inventario por producto
+- [x] revisar por que no vienen las trasnferencias en el submayor de inventario por producto
+- [x] en el listado de existencia por almacen traer por cuentas(ya lo hace) y subcuentas(hay que implementarlo)
+
+- [x] revisar en todos los docuemtnos de entrada y salida que adicione el id_tipo_documento y el 
+        anno en la tabla documento
+- [x] Forzar al .00 en los listados de productos y mercancias
+- [x] hacer un imprimir en los documentos tanto entrada como slaida que imprima el que se 
+        esta elaborando, si necesidad de guardar e ir atras
+        (ajuste, ajuste_salida)
+- [ ] revisar a la hora de dar un consecutivo, si el ultimo esta cancelado, 
+        reasignarlo ( cambia la logica de los consecutivos, en ves de contar 
+        solo preguntaremos por el ultimo )
+- [ ] en los doc entrada y salida - add movimiento_mercancia o producto (id_almacen)

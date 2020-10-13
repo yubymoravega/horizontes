@@ -198,8 +198,33 @@
     <script>
 
         function Print_Ajuste() {
-            const url = '/contabilidad/inventario/transferencia-entrada/print_report/' + $('#select_nros').val()
-            window.open(url, 'blank_')
+            if ($('#select_nros').val() == consecutivo) {
+                if (list_mercancia.length > 0) {
+
+                    const unidad_origen = $("#transferencia_id_unidad option:selected").text()
+                    const almacen_origen = $("#transferencia_id_almacen option:selected").text()
+                    const mercancia_json = JSON.stringify(list_mercancia)
+
+                    $('body').append(`
+                    <form action='/contabilidad/inventario/transferencia-entrada/print_report_current/'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='text' hidden name='datos[unidad_origen]' value='${unidad_origen}'/>
+                        <input type='text' hidden name='datos[almacen_origen]' value='${almacen_origen}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                        <input type='text' hidden name='nro' value="${consecutivo}" />
+                    </form>`)
+
+                    const fomrulario = $('#form_print_current')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('No excisten mercancias para imprimir', 'danger')
+
+            } else {
+                const url = '/contabilidad/inventario/transferencia-entrada/print_report/' + $('#select_nros').val()
+                window.open(url, 'blank_')
+            }
         }
 
         function cancelar() {
@@ -215,6 +240,9 @@
         let consecutivo = 0;
         let cuentas_inventarios = [];
         let cuentas_acreedoras = [];
+        let list_mercancia = []
+        let importe_total = 0;
+
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -311,9 +339,9 @@
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
                                     <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['importe']}</td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['precio']} </td>
-                                    <td style="font-weight:400;">${mercancias[i]['existencia']}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
+                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -397,7 +425,7 @@
                 if (e.which == 13) {
                     let codigo = $('#transferencia_mercancia_codigo').val()
                     let cuenta = $('#transferencia_nro_cuenta_inventario').val()
-                    if (cuenta != '' && codigo != '') {
+                    if (!!cuenta && !!codigo) {
                         let nro = cuenta.split(' - ')[0];
                         loadingModal.show("cargando mercancia...")
                         $.ajax({
@@ -565,9 +593,6 @@
                 }
             });
 
-            let list_mercancia = []
-            let importe_total = 0;
-
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
                     let codigo = $('#transferencia_mercancia_codigo').val()
@@ -589,9 +614,9 @@
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${importe}</td>
-                        <td style="font-weight:400;"> ${precio} </td>
-                        <td style="font-weight:400;">${nueva_existencia}</td>
+                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -630,7 +655,7 @@
                     $('#transferencia_mercancia_codigo').val(mercancias[i]['codigo'])
                     $('#transferencia_mercancia_descripcion').val(mercancias[i]['descripcion'])
                     $('#transferencia_mercancia_precio').val(mercancias[i]['precio_compra'])
-                    $('#transferencia_mercancia_existencia').val(mercancias[i]['existencia'])
+                    $('#transferencia_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
                     break
                 }
             }
