@@ -23,11 +23,6 @@ class TipoComprobante
     private $descripcion;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $boolean;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $activo;
@@ -49,17 +44,6 @@ class TipoComprobante
         return $this;
     }
 
-    public function getBoolean(): ?string
-    {
-        return $this->boolean;
-    }
-
-    public function setBoolean(string $boolean): self
-    {
-        $this->boolean = $boolean;
-
-        return $this;
-    }
 
     public function getActivo(): ?bool
     {
@@ -69,6 +53,12 @@ class TipoComprobante
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+    public function setId(int $id): self
+    {
+        $this->id = $id;
 
         return $this;
     }

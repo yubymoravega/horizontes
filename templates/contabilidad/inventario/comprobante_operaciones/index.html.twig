@@ -60,17 +60,17 @@
                 </tbody>
             </table>
         {% endfor %}
+        <form action="{{ path('contabilidad_inventario_comprobante_operaciones_guardar') }}" method="post">
         <div style="width: 960px" class="mt-5">
             <label for="observacion" class="font-weight-bold">Observación:</label>
             <textarea name="observacion" id="observacion" cols="120" rows="4" class="w-100"></textarea>
+            <input type="text" name="fecha" hidden value="{{ fecha }}">
         </div>
         <div style="width: 960px">
-
-
             <button type="submit" name="btn_generar" class="btn btn-secondary text-uppercase mt-2 font-weight-bold">
                 Generar Comprobante
             </button>
-
         </div>
+        </form>
     </div>
 {% endblock %}

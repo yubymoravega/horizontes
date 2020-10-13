@@ -86,7 +86,6 @@ class CerrarDiaController extends AbstractController
         $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_cierre;
         $next_day = strtotime($today . "+ 1 days");
 
-
         //1- obtener todos los debitos(entradas) y creditos(salidas)
         //1.1 mercancias
         $movimientos_mercancias_arr = $movimiento_mercancias_er->findBy(array(
@@ -94,6 +93,7 @@ class CerrarDiaController extends AbstractController
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
+
         $debitos = 0;
         $creditos = 0;
         /** @var MovimientoMercancia $obj_mercancia */

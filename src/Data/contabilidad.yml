@@ -34,3 +34,9 @@ configuraciones:
       name: "CAPITAL HUMANO"
     - id: 6
       name: "GENERAL"
+
+  tipo_comprobantes:
+    - id: 1
+      name: "COMPROBANTE DE ANOTACIONES"
+    - id: 2
+      name: "COMPROBANTE DE OPERACIONES"
