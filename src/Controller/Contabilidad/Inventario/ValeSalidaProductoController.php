@@ -227,7 +227,7 @@ class ValeSalidaProductoController extends AbstractController
 
 
                     //2-adicionar en documento
-                    $today = Date('Y-m-d');
+                    $today = AuxFunctions::getDateToClose($em, $id_almacen);
                     $documento = new Documento();
                     $documento
                         ->setActivo(true)
@@ -273,6 +273,7 @@ class ValeSalidaProductoController extends AbstractController
                                 ->setImporte(floatval($importe_mercancia))
                                 ->setEntrada(false)
                                 ->setCantidad($cantidad_mercancia)
+                                ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                                 ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                                 ->setIdDocumento($documento)
                                 ->setIdCentroCosto($em->getRepository(CentroCosto::class)->find($centro_costo))

@@ -59,6 +59,13 @@ body {
     padding-bottom: .3rem;
 }
 
+.row-group-subconta {
+    font-weight: 600;
+    background-color: #5d5753;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+}
+
 /*********************** MY redefinicion de stilos ****************************/
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {

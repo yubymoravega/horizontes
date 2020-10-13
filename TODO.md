@@ -72,4 +72,4 @@ verifica rque el producto tiene que estar asociado por cuentas(1 producto solo p
 - [ ] revisar a la hora de dar un consecutivo, si el ultimo esta cancelado, 
         reasignarlo ( cambia la logica de los consecutivos, en ves de contar 
         solo preguntaremos por el ultimo )
-- [ ] en los doc entrada y salida - add movimiento_mercancia o producto (id_almacen)
+- [x] en los doc entrada y salida - add movimiento_mercancia o producto (id_almacen)

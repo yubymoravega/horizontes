@@ -28,20 +28,21 @@ class MercanciaController extends AbstractController
         $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array(
             'activo' => true
         ));
-        $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
         $row = [];
+        $list_cuentas = [];
         foreach ($cuentas_arr as $cuenta) {
             /**@var $cuenta Cuenta * */
             $nro = $cuenta->getNroCuenta();
             $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy(array(
-                'id_cuenta'=>$cuenta,
-                'activo'=>true
+                'id_cuenta' => $cuenta,
+                'activo' => true
             ));
             $row_data = [];
-            /**@var $subcuenta Subcuenta  */
-            foreach ($arr_subcuentas as $subcuenta){
+            /**@var $subcuenta Subcuenta */
+            foreach ($arr_subcuentas as $subcuenta) {
                 $nro_subcuenta = $subcuenta->getNroSubcuenta();
-                $datos = $this->getDatosPorSubCuenta($em, $nro_subcuenta,$nro, $id_almacen);
+                $datos = $this->getDatosPorSubCuenta($em, $nro_subcuenta, $nro, $id_almacen);
                 if (!empty($datos['data']))
                     $row_data[] = array(
                         'cuenta' => $nro_subcuenta . ' - ' . $subcuenta->getDescripcion(),
@@ -49,22 +50,38 @@ class MercanciaController extends AbstractController
                         'total' => $datos['total']
                     );
             }
-            if(!empty($row_data))
-                $row[] = array(
-                    'cuenta' => $nro . ' - ' . $cuenta->getNombre(),
-                    'existencia' => $row_data,
-                    'total' => ''
-                );
-
+            // validar solo las que tienen valor
+            if (!empty($row_data)) {
+                if (empty($row)) // Solo la primera cuenta
+                    $row = [
+                        'cuenta' => $nro . ' - ' . $cuenta->getNombre(),
+                        'existencia' => $row_data,
+                        'total' => ''
+                    ];
+                $list_cuentas[] = [
+//                    'nro_cuenta' => $nro,
+//                    'cuenta' => $nro . ' - ' . $cuenta->getNombre()
+                    $nro . ' - ' . $cuenta->getNombre() => $nro
+                ];
+            }
         }
-//        dd($row);
+
+        dd($list_cuentas);
+        $form = $this->createFormBuilder()->add('cuentas',
+            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+            [
+                'choices' => $list_cuentas
+            ])
+            ->getForm();
         return $this->render('contabilidad/inventario/mercancia/index.html.twig', [
             'controller_name' => 'MercanciaController',
-            'mercancias' => $row
+            'mercancias' => $row,
+            'list_cuentas' => $list_cuentas,
+            'form' => $form->createView()
         ]);
     }
 
-    public function getDatosPorSubCuenta($em, $nro_subcuenta,$cuenta, $id_amlacen)
+    public function getDatosPorSubCuenta($em, $nro_subcuenta, $cuenta, $id_amlacen)
     {
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
@@ -73,13 +90,13 @@ class MercanciaController extends AbstractController
             'activo' => true,
             'id_amlacen' => $id_amlacen,
             'nro_subcuenta_inventario' => $nro_subcuenta,
-            'cuenta'=>$cuenta
+            'cuenta' => $cuenta
         ));
         $producto_arr = $producto_er->findBy(array(
             'activo' => true,
             'id_amlacen' => $id_amlacen,
             'nro_subcuenta_inventario' => $nro_subcuenta,
-            'cuenta'=>$cuenta
+            'cuenta' => $cuenta
         ));
         $row_mercancia = [];
         $row_producto = [];
@@ -88,20 +105,20 @@ class MercanciaController extends AbstractController
                 $row_mercancia[] = array(
                     'codigo' => $mercancia_obj->getCodigo(),
                     'descripcion' => $mercancia_obj->getDescripcion(),
-                    'unidad_medida' =>strtoupper($mercancia_obj->getIdUnidadMedida()->getAbreviatura()) ,
+                    'unidad_medida' => strtoupper($mercancia_obj->getIdUnidadMedida()->getAbreviatura()),
                     'existencia' => $mercancia_obj->getExistencia(),
                     'precio' => number_format(($mercancia_obj->getImporte() / $mercancia_obj->getExistencia()), 5, '.', ''),
-                    'importe' =>number_format($mercancia_obj->getImporte(),2)
+                    'importe' => number_format($mercancia_obj->getImporte(), 2)
                 );
                 $total += floatval($mercancia_obj->getImporte());
             }
             $row_mercancia[] = array(
                 'codigo' => '',
                 'descripcion' => 'TOTAL',
-                'unidad_medida' =>'',
+                'unidad_medida' => '',
                 'existencia' => '',
                 'precio' => '',
-                'importe' =>number_format($total,2)
+                'importe' => number_format($total, 2)
             );
 //            $total += floatval($mercancia_obj->getImporte());
         }
@@ -114,17 +131,17 @@ class MercanciaController extends AbstractController
                     'unidad_medida' => $producto_obj->getIdUnidadMedida()->getNombre(),
                     'existencia' => $producto_obj->getExistencia(),
                     'precio' => number_format(($producto_obj->getImporte() / $producto_obj->getExistencia()), 5, '.', ''),
-                    'importe' => number_format($producto_obj->getImporte(),2)
+                    'importe' => number_format($producto_obj->getImporte(), 2)
                 );
                 $total += floatval($producto_obj->getImporte());
             }
             $row_producto[] = array(
                 'codigo' => '',
                 'descripcion' => 'TOTAL',
-                'unidad_medida' =>'',
+                'unidad_medida' => '',
                 'existencia' => '',
                 'precio' => '',
-                'importe' =>number_format($total,2)
+                'importe' => number_format($total, 2)
             );
         }
         return ['data' => array_merge($row_mercancia, $row_producto), 'total' => ''];

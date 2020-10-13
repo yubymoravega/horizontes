@@ -14,6 +14,9 @@
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Listado de existencia en almacén
             </h4>
+            <select name="" id="">
+
+            </select>
         </div>
         {# end header #}
 
@@ -28,26 +31,24 @@
             <th width="80px">Importe</th>
             </thead>
             <tbody>
-            {% for datos in mercancias %}
+            <tr>
+                <td class="row-group-conta" colspan="5">{{ mercancias.cuenta }}</td>
+                <td class="row-group-conta text-right">{{ mercancias.total }}</td>
+            </tr>
+            {% for item in mercancias.existencia %}
                 <tr>
-                    <td class="row-group-conta" colspan="5">{{ datos.cuenta }}</td>
-                    <td class="row-group-conta text-right">{{ datos.total }}</td>
+                    <td class="row-group-subconta" colspan="5">{{ item.cuenta }}</td>
+                    <td class="row-group-subconta text-right">{{ item.total }}</td>
                 </tr>
-                {% for item in datos.existencia %}
+                {% for new_item in item.existencia %}
                     <tr>
-                        <td class="row-group-conta" colspan="5">{{ item.cuenta }}</td>
-                        <td class="row-group-conta text-right">{{ item.total }}</td>
+                        <td style="font-weight:400;">{{ new_item.codigo }}</td>
+                        <td style="font-weight:400;">{{ new_item.descripcion }}</td>
+                        <td style="font-weight:400;">{{ new_item.unidad_medida }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.existencia }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.precio }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.importe }}</td>
                     </tr>
-                    {% for new_item in item.existencia %}
-                        <tr>
-                            <td style="font-weight:400;">{{ new_item.codigo }}</td>
-                            <td style="font-weight:400;">{{ new_item.descripcion }}</td>
-                            <td style="font-weight:400;">{{ new_item.unidad_medida }}</td>
-                            <td style="font-weight:400;" class="text-right">{{ new_item.existencia }}</td>
-                            <td style="font-weight:400;" class="text-right">{{ new_item.precio }}</td>
-                            <td style="font-weight:400;" class="text-right">{{ new_item.importe }}</td>
-                        </tr>
-                    {% endfor %}
                 {% endfor %}
             {% endfor %}
             </tbody>

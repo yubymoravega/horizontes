@@ -114,7 +114,7 @@ class TransferenciaSalidaController extends AbstractController
                 $consecutivo = $contador + 1;
 
                 //2-adicionar en documento
-                $today = Date('Y-m-d');
+                $today = AuxFunctions::getDateToClose($em, $id_almacen);
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
@@ -168,6 +168,7 @@ class TransferenciaSalidaController extends AbstractController
                             ->setActivo(true)
                             ->setImporte(floatval($importe_mercancia))
                             ->setEntrada(false)
+                            ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                             ->setCantidad($cantidad_mercancia)
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
