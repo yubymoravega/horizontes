@@ -52,7 +52,8 @@ class AuxFunctions
      * @param string $entidad entidad a la que se relaciona
      * @return array Arreglo de valores con todos los numeros concesutivos del anno incluyendo el siguiente, de forma invertida(Mayor a menor)
      */
-    public static function getConsecutivos(EntityManagerInterface $em, EntityRepository $er, int $anno, int $id_usuario, int $id_almacen, array $criterio = [], string $entidad = '')
+    public static function getConsecutivos(EntityManagerInterface $em, EntityRepository $er, int $anno,
+                                           int $id_usuario, int $id_almacen, array $criterio = [], string $entidad = '')
     {
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,

@@ -193,6 +193,36 @@
         let eliminados = [];
         let consecutivo = 0;
         let cuentas_inventarios = [];
+        let list_mercancia = []
+        let importe_total = 0;
+
+
+
+        function Print_Informe_Productos() {
+
+            if ($('#select_nros').val() == consecutivo) {
+                if (list_mercancia.length > 0) {
+                    const mercancia_json = JSON.stringify(list_mercancia)
+                    $('body').append(`
+                    <form action='/contabilidad/inventario/informe-recepcion-productos/print_report_current/'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                        <input type='text' hidden name='nro' value="${consecutivo}" />
+                    </form>`)
+
+                    const fomrulario = $('#form_print_current')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('No excisten mercancias para imprimir', 'danger')
+
+            } else {
+                let url = '/contabilidad/inventario/informe-recepcion-productos/print-report/' + $('#select_nros').val()
+                window.open(url, 'blank_')
+            }
+        }
+
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
 
@@ -425,9 +455,6 @@
                 }
             });
 
-            let list_mercancia = []
-            let importe_total = 0;
-
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
                     let codigo = $('#informe_recepcion_producto_mercancia_codigo').val()
@@ -449,9 +476,9 @@
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${importe}</td>
-                        <td style="font-weight:400;"> ${precio} </td>
-                        <td style="font-weight:400;">${nueva_existencia}</td>
+                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -491,7 +518,7 @@
                     $('#informe_recepcion_producto_mercancia_codigo').val(mercancias[i]['codigo'])
                     $('#informe_recepcion_producto_mercancia_descripcion').val(mercancias[i]['descripcion'])
                     $('#informe_recepcion_producto_mercancia_precio').val(mercancias[i]['precio_compra'])
-                    $('#informe_recepcion_producto_mercancia_existencia').val(mercancias[i]['existencia'])
+                    $('#informe_recepcion_producto_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
                     break
                 }
             }
@@ -514,11 +541,10 @@
         }
 
         function llenarFormulario(nro_informe) {
-            if(nro_informe<1){
+            if (nro_informe < 1) {
                 alertTemplate('El menor número permitido es 1', 'danger')
                 resetFormulario()
-            }
-            else{
+            } else {
                 loadingModal.show()
                 $.ajax({
                     url: '/contabilidad/inventario/informe-recepcion-productos/getInforme/' + nro_informe,
@@ -544,8 +570,8 @@
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${productos[i]['codigo']} </td>
                                     <td style="font-weight:400;"> ${productos[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${productos[i]['importe']}</td>
-                                    <td style="font-weight:400;"> ${productos[i]['precio']} </td>
+                                    <td style="font-weight:400;"> ${parseFloat(productos[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(productos[i]['precio']).toFixed(2)} </td>
                                     <td style="font-weight:400;">${productos[i]['existencia']}</td>
                                     <td></td>
                                    </tr>`
@@ -601,11 +627,6 @@
                 error: function () {
                 }
             })
-        }
-
-        function Print_Informe_Productos() {
-            let url = '/contabilidad/inventario/informe-recepcion-productos/print-report/' + $('#select_nros').val()
-            window.open(url, 'blank_')
         }
 
         const myOnDeleteConfirm = function () {

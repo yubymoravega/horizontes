@@ -13,20 +13,18 @@ use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
-use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
-use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\TransferenciaType;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -521,8 +519,8 @@ class TransferenciaController extends AbstractController
             'datos' => array(
                 'importe_total' => number_format($importe_total, 2, '.', ''),
                 'almacen' => $almacen,
-                'cod_proveedor' => '$cod_proveedor',
-                'proveedor' => '$proveedor',
+                //                'cod_proveedor' => '$cod_proveedor',
+//                'proveedor' => '$proveedor',
                 'unidad' => $unidad,
                 'unidad_origen' => $unidad_origen,
                 'almacen_origen' => $almacen_origen,
@@ -534,6 +532,45 @@ class TransferenciaController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/print_report_current/", name="contabilidad_inventario_transferencia_entrada_print_report_current",methods={"GET","POST"})
+     */
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    {
+        $datos = $request->get('datos');
+        $mercancias = json_decode($request->get('mercancias'));
+        $nro = $request->get('nro');
+        $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
+        $rows = [];
+        foreach ($mercancias as $obj) {
+            array_push($rows, [
+                "id" => 0,
+                "codigo" => $obj->codigo,
+                "um" => $obj->um,
+                "descripcion" => $obj->descripcion,
+                "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
+                "cantidad" => $obj->cant,
+                "precio" => number_format($obj->precio, 2, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
+            ]);
+        }
+//        dd($datos);
+        return $this->render('contabilidad/inventario/transferencia/print.html.twig', [
+            'controller_name' => 'AjusteEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($datos['importe_total'], 2, '.', ''),
+                'almacen' => $request->getSession()->get('selected_almacen/name'),
+                'unidad' => $unidad,
+                'unidad_origen' => $datos["unidad_origen"] == ' -- seleccione -- ' ? '' : $datos["unidad_origen"],
+                'almacen_origen' => $datos["almacen_origen"] == '-- seleccione --' ? '' : $datos["almacen_origen"],
+                'fecha_transferencia' => '10/10/1010',
+                'nro_solicitud' => $nro
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+
+    }
 
     /**
      * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia",methods={"GET","POST"})

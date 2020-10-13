@@ -6,8 +6,10 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Documento;
@@ -17,6 +19,7 @@ use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\ValeSalidaType;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -188,12 +191,14 @@ class ValeSalidaProductoController extends AbstractController
             $list_mercancia = json_decode($request->get('vale_salida')['list_mercancia'], true);
             if ($this->isCsrfTokenValid('authenticate', $request->get('_token'))) {
                 $vale_salida = $request->get('vale_salida');
+                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+                $obj_tipo_documento = $tipo_documento_er->find(8);
 
                 /**  datos de InformeRecepcionType **/
                 $fecha_solicitud = $vale_salida['fecha_solicitud'];
                 $nro_solicitud = $vale_salida['nro_solicitud'];
-                $nro_cuenta_deudora = $vale_salida['nro_cuenta_deudora'];
-                $nro_subcuenta_deudora = $vale_salida['nro_subcuenta_deudora'];
+                $nro_cuenta_deudora = AuxFunctions::getNro($vale_salida['nro_cuenta_deudora']);
+                $nro_subcuenta_deudora = AuxFunctions::getNro($vale_salida['nro_subcuenta_deudora']);
                 $id_moneda = $vale_salida['documento']['id_moneda'];
 
 
@@ -227,6 +232,8 @@ class ValeSalidaProductoController extends AbstractController
                     $documento
                         ->setActivo(true)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                        ->setAnno($year_)
+                        ->setIdTipoDocumento($obj_tipo_documento)
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                         ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                         ->setIdMoneda($em->getRepository(Moneda::class)->find($id_moneda));
@@ -247,8 +254,7 @@ class ValeSalidaProductoController extends AbstractController
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $producto_er = $em->getRepository(Producto::class);
-                    $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                    $obj_tipo_documento = $tipo_documento_er->find(8);
+
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $mercancia) {
@@ -367,11 +373,15 @@ class ValeSalidaProductoController extends AbstractController
             );
             $importe_total += $obj->getImporte();
         }
+        $cuentas = $em->getRepository(Cuenta::class);
+        $subcuentas = $em->getRepository(Subcuenta::class);
+        $cuenta_obj = $cuentas->findOneBy(['nro_cuenta' => $vale_obj->getNroCuentaDeudora()]);
+        $subcuenta_obj = $subcuentas->findOneBy(['id_cuenta' => $cuenta_obj, 'nro_subcuenta' => $vale_obj->getNroSubcuentaDeudora()]);
 
         $rows = array(
             'id' => $vale_obj->getId(),
-            'nro_cuenta_deudora' => $vale_obj->getNroCuentaDeudora(),
-            'nro_subcuenta_deudora' => $vale_obj->getNroSubcuentaDeudora(),
+            'nro_cuenta_deudora' => $vale_obj->getNroCuentaDeudora(). ' - ' .$cuenta_obj->getNombre(),
+            'nro_subcuenta_deudora' => $vale_obj->getNroSubcuentaDeudora() . ' - ' . $subcuenta_obj->getDescripcion(),
             'nro_solicitud' => $vale_obj->getNroSolicitud(),
             'fecha_solicitud' => $vale_obj->getFechaSolicitud()->format('d/m/Y'),
             'id_moneda' => $vale_obj->getIdDocumento()->getIdMoneda()->getId(),
@@ -521,5 +531,46 @@ class ValeSalidaProductoController extends AbstractController
             'productos' => $rows,
             'id' => $nro
         ]);
+    }
+
+    /**
+     * @Route("/print_report_current/", name="contabilidad_inventario_vale_salida_prod_print_report_current",methods={"GET","POST"})
+     */
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    {
+        $datos = $request->get('datos');
+        $mercancias = json_decode($request->get('mercancias'));
+        $nro = $request->get('nro');
+        $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
+        $rows = [];
+
+        foreach ($mercancias as $obj) {
+            array_push($rows, [
+                "id" => 0,
+                "codigo" => $obj->codigo,
+                "um" => $obj->um,
+                "descripcion" => $obj->descripcion,
+                "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
+                "cantidad" => $obj->cant,
+                "precio" => number_format($obj->precio, 2, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
+            ]);
+        }
+
+        return $this->render('contabilidad/inventario/vale_salida/print.html.twig', [
+            'controller_name' => 'AjusteEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($datos['importe_total'], 2, '.', ''),
+                'almacen' => $request->getSession()->get('selected_almacen/name'),
+                'fecha' => date("d/m/Y", strtotime($datos["fecha_solicitud"])),
+                'nro_solicitud' => $datos["nro_solicitud"],
+                'unidad' => $unidad,
+                'fecha_vale' => '10/10/1010',
+                'nro_consecutivo' => $nro
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+
     }
 }

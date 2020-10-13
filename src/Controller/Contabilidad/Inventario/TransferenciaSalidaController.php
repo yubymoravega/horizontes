@@ -13,6 +13,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\TransferenciaSalidaType;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\CuentaRepository;
 use App\Repository\Contabilidad\Config\SubcuentaRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -79,6 +80,8 @@ class TransferenciaSalidaController extends AbstractController
         if ($form->isSubmitted()) {
             $list_mercancia = json_decode($request->get('transferencia_salida')['list_mercancia'], true);
 //            if ($form->isValid()) {
+            $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+            $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_SALIDA);
             $transferencia_salida = $request->get('transferencia_salida');
 
             /**  datos de TransferenciaEntradaType **/
@@ -116,6 +119,8 @@ class TransferenciaSalidaController extends AbstractController
                 $documento
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setAnno($year_)
+                    ->setIdTipoDocumento($obj_tipo_documento)
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                     ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
                     ->setIdMoneda($em->getRepository(Moneda::class)->find($transferencia_salida['documento']['id_moneda']));
@@ -147,8 +152,7 @@ class TransferenciaSalidaController extends AbstractController
 
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
-                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_SALIDA);
+
                 $importe_total = 0;
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
@@ -481,6 +485,45 @@ class TransferenciaSalidaController extends AbstractController
         ]);
     }
 
+
+    /**
+     * @Route("/print_report_current/", name="contabilidad_inventario_transferencia_salida_print_report_current",methods={"GET","POST"})
+     */
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    {
+        $datos = $request->get('datos');
+        $mercancias = json_decode($request->get('mercancias'));
+        $nro = $request->get('nro');
+        $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
+        $rows = [];
+        foreach ($mercancias as $obj) {
+            array_push($rows, [
+                "id" => 0,
+                "codigo" => $obj->codigo,
+                "um" => $obj->um,
+                "descripcion" => $obj->descripcion,
+                "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
+                "cantidad" => $obj->cant,
+                "precio" => number_format($obj->precio, 2, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
+            ]);
+        }
+//        dd($datos);
+        return $this->render('contabilidad/inventario/transferencia_salida/print.html.twig', [
+            'controller_name' => 'AjusteEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($datos['importe_total'], 2, '.', ''),
+                'almacen' => $request->getSession()->get('selected_almacen/name'),
+                'unidad' => $unidad,
+                'unidad_origen' => $datos["unidad_origen"] == ' -- seleccione -- ' ? '' : $datos["unidad_origen"],
+                'almacen_origen' => $datos["almacen_origen"] == ' -- seleccione -- ' ? '' : $datos["almacen_origen"],
+                'fecha_transferencia' => '10/10/1010',
+                'nro_solicitud' => $nro
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+    }
 
     /**
      * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia_salida",methods={"GET","POST"})

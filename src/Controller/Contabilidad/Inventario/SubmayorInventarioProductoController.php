@@ -69,7 +69,7 @@ class SubmayorInventarioProductoController extends AbstractController
     }
 
     /**
-     * @Route("/print/{cod}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
+     * @Route("/print/{cod}", name="contabilidad_inventario_submayor_print",methods={"GET"})
      */
     public function print(EntityManagerInterface $em, $cod, Request $request)
     {

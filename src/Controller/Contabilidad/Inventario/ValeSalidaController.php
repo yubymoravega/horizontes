@@ -18,6 +18,7 @@ use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\ValeSalidaType;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -524,6 +525,7 @@ class ValeSalidaController extends AbstractController
             }
 
         }
+
         return $this->render('contabilidad/inventario/vale_salida/print.html.twig', [
             'controller_name' => 'ValeSalidaControllerPrint',
             'datos' => array(
@@ -538,5 +540,46 @@ class ValeSalidaController extends AbstractController
             'mercancias' => $rows,
             'id' => $nro
         ]);
+    }
+
+    /**
+     * @Route("/print_report_current/", name="contabilidad_inventario_vale_salida_print_report_current",methods={"GET","POST"})
+     */
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    {
+        $datos = $request->get('datos');
+        $mercancias = json_decode($request->get('mercancias'));
+        $nro = $request->get('nro');
+        $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
+        $rows = [];
+
+        foreach ($mercancias as $obj) {
+            array_push($rows, [
+                "id" => 0,
+                "codigo" => $obj->codigo,
+                "um" => $obj->um,
+                "descripcion" => $obj->descripcion,
+                "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
+                "cantidad" => $obj->cant,
+                "precio" => number_format($obj->precio, 2, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
+            ]);
+        }
+
+        return $this->render('contabilidad/inventario/vale_salida/print.html.twig', [
+            'controller_name' => 'AjusteEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($datos['importe_total'], 2, '.', ''),
+                'almacen' => $request->getSession()->get('selected_almacen/name'),
+                'fecha' => date("d/m/Y", strtotime($datos["fecha_solicitud"])),
+                'nro_solicitud' => $datos["nro_solicitud"],
+                'unidad' => $unidad,
+                'fecha_vale' => '10/10/1010',
+                'nro_consecutivo' => $nro
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+
     }
 }
