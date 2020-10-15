@@ -264,7 +264,7 @@ class AjusteSalidaController extends AbstractController
 //        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
 //            array('activo' => true, 'id_unidad' => $unidad)
 //        );
-        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['GAT', 'EXP']);
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
         $rows = [];
