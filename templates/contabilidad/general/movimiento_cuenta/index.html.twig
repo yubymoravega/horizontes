@@ -10,10 +10,40 @@
     <div class="container-fluid">
 
         {# header #}
+        {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
         <div class="d-flex align-items-center">
             <h6 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Movimiento de Cuentas
             </h6>
+            {{ form_widget(form.buscar,{'attr': {'class': 'form-control ml-auto btn-primary','style':'width:100px'}}) }}
+            {{ form_widget(form.limpiar,{'attr': {'class': 'form-control btn-outline-secondary ml-3','style':'width:100px'}}) }}
+        </div>
+
+        <div class="mt-0 row">
+            <div class="form-group input-group input-group-sm d-block col-2">
+                {{ form_widget(form.nro_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm d-block col-2">
+                {{ form_widget(form.nro_subcuenta,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm d-block col-2">
+                {{ form_widget(form.periodo,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+
+            <div class="form-group mt-0 input-group input-group-sm d-block col-2">
+                {{ form_widget(form.centro_costo,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm d-block col-2">
+                {{ form_widget(form.elemento_gasto,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm d-block col-2">
+                {{ form_widget(form.expediente,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm d-block col-2">
+                {{ form_widget(form.almacen,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+
+            {{ form_end(form) }}
         </div>
         {# end header #}
 
@@ -41,4 +71,65 @@
         </table>
         {# end list #}
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        let cuenta = [];
+        resetForm()
+        $('#movimiento_cuenta_nro_cuenta').on('change', function () {
+            $('#movimiento_cuenta_nro_subcuenta').find('option').remove()
+            cuenta.forEach(function (valor, pos) {
+                if ($('#movimiento_cuenta_nro_cuenta').val() == valor.nro_cuenta) {
+                    $('#movimiento_cuenta_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                    for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                        $('#movimiento_cuenta_nro_subcuenta').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                    }
+                }
+            })
+        })
+
+        function resetForm() {
+            //ocultar los combobox
+            $('#movimiento_cuenta_nro_cuenta').find('option').remove()
+            $('#movimiento_cuenta_nro_cuenta').prepend('<option selected = "false" value = "0" disabled>-- Cuenta --</option>')
+            $('#movimiento_cuenta_nro_subcuenta').find('option').remove()
+            $('#movimiento_cuenta_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- Subcuenta -- </option>');
+            $('#movimiento_cuenta_periodo').find('option').remove()
+            $('#movimiento_cuenta_periodo').prepend('<option selected = "false" value = "0" disabled> -- Período -- </option>');
+            $('#movimiento_cuenta_periodo').append('<option value = "1">Período actual</option>');
+            $('#movimiento_cuenta_periodo').append('<option value = "2">Acumulado </option>');
+
+            $('#movimiento_cuenta_centro_costo').prepend('<option selected = "false" value = "0" disabled> -- Centro de Costo -- </option>');
+            $('#movimiento_cuenta_elemento_gasto').prepend('<option selected = "false" value = "0" disabled> -- Elemento de Gasto -- </option>');
+            $('#movimiento_cuenta_expediente').prepend('<option selected = "false" value = "0" disabled> -- Expediente -- </option>');
+            $('#movimiento_cuenta_almacen').prepend('<option selected = "false" value = "0" disabled> -- Almacén -- </option>');
+
+            loadingModal.show()
+
+            $.ajax({
+                url: '/contabilidad/general/movimiento-cuenta/getDatos',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    cuenta = result.cuentas_inventario
+                    $(result.cuentas_inventario).each(function (pos, valor) {
+                        $('#movimiento_cuenta_nro_cuenta').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                    })
+                    $(result.elemento_gasto).each(function (pos, valor) {
+                        $('#movimiento_cuenta_elemento_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.centro_costo).each(function (pos, valor) {
+                        $('#movimiento_cuenta_centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.almacenes).each(function (pos, valor) {
+                        $('#movimiento_cuenta_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+        }
+    </script>
 {% endblock %}

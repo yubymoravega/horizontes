@@ -20,14 +20,20 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" id="confirm_body">
-                    {{ message }}
-                </div>
-                <form id="form_confirm_modal" method="post" action="{{ path('contabilidad_inventario_cerrar_dia_cerrar') }}">
+                <form id="form_confirm_modal" method="post"
+                      action="{{ path('contabilidad_inventario_cerrar_dia_cerrar') }}">
+                    <div class="modal-body" id="confirm_body">
+                        {{ message }}
+                        {% if error %}
+                        <input type="date" name="fecha_cierre" min="{{ fecha_minima }}" max="{{ fecha_maxima }}"
+                               value="{{ fecha_minima }}">
+                        {% endif %}
+                    </div>
                     <input type="hidden" name="_method" value="DELETE">
                     <input id="_token_confirm_modal" type="hidden" name="_token" value="123...">
                     <div class="modal-footer">
-                        <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar
+                        <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">
+                            Cancelar
                         </button>
                         <button type="submit" class="my-0 btn btn-danger" id="confirm_btn_ok">Aceptar</button>
                     </div>
@@ -43,7 +49,5 @@
         $(document).ready(function () {
             $('#cerrarDia').modal('show')
         })
-
-
     </script>
 {% endblock %}

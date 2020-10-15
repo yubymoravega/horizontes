@@ -41,7 +41,10 @@ class CerrarDiaController extends AbstractController
 
                 return $this->render('contabilidad/inventario/cerrar_dia/index.html.twig', [
                     'controller_name' => 'CerrarDiaController',
-                    'message'=>'¿ Está seguro que desea cerrar el día '.$arr[2].'-'.$arr[1].'-'.$arr[0].' ?'
+                    'message'=>'¿ Está seguro que desea cerrar el día ?',
+                    'fecha_minima'=>$arr[0].'-'.$arr[1].'-'.$arr[2],
+                    'fecha_maxima'=>Date('Y-m-d'),
+                    'error'=>true,
                 ]);
             }
             else
@@ -76,14 +79,20 @@ class CerrarDiaController extends AbstractController
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
 
+
+
         $obj_cierre_abierto = $cierre_er->findOneBy(array(
             'id_almacen' => $almacen_obj,
             'abierto' => true,
         ));
 
-        $fecha_cierre = AuxFunctions::getDateToClose($em,$id_almacen);
+//        $fecha_inicio = AuxFunctions::getDateToClose($em,$id_almacen);
+        $fecha_seleccionada = $request->get('fecha_cierre');
+
+
         /**@var Cierre $obj_cierre_abierto */
-        $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_cierre;
+//        $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_seleccionada;
+        $today = $fecha_seleccionada;
         $next_day = strtotime($today . "+ 1 days");
 
         //1- obtener todos los debitos(entradas) y creditos(salidas)
@@ -139,7 +148,8 @@ class CerrarDiaController extends AbstractController
 
         $saldo_apertura = $obj_cierre_abierto ? $obj_cierre_abierto->getSaldo() : 0;
         //verificar que los debitos menos los creditos = existencia en almacen
-        if ($existencia_almacen_importe == ($saldo_apertura + $debitos - $creditos)) {
+        $x = $saldo_apertura + $debitos - $creditos;
+        if (round($existencia_almacen_importe,5) == round(($saldo_apertura + $debitos - $creditos),5)) {
             if (!$obj_cierre_abierto) {
                 //no se ha realizado ningun cierre, o sea es el primero que se efectuara
                 //hago el cierre del dia
@@ -191,10 +201,14 @@ class CerrarDiaController extends AbstractController
             //hubo diferencia
             return $this->render('contabilidad/inventario/cerrar_dia/index.html.twig', [
                 'controller_name' => 'CerrarDiaController',
+                'fecha_minima'=>'',
+                'fecha_maxima'=>'',
+                'error'=>false,
                 'message'=>'El día no pudo ser cerrado por diferencia de valores: Saldo de apertura = '.$saldo_apertura.', Débitos = '.$debitos.', Creditos = '.$creditos.', y Existencia en almacén = '.$existencia_almacen_importe
             ]);
         }
         $em->flush();
+        $this->addFlash('success','Día cerrado satisfactoriamente');
         return $this->redirectToRoute('inventario');
     }
 }
