@@ -59,17 +59,7 @@
             <div class="card-body">
                 {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'ajuste_entrada','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-6 pr-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_cuenta_inventario) }}
-                        {{ form_widget(formulario.nro_cuenta_inventario) }}
-                    </div>
-                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(formulario.nro_subcuenta_inventario) }}
-                        {{ form_widget(formulario.nro_subcuenta_inventario) }}
-                    </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
-                </div>
-                <div class="row mt-0 p-0">
                     <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
@@ -103,7 +93,15 @@
 
                 {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
+                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.mercancia.nro_cuenta_inventario) }}
+                        {{ form_widget(formulario.mercancia.nro_cuenta_inventario) }}
+                    </div>
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.nro_subcuenta_inventario) }}
+                        {{ form_widget(formulario.mercancia.nro_subcuenta_inventario) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-1 d-block">
                         {{ form_label(formulario.mercancia.codigo) }}
                         <div class="row m-0 p-0">
                             <div class="col-8 p-0">
@@ -161,6 +159,7 @@
                         <th width="110px">Importe</th>
                         <th width="110px">Precio</th>
                         <th scope="col-1">Nueva Exist</th>
+                        <th width="90px">Cuenta/Sub.</th>
                         <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
                         <th scope="col-1" hidden>UM</th>
                         <th scope="col-1" hidden>Descripcion</th>
@@ -304,8 +303,6 @@
                     success: function (result) {
                         if (result.success) {
                             let data = result.data;
-                            const cuenta = $('#ajuste_nro_cuenta_inventario')
-                            const subcuenta = $('#ajuste_nro_subcuenta_inventario')
                             const cuenta_acreedora = $('#ajuste_nro_cuenta_acreedora')
                             const subcuenta_acreedora = $('#ajuste_nro_subcuenta_acreedora')
                             const moneda = $('#ajuste_documento_id_moneda')
@@ -313,8 +310,6 @@
 
                             // datos del Formulario
                             $('#ajuste_entrada select').find('option').remove()
-                            cuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_inventario} </option>`);
-                            subcuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_cuenta_inventario} </option>`);
                             cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
                             subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_acreedora} </option>`);
                             moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
@@ -331,6 +326,7 @@
                                     <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
                                     <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
                                     <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;">${mercancias[i]['cuenta_subcuenta']}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -352,6 +348,9 @@
                 $('#ajuste_entrada select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                 $('#form_mercancia').css('display', 'block')
 
+                $('#ajuste_mercancia_nro_subcuenta_inventario').find('option').remove()
+                $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
                 $.ajax({
                     url: '/contabilidad/inventario/ajuste-entrada/getCuentas',
                     method: 'POST',
@@ -360,7 +359,7 @@
                         cuentas_inventarios = result.cuentas_inventario
                         cuentas_acreedoras = result.cuentas_acreedoras
                         $(result.cuentas_inventario).each(function (pos, valor) {
-                            $('#ajuste_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                            $('#ajuste_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
                         $(result.cuentas_acreedoras).each(function (pos, valor) {
                             $('#ajuste_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
@@ -379,7 +378,7 @@
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
                 let codigo = $('#ajuste_mercancia_codigo').val() != '' ? $('#ajuste_mercancia_codigo').val() : -1
-                let cuenta = $('#ajuste_nro_cuenta_inventario').val() != '' ? $('#ajuste_nro_cuenta_inventario').val() : ''
+                let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val() != '' ? $('#ajuste_mercancia_nro_cuenta_inventario').val() : ''
                 $.ajax({
                     url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + cuenta,
                     method: 'POST',
@@ -405,7 +404,7 @@
             $('#ajuste_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
                     let codigo = $('#ajuste_mercancia_codigo').val()
-                    let cuenta = $('#ajuste_nro_cuenta_inventario').val()
+                    let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val()
                     if (!!cuenta && !!codigo) {
                         let nro = cuenta.split(' - ')[0];
                         loadingModal.show("cargando mercancia...")
@@ -463,13 +462,13 @@
                 $('#ajuste_mercancia_existencia').val('')
             })
 
-            $('#ajuste_nro_cuenta_inventario').on('change', function () {
-                $('#ajuste_nro_subcuenta_inventario').find('option').remove()
+            $('#ajuste_mercancia_nro_cuenta_inventario').on('change', function () {
+                $('#ajuste_mercancia_nro_subcuenta_inventario').find('option').remove()
                 cuentas_inventarios.forEach(function (valor, pos) {
-                    if ($('#ajuste_nro_cuenta_inventario').val() == valor.nro_cuenta) {
-                        $('#ajuste_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                    if ($('#ajuste_mercancia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                        $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                            $('#ajuste_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            $('#ajuste_mercancia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })
@@ -526,6 +525,8 @@
                     'ajuste[mercancia][id_unidad_medida]': "required",
                     'ajuste[documento][cantidad_mercancia]': "required",
                     'ajuste[documento][importe_mercancia]': "required",
+                    'ajuste[mercancia][nro_cuenta_inventario]': "required",
+                    'ajuste[mercancia][nro_subcuenta_inventario]': "required",
                 },
                 messages: {
                     'ajuste[mercancia][codigo]': 'Obligatorio!',
@@ -533,6 +534,8 @@
                     'ajuste[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'ajuste[documento][cantidad_mercancia]': 'Obligatorio!',
                     'ajuste[documento][importe_mercancia]': 'Obligatorio!',
+                    'ajuste[mercancia][nro_cuenta_inventario]': "Obligatorio!",
+                    'ajuste[mercancia][nro_subcuenta_inventario]': "Obligatorio!",
                 }
             })
 
@@ -576,12 +579,24 @@
                     let nueva_existencia = $('#ajuste_mercancia_existencia_incremento').val()
                     let um = $('#ajuste_mercancia_id_unidad_medida').val()
                     let descripcion = $('#ajuste_mercancia_descripcion').val()
+                    let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val()
+                    let subcuenta = $('#ajuste_mercancia_nro_subcuenta_inventario').val()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
-                        list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
+                        list_mercancia.push({
+                            codigo,
+                            cant,
+                            importe,
+                            precio,
+                            nueva_existencia,
+                            um,
+                            descripcion,
+                            cuenta,
+                            subcuenta
+                        })
                         importe_total += Number.parseFloat(importe)
 
                         $("#importe-total").text('$' + importe_total.toFixed(2))
@@ -591,6 +606,7 @@
                         <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
                         <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
                         <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -606,6 +622,8 @@
                         $('#ajuste_documento_importe_mercancia').val('')
                         $('#ajuste_mercancia_precio').val('')
                         $('#ajuste_mercancia_existencia_incremento').val('')
+                        $('#ajuste_mercancia_nro_cuenta_inventario').val(0)
+                        $('#ajuste_mercancia_nro_subcuenta_inventario').val(0)
                     }
 
                 }

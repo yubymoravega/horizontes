@@ -29,16 +29,6 @@ class InformeRecepcionType extends AbstractType
                 'mapped'=>false,
                 'auto_initialize'=>true
             ])
-            ->add('nro_cuenta_inventario', ChoiceType::class, array(
-                'attr' => ['class' => 'w-100'],
-                'label'=>'Cuenta de inventario',
-                'choice_label' => 'nro_cuenta',
-            ))
-            ->add('nro_subcuenta_inventario', ChoiceType::class, array(
-                'attr' => ['class' => 'w-100'],
-                'label'=>'Subcuenta de inventario',
-                'choice_label' => 'nro_subcuenta',
-            ))
             ->add('nro_cuenta_acreedora', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label'=>'Cuenta acreedora',

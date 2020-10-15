@@ -1,7 +1,7 @@
 # Revisar siempre
 - `ParanoidEntityRepository` hacer que los EntityRepositorys hereden de esta class que implementa el modo paranoid como en Nodejs
 # TODO - Contabilidad
-### Configuración
+### ✓ Configuración
 - [x] Crear las Entidades
 - [x] CRUD por cada Entidad -- REVISION
     - [x] Config inicial 
@@ -73,3 +73,8 @@ verifica rque el producto tiene que estar asociado por cuentas(1 producto solo p
         reasignarlo ( cambia la logica de los consecutivos, en ves de contar 
         solo preguntaremos por el ultimo )
 - [x] en los doc entrada y salida - add movimiento_mercancia o producto (id_almacen)
+
+####TODO - 15/10/2020
+- (✓) Los Documentos de Entrada (Informe recepcion, Transferencias, Ajuste) asignar la cuenta y subcuenta de a
+inventario a la mercancia directamente y quitarla del tipo de documento en cuestion
+-  Ajuste Salida -> dependiendo del criterio de analisis [cc, eg] o [exp] asignarle el campo correspondiente

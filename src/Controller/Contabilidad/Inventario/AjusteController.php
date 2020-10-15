@@ -18,6 +18,8 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -99,10 +101,8 @@ class AjusteController extends AbstractController
             $tipo_documento_er = $em->getRepository(TipoDocumento::class);
             $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_AJUSTE_ENTRADA);
             /**  datos de AjusteEntradaType **/
-            $cuenta_acreedora = AuxFunctions::getNro($ajuste_entrada['nro_cuenta_acreedora']);
-            $cuenta_inventario = AuxFunctions::getNro($ajuste_entrada['nro_cuenta_inventario']);
             $observacion = $ajuste_entrada['observacion'];
-            $subcuenta_inventario = AuxFunctions::getNro($ajuste_entrada['nro_subcuenta_inventario']);
+            $cuenta_acreedora = AuxFunctions::getNro($ajuste_entrada['nro_cuenta_acreedora']);
             $subcuenta_acreedora = AuxFunctions::getNro($ajuste_entrada['nro_subcuenta_acreedora']);
 
             ////0-obtengo el numero consecutivo de documento
@@ -149,9 +149,9 @@ class AjusteController extends AbstractController
                     ->setIdDocumento($documento)
                     ->setObservacion($observacion)
                     ->setNroConcecutivo($consecutivo)
+                    ->setNroCuentaInventario('')
+                    ->setNroSubcuentaInventario('')
                     ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
-                    ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
-                    ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
                     ->setNroSubcuentaAcreedora(AuxFunctions::getNro($subcuenta_acreedora))
                     ->setActivo(true)
                     ->setEntrada(true);
@@ -175,6 +175,8 @@ class AjusteController extends AbstractController
                         $descripcion = $mercancia['descripcion'];
                         $importe_mercancia = $mercancia['importe'];
                         $unidad_medida = $mercancia['um'];
+                        $cuenta_inventario = AuxFunctions::getNro($mercancia['cuenta']);
+                        $subcuenta_inventario = AuxFunctions::getNro($mercancia['subcuenta']);
 
                         $importe_total += floatval($importe_mercancia);
 
@@ -505,7 +507,7 @@ class AjusteController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_ajuste_entrada_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
@@ -516,7 +518,7 @@ class AjusteController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $obj->um,
+                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia,2,'.',''),
                 "cantidad" => $obj->cant,
@@ -577,6 +579,7 @@ class AjusteController extends AbstractController
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
+                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() .' - '. $obj->getIdMercancia()->getNroSubcuentaInventario(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
             );
@@ -586,9 +589,7 @@ class AjusteController extends AbstractController
         $cuentaacre_obj = $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaAcreedora()]);
         $rows = array(
             'id' => $ajuste_obj->getId(),
-            'nro_cuenta_inventario' => $ajuste_obj->getNroCuentaInventario() . ' - ' . $cuentainv_obj->getNombre(),
             'nro_cuenta_acreedora' => $ajuste_obj->getNroCuentaAcreedora() . ' - ' . $cuentaacre_obj->getNombre(),
-            'nro_subcuenta_cuenta_inventario' => $ajuste_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['id_cuenta' => $cuentainv_obj, 'nro_subcuenta' => $ajuste_obj->getNroSubcuentaInventario()])->getDescripcion(),
             'nro_subcuenta_acreedora' => $ajuste_obj->getNroSubcuentanroAcreedora() . ' - ' . $subcuentas->findOneBy(['id_cuenta' => $cuentaacre_obj, 'nro_subcuenta' => $ajuste_obj->getNroSubcuentanroAcreedora()])->getDescripcion(),
             'id_moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getNombre(),

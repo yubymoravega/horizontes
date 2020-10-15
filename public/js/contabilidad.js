@@ -228,3 +228,10 @@ var contableAsyncLoads = {
         }
     }
 }
+
+const getNro = function (nro) {
+    $arr = nro.split(' - ');
+    if ($arr)
+        return $arr[0];
+    return '';
+}

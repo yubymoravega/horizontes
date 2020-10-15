@@ -73,16 +73,6 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.nro_cuenta_inventario) }}
-                        {{ form_widget(formulario.nro_cuenta_inventario) }}
-                    </div>
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block p-0">
-                        {{ form_label(formulario.nro_subcuenta_inventario) }}
-                        {{ form_widget(formulario.nro_subcuenta_inventario) }}
-                    </div>
-                </div>
-                <div class="row mt-0 p-0">
                     <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
@@ -105,7 +95,15 @@
 
                 {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
+                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.mercancia.nro_cuenta_inventario) }}
+                        {{ form_widget(formulario.mercancia.nro_cuenta_inventario) }}
+                    </div>
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.nro_subcuenta_inventario) }}
+                        {{ form_widget(formulario.mercancia.nro_subcuenta_inventario) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-1 d-block">
                         {{ form_label(formulario.mercancia.codigo) }}
                         <div class="row m-0 p-0">
                             <div class="col-8 p-0">
@@ -163,6 +161,7 @@
                         <th width="110px">Importe</th>
                         <th width="110px">Precio</th>
                         <th scope="col-1">Nueva Exist</th>
+                        <th width="90px">Cuenta/Sub.</th>
                         <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
                         <th scope="col-1" hidden>UM</th>
                         <th scope="col-1" hidden>Descripcion</th>
@@ -312,8 +311,8 @@
                     success: function (result) {
                         if (result.success) {
                             let data = result.data;
-                            const cuenta = $('#transferencia_nro_cuenta_inventario')
-                            const subcuenta = $('#transferencia_nro_subcuenta_inventario')
+                            const cuenta = $('#transferencia_mercancia_nro_cuenta_inventario')
+                            const subcuenta = $('#transferencia_mercancia_nro_subcuenta_inventario')
                             const cuenta_acreedora = $('#transferencia_nro_cuenta_acreedora')
                             const subcuenta_acreedora = $('#transferencia_nro_subcuenta_acreedora')
                             const moneda = $('#transferencia_documento_id_moneda')
@@ -342,6 +341,7 @@
                                     <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
                                     <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
                                     <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;">${mercancias[i]['cuenta_subcuenta']}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -370,8 +370,10 @@
                     success: function (result) {
                         cuentas_inventarios = result.cuentas_inventario
                         cuentas_acreedoras = result.cuentas_acreedoras
+                        $('#transferencia_mercancia_nro_subcuenta_inventario').find('option').remove()
+                        $('#transferencia_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         $(result.cuentas_inventario).each(function (pos, valor) {
-                            $('#transferencia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                            $('#transferencia_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
                         $(result.monedas).each(function (pos, valor) {
                             $('#transferencia_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
@@ -398,7 +400,7 @@
                 console.info('asasa')
                 $('#rows_table').find('tr').remove();
                 let codigo = $('#transferencia_mercancia_codigo').val()
-                let cuenta = $('#transferencia_nro_cuenta_inventario').val()
+                let cuenta = $('#transferencia_mercancia_nro_cuenta_inventario').val()
                 $.ajax({
                     url: '/contabilidad/inventario/transferencia-entrada/getMercancia/' + codigo + ',' + cuenta,
                     method: 'POST',
@@ -424,7 +426,7 @@
             $('#transferencia_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
                     let codigo = $('#transferencia_mercancia_codigo').val()
-                    let cuenta = $('#transferencia_nro_cuenta_inventario').val()
+                    let cuenta = $('#transferencia_mercancia_nro_cuenta_inventario').val()
                     if (!!cuenta && !!codigo) {
                         let nro = cuenta.split(' - ')[0];
                         loadingModal.show("cargando mercancia...")
@@ -482,12 +484,12 @@
                 $('#transferencia_mercancia_existencia').val('')
             })
 
-            $('#transferencia_nro_cuenta_inventario').on('change', function () {
-                $('#transferencia_nro_subcuenta_inventario').find('option').remove()
+            $('#transferencia_mercancia_nro_cuenta_inventario').on('change', function () {
+                $('#transferencia_mercancia_nro_subcuenta_inventario').find('option').remove()
                 cuentas_inventarios.forEach(function (valor, pos) {
-                    if ($('#transferencia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                    if ($('#transferencia_mercancia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                            $('#transferencia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            $('#transferencia_mercancia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })
@@ -523,16 +525,12 @@
                 },
                 rules: {
                     'transferencia[id_proveedor]': "required",
-                    'transferencia[nro_cuenta_inventario]': "required",
-                    'transferencia[nro_subcuenta_inventario]': "required",
                     'transferencia[nro_cuenta_acreedora]': "required",
                     'transferencia[nro_subcuenta_acreedora]': "required",
                     'transferencia[documento][id_moneda]': "required",
                 },
                 messages: {
                     'transferencia[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'transferencia[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'transferencia[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[nro_subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'transferencia[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -552,6 +550,8 @@
                     'transferencia[mercancia][id_unidad_medida]': "required",
                     'transferencia[documento][cantidad_mercancia]': "required",
                     'transferencia[documento][importe_mercancia]': "required",
+                    'transferencia[mercancia][nro_cuenta_inventario]': 'required',
+                    'transferencia[mercancia][nro_subcuenta_inventario]': 'required',
                 },
                 messages: {
                     'transferencia[mercancia][codigo]': 'Obligatorio!',
@@ -559,6 +559,8 @@
                     'transferencia[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'transferencia[documento][cantidad_mercancia]': 'Obligatorio!',
                     'transferencia[documento][importe_mercancia]': 'Obligatorio!',
+                    'transferencia[mercancia][nro_cuenta_inventario]': 'Obligatorio!',
+                    'transferencia[mercancia][nro_subcuenta_inventario]': 'Obligatorio!',
                 }
             })
 
@@ -602,12 +604,24 @@
                     let nueva_existencia = $('#transferencia_mercancia_existencia_incremento').val()
                     let um = $('#transferencia_mercancia_id_unidad_medida').val()
                     let descripcion = $('#transferencia_mercancia_descripcion').val()
+                    let cuenta = $('#transferencia_mercancia_nro_cuenta_inventario').val()
+                    let subcuenta = $('#transferencia_mercancia_nro_subcuenta_inventario').val()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
-                        list_mercancia.push({codigo, cant, importe, precio, nueva_existencia, um, descripcion})
+                        list_mercancia.push({
+                            codigo,
+                            cant,
+                            importe,
+                            precio,
+                            nueva_existencia,
+                            um,
+                            descripcion,
+                            cuenta,
+                            subcuenta
+                        })
                         importe_total += Number.parseFloat(importe)
 
                         $("#importe-total").text('$' + importe_total.toFixed(2))
@@ -617,6 +631,7 @@
                         <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
                         <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
                         <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">

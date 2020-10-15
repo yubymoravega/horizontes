@@ -21,6 +21,8 @@ use App\Form\Contabilidad\Inventario\AjusteSalidaType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\CentroCostoRepository;
 use App\Repository\Contabilidad\Config\ElementoGastoRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -460,7 +462,7 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_ajuste_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
@@ -471,7 +473,7 @@ class AjusteSalidaController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $obj->um,
+                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia,2,'.',''),
                 "cantidad" => $obj->cant,
@@ -551,5 +553,15 @@ class AjusteSalidaController extends AbstractController
             'mercancias' => $rows_movimientos
         );
         return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'ajuste de entrada cargado con éxito.']);
+    }
+
+    /**
+     * @Route("/dinamic-files/{nro}", name="contabilidad_inventario_load_salida_ajuste",methods={"GET","POST"})
+     */
+    public function dinamicFiles(EntityManagerInterface $em, $nro)
+    {
+        $no_cuenta = AuxFunctions::getNro($nro);
+        $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
+        return new JsonResponse(['data' => $respuesta, 'success' => true]);
     }
 }
