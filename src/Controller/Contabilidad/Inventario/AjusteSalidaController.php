@@ -24,7 +24,10 @@ use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -473,12 +476,12 @@ class AjusteSalidaController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
-                "existencia" => number_format($obj->nueva_existencia,2,'.',''),
+                "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
-                "precio" => number_format($obj->precio,2,'.',''),
-                "importe" => number_format($obj->importe, 2,'.','')
+                "precio" => number_format($obj->precio, 2, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
             ]);
         }
         return $this->render('contabilidad/inventario/ajuste_salida/print.html.twig', [
@@ -562,6 +565,34 @@ class AjusteSalidaController extends AbstractController
     {
         $no_cuenta = AuxFunctions::getNro($nro);
         $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
-        return new JsonResponse(['data' => $respuesta, 'success' => true]);
+
+        $news = $this->createFormBuilder()
+            ->add('id_centro_costo', EntityType::class, [
+                'class' => CentroCosto::class,
+                'choice_label' => 'nombre',
+//                'choice_label' => 'codigo',
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Centro costo',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('id_elemento_gasto', EntityType::class, [
+                'class' => ElementoGasto::class,
+                'choice_label' => 'descripcion',
+                'choice_value' => 'id',
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Elemento de gasto',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.descripcion', 'ASC');
+                }
+            ])->getForm();
+//        dd($this->render('utils/dinamic_form.html.twig', ['form' => $news->createView()]));
+//        return new JsonResponse(['data' => $respuesta, 'success' => true]);
+        return $this->render('utils/dinamic_form.html.twig', ['form' => $news->createView()]);
     }
 }

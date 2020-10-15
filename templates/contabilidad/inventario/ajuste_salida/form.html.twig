@@ -79,7 +79,7 @@
                         {{ form_widget(formulario.documento.id_moneda) }}
                     </div>
                 </div>
-
+                <div id="dinamic_form_id" class="row mt-0 p-0"></div>
                 {{ form_end(formulario.nro_cuenta_deudora) }}
 
                 <div class="d-flex align-items-center mt-3 pl-2">
@@ -502,13 +502,13 @@
                 $.ajax({
                     url: '/contabilidad/inventario/ajuste-salida/dinamic-files/'+$(this).val(),
                     method: 'POST',
-                    dataType: 'json',
                     success: function (result) {
-                        if (result.success) {
-                            console.log(result)
-                        } else {
+                        // if (result.success) {
+                            console.log(result, $(result).find('#form'))
+                            $('#dinamic_form_id').html($(result).find('#form'));
+                        /*} else {
                             alertTemplate(result.msg)
-                        }
+                        }*/
                     },
                     error: function () {
                     }
