@@ -31,16 +31,18 @@ class TipoComprobanteController extends AbstractController
         foreach ($tipos_comprobantes_yml as $tipos) {
             $td = $tipo_comprobante_er->find($tipos['id']);
             if ($td) {
-                /**@var $td TipoComprobante**/
+                /**@var $td TipoComprobante* */
                 $td
                     ->setActivo(true)
-                    ->setDescripcion($tipos['name']);
+                    ->setDescripcion($tipos['name'])
+                    ->setAbreviatura($tipos['abreviatura']);
                 $em->persist($td);
             } else {
                 $new_tipo = new TipoComprobante();
                 $new_tipo
                     ->setDescripcion($tipos['name'])
                     ->setActivo(true)
+                    ->setAbreviatura($tipos['abreviatura'])
                     ->setId($tipos['id']);
                 $em->persist($new_tipo);
             }
@@ -57,7 +59,8 @@ class TipoComprobanteController extends AbstractController
             /**@var $tipoComprobante TipoComprobante */
             $row[] = array(
                 'nombre' => $tipoComprobante->getDescripcion(),
-                'numero' => $tipoComprobante->getId()
+                'numero' => $tipoComprobante->getId(),
+                'abreviatura' => $tipoComprobante->getAbreviatura()
             );
         }
         return $this->render('contabilidad/config/tipo_comprobante/index.html.twig', [

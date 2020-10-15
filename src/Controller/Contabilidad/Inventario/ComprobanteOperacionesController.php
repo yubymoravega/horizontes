@@ -69,6 +69,8 @@ class ComprobanteOperacionesController extends AbstractController
         ));
 
         $row = [];
+        $debito = 0;
+        $credito = 0;
         /** @var Cierre $cierre */
         foreach ($obj_cierre_abierto as $cierre) {
             if (!empty($registro_operaciones)) {
@@ -80,7 +82,10 @@ class ComprobanteOperacionesController extends AbstractController
                 $fecha = $cierre->getFecha();
                 $row = array_merge($row, $this->getData($request, $em, $fecha));
             }
+            $debito += floatval($cierre->getDebito());
+            $credito += floatval($cierre->getCredito());
         }
+
         if (!empty($obj_cierre_abierto)) {
             $i = count($obj_cierre_abierto);
             $fecha_cierre = $obj_cierre_abierto[$i - 1]->getFecha();
@@ -89,7 +94,9 @@ class ComprobanteOperacionesController extends AbstractController
                 'almacen' => $nombre_almacen,
                 'unidad' => $nombre_unidad,
                 'fecha' => $fecha_cierre->format('d-m-Y'),
-                'datos' => $row
+                'datos' => $row,
+                'total_debito'=>$debito,
+                'total_credito'=>$credito
             ]);
         } else {
             return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
@@ -447,6 +454,8 @@ class ComprobanteOperacionesController extends AbstractController
         $cierre_er = $em->getRepository(Cierre::class);
         $fecha = $request->get('fecha');
         $observacion = $request->get('observacion');
+        $debito = $request->get('debito');
+        $credito = $request->get('credito');
         $usuario = $this->getUser();
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         /** @var Almacen $obj_almacen */
@@ -463,8 +472,6 @@ class ComprobanteOperacionesController extends AbstractController
             'fecha' => \DateTime::createFromFormat('d-m-Y', $fecha),
         ));
         if ($obj_cierre) {
-            $debito = $obj_cierre->getDebito();
-            $credito = $obj_cierre->getCredito();
             $arr = explode('-', $fecha);
             $anno = $arr[2];
 
@@ -503,10 +510,10 @@ class ComprobanteOperacionesController extends AbstractController
             $em->persist($new_registro);
             $em->flush();
         }
-        return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
+        return $this->render('contabilidad/inventario/comprobante_operaciones/success.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',
             'title' => '!!Exito',
-            'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' . $nro_consecutivo . '/' . $anno . ', para ver detalles consulte el registro de comprobantes .'
+            'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' .$new_registro->getIdTipoComprobante()->getAbreviatura().'-'. $nro_consecutivo .', para ver detalles consulte el registro de comprobantes .'
         ]);
     }
 }

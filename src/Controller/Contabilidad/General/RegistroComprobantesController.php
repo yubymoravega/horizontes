@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * Class RegistroComprobantesController
@@ -42,8 +41,9 @@ class RegistroComprobantesController extends AbstractController
             foreach ($comprobantes as $comp){
                 $row[] = array(
                     'id'=>$comp->getId(),
-                    'nro'=>$comp->getNroConsecutivo().'/'.$comp->getAnno(),
+                    'nro'=>$comp->getNroConsecutivo(),
                     'tipo_comprobante'=>$comp->getIdTipoComprobante()->getDescripcion(),
+                    'abreviatura_comprobante'=>$comp->getIdTipoComprobante()->getAbreviatura(),
                     'descripcion'=>$comp->getDescripcion(),
                     'fecha'=>$comp->getFecha()->format('d-m-Y'),
                     'usuario'=>$comp->getIdUsuario()->getUsername(),

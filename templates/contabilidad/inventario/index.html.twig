@@ -67,9 +67,9 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_cerrar_dia') }}">Cerrar
                             Día</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Cerrar
-                            Mes</a>
-                        <a class="dropdown-item" target="_blank" href="{{ url ('contabilidad_inventario_comprobante_operaciones') }}">Generar comprobante de operaciones</a>
+{#                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Cerrar#}
+{#                            Mes</a>#}
+                        <a class="dropdown-item" {#target="_blank"#} href="{{ url ('contabilidad_inventario_comprobante_operaciones') }}">Generar comprobante de operaciones</a>
                     </div>
                 </li>
 
@@ -81,7 +81,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_mercancia') }}">Existencia en Almacén</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_submayor_inventario_producto') }}">Submayor de inventario por producto</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_comprobante_anotaciones') }}">Comprobante de anotaciones</a>
+                        <a class="dropdown-item" target="_blank" href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print') }}">Comprobante de anotaciones</a>
                     </div>
                 </li>
             </ul>

@@ -12,7 +12,6 @@ class TipoComprobante
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -26,6 +25,11 @@ class TipoComprobante
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $abreviatura;
 
     public function getId(): ?int
     {
@@ -59,6 +63,18 @@ class TipoComprobante
     public function setId(int $id): self
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getAbreviatura(): ?string
+    {
+        return $this->abreviatura;
+    }
+
+    public function setAbreviatura(string $abreviatura): self
+    {
+        $this->abreviatura = $abreviatura;
 
         return $this;
     }

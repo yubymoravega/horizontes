@@ -11,9 +11,9 @@
 
         {# header #}
         <div class="d-flex align-items-center">
-            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Registro de comprobantes
-            </h4>
+            <h6 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Movimiento de Cuentas
+            </h6>
         </div>
         {# end header #}
 
@@ -28,15 +28,15 @@
             <th scope="col-1">Descripción</th>
             </thead>
             <tbody>
-            {% for item in registro %}
-                <tr>
-                    <td style="font-weight:400;"><a href="imprimir/{{ item.id }}" class="text-white" title="VISUALIZAR {{ item.tipo_comprobante }}">{{ item.abreviatura_comprobante }}-{{ item.nro }}</a></td>
-                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.almacen }}</td>
-                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.fecha }}</td>
-                    <td style="font-weight:400;">{{ item.usuario }}</td>
-                    <td style="font-weight:400;">{{ item.descripcion }}</td>
-                </tr>
-            {% endfor %}
+{#            {% for item in registro %}#}
+{#                <tr>#}
+{#                    <td style="font-weight:400;"><a href="imprimir/{{ item.id }}" class="text-white" title="VISUALIZAR {{ item.tipo_comprobante }}">{{ item.abreviatura_comprobante }}-{{ item.nro }}</a></td>#}
+{#                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.almacen }}</td>#}
+{#                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.fecha }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.usuario }}</td>#}
+{#                    <td style="font-weight:400;">{{ item.descripcion }}</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
             </tbody>
         </table>
         {# end list #}

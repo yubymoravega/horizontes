@@ -38,5 +38,7 @@ configuraciones:
   tipo_comprobantes:
     - id: 1
       name: "COMPROBANTE DE APERTURA"
+      abreviatura: "AP"
     - id: 2
       name: "COMPROBANTE DE OPERACIONES"
+      abreviatura: "00"

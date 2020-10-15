@@ -48,7 +48,7 @@ class EmpleadoController extends AbstractController
                 'fecha_alta' => $item->getFechaAlta()->format('d-m-Y')
             );
         }
-        $callback = 'contabilidad/capital_humano/empleado/index olddd.html.twig';
+        $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
 //
         $roles = $this->getRoles();
         return $this->render($callback, [
