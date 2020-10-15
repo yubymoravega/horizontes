@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -54,7 +55,18 @@ class MercanciaType extends AbstractType
                         ->where('u.activo = true')
                         ->orderBy('u.abreviatura', 'ASC');
                 }
-            ]);
+            ])
+            ->add('nro_cuenta_inventario', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label'=>'Cuenta de inventario',
+                'choice_label' => 'nro_cuenta',
+            ))
+            ->add('nro_subcuenta_inventario', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label'=>'Subcuenta de inventario',
+                'choice_label' => 'nro_subcuenta',
+            ))
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

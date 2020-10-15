@@ -20,9 +20,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class MercanciaController extends AbstractController
 {
     /**
-     * @Route("/", name="contabilidad_inventario_mercancia",methods={"GET"})
+     * @Route("/{nro_cuenta}", name="contabilidad_inventario_mercancia",methods={"GET", "POST"})
      */
-    public function index(Request $request)
+    public function index(Request $request, $nro_cuenta)
     {
         $em = $this->getDoctrine()->getManager();
         $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array(
@@ -50,29 +50,38 @@ class MercanciaController extends AbstractController
                         'total' => $datos['total']
                     );
             }
-            // validar solo las que tienen valor
+            // validar solo las subcuentas de la cuenta contiene mercancias
             if (!empty($row_data)) {
-                if (empty($row)) // Solo la primera cuenta
+                if (empty($row) && $nro_cuenta == 'one') // Solo la primera cuenta y si es 'one'
                     $row = [
                         'cuenta' => $nro . ' - ' . $cuenta->getNombre(),
                         'existencia' => $row_data,
                         'total' => ''
                     ];
-                $list_cuentas[] = [
-//                    'nro_cuenta' => $nro,
-//                    'cuenta' => $nro . ' - ' . $cuenta->getNombre()
-                    $nro . ' - ' . $cuenta->getNombre() => $nro
-                ];
+                if ($nro_cuenta == $nro) {
+                    $row = [
+                        'cuenta' => $nro . ' - ' . $cuenta->getNombre(),
+                        'existencia' => $row_data,
+                        'total' => ''
+                    ];
+                }
+                $list_cuentas[$nro . ' - ' . $cuenta->getNombre()] = $nro;
             }
         }
 
-        dd($list_cuentas);
-        $form = $this->createFormBuilder()->add('cuentas',
-            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-            [
-                'choices' => $list_cuentas
-            ])
+        $form = $this->createFormBuilder()
+            ->add('cuentas',
+                'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+                [
+                    'label' => 'Cuentas',
+                    'attr' => ['class' => 'w-100 pb-0'],
+                    'choices' => $list_cuentas,
+                    'data' => $nro_cuenta
+                ])
             ->getForm();
+
+        if (empty($row))// una orden inexistente por parametros
+            return $this->redirectToRoute('contabilidad_inventario_mercancia', ['nro_cuenta' => 'one']);
         return $this->render('contabilidad/inventario/mercancia/index.html.twig', [
             'controller_name' => 'MercanciaController',
             'mercancias' => $row,

@@ -497,6 +497,22 @@
                         }
                     }
                 })
+
+                // cargar dinamicamente [cc, eg] o [exp]
+                $.ajax({
+                    url: '/contabilidad/inventario/ajuste-salida/dinamic-files/'+$(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            console.log(result)
+                        } else {
+                            alertTemplate(result.msg)
+                        }
+                    },
+                    error: function () {
+                    }
+                })
             })
 
             const form_ajuste_salida = $('#ajuste_salida')

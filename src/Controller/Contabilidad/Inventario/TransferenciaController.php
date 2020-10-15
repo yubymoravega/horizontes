@@ -19,6 +19,8 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\TransferenciaType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -89,8 +91,6 @@ class TransferenciaController extends AbstractController
 
             /**  datos de TransferenciaEntradaType **/
             $cuenta_acreedora = AuxFunctions::getNro($transferencia_entrada['nro_cuenta_acreedora']);
-            $cuenta_inventario = AuxFunctions::getNro($transferencia_entrada['nro_cuenta_inventario']);
-            $subcuenta_inventario = AuxFunctions::getNro($transferencia_entrada['nro_subcuenta_inventario']);
             $subcuenta_acreedora = AuxFunctions::getNro($transferencia_entrada['nro_subcuenta_acreedora']);
             $id_unidad_origen = isset($transferencia_entrada['id_unidad']) ? $transferencia_entrada['id_unidad'] : '';
             $id_almacen_origen = isset($transferencia_entrada['id_almacen']) ? $transferencia_entrada['id_almacen'] : '';
@@ -139,8 +139,8 @@ class TransferenciaController extends AbstractController
                     ->setIdDocumento($documento)
                     ->setNroConcecutivo($consecutivo)
                     ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
-                    ->setNroCuentaInventario(AuxFunctions::getNro($cuenta_inventario))
-                    ->setNroSubcuentaInventario(AuxFunctions::getNro($subcuenta_inventario))
+                    ->setNroCuentaInventario(AuxFunctions::getNro(''))
+                    ->setNroSubcuentaInventario(AuxFunctions::getNro(''))
                     ->setNroSubcuentaAcreedora(AuxFunctions::getNro($subcuenta_acreedora))
                     ->setIdUnidad($id_unidad_origen != '' ? $em->getRepository(Unidad::class)->find($id_unidad_origen) : null)
                     ->setIdAlmacen($id_almacen_origen != '' ? $em->getRepository(Almacen::class)->find($id_almacen_origen) : null)
@@ -165,6 +165,8 @@ class TransferenciaController extends AbstractController
                         $descripcion = $mercancia['descripcion'];
                         $importe_mercancia = $mercancia['importe'];
                         $unidad_medida = $mercancia['um'];
+                        $cuenta_inventario = AuxFunctions::getNro($mercancia['cuenta']);
+                        $subcuenta_inventario = AuxFunctions::getNro($mercancia['subcuenta']);
 
                         $importe_total += floatval($importe_mercancia);
 
@@ -536,7 +538,7 @@ class TransferenciaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_transferencia_entrada_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
@@ -547,7 +549,7 @@ class TransferenciaController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $obj->um,
+                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
@@ -609,6 +611,7 @@ class TransferenciaController extends AbstractController
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
+                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() .' - '. $obj->getIdMercancia()->getNroSubcuentaInventario(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
@@ -618,9 +621,7 @@ class TransferenciaController extends AbstractController
 
         $rows = array(
             'id' => $transferencia_obj->getId(),
-            'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaInventario()])->getNombre(),
             'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaAcreedora()])->getNombre(),
-            'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
             'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaAcreedora()])->getDescripcion(),
             'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '',
             'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '',

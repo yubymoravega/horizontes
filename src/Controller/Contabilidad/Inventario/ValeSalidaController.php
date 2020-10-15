@@ -19,6 +19,8 @@ use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\ValeSalidaType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -546,7 +548,7 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_vale_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
@@ -558,7 +560,7 @@ class ValeSalidaController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $obj->um,
+                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,

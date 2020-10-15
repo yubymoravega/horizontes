@@ -545,7 +545,28 @@ class AuxFunctions
                 /**existe un cierre abierto, rretorno su fecha*/
                 return $obj_cierre_abierto->getFecha()->format('Y-m-d');
             else
-                    return false;
+                return false;
         }
+    }
+
+    /**
+     * Leo -
+     */
+    public static function getCriterioByCuenta($nro_cuenta, EntityManagerInterface $em): array
+    {
+        $cuenta_obj = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => $nro_cuenta]);
+        $cuenta_criterio_analisis = $em->getRepository(CuentaCriterioAnalisis::class)->findBy(['id_cuenta' => $cuenta_obj]);
+        $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+
+        $arr_criterios = [];
+
+        foreach ($cuenta_criterio_analisis as $obj) {
+            $criterio_obj = $criterio_analisis_er->findOneBy(['id' => $obj->getIdCriterioAnalisis()]);
+            $arr_criterios [] = [
+                $criterio_obj->getAbreviatura()
+            ];
+        }
+
+        return $arr_criterios;
     }
 }

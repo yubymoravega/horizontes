@@ -10,13 +10,15 @@
     <div class="container-fluid">
 
         {# header #}
-        <div class="d-flex align-items-center">
+        <div class="d-flex justify-content-between align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Listado de existencia en almacén
             </h4>
-            <select name="" id="">
-
-            </select>
+            <div style="width: 350px" class="mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block p-0">
+                {{ form_start(form, {'method':'post', 'attr': {'id': 'mercancia_formulario_id'}}) }}
+                {{ form_widget(form.cuentas) }}
+                {{ form_end(form) }}
+            </div>
         </div>
         {# end header #}
 
@@ -55,4 +57,17 @@
         </table>
         {# end list #}
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#form_cuentas').on('change', function (event) {
+                loadingModal.show()
+                const cuenta = $(this).val()
+                $('#mercancia_formulario_id').attr('action', `/contabilidad/inventario/existencia-almacen/${cuenta}`)
+                $('#mercancia_formulario_id').submit()
+            })
+        })
+    </script>
 {% endblock %}

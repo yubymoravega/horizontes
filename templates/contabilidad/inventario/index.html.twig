@@ -79,7 +79,7 @@
                         Informes
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_mercancia') }}">Existencia en Almacén</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_mercancia',{nro_cuenta:'one'}) }}">Existencia en Almacén</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_submayor_inventario_producto') }}">Submayor de inventario por producto</a>
                         <a class="dropdown-item" target="_blank" href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print') }}">Comprobante de anotaciones</a>
                     </div>

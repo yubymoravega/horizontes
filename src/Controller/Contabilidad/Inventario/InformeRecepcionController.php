@@ -26,6 +26,8 @@ use App\Entity\Contabilidad\Inventario\SubcuentaProveedor;
 use App\Form\Contabilidad\Inventario\InformeRecepcionType;
 use App\Form\Contabilidad\Inventario\InformeRecepcionTypeOriginal;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -134,10 +136,8 @@ class InformeRecepcionController extends AbstractController
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
                 $obj_tipo_documento = $tipo_documento_er->find(1);
                 /**  datos de InformeRecepcionType **/
-                $cuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_cuenta_acreedora']);
-                $cuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_cuenta_inventario']);
                 $proveedor = $informe_recepcion['cod_proveedor'];
-                $subcuenta_inventario = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_inventario']);
+                $cuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_cuenta_acreedora']);
                 $subcuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_acreedora']);
                 $fecha_factura = $informe_recepcion['fecha_factura'];
                 $codigo_factura = $informe_recepcion['codigo_factura'];
@@ -222,8 +222,8 @@ class InformeRecepcionController extends AbstractController
                         ->setIdProveedor($proveedor_obj)
                         ->setNroConcecutivo($consecutivo)
                         ->setNroCuentaAcreedora($cuenta_acreedora)
-                        ->setNroCuentaInventario($cuenta_inventario)
-                        ->setNroSubcuentaInventario($subcuenta_inventario)
+                        ->setNroCuentaInventario('')
+                        ->setNroSubcuentaInventario('')
                         ->setActivo(true)
                         ->setProduco(false)
                         ->setNroSubcuentaAcreedora($subcuenta_acreedora);
@@ -245,6 +245,9 @@ class InformeRecepcionController extends AbstractController
                             $cantidad_mercancia = $mercancia['cant'];
                             $descripcion = $mercancia['descripcion'];
                             $importe_mercancia = $mercancia['importe'];
+                            $unidad_medida = $mercancia['um'];
+                            $cuenta_inventario = AuxFunctions::getNro($mercancia['cuenta']);
+                            $subcuenta_inventario = AuxFunctions::getNro($mercancia['subcuenta']);
                             $unidad_medida = $mercancia['um'];
 
                             $importe_total += floatval($importe_mercancia);
@@ -576,7 +579,7 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_informe_recepcion_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository)
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
@@ -587,7 +590,7 @@ class InformeRecepcionController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $obj->um,
+                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
@@ -655,6 +658,7 @@ class InformeRecepcionController extends AbstractController
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
+                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() .' - '. $obj->getIdMercancia()->getNroSubcuentaInventario(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
             );
@@ -663,9 +667,7 @@ class InformeRecepcionController extends AbstractController
 
         $rows = array(
             'id' => $informe_obj->getId(),
-            'nro_cuenta_inventario' => $informe_obj->getNroCuentaInventario() . ' - ' . $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaInventario())->getNombre(),
             'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora() . ' - ' . $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaAcreedora())->getNombre(),
-            'nro_subcuenta_inventario' => $informe_obj->getNroSubcuentaInventario() . ' - ' . $this->getSubcuenta($subcuenta_er, $informe_obj->getNroSubcuentaInventario(), $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaInventario()))->getDescripcion(),
             'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora() . ' - ' . $this->getSubcuenta($subcuenta_er, $informe_obj->getNroSubcuentaAcreedora(), $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaAcreedora()))->getDescripcion(),
             'cod_proveedor' => $informe_obj->getIdProveedor()->getCodigo(),
             'nombre_proveedor' => $informe_obj->getIdProveedor()->getNombre(),
