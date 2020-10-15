@@ -315,8 +315,8 @@ class AjusteController extends AbstractController
     public function getCuentas()
     {
         $em = $this->getDoctrine()->getManager();
-        $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM','EXP']);
 
         $monedas = $em->getRepository(Moneda::class)->findAll();
         $rows = [];

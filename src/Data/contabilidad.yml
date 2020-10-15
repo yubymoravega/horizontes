@@ -37,6 +37,6 @@ configuraciones:
 
   tipo_comprobantes:
     - id: 1
-      name: "COMPROBANTE DE ANOTACIONES"
+      name: "COMPROBANTE DE APERTURA"
     - id: 2
       name: "COMPROBANTE DE OPERACIONES"
