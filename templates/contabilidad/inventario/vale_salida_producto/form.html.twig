@@ -287,7 +287,7 @@
                 }
             })
             /** FIN BLOQUE JQuery DEL SELECTOR DE NUMEROS CONSECUTIVOS DEL DOCUMENTO**/
-
+            let importe_real = 0; // guardar el importe de la mercancia selecionada
             /*** BLOQUE DE JQuery DE MERCANCIA ***/
             $('#vale_salida_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
@@ -301,6 +301,7 @@
                             success: function (result) {
                                 productos = result.productos
                                 if (productos.length > 0) {
+                                    importe_real = mercancias[0]['importe']
                                     $('#vale_salida_mercancia_descripcion').val(productos[0]['descripcion'])
                                     $('#vale_salida_mercancia_existencia').val(productos[0]['existencia'])
                                     $('#vale_salida_mercancia_precio').val(parseFloat(productos[0]['precio_compra']).toFixed(5))
@@ -315,6 +316,7 @@
                                 loadingModal.close()
                             },
                             error: function () {
+                                importe_real = 0;
                                 importe_total = 0
                                 resetFormMercancia()
                             }
@@ -358,7 +360,7 @@
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
                         let importe = parseFloat(precio * cantidad).toFixed(2)
-                        let resto = parseFloat(importe_total - importe).toFixed(2)
+                        let resto = parseFloat(importe_real - importe).toFixed(2)
                         $('#vale_salida_documento_importe_mercancia').val(importe)
                         $('#resto_importe').val(resto)
                         let existencia_inicial = (parseFloat($('#vale_salida_mercancia_existencia').val()) > 0 || $('#vale_salida_mercancia_existencia').val() != '') ? parseFloat($('#vale_salida_mercancia_existencia').val()) : 0
