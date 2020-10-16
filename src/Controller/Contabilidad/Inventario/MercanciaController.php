@@ -43,6 +43,7 @@ class MercanciaController extends AbstractController
             foreach ($arr_subcuentas as $subcuenta) {
                 $nro_subcuenta = $subcuenta->getNroSubcuenta();
                 $datos = $this->getDatosPorSubCuenta($em, $nro_subcuenta, $nro, $id_almacen);
+
                 if (!empty($datos['data']))
                     $row_data[] = array(
                         'cuenta' => $nro_subcuenta . ' - ' . $subcuenta->getDescripcion(),
@@ -50,6 +51,7 @@ class MercanciaController extends AbstractController
                         'total' => $datos['total']
                     );
             }
+
             // validar solo las subcuentas de la cuenta contiene mercancias
             if (!empty($row_data)) {
                 if (empty($row) && $nro_cuenta == 'one') // Solo la primera cuenta y si es 'one'
@@ -80,7 +82,7 @@ class MercanciaController extends AbstractController
                 ])
             ->getForm();
 
-        if (empty($row))// una orden inexistente por parametros
+        if (empty($row) && $nro_cuenta != 'one')// una orden inexistente por parametros y no sea one
             return $this->redirectToRoute('contabilidad_inventario_mercancia', ['nro_cuenta' => 'one']);
         return $this->render('contabilidad/inventario/mercancia/index.html.twig', [
             'controller_name' => 'MercanciaController',
@@ -121,14 +123,6 @@ class MercanciaController extends AbstractController
                 );
                 $total += floatval($mercancia_obj->getImporte());
             }
-            $row_mercancia[] = array(
-                'codigo' => '',
-                'descripcion' => 'TOTAL',
-                'unidad_medida' => '',
-                'existencia' => '',
-                'precio' => '',
-                'importe' => number_format($total, 2)
-            );
 //            $total += floatval($mercancia_obj->getImporte());
         }
         if (!empty($producto_arr)) {
@@ -144,15 +138,19 @@ class MercanciaController extends AbstractController
                 );
                 $total += floatval($producto_obj->getImporte());
             }
-            $row_producto[] = array(
-                'codigo' => '',
-                'descripcion' => 'TOTAL',
+        }
+
+        $data = array_merge($row_mercancia, $row_producto);
+        if ($row_mercancia || $row_producto) {
+            $data[] = array(
+                'codigo' => 'TOTAL',
+                'descripcion' => '',
                 'unidad_medida' => '',
                 'existencia' => '',
                 'precio' => '',
                 'importe' => number_format($total, 2)
             );
         }
-        return ['data' => array_merge($row_mercancia, $row_producto), 'total' => ''];
+        return ['data' => $data, 'total' => ''];
     }
 }

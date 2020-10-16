@@ -77,4 +77,9 @@ verifica rque el producto tiene que estar asociado por cuentas(1 producto solo p
 ####TODO - 15/10/2020
 - (✓) Los Documentos de Entrada (Informe recepcion, Transferencias, Ajuste) asignar la cuenta y subcuenta de a
 inventario a la mercancia directamente y quitarla del tipo de documento en cuestion
--  Ajuste Salida -> dependiendo del criterio de analisis [cc, eg] o [exp] asignarle el campo correspondiente
+- (✓) Ajuste Salida -> dependiendo del criterio de analisis [cc, eg] o [exp] asignarle el campo correspondiente
+    - cargar [cc, eg] o [exp] cuando se seleccione un numero de cuenta y cargar la descripcion de
+    los expedientes cuando se de enter en el codigo
+- revisar el tema de la creacion y carga de los nro_consecutivos por(almacen, año, tex.) --
+en la casa el Ajuste entrada carga
+incorectamente un nro_consecutivo por algun motivo desconocido 

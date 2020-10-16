@@ -79,7 +79,27 @@
                         {{ form_widget(formulario.documento.id_moneda) }}
                     </div>
                 </div>
-                <div id="dinamic_form_id" class="row mt-0 p-0"></div>
+                <div id="eg_cc_row" class="row mt-0 p-0">
+                    <div class="col-6 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
+                        {{ form_label(formulario.id_elemento_gasto) }}
+                        {{ form_widget(formulario.id_elemento_gasto) }}
+                    </div>
+                    <div class="col-6 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.id_centro_costo) }}
+                        {{ form_widget(formulario.id_centro_costo) }}
+                    </div>
+                </div>
+                <div id="expediente_row" class="row mt-0 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
+                        {{ form_label(formulario.codigo_exp) }}
+                        {{ form_widget(formulario.codigo_exp) }}
+                    </div>
+                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.descripcion_exp) }}
+                        {{ form_widget(formulario.descripcion_exp) }}
+                    </div>
+                </div>
+                {#                <div id="dinamic_form_id" class="row mt-0 p-0"></div>#}
                 {{ form_end(formulario.nro_cuenta_deudora) }}
 
                 <div class="d-flex align-items-center mt-3 pl-2">
@@ -190,14 +210,12 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $('#ajuste_salida_id_centro_costo').hide()
-        $('#ajuste_salida_id_elemento_gasto').hide()
+        $('#eg_cc_row').hide()
+        $('#expediente_row').hide()
 
         function Print_Ajuste() {
             if ($('#select_nros').val() == consecutivo) {
-                if(list_mercancia.length > 0) {
-
-
+                if (list_mercancia.length > 0) {
                     const obsercacion = $("#ajuste_salida_observacion").val()
                     const mercancia_json = JSON.stringify(list_mercancia)
                     $('body').append(`
@@ -212,7 +230,7 @@
                     const fomrulario = $('#form_print_current')
                     fomrulario.submit()
                     fomrulario.remove()
-                }else
+                } else
                     alertTemplate('No excisten mercancias para imprimir', 'danger')
 
             } else {
@@ -255,6 +273,8 @@
                 }
             })
 
+            $('#ajuste_salida_id_elemento_gasto, #ajuste_salida_id_centro_costo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
             $('#select_nros').on('change', function () {
                 if ($('#select_nros').val() == consecutivo) {
@@ -266,9 +286,13 @@
             $('#select_nros').on('keyup', function (event) {
                 if (event.which == 13) {
                     $('#ajuste_salida').resetForm()
+                    $('#ajuste_salida_observacion').text('')
                     $('#form_mercancia').resetForm()
                     $("#importe-total").text('$ 0.00')
                     $('#rows_mercancias').find('tr').remove()
+
+                    $('#expediente_row').hide()
+                    $('#eg_cc_row').hide()
 
                     if ($('#select_nros').val() == consecutivo) {// si es el consecutivo
                         $('#btnSubbmitAjuste').show()
@@ -279,7 +303,7 @@
                         $('#btnSubbmitAjuste').hide()
                         $('#btnImprimir').hide()
                         $('#btnCancelar').hide()
-                        $('#ajuste_salida select').find('option').remove()
+                        //$('#ajuste_salida select').find('option').remove()
                         alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
                     } else if ($('#select_nros').val() == '') {// si no hay numero
                         $('#btnSubbmitAjuste').hide()
@@ -309,12 +333,24 @@
                             const subcuenta_acreedora = $('#ajuste_salida_nro_subcuenta_deudora')
                             const moneda = $('#ajuste_salida_documento_id_moneda')
                             $('#ajuste_salida_observacion').text(data.observaciones)
-
+                            cl(data)
                             // datos del Formulario
-                            $('#ajuste_salida select').find('option').remove()
+                            $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora', '#ajuste_salida_documento_id_moneda').find('option').remove()
                             cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_deudora} </option>`);
                             subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_deudora} </option>`);
                             moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
+
+                            // CC EG EXP
+                            if (data.centro_costo && data.elemento_gasto) {
+                                $('#eg_cc_row').show()
+                                $('#ajuste_salida_id_elemento_gasto').val(data.elemento_gasto.id)
+                                $('#ajuste_salida_id_centro_costo').val(data.centro_costo.id)
+                            }
+                            if (data.expediente) {
+                                $('#expediente_row').show()
+                                $('#ajuste_salida_codigo_exp').val(data.expediente.codigo)
+                                $('#ajuste_salida_descripcion_exp').val(data.expediente.descripcion)
+                            }
 
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
@@ -343,10 +379,39 @@
                 })
             }
 
+            $('#ajuste_salida_codigo_exp').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo = $('#ajuste_salida_codigo_exp').val()
+                    if (!!codigo) {
+                        loadingModal.show("cargando expediente...")
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-salida/get-expediente/' + codigo,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                if (result.success) {
+                                    const expediente = result.data
+                                    $('#ajuste_salida_descripcion_exp').val(expediente)
+
+                                } else {
+                                    alertTemplate('No existen expediente con ese código')
+                                    $('#ajuste_salida_descripcion_exp').val('')
+                                }
+                                loadingModal.close()
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El campo código no deben estar vacio.', 'danger')
+                    }
+                }
+            })
+
             const loadingData = function () {
                 loadingModal.show()
-                $('#ajuste_salida select').find('option').remove()
-                $('#ajuste_salida select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora, #ajuste_salida_documento_id_moneda').find('option').remove()
+                $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora, #ajuste_salida_documento_id_moneda').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
 
                 $('#form_mercancia').css('display', 'block')
 
@@ -372,28 +437,44 @@
 
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
-                let codigo = $('#ajuste_mercancia_codigo').val() != '' ? $('#ajuste_mercancia_codigo').val() : -1
-                let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val() != '' ? $('#ajuste_salida_nro_cuenta_deudora').val() : ''
-                $.ajax({
-                    url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + cuenta,
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        mercancias = result.mercancias
-                        $(result.mercancias).each(function (pos, valor) {
-                            $('#rows_table').append('<tr>' +
-                                '<td style="font-weight:400;"> ' +
-                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                                '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
-                            );
-                        })
-                    },
-                    error: function () {
-                    }
-                })
+                let codigo = $('#ajuste_salida_mercancia_codigo').val()
+                let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val()
+                if (!!cuent) {
+                    let nro = cuenta.split(' - ')[0];
+                    loadingModal.show("cargando mercancia...")
+                    $.ajax({
+                        url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + nro,
+                        method: 'POST',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            $(result.mercancias).each(function (pos, valor) {
+                                $('#rows_table').append('<tr>' +
+                                    '<td style="font-weight:400;"> ' +
+                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                    '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
+                                );
+                            })
+                        },
+                        error: function () {
+                            $('#ajuste_salida_mercancia_descripcion').val('')
+                            $('#ajuste_salida_mercancia_existencia').val('')
+                            $('#ajuste_salida_mercancia_precio').val('')
+                            $('#true_precio_mercancia').val('')
+                            $('#ajuste_salida_mercancia_id_unidad_medida').val('')
+                            $('#ajuste_salida_documento_importe_mercancia').val('')
+                            $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                            $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                            $('#resto_importe').val('')
+                            importe_real = 0
+                        }
+                    })
+                } else {
+                    alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                }
             })
             let importe_real = 0
             $('#ajuste_salida_mercancia_codigo').on('keyup', function (e) {
@@ -497,18 +578,23 @@
                         }
                     }
                 })
-
+                loadingModal.show('Cargando otros campos...')
                 // cargar dinamicamente [cc, eg] o [exp]
                 $.ajax({
-                    url: '/contabilidad/inventario/ajuste-salida/dinamic-files/'+$(this).val(),
+                    url: '/contabilidad/inventario/ajuste-salida/dinamic-files/' + $(this).val(),
                     method: 'POST',
                     success: function (result) {
-                        // if (result.success) {
-                            console.log(result, $(result).find('#form'))
-                            $('#dinamic_form_id').html($(result).find('#form'));
-                        /*} else {
+                        if (result.success) {
+                            $('#eg_cc_row').hide()
+                            $('#expediente_row').hide()
+                            result.data.forEach(data => {
+                                if (data == 'CC' || data == 'EG') $('#eg_cc_row').show()
+                                if (data == 'EXP') $('#expediente_row').show()
+                            })
+                        } else {
                             alertTemplate(result.msg)
-                        }*/
+                        }
+                        loadingModal.close()
                     },
                     error: function () {
                     }
@@ -528,12 +614,22 @@
                     'ajuste_salida[nro_cuenta_deudora]': "required",
                     'ajuste_salida[nro_subcuenta_deudora]': "required",
                     'ajuste_salida[documento][id_moneda]': "required",
+
+                    'ajuste_salida[id_elemento_gasto]': "required",
+                    'ajuste_salida[id_centro_costo]': "required",
+                    'ajuste_salida[codigo_exp]': "required",
+                    'ajuste_salida[descripcion_exp]': "required",
                 },
                 messages: {
                     'ajuste_salida[observacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste_salida[nro_cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste_salida[nro_subcuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste_salida[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+
+                    'ajuste_salida[id_elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[id_centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[codigo_exp]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[descripcion_exp]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
