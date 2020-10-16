@@ -15,6 +15,7 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteSalidaType;
@@ -23,8 +24,10 @@ use App\Repository\Contabilidad\Config\CentroCostoRepository;
 use App\Repository\Contabilidad\Config\ElementoGastoRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Config\UnidadRepository;
+use App\Repository\Contabilidad\Inventario\ExpedienteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -68,7 +71,10 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_ajuste_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarAjuste(EntityManagerInterface $em, Request $request)
+    public function gestionarAjuste(EntityManagerInterface $em, Request $request,
+                                    ElementoGastoRepository $elementoGastoRepository,
+                                    CentroCostoRepository $centroCostoRepository,
+                                    ExpedienteRepository $expedienteRepository)
     {
         $form = $this->createForm(AjusteSalidaType::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');//aqui es donde cojo la variable global que contiene el almacen seleccionado
@@ -83,6 +89,14 @@ class AjusteSalidaController extends AbstractController
             /**  datos de AjusteEntradaType **/
             $cuenta_inventario = AuxFunctions::getNro($ajuste_salida['nro_cuenta_deudora']);
             $subcuenta_inventario = AuxFunctions::getNro($ajuste_salida['nro_subcuenta_deudora']);
+            $centro_costo = array_key_exists('id_centro_costo', $ajuste_salida)
+                ? $centroCostoRepository->find($ajuste_salida['id_centro_costo'])
+                : null;
+            $elemento_gasto = array_key_exists('id_elemento_gasto', $ajuste_salida)
+                ? $elementoGastoRepository->find($ajuste_salida['id_elemento_gasto'])
+                : null;
+            $codigo_exp = array_key_exists('codigo_exp', $ajuste_salida) ? $ajuste_salida['codigo_exp'] : null;
+            $descripcion_exp = array_key_exists('descripcion_exp', $ajuste_salida) ? $ajuste_salida['descripcion_exp'] : null;
             $observacion = $ajuste_salida['observacion'];
 
             ////0-obtengo el numero consecutivo de documento
@@ -159,22 +173,39 @@ class AjusteSalidaController extends AbstractController
                             'codigo' => $mercancia['codigo'],
                             'id_amlacen' => $id_almacen,
                         ));
-//                        dd($mercancia);
+                        $alamcen = $em->getRepository(Almacen::class)->find($id_almacen);
+
                         //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
                         $movimiento_mercancia = new MovimientoMercancia();
                         $movimiento_mercancia
                             ->setActivo(true)
                             ->setImporte(floatval($importe_mercancia))
                             ->setEntrada(false)
-                            ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
+                            ->setIdAlmacen($alamcen)
                             ->setCantidad($cantidad_mercancia)
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
-//                            ->setIdCentroCosto($repo_centro_costo->find($mercancia['centro_costo']))
-//                            ->setIdElementoGasto($repo_elemeto_gasto->find($mercancia['elemento_gasto']))
+                            ->setIdCentroCosto($centro_costo)
+                            ->setIdElementoGasto($elemento_gasto)
+//                            ->setIdExpediente($expedienteRepository->find())
                             ->setIdUsuario($this->getUser());
 
+
+                        // Verificar el criterio de analisis de EXP esta en esta cuenta
+                        if ($codigo_exp != null) {
+                            // Verificar si existe el Expediente sino hacerlo nuevo
+                            $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo_exp]);
+                            if (!$expediente) {
+                                $expediente = new Expediente();
+                                $expediente->setCodigo($codigo_exp)
+                                    ->setDescripcion($descripcion_exp)
+                                    ->setIdUnidad($alamcen->getIdUnidad())
+                                    ->setActivo(true);
+                                $em->persist($expediente);
+                            }
+                            $movimiento_mercancia->setIdExpediente($expediente);
+                        }
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
 
                         /**@var $obj_mercancia Mercancia* */
@@ -528,20 +559,29 @@ class AjusteSalidaController extends AbstractController
             'id_documento' => $ajuste_obj->getIdDocumento()
         ));
 
+        $centro_costo = null;
+        $elemento_gasto = null;
+        $expediente = null;
+
         foreach ($arr_movimiento_mercancia as $obj) {
             /**@var $obj MovimientoMercancia* */
             $rows_movimientos[] = array(
                 'id' => $obj->getIdMercancia()->getId(),
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
-//                'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
-//                'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
             );
             $importe_total += $obj->getImporte();
+
+            // verigficar el EG CC o EXP
+            if (!$elemento_gasto && !$centro_costo) {
+                $elemento_gasto = $obj->getIdElementoGasto();
+                $centro_costo = $obj->getIdCentroCosto();
+            }
+            if (!$expediente) $expediente = $obj->getIdExpediente();
         }
 
         $cuenta_obj = $cuentas->findOneBy(['nro_cuenta' => $ajuste_obj->getNroCuentaInventario()]);
@@ -553,46 +593,63 @@ class AjusteSalidaController extends AbstractController
             'moneda' => $ajuste_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,
             'observaciones' => $ajuste_obj->getObservacion(),
-            'mercancias' => $rows_movimientos
+            'mercancias' => $rows_movimientos,
+            'elemento_gasto' => $elemento_gasto
+                ? ['id' => $elemento_gasto->getId(), 'descripcion' => $elemento_gasto->getDescripcion()] : null,
+            'centro_costo' => $centro_costo
+                ? ['id' => $centro_costo->getId(), 'nombre' => $centro_costo->getNombre()] : null,
+            'expediente' => $expediente ? ['codigo' => $expediente->getCodigo(), 'descripcion' => $expediente->getDescripcion()] : null,
         );
         return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'ajuste de entrada cargado con éxito.']);
     }
 
     /**
-     * @Route("/dinamic-files/{nro}", name="contabilidad_inventario_load_salida_ajuste",methods={"GET","POST"})
+     * @Route("/dinamic-files/{nro}", name="contabilidad_inventario_dinamic_files_ajuste",methods={"GET","POST"})
      */
     public function dinamicFiles(EntityManagerInterface $em, $nro)
     {
         $no_cuenta = AuxFunctions::getNro($nro);
         $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
 
-        $news = $this->createFormBuilder()
-            ->add('id_centro_costo', EntityType::class, [
-                'class' => CentroCosto::class,
-                'choice_label' => 'nombre',
-//                'choice_label' => 'codigo',
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Centro costo',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
-            ])
-            ->add('id_elemento_gasto', EntityType::class, [
-                'class' => ElementoGasto::class,
-                'choice_label' => 'descripcion',
-                'choice_value' => 'id',
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Elemento de gasto',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.descripcion', 'ASC');
-                }
-            ])->getForm();
-//        dd($this->render('utils/dinamic_form.html.twig', ['form' => $news->createView()]));
-//        return new JsonResponse(['data' => $respuesta, 'success' => true]);
-        return $this->render('utils/dinamic_form.html.twig', ['form' => $news->createView()]);
+        return new JsonResponse(['data' => $respuesta, 'success' => true]);
+
+        /*
+                $news = $this->createFormBuilder()
+                    ->add('id_centro_costo', EntityType::class, [
+                        'class' => CentroCosto::class,
+                        'choice_label' => 'nombre',
+                        'attr' => ['class' => 'col-2 mt-0 form-group input-group input-group-sm d-block'],
+                        'label' => 'Centro costo',
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('u')
+                                ->where('u.activo = true')
+                                ->orderBy('u.nombre', 'ASC');
+                        }
+                    ])
+                    ->add('id_elemento_gasto', EntityType::class, [
+                        'class' => ElementoGasto::class,
+                        'choice_label' => 'descripcion',
+                        'choice_value' => 'id',
+                        'attr' => ['class' => 'w-100'],
+                        'label' => 'Elemento de gasto',
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('u')
+                                ->where('u.activo = true')
+                                ->orderBy('u.descripcion', 'ASC');
+                        }
+                    ])->getForm();*/
+//        return $this->render('utils/dinamic_form.html.twig', ['form' => $news->createView()]);
+    }
+
+    /**
+     * @Route("/get-expediente/{codigo}")
+     */
+    public function getExpediente($codigo, ExpedienteRepository $expedienteRepository)
+    {
+        $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo]);
+        if ($expediente) {
+            return new JsonResponse(['data' => $expediente->getDescripcion(), 'success' => true]);
+        }
+        return new JsonResponse(['data' => null, 'success' => false]);
     }
 }

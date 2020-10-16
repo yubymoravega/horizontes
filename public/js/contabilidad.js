@@ -1,4 +1,8 @@
 // conseloe.log() function
+/**
+ * Avreviatura de console.log()
+ * @type {(message?: any, ...optionalParams: any[]) => void}
+ */
 var cl = console.log
 
 $(document).ready(function () {

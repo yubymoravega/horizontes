@@ -30,8 +30,14 @@ class Expediente
 
     /**
      * @ORM\OneToOne(targetEntity=Unidad::class, cascade={"persist", "remove"})
+     *  @ORM\JoinColumn(nullable=true)
      */
     private $id_unidad;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activo;
 
 
     public function getId(): ?int
@@ -71,6 +77,18 @@ class Expediente
     public function setIdUnidad(?Unidad $id_unidad): self
     {
         $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(bool $activo): self
+    {
+        $this->activo = $activo;
 
         return $this;
     }

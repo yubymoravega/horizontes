@@ -91,7 +91,8 @@ class MovimientoMercancia
     private $id_almacen;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Expediente::class, nullable="true")
+     * @ORM\ManyToOne(targetEntity=Expediente::class)
+     *  @ORM\JoinColumn(nullable=true)
      */
     private $id_expediente;
 
