@@ -90,10 +90,6 @@ class MovimientoMercancia
      */
     private $id_almacen;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Expediente::class, nullable="true")
-     */
-    private $id_expediente;
 
     public function getId(): ?int
     {
@@ -252,18 +248,6 @@ class MovimientoMercancia
     public function setIdAlmacen(?Almacen $id_almacen): self
     {
         $this->id_almacen = $id_almacen;
-
-        return $this;
-    }
-
-    public function getIdExpediente(): ?Expediente
-    {
-        return $this->id_expediente;
-    }
-
-    public function setIdExpediente(?Expediente $id_expediente): self
-    {
-        $this->id_expediente = $id_expediente;
 
         return $this;
     }

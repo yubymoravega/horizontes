@@ -33,12 +33,13 @@ class ComprobanteAnotacionesController extends AbstractController
     {
 
         return $this->render('contabilidad/inventario/comprobante_anotaciones/index.html.twig', [
-            'datos' => $this->getData($request,$em),
+            'datos' => $this->getData($request, $em),
             'controller_name' => 'ComprobanteAnotacionesController',
         ]);
     }
 
-    public function getData($request, $em){
+    public function getData($request, $em)
+    {
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $documento_er = $em->getRepository(Documento::class);
@@ -51,7 +52,8 @@ class ComprobanteAnotacionesController extends AbstractController
             'activo' => true
         ));
         foreach ($arr_obj_documentos as $obj_documento) {
-            /**@var $obj_documento Documento**/
+            $cod_almacen = $obj_documento->getIdAlmacen()->getCodigo();
+            /**@var $obj_documento Documento* */
             $id_tipo_documento = $obj_documento->getIdTipoDocumento()->getId();
             if ($id_tipo_documento == 1) {
                 //informe recepcion mercancia
@@ -61,12 +63,9 @@ class ComprobanteAnotacionesController extends AbstractController
                 ));
                 /**@var $obj_informe InformeRecepcion* */
                 $nro_doc = 'IRM' . '-' . $obj_informe->getNroConcecutivo();
-                $nro_cuenta_deudora = $obj_informe->getNroCuentaInventario();
-                $nro_subcuenta_deudora = $obj_informe->getNroSubcuentaInventario();
                 $nro_cuenta_acreedora = $obj_informe->getNroCuentaAcreedora();
                 $nro_subcuenta_acreedora = $obj_informe->getNroSubcuentaAcreedora();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-                $cod_almacen = $obj_documento->getIdAlmacen()->getCodigo();
                 $cod_proveedor = $obj_informe->getIdProveedor()->getCodigo();
                 $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
                     'id_documento' => $obj_documento,
@@ -74,20 +73,49 @@ class ComprobanteAnotacionesController extends AbstractController
                 ));
                 $total = 0;
                 //totalizar importe
+                $cuentas_ir = [];
                 foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
-                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
                     $total += floatval($obj_movimiento_mercancia->getImporte());
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+                    $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                    if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                        $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+                    }
                 }
-                $rows[] = array(
-                    'nro_doc' => $nro_doc,
-                    'fecha' => $fecha_doc,
-                    'nro_cuenta' => $nro_cuenta_deudora,
-                    'nro_subcuenta' => $nro_subcuenta_deudora,
-                    'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
-                    'debito' => number_format($total, 2),
-                    'credito' => ''
-                );
+
+                foreach ($cuentas_ir as $key => $cuenta) {
+                    $parte = 0;
+                    foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                        /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                        if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                            $parte += floatval($obj_movimiento_mercancia->getImporte());
+                        }
+                    }
+                    $dat = explode(':', $cuenta);
+                    if ($key == 0)
+                        $rows[] = array(
+                            'nro_doc' => $nro_doc,
+                            'fecha' => $fecha_doc,
+                            'nro_cuenta' => $dat[0],
+                            'nro_subcuenta' => $dat[1],
+                            'analisis_1' => $cod_almacen,
+                            'analisis_2' => '',
+                            'debito' => number_format($parte, 2),
+                            'credito' => ''
+                        );
+                    else
+                        $rows[] = array(
+                            'nro_doc' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => $dat[0],
+                            'nro_subcuenta' => $dat[1],
+                            'analisis_1' => $cod_almacen,
+                            'analisis_2' => '',
+                            'debito' => number_format($parte, 2),
+                            'credito' => ''
+                        );
+                }
                 $rows[] = array(
                     'nro_doc' => '',
                     'fecha' => '',
@@ -108,8 +136,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'debito' => number_format($total, 2),
                     'credito' => number_format($total, 2)
                 );
-            }
-            elseif ($id_tipo_documento == 2) {
+            } elseif ($id_tipo_documento == 2) {
                 //informe recepcion producto
                 $obj_informe = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -141,7 +168,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => $nro_subcuenta_deudora,
                     'analisis_1' => $cod_almacen,
                     'analisis_2' => '',
-                    'debito' => number_format($total,2),
+                    'debito' => number_format($total, 2),
                     'credito' => ''
                 );
                 $rows[] = array(
@@ -152,7 +179,7 @@ class ComprobanteAnotacionesController extends AbstractController
                     'analisis_1' => $cod_proveedor,
                     'analisis_2' => '',
                     'debito' => '',
-                    'credito' => number_format($total,2)
+                    'credito' => number_format($total, 2)
                 );
                 $rows[] = array(
                     'nro_doc' => '',
@@ -161,11 +188,10 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => number_format($total,2),
-                    'credito' => number_format($total,2)
+                    'debito' => number_format($total, 2),
+                    'credito' => number_format($total, 2)
                 );
-            }
-            elseif ($id_tipo_documento == 3) {
+            } elseif ($id_tipo_documento == 3) {
                 //ajuste de entrada
                 $obj_informe = $em->getRepository(Ajuste::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -174,9 +200,7 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Ajuste* */
                 $nro_doc = 'AJE' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            }
-            elseif ($id_tipo_documento == 4)
-            {
+            } elseif ($id_tipo_documento == 4) {
                 //Ajuste de salida
                 $obj_informe = $em->getRepository(Ajuste::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -185,8 +209,7 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Ajuste* */
                 $nro_doc = 'AJS' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            }
-            elseif ($id_tipo_documento == 5) {
+            } elseif ($id_tipo_documento == 5) {
                 //transferencia de entrada
                 $obj_informe = $em->getRepository(Transferencia::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -195,8 +218,7 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Transferencia* */
                 $nro_doc = 'TE' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            }
-            elseif ($id_tipo_documento == 6) {
+            } elseif ($id_tipo_documento == 6) {
                 //transferencia de salida
                 $obj_informe = $em->getRepository(Transferencia::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -205,8 +227,8 @@ class ComprobanteAnotacionesController extends AbstractController
                 /**@var $obj_informe Transferencia* */
                 $nro_doc = 'TS' . '-' . $obj_informe->getNroConcecutivo();
                 $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-            }
-            elseif ($id_tipo_documento == 7) {
+            } elseif
+            ($id_tipo_documento == 7) {
                 //vale salida de mercancia
                 $obj_informe = $em->getRepository(ValeSalida::class)->findOneBy(array(
                     'id_documento' => $obj_documento,
@@ -222,8 +244,10 @@ class ComprobanteAnotacionesController extends AbstractController
                 ));
                 //totalizar importe
                 $rep_arr = [];
+
                 $i = 0;
-                $total_general=0;
+                $total = 0;
+                $total_general = 0;
                 foreach ($arr_obj_movimiento_mercancia as $d) {
                     $cc = $d->getIdCentroCosto()->getId() . '-' . $d->getIdElementoGasto()->getId();
                     if (!in_array($cc, $rep_arr)) {
@@ -249,32 +273,49 @@ class ComprobanteAnotacionesController extends AbstractController
                         $total_general += $total;
                     }
                 }
+///aqui es el cambio
+                $cuentas_ir = [];
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    $total += floatval($obj_movimiento_mercancia->getImporte());
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+                    $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                    if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                        $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+                    }
+                }
 
-                $i = 0;
-                foreach ($arr_obj_movimiento_mercancia as $d) {
-                    /** @var  $d  MovimientoMercancia*/
-                    $cc = $d->getIdMercancia()->getCuenta() . '-' . $d->getIdMercancia()->getNroSubcuentaInventario();
-                    if (!in_array($cc, $rep_arr)) {
-                        $rep_arr[$i] = $cc;
-                        $i++;
-                        $total = 0;
-                        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
-                            /**@var $obj_movimiento_mercancia MovimientoMercancia */
-                            if ($obj_movimiento_mercancia->getIdMercancia()->getNroCuentaAcreedora() == $d->getIdMercancia()->getNroCuentaAcreedora() &&
-                                $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaAcreedora() == $d->getIdMercancia()->getNroSubcuentaAcreedora())
-                                $total += floatval($obj_movimiento_mercancia->getImporte());
+                foreach ($cuentas_ir as $key => $cuenta) {
+                    $parte = 0;
+                    foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                        /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                        if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                            $parte += floatval($obj_movimiento_mercancia->getImporte());
                         }
+                    }
+                    $dat = explode(':', $cuenta);
+                    if ($key == 0)
                         $rows[] = array(
                             'nro_doc' => '',
                             'fecha' => '',
-                            'nro_cuenta' => $d->getIdMercancia()->getCuenta(),
-                            'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaInventario(),
-                            'analisis_1' => $obj_informe->getIdDocumento()->getIdAlmacen()->getCodigo(),
+                            'nro_cuenta' => $dat[0],
+                            'nro_subcuenta' => $dat[1],
+                            'analisis_1' => $cod_almacen,
                             'analisis_2' => '',
-                            'debito' => '',
-                            'credito' => number_format($total,2)
+                            'credito' => number_format($parte, 2),
+                            'debito' => ''
                         );
-                    }
+                    else
+                        $rows[] = array(
+                            'nro_doc' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => $dat[0],
+                            'nro_subcuenta' => $dat[1],
+                            'analisis_1' => $cod_almacen,
+                            'analisis_2' => '',
+                            'credito' => number_format($parte, 2),
+                            'debito' => ''
+                        );
                 }
 
                 $rows[] = array(
@@ -305,7 +346,7 @@ class ComprobanteAnotacionesController extends AbstractController
                 //totalizar importe
                 $rep_arr = [];
                 $i = 0;
-                $total_general=0;
+                $total_general = 0;
                 foreach ($arr_obj_movimiento_producto as $d) {
                     $cc = $d->getIdCentroCosto()->getId() . '-' . $d->getIdElementoGasto()->getId();
                     if (!in_array($cc, $rep_arr)) {
@@ -318,6 +359,7 @@ class ComprobanteAnotacionesController extends AbstractController
                                 $obj_movimiento_producto->getIdElementoGasto()->getId() == $d->getIdElementoGasto()->getId())
                                 $total += floatval($obj_movimiento_producto->getImporte());
                         }
+
                         $rows[] = array(
                             'nro_doc' => $i == 1 ? $nro_doc : '',
                             'fecha' => $i == 1 ? $fecha_doc : '',
@@ -325,7 +367,7 @@ class ComprobanteAnotacionesController extends AbstractController
                             'nro_subcuenta' => $obj_informe->getNroSubcuentaDeudora(),
                             'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
                             'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
-                            'debito' => number_format($total,2),
+                            'debito' => number_format($total, 2),
                             'credito' => ''
                         );
                         $total_general += $total;
@@ -353,7 +395,7 @@ class ComprobanteAnotacionesController extends AbstractController
                             'analisis_1' => $obj_informe->getIdDocumento()->getIdAlmacen()->getCodigo(),
                             'analisis_2' => '',
                             'debito' => '',
-                            'credito' => number_format($total,2)
+                            'credito' => number_format($total, 2)
                         );
                     }
                 }
@@ -365,8 +407,8 @@ class ComprobanteAnotacionesController extends AbstractController
                     'nro_subcuenta' => '',
                     'analisis_1' => '',
                     'analisis_2' => '',
-                    'debito' => number_format($total_general,2),
-                    'credito' => number_format($total_general,2)
+                    'debito' => number_format($total_general, 2),
+                    'credito' => number_format($total_general, 2)
                 );
             }
         }
@@ -376,15 +418,16 @@ class ComprobanteAnotacionesController extends AbstractController
     /**
      * @Route("/print", name="contabilidad_inventario_comprobante_anotaciones_print")
      */
-    public function print(Request $request, EntityManagerInterface $em)
+    public
+    function print(Request $request, EntityManagerInterface $em)
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         /** @var Almacen $almacen_obj */
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         return $this->render('contabilidad/inventario/comprobante_anotaciones/print.html.twig', [
-            'datos' => $this->getData($request,$em),
-            'almacen'=>$almacen_obj->getCodigo().': '.$almacen_obj->getDescripcion(),
-            'unidad'=>$almacen_obj->getIdUnidad()->getCodigo().': '.$almacen_obj->getIdUnidad()->getNombre()
+            'datos' => $this->getData($request, $em),
+            'almacen' => $almacen_obj->getCodigo() . ': ' . $almacen_obj->getDescripcion(),
+            'unidad' => $almacen_obj->getIdUnidad()->getCodigo() . ': ' . $almacen_obj->getIdUnidad()->getNombre()
         ]);
     }
 

@@ -204,7 +204,7 @@ class CerrarDiaController extends AbstractController
                 'fecha_minima'=>'',
                 'fecha_maxima'=>'',
                 'error'=>false,
-                'message'=>'El día no pudo ser cerrado por diferencia de valores: Saldo de apertura = '.$saldo_apertura.', Débitos = '.$debitos.', Creditos = '.$creditos.', y Existencia en almacén = '.$existencia_almacen_importe
+                'message'=>'El día no pudo ser cerrado por diferencia de valores: Sumbayor de inventariosymfony server = '.$saldo_apertura.', Débitos = '.$debitos.', Creditos = '.$creditos.', y Existencia en almacén = '.$existencia_almacen_importe
             ]);
         }
         $em->flush();
