@@ -160,10 +160,23 @@ class AjusteSalidaController extends AbstractController
 
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
-
-//                dd($obj_tipo_documento);
                 $importe_total = 0;
+                $alamcen = $em->getRepository(Almacen::class)->find($id_almacen);
 
+                $expediente = null;
+                // Verificar el criterio de analisis de EXP esta en esta cuenta
+                if ($codigo_exp != null) {
+                    // Verificar si existe el Expediente sino hacerlo nuevo
+                    $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo_exp]);
+                    if (!$expediente) {
+                        $expediente = new Expediente();
+                        $expediente->setCodigo($codigo_exp)
+                            ->setDescripcion($descripcion_exp)
+                            ->setIdUnidad($alamcen->getIdUnidad())
+                            ->setActivo(true);
+                        $em->persist($expediente);
+                    }
+                }
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
                         $cantidad_mercancia = $mercancia['cant'];
@@ -173,7 +186,6 @@ class AjusteSalidaController extends AbstractController
                             'codigo' => $mercancia['codigo'],
                             'id_amlacen' => $id_almacen,
                         ));
-                        $alamcen = $em->getRepository(Almacen::class)->find($id_almacen);
 
                         //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
                         $movimiento_mercancia = new MovimientoMercancia();
@@ -188,24 +200,9 @@ class AjusteSalidaController extends AbstractController
                             ->setIdTipoDocumento($obj_tipo_documento)
                             ->setIdCentroCosto($centro_costo)
                             ->setIdElementoGasto($elemento_gasto)
-//                            ->setIdExpediente($expedienteRepository->find())
+                            ->setIdExpediente($expediente)
                             ->setIdUsuario($this->getUser());
 
-
-                        // Verificar el criterio de analisis de EXP esta en esta cuenta
-                        if ($codigo_exp != null) {
-                            // Verificar si existe el Expediente sino hacerlo nuevo
-                            $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo_exp]);
-                            if (!$expediente) {
-                                $expediente = new Expediente();
-                                $expediente->setCodigo($codigo_exp)
-                                    ->setDescripcion($descripcion_exp)
-                                    ->setIdUnidad($alamcen->getIdUnidad())
-                                    ->setActivo(true);
-                                $em->persist($expediente);
-                            }
-                            $movimiento_mercancia->setIdExpediente($expediente);
-                        }
                         //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
 
                         /**@var $obj_mercancia Mercancia* */

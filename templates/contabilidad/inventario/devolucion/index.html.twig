@@ -1,0 +1,671 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {# Modal de Cuentas#}
+    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app" style="height: 600px;">
+                    <div style="height: 500px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light">
+                            <thead class="thead-dark">
+                            <th style="width: 10px">Sel.</th>
+                            <th style="width: 160px">Código</th>
+                            <th scope="col-6">Descripción</th>
+                            <th style="width: 200px">Precio Compra</th>
+                            </thead>
+                            <tbody id="rows_table">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
+                                    onclick="SeleccionarMercancia()"
+                                    data-dismiss="modal">Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Devolución</h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'devolucion','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0">
+                    <div class="col-5 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_cuenta_acreedora) }}
+                        {{ form_widget(formulario.nro_cuenta_acreedora) }}
+                    </div>
+                    <div class="col-5 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_subcuenta_acreedora) }}
+                        {{ form_widget(formulario.nro_subcuenta_acreedora) }}
+                    </div>
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm pr-0 d-block">
+                        {{ form_label(formulario.documento.id_moneda) }}
+                        {{ form_widget(formulario.documento.id_moneda) }}
+                    </div>
+                </div>
+                {{ form_end(formulario.nro_cuenta_acreedora) }}
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
+                    <div class="px-2" style="background: dimgray; border-radius: .3rem;">
+                        <span class="pr-1">Importe Total : </span>
+                        <span id="importe-total">0</span>
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+
+                {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0">
+                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.mercancia.nro_cuenta_inventario) }}
+                        {{ form_widget(formulario.mercancia.nro_cuenta_inventario) }}
+                    </div>
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.nro_subcuenta_inventario) }}
+                        {{ form_widget(formulario.mercancia.nro_subcuenta_inventario) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-1 d-block">
+                        {{ form_label(formulario.mercancia.codigo) }}
+                        <div class="row m-0 p-0">
+                            <div class="col-8 p-0">
+                                {{ form_widget(formulario.mercancia.codigo) }}
+                            </div>
+                            <div class="col-1 mt-0 p-0">
+                                <button class="btn btn-secondary btn-sm" data-toggle="modal" type="button"
+                                        data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
+                                            class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-7 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.descripcion) }}
+                        {{ form_widget(formulario.mercancia.descripcion) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block pr-0">
+                        {{ form_label(formulario.mercancia.id_unidad_medida) }}
+                        {{ form_widget(formulario.mercancia.id_unidad_medida) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.documento.cantidad_mercancia) }}
+                        {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.mercancia.precio) }}
+                        {{ form_widget(formulario.mercancia.precio) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.documento.importe_mercancia) }}
+                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number'}) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.mercancia.existencia) }}
+                        {{ form_widget(formulario.mercancia.existencia) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.existencia_incremento) }}
+                        {{ form_widget(formulario.mercancia.existencia_incremento) }}
+                    </div>
+                    {{ form_end(formulario.mercancia) }}
+
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <table class="table-small-rows table table-hover text-light">
+                        <thead class="thead-dark">
+                        <th width="120px">Cod.</th>
+                        <th width="110px">Cant.</th>
+                        <th width="110px">Importe</th>
+                        <th width="110px">Precio</th>
+                        <th scope="col-1">Nueva Exist</th>
+                        <th width="90px">Cuenta/Sub.</th>
+                        <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+                        <th scope="col-1" hidden>UM</th>
+                        <th scope="col-1" hidden>Descripcion</th>
+                        </thead>
+                        <tbody id="rows_mercancias">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex mt-2">
+                    <div class="mr-auto">
+                        <a href="{{ url('inventario') }}"
+                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
+                        </button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnSubbmitdevolucion">contabilizar
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+
+        function Print_Ajuste() {
+            if ($('#select_nros').val() == consecutivo) {
+                if (list_mercancia.length > 0) {
+
+                    const unidad_origen = $("#devolucion_id_unidad option:selected").text()
+                    const almacen_origen = $("#devolucion_id_almacen option:selected").text()
+                    const mercancia_json = JSON.stringify(list_mercancia)
+
+                    $('body').append(`
+                    <form action='/contabilidad/inventario/devolucion/print_report_current/'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='text' hidden name='datos[unidad_origen]' value='${unidad_origen}'/>
+                        <input type='text' hidden name='datos[almacen_origen]' value='${almacen_origen}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                        <input type='text' hidden name='nro' value="${consecutivo}" />
+                    </form>`)
+
+                    const fomrulario = $('#form_print_current')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('No excisten mercancias para imprimir', 'danger')
+
+            } else {
+                const url = '/contabilidad/inventario/devolucion/print_report/' + $('#select_nros').val()
+                window.open(url, 'blank_')
+            }
+        }
+
+        function cancelar() {
+            const url = '/contabilidad/inventario/devolucion/delete/' + $('#select_nros').val()
+            onDeleteConfirm({
+                message: 'Está seguro que desea cancelar la devolucion?',
+                url
+            })
+        }
+
+        let mercancias_seleccionada = [];
+        let mercancias = [];
+        let consecutivo = 0;
+        let cuentas_inventarios = [];
+        let cuentas_acreedoras = [];
+        let list_mercancia = []
+        let importe_total = 0;
+
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        loadingModal.show()
+
+        $(document).ready(function () {
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/devolucion/get-nros-devolucions',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
+                    $('#btnSubbmitdevolucion').show()
+                } else {
+                    $('#btnSubbmitdevolucion').hide()
+                }
+            })
+            $('#select_nros').on('keyup', function (event) {
+                if (event.which == 13) {
+                    $('#devolucion').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+
+                    if ($('#select_nros').val() == consecutivo) {
+                        $('#btnSubbmitdevolucion').show()
+                        $('#btnImprimir').show()
+                        $('#btnCancelar').hide()
+                        loadingData()
+                    } else if ($('#select_nros').val() > consecutivo) {
+                        $('#btnSubbmitdevolucion').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        $('#devolucion select').find('option').remove()
+                        alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                    } else if ($('#select_nros').val() == '') {
+                        $('#btnSubbmitdevolucion').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                    } else {
+                        $('#btnImprimir').show()
+                        $('#btnSubbmitdevolucion').hide()
+                        $('#btnCancelar').show()
+                        llenarFormulario($('#select_nros').val())
+                    }
+                }
+            })
+
+            function llenarFormulario(nro) {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/inventario/devolucion/load-devolucion/' + nro,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            let data = result.data;
+                            const cuenta = $('#devolucion_mercancia_nro_cuenta_inventario')
+                            const subcuenta = $('#devolucion_mercancia_nro_subcuenta_inventario')
+                            const cuenta_acreedora = $('#devolucion_nro_cuenta_acreedora')
+                            const subcuenta_acreedora = $('#devolucion_nro_subcuenta_acreedora')
+                            const moneda = $('#devolucion_documento_id_moneda')
+                            const unidad = $('#devolucion_id_unidad')
+                            const almacen = $('#devolucion_id_almacen')
+
+                            // datos del Formulario
+                            $('#devolucion select').find('option').remove()
+                            cuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_inventario} </option>`);
+                            subcuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_cuenta_inventario} </option>`);
+                            cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
+                            subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_acreedora} </option>`);
+                            moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
+                            unidad.prepend(`<option selected = "false" value = "0" disabled> ${data.unidad} </option>`);
+                            almacen.prepend(`<option selected = "false" value = "0" disabled> ${data.almacen} </option>`);
+
+                            $('#form_mercancia').css('display', 'none')
+                            // datos de la mercancia
+                            let mercancias = data.mercancias
+                            $("#importe-total").text('$' + parseFloat(data.importe_total).toFixed(2))
+                            for (var i = 0; i < mercancias.length; i++) {
+
+                                $('#rows_mercancias').append(`<tr>
+                                    <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
+                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
+                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;">${mercancias[i]['cuenta_subcuenta']}</td>
+                                    <td></td>
+                                   </tr>`
+                                );
+                            }
+                            loadingModal.close()
+                        } else {
+                            loadingModal.close()
+                            alertTemplate(result.msg, 'danger')
+                        }
+                    },
+                    error: function () {
+                    }
+                })
+            }
+
+            const loadingData = function () {
+                loadingModal.show()
+                $('#devolucion select').find('option').remove()
+                $('#devolucion select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $('#form_mercancia').css('display', 'block')
+
+                $.ajax({
+                    url: '/contabilidad/inventario/devolucion/getChoices',
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        cuentas_inventarios = result.cuentas_inventario
+                        cuentas_acreedoras = result.cuentas_acreedoras
+                        $('#devolucion_mercancia_nro_subcuenta_inventario').find('option').remove()
+                        $('#devolucion_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        $(result.cuentas_inventario).each(function (pos, valor) {
+                            $('#devolucion_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        })
+                        $(result.monedas).each(function (pos, valor) {
+                            $('#devolucion_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.unidades).each(function (pos, valor) {
+                            $('#devolucion_id_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.almacenes).each(function (pos, valor) {
+                            $('#devolucion_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.cuentas_acreedoras).each(function (pos, valor) {
+                            $('#devolucion_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        })
+                        loadingModal.close()
+                    },
+                    error: function () {
+                    }
+                })
+            }
+            loadingData()
+
+
+            $('#btnSearchMercancia').on('click', function () {
+                console.info('asasa')
+                $('#rows_table').find('tr').remove();
+                let codigo = $('#devolucion_mercancia_codigo').val()
+                let cuenta = $('#devolucion_mercancia_nro_cuenta_inventario').val()
+                $.ajax({
+                    url: '/contabilidad/inventario/devolucion/getMercancia/' + codigo + ',' + cuenta,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        mercancias = result.mercancias
+                        $(result.mercancias).each(function (pos, valor) {
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
+                            );
+                        })
+                    },
+                    error: function () {
+                    }
+                })
+            })
+
+            $('#devolucion_mercancia_codigo').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo = $('#devolucion_mercancia_codigo').val()
+                    let cuenta = $('#devolucion_mercancia_nro_cuenta_inventario').val()
+                    if (!!cuenta && !!codigo) {
+                        let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando mercancia...")
+                        $.ajax({
+                            url: '/contabilidad/inventario/devolucion/getMercancia/' + codigo + ',' + nro,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    $('#devolucion_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#devolucion_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#devolucion_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código')
+                                }
+                                loadingModal.close()
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                    }
+                }
+            })
+
+            $('#devolucion_documento_importe_mercancia').on('keyup', function () {
+                let importe = parseFloat($('#devolucion_documento_importe_mercancia').val())
+                let cantidad = parseFloat($('#devolucion_documento_cantidad_mercancia').val())
+                if (importe > 0) {
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
+                    $('#devolucion_mercancia_precio').val(precio_final)
+                } else {
+                    $('#devolucion_mercancia_precio').val(0)
+                }
+            })
+
+            $('#devolucion_documento_cantidad_mercancia').on('keyup', function () {
+                let importe = parseFloat($('#devolucion_documento_importe_mercancia').val())
+                let cantidad = parseFloat($('#devolucion_documento_cantidad_mercancia').val())
+                if (importe > 0) {
+                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
+                    $('#devolucion_mercancia_precio').val(precio_final)
+                } else {
+                    $('#devolucion_mercancia_precio').val(0)
+                }
+                let existencia_inicial = (parseFloat($('#devolucion_mercancia_existencia').val()) > 0 || $('#devolucion_mercancia_existencia').val() != '') ? parseFloat($('#devolucion_mercancia_existencia').val()) : 0
+                $('#devolucion_mercancia_existencia_incremento').val(existencia_inicial + parseFloat($('#devolucion_documento_cantidad_mercancia').val()))
+            })
+
+            $('#devolucion_mercancia_codigo').on('keyup', function () {
+                $('#devolucion_mercancia_descripcion').val('')
+                $('#devolucion_mercancia_precio').val('')
+                $('#devolucion_mercancia_existencia').val('')
+            })
+
+            $('#devolucion_mercancia_nro_cuenta_inventario').on('change', function () {
+                $('#devolucion_mercancia_nro_subcuenta_inventario').find('option').remove()
+                cuentas_inventarios.forEach(function (valor, pos) {
+                    if ($('#devolucion_mercancia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            $('#devolucion_mercancia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+            })
+
+            $('#devolucion_nro_cuenta_acreedora').on('change', function () {
+                $('#devolucion_nro_subcuenta_acreedora').find('option').remove()
+                cuentas_acreedoras.forEach(function (valor, pos) {
+                    if ($('#devolucion_nro_cuenta_acreedora').val() == valor.nro_cuenta) {
+                        $('#devolucion_nro_subcuenta_acreedora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            $('#devolucion_nro_subcuenta_acreedora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+            })
+
+            $('#devolucion_id_unidad').on('change', function () {
+                $('#devolucion_id_almacen').val(0)
+            })
+
+            $('#devolucion_id_almacen').on('change', function () {
+                $('#devolucion_id_unidad').val(0)
+            })
+
+            const form_devolucion = $('#devolucion')
+
+            form_devolucion.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'devolucion[id_proveedor]': "required",
+                    'devolucion[nro_cuenta_acreedora]': "required",
+                    'devolucion[nro_subcuenta_acreedora]': "required",
+                    'devolucion[documento][id_moneda]': "required",
+                },
+                messages: {
+                    'devolucion[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[nro_subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                }
+            })
+
+            const form_mercancia = $('#form_mercancia')
+            form_mercancia.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'devolucion[mercancia][codigo]': "required",
+                    'devolucion[mercancia][descripcion]': "required",
+                    'devolucion[mercancia][id_unidad_medida]': "required",
+                    'devolucion[documento][cantidad_mercancia]': "required",
+                    'devolucion[documento][importe_mercancia]': "required",
+                    'devolucion[mercancia][nro_cuenta_inventario]': 'required',
+                    'devolucion[mercancia][nro_subcuenta_inventario]': 'required',
+                },
+                messages: {
+                    'devolucion[mercancia][codigo]': 'Obligatorio!',
+                    'devolucion[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[mercancia][id_unidad_medida]': 'Obligatorio!',
+                    'devolucion[documento][cantidad_mercancia]': 'Obligatorio!',
+                    'devolucion[documento][importe_mercancia]': 'Obligatorio!',
+                    'devolucion[mercancia][nro_cuenta_inventario]': 'Obligatorio!',
+                    'devolucion[mercancia][nro_subcuenta_inventario]': 'Obligatorio!',
+                }
+            })
+
+            $("#btnSubbmitdevolucion").click(function (e) {
+                if (form_devolucion.valid()) {
+                    if (list_mercancia.length) {
+                        let data = form_devolucion.serializeArray()
+                        loadingModal.show()
+                        data.push({
+                            name: 'devolucion[list_mercancia]',
+                            value: JSON.stringify(list_mercancia)
+                        })
+                        $.ajax({
+                            url: '/contabilidad/inventario/devolucion/',
+                            method: 'POST',
+                            data: data,
+                            dataType: 'json',
+                            success: function (result) {
+                                if (result.success) {
+                                    window.location.replace('{{ path('contabilidad_inventario_devolucion') }}')
+                                } else {
+                                    loadingModal.close()
+                                    alertTemplate(result.msg)
+                                }
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('La Devolución de Entrada debe contener algunas mercancias', 'danger')
+                    }
+                }
+            });
+
+            $('#btnAplicarMercancia').on('click', function () {
+                if (form_mercancia.valid()) {
+                    let codigo = $('#devolucion_mercancia_codigo').val()
+                    let cant = $('#devolucion_documento_cantidad_mercancia').val()
+                    let importe = $('#devolucion_documento_importe_mercancia').val()
+                    let precio = $('#devolucion_mercancia_precio').val()
+                    let nueva_existencia = $('#devolucion_mercancia_existencia_incremento').val()
+                    let um = $('#devolucion_mercancia_id_unidad_medida').val()
+                    let descripcion = $('#devolucion_mercancia_descripcion').val()
+                    let cuenta = $('#devolucion_mercancia_nro_cuenta_inventario').val()
+                    let subcuenta = $('#devolucion_mercancia_nro_subcuenta_inventario').val()
+
+                    //validar que el codigo no se repita
+                    if (list_mercancia.some(e => e.codigo === codigo)) {
+                        alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
+                    } else {
+                        list_mercancia.push({
+                            codigo,
+                            cant,
+                            importe,
+                            precio,
+                            nueva_existencia,
+                            um,
+                            descripcion,
+                            cuenta,
+                            subcuenta
+                        })
+                        importe_total += Number.parseFloat(importe)
+
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
+                        $('#rows_mercancias').append(`<tr>
+                        <td style="font-weight:400;"> ${codigo}</td>
+                        <td style="font-weight:400;"> ${cant}</td>
+                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
+                        <td style="font-weight:400;" hidden> ${descripcion}</td>
+                        <td> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td>
+                        <td style="font-weight:400;" hidden> ${um} </td> </tr>`
+                        );
+                        $('#devolucion_mercancia_codigo').val('')
+                        $('#devolucion_mercancia_descripcion').val('')
+                        $('#devolucion_mercancia_existencia').val('')
+                        $('#devolucion_documento_cantidad_mercancia').val('')
+                        $('#devolucion_documento_importe_mercancia').val('')
+                        $('#devolucion_mercancia_precio').val('')
+                        $('#devolucion_mercancia_existencia_incremento').val('')
+                    }
+
+                }
+            })
+
+            // eliminar la mercancia de la lista
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
+                importe_total -= Number.parseFloat(mercancia.importe)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
+                list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
+                $(this).closest('tr').remove()
+            })
+        })
+
+        function SeleccionarMercancia() {
+            for (var i = 0; i < mercancias.length; i++) {
+                let id = '#' + mercancias[i]['codigo']
+                if ($(id).prop('checked') == true) {
+                    $('#devolucion_mercancia_codigo').val(mercancias[i]['codigo'])
+                    $('#devolucion_mercancia_descripcion').val(mercancias[i]['descripcion'])
+                    $('#devolucion_mercancia_precio').val(mercancias[i]['precio_compra'])
+                    $('#devolucion_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
+                    break
+                }
+            }
+        }
+
+
+    </script>
+{% endblock %}

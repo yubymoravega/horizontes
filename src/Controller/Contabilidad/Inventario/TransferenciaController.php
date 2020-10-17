@@ -549,7 +549,7 @@ class TransferenciaController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
@@ -611,7 +611,7 @@ class TransferenciaController extends AbstractController
                 'codigo' => $obj->getIdMercancia()->getCodigo(),
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
-                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() .' - '. $obj->getIdMercancia()->getNroSubcuentaInventario(),
+                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() . ' - ' . $obj->getIdMercancia()->getNroSubcuentaInventario(),
                 'cantidad' => $obj->getCantidad(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
@@ -619,10 +619,13 @@ class TransferenciaController extends AbstractController
             $importe_total += $obj->getImporte();
         }
 
+        $cuenta_acred = $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaAcreedora()]);
+        $subcuenta_acred = $subcuentas->findOneBy(['id_cuenta' => $cuenta_acred->getId(), 'nro_subcuenta' => $transferencia_obj->getNroSubcuentaAcreedora()]);
+
         $rows = array(
             'id' => $transferencia_obj->getId(),
-            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaAcreedora()])->getNombre(),
-            'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuentas->findOneBy(['nro_subcuenta' => $transferencia_obj->getNroSubcuentaAcreedora()])->getDescripcion(),
+            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuenta_acred->getNombre(),
+            'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuenta_acred->getDescripcion(),
             'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '',
             'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
             'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),

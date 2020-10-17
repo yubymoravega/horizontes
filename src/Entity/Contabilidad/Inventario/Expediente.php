@@ -29,7 +29,7 @@ class Expediente
     private $descripcion;
 
     /**
-     * @ORM\OneToOne(targetEntity=Unidad::class, cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
      *  @ORM\JoinColumn(nullable=true)
      */
     private $id_unidad;
