@@ -96,6 +96,12 @@ class MovimientoMercancia
      */
     private $id_expediente;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
+     *  @ORM\JoinColumn(nullable=true)
+     */
+    private $id_orden_trabajo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -265,6 +271,18 @@ class MovimientoMercancia
     public function setIdExpediente(?Expediente $id_expediente): self
     {
         $this->id_expediente = $id_expediente;
+
+        return $this;
+    }
+
+    public function getIdOrdenTrabajo(): ?OrdenTrabajo
+    {
+        return $this->id_orden_trabajo;
+    }
+
+    public function setIdOrdenTrabajo(?OrdenTrabajo $id_orden_trabajo): self
+    {
+        $this->id_orden_trabajo = $id_orden_trabajo;
 
         return $this;
     }

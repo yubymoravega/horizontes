@@ -85,6 +85,16 @@
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
+                <div id="orden_trabajo_row" class="row mt-0 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.codigo_ot) }}
+                        {{ form_widget(formulario.codigo_ot) }}
+                    </div>
+                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.descripcion_ot) }}
+                        {{ form_widget(formulario.descripcion_ot) }}
+                    </div>
+                </div>
                 {{ form_end(formulario.fecha_solicitud) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
@@ -201,6 +211,8 @@
     {{ parent() }}
     <script>
 
+        $('#orden_trabajo_row').hide()
+
         function Print_Vale() {
             if ($('#select_nros').val() == consecutivo) {
                 if (list_mercancia.length > 0) {
@@ -247,6 +259,7 @@
             /** BLOQUE JQuery DEL SELECTOR DE NUMEROS CONSECUTIVOS DEL DOCUMENTO**/
             $('#select_nros').on('keyup', function (e) {
                 if (e.which == 13) {
+                    $('#orden_trabajo_row').hide()
                     if ($('#select_nros').val() != '') {
                         if (eliminados.includes($('#select_nros').val())) {
                             $('#btnSubbmitValeSalida').hide()
@@ -393,6 +406,29 @@
                         }
                     }
                 })
+
+                loadingModal.show('Cargando otros campos...')
+                // cargar dinamicamente [OT]
+                $.ajax({
+                    url: '/contabilidad/inventario/ajuste-salida/dinamic-files/' + $(this).val(),
+                    method: 'POST',
+                    success: function (result) {
+                        if (result.success) {
+                            $('#orden_trabajo_row').hide()
+
+                            $('#vale_salida_codigo_ot').val(null)
+                            $('#vale_salida_descripcion_ot').val(null)
+                            result.data.forEach(data => {
+                                if (data == 'OT') $('#orden_trabajo_row').show()
+                            })
+                        } else {
+                            alertTemplate(result.message,'danger')
+                        }
+                        loadingModal.close()
+                    },
+                    error: function () {
+                    }
+                })
             })
 
             /*** BLOQUE DE VALIDACIONES(CAMPOS OBLIGATORIOS)*********/
@@ -409,12 +445,16 @@
                     'vale_salida[nro_solicitud]': "required",
                     'vale_salida[nro_cuenta_deudora]': "required",
                     'vale_salida[documento][id_moneda]': "required",
+                    'vale_salida[codigo_ot]': "required",
+                    'vale_salida[descripcion_ot]': "required",
                 },
                 messages: {
                     'vale_salida[fecha_solicitud]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[nro_solicitud]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[nro_cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'vale_salida[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[codigo_ot]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'vale_salida[descripcion_ot]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
             form_mercancia.validate({
@@ -459,7 +499,7 @@
                                     window.location.replace('{{ path('contabilidad_inventario_vale_salida_gestionar') }}')
                                 } else {
                                     loadingModal.close()
-                                    alertTemplate(result.msg)
+                                    alertTemplate(result.message,'danger')
                                 }
                             },
                             error: function () {
@@ -587,6 +627,35 @@
             cargarDatosIniciales()
         }
 
+        $('#vale_salida_codigo_ot').on('keyup', function (e) {
+            if (e.which == 13) {
+                let codigo = $('#vale_salida_codigo_ot').val()
+                if (!!codigo) {
+                    loadingModal.show("cargando orden de trabajo...")
+                    $.ajax({
+                        url: '/contabilidad/inventario/vale-salida/get-orden-trabajo/' + codigo,
+                        method: 'POST',
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.success) {
+                                const orden_trabajo = result.data
+                                $('#vale_salida_descripcion_ot').val(orden_trabajo)
+
+                            } else {
+                                alertTemplate('No existen la orden con ese código')
+                                $('#vale_salida_descripcion_ot').val('')
+                            }
+                            loadingModal.close()
+                        },
+                        error: function () {
+                        }
+                    })
+                } else {
+                    alertTemplate('El campo código no deben estar vacio.', 'danger')
+                }
+            }
+        })
+
         function llenarFormulario(nro_vale) {
             if (nro_vale < 1) {
                 alertTemplate('El menor número permitido es 1', 'danger')
@@ -598,8 +667,8 @@
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
-                        if (result[0].success == true) {
-                            let vale = result[0].vale;
+                        if (result.success == true) {
+                            let vale = result.vale;
                             let ids = ['_nro_cuenta_deudora', '_nro_subcuenta_deudora', '_documento_id_moneda']
                             for (let i = 0; i < ids.length; i++) {
                                 $("#vale_salida" + ids[i]).find('option').remove()
@@ -611,6 +680,12 @@
                             $('#vale_salida_nro_solicitud').val(vale.nro_solicitud);
                             $('#vale_salida_fecha_solicitud').attr('type', 'text')
                             $('#vale_salida_fecha_solicitud').val(vale.fecha_solicitud);
+
+                            if (vale.orden_trabajo) {
+                                $('#orden_trabajo_row').show()
+                                $('#vale_salida_codigo_ot').val(vale.orden_trabajo.codigo)
+                                $('#vale_salida_descripcion_ot').val(vale.orden_trabajo.descripcion)
+                            }
 
                             let mercancias = vale.mercancias
                             $("#importe-total").text('$' + parseFloat(vale.importe_total).toFixed(2))
@@ -627,9 +702,9 @@
                             }
                             loadingModal.close()
                         }
-                        if (result[0].success == false) {
+                        if (result.success == false) {
                             loadingModal.close()
-                            alertTemplate(result.msg, 'danger')
+                            alertTemplate(result.message, 'danger')
                         }
                     },
                     error: function (result) {

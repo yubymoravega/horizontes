@@ -108,7 +108,7 @@
                     </div>
                     <div class="col-7 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.descripcion) }}
-                        {{ form_widget(formulario.mercancia.descripcion) }}
+                        {{ form_widget(formulario.mercancia.descripcion, {'attr':{'readonly':'true'}}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block pr-0">
                         {{ form_label(formulario.mercancia.id_unidad_medida) }}
@@ -185,6 +185,10 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+
+
+        $('#devolucion_mercancia_precio').removeAttr('disabled')
+        $('#devolucion_documento_importe_mercancia').attr('disabled', true)
 
         function Print_Ajuste() {
             if ($('#select_nros').val() == consecutivo) {
@@ -360,8 +364,8 @@
                     success: function (result) {
                         cuentas_inventarios = result.cuentas_inventario
                         cuentas_acreedoras = result.cuentas_acreedoras
-                        $('#devolucion_mercancia_nro_subcuenta_inventario').find('option').remove()
-                        $('#devolucion_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        $('#devolucion_mercancia_nro_subcuenta_inventario, #devolucion_mercancia_nro_cuenta_inventario').find('option').remove()
+                        $('#devolucion_mercancia_nro_subcuenta_inventario, #devolucion_mercancia_nro_cuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         $(result.cuentas_inventario).each(function (pos, valor) {
                             $('#devolucion_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
@@ -429,7 +433,9 @@
                                 if (mercancias.length > 0) {
                                     $('#devolucion_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#devolucion_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#devolucion_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                    // $('#devolucion_mercancia_precio').val(mercancias[0]['precio_compra'])
+                                    $('#devolucion_mercancia_id_unidad_medida').find('option').remove()
+                                    $('#devolucion_mercancia_id_unidad_medida').append('<option value = "' + mercancias[0]['idum'] + '">' + mercancias[0]['um'] + '</option>');
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
                                 }
@@ -444,28 +450,26 @@
                 }
             })
 
-            $('#devolucion_documento_importe_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#devolucion_documento_importe_mercancia').val())
+            $('#devolucion_mercancia_precio').on('keyup', function () {
+                let precio = parseFloat($(this).val())
                 let cantidad = parseFloat($('#devolucion_documento_cantidad_mercancia').val())
-                if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
-                    $('#devolucion_mercancia_precio').val(precio_final)
+                if (precio > 0) {
+                    let importe = parseFloat(precio * cantidad).toFixed(2)
+                    $('#devolucion_documento_importe_mercancia').val(importe)
                 } else {
-                    $('#devolucion_mercancia_precio').val(0)
+                    $('#devolucion_documento_importe_mercancia').val(0)
                 }
             })
 
             $('#devolucion_documento_cantidad_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#devolucion_documento_importe_mercancia').val())
-                let cantidad = parseFloat($('#devolucion_documento_cantidad_mercancia').val())
-                if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
-                    $('#devolucion_mercancia_precio').val(precio_final)
-                } else {
-                    $('#devolucion_mercancia_precio').val(0)
-                }
+                let precio = parseFloat($('#devolucion_mercancia_precio').val())
+                let cantidad = parseFloat($(this).val()) || 0
+
+                let importe = parseFloat(precio * cantidad).toFixed(2)
+                $('#devolucion_documento_importe_mercancia').val(importe)
+
                 let existencia_inicial = (parseFloat($('#devolucion_mercancia_existencia').val()) > 0 || $('#devolucion_mercancia_existencia').val() != '') ? parseFloat($('#devolucion_mercancia_existencia').val()) : 0
-                $('#devolucion_mercancia_existencia_incremento').val(existencia_inicial + parseFloat($('#devolucion_documento_cantidad_mercancia').val()))
+                $('#devolucion_mercancia_existencia_incremento').val(existencia_inicial + cantidad)
             })
 
             $('#devolucion_mercancia_codigo').on('keyup', function () {
@@ -539,7 +543,7 @@
                     'devolucion[mercancia][descripcion]': "required",
                     'devolucion[mercancia][id_unidad_medida]': "required",
                     'devolucion[documento][cantidad_mercancia]': "required",
-                    'devolucion[documento][importe_mercancia]': "required",
+                    'devolucion[mercancia][precio]': "required",
                     'devolucion[mercancia][nro_cuenta_inventario]': 'required',
                     'devolucion[mercancia][nro_subcuenta_inventario]': 'required',
                 },
@@ -548,7 +552,7 @@
                     'devolucion[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'devolucion[mercancia][id_unidad_medida]': 'Obligatorio!',
                     'devolucion[documento][cantidad_mercancia]': 'Obligatorio!',
-                    'devolucion[documento][importe_mercancia]': 'Obligatorio!',
+                    'devolucion[mercancia][precio]': 'Obligatorio!',
                     'devolucion[mercancia][nro_cuenta_inventario]': 'Obligatorio!',
                     'devolucion[mercancia][nro_subcuenta_inventario]': 'Obligatorio!',
                 }
@@ -659,7 +663,7 @@
                 if ($(id).prop('checked') == true) {
                     $('#devolucion_mercancia_codigo').val(mercancias[i]['codigo'])
                     $('#devolucion_mercancia_descripcion').val(mercancias[i]['descripcion'])
-                    $('#devolucion_mercancia_precio').val(mercancias[i]['precio_compra'])
+                    // $('#devolucion_mercancia_precio').val(mercancias[i]['precio_compra'])
                     $('#devolucion_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
                     break
                 }
