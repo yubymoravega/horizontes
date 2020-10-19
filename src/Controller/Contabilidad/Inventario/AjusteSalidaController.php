@@ -203,6 +203,7 @@ class AjusteSalidaController extends AbstractController
                                     ->setIdUnidad($alamcen->getIdUnidad())
                                     ->setActivo(true);
                                 $em->persist($expediente);
+//                                dd($expediente);
                             }
                             $movimiento_mercancia->setIdExpediente($expediente);
                         }

@@ -4,6 +4,8 @@ namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Repository\Contabilidad\Inventario\ExpedienteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,15 +31,20 @@ class Expediente
     private $descripcion;
 
     /**
-     * @ORM\OneToOne(targetEntity=Unidad::class, cascade={"persist", "remove"})
-     *  @ORM\JoinColumn(nullable=true)
-     */
-    private $id_unidad;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad;
+
+    public function __construct()
+    {
+        $this->id_unidad = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -69,18 +76,6 @@ class Expediente
         return $this;
     }
 
-    public function getIdUnidad(): ?Unidad
-    {
-        return $this->id_unidad;
-    }
-
-    public function setIdUnidad(?Unidad $id_unidad): self
-    {
-        $this->id_unidad = $id_unidad;
-
-        return $this;
-    }
-
     public function getActivo(): ?bool
     {
         return $this->activo;
@@ -89,6 +84,18 @@ class Expediente
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
 
         return $this;
     }
