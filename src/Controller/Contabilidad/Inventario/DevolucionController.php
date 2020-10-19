@@ -287,7 +287,8 @@ class DevolucionController extends AbstractController
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
-                'codigo' => $codigo
+                'codigo' => $codigo,
+                'cuenta' => $cuenta
             ));
 
         $row = array();
@@ -299,6 +300,8 @@ class DevolucionController extends AbstractController
                 'descripcion' => $obj->getDescripcion(),
                 'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),
+                'idum' => $obj->getIdUnidadMedida()->getId(),
+                'um' => $obj->getIdUnidadMedida()->getAbreviatura(),
                 'existencia' => $obj->getExistencia()
             );
         }

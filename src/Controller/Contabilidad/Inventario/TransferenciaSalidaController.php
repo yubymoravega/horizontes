@@ -241,7 +241,8 @@ class TransferenciaSalidaController extends AbstractController
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
-                'codigo' => $codigo
+                'codigo' => $codigo,
+                'cuenta' => $cuenta
             ));
 
         $row = array();

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ExpedienteRepository::class)
  */
-class Expediente
+class OrdenTrabajo
 {
     /**
      * @ORM\Id()

@@ -54,6 +54,16 @@ class ValeSalidaType extends AbstractType
                 'label' => 'Elemento de gasto',
                 'choice_label' => 'codigo',
             ))
+            ->add('codigo_ot', TextType::class, [
+                'required' => false,
+                'attr' => ['class' => 'w-100'],
+                'label'=>'Código O.T.',
+            ])
+            ->add('descripcion_ot', TextType::class, [
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Descripción O.T.',
+                'required' => false,
+            ])
             ->add('list_mercancia', HiddenType::class);
         ;
     }

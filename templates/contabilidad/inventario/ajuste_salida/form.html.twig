@@ -334,7 +334,7 @@
                             const subcuenta_acreedora = $('#ajuste_salida_nro_subcuenta_deudora')
                             const moneda = $('#ajuste_salida_documento_id_moneda')
                             $('#ajuste_salida_observacion').text(data.observaciones)
-                            cl(data)
+
                             // datos del Formulario
                             $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora', '#ajuste_salida_documento_id_moneda').find('option').remove()
                             cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_deudora} </option>`);

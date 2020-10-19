@@ -167,7 +167,7 @@ class AjusteSalidaController extends AbstractController
                 // Verificar el criterio de analisis de EXP esta en esta cuenta
                 if ($codigo_exp != null) {
                     // Verificar si existe el Expediente sino hacerlo nuevo
-                    $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo_exp]);
+                    $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo_exp, 'anno' => $year_]);
                     if (!$expediente) {
                         $expediente = new Expediente();
                         $expediente->setCodigo($codigo_exp)
@@ -175,8 +175,10 @@ class AjusteSalidaController extends AbstractController
                             ->setIdUnidad($alamcen->getIdUnidad())
                             ->setActivo(true);
                         $em->persist($expediente);
-                    }
+                    } else if ($descripcion_exp != $expediente->getDescripcion())
+                        return new JsonResponse(['success' => false, 'message' => 'El código del expediente ya exciste']);
                 }
+
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
                         $cantidad_mercancia = $mercancia['cant'];
@@ -265,7 +267,8 @@ class AjusteSalidaController extends AbstractController
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
-                'codigo' => $codigo
+                'codigo' => $codigo,
+                'cuenta' => $cuenta
             ));
 
         $row = array();

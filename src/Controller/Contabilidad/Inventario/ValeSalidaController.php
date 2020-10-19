@@ -15,12 +15,14 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\ValeSalidaType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Config\UnidadRepository;
+use App\Repository\Contabilidad\Inventario\OrdenTrabajoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -182,7 +184,7 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/form-add", name="contabilidad_inventario_vale_salida_gestionar", methods={"GET","POST"})
      */
-    public function gestionarVale(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    public function gestionarVale(EntityManagerInterface $em, Request $request, OrdenTrabajoRepository $ordenTrabajoRepository)
     {
         $form = $this->createForm(ValeSalidaType::class);
         $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
@@ -201,6 +203,8 @@ class ValeSalidaController extends AbstractController
                 $nro_subcuenta_deudora = isset($vale_salida['nro_subcuenta_deudora'])
                     ? AuxFunctions::getNro($vale_salida['nro_subcuenta_deudora']) : '';
                 $id_moneda = $vale_salida['documento']['id_moneda'];
+                $codigo_ot = array_key_exists('codigo_ot', $vale_salida) ? $vale_salida['codigo_ot'] : null;
+                $descripcion_ot = array_key_exists('descripcion_ot', $vale_salida) ? $vale_salida['descripcion_ot'] : null;
 
 
                 ////0-obtengo el numero consecutivo de documento
@@ -255,6 +259,25 @@ class ValeSalidaController extends AbstractController
 
                     /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                     $mercancia_er = $em->getRepository(Mercancia::class);
+                    $alamcen = $em->getRepository(Almacen::class)->find($id_almacen);
+
+                    $orden_trabajo = null;
+                    // Verificar el criterio de analisis de EXP esta en esta cuenta
+                    if ($codigo_ot != null) {
+                        // Verificar si existe el Expediente sino hacerlo nuevo
+                        $orden_trabajo = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo_ot, 'anno' => $year_]);
+                        if (!$orden_trabajo) {
+                            $orden_trabajo = new OrdenTrabajo();
+                            $orden_trabajo->setCodigo($codigo_ot)
+                                ->setDescripcion($descripcion_ot)
+                                ->setIdUnidad($alamcen->getIdUnidad())
+                                ->setAnno($year_)
+                                ->setActivo(true);
+                            $em->persist($orden_trabajo);
+                        } else if ($descripcion_ot != $orden_trabajo->getDescripcion())
+                            return new JsonResponse(['success' => false, 'message' => 'El código de la orden de trabajo ya exciste']);
+
+                    }
 
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
@@ -279,6 +302,7 @@ class ValeSalidaController extends AbstractController
                                 ->setCantidad($cantidad_mercancia)
                                 ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                                 ->setIdDocumento($documento)
+                                ->setIdOrdenTrabajo($orden_trabajo)
                                 ->setIdCentroCosto($em->getRepository(CentroCosto::class)->find($centro_costo))
                                 ->setIdElementoGasto($em->getRepository(ElementoGasto::class)->find($elemento_gasto))
                                 ->setIdTipoDocumento($obj_tipo_documento)
@@ -337,7 +361,8 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/getVale/{nro}", name="contabilidad_inventario_vale_salida_get_vale",methods={"POST"})
      */
-    public function getVale(EntityManagerInterface $em, Request $request, $nro)
+    public
+    function getVale(EntityManagerInterface $em, Request $request, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -369,6 +394,7 @@ class ValeSalidaController extends AbstractController
             'id_documento' => $vale_obj->getIdDocumento()
         ));
 
+        $orden_trabajo = null;
         foreach ($arr_movimiento_mercancia as $obj) {
             /**@var $obj MovimientoMercancia* */
             $rows_movimientos[] = array(
@@ -381,6 +407,7 @@ class ValeSalidaController extends AbstractController
                 'importe' => number_format($obj->getImporte(), 3, '.', ''),
             );
             $importe_total += $obj->getImporte();
+            if (!$orden_trabajo) $orden_trabajo = $obj->getIdOrdenTrabajo();
         }
 
         $cuentas = $em->getRepository(Cuenta::class);
@@ -398,15 +425,17 @@ class ValeSalidaController extends AbstractController
             'id_moneda' => $vale_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $vale_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,
-            'mercancias' => $rows_movimientos
+            'mercancias' => $rows_movimientos,
+            'orden_trabajo' => $orden_trabajo ? ['codigo' => $orden_trabajo->getCodigo(), 'descripcion' => $orden_trabajo->getDescripcion()] : null,
         );
-        return new JsonResponse([['vale' => $rows, 'success' => true, 'msg' => 'Vale de salida recuperado con éxito.']]);
+        return new JsonResponse(['vale' => $rows, 'success' => true, 'msg' => 'Vale de salida recuperado con éxito.']);
     }
 
     /**
      * @Route("/delete/{nro}", name="contabilidad_inventario_vale_salida_delete", methods={"DELETE"})
      */
-    public function deleteInforme(Request $request, $nro)
+    public
+    function deleteInforme(Request $request, $nro)
     {
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
@@ -469,7 +498,8 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/print-report/{nro}", name="contabilidad_inventario_vale_salida_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public
+    function print(EntityManagerInterface $em, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -560,7 +590,7 @@ class ValeSalidaController extends AbstractController
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
@@ -584,5 +614,30 @@ class ValeSalidaController extends AbstractController
             'nro' => $nro
         ]);
 
+    }
+
+    /**
+     * @Route("/dinamic-files/{nro}", name="contabilidad_inventario_vale_salida_dinamic",methods={"GET","POST"})
+     */
+    public function dinamic(EntityManagerInterface $em, $nro)
+    {
+        $no_cuenta = AuxFunctions::getNro($nro);
+        $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
+
+        return new JsonResponse(['data' => $respuesta, 'success' => true]);
+
+    }
+
+    /**
+     * @Route("/get-orden-trabajo/{codigo}")
+     */
+    public function getOrden($codigo, OrdenTrabajoRepository $ordenTrabajoRepository)
+    {
+
+        $orden = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo]);
+        if ($orden) {
+            return new JsonResponse(['data' => $orden->getDescripcion(), 'success' => true]);
+        }
+        return new JsonResponse(['data' => null, 'success' => false]);
     }
 }
