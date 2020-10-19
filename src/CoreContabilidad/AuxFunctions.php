@@ -10,8 +10,14 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\InformeRecepcion;
+use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\Transferencia;
+use App\Entity\Contabilidad\Inventario\ValeSalida;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -82,7 +88,6 @@ class AuxFunctions
         }
         return $consecutivo;
     }
-
 
     /**
      * Indica si un objeto esta duplicado en BD,ya sea para 'adicionar' como `modificar`
@@ -569,4 +574,590 @@ class AuxFunctions
 
         return $arr_criterios;
     }
+
+    /**
+     * FUNCIONES PARA EL COMPROBANTE DE ANOTACIONES Y EL CUADRE DIARIO
+     */
+    public static function getDataInformeRecepcion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        //informe recepcion mercancia
+        $obj_informe = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'producto' => false
+        ));
+        /**@var $obj_informe InformeRecepcion* */
+        $nro_doc = 'IRM' . '-' . $obj_informe->getNroConcecutivo();
+        $nro_cuenta_acreedora = $obj_informe->getNroCuentaAcreedora();
+        $nro_subcuenta_acreedora = $obj_informe->getNroSubcuentaAcreedora();
+        $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+        $cod_proveedor = $obj_informe->getIdProveedor()->getCodigo();
+        $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_documento' => $obj_documento,
+            'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+        ));
+        $total = 0;
+        //totalizar importe
+        $cuentas_ir = [];
+        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+            $total += floatval($obj_movimiento_mercancia->getImporte());
+            /**@var $obj_movimiento_mercancia MovimientoMercancia */
+            $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+            $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+            if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+            }
+        }
+
+        foreach ($cuentas_ir as $key => $cuenta) {
+            $parte = 0;
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                    $parte += floatval($obj_movimiento_mercancia->getImporte());
+                }
+            }
+            $dat = explode(':', $cuenta);
+            if ($key == 0)
+                $rows[] = array(
+                    'nro_doc' => $nro_doc,
+                    'fecha' => $fecha_doc,
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '',
+                    'debito' => number_format($parte, 2),
+                    'credito' => ''
+                );
+            else
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '',
+                    'debito' => number_format($parte, 2),
+                    'credito' => ''
+                );
+        }
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => $nro_cuenta_acreedora,
+            'nro_subcuenta' => $nro_subcuenta_acreedora,
+            'analisis_1' => $cod_proveedor,
+            'analisis_2' => '',
+            'debito' => '',
+            'credito' => number_format($total, 2)
+        );
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => '',
+            'nro_subcuenta' => '',
+            'analisis_1' => '',
+            'analisis_2' => '',
+            'debito' => number_format($total, 2),
+            'credito' => number_format($total, 2)
+        );
+        return $rows;
+    }
+
+    public static function getDataValeSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        $obj_vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'producto' => false
+        ));
+        /**@var $obj_vale_salida ValeSalida* */
+        $nro_doc = 'VSM' . '-' . $obj_vale_salida->getNroConsecutivo();
+        $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+        $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_documento' => $obj_documento,
+            'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+        ));
+        //totalizar importe
+        $rep_arr = [];
+
+        $i = 0;
+        $total = 0;
+        $total_general = 0;
+        foreach ($arr_obj_movimiento_mercancia as $d) {
+            $cc = $d->getIdCentroCosto()->getId() . '-' . $d->getIdElementoGasto()->getId();
+            if (!in_array($cc, $rep_arr)) {
+                $rep_arr[$i] = $cc;
+                $i++;
+                $total = 0;
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    if ($obj_movimiento_mercancia->getIdCentroCosto()->getId() == $d->getIdCentroCosto()->getId() &&
+                        $obj_movimiento_mercancia->getIdElementoGasto()->getId() == $d->getIdElementoGasto()->getId())
+                        $total += floatval($obj_movimiento_mercancia->getImporte());
+                }
+                $rows[] = array(
+                    'nro_doc' => $i == 1 ? $nro_doc : '',
+                    'fecha' => $i == 1 ? $fecha_doc : '',
+                    'nro_cuenta' => $obj_vale_salida->getNroCuentaDeudora(),
+                    'nro_subcuenta' => $obj_vale_salida->getNroSubcuentaDeudora(),
+                    'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
+                    'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
+                    'debito' => number_format($total, 2),
+                    'credito' => ''
+                );
+                $total_general += $total;
+            }
+        }
+
+        $cuentas_ir = [];
+        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+            $total += floatval($obj_movimiento_mercancia->getImporte());
+            /**@var $obj_movimiento_mercancia MovimientoMercancia */
+            $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+            $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+            if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+            }
+        }
+
+        foreach ($cuentas_ir as $key => $cuenta) {
+            $parte = 0;
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                    $parte += floatval($obj_movimiento_mercancia->getImporte());
+                }
+            }
+            $dat = explode(':', $cuenta);
+            if ($key == 0)
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '',
+                    'credito' => number_format($parte, 2),
+                    'debito' => ''
+                );
+            else
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '',
+                    'credito' => number_format($parte, 2),
+                    'debito' => ''
+                );
+        }
+
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => '',
+            'nro_subcuenta' => '',
+            'analisis_1' => '',
+            'analisis_2' => '',
+            'debito' => number_format($total_general, 2),
+            'credito' => number_format($total_general, 2)
+        );
+
+        return $rows;
+    }
+
+    public static function getDataAjusteSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        $obj_ajuste_salida = $em->getRepository(Ajuste::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'entrada' => false,
+            'activo' => true
+        ));
+        if ($obj_ajuste_salida) {
+            /**@var $obj_ajuste_salida Ajuste* */
+            $nro_doc = 'AS' . '-' . $obj_ajuste_salida->getNroConcecutivo();
+            $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+            $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+                'id_documento' => $obj_documento,
+                'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+            ));
+            //totalizar importe
+            $rep_arr = [];
+
+            $i = 0;
+            $total = 0;
+            $total_general = 0;
+            /** @var MovimientoMercancia $d */
+            foreach ($arr_obj_movimiento_mercancia as $d) {
+                if ($d->getIdCentroCosto() != null && $d->getIdElementoGasto() != null) {
+                    $cc = $d->getIdCentroCosto()->getCodigo() . '-' . $d->getIdElementoGasto()->getCodigo();
+                    if (!in_array($cc, $rep_arr)) {
+                        $rep_arr[$i] = $cc;
+                        $i++;
+                        $total = 0;
+                        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                            /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                            if ($obj_movimiento_mercancia->getIdCentroCosto()->getId() == $d->getIdCentroCosto()->getId() &&
+                                $obj_movimiento_mercancia->getIdElementoGasto()->getId() == $d->getIdElementoGasto()->getId())
+                                $total += floatval($obj_movimiento_mercancia->getImporte());
+                        }
+                        $rows[] = array(
+                            'nro_doc' => $i == 1 ? $nro_doc : '',
+                            'fecha' => $i == 1 ? $fecha_doc : '',
+                            'nro_cuenta' => $obj_ajuste_salida->getNroCuentaInventario(),
+                            'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
+                            'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
+                            'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
+                            'debito' => number_format($total, 2),
+                            'credito' => ''
+                        );
+                        $total_general += $total;
+                    }
+                } elseif ($d->getIdExpediente() != null) {
+                    $cc = $d->getIdExpediente()->getCodigo();
+                    if (!in_array($cc, $rep_arr)) {
+                        $rep_arr[$i] = $cc;
+                        $i++;
+                        $total = 0;
+                        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                            /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                            if ($obj_movimiento_mercancia->getIdExpediente()->getId() == $d->getIdExpediente()->getId())
+                                $total += floatval($obj_movimiento_mercancia->getImporte());
+                        }
+                        $rows[] = array(
+                            'nro_doc' => $i == 1 ? $nro_doc : '',
+                            'fecha' => $i == 1 ? $fecha_doc : '',
+                            'nro_cuenta' => $obj_ajuste_salida->getNroCuentaInventario(),
+                            'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
+                            'analisis_1' => $d->getIdExpediente()->getCodigo(),
+                            'analisis_2' => '',
+                            'debito' => number_format($total, 2),
+                            'credito' => ''
+                        );
+                        $total_general += $total;
+                    }
+                }
+            }
+
+            $cuentas_ir = [];
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+//            $total_general += floatval($obj_movimiento_mercancia->getImporte());
+                /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+                $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                    $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+                }
+            }
+
+            foreach ($cuentas_ir as $key => $cuenta) {
+                $parte = 0;
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                        $parte += floatval($obj_movimiento_mercancia->getImporte());
+                    }
+                }
+                $dat = explode(':', $cuenta);
+                if ($key == 0)
+                    $rows[] = array(
+                        'nro_doc' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'credito' => number_format($parte, 2),
+                        'debito' => ''
+                    );
+                else
+                    $rows[] = array(
+                        'nro_doc' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'credito' => number_format($parte, 2),
+                        'debito' => ''
+                    );
+            }
+
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => '',
+                'nro_subcuenta' => '',
+                'analisis_1' => '',
+                'analisis_2' => '',
+                'debito' => number_format($total_general, 2),
+                'credito' => number_format($total_general, 2)
+            );
+
+            return $rows;
+        }
+    }
+
+    public static function getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        /**@var $obj_ajuste_entrada Ajuste* */
+        $obj_ajuste_entrada = $em->getRepository(Ajuste::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'entrada' => true,
+            'activo' => true
+        ));
+        if ($obj_ajuste_entrada) {
+            $nro_doc = 'AE' . '-' . $obj_ajuste_entrada->getNroConcecutivo();
+            $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+            $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+                'id_documento' => $obj_documento,
+                'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+            ));
+
+            $cuentas_ir = [];
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+                $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                    $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+                }
+            }
+
+            foreach ($cuentas_ir as $key => $cuenta) {
+                $parte = 0;
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    $cuenta_subcuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                    if ($cuenta_subcuenta == $cuenta) {
+                        $parte += floatval($obj_movimiento_mercancia->getImporte());
+                    }
+                }
+                $dat = explode(':', $cuenta);
+                if ($key == 0)
+                    $rows[] = array(
+                        'nro_doc' => $nro_doc,
+                        'fecha' => $fecha_doc,
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'debito' => number_format($parte, 2),
+                        'credito' => ''
+                    );
+                else
+                    $rows[] = array(
+                        'nro_doc' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'debito' => number_format($parte, 2),
+                        'credito' => ''
+                    );
+            }
+
+            //acreedora
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $obj_ajuste_entrada->getNroCuentaAcreedora(),
+                'nro_subcuenta' => $obj_ajuste_entrada->getNroSubcuentanroAcreedora(),
+                'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
+                'analisis_2' => '',
+                'debito' => '',
+                'credito' => number_format($obj_documento->getImporteTotal(), 2)
+            );
+
+            //totalizado
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => '',
+                'nro_subcuenta' => '',
+                'analisis_1' => '',
+                'analisis_2' => '',
+                'debito' => number_format($obj_documento->getImporteTotal(), 2),
+                'credito' => number_format($obj_documento->getImporteTotal(), 2)
+            );
+
+            return $rows;
+        }
+    }
+
+    public static function getDataTransferenciaSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        /** @var Documento $obj_documento */
+        $obj_transferencia_salida = $em->getRepository(Transferencia::class)->findOneBy(array(
+            'id_documento' => $obj_documento
+        ));
+        /**@var $obj_transferencia_salida Transferencia* */
+        $nro_doc = 'TS' . '-' . $obj_transferencia_salida->getNroConcecutivo();
+        $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+        $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_documento' => $obj_documento,
+            'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+        ));
+        //totalizar importe
+        $rep_arr = [];
+
+        $i = 0;
+        $total_general = 0;
+        $rows[] = array(
+            'nro_doc' => $nro_doc,
+            'fecha' => $fecha_doc,
+            'nro_cuenta' => $obj_transferencia_salida->getNroCuentaInventario(),
+            'nro_subcuenta' => $obj_transferencia_salida->getNroSubcuentaInventario(),
+            'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
+            'analisis_2' => '',
+            'debito' => number_format($obj_documento->getImporteTotal(), 2),
+            'credito' => ''
+        );
+
+        /** @var MovimientoMercancia $d */
+        foreach ($arr_obj_movimiento_mercancia as $d) {
+            $cc = $d->getIdMercancia()->getCuenta() . '-' . $d->getIdMercancia()->getNroSubcuentaInventario();
+            if (!in_array($cc, $rep_arr)) {
+                $rep_arr[$i] = $cc;
+                $i++;
+                $total = 0;
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() == $d->getIdMercancia()->getCuenta() &&
+                        $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $d->getIdMercancia()->getNroSubcuentaInventario())
+                        $total += floatval($obj_movimiento_mercancia->getImporte());
+                }
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $d->getIdMercancia()->getCuenta(),
+                    'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaInventario(),
+                    'analisis_1' => $d->getIdAlmacen()->getCodigo(),
+                    'analisis_2' => '',
+                    'credito' => number_format($total, 2),
+                    'debito' => ''
+                );
+            }
+        }
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => '',
+            'nro_subcuenta' => '',
+            'analisis_1' => '',
+            'analisis_2' => '',
+            'debito' => number_format($obj_documento->getImporteTotal(), 2),
+            'credito' => number_format($obj_documento->getImporteTotal(), 2)
+        );
+
+        return $rows;
+    }
+
+    public static function getCriterioByCuentagetDataTransferenciaEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'entrada' => true
+        ));
+        /**@var $obj_transferencia_entrada Transferencia* */
+        $nro_doc = 'TE' . '-' . $obj_transferencia_entrada->getNroConcecutivo();
+        $nro_cuenta_acreedora = $obj_transferencia_entrada->getNroCuentaAcreedora();
+        $nro_subcuenta_acreedora = $obj_transferencia_entrada->getNroSubcuentaAcreedora();
+        $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+        $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_documento' => $obj_documento,
+            'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+        ));
+        $total = 0;
+        //totalizar importe
+        $cuentas_ir = [];
+        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+            $total += floatval($obj_movimiento_mercancia->getImporte());
+            /**@var $obj_movimiento_mercancia MovimientoMercancia */
+            $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+            $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+            if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+            }
+        }
+
+        foreach ($cuentas_ir as $key => $cuenta) {
+            $parte = 0;
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                    $parte += floatval($obj_movimiento_mercancia->getImporte());
+                }
+            }
+            $dat = explode(':', $cuenta);
+            if ($key == 0)
+                $rows[] = array(
+                    'nro_doc' => $nro_doc,
+                    'fecha' => $fecha_doc,
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '',
+                    'debito' => number_format($parte, 2),
+                    'credito' => ''
+                );
+            else
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '',
+                    'debito' => number_format($parte, 2),
+                    'credito' => ''
+                );
+        }
+
+        if($obj_transferencia_entrada->getIdAlmacen()){
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $nro_cuenta_acreedora,
+                'nro_subcuenta' => $nro_subcuenta_acreedora,
+                'analisis_1' => $obj_transferencia_entrada->getIdAlmacen()->getCodigo(),
+                'analisis_2' => '',
+                'debito' => '',
+                'credito' => number_format($total, 2)
+            );
+        }
+        elseif ($obj_transferencia_entrada->getIdUnidad()){
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $nro_cuenta_acreedora,
+                'nro_subcuenta' => $nro_subcuenta_acreedora,
+                'analisis_1' => $obj_transferencia_entrada->getIdUnidad()->getCodigo(),
+                'analisis_2' => '',
+                'debito' => '',
+                'credito' => number_format($total, 2)
+            );
+        }
+
+
+
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => '',
+            'nro_subcuenta' => '',
+            'analisis_1' => '',
+            'analisis_2' => '',
+            'debito' => number_format($total, 2),
+            'credito' => number_format($total, 2)
+        );
+        return $rows;
+    }
+
 }
