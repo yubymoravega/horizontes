@@ -87,7 +87,7 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 8) {
 
             }//devolucion
-            elseif ($id_tipo_documento == 9){
+            elseif ($id_tipo_documento == 9) {
 
             }
         }
@@ -105,7 +105,7 @@ class ComprobanteAnotacionesController extends AbstractController
         return $this->render('contabilidad/inventario/comprobante_anotaciones/print.html.twig', [
             'datos' => $this->getData($request, $em),
             'almacen' => $almacen_obj->getCodigo() . ': ' . $almacen_obj->getDescripcion(),
-            'unidad' => $almacen_obj->getIdUnidad()->getCodigo() . ': ' . $almacen_obj->getIdUnidad()->getNombre()
+            'unidad' => $almacen_obj->getIdUnidad()->getCodigo() . ': ' . $almacen_obj->getIdUnidad()->getNombre(),
         ]);
     }
 }
