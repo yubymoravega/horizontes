@@ -24,18 +24,14 @@
                 <tr class="font-weight-bold border">
                     <td style="width: 60px !important;" class="text-left">Cuenta</td>
                     <td style="width: 100px" class="text-left">Subcuenta</td>
-                    <td style="width: 100px" class="text-left">Análisis 1</td>
-                    <td style="width: 100px" class="text-left">Análisis 2</td>
-                    <td style="width: 100px" class="text-left">Análisis 3</td>
+                    <td style="width: 300px" class="text-left">Análisis 1 - Análisis 2 - Análisis 3</td>
                     <td class="text-center">Descripción</td>
                 </tr>
                 <tbody>
                 <tr>
                     <td style="width: 100px" class="text-left">{{ item.cuenta }}</td>
                     <td style="width: 100px" class="text-left">{{ item.subcuenta }}</td>
-                    <td style="width: 100px" class="text-left"></td>
-                    <td style="width: 100px" class="text-left"></td>
-                    <td style="width: 100px" class="text-left"></td>
+                    <td style="width: 100px" class="text-left">{{ item.analisis }}</td>
                     <td class="text-center">{{ item.descripcion }}</td>
                 </tr>
                 <table class="align-content-center ml-5 mt-2" border="0" width="800px">
@@ -77,7 +73,7 @@
         <div class="d-flex" style="width: 960px">
             <div class="">
                 <a type="button" name="btn_generar" href="{{ url('inventario') }}"
-                   class="btn btn-outline-secondary text-uppercase mt-2 font-weight-bold">
+                   class="btn btn-secondary text-uppercase mt-2 font-weight-bold">
                     Atras
                 </a>
             </div>
