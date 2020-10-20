@@ -80,6 +80,6 @@ inventario a la mercancia directamente y quitarla del tipo de documento en cuest
 - (✓) Ajuste Salida -> dependiendo del criterio de analisis [cc, eg] o [exp] asignarle el campo correspondiente
     - cargar [cc, eg] o [exp] cuando se seleccione un numero de cuenta y cargar la descripcion de
     los expedientes cuando se de enter en el codigo
-- revisar el tema de la creacion y carga de los nro_consecutivos por(almacen, año, tex.) --
+- revisar el tema de la creacion y carga de los (******* nro_consecutivos) por(almacen, año, tex.) --
 en la casa el Ajuste entrada carga
 incorectamente un nro_consecutivo por algun motivo desconocido 

@@ -268,7 +268,6 @@ class AjusteSalidaController extends AbstractController
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
                 'codigo' => $codigo,
-                'cuenta' => $cuenta
             ));
 
         $row = array();

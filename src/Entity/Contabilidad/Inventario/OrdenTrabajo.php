@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Repository\Contabilidad\Inventario\ExpedienteRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -43,6 +44,12 @@ class OrdenTrabajo
      * @ORM\Column(type="integer")
      */
     private $anno;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $id_almacen;
 
 
     public function getId(): ?int
@@ -106,6 +113,18 @@ class OrdenTrabajo
     public function setAnno(int $anno): self
     {
         $this->anno = $anno;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
 
         return $this;
     }

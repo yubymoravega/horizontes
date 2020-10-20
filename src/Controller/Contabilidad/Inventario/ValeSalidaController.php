@@ -265,12 +265,13 @@ class ValeSalidaController extends AbstractController
                     // Verificar el criterio de analisis de EXP esta en esta cuenta
                     if ($codigo_ot != null) {
                         // Verificar si existe el Expediente sino hacerlo nuevo
-                        $orden_trabajo = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo_ot, 'anno' => $year_]);
+                        $orden_trabajo = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo_ot, 'anno' => $year_,  'id_almacen' => $alamcen]);
                         if (!$orden_trabajo) {
                             $orden_trabajo = new OrdenTrabajo();
                             $orden_trabajo->setCodigo($codigo_ot)
                                 ->setDescripcion($descripcion_ot)
                                 ->setIdUnidad($alamcen->getIdUnidad())
+                                ->setIdAlmacen($alamcen)
                                 ->setAnno($year_)
                                 ->setActivo(true);
                             $em->persist($orden_trabajo);
@@ -631,10 +632,12 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/get-orden-trabajo/{codigo}")
      */
-    public function getOrden($codigo, OrdenTrabajoRepository $ordenTrabajoRepository)
+    public function getOrden($codigo, Request $request,
+                             OrdenTrabajoRepository $ordenTrabajoRepository,
+                             AlmacenRepository $almacenRepository)
     {
-
-        $orden = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo]);
+        $almacen = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')]);
+        $orden = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo, 'id_almacen' => $almacen]);
         if ($orden) {
             return new JsonResponse(['data' => $orden->getDescripcion(), 'success' => true]);
         }

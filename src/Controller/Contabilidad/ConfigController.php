@@ -7,6 +7,10 @@ use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
+use App\Repository\Contabilidad\CapitalHumano\EmpleadoRepository;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Inventario\ExpedienteRepository;
+use App\Repository\Contabilidad\Inventario\OrdenTrabajoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -104,6 +108,63 @@ class ConfigController extends AbstractController
             return new JsonResponse(['msg' => $err->getMessage()]);
         }
         return new JsonResponse(['success' => true]);
+    }
+
+    /**
+     * @Route("/contabilidad/config/expedientes", name="contabilidad_config_expedientes")
+     */
+    public function listExpedientes(ExpedienteRepository $expedienteRepository, EmpleadoRepository $empleadoRepository)
+    {
+        $id_user = $this->getUser()->getId();
+        $obj_empleado = $empleadoRepository->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $id_user
+        ));
+
+        $unidad = $obj_empleado->getIdUnidad();
+        $expedientes = $expedienteRepository->findBy(['activo' => true, 'id_unidad' => $unidad]);
+
+        return $this->render('contabilidad/config/Expediente/index.html.twig',
+            ['list_expedientes' => $expedientes]
+        );
+    }
+
+    /**
+     * @Route("/contabilidad/config/orden-trabajo", name="contabilidad_config_orden_trabajo")
+     */
+    public function listOrdenTrabajo(OrdenTrabajoRepository $ordenTrabajoRepository,
+                                     EmpleadoRepository $empleadoRepository,
+                                     AlmacenRepository $almacenRepository)
+    {
+        $id_user = $this->getUser()->getId();
+        $obj_empleado = $empleadoRepository->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $id_user
+        ));
+
+        $unidad = $obj_empleado->getIdUnidad();
+        $alamcenes = $almacenRepository->findBy(['id_unidad' => $unidad]);
+        $row_almacenes = [];
+        foreach ($alamcenes as $alm) {
+            $ordenes = $ordenTrabajoRepository->findBy(['activo' => true, 'id_unidad' => $unidad, 'id_almacen' => $alm]);
+            if ($ordenes) {
+                $list_ordenes = [];
+                foreach ($ordenes as $obj) {
+                    array_push($list_ordenes, $obj);
+                }
+
+                $row_almacenes [] = [
+                    'almacen' => $alm->getDescripcion(),
+                    'ordenes' => $list_ordenes
+                ];
+            }
+        }
+
+//        dd($row_almacenes);
+
+        return $this->render('contabilidad/config/orden_trabajo/index.html.twig',
+            ['list_ordenes' => $row_almacenes]
+        );
     }
 }
 
