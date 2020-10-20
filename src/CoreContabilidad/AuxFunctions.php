@@ -1324,9 +1324,9 @@ class AuxFunctions
         $analisis1 = '';
         $analisis2 = '';
         foreach ($arr_criterios as $abreviatura){
-            if($abreviatura[0] == 'ALM')
+            if($abreviatura == 'ALM')
                 $analisis1 = $cod_almacen;
-            elseif ($abreviatura[0] == 'UNID')
+            elseif ($abreviatura == 'UNID')
                 $analisis2 = $em->getRepository(Almacen::class)->findOneBy(['codigo'=>$cod_almacen,'activo'=>true])->getIdUnidad()->getCodigo();
         }
         $rows[] = array(
