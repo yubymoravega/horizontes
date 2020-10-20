@@ -247,7 +247,7 @@ class CerrarDiaController extends AbstractController
             $almacen = $element->getIdAlmacen()?$element->getIdAlmacen()->getCodigo():'';
 //            $orden_trabajo = $element->getIdOrdenTrabajo()?$element->getIdOrdenTrabajo()->getCodigo():'';
             $str_creiterios = '-';
-            if (in_array('CC',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+            if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
                 $str_creiterios = $str_creiterios. $centro_costo.'-';
             }
             if (in_array('EG',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
@@ -285,7 +285,7 @@ class CerrarDiaController extends AbstractController
                 $almacen = $element->getIdAlmacen()?$element->getIdAlmacen()->getCodigo():'';
 //            $orden_trabajo = $element->getIdOrdenTrabajo()?$element->getIdOrdenTrabajo()->getCodigo():'';
                 $str_creiterios = '-';
-                if (in_array('CC',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+                if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
                     $str_creiterios = $str_creiterios. $centro_costo.'-';
                 }
                 if (in_array('EG',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
