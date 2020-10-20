@@ -568,9 +568,7 @@ class AuxFunctions
 
         foreach ($cuenta_criterio_analisis as $obj) {
             $criterio_obj = $criterio_analisis_er->findOneBy(['id' => $obj->getIdCriterioAnalisis()]);
-            $arr_criterios [] = [
-                $criterio_obj->getAbreviatura()
-            ];
+            array_push($arr_criterios, $criterio_obj->getAbreviatura());
         }
 
         return $arr_criterios;
@@ -1121,7 +1119,7 @@ class AuxFunctions
                 );
         }
 
-        if($obj_transferencia_entrada->getIdAlmacen()){
+        if ($obj_transferencia_entrada->getIdAlmacen()) {
             $rows[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -1244,7 +1242,6 @@ class AuxFunctions
                 'credito' => number_format($total, 2)
             );
         }
-
 
 
         $rows[] = array(

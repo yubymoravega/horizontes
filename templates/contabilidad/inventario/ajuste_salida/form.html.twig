@@ -579,15 +579,15 @@
                         }
                     }
                 })
-                loadingModal.show('Cargando otros campos...')
+                miniLoadin.show({msg:'cargando otros campos...', target: '#ajuste_salida'})
                 // cargar dinamicamente [cc, eg] o [exp]
+                $('#eg_cc_row').hide()
+                $('#expediente_row').hide()
                 $.ajax({
                     url: '/contabilidad/inventario/ajuste-salida/dinamic-files/' + $(this).val(),
                     method: 'POST',
                     success: function (result) {
                         if (result.success) {
-                            $('#eg_cc_row').hide()
-                            $('#expediente_row').hide()
 
                             $('#ajuste_salida_id_elemento_gasto').val(0)
                             $('#ajuste_salida_id_centro_costo').val(0)
@@ -600,7 +600,7 @@
                         } else {
                             alertTemplate(result.msg)
                         }
-                        loadingModal.close()
+                        miniLoadin.close()
                     },
                     error: function () {
                     }

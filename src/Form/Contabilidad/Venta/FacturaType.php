@@ -19,6 +19,7 @@ class FacturaType extends AbstractType
             ->add('id_contrato')
             ->add('cuenta_obligacion')
             ->add('subcuenta_obligacion')
+            ->add('movimiento_venta', MovimientoVentaType::class)
         ;
     }
 

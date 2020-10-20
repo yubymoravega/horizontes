@@ -181,7 +181,22 @@ loadingModal = {
             $('#loading-modal').modal('hide');
         }, 500)
     }
+}
 
+miniLoadin = {
+    show: (config) => {
+        const {msg = 'Cargando...', target} = config
+
+        $(target).append(
+            `<div mili-loading class="d-flex justify-content-center">
+                <span class="spinner-border text-primary" style="width: 1.3rem; height: 1.3rem;" role="status" aria-hidden="true"></span>
+                <span class="text-primary ml-2" id="loading-modal-msg"> ${msg}</span>
+            </div>`
+        )
+    },
+    close: () => {
+        $('[mili-loading]').remove()
+    }
 }
 
 
@@ -202,10 +217,16 @@ var contableAsyncLoads = {
     config: {
 
         /**
-         * Carga una el listado de subcuentas y lo asigna en un <select>, si `slect_index != 0` sera el valor seleccionado por defecto
+         * Carga una el listado de subcuentas y lo asigna en un <select>, si
+         `slect_index != 0`
+         sera el valor seleccionado por defecto
          * @param id_cuenta id de la cuenta por la que se va a buscar
-         * @param select_input `<select>` componente HTML que se va a cargar el listado de cuentas
-         * @param select_index `<options>` seleccionada por defecto
+         * @param select_input
+         `<select>`
+         componente HTML que se va a cargar el listado de cuentas
+         * @param select_index
+         `<options>`
+         seleccionada por defecto
          */
         loadSubcuentaByCuenta: function (id_cuenta, select_input, select_index = 0) {
             loadingModal.show('Cargando subcuentas...')

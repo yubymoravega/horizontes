@@ -407,14 +407,14 @@
                     }
                 })
 
-                loadingModal.show('Cargando otros campos...')
+                miniLoadin.show({msg:'cargando otros campos...', target: '#vale_salida'})
                 // cargar dinamicamente [OT]
+                $('#orden_trabajo_row').hide()
                 $.ajax({
                     url: '/contabilidad/inventario/ajuste-salida/dinamic-files/' + $(this).val(),
                     method: 'POST',
                     success: function (result) {
                         if (result.success) {
-                            $('#orden_trabajo_row').hide()
 
                             $('#vale_salida_codigo_ot').val(null)
                             $('#vale_salida_descripcion_ot').val(null)
@@ -424,7 +424,7 @@
                         } else {
                             alertTemplate(result.message,'danger')
                         }
-                        loadingModal.close()
+                        miniLoadin.close()
                     },
                     error: function () {
                     }
