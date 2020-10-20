@@ -14,7 +14,7 @@
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Registro de comprobantes
             </h4>
-            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir"
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir Registro de Comprobantes"
                     onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">
                 <i class="fa fa-print"></i>
             </button>
@@ -30,17 +30,17 @@
             <th width="100px" class="pl-0 text-center pr-0">Fecha</th>
             <th scope="col-1" class="pl-2 text-center">Usuario</th>
             <th scope="col-1">Descripción</th>
+            <th width="100px">Imprimir</th>
             </thead>
             <tbody>
             {% for item in registro %}
                 <tr>
-                    <td style="font-weight:400;"><a href="{{ url('contabilidad_general_registro_comprobantes_detalles',{id: item.id}) }}" target="_blank" class="text-white"
-                                                    title="VISUALIZAR {{ item.tipo_comprobante }}">{{ item.abreviatura_comprobante }}
-                            -{{ item.nro }}</a></td>
+                    <td style="font-weight:400;">{{ item.abreviatura_comprobante }}-{{ item.nro }}</td>
                     <td style="font-weight:400;" class="pl-0 pr-0">{{ item.almacen }}</td>
                     <td style="font-weight:400;" class="pl-0 pr-0">{{ item.fecha }}</td>
                     <td style="font-weight:400;" class="text-center">{{ item.usuario }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning" title="Imprimir Comprobante" onclick="Print_Comprobante({{ item.id }})"></i></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -53,6 +53,10 @@
     {{ parent() }}
     <script>
         function Print(url) {
+            window.open(url, 'blank_')
+        }
+        function Print_Comprobante(id) {
+            let url = '/contabilidad/general/registro-comprobantes/detalles/' + id
             window.open(url, 'blank_')
         }
     </script>

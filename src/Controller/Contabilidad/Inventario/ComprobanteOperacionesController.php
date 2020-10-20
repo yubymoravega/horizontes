@@ -108,8 +108,6 @@ class ComprobanteOperacionesController extends AbstractController
                 'message' => 'No existen cierres realizados en el almacén.'
             ]);
         }
-
-
     }
 
     public function getData($request, $em, $fecha)
