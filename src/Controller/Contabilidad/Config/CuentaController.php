@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
@@ -354,6 +355,18 @@ class CuentaController extends AbstractController
             );
         }
         return new JsonResponse(['subcuentas' => $row]);
+    }
+
+    /**
+     * $nro - numero de la cuenta
+     * {Array} - Criterios de analicis de la cuenta
+     * @Route("/get-criterios/{nro}", name="contabilidad_config_get_criterios" ,methods={"POST"})
+     */
+    public function getCriterios(EntityManagerInterface $em, $nro)
+    {
+        $no_cuenta = AuxFunctions::getNro($nro);
+        $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
+        return new JsonResponse(['data' => $respuesta, 'success' => true]);
     }
 
 }

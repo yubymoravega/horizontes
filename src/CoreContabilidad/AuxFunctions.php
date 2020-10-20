@@ -568,9 +568,7 @@ class AuxFunctions
 
         foreach ($cuenta_criterio_analisis as $obj) {
             $criterio_obj = $criterio_analisis_er->findOneBy(['id' => $obj->getIdCriterioAnalisis()]);
-            $arr_criterios [] = [
-                $criterio_obj->getAbreviatura()
-            ];
+            array_push($arr_criterios, $criterio_obj->getAbreviatura());
         }
 
         return $arr_criterios;
@@ -1121,7 +1119,7 @@ class AuxFunctions
                 );
         }
 
-        if($obj_transferencia_entrada->getIdAlmacen()){
+        if ($obj_transferencia_entrada->getIdAlmacen()) {
             $rows[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -1132,8 +1130,7 @@ class AuxFunctions
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
-        }
-        elseif ($obj_transferencia_entrada->getIdUnidad()){
+        } elseif ($obj_transferencia_entrada->getIdUnidad()) {
             $rows[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -1220,7 +1217,7 @@ class AuxFunctions
                 );
         }
 
-        if($obj_transferencia_entrada->getIdAlmacen()){
+        if ($obj_transferencia_entrada->getIdAlmacen()) {
             $rows[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -1231,8 +1228,7 @@ class AuxFunctions
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
-        }
-        elseif ($obj_transferencia_entrada->getIdUnidad()){
+        } elseif ($obj_transferencia_entrada->getIdUnidad()) {
             $rows[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -1244,7 +1240,6 @@ class AuxFunctions
                 'credito' => number_format($total, 2)
             );
         }
-
 
 
         $rows[] = array(
@@ -1320,14 +1315,14 @@ class AuxFunctions
                     'credito' => ''
                 );
         }
-        $arr_criterios = self::getCriterioByCuenta($nro_cuenta_acreedora,$em);
+        $arr_criterios = self::getCriterioByCuenta($nro_cuenta_acreedora, $em);
         $analisis1 = '';
         $analisis2 = '';
-        foreach ($arr_criterios as $abreviatura){
-            if($abreviatura[0] == 'ALM')
+        foreach ($arr_criterios as $abreviatura) {
+            if ($abreviatura[0] == 'ALM')
                 $analisis1 = $cod_almacen;
             elseif ($abreviatura[0] == 'UNID')
-                $analisis2 = $em->getRepository(Almacen::class)->findOneBy(['codigo'=>$cod_almacen,'activo'=>true])->getIdUnidad()->getCodigo();
+                $analisis2 = $em->getRepository(Almacen::class)->findOneBy(['codigo' => $cod_almacen, 'activo' => true])->getIdUnidad()->getCodigo();
         }
         $rows[] = array(
             'nro_doc' => '',
