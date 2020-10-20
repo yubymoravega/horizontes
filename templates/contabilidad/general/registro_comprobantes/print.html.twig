@@ -25,10 +25,10 @@
             {% for item in datos %}
                     <tr>
                         <td style="font-weight:400;" class="text-left">{{ item.abreviatura_comprobante }} - {{ item.nro }}</td>
-                        <td style="font-weight:400;"></td>
-                        <td style="font-weight:400;" class="text-left"></td>
-                        <td style="font-weight:400;" class="text-left">{{ item.usuario }} ({{ item.fecha }})</td>
-                        <td style="font-weight:400;" class="text-left"></td>
+                        <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ item.usuario }} ({{ item.fecha }})</td>
+                        <td style="font-weight:400;" class="text-center"></td>
                     </tr>
             {% endfor %}
             </tbody>

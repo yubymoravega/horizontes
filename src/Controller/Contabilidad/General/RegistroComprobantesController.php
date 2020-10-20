@@ -59,6 +59,8 @@ class RegistroComprobantesController extends AbstractController
                     'abreviatura_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
                     'descripcion' => $comp->getDescripcion(),
                     'fecha' => $comp->getFecha()->format('d-m-Y'),
+                    'debito'=>$comp->getDebito(),
+                    'credito'=>$comp->getCredito(),
                     'usuario' => $obj_empleado->getNombre(),
                     'almacen' => $comp->getIdAlmacen()->getCodigo() . '-' . $comp->getIdAlmacen()->getDescripcion()
                 );
@@ -92,9 +94,11 @@ class RegistroComprobantesController extends AbstractController
     /**
      * @param EntityManagerInterface $em
      * @param Request $request
-     * @Route("/detalles/{$id}", name="contabilidad_general_registro_comprobantes_detalles")
+     * @Route("/detalles", name="contabilidad_general_registro_comprobantes_detalles")
      */
-    public function getDetalles(EntityManagerInterface $em, Request $request,$id){
-        dd($id);
+    public function getDetalles(EntityManagerInterface $em, Request $request){
+        $registro_obj = $em->getRepository(RegistroComprobantes::class)->find($request->get('id'));
+        dd($registro_obj);
+
     }
 }

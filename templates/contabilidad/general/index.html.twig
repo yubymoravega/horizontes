@@ -28,6 +28,16 @@
                     <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Balance de comprobación de Saldo</a>
                 </div>
             </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Nomencladores
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_expedientes') }}">Expedientes</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_orden_trabajo') }}">Ordenes de Trabajo</a>
+                </div>
+            </li>
         </ul>
     </nav>
 {% endblock %}

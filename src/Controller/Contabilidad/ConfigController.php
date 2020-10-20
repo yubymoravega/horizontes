@@ -111,7 +111,7 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/expedientes", name="contabilidad_config_expedientes")
+     * @Route("/contabilidad/general/expedientes", name="contabilidad_config_expedientes")
      */
     public function listExpedientes(ExpedienteRepository $expedienteRepository, EmpleadoRepository $empleadoRepository)
     {
@@ -130,7 +130,7 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/config/orden-trabajo", name="contabilidad_config_orden_trabajo")
+     * @Route("/contabilidad/general/orden-trabajo", name="contabilidad_config_orden_trabajo")
      */
     public function listOrdenTrabajo(OrdenTrabajoRepository $ordenTrabajoRepository,
                                      EmpleadoRepository $empleadoRepository,
