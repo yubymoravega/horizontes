@@ -1,0 +1,37 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Comprobante de Anotaciones {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Registro de comprobantes
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Unidad: </strong> {{ unidad_codigo }} : {{ unidad_nombre }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0" width="960px" class="text-center">
+            <thead>
+            <th width="70px">Comprobante</th>
+            <th width="70px">Débito</th>
+            <th width="175px">Crédito</th>
+            <th width="120px">Traspasado por</th>
+            <th width="120px">Anotado por</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                    <tr>
+                        <td style="font-weight:400;" class="text-left">{{ item.abreviatura_comprobante }} - {{ item.nro }}</td>
+                        <td style="font-weight:400;"></td>
+                        <td style="font-weight:400;" class="text-left"></td>
+                        <td style="font-weight:400;" class="text-left">{{ item.usuario }} ({{ item.fecha }})</td>
+                        <td style="font-weight:400;" class="text-left"></td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

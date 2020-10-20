@@ -14,6 +14,10 @@
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Registro de comprobantes
             </h4>
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir"
+                    onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">
+                <i class="fa fa-print"></i>
+            </button>
         </div>
         {# end header #}
 
@@ -24,16 +28,18 @@
             <th width="100px">#</th>
             <th width="350px" class="pr-0 pl-0">Almacén</th>
             <th width="100px" class="pl-0 text-center pr-0">Fecha</th>
-            <th scope="col-1" class="pl-2">Usuario</th>
+            <th scope="col-1" class="pl-2 text-center">Usuario</th>
             <th scope="col-1">Descripción</th>
             </thead>
             <tbody>
             {% for item in registro %}
                 <tr>
-                    <td style="font-weight:400;"><a href="imprimir/{{ item.id }}" class="text-white" title="VISUALIZAR {{ item.tipo_comprobante }}">{{ item.abreviatura_comprobante }}-{{ item.nro }}</a></td>
+                    <td style="font-weight:400;"><a href="{{ url('contabilidad_general_registro_comprobantes_detalles',{id: item.id}) }}" target="_blank" class="text-white"
+                                                    title="VISUALIZAR {{ item.tipo_comprobante }}">{{ item.abreviatura_comprobante }}
+                            -{{ item.nro }}</a></td>
                     <td style="font-weight:400;" class="pl-0 pr-0">{{ item.almacen }}</td>
                     <td style="font-weight:400;" class="pl-0 pr-0">{{ item.fecha }}</td>
-                    <td style="font-weight:400;">{{ item.usuario }}</td>
+                    <td style="font-weight:400;" class="text-center">{{ item.usuario }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                 </tr>
             {% endfor %}
@@ -41,4 +47,13 @@
         </table>
         {# end list #}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+    </script>
 {% endblock %}

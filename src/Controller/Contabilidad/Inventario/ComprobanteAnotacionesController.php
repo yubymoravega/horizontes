@@ -85,10 +85,11 @@ class ComprobanteAnotacionesController extends AbstractController
                 $rows = array_merge($rows, $datos_vale);
             } //vale salida de producto
             elseif ($id_tipo_documento == 8) {
-
+                $rows = array_merge($rows, []);
             }//devolucion
             elseif ($id_tipo_documento == 9) {
-
+                $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_devolucion);
             }
         }
         return $rows;
