@@ -203,8 +203,6 @@ class ValeSalidaController extends AbstractController
                 $nro_subcuenta_deudora = isset($vale_salida['nro_subcuenta_deudora'])
                     ? AuxFunctions::getNro($vale_salida['nro_subcuenta_deudora']) : '';
                 $id_moneda = $vale_salida['documento']['id_moneda'];
-                $codigo_ot = array_key_exists('codigo_ot', $vale_salida) ? $vale_salida['codigo_ot'] : null;
-                $descripcion_ot = array_key_exists('descripcion_ot', $vale_salida) ? $vale_salida['descripcion_ot'] : null;
 
 
                 ////0-obtengo el numero consecutivo de documento
@@ -238,6 +236,7 @@ class ValeSalidaController extends AbstractController
                         ->setActivo(true)
                         ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                         ->setAnno($year_)
+                        ->setImporteTotal(0)
                         ->setIdTipoDocumento($obj_tipo_documento)
                         ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                         ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
@@ -261,25 +260,6 @@ class ValeSalidaController extends AbstractController
                     $mercancia_er = $em->getRepository(Mercancia::class);
                     $alamcen = $em->getRepository(Almacen::class)->find($id_almacen);
 
-                    $orden_trabajo = null;
-                    // Verificar el criterio de analisis de EXP esta en esta cuenta
-                    if ($codigo_ot != null) {
-                        // Verificar si existe el Expediente sino hacerlo nuevo
-                        $orden_trabajo = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo_ot, 'anno' => $year_,  'id_almacen' => $alamcen]);
-                        if (!$orden_trabajo) {
-                            $orden_trabajo = new OrdenTrabajo();
-                            $orden_trabajo->setCodigo($codigo_ot)
-                                ->setDescripcion($descripcion_ot)
-                                ->setIdUnidad($alamcen->getIdUnidad())
-                                ->setIdAlmacen($alamcen)
-                                ->setAnno($year_)
-                                ->setActivo(true);
-                            $em->persist($orden_trabajo);
-                        } else if ($descripcion_ot != $orden_trabajo->getDescripcion())
-                            return new JsonResponse(['success' => false, 'message' => 'El código de la orden de trabajo ya exciste']);
-
-                    }
-
                     $importe_total = 0;
                     if ($obj_tipo_documento) {
                         foreach ($list_mercancia as $mercancia) {
@@ -290,6 +270,14 @@ class ValeSalidaController extends AbstractController
                             $unidad_medida = $mercancia['um'];
                             $centro_costo = $mercancia['centro_costo'];
                             $elemento_gasto = $mercancia['elemento_gasto'];
+                            $codigo_ot = array_key_exists('codigo_ot', $mercancia) ? $mercancia['codigo_ot'] : null;
+                            $descripcion_ot = array_key_exists('descripcion_ot', $mercancia) ? $mercancia['descripcion_ot'] : null;
+                            $orden_trabajo = null;
+                            // Verificar el criterio de analisis de EXP esta en esta cuenta
+                            if ($codigo_ot != null) {
+                                // Verificar si existe el Expediente sino hacerlo nuevo
+                                $orden_trabajo = $this->insertOT($em,$codigo_ot,$descripcion_ot,$alamcen,$year_);
+                            }
 
                             $importe_total += floatval($importe_mercancia);
 
@@ -340,6 +328,7 @@ class ValeSalidaController extends AbstractController
                     $documento
                         ->setImporteTotal($importe_total);
                     $em->persist($documento);
+//                    dd($documento);
 
                     try {
                         $em->flush();
@@ -546,6 +535,7 @@ class ValeSalidaController extends AbstractController
                     /**@var $obj MovimientoMercancia* */
                     $rows[] = array(
                         'id' => $obj->getIdMercancia()->getId(),
+                        'ot'=> $obj->getIdOrdenTrabajo()?$obj->getIdOrdenTrabajo()->getCodigo():'',
                         'codigo' => $obj->getIdMercancia()->getCodigo(),
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
@@ -587,11 +577,13 @@ class ValeSalidaController extends AbstractController
         $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
         $rows = [];
 
+//        dd($mercancias);
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
+                "ot"=> $obj->codigo_ot?$obj->codigo_ot:'',
+                "um" => $unidadRepository->findOneBy(['nombre' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
@@ -642,5 +634,28 @@ class ValeSalidaController extends AbstractController
             return new JsonResponse(['data' => $orden->getDescripcion(), 'success' => true]);
         }
         return new JsonResponse(['data' => null, 'success' => false]);
+    }
+
+    public function insertOT(EntityManagerInterface $em,$cod,$desc,$alamcen,$year_){
+        $ordenTrabajoRepository = $em->getRepository(OrdenTrabajo::class);
+
+        $orden_trabajo = $ordenTrabajoRepository->findOneBy(array(
+            'codigo' => $cod,
+            'anno' => $year_,
+            'id_almacen' => $alamcen
+        ));
+
+        if (!$orden_trabajo) {
+            $orden_trabajo = new OrdenTrabajo();
+            $orden_trabajo->setCodigo($cod)
+                ->setDescripcion($desc)
+                ->setIdUnidad($alamcen->getIdUnidad())
+                ->setIdAlmacen($alamcen)
+                ->setAnno($year_)
+                ->setActivo(true);
+            $em->persist($orden_trabajo);
+            $em->flush();
+        }
+        return $orden_trabajo;
     }
 }

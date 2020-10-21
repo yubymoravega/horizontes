@@ -10,6 +10,7 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\ComprobanteCierre;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
@@ -45,71 +46,79 @@ class ComprobanteOperacionesController extends AbstractController
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $nombre_unidad = $almacen_obj->getIdUnidad()->getNombre();
 
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha = explode('-', $fecha);
+        $year_ = intval($arr_fecha[0]);
+
         $registro_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_tipo_comprobante' => $em->getRepository(TipoComprobante::class)->find(2),
-            'id_unidad' => $obj_unidad
+            'id_unidad' => $obj_unidad,
+            'anno' => $year_
         ));
 
-        if (empty($registro_operaciones)) {
-            //recorro todos los cierres para formar el arreglo de operaciones
-            $anno = Date('Y');
-        } else {
-            /** @var RegistroComprobantes $ultimo */
-            $j = count($registro_operaciones);
-            $ultimo = $registro_operaciones[$j - 1];
-            $fecha_ultimo_registro = $ultimo->getFecha();
-            $anno = $ultimo->getAnno();
-        }
-
-        //obtengo todos los cierres diarios del anno
-        $obj_cierre_abierto = $cierre_er->findBy(array(
+        $arr_cierre = $cierre_er->findBy(array(
             'id_almacen' => $almacen_obj,
             'abierto' => false,
-            'anno' => $anno,
+            'anno' => $year_,
             'diario' => true
         ));
-
         $row = [];
         $debito = 0;
         $credito = 0;
-        /** @var Cierre $cierre */
-        foreach ($obj_cierre_abierto as $cierre) {
-            if (!empty($registro_operaciones)) {
-                if ($cierre->getFecha() > $fecha_ultimo_registro) {
-                    $fecha = $cierre->getFecha();
-                    $row = array_merge($row, $this->getData($request, $em, $fecha));
+
+        if (!empty($registro_operaciones)) {
+            /** @var RegistroComprobantes $obj_comprobante */
+            $obj_comprobante = $registro_operaciones[count($registro_operaciones) - 1];
+            $last_id_cierre = 0;
+
+            $arr_registro_cierre = $em->getRepository(ComprobanteCierre::class)->findBy(['id_comprobante' => $obj_comprobante]);
+            if (!empty($arr_registro_cierre)) {
+                /** @var ComprobanteCierre $registro_cierre */
+                foreach ($arr_registro_cierre as $registro_cierre) {
+                    if ($registro_cierre->getIdCierre()->getId() > $last_id_cierre)
+                        $last_id_cierre = $registro_cierre->getIdCierre()->getId();
                 }
-            } else {
-                $fecha = $cierre->getFecha();
-                $row = array_merge($row, $this->getData($request, $em, $fecha));
+            }
+            if (!empty($arr_cierre)) {
+                /** @var Cierre $cierre */
+                foreach ($arr_cierre as $cierre) {
+                    if ($cierre->getId() > $last_id_cierre) {
+                        $row = array_merge($row, $this->getData($request, $em, $cierre->getFecha()));
+                    }
+                }
+            }
+        } else {
+            foreach ($arr_cierre as $cierre) {
+                $row = array_merge($row, $this->getData($request, $em, $cierre->getFecha()));
             }
         }
-        foreach ($row as $d){
-            $arr = explode(',',$d['datos'][count($d['datos'])-1]['debito']);
-            if (count($arr)>1)
-            $debito += floatval($arr[0])*1000+ floatval($arr[1]);
+
+        foreach ($row as $d) {
+            $arr = explode(',', $d['datos'][count($d['datos']) - 1]['debito']);
+            if (count($arr) > 1)
+                $debito += floatval($arr[0]) * 1000 + floatval($arr[1]);
             else
-                $debito += floatval($d['datos'][count($d['datos'])-1]['debito']);
-            $arr_ = explode(',',$d['datos'][count($d['datos'])-1]['credito']);
-            if (count($arr_)>1)
-            $credito += floatval($arr_[0])*1000+ floatval($arr_[1]);
+                $debito += floatval($d['datos'][count($d['datos']) - 1]['debito']);
+            $arr_ = explode(',', $d['datos'][count($d['datos']) - 1]['credito']);
+            if (count($arr_) > 1)
+                $credito += floatval($arr_[0]) * 1000 + floatval($arr_[1]);
             else
-                $credito += floatval($d['datos'][count($d['datos'])-1]['credito']);
+                $credito += floatval($d['datos'][count($d['datos']) - 1]['credito']);
         }
 
-        if (!empty($obj_cierre_abierto)) {
-            $i = count($obj_cierre_abierto);
-            $fecha_cierre = $obj_cierre_abierto[$i - 1]->getFecha();
+        if (!empty($arr_cierre)) {
+            $i = count($arr_cierre);
+            $fecha_cierre = $arr_cierre[$i - 1]->getFecha();
             return $this->render('contabilidad/inventario/comprobante_operaciones/index.html.twig', [
                 'controller_name' => 'ComprobanteOperacionesController',
                 'almacen' => $nombre_almacen,
                 'unidad' => $nombre_unidad,
                 'fecha' => $fecha_cierre->format('d-m-Y'),
                 'datos' => $row,
-                'total_debito'=>number_format($debito,2) ,
-                'total_credito'=>number_format($credito,2),
-                'debito'=>$debito ,
-                'credito'=>$credito
+                'total_debito' => number_format($debito, 2),
+                'total_credito' => number_format($credito, 2),
+                'debito' => $debito,
+                'credito' => $credito
             ]);
         } else {
             return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
@@ -192,69 +201,106 @@ class ComprobanteOperacionesController extends AbstractController
      */
     public function save(EntityManagerInterface $em, Request $request)
     {
-        $cierre_er = $em->getRepository(Cierre::class);
-        $fecha = $request->get('fecha');
         $observacion = $request->get('observacion');
         $debito = $request->get('debito');
         $credito = $request->get('credito');
-        $usuario = $this->getUser();
+
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         /** @var Almacen $obj_almacen */
         $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
         /** @var Unidad $obj_unidad */
         $obj_unidad = $obj_almacen->getIdUnidad();
-        /** @var TipoComprobante $tipo_comprobante */
-        $tipo_comprobante = $em->getRepository(TipoComprobante::class)->find(2);
+        $cierre_er = $em->getRepository(Cierre::class);
+        $nombre_almacen = $request->getSession()->get('selected_almacen/name');
+        /** @var Almacen $almacen_obj */
+        $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
+        $nombre_unidad = $almacen_obj->getIdUnidad()->getNombre();
 
-        /** @var Cierre $obj_cierre */
-        $obj_cierre = $cierre_er->findOneBy(array(
-            'id_almacen' => $obj_almacen,
-            'abierto' => false,
-            'fecha' => \DateTime::createFromFormat('d-m-Y', $fecha),
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha = explode('-', $fecha);
+        $year_ = intval($arr_fecha[0]);
+
+        $registro_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+            'id_tipo_comprobante' => $em->getRepository(TipoComprobante::class)->find(2),
+            'id_unidad' => $obj_unidad,
+            'anno' => $year_
         ));
-        if ($obj_cierre) {
-            $arr = explode('-', $fecha);
-            $anno = $arr[2];
 
-            /** @var RegistroComprobantes $duplicate */
-            $duplicate = $em->getRepository(RegistroComprobantes::class)->findOneBy(array(
-                'anno' => $anno,
-                'fecha' => \DateTime::createFromFormat('d-m-Y', $fecha),
-                'id_tipo_comprobante' => $tipo_comprobante,
-                'id_unidad' => $obj_unidad
-            ));
-            if ($duplicate) {
-                return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
-                    'controller_name' => 'ComprobanteOperacionesController',
-                    'title' => '!!Error duplicado',
-                    'message' => 'Ya existe un comprobante de operaciones registrado para la fecha seleccionada, su numero es ' . $duplicate->getNroConsecutivo() . '/' . $duplicate->getAnno() . ' .'
-                ]);
+        $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+            'id_unidad' => $obj_unidad,
+            'anno' => $year_
+        ));
+        $nro_consecutivo = count($arr_registros) + 1;
+
+        $new_registro = new RegistroComprobantes();
+        $new_registro
+            ->setDescripcion($observacion)
+            ->setIdUsuario($this->getUser())
+            ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+            ->setAnno($year_)
+            ->setCredito(floatval($credito))
+            ->setDebito(floatval($debito))
+            ->setIdAlmacen($obj_almacen)
+            ->setIdTipoComprobante($em->getRepository(TipoComprobante::class)->find(2))
+            ->setIdUnidad($obj_unidad)
+            ->setNroConsecutivo($nro_consecutivo);
+        $em->persist($new_registro);
+
+        $arr_cierre = $cierre_er->findBy(array(
+            'abierto' => false,
+            'id_almacen' => $almacen_obj,
+            'anno' => $year_,
+            'diario' => true
+        ));
+
+        if(empty($arr_cierre))
+            return $this->render('contabilidad/inventario/comprobante_operaciones/success.html.twig', [
+                'controller_name' => 'ComprobanteOperacionesController',
+                'title' => '!!Error',
+                'message' => 'No existen cierres registrados, para generar el comprobante de operaciones debe cerrar primero las operaciones del día'
+            ]);
+
+        if (!empty($registro_operaciones)) {
+            /** @var RegistroComprobantes $obj_comprobante */
+            $obj_comprobante = $registro_operaciones[count($registro_operaciones) - 1];
+            $last_id_cierre = 0;
+
+            $arr_registro_cierre = $em->getRepository(ComprobanteCierre::class)->findBy(['id_comprobante' => $obj_comprobante]);
+            if (!empty($arr_registro_cierre)) {
+                /** @var ComprobanteCierre $registro_cierre */
+                foreach ($arr_registro_cierre as $registro_cierre) {
+                    if ($registro_cierre->getIdCierre()->getId() > $last_id_cierre)
+                        $last_id_cierre = $registro_cierre->getIdCierre()->getId();
+                }
             }
-            $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
-                'id_unidad' => $obj_unidad,
-                'anno' => $anno
-            ));
-            $nro_consecutivo = count($arr_registros) + 1;
-
-            $new_registro = new RegistroComprobantes();
-            $new_registro
-                ->setDescripcion($observacion)
-                ->setIdUsuario($usuario)
-                ->setFecha(\DateTime::createFromFormat('d-m-Y', $fecha))
-                ->setAnno($anno)
-                ->setCredito(floatval($credito))
-                ->setDebito(floatval($debito))
-                ->setIdAlmacen($obj_almacen)
-                ->setIdTipoComprobante($tipo_comprobante)
-                ->setIdUnidad($obj_unidad)
-                ->setNroConsecutivo($nro_consecutivo);
-            $em->persist($new_registro);
-            $em->flush();
+            if (!empty($arr_cierre)) {
+                /** @var Cierre $cierre */
+                foreach ($arr_cierre as $cierre) {
+                    if ($cierre->getId() > $last_id_cierre) {
+                       //adiciono en la relacion
+                        $comprobante_cierre = new ComprobanteCierre();
+                        $comprobante_cierre
+                            ->setIdCierre($cierre)
+                            ->setIdComprobante($new_registro);
+                        $em->persist($comprobante_cierre);
+                    }
+                }
+            }
+        } else {
+            foreach ($arr_cierre as $cierre) {
+                //adiciono en la relacion
+                $comprobante_cierre = new ComprobanteCierre();
+                $comprobante_cierre
+                    ->setIdCierre($cierre)
+                    ->setIdComprobante($new_registro);
+                $em->persist($comprobante_cierre);
+            }
         }
+        $em->flush();
         return $this->render('contabilidad/inventario/comprobante_operaciones/success.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',
             'title' => '!!Exito',
-            'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' .$new_registro->getIdTipoComprobante()->getAbreviatura().'-'. $nro_consecutivo .', para ver detalles consulte el registro de comprobantes .'
+            'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' . $new_registro->getIdTipoComprobante()->getAbreviatura() . '-' . $nro_consecutivo . ', para ver detalles consulte el registro de comprobantes .'
         ]);
     }
 }

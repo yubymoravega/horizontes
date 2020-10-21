@@ -85,16 +85,6 @@
                     </div>
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                 </div>
-                <div id="orden_trabajo_row" class="row mt-0 p-0">
-                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.codigo_ot) }}
-                        {{ form_widget(formulario.codigo_ot) }}
-                    </div>
-                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
-                        {{ form_label(formulario.descripcion_ot) }}
-                        {{ form_widget(formulario.descripcion_ot) }}
-                    </div>
-                </div>
                 {{ form_end(formulario.fecha_solicitud) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
@@ -153,6 +143,16 @@
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
                         <label for="">Resto Importe</label>
                         <input type="text" id="resto_importe" class="w-100 form-control">
+                    </div>
+                </div>
+                <div id="orden_trabajo_row" class="row mt-0 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.codigo_ot) }}
+                        {{ form_widget(formulario.codigo_ot) }}
+                    </div>
+                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.descripcion_ot) }}
+                        {{ form_widget(formulario.descripcion_ot) }}
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
@@ -514,6 +514,8 @@
 
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
+                    let codigo_ot = $('#vale_salida_codigo_ot').val()
+                    let descripcion_ot = $('#vale_salida_descripcion_ot').val()
                     let codigo = $('#vale_salida_mercancia_codigo').val()
                     let cant = $('#vale_salida_documento_cantidad_mercancia').val()
                     let importe = $('#vale_salida_documento_importe_mercancia').val()
@@ -537,7 +539,9 @@
                             um,
                             descripcion,
                             centro_costo,
-                            elemento_gasto
+                            elemento_gasto,
+                            codigo_ot,
+                            descripcion_ot
                         })
                         importe_total += Number.parseFloat(importe)
 
