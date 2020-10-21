@@ -66,6 +66,10 @@ body {
     padding-bottom: .3rem;
 }
 
+.read-only-select {
+    pointer-events: none;
+}
+
 /*********************** MY redefinicion de stilos ****************************/
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {

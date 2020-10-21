@@ -293,7 +293,7 @@
                     }
                 }
             })
-
+            $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
             function llenarFormulario(nro) {
                 loadingModal.show()
                 $.ajax({
@@ -418,7 +418,15 @@
                                     $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
                                     $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
+
+                                    $('#ajuste_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
+                                    $('#ajuste_mercancia_id_unidad_medida').addClass('read-only-select');
+                                    $('#ajuste_mercancia_descripcion').attr('readonly', true)
                                 } else {
+                                    $('#ajuste_mercancia_id_unidad_medida').val(0)
+                                    $('#ajuste_mercancia_id_unidad_medida').removeClass('read-only-select');
+                                    $('#ajuste_mercancia_descripcion').attr('readonly', false)
+
                                     alertTemplate('No existen mercancias con ese código')
                                 }
                                 loadingModal.close()
@@ -427,7 +435,7 @@
                             }
                         })
                     } else {
-                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'error')
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
                     }
                 }
             })
@@ -457,6 +465,11 @@
             })
 
             $('#ajuste_mercancia_codigo').on('keyup', function () {
+                $('#ajuste_mercancia_descripcion').val('')
+                $('#ajuste_mercancia_descripcion').attr('readonly', true)
+                $('#ajuste_mercancia_id_unidad_medida').val(0)
+                $('#ajuste_mercancia_id_unidad_medida').addClass('read-only-select');
+
                 $('#ajuste_mercancia_descripcion').val('')
                 $('#ajuste_mercancia_precio').val('')
                 $('#ajuste_mercancia_existencia').val('')
