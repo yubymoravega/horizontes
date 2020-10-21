@@ -247,19 +247,19 @@ class CerrarDiaController extends AbstractController
             $almacen = $element->getIdAlmacen()?$element->getIdAlmacen()->getCodigo():'';
 //            $orden_trabajo = $element->getIdOrdenTrabajo()?$element->getIdOrdenTrabajo()->getCodigo():'';
             $str_creiterios = '-';
-            if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+            if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios = $str_creiterios. $centro_costo.'-';
             }
-            if (in_array('EG',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+            if (in_array('EG',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios  = $str_creiterios. $elemento_gasto.'-';
             }
-            if (in_array('EXP',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+            if (in_array('EXP',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios  = $str_creiterios. $expediente.'-';
             }
-            if (in_array('ALM',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+            if (in_array('ALM',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios  = $str_creiterios. $almacen.'-';
             }
-            if (in_array('CLIPRO',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+            if (in_array('CLIPRO',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $proveedor = $em->getRepository(InformeRecepcion::class)->findOneBy($element->getIdDocumento()->getId())->getIdProveedor()->getCodigo();
                 $str_creiterios  = $str_creiterios. $proveedor.'-';
             }
@@ -285,19 +285,19 @@ class CerrarDiaController extends AbstractController
                 $almacen = $element->getIdAlmacen()?$element->getIdAlmacen()->getCodigo():'';
 //            $orden_trabajo = $element->getIdOrdenTrabajo()?$element->getIdOrdenTrabajo()->getCodigo():'';
                 $str_creiterios = '-';
-                if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+                if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $str_creiterios = $str_creiterios. $centro_costo.'-';
                 }
-                if (in_array('EG',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+                if (in_array('EG',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $str_creiterios  = $str_creiterios. $elemento_gasto.'-';
                 }
-                if (in_array('EXP',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+                if (in_array('EXP',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $str_creiterios  = $str_creiterios. $expediente.'-';
                 }
-                if (in_array('ALM',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+                if (in_array('ALM',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $str_creiterios  = $str_creiterios. $almacen.'-';
                 }
-                if (in_array('CLIPRO',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em)[0])){
+                if (in_array('CLIPRO',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $proveedor = $em->getRepository(InformeRecepcion::class)->findOneBy($element->getIdDocumento()->getId())->getIdProveedor()->getCodigo();
                     $str_creiterios  = $str_creiterios. $proveedor.'-';
                 }

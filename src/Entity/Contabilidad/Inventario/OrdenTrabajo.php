@@ -4,11 +4,11 @@ namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Unidad;
-use App\Repository\Contabilidad\Inventario\ExpedienteRepository;
+use App\Repository\Contabilidad\Inventario\OrdenTrabajoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=ExpedienteRepository::class)
+ * @ORM\Entity(repositoryClass=OrdenTrabajoRepository::class)
  */
 class OrdenTrabajo
 {

@@ -83,12 +83,3 @@ inventario a la mercancia directamente y quitarla del tipo de documento en cuest
 - revisar el tema de la creacion y carga de los (******* nro_consecutivos) por(almacen, año, tex.) --
 en la casa el Ajuste entrada carga
 incorectamente un nro_consecutivo por algun motivo desconocido 
-
-#### 21--10-2020
-ok-totalizar los debitos y creditos del comprobante de operaciones(deben ser iguales):ver como guardar los reportes de operaciones
--vajar el codigo y descripcion de orden de trabajo para la parte de mercancia
--imprimir el listado completo de existencia del almacen
--revisar el comprobante de operaciones cuando voy a imprimirlo en general ya que me trae el acumulado
-ok-revisar el imprimir sin guardar de informe de recepcion
--cuando se teclea un codigo de cualquier cosa que se carge de la base de datos no puede dejar teclear ningun dato como descripcion, etc
-ok-totalizar las cuentas en existencia en almacen
