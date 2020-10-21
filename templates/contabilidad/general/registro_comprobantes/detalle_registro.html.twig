@@ -62,6 +62,13 @@
             </table>
         </table>
         {% endfor %}
+        <table width="960px" class="text-center">
+            <tr>
+                <td width="700px" class="font-weight-bold">TOTAL</td>
+                <td class="font-weight-bold text-right">{{ total_debito }}</td>
+                <td class="font-weight-bold text-right">{{ total_credito }}</td>
+            </tr>
+        </table>
         <form action="{{ path('contabilidad_inventario_comprobante_operaciones_guardar') }}" method="post">
             <div style="width: 960px" class="mt-2">
                 <label for="observacion" class="font-weight-bold">Observación:</label>

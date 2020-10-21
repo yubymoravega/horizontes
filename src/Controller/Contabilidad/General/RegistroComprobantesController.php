@@ -147,11 +147,8 @@ class RegistroComprobantesController extends AbstractController
                 if ($cierre->getFecha() >= $fecha_inicio && $cierre->getFecha() <= $fecha_ultimo_registro) {
                     $row = array_merge($row, $this->getDataDetalles($request, $em,  $cierre->getFecha(),$obj_almacen));
                 }
-                $debito += floatval($cierre->getDebito());
-                $credito += floatval($cierre->getCredito());
             }
         }
-
         return $this->render('contabilidad/general/registro_comprobantes/detalle_registro.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',
             'almacen' => $nombre_almacen,
@@ -159,8 +156,8 @@ class RegistroComprobantesController extends AbstractController
             'unidad' => $nombre_unidad,
             'fecha' => $fecha_ultimo_registro->format('d-m-Y'),
             'datos' => $row,
-            'total_debito' => $debito,
-            'total_credito' => $credito
+            'total_debito'=>number_format($registro_obj->getDebito(),2) ,
+            'total_credito'=>number_format($registro_obj->getCredito(),2),
         ]);
 
 

@@ -18,17 +18,15 @@
             <th width="70px">Comprobante</th>
             <th width="70px">Débito</th>
             <th width="175px">Crédito</th>
-            <th width="120px">Traspasado por</th>
-            <th width="120px">Anotado por</th>
+            <th width="200px">Anotado por</th>
             </thead>
             <tbody>
             {% for item in datos %}
                     <tr>
-                        <td style="font-weight:400;" class="text-left">{{ item.abreviatura_comprobante }} - {{ item.nro }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.abreviatura_comprobante }} - {{ item.nro }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
-                        <td style="font-weight:400;" class="text-center">{{ item.usuario }} ({{ item.fecha }})</td>
-                        <td style="font-weight:400;" class="text-center"></td>
+                        <td style="font-weight:400;" class="text-center">{{ item.usuario }} ({{ item.fecha }})
                     </tr>
             {% endfor %}
             </tbody>
