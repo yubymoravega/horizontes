@@ -7,7 +7,6 @@ use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\Producto;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\Expr\Math;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MercanciaController extends AbstractController
 {
     /**
-     * @Route("/{nro_cuenta}", name="contabilidad_inventario_mercancia",methods={"GET", "POST"})
+     * @Route("/{nro_cuenta}",priority="0", name="contabilidad_inventario_mercancia", methods={"GET", "POST"})
      */
     public function index(Request $request, $nro_cuenta)
     {
@@ -161,49 +160,53 @@ class MercanciaController extends AbstractController
     }
 
     /**
-     * @Route("/print", name="contabilidad_inventario_mercancia_print")
+     * @Route("/print",priority="1" , name="contabilidad_inventario_mercancia_print")
      */
     public function print(EntityManagerInterface $em, Request $request)
     {
-        dd('asasasasas');
-//        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array(
-//            'activo' => true
-//        ));
-//        $id_almacen = $request->getSession()->get('selected_almacen/id');
-//        $row = [];
-//        foreach ($cuentas_arr as $cuenta) {
-//            $total_general = 0;
-//            /**@var $cuenta Cuenta * */
-//            $nro = $cuenta->getNroCuenta();
-//            $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy(array(
-//                'id_cuenta' => $cuenta,
-//                'activo' => true
-//            ));
-//            $row_data = [];
-//            /**@var $subcuenta Subcuenta */
-//            foreach ($arr_subcuentas as $subcuenta) {
-//                $nro_subcuenta = $subcuenta->getNroSubcuenta();
-//                $datos = $this->getDatosPorSubCuenta($em, $nro_subcuenta, $nro, $id_almacen);
-//
-//                if (!empty($datos['data'])) {
-//                    $row_data[] = array(
-//                        'cuenta' => $nro_subcuenta . ' - ' . $subcuenta->getDescripcion(),
-//                        'existencia' => $datos['data'],
-//                        'total' => $datos['total']
-//                    );
-//                    $total_general += floatval($datos['total_count']);
-//                }
-//            }
-//
-//            // validar solo las subcuentas de la cuenta contiene mercancias
-//            if (!empty($row_data)) {
-//                $row = [
-//                    'cuenta' => $nro . ' - ' . $cuenta->getNombre(),
-//                    'existencia' => $row_data,
-//                    'total' => number_format($total_general, 2)
-//                ];
-//            }
-//        }
-        dd($row);
+        $cuentas_arr = $em->getRepository(Cuenta::class)->findBy(array(
+            'activo' => true
+        ));
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $row = [];
+        foreach ($cuentas_arr as $cuenta) {
+            $total_general = 0;
+            /**@var $cuenta Cuenta * */
+            $nro = $cuenta->getNroCuenta();
+            $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy(array(
+                'id_cuenta' => $cuenta,
+                'activo' => true
+            ));
+            $row_data = [];
+            /**@var $subcuenta Subcuenta */
+            foreach ($arr_subcuentas as $subcuenta) {
+                $nro_subcuenta = $subcuenta->getNroSubcuenta();
+                $datos = $this->getDatosPorSubCuenta($em, $nro_subcuenta, $nro, $id_almacen);
+
+                if (!empty($datos['data'])) {
+                    $row_data[] = array(
+                        'subcuenta' => $nro_subcuenta . ' - ' . $subcuenta->getDescripcion(),
+                        'existencia' => $datos['data'],
+                        'total' => $datos['total']
+                    );
+                    $total_general += floatval($datos['total_count']);
+                }
+            }
+
+            // validar solo las subcuentas de la cuenta contiene mercancias
+            if (!empty($row_data)) {
+                $row[] = [
+                    'cuenta' => $nro . ' - ' . $cuenta->getNombre(),
+                    'data' => $row_data,
+                    'total' => number_format($total_general, 2)
+                ];
+            }
+        }
+
+//        dd($row);
+        return $this->render('contabilidad/inventario/mercancia/print.html.twig', [
+            'controller_name' => 'MercanciaController',
+            'cuentas' => $row
+        ]);
     }
 }

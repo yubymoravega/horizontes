@@ -4,7 +4,6 @@ namespace App\Repository\Contabilidad\Venta;
 
 use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Venta\ContratosCliente;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
