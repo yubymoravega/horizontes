@@ -303,6 +303,7 @@ class AjusteController extends AbstractController
             $row [] = array(
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
+                'id_um' => $obj->getIdUnidadMedida()->getId(),
                 'descripcion' => $obj->getDescripcion(),
                 'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),

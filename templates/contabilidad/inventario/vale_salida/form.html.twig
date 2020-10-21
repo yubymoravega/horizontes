@@ -410,6 +410,7 @@
                 miniLoadin.show({msg:'cargando otros campos...', target: '#vale_salida'})
                 // cargar dinamicamente [OT]
                 $('#orden_trabajo_row').hide()
+                $('#vale_salida_descripcion_ot').attr('readonly', true)
                 $.ajax({
                     url: '/contabilidad/inventario/ajuste-salida/dinamic-files/' + $(this).val(),
                     method: 'POST',
@@ -644,10 +645,12 @@
                             if (result.success) {
                                 const orden_trabajo = result.data
                                 $('#vale_salida_descripcion_ot').val(orden_trabajo)
+                                $('#vale_salida_descripcion_ot').attr('readonly', true)
 
                             } else {
                                 alertTemplate('No existen la orden con ese código')
                                 $('#vale_salida_descripcion_ot').val('')
+                                $('#vale_salida_descripcion_ot').attr('readonly', false)
                             }
                             loadingModal.close()
                         },
@@ -657,6 +660,9 @@
                 } else {
                     alertTemplate('El campo código no deben estar vacio.', 'danger')
                 }
+            }else{
+                $('#vale_salida_descripcion_ot').val('')
+                $('#vale_salida_descripcion_ot').attr('readonly', true)
             }
         })
 

@@ -393,10 +393,12 @@
                                 if (result.success) {
                                     const expediente = result.data
                                     $('#ajuste_salida_descripcion_exp').val(expediente)
+                                    $('#ajuste_salida_descripcion_exp').attr('readonly', true)
 
                                 } else {
                                     alertTemplate('No existen expediente con ese código')
                                     $('#ajuste_salida_descripcion_exp').val('')
+                                    $('#ajuste_salida_descripcion_exp').attr('readonly', false)
                                 }
                                 loadingModal.close()
                             },
@@ -406,6 +408,9 @@
                     } else {
                         alertTemplate('El campo código no deben estar vacio.', 'danger')
                     }
+                } else {
+                    $('#ajuste_salida_descripcion_exp').val('')
+                    $('#ajuste_salida_descripcion_exp').attr('readonly', true)
                 }
             })
 
@@ -506,34 +511,31 @@
                                 loadingModal.close()
                             },
                             error: function () {
-                                $('#ajuste_salida_mercancia_descripcion').val('')
-                                $('#ajuste_salida_mercancia_existencia').val('')
-                                $('#ajuste_salida_mercancia_precio').val('')
-                                $('#true_precio_mercancia').val('')
-                                $('#ajuste_salida_mercancia_id_unidad_medida').val('')
-                                $('#ajuste_salida_documento_importe_mercancia').val('')
-                                $('#ajuste_salida_mercancia_existencia_decremento').val('')
-                                $('#ajuste_salida_documento_cantidad_mercancia').val('')
-                                $('#resto_importe').val('')
-                                importe_real = 0
+                                resetMercancias()
                             }
                         })
                     } else {
+                        resetMercancias()
                         alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
                     }
                 } else {
-                    $('#ajuste_salida_mercancia_descripcion').val('')
-                    $('#ajuste_salida_mercancia_existencia').val('')
-                    $('#ajuste_salida_mercancia_precio').val('')
-                    $('#true_precio_mercancia').val('')
-                    $('#ajuste_salida_mercancia_id_unidad_medida').val('')
-                    $('#ajuste_salida_documento_importe_mercancia').val('')
-                    $('#ajuste_salida_mercancia_existencia_decremento').val('')
-                    $('#ajuste_salida_documento_cantidad_mercancia').val('')
-                    $('#resto_importe').val('')
-                    importe_real = 0
+                    resetMercancias()
                 }
             })
+
+            function resetMercancias(){
+
+                $('#ajuste_salida_mercancia_descripcion').val('')
+                $('#ajuste_salida_mercancia_existencia').val('')
+                $('#ajuste_salida_mercancia_precio').val('')
+                $('#true_precio_mercancia').val('')
+                $('#ajuste_salida_mercancia_id_unidad_medida').find('option').remove()
+                $('#ajuste_salida_documento_importe_mercancia').val('')
+                $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                $('#resto_importe').val('')
+                importe_real = 0
+            }
 
             $('#ajuste_salida_documento_cantidad_mercancia').on('keyup', function () {
                 let cantidad = parseFloat($('#ajuste_salida_documento_cantidad_mercancia').val())
@@ -579,7 +581,7 @@
                         }
                     }
                 })
-                miniLoadin.show({msg:'cargando otros campos...', target: '#ajuste_salida'})
+                miniLoadin.show({msg: 'cargando otros campos...', target: '#ajuste_salida'})
                 // cargar dinamicamente [cc, eg] o [exp]
                 $('#eg_cc_row').hide()
                 $('#expediente_row').hide()

@@ -67,10 +67,10 @@ class AjusteSalidaType extends AbstractType
             ->add('codigo_exp', TextType::class, [
                 'required' => false,
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Código Expediente',
+                'label' => 'Código Expediente',
             ])
             ->add('descripcion_exp', TextType::class, [
-                'attr' => ['class' => 'w-100'],
+                'attr' => ['class' => 'w-100', 'readonly' => true],
                 'label' => 'Descripción Expediente',
                 'required' => false,
             ])

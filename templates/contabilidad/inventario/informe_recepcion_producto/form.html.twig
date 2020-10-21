@@ -310,7 +310,14 @@
                                         $('#informe_recepcion_producto_mercancia_descripcion').val(productos[0]['descripcion'])
                                         $('#informe_recepcion_producto_mercancia_existencia').val(productos[0]['existencia'])
                                         $('#informe_recepcion_producto_mercancia_precio').val(productos[0]['precio_compra'])
+
+                                        $('#informe_recepcion_producto_mercancia_id_unidad_medida').val(productos[0]['id_um'])
+                                        $('#informe_recepcion_producto_mercancia_id_unidad_medida').addClass('read-only-select');
+                                        $('#informe_recepcion_producto_mercancia_descripcion').attr('readonly', true)
                                     } else {
+                                        $('#informe_recepcion_producto_mercancia_descripcion').attr('readonly', false)
+                                        $('#informe_recepcion_producto_mercancia_id_unidad_medida').val(0)
+                                        $('#informe_recepcion_producto_mercancia_id_unidad_medida').removeClass('read-only-select');
                                         alertTemplate('No existen productos con ese código')
                                     }
                                     loadingModal.close()
@@ -354,6 +361,10 @@
 
             $('#informe_recepcion_producto_mercancia_codigo').on('keyup', function () {
                 $('#informe_recepcion_producto_mercancia_descripcion').val('')
+                $('#informe_recepcion_producto_mercancia_descripcion').attr('readonly', true)
+                $('#informe_recepcion_producto_mercancia_id_unidad_medida').val(0)
+                $('#informe_recepcion_producto_mercancia_id_unidad_medida').addClass('read-only-select');
+
                 $('#informe_recepcion_producto_mercancia_precio').val('')
                 $('#informe_recepcion_producto_mercancia_existencia').val('')
             })

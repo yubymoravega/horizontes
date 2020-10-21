@@ -436,37 +436,35 @@
 
                                 } else {
                                     alertTemplate('No existen mercancias con ese código')
+                                    resertFormMercancia()
                                 }
                                 loadingModal.close()
                             },
                             error: function () {
-                                $('#transferencia_salida_mercancia_descripcion').val('')
-                                $('#transferencia_salida_mercancia_existencia').val('')
-                                $('#transferencia_salida_mercancia_precio').val('')
-                                $('#true_precio_mercancia').val('')
-                                $('#transferencia_salida_mercancia_id_unidad_medida').val('')
-                                $('#transferencia_salida_documento_importe_mercancia').val('')
-                                $('#transferencia_salida_mercancia_existencia_decremento').val('')
-                                $('#transferencia_salida_documento_cantidad_mercancia').val('')
-                                $('#resto_importe').val('')
-                                importe_real = 0
+                                resertFormMercancia()
                             }
                         })
                     } else {
                         alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
-                        $('#transferencia_salida_mercancia_descripcion').val('')
-                        $('#transferencia_salida_mercancia_existencia').val('')
-                        $('#transferencia_salida_mercancia_precio').val('')
-                        $('#true_precio_mercancia').val('')
-                        $('#transferencia_salida_mercancia_id_unidad_medida').val('')
-                        $('#transferencia_salida_documento_importe_mercancia').val('')
-                        $('#transferencia_salida_mercancia_existencia_decremento').val('')
-                        $('#transferencia_salida_documento_cantidad_mercancia').val('')
-                        $('#resto_importe').val('')
-                        importe_real = 0
+                        resertFormMercancia()
                     }
+                }else{
+                    resertFormMercancia()
                 }
             })
+
+            function resertFormMercancia() {
+                $('#transferencia_salida_mercancia_descripcion').val('')
+                $('#transferencia_salida_mercancia_existencia').val('')
+                $('#transferencia_salida_mercancia_precio').val('')
+                $('#true_precio_mercancia').val('')
+                $('#transferencia_salida_mercancia_id_unidad_medida').find('option').remove()
+                $('#transferencia_salida_documento_importe_mercancia').val('')
+                $('#transferencia_salida_mercancia_existencia_decremento').val('')
+                $('#transferencia_salida_documento_cantidad_mercancia').val('')
+                $('#resto_importe').val('')
+                importe_real = 0
+            }
 
             $('#transferencia_salida_documento_cantidad_mercancia').on('keyup', function () {
                 let cantidad = parseFloat($('#transferencia_salida_documento_cantidad_mercancia').val())

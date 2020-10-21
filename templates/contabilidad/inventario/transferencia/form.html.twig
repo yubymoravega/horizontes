@@ -440,7 +440,14 @@
                                     $('#transferencia_mercancia_descripcion').val(mercancias[0]['descripcion'])
                                     $('#transferencia_mercancia_existencia').val(mercancias[0]['existencia'])
                                     $('#transferencia_mercancia_precio').val(mercancias[0]['precio_compra'])
+
+                                    $('#transferencia_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
+                                    $('#transferencia_mercancia_id_unidad_medida').addClass('read-only-select');
+                                    $('#transferencia_mercancia_descripcion').attr('readonly', true)
                                 } else {
+                                    $('#transferencia_mercancia_id_unidad_medida').val(0)
+                                    $('#transferencia_mercancia_id_unidad_medida').removeClass('read-only-select');
+                                    $('#transferencia_mercancia_descripcion').attr('readonly', false)
                                     alertTemplate('No existen mercancias con ese código')
                                 }
                                 loadingModal.close()
@@ -479,6 +486,11 @@
             })
 
             $('#transferencia_mercancia_codigo').on('keyup', function () {
+                $('#transferencia_mercancia_descripcion').val('')
+                $('#transferencia_mercancia_descripcion').attr('readonly', true)
+                $('#transferencia_mercancia_id_unidad_medida').val(0)
+                $('#transferencia_mercancia_id_unidad_medida').addClass('read-only-select');
+
                 $('#transferencia_mercancia_descripcion').val('')
                 $('#transferencia_mercancia_precio').val('')
                 $('#transferencia_mercancia_existencia').val('')

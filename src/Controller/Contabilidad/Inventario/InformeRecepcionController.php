@@ -361,6 +361,7 @@ class InformeRecepcionController extends AbstractController
                 'id' => $obj->getId(),
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
+                'id_um' => $obj->getIdUnidadMedida()->getId(),
                 'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia()

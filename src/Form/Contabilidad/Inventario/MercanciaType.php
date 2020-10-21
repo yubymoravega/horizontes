@@ -23,7 +23,7 @@ class MercanciaType extends AbstractType
                 'label' => 'Código',
             ])
             ->add('descripcion', TextType::class, [
-                'attr' => ['class' => 'w-100'],
+                'attr' => ['class' => 'w-100', 'readonly' => true],
                 'label' => 'Descripción',
                 'required' => false,
             ])
@@ -45,7 +45,7 @@ class MercanciaType extends AbstractType
                 'attr' => ['class' => 'w-100']
             ])
             ->add('id_unidad_medida', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
+                'attr' => ['class' => 'w-100 read-only-select'],
                 'label' => 'UM',
                 'class' => UnidadMedida::class,
                 'choice_label' => 'abreviatura',
@@ -58,15 +58,14 @@ class MercanciaType extends AbstractType
             ])
             ->add('nro_cuenta_inventario', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Cuenta de inventario',
+                'label' => 'Cuenta de inventario',
                 'choice_label' => 'nro_cuenta',
             ))
             ->add('nro_subcuenta_inventario', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Subcuenta de inventario',
+                'label' => 'Subcuenta de inventario',
                 'choice_label' => 'nro_subcuenta',
-            ))
-        ;
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver)
