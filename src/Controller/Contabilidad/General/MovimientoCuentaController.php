@@ -9,7 +9,10 @@ use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\Inventario\Ajuste;
+use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\ComprobanteCierre;
 use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
@@ -40,6 +43,8 @@ class MovimientoCuentaController extends AbstractController
     {
         $mercancia_er = $em->getRepository(Mercancia::class);
         $movimientos_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $cierre_er = $em->getRepository(Cierre::class);
+        $comprobante_cierre_er = $em->getRepository(ComprobanteCierre::class);
 
         $mercancias_arr = $mercancia_er->findBy(array(
             'cuenta'=>'183',
@@ -59,11 +64,25 @@ class MovimientoCuentaController extends AbstractController
         $arr_nros=[];
         /** @var MovimientoMercancia $movimiento_mercancia */
         foreach ($row_movimientos as $key=>$movimiento_mercancia){
-            $nro = $this->getNro($em,$movimiento_mercancia->getIdDocumento());
-            $arr_nros[$key]['id_movimiento']=$movimiento_mercancia->getId();
-            $arr_nros[$key]['nro_consecutivo']=$nro;
-            $arr_nros[$key]['debito']=$movimiento_mercancia->getImporte();
-            $arr_nros[$key]['credito']=$movimiento_mercancia->getImporte();
+            $fecha_movimiento = $movimiento_mercancia->getFecha();
+
+            $cierre_obj = $cierre_er->findOneBy(['fecha'=>$fecha_movimiento,'abierto'=>false]);
+            if($cierre_obj){
+                /** @var ComprobanteCierre $obj_comprobante_cierre */
+                $obj_comprobante_cierre = $comprobante_cierre_er->findOneBy(['id_cierre'=>$cierre_obj]);
+                /** @var RegistroComprobantes $registro_comprobante */
+                $registro_comprobante = $obj_comprobante_cierre->getIdComprobante();
+                $nro_comprobante = $registro_comprobante->getNroConsecutivo();
+                $tipo_comprobante = $registro_comprobante->getIdTipoComprobante()->getAbreviatura();
+
+                $nro = $this->getNro($em,$movimiento_mercancia->getIdDocumento());
+                $arr_nros[$key]['id_movimiento']=$movimiento_mercancia->getId();
+                $arr_nros[$key]['tipo_comprobante']=$tipo_comprobante;
+                $arr_nros[$key]['nro_comprobante']=$nro_comprobante;
+                $arr_nros[$key]['nro_consecutivo']=$nro;
+                $arr_nros[$key]['debito']=$movimiento_mercancia->getImporte();
+                $arr_nros[$key]['credito']=$movimiento_mercancia->getImporte();
+            }
         }
         sort($arr_nros);
 dd($arr_nros);
