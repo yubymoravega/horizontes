@@ -83,8 +83,18 @@ class ComprobanteOperacionesController extends AbstractController
                 $fecha = $cierre->getFecha();
                 $row = array_merge($row, $this->getData($request, $em, $fecha));
             }
-            $debito += floatval($cierre->getDebito());
-            $credito += floatval($cierre->getCredito());
+        }
+        foreach ($row as $d){
+            $arr = explode(',',$d['datos'][count($d['datos'])-1]['debito']);
+            if (count($arr)>1)
+            $debito += floatval($arr[0])*1000+ floatval($arr[1]);
+            else
+                $debito += floatval($d['datos'][count($d['datos'])-1]['debito']);
+            $arr_ = explode(',',$d['datos'][count($d['datos'])-1]['credito']);
+            if (count($arr_)>1)
+            $credito += floatval($arr_[0])*1000+ floatval($arr_[1]);
+            else
+                $credito += floatval($d['datos'][count($d['datos'])-1]['credito']);
         }
 
         if (!empty($obj_cierre_abierto)) {
@@ -96,8 +106,10 @@ class ComprobanteOperacionesController extends AbstractController
                 'unidad' => $nombre_unidad,
                 'fecha' => $fecha_cierre->format('d-m-Y'),
                 'datos' => $row,
-                'total_debito'=>$debito,
-                'total_credito'=>$credito
+                'total_debito'=>number_format($debito,2) ,
+                'total_credito'=>number_format($credito,2),
+                'debito'=>$debito ,
+                'credito'=>$credito
             ]);
         } else {
             return $this->render('contabilidad/inventario/comprobante_operaciones/error.html.twig', [
@@ -230,8 +242,8 @@ class ComprobanteOperacionesController extends AbstractController
                 ->setIdUsuario($usuario)
                 ->setFecha(\DateTime::createFromFormat('d-m-Y', $fecha))
                 ->setAnno($anno)
-                ->setCredito($credito)
-                ->setDebito($debito)
+                ->setCredito(floatval($credito))
+                ->setDebito(floatval($debito))
                 ->setIdAlmacen($obj_almacen)
                 ->setIdTipoComprobante($tipo_comprobante)
                 ->setIdUnidad($obj_unidad)
