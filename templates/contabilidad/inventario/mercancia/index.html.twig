@@ -20,6 +20,10 @@
                 {{ form_widget(form.cuentas) }}
                 {{ form_end(form) }}
             </div>
+            <div>
+                <i class="btn fa-print btn-warning ml-3" title="Imprimir listado de existencia"
+                   onclick="Print('{{ path('contabilidad_inventario_mercancia_print') }}')"></i>
+            </div>
         </div>
         {# end header #}
 
@@ -59,7 +63,7 @@
         </table>
         {# end list #}
         {% else %}
-            <h3 class="text-light text-center">El almacén esta vacio !!!</h3>
+            <h3 class="text-light text-center">No se exixte mercancia registrada en el sistema para el almacén!!!</h3>
         {% endif %}
     </div>
 {% endblock %}
@@ -74,5 +78,9 @@
                 $('#mercancia_formulario_id').submit()
             })
         })
+        function Print(url) {
+            console.info(url)
+            window.open(url, 'blank_')
+        }
     </script>
 {% endblock %}

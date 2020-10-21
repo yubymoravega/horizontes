@@ -1,22 +1,56 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target_cuentas','method':'POST'}}) }}
-{#    <div class="row pt-0 mt-0">#}
-{#        <div class="col-6 form-group input-group input-group-sm d-block">#}
-{#            {{ form_label(form_cuentas.nro_cuenta) }}#}
-{#            {{ form_widget(form_cuentas.nro_cuenta,{'attr': {'class': 'form- control w-100'}}) }}#}
-{#        </div>#}
-{#        <div class="col-3 mt-0 form-group input-group input-group-sm d-block">#}
-{#            {{ form_label(form_cuentas.id_moneda) }}#}
-{#            {{ form_widget(form_cuentas.id_moneda,{'attr': {'class': 'form- control w-100'}}) }}#}
-{#        </div>#}
-{#        <div class="col-3 mt-4 form-group input-group input-group-sm d-block">#}
-{#            <button class="btn btn-secondary btn-sm" type="button" id="btnAplicarCuenta">ADICIONAR#}
-{#            </button>#}
-{#        </div>#}
-{#    </div>#}
-    <input type="text" id="id_cliente_contabilidad" hidden>
-    {{ form_end(form) }}
+
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Factura </h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <span class="h5 text-light mr-2">#</span><input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target_cuentas','method':'POST'}}) }}
+                <div class="row mt-0 p-0">
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.fecha_factura) }}
+                        {{ form_widget(form.fecha_factura) }}
+                    </div>
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.tipo_cliente) }}
+                        {{ form_widget(form.tipo_cliente) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.id_cliente) }}
+                        {{ form_widget(form.id_cliente) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-12 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.id_contrato) }}
+                        {{ form_widget(form.id_contrato) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.cuenta_obligacion) }}
+                        {{ form_widget(form.cuenta_obligacion) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.subcuenta_obligacion) }}
+                        {{ form_widget(form.subcuenta_obligacion) }}
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
     <div>
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
@@ -28,4 +62,44 @@
             </tbody>
         </table>
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const cbx_tipoCliente = $('#factura_tipo_cliente')
+        const cbx_cliente = $('#factura_id_cliente')
+
+        cbx_tipoCliente.on('change', function () {
+
+            cbx_cliente.find('option').remove()
+            $.ajax({
+                url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        result.clientes.forEach(
+                            el => cbx_cliente.append('<option value = "' + el.id + '">' + el.nombre + '</option>')
+                        )
+                        cbx_cliente
+                    } else {
+
+                    }
+                },
+                error: function () {
+                }
+            })
+        })
+
+        /*
+                    cuentas_inventarios.forEach(function (valor, pos) {
+                        if ($('#ajuste_mercancia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
+                            $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                            for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                                $('#ajuste_mercancia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            }
+                        }
+                    })
+                */
+    </script>
 {% endblock %}
