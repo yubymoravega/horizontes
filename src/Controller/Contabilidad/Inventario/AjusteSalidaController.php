@@ -495,13 +495,16 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_ajuste_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
         $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
         $rows = [];
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
+        $arr_fecha_contable = explode('-',$fecha_contable);
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
@@ -521,7 +524,7 @@ class AjusteSalidaController extends AbstractController
                 'almacen' => $request->getSession()->get('selected_almacen/name'),
                 'observacion' => $datos['observacion'],
                 'unidad' => $unidad,
-                'fecha_ajuste' => '10/10/1010',
+                'fecha_ajuste' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
                 'nro_solicitud' => $nro,
             ),
             'mercancias' => $rows,

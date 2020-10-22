@@ -240,6 +240,7 @@
         let cuentas_inventarios = [];
         let list_mercancia = []
         let importe_total = 0;
+        let flag = false;
 
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
@@ -262,6 +263,21 @@
                 }
             })
 
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    $(this).val(consecutivo)
+                    $('#transferencia_salida').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    loadingData()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
             $('#select_nros').on('change', function () {
                 if ($('#select_nros').val() == consecutivo) {
@@ -272,6 +288,7 @@
             })
             $('#select_nros').on('keyup', function (event) {
                 if (event.which == 13) {
+                    flag = true;
                     $('#transferencia_salida').resetForm()
                     $('#form_mercancia').resetForm()
                     $("#importe-total").text('$ 0.00')

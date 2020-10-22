@@ -493,8 +493,11 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_transferencia_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
+        $arr_fecha_contable = explode('-',$fecha_contable);
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
@@ -521,7 +524,7 @@ class TransferenciaSalidaController extends AbstractController
                 'unidad' => $unidad,
                 'unidad_origen' => $datos["unidad_origen"] == ' -- seleccione -- ' ? '' : $datos["unidad_origen"],
                 'almacen_origen' => $datos["almacen_origen"] == ' -- seleccione -- ' ? '' : $datos["almacen_origen"],
-                'fecha_transferencia' => '10/10/1010',
+                'fecha_transferencia' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
                 'nro_solicitud' => $nro
             ),
             'mercancias' => $rows,

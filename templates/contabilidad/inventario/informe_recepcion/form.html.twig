@@ -215,6 +215,7 @@
         let cuentas_acreedoras = [];
         let list_mercancia = []
         let importe_total = 0;
+        let flag = false;
 
         function Print_Informe() {
             if ($('#select_nros').val() == consecutivo) {
@@ -257,8 +258,18 @@
         $(document).ready(function () {
             cargarDatosIniciales()
 
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    resetFormulario()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
             $('#select_nros').on('keyup', function (e) {
                 if (e.which == 13) {
+                    flag = true
                     if (eliminados.includes($('#select_nros').val())) {
                         $('#btnSubbmitInforme').hide()
                         $('#btnImprimir').hide()
@@ -558,7 +569,7 @@
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
                         <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(6)} </td>
                         <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
@@ -608,6 +619,7 @@
         }
 
         function resetFormulario() {
+            loadingModal.show()
             $('#btnCancelar').hide()
             $('#informe_recepcion_fecha_factura').attr('type', 'date')
             $('#form_mercancia').css('display', 'block')
@@ -702,6 +714,7 @@
                     loadingModal.close()
                 },
                 error: function () {
+                    loadingModal.close()
                 }
             })
 

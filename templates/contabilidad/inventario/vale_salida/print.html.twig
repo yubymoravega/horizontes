@@ -10,11 +10,12 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="6"><strong>Unidad:</strong> {{ datos.unidad }}</td>
-                <td colspan="1" width="200px" class="text-center"><strong>Fecha: </strong>{{ datos.fecha_vale }}</td>
+                <td colspan="5"><strong>Unidad:</strong> {{ datos.unidad }}</td>
+                <td colspan="2" width="200px" ><strong>Fecha: </strong>{{ datos.fecha_vale }}</td>
             </tr>
             <tr>
-                <td colspan="7"><strong>Almacén: </strong>{{ datos.almacen }}</td>
+                <td colspan="5"><strong>Almacén: </strong>{{ datos.almacen }}</td>
+                <td colspan="2"><strong>Orden de trabajo: </strong>{{ datos.ot }}</td>
             </tr>
             </tbody>
         </table>
@@ -31,7 +32,6 @@
             <thead>
             <th width="80" class="text-center"><strong>Código</strong></th>
             <th colspan="2" class="text-center"><strong>Descripción</strong></th>
-            <th width="110" class="text-center"><strong>Orden de Trabajo</strong></th>
             <th width="10" class="text-center"><strong>UM</strong></th>
             <th width="100" class="text-center"><strong>Cantidad</strong></th>
             <th width="100" class="text-center"><strong>Precio</strong></th>
@@ -43,7 +43,6 @@
                 <tr>
                     <td width="80">{{ item.codigo }}</td>
                     <td colspan="2">{{ item.descripcion }}</td>
-                    <td width="110" class="text-center">{{ item.ot }}</td>
                     <td class="text-center">{{ item.um }}</td>
                     <td width="100" class="text-right">{{ item.cantidad }}</td>
                     <td width="100" class="text-right">{{ item.precio }}</td>

@@ -40,8 +40,25 @@ class CuentaController extends AbstractController
             $arr_criterios_asociados = $cuenta_criterio_er->findBy(array(
                 'id_cuenta' => $item
             ));
+            $str_a1 = 0;
+            $str_a2 = 0;
+            $str_a3 = 0;
+            $str_a4 = 0;
             if (!empty($arr_criterios_asociados)) {
-                foreach ($arr_criterios_asociados as $criterios_asociados) {
+                /**@var CuentaCriterioAnalisis $criterios_asociados */
+                foreach ($arr_criterios_asociados as $key => $criterios_asociados) {
+                    if ($key == 0) {
+                        $str_a1 = $criterios_asociados->getIdCriterioAnalisis()->getId();
+                    }
+                    if ($key == 1) {
+                        $str_a2 = $criterios_asociados->getIdCriterioAnalisis()->getId();
+                    }
+                    if ($key == 2) {
+                        $str_a3 = $criterios_asociados->getIdCriterioAnalisis()->getId();
+                    }
+                    if ($key == 3) {
+                        $str_a4 = $criterios_asociados->getIdCriterioAnalisis()->getId();
+                    }
                     $abreviatura = $criterios_asociados->getIdCriterioAnalisis()->getAbreviatura();
                     $str_criterios = $str_criterios . $abreviatura . ' - ';
                 }
@@ -63,12 +80,16 @@ class CuentaController extends AbstractController
                 'obligacion_aceedora' => $item->getObligacionAcreedora() == true ? 'SI' : '',
                 'obligacion_deudora' => $item->getObligacionDeudora() == true ? 'SI' : '',
 //                'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : 'NO',
-                'tipo_cuenta' => $item->getIdTipoCuenta()->getId(),
+                'id_tipo_cuenta' => intval($item->getIdTipoCuenta()->getId()),
+                'id_criterio_uno' => intval($str_a1),
+                'id_criterio_dos' => intval($str_a2),
+                'id_criterio_tres' => intval($str_a3),
+                'id_criterio_cuatro' => intval($str_a4),
                 'nombre_tipo_cuenta' => $item->getIdTipoCuenta()->getNombre(),
                 'criterios' => $str_criterios == '' ? '' : substr($str_criterios, 0, -2)
             );
         }
-
+//        dd($row);
         $paginator = $pagination->paginate(
             $row,
             $request->query->getInt('page', $request->get("page") || 1), /*page number*/
@@ -197,22 +218,54 @@ class CuentaController extends AbstractController
                     ->setDeudora($field_deudora)
                     ->setMixta($field_mixta);
                 $em->persist($cuenta);
-                $abreviaturas = $request->get('criterio_analisis')['abreviatura'];
-                if (!empty($abreviaturas)) {
-                    $arr_abreviaturas = explode(' - ', $abreviaturas);
-                    $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
-                    foreach ($arr_abreviaturas as $abreviatura_) {
-                        $obj_criterio = $criterio_analisis_er->findOneBy(array(
-                            'abreviatura' => $abreviatura_,
-                            'activo' => true
-                        ));
-                        if ($obj_criterio) {
-                            $cuenta_criterio = new CuentaCriterioAnalisis();
-                            $cuenta_criterio
-                                ->setIdCuenta($cuenta)
-                                ->setIdCriterioAnalisis($obj_criterio);
-                            $em->persist($cuenta_criterio);
-                        }
+
+                $id_criterio_uno = isset($request->get('cuenta')['id_criterio_uno']) ? $request->get('cuenta')['id_criterio_uno'] : '';
+                $id_criterio_dos = isset($request->get('cuenta')['id_criterio_dos']) ? $request->get('cuenta')['id_criterio_dos'] : '';
+                $id_criterio_tres = isset($request->get('cuenta')['id_criterio_tres']) ? $request->get('cuenta')['id_criterio_tres'] : '';
+                $id_criterio_cuatro = isset($request->get('cuenta')['id_criterio_cuatro']) ? $request->get('cuenta')['id_criterio_cuatro'] : '';
+                $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+                if ($id_criterio_uno !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_uno);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(1)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
+                    }
+                }
+                if ($id_criterio_dos !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_dos);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(2)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
+                    }
+                }
+                if ($id_criterio_tres !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_tres);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(3)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
+                    }
+                }
+                if ($id_criterio_cuatro !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_cuatro);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(4)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
                     }
                 }
                 $em->flush();

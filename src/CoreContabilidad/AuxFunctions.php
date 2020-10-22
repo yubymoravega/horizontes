@@ -623,7 +623,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -634,7 +634,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -645,7 +645,7 @@ class AuxFunctions
             'nro_cuenta' => $nro_cuenta_acreedora,
             'nro_subcuenta' => $nro_subcuenta_acreedora,
             'analisis_1' => $cod_proveedor,
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => '',
             'credito' => number_format($total, 2)
         );
@@ -655,7 +655,7 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2)
         );
@@ -682,6 +682,7 @@ class AuxFunctions
         $i = 0;
         $total = 0;
         $total_general = 0;
+        /** @var MovimientoMercancia $d */
         foreach ($arr_obj_movimiento_mercancia as $d) {
             $cc = $d->getIdCentroCosto()->getId() . '-' . $d->getIdElementoGasto()->getId();
             if (!in_array($cc, $rep_arr)) {
@@ -691,7 +692,9 @@ class AuxFunctions
                 foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
                     /**@var $obj_movimiento_mercancia MovimientoMercancia */
                     if ($obj_movimiento_mercancia->getIdCentroCosto()->getId() == $d->getIdCentroCosto()->getId() &&
-                        $obj_movimiento_mercancia->getIdElementoGasto()->getId() == $d->getIdElementoGasto()->getId())
+                        $obj_movimiento_mercancia->getIdElementoGasto()->getId() == $d->getIdElementoGasto()->getId() ||
+                        ($obj_movimiento_mercancia->getIdOrdenTrabajo() &&$obj_movimiento_mercancia->getIdOrdenTrabajo()->getId() == $d->getIdOrdenTrabajo()->getId())
+                        )
                         $total += floatval($obj_movimiento_mercancia->getImporte());
                 }
                 $rows[] = array(
@@ -700,7 +703,8 @@ class AuxFunctions
                     'nro_cuenta' => $obj_vale_salida->getNroCuentaDeudora(),
                     'nro_subcuenta' => $obj_vale_salida->getNroSubcuentaDeudora(),
                     'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
-                    'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
+                    'analisis_2' => $d->getIdOrdenTrabajo()?$d->getIdOrdenTrabajo()->getCodigo():'',
+                    'analisis_3' => $d->getIdElementoGasto()->getCodigo(),
                     'debito' => number_format($total, 2),
                     'credito' => ''
                 );
@@ -735,7 +739,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'credito' => number_format($parte, 2),
                     'debito' => ''
                 );
@@ -746,7 +750,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'credito' => number_format($parte, 2),
                     'debito' => ''
                 );
@@ -758,7 +762,7 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($total_general, 2),
             'credito' => number_format($total_general, 2)
         );
@@ -809,6 +813,7 @@ class AuxFunctions
                             'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
                             'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
                             'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
+                            'analisis_3' => '',
                             'debito' => number_format($total, 2),
                             'credito' => ''
                         );
@@ -831,7 +836,7 @@ class AuxFunctions
                             'nro_cuenta' => $obj_ajuste_salida->getNroCuentaInventario(),
                             'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
                             'analisis_1' => $d->getIdExpediente()->getCodigo(),
-                            'analisis_2' => '',
+                            'analisis_2' => '','analisis_3' => '',
                             'debito' => number_format($total, 2),
                             'credito' => ''
                         );
@@ -867,7 +872,7 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '',
+                        'analisis_2' => '','analisis_3' => '',
                         'credito' => number_format($parte, 2),
                         'debito' => ''
                     );
@@ -878,7 +883,7 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '',
+                        'analisis_2' => '','analisis_3' => '',
                         'credito' => number_format($parte, 2),
                         'debito' => ''
                     );
@@ -890,7 +895,7 @@ class AuxFunctions
                 'nro_cuenta' => '',
                 'nro_subcuenta' => '',
                 'analisis_1' => '',
-                'analisis_2' => '',
+                'analisis_2' => '','analisis_3' => '',
                 'debito' => number_format($total_general, 2),
                 'credito' => number_format($total_general, 2)
             );
@@ -943,7 +948,7 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '',
+                        'analisis_2' => '','analisis_3' => '',
                         'debito' => number_format($parte, 2),
                         'credito' => ''
                     );
@@ -954,7 +959,7 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '',
+                        'analisis_2' => '','analisis_3' => '',
                         'debito' => number_format($parte, 2),
                         'credito' => ''
                     );
@@ -967,7 +972,7 @@ class AuxFunctions
                 'nro_cuenta' => $obj_ajuste_entrada->getNroCuentaAcreedora(),
                 'nro_subcuenta' => $obj_ajuste_entrada->getNroSubcuentanroAcreedora(),
                 'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
-                'analisis_2' => '',
+                'analisis_2' => '','analisis_3' => '',
                 'debito' => '',
                 'credito' => number_format($obj_documento->getImporteTotal(), 2)
             );
@@ -979,7 +984,7 @@ class AuxFunctions
                 'nro_cuenta' => '',
                 'nro_subcuenta' => '',
                 'analisis_1' => '',
-                'analisis_2' => '',
+                'analisis_2' => '','analisis_3' => '',
                 'debito' => number_format($obj_documento->getImporteTotal(), 2),
                 'credito' => number_format($obj_documento->getImporteTotal(), 2)
             );
@@ -1013,7 +1018,7 @@ class AuxFunctions
             'nro_cuenta' => $obj_transferencia_salida->getNroCuentaInventario(),
             'nro_subcuenta' => $obj_transferencia_salida->getNroSubcuentaInventario(),
             'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($obj_documento->getImporteTotal(), 2),
             'credito' => ''
         );
@@ -1037,7 +1042,7 @@ class AuxFunctions
                     'nro_cuenta' => $d->getIdMercancia()->getCuenta(),
                     'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaInventario(),
                     'analisis_1' => $d->getIdAlmacen()->getCodigo(),
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'credito' => number_format($total, 2),
                     'debito' => ''
                 );
@@ -1049,7 +1054,7 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($obj_documento->getImporteTotal(), 2),
             'credito' => number_format($obj_documento->getImporteTotal(), 2)
         );
@@ -1102,7 +1107,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1113,7 +1118,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1126,7 +1131,7 @@ class AuxFunctions
                 'nro_cuenta' => $nro_cuenta_acreedora,
                 'nro_subcuenta' => $nro_subcuenta_acreedora,
                 'analisis_1' => $obj_transferencia_entrada->getIdAlmacen()->getCodigo(),
-                'analisis_2' => '',
+                'analisis_2' => '','analisis_3' => '',
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1138,6 +1143,7 @@ class AuxFunctions
                 'nro_cuenta' => $nro_cuenta_acreedora,
                 'nro_subcuenta' => $nro_subcuenta_acreedora,
                 'analisis_2' => $obj_transferencia_entrada->getIdUnidad()->getCodigo(),
+                'analisis_3' => '',
                 'analisis_1' => '',
                 'debito' => '',
                 'credito' => number_format($total, 2)
@@ -1149,7 +1155,7 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2)
         );
@@ -1201,7 +1207,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1212,7 +1218,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1225,7 +1231,7 @@ class AuxFunctions
                 'nro_cuenta' => $nro_cuenta_acreedora,
                 'nro_subcuenta' => $nro_subcuenta_acreedora,
                 'analisis_1' => $obj_transferencia_entrada->getIdAlmacen()->getCodigo(),
-                'analisis_2' => '',
+                'analisis_2' => '','analisis_3' => '',
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1237,7 +1243,7 @@ class AuxFunctions
                 'nro_cuenta' => $nro_cuenta_acreedora,
                 'nro_subcuenta' => $nro_subcuenta_acreedora,
                 'analisis_1' => $obj_transferencia_entrada->getIdUnidad()->getCodigo(),
-                'analisis_2' => '',
+                'analisis_2' => '','analisis_3' => '',
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1250,7 +1256,7 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2)
         );
@@ -1301,7 +1307,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1312,7 +1318,7 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '',
+                    'analisis_2' => '','analisis_3' => '',
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1333,6 +1339,7 @@ class AuxFunctions
             'nro_subcuenta' => $nro_subcuenta_acreedora,
             'analisis_1' => $analisis1,
             'analisis_2' => $analisis2,
+            'analisis_3' => '',
             'debito' => '',
             'credito' => number_format($total, 2)
         );
@@ -1342,7 +1349,7 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '',
+            'analisis_2' => '','analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2)
         );

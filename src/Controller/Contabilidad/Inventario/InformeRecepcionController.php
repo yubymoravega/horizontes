@@ -580,13 +580,16 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_informe_recepcion_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
         $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
         $rows = [];
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
+        $arr_fecha_contable = explode('-',$fecha_contable);
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
@@ -610,7 +613,7 @@ class InformeRecepcionController extends AbstractController
                 'fecha' => date("d/m/Y", strtotime($datos["fecha_factura"])),
                 'cod_factura' => $datos["numero_factura"],
                 'unidad' => $unidad,
-                'fecha_informe' => '10/10/1010',
+                'fecha_informe' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
                 'nro_solicitud' => $nro
             ),
             'mercancias' => $rows,

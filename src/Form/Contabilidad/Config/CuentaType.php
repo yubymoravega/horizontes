@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\Config;
 
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\TipoCuenta;
 use Doctrine\ORM\EntityRepository;
@@ -48,6 +49,58 @@ class CuentaType extends AbstractType
                 'class' => TipoCuenta::class,
                 'label' => 'Tipo de cuenta',
                 'choice_label' => 'nombre',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('id_criterio_uno', EntityType::class, [
+                'class' => CriterioAnalisis::class,
+                'mapped'=>false,
+                'label' => 'Análisis 1',
+                'choice_label' => function ($category) {
+                    return $category->getAbreviatura().' - '.$category->getNombre();
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('id_criterio_dos', EntityType::class, [
+                'class' => CriterioAnalisis::class,
+                'mapped'=>false,
+                'label' => 'Análisis 2',
+                'choice_label' => function ($category) {
+                    return $category->getAbreviatura().' - '.$category->getNombre();
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('id_criterio_tres', EntityType::class, [
+                'class' => CriterioAnalisis::class,
+                'mapped'=>false,
+                'label' => 'Análisis 3',
+                'choice_label' => function ($category) {
+                    return $category->getAbreviatura().' - '.$category->getNombre();
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('id_criterio_cuatro', EntityType::class, [
+                'class' => CriterioAnalisis::class,
+                'mapped'=>false,
+                'label' => 'Análisis 4',
+                'choice_label' => function ($category) {
+                    return $category->getAbreviatura().' - '.$category->getNombre();
+                },
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.activo = true')

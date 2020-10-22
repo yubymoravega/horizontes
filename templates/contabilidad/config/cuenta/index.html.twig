@@ -71,7 +71,12 @@
                                             deudora:'{{ item.deudora }}' ,
                                             nombre_tipo_cuenta:'{{ item.nombre_tipo_cuenta }}' ,
                                             criterios:'{{ item.criterios }}' ,
-                                            id: '{{ item.id }}'
+                                            id: '{{ item.id }}',
+                                            id_criterio_uno: '{{ item.id_criterio_uno }}',
+                                            id_criterio_dos: '{{ item.id_criterio_dos }}',
+                                            id_criterio_tres: '{{ item.id_criterio_tres }}',
+                                            id_criterio_cuatro: '{{ item.id_criterio_cuatro }}',
+                                            id_tipo_cuenta: '{{ item.id_tipo_cuenta }}',
                                             })">
                                 <i class="fa fa-edit"></i>
                             </button>
@@ -121,8 +126,17 @@
 
             const {
                 nro_cuenta = '', id = '', deudora = '', nombre = '',
-                obligacion_deudora = '', obligacion_acreedora = '', criterios = ''
+                obligacion_deudora = '', obligacion_acreedora = '', criterios = '',id_criterio_uno = '',id_criterio_dos = '',
+                id_criterio_tres = '',id_criterio_cuatro = '',id_tipo_cuenta = '',
             } = config
+            console.log(parseInt(id_criterio_uno))
+            $('#cuenta_id_criterio_uno').val(parseInt(id_criterio_uno))
+            $('#cuenta_id_criterio_dos').val(id_criterio_dos)
+            $('#cuenta_id_criterio_tres').val(id_criterio_tres)
+            $('#cuenta_id_criterio_cuatro').val(id_criterio_cuatro)
+            $('#cuenta_id_tipo_cuenta').val(id_tipo_cuenta)
+
+
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').html("Modificar " + nro_cuenta)
@@ -147,7 +161,10 @@
         }
         $(document).ready(function () {
             $('#modal__btn__actualizar').hide()
-
+            let ids = ['id_criterio_uno', 'id_criterio_dos', 'id_criterio_tres', 'id_criterio_cuatro']
+            for (let i = 0; i < ids.length; i++) {
+                $("#cuenta_" + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            }
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
                 errorClass: 'invalid-label-orange',

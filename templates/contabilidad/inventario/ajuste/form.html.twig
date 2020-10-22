@@ -236,6 +236,7 @@
         loadingModal.show()
         let list_mercancia = []
         let importe_total = 0;
+        let flag = false;
 
         $(document).ready(function () {
             /** Ajax para obtener los nros consecutivos**/
@@ -262,8 +263,34 @@
                     $('#btnSubbmitAjuste').hide()
                 }
             })
+
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    //no dio enter
+                    $(this).val(consecutivo)
+                    $('#ajuste_entrada').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $('#btnSubbmitAjuste').show()
+                    $('#btnImprimir').show()
+                    $('#btnCancelar').hide()
+                    $('#ajuste_observacion').val('')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    loadingData()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
+            // $("#select_nros").blur(function(){
+            //     $(this).hide("slow");
+            // });
+
             $('#select_nros').on('keyup', function (event) {
                 if (event.which == 13) {
+                    flag = true;
+                    console.info(flag)
                     $('#ajuste_entrada').resetForm()
                     $('#form_mercancia').resetForm()
                     $("#importe-total").text('$ 0.00')

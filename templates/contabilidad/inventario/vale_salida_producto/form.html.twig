@@ -205,6 +205,7 @@
         let cuentas_inventarios = [];
         let eliminados = [];
         let importe_total = 0;
+        let flag = false;
         let list_mercancia = []
 
         function Print_Vale() {
@@ -242,9 +243,25 @@
         $(document).ready(function () {
             cargarDatosIniciales()
 
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    $(this).val(consecutivo)
+                    resetFormMercancia()
+                    resetFormulario()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    cargarDatosIniciales()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
             /** BLOQUE JQuery DEL SELECTOR DE NUMEROS CONSECUTIVOS DEL DOCUMENTO**/
             $('#select_nros').on('keyup', function (e) {
                 if (e.which == 13) {
+                    flag = true
                     if ($('#select_nros').val() != '') {
                         if (eliminados.includes($('#select_nros').val())) {
                             $('#btnSubbmitValeSalida').hide()
@@ -639,6 +656,7 @@
         }
 
         function cargarDatosIniciales() {
+            loadingModal.show()
             $('#btnCancelar').hide()
             $('#vale_salida_fecha_solicitud').attr('type', 'date')
             $('#vale_salida_documento_importe_mercancia').prop('disabled', true)
