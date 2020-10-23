@@ -5,7 +5,9 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\CuadreDiario;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
@@ -86,13 +88,13 @@ class CerrarDiaController extends AbstractController
             'abierto' => true,
         ));
 
-//        $fecha_inicio = AuxFunctions::getDateToClose($em,$id_almacen);
-        $fecha_seleccionada = $request->get('fecha_cierre');
+        $fecha_inicio = AuxFunctions::getDateToClose($em,$id_almacen);
+//        $fecha_seleccionada = $request->get('fecha_cierre');
 
 
         /**@var Cierre $obj_cierre_abierto */
-//        $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_seleccionada;
-        $today = $fecha_seleccionada;
+        $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_inicio;
+//        $today = $fecha_inicio;
         $next_day = strtotime($today . "+ 1 days");
 
         //1- obtener todos los debitos(entradas) y creditos(salidas)
@@ -197,7 +199,6 @@ class CerrarDiaController extends AbstractController
                 ->setDebito(0);
             $em->persist($new_cierre);
         } else {
-//            dd($existencia_almacen_importe, $saldo_apertura, $debitos, $creditos);
             //hubo diferencia
             return $this->render('contabilidad/inventario/cerrar_dia/index.html.twig', [
                 'controller_name' => 'CerrarDiaController',
@@ -208,36 +209,45 @@ class CerrarDiaController extends AbstractController
             ]);
         }
         $em->flush();
-        $session = $request->getSession();
-        $fecha_sistema = AuxFunctions::getDateToClose($em, $id_almacen);
-        $arr_part_fecha = explode('-', $fecha_sistema);
-        $fecha = $arr_part_fecha[2] . '/' . $arr_part_fecha[1] . '/' . $arr_part_fecha[0];
-        $session->set('date_system', $fecha);
-        $session->set('min_date', $fecha_sistema);
-        $session->set('max_date', Date('Y-m-d'));
-//        $this->addFlash('success', 'Día cerrado satisfactoriamente');
-//        return $this->redirectToRoute('inventario');
-        return $this->getDataCuadreDiario($em,$request,$today);
+        $obj_cierre_to_cuadre = $em->getRepository(Cierre::class)->findOneBy(array(
+            'fecha'=>\DateTime::createFromFormat('Y-m-d', $today),
+            'id_almacen'=>$almacen_obj,
+            'abierto'=>false
+        ));
+        $flag = $this->getDataCuadreDiario($em,$request,$obj_cierre_to_cuadre);
+        if($flag){
+            $session = $request->getSession();
+            $fecha_sistema = AuxFunctions::getDateToClose($em, $id_almacen);
+            $arr_part_fecha = explode('-', $fecha_sistema);
+            $fecha = $arr_part_fecha[2] . '/' . $arr_part_fecha[1] . '/' . $arr_part_fecha[0];
+            $session->set('date_system', $fecha);
+            $session->set('min_date', $fecha_sistema);
+            $session->set('max_date', Date('Y-m-d'));
+            return $this->PrintCuadreDiario($em,$request,$obj_cierre_to_cuadre);
+        }
+        else{
+        $this->addFlash('error', 'Ocurrió un error inesperado, consulte a su administrador de software');
+        return $this->redirectToRoute('inventario');
+        }
     }
 
     /**
      * @Route("/get", name="getData")
      */
-    public function getDataCuadreDiario(EntityManagerInterface $em, Request $request,$fecha)
+    public function getDataCuadreDiario(EntityManagerInterface $em, Request $request,$objCierre)
     {
+        /** @var Cierre $objCierre */
         $movimiento_mercancias_er = $em->getRepository(MovimientoMercancia::class);
-        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $return_rows=[];
 
         $movimientos_mercancias_arr = $movimiento_mercancias_er->findBy(array(
-            'fecha' => \DateTime::createFromFormat('Y-m-d', $fecha),
+            'fecha' => $objCierre->getFecha(),
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
-        $total_entrada = 0;
-        $total_salida = 0;
+
         $arr_duplicate = [];
         /** @var MovimientoMercancia $element */
         foreach ($movimientos_mercancias_arr as $element) {
@@ -245,7 +255,7 @@ class CerrarDiaController extends AbstractController
             $elemento_gasto = $element->getIdElementoGasto()?$element->getIdElementoGasto()->getCodigo():'';
             $expediente = $element->getIdExpediente()?$element->getIdExpediente()->getCodigo():'';
             $almacen = $element->getIdAlmacen()?$element->getIdAlmacen()->getCodigo():'';
-//            $orden_trabajo = $element->getIdOrdenTrabajo()?$element->getIdOrdenTrabajo()->getCodigo():'';
+            $orden_trabajo = $element->getIdOrdenTrabajo()?$element->getIdOrdenTrabajo()->getCodigo():'';
             $str_creiterios = '-';
             if (in_array('CCT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios = $str_creiterios. $centro_costo.'-';
@@ -255,6 +265,9 @@ class CerrarDiaController extends AbstractController
             }
             if (in_array('EXP',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios  = $str_creiterios. $expediente.'-';
+            }
+            if (in_array('OT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
+                $str_creiterios  = $str_creiterios. $orden_trabajo.'-';
             }
             if (in_array('ALM',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                 $str_creiterios  = $str_creiterios. $almacen.'-';
@@ -272,8 +285,8 @@ class CerrarDiaController extends AbstractController
         }
         sort($arr_duplicate);
         foreach ($arr_duplicate as $cuentas_subcuentas) {
-            $entrada = 0;
-            $salida = 0;
+            $debitos = 0;
+            $creditos = 0;
             $saldo_final = 0;
             $descripcion = 0;
             $i = 0;
@@ -294,6 +307,9 @@ class CerrarDiaController extends AbstractController
                 if (in_array('EXP',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $str_creiterios  = $str_creiterios. $expediente.'-';
                 }
+                if (in_array('OT',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
+                    $str_creiterios  = $str_creiterios. $orden_trabajo.'-';
+                }
                 if (in_array('ALM',AuxFunctions::getCriterioByCuenta($element->getIdMercancia()->getCuenta(),$em))){
                     $str_creiterios  = $str_creiterios. $almacen.'-';
                 }
@@ -310,36 +326,85 @@ class CerrarDiaController extends AbstractController
                         $i=1;
                     }
                     if ($element->getEntrada()) {
-                        $entrada += $element->getImporte();
+                        $debitos += $element->getImporte();
                     } else {
-                        $salida += $element->getImporte();
+                        $creditos += $element->getImporte();
                     }
                 }
             }
             $analisis = substr($str_creiterios, 1, -1);
             $arr_cuenta_subcuenta = explode('-', $cuentas_subcuentas);
+
+//            saldo anterior
+            $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>$arr_cuenta_subcuenta[0],'activo'=>true]);
+            $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                'nro_subcuenta'=>$arr_cuenta_subcuenta[1],
+                'id_cuenta'=>$obj_cuenta,
+                'activo'=>true
+            ]);
+            $arr_cuadre = $em->getRepository(CuadreDiario::class)->findBy(array(
+                'id_cuenta'=>$obj_cuenta,
+                'id_subcuenta'=>$obj_subcuenta,
+                'id_almacen'=>$almacen_obj
+            ));
+            if(empty($arr_cuadre)){
+                $saldo_inicial = 0;
+            }
+            else{
+                /** @var CuadreDiario $cuadre */
+                $cuadre = $arr_cuadre[count($arr_cuadre)-1];
+                $saldo_inicial = $cuadre->getSaldo()+$cuadre->getDebito()-$cuadre->getCredito();
+            }
+            $new_cuadre_diario = new CuadreDiario();
+            $new_cuadre_diario
+                ->setFecha($objCierre->getFecha())
+                ->setDebito($debitos)
+                ->setCredito($creditos)
+                ->setSaldo($saldo_inicial)
+                ->setIdAlmacen($almacen_obj)
+                ->setStrAnalisis($analisis)
+                ->setIdCuenta($obj_cuenta)
+                ->setIdSubcuenta($obj_subcuenta)
+                ->setIdCierre($objCierre);
+            $em->persist($new_cuadre_diario);
+        }
+        $em->flush();
+        return true;
+    }
+
+
+    public function PrintCuadreDiario(EntityManagerInterface $em, Request $request,$objCierre)
+    {
+        /** @var Cierre $objCierre */
+        $return_rows=[];
+        $total_entrada = 0;
+        $total_salida = 0;
+        $arr_cuadre = $em->getRepository(CuadreDiario::class)->findBy([
+            'id_cierre'=>$objCierre
+        ]);
+        /** @var CuadreDiario $cuadre */
+        foreach ($arr_cuadre as $cuadre){
             $return_rows[] = array(
-                'cuenta' => $arr_cuenta_subcuenta[0],
-                'subcuenta' => $arr_cuenta_subcuenta[1],
-                'analisis'=>$analisis,
-                'descripcion'=>$em->getRepository(Cuenta::class)->findOneBy(array('activo'=>true, 'nro_cuenta'=>$arr_cuenta_subcuenta[0]))->getNombre(),
+                'cuenta' => $cuadre->getIdCuenta()->getNroCuenta(),
+                'subcuenta' => $cuadre->getIdSubcuenta()->getNroSubcuenta(),
+                'analisis'=>$cuadre->getStrAnalisis(),
+                'descripcion'=>$cuadre->getIdCuenta()->getNombre(),
                 'desglose'=>array(
-                    'entrada' => $entrada,
-                    'salida' => $salida,
-                    'saldo_final'=>$saldo_final,
-                    'saldo_inicial'=> round(($saldo_final-$entrada+$salida),2)
+                    'entrada' => $cuadre->getDebito(),
+                    'salida' => $cuadre->getCredito(),
+                    'saldo_final'=>$cuadre->getSaldo()+$cuadre->getDebito()-$cuadre->getCredito(),
+                    'saldo_inicial'=> $cuadre->getSaldo()
                 )
             );
-            $total_entrada += $entrada;
-            $total_salida += $salida;
+            $total_entrada += $cuadre->getDebito();
+            $total_salida += $cuadre->getCredito();
         }
-        $fech_arr = explode('-',$fecha);
 
         return $this->render('contabilidad/inventario/cerrar_dia/cuadre_diario_print.html.twig', [
             'datos' => $return_rows,
-            'almacen' => $almacen_obj->getCodigo() . ': ' . $almacen_obj->getDescripcion(),
-            'unidad' => $almacen_obj->getIdUnidad()->getCodigo() . ': ' . $almacen_obj->getIdUnidad()->getNombre(),
-            'fecha'=>$fech_arr[2].'/'.$fech_arr[1].'/'.$fech_arr[0],
+            'almacen' => $objCierre->getIdAlmacen()->getCodigo().' : '.$objCierre->getIdAlmacen()->getDescripcion(),
+            'unidad' => $objCierre->getIdAlmacen()->getIdUnidad()->getCodigo() . ': ' . $objCierre->getIdAlmacen()->getIdUnidad()->getNombre(),
+            'fecha'=>$objCierre->getFecha()->format('d/m/Y'),
             'total_entrada'=>$total_entrada,
             'total_salida'=>$total_salida,
         ]);
