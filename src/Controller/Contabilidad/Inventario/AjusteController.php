@@ -275,41 +275,12 @@ class AjusteController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{params}", name="contabilidad_inventario_ajuste_entrada_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_ajuste_entrada_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request, $params)
+    public function getMercancia(EntityManagerInterface $em, Request $request, $codigo)
     {
-        $arr = explode(',', $params);
-        $codigo = $arr[0];
-        $cuenta = $arr[1];
-        $em = $this->getDoctrine()->getManager();
-        if ($codigo == -1 || $codigo == '-1')
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'activo' => true,
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'cuenta' => $cuenta
-            ));
-        else
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'activo' => true,
-                'codigo' => $codigo,
-                'cuenta' => $cuenta
-            ));
-
-        $row = array();
-        foreach ($mercancia_arr as $obj) {
-            /**@var $obj Mercancia* */
-            $row [] = array(
-                'id' => $obj->getId(),
-                'codigo' => $obj->getCodigo(),
-                'id_um' => $obj->getIdUnidadMedida()->getId(),
-                'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
-                'id_almacen' => $obj->getIdAmlacen(),
-                'existencia' => $obj->getExistencia()
-            );
-        }
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $row = AuxFunctions::getMercanciaByCod($em,$codigo,$id_almacen);
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
     }
 

@@ -77,6 +77,7 @@
                                             id_criterio_tres: '{{ item.id_criterio_tres }}',
                                             id_criterio_cuatro: '{{ item.id_criterio_cuatro }}',
                                             id_tipo_cuenta: '{{ item.id_tipo_cuenta }}',
+                                            cuenta_produccion: '{{ item.produccion }}',
                                             })">
                                 <i class="fa fa-edit"></i>
                             </button>
@@ -108,60 +109,9 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        function Print(url) {
-            window.open(url, 'blank_')
-        }
-        function mostrarBtn() {
-            $('#modal__btn__actualizar').hide()
-            $('#modal__btn__aceptar').show()
-        }
-
-        function onViewSuncuentas(id) {
-            window.location.replace('/contabilidad/config/subcuenta/' + id);
-        }
-
-        const onUpdate = function (config) {
-            $('#modal__btn__actualizar').show()
-            $('#modal__btn__aceptar').hide()
-
-            const {
-                nro_cuenta = '', id = '', deudora = '', nombre = '',
-                obligacion_deudora = '', obligacion_acreedora = '', criterios = '',id_criterio_uno = '',id_criterio_dos = '',
-                id_criterio_tres = '',id_criterio_cuatro = '',id_tipo_cuenta = '',
-            } = config
-            console.log(parseInt(id_criterio_uno))
-            $('#cuenta_id_criterio_uno').val(parseInt(id_criterio_uno))
-            $('#cuenta_id_criterio_dos').val(id_criterio_dos)
-            $('#cuenta_id_criterio_tres').val(id_criterio_tres)
-            $('#cuenta_id_criterio_cuatro').val(id_criterio_cuatro)
-            $('#cuenta_id_tipo_cuenta').val(id_tipo_cuenta)
-
-
-
-            $('#modal__form__id').modal('show')
-            $('#modal__form__label__id').html("Modificar " + nro_cuenta)
-
-            $('#id_cuenta').val(id)
-            $('#cuenta_nro_cuenta').val(nro_cuenta)
-            $('#cuenta_nombre').val(nombre)
-            $('#id_criterio').val(criterios)
-            if (obligacion_deudora == 'SI')
-                $('#cuenta_produccion').prop('checked', true)
-            else
-                $('#cuenta_obligacion_deudora').prop('checked', false)
-            if (obligacion_acreedora == 'SI')
-                $('#cuenta_obligacion_acreedora').prop('checked', true)
-            else
-                $('#cuenta_obligacion_acreedora').prop('checked', false)
-            if (deudora == 'Deudora')
-                $('#cuenta_deudora').val(1)
-            else
-                $('#cuenta_deudora').val(0)
-
-        }
         $(document).ready(function () {
             $('#modal__btn__actualizar').hide()
-            let ids = ['id_criterio_uno', 'id_criterio_dos', 'id_criterio_tres', 'id_criterio_cuatro']
+            let ids = ['id_criterio_uno', 'id_criterio_dos', 'id_criterio_tres', 'id_criterio_cuatro','id_tipo_cuenta']
             for (let i = 0; i < ids.length; i++) {
                 $("#cuenta_" + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
             }
@@ -232,6 +182,59 @@
             })
 
         })
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
+
+        function onViewSuncuentas(id) {
+            window.location.replace('/contabilidad/config/subcuenta/' + id);
+        }
+
+        const onUpdate = function (config) {
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {
+                nro_cuenta = '', id = '', deudora = '', nombre = '',
+                obligacion_deudora = '', obligacion_acreedora = '', criterios = '',id_criterio_uno = '',id_criterio_dos = '',
+                id_criterio_tres = '',id_criterio_cuatro = '',id_tipo_cuenta = '',cuenta_produccion = '',
+            } = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').html("Modificar " + nro_cuenta)
+
+            $('#id_cuenta').val(id)
+            $('#cuenta_nro_cuenta').val(nro_cuenta)
+            $('#cuenta_nombre').val(nombre)
+            $('#id_criterio').val(criterios)
+            if (cuenta_produccion == 'SI')
+                $('#cuenta_produccion').prop('checked', true)
+            if (obligacion_deudora == 'SI')
+                $('#cuenta_obligacion_deudora').prop('checked', true)
+            if (obligacion_acreedora == 'SI')
+                $('#cuenta_obligacion_acreedora').prop('checked', true)
+            setValue(id_criterio_uno,id_criterio_dos,id_criterio_tres,id_criterio_cuatro,id_tipo_cuenta,deudora)
+        }
+        function setValue(id_criterio_uno,id_criterio_dos,id_criterio_tres,id_criterio_cuatro,id_tipo_cuenta,deudora) {
+            loadingModal.show()
+            console.info(deudora)
+            $('#cuenta_id_criterio_uno').val(parseInt(id_criterio_uno))
+            $('#cuenta_id_criterio_dos').val(id_criterio_dos)
+            $('#cuenta_id_criterio_tres').val(id_criterio_tres)
+            $('#cuenta_id_criterio_cuatro').val(id_criterio_cuatro)
+            $('#cuenta_id_tipo_cuenta').val(id_tipo_cuenta)
+            if(deudora == 'Acreedora')
+            $('#cuenta_deudora').val(0)
+            if(deudora == 'Deudora')
+            $('#cuenta_deudora').val(1)
+            if(deudora == 'Mixta')
+            $('#cuenta_deudora').val(2)
+            loadingModal.close()
+        }
     </script>
 {% endblock %}
 

@@ -1,49 +1,5 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-    {# Modal de Cuentas#}
-    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
-         data-keyboard="false"
-         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-dark">
-                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias</h4>
-                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body bg-dark-app" style="height: 600px;">
-                    <div style="height: 500px; overflow-y: auto;">
-                        <table class="table-small-rows table table-hover text-light">
-                            <thead class="thead-dark">
-                            <th style="width: 10px">Sel.</th>
-                            <th style="width: 160px">Código</th>
-                            <th scope="col-6">Descripción</th>
-                            <th style="width: 200px">Precio Compra</th>
-                            </thead>
-                            <tbody id="rows_table">
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex mt-4">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
-                                    onclick="SeleccionarMercancia()"
-                                    data-dismiss="modal">Aceptar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
@@ -108,9 +64,9 @@
                                 {{ form_widget(formulario.mercancia.codigo) }}
                             </div>
                             <div class="col-1 mt-0 p-0">
-                                <button class="btn btn-secondary btn-sm" data-toggle="modal" type="button"
-                                        data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
-                                            class="fa fa-search"></i></button>
+                                <button class="btn btn-secondary btn-sm" type="button" id="btnSearchMercancia">
+                                    <i class="fa fa-search"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -403,66 +359,21 @@
             loadingData()
 
             $('#btnSearchMercancia').on('click', function () {
-                $('#rows_table').find('tr').remove();
-                let codigo = $('#ajuste_mercancia_codigo').val() != '' ? $('#ajuste_mercancia_codigo').val() : -1
-                let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val() != '' ? $('#ajuste_mercancia_nro_cuenta_inventario').val() : ''
-                $.ajax({
-                    url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + cuenta,
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        mercancias = result.mercancias
-                        $(result.mercancias).each(function (pos, valor) {
-                            $('#rows_table').append('<tr>' +
-                                '<td style="font-weight:400;"> ' +
-                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                                '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
-                            );
-                        })
-                    },
-                    error: function () {
-                    }
-                })
+                let codigo = $('#ajuste_mercancia_codigo').val()
+                if (codigo !== '') {
+                    getDataMercancia(codigo)
+                } else {
+                    alertTemplate('El campo código es obligatorio.', 'danger')
+                }
             })
 
             $('#ajuste_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
                     let codigo = $('#ajuste_mercancia_codigo').val()
-                    let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val()
-                    if (!!cuenta && !!codigo) {
-                        let nro = cuenta.split(' - ')[0];
-                        loadingModal.show("cargando mercancia...")
-                        $.ajax({
-                            url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo + ',' + nro,
-                            method: 'POST',
-                            dataType: 'json',
-                            success: function (result) {
-                                mercancias = result.mercancias
-                                if (mercancias.length > 0) {
-                                    $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                    $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
-
-                                    $('#ajuste_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
-                                    $('#ajuste_mercancia_id_unidad_medida').addClass('read-only-select');
-                                    $('#ajuste_mercancia_descripcion').attr('readonly', true)
-                                } else {
-                                    $('#ajuste_mercancia_id_unidad_medida').val(0)
-                                    $('#ajuste_mercancia_id_unidad_medida').removeClass('read-only-select');
-                                    $('#ajuste_mercancia_descripcion').attr('readonly', false)
-
-                                    alertTemplate('No existen mercancias con ese código')
-                                }
-                                loadingModal.close()
-                            },
-                            error: function () {
-                            }
-                        })
+                    if (codigo !== '') {
+                        getDataMercancia(codigo)
                     } else {
-                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                        alertTemplate('El campo código es obligatorio.', 'danger')
                     }
                 }
             })
@@ -644,7 +555,7 @@
                         <td style="font-weight:400;"> ${codigo}</td>
                         <td style="font-weight:400;"> ${cant}</td>
                         <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(6)} </td>
                         <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
@@ -680,20 +591,48 @@
             })
         })
 
-        function SeleccionarMercancia() {
-            for (var i = 0; i < mercancias.length; i++) {
-                let id = '#' + mercancias[i]['codigo']
-                if ($(id).prop('checked') == true) {
-                    $('#ajuste_mercancia_codigo').val(mercancias[i]['codigo'])
-                    $('#ajuste_mercancia_descripcion').val(mercancias[i]['descripcion'])
-                    $('#ajuste_mercancia_precio').val(mercancias[i]['precio_compra'])
-                    $('#ajuste_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
-                    break
+        function getDataMercancia(codigo) {
+            loadingModal.show("Cargando mercancia...")
+            $.ajax({
+                url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    mercancias = result.mercancias
+                    if (mercancias.length > 0) {
+                        $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                        $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
+                        $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
+
+                        $('#ajuste_mercancia_nro_cuenta_inventario').val(mercancias[0]['cuenta'])
+                        $('#ajuste_mercancia_nro_cuenta_inventario').addClass('read-only-select');
+
+                        let nro_subcuenta = mercancias[0]['subcuenta_inv'];
+                        $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = '+nro_subcuenta+'>'+nro_subcuenta+'</option>');
+                        $('#ajuste_mercancia_nro_subcuenta_inventario').addClass('read-only-select');
+
+                        $('#ajuste_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
+                        $('#ajuste_mercancia_id_unidad_medida').addClass('read-only-select');
+                        $('#ajuste_mercancia_descripcion').attr('readonly', true)
+                    } else {
+                        $('#ajuste_mercancia_id_unidad_medida').val(0)
+                        $('#ajuste_mercancia_id_unidad_medida').removeClass('read-only-select');
+
+                        $('#ajuste_mercancia_nro_cuenta_inventario').val(0)
+                        $('#ajuste_mercancia_nro_cuenta_inventario').removeClass('read-only-select');
+
+                        $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value =0 disabled >-- seleccione --</option>');
+                        $('#ajuste_mercancia_nro_subcuenta_inventario').removeClass('read-only-select');
+                        $('#ajuste_mercancia_descripcion').attr('readonly', false)
+
+                        alertTemplate('No existen mercancias con ese código')
+                    }
+                    loadingModal.close()
+                },
+                error: function () {
                 }
-            }
+            })
         }
-
-
     </script>
 {% endblock %}
 

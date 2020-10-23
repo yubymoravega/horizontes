@@ -322,24 +322,57 @@ class CuentaController extends AbstractController
                 }
                 //adiciono los nuevos criterios asociados a las cuentas
 
-                $abreviaturas = $request->get('criterio_analisis')['abreviatura'];
-                if (!empty($abreviaturas)) {
-                    $arr_abreviaturas = explode(' - ', $abreviaturas);
-                    $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
-                    foreach ($arr_abreviaturas as $abreviatura_) {
-                        $obj_criterio = $criterio_analisis_er->findOneBy(array(
-                            'abreviatura' => $abreviatura_,
-                            'activo' => true
-                        ));
-                        if ($obj_criterio) {
-                            $cuenta_criterio = new CuentaCriterioAnalisis();
-                            $cuenta_criterio
-                                ->setIdCuenta($cuenta)
-                                ->setIdCriterioAnalisis($obj_criterio);
-                            $em->persist($cuenta_criterio);
-                        }
+
+                $id_criterio_uno = isset($request->get('cuenta')['id_criterio_uno']) ? $request->get('cuenta')['id_criterio_uno'] : '';
+                $id_criterio_dos = isset($request->get('cuenta')['id_criterio_dos']) ? $request->get('cuenta')['id_criterio_dos'] : '';
+                $id_criterio_tres = isset($request->get('cuenta')['id_criterio_tres']) ? $request->get('cuenta')['id_criterio_tres'] : '';
+                $id_criterio_cuatro = isset($request->get('cuenta')['id_criterio_cuatro']) ? $request->get('cuenta')['id_criterio_cuatro'] : '';
+                $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+                if ($id_criterio_uno !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_uno);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(1)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
                     }
                 }
+                if ($id_criterio_dos !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_dos);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(2)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
+                    }
+                }
+                if ($id_criterio_tres !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_tres);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(3)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
+                    }
+                }
+                if ($id_criterio_cuatro !== '') {
+                    $obj_criterio = $criterio_analisis_er->find($id_criterio_cuatro);
+                    if ($obj_criterio) {
+                        $cuenta_criterio = new CuentaCriterioAnalisis();
+                        $cuenta_criterio
+                            ->setIdCuenta($cuenta)
+                            ->setOrden(4)
+                            ->setIdCriterioAnalisis($obj_criterio);
+                        $em->persist($cuenta_criterio);
+                    }
+                }
+
                 $em->flush();
                 $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
             } catch (FileException $exception) {
@@ -347,6 +380,30 @@ class CuentaController extends AbstractController
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
+    }
+
+    /**
+     * @Route("/upd-relations", name="contabilidad_config_cuenta_upd_relations", methods={"GET", "POST"})
+     */
+    public function updRelations(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    {
+        $cuenta_arr = $em->getRepository(Cuenta::class)->findAll();
+        $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
+        /** @var Cuenta $cuenta_obj */
+        foreach ($cuenta_arr as $cuenta_obj){
+            $arr_cuentas_criterios = $cuenta_criterio_er->findBy(['id_cuenta'=>$cuenta_obj]);
+            if (!empty($arr_cuentas_criterios)){
+                /** @var CuentaCriterioAnalisis $cuenta_criterio */
+                foreach ($arr_cuentas_criterios as $key=>$cuenta_criterio){
+                    $cuenta_criterio
+                        ->setOrden($key+1);
+                    $em->persist($cuenta_criterio);
+                }
+            }
+        }
+        $em->flush();
+        $this->addFlash('success','Relaciones actualizadas satisfactoriamente');
         return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
     }
 
