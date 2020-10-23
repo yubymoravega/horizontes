@@ -28,6 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Class MovimientoCuentaController
@@ -41,51 +42,6 @@ class MovimientoCuentaController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
-        $mercancia_er = $em->getRepository(Mercancia::class);
-        $movimientos_mercancia_er = $em->getRepository(MovimientoMercancia::class);
-        $cierre_er = $em->getRepository(Cierre::class);
-        $comprobante_cierre_er = $em->getRepository(ComprobanteCierre::class);
-
-        $mercancias_arr = $mercancia_er->findBy(array(
-            'cuenta'=>'183',
-            'nro_subcuenta_inventario'=>'0010',
-            'activo'=>true
-        ));
-
-        $row_movimientos= [];
-        /** @var Mercancia $mercancia */
-        foreach ($mercancias_arr as $mercancia){
-            $arr_movimientos = $movimientos_mercancia_er->findBy(array(
-                'id_mercancia'=>$mercancia
-            ));
-            if(!empty($arr_movimientos))
-                $row_movimientos = array_merge($row_movimientos,$arr_movimientos);
-        }
-        $arr_nros=[];
-        /** @var MovimientoMercancia $movimiento_mercancia */
-        foreach ($row_movimientos as $key=>$movimiento_mercancia){
-            $fecha_movimiento = $movimiento_mercancia->getFecha();
-
-            $cierre_obj = $cierre_er->findOneBy(['fecha'=>$fecha_movimiento,'abierto'=>false]);
-            if($cierre_obj){
-                /** @var ComprobanteCierre $obj_comprobante_cierre */
-                $obj_comprobante_cierre = $comprobante_cierre_er->findOneBy(['id_cierre'=>$cierre_obj]);
-                /** @var RegistroComprobantes $registro_comprobante */
-                $registro_comprobante = $obj_comprobante_cierre->getIdComprobante();
-                $nro_comprobante = $registro_comprobante->getNroConsecutivo();
-                $tipo_comprobante = $registro_comprobante->getIdTipoComprobante()->getAbreviatura();
-
-                $nro = $this->getNro($em,$movimiento_mercancia->getIdDocumento());
-                $arr_nros[$key]['id_movimiento']=$movimiento_mercancia->getId();
-                $arr_nros[$key]['tipo_comprobante']=$tipo_comprobante;
-                $arr_nros[$key]['nro_comprobante']=$nro_comprobante;
-                $arr_nros[$key]['nro_consecutivo']=$nro;
-                $arr_nros[$key]['debito']=$movimiento_mercancia->getImporte();
-                $arr_nros[$key]['credito']=$movimiento_mercancia->getImporte();
-            }
-        }
-        sort($arr_nros);
-dd($arr_nros);
         $form = $this->createForm(MovimientoCuentaType::class);
         return $this->render('contabilidad/general/movimiento_cuenta/index.html.twig', [
             'controller_name' => 'MovimientoCuentaController',
@@ -93,55 +49,119 @@ dd($arr_nros);
         ]);
     }
 
-    public function getNro(EntityManagerInterface $em,$obj_documento){
-        /** @var Documento  $obj_documento */
-        $id_tipo =  $obj_documento->getIdTipoDocumento()->getId();
+    /**
+     * @Route("/getSubmayor", name="contabilidad_general_movimiento_cuenta_get", methods={"POST","GET"})
+     */
+    public function getSumbayor(EntityManagerInterface $em, Request $request)
+    {
+        //params to view
+        $nro_cuenta = $request->request->get('nro_cuenta');
+        $nro_subcuenta = $request->request->get('nro_subcuenta');
+        $almacen = $request->request->get('almacen');
+
+        $arr_cuenta = explode(' - ', $nro_cuenta);
+        $arr_subcuenta = explode(' - ', $nro_subcuenta);
+
+        $mercancia_er = $em->getRepository(Mercancia::class);
+        $almacen_er = $em->getRepository(Almacen::class);
+        $movimientos_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $cierre_er = $em->getRepository(Cierre::class);
+        $comprobante_cierre_er = $em->getRepository(ComprobanteCierre::class);
+
+        $mercancias_arr = $mercancia_er->findBy(array(
+            'cuenta' => $arr_cuenta[0],
+            'nro_subcuenta_inventario' => $arr_subcuenta[0],
+            'activo' => true,
+            'id_amlacen' => $almacen_er->find($almacen)
+        ));
+
+        $row_movimientos = [];
+        /** @var Mercancia $mercancia */
+        foreach ($mercancias_arr as $mercancia) {
+            $arr_movimientos = $movimientos_mercancia_er->findBy(array(
+                'id_mercancia' => $mercancia
+            ));
+            if (!empty($arr_movimientos))
+                $row_movimientos = array_merge($row_movimientos, $arr_movimientos);
+        }
+        $arr_nros = [];
+        /** @var MovimientoMercancia $movimiento_mercancia */
+        foreach ($row_movimientos as $key => $movimiento_mercancia) {
+            $fecha_movimiento = $movimiento_mercancia->getFecha();
+
+            $cierre_obj = $cierre_er->findOneBy(['fecha' => $fecha_movimiento, 'abierto' => false]);
+            if ($cierre_obj) {
+                /** @var ComprobanteCierre $obj_comprobante_cierre */
+                $obj_comprobante_cierre = $comprobante_cierre_er->findOneBy(['id_cierre' => $cierre_obj]);
+                /** @var RegistroComprobantes $registro_comprobante */
+                $registro_comprobante = $obj_comprobante_cierre->getIdComprobante();
+                $nro_comprobante = $registro_comprobante->getNroConsecutivo();
+                $tipo_comprobante = $registro_comprobante->getIdTipoComprobante()->getAbreviatura();
+
+                $nro = $this->getNro($em, $movimiento_mercancia->getIdDocumento());
+                $arr_nros[$key]['id_movimiento'] = $movimiento_mercancia->getId();
+                $arr_nros[$key]['tipo_comprobante'] = $tipo_comprobante;
+                $arr_nros[$key]['nro_comprobante'] = $nro_comprobante;
+                $arr_nros[$key]['nro_consecutivo'] = $nro;
+                $arr_nros[$key]['debito'] = $movimiento_mercancia->getImporte();
+                $arr_nros[$key]['credito'] = $movimiento_mercancia->getImporte();
+            }
+        }
+        sort($arr_nros);
+//        dd($arr_nros)
+        return new JsonResponse(['success'=>true,'datos'=>$arr_nros]);
+    }
+
+    public function getNro(EntityManagerInterface $em, $obj_documento)
+    {
+        /** @var Documento $obj_documento */
+        $id_tipo = $obj_documento->getIdTipoDocumento()->getId();
         $nro = '';
-        switch ($id_tipo){
+        switch ($id_tipo) {
             case 1:
                 /** @var InformeRecepcion $informe_recepcion */
-                $informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'IRM-'.$informe_recepcion->getNroConcecutivo();
+                $informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'IRM-' . $informe_recepcion->getNroConcecutivo();
                 break;
             case 2:
                 /** @var InformeRecepcion $informe_recepcion */
-                $informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'IRP-'.$informe_recepcion->getNroConcecutivo();
+                $informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'IRP-' . $informe_recepcion->getNroConcecutivo();
                 break;
             case 3:
                 /** @var Ajuste $ajuste_entrada */
-                $ajuste_entrada = $em->getRepository(Ajuste::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'AE-'.$ajuste_entrada->getNroConcecutivo();
+                $ajuste_entrada = $em->getRepository(Ajuste::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'AE-' . $ajuste_entrada->getNroConcecutivo();
                 break;
             case 4:
                 /** @var Ajuste $ajuste_salida */
-                $ajuste_salida = $em->getRepository(Ajuste::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'AS-'.$ajuste_salida->getNroConcecutivo();
+                $ajuste_salida = $em->getRepository(Ajuste::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'AS-' . $ajuste_salida->getNroConcecutivo();
                 break;
             case 5:
                 /** @var Transferencia $transferencia_entrada */
-                $transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'TE-'.$transferencia_entrada->getNroConcecutivo();
+                $transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'TE-' . $transferencia_entrada->getNroConcecutivo();
                 break;
             case 6:
                 /** @var Transferencia $transferencia_salida */
-                $transferencia_salida = $em->getRepository(Transferencia::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'TE-'.$transferencia_salida->getNroConcecutivo();
+                $transferencia_salida = $em->getRepository(Transferencia::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'TE-' . $transferencia_salida->getNroConcecutivo();
                 break;
             case 7:
                 /** @var ValeSalida $vale_salida */
-                $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'VSM-'.$vale_salida->getNroConsecutivo();
+                $vale_salida = $em->getRepository(ValeSalida::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'VSM-' . $vale_salida->getNroConsecutivo();
                 break;
             case 8:
                 /** @var ValeSalida $vale_salida_producto */
-                $vale_salida_producto = $em->getRepository(ValeSalida::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'VSP-'.$vale_salida_producto->getNroConsecutivo();
+                $vale_salida_producto = $em->getRepository(ValeSalida::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'VSP-' . $vale_salida_producto->getNroConsecutivo();
                 break;
             case 9:
                 /** @var Devolucion $devolucion */
-                $devolucion = $em->getRepository(Devolucion::class)->findOneBy(['id_documento'=>$obj_documento]);
-                $nro = 'D-'.$devolucion->getNroConcecutivo();
+                $devolucion = $em->getRepository(Devolucion::class)->findOneBy(['id_documento' => $obj_documento]);
+                $nro = 'D-' . $devolucion->getNroConcecutivo();
                 break;
         }
         return $nro;

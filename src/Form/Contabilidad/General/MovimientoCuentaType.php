@@ -48,7 +48,6 @@ class MovimientoCuentaType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Período'
             ))
-         ->add('buscar', SubmitType::class, ['attr'=> ['class' => 'btn btn-primary']])
          ->add('limpiar', ResetType::class, ['attr'=> ['class' => 'btn btn-outlined-secondary']])
         ;
     }
