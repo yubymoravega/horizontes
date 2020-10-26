@@ -12,6 +12,23 @@ class ClientesAdapter
     public static $UNIDAD_SISTEMA = 2;
     public static $CLIENTE_CONTABILIDAD = 3;
     protected EntityManagerInterface $em;
+    protected String $tipo;
+
+    /**
+     * @return String
+     */
+    public function getTipo(): string
+    {
+        return $this->tipo;
+    }
+
+    /**
+     * @param String $tipo
+     */
+    public function setTipo(string $tipo): void
+    {
+        $this->tipo = $tipo;
+    }
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -29,7 +46,7 @@ class ClientesAdapter
             case self::$CLIENTE_CONTABILIDAD:
                 return new ContabilidadCliente($em);
             default:
-                return new PersonaCliente($em);
+                return null;
         }
     }
 

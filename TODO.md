@@ -96,3 +96,8 @@ incorectamente un nro_consecutivo por algun motivo desconocido
 - yo- cuando se teclea un codigo de cualquier cosa que se carge de la base de datos no puede dejar
     teclear ningun dato como descripcion, etc
 - (✓) totalizar las cuentas en existencia en almacen
+
+#### TODO - Ventas
+- **FacturaRepository->generateNroFactura($unidad)** mejorar para que obtenga el nro_factura por 
+    el max() de los # existentes
+-  Almacen - esta como un valor fijo para el (almacen 2) cambiar este comportamiento

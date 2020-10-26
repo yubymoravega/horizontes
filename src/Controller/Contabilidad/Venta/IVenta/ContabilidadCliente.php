@@ -11,6 +11,7 @@ class ContabilidadCliente extends ClientesAdapter implements ICliente
     public function __construct(EntityManagerInterface $em)
     {
         parent::__construct($em);
+        $this->tipo = 'contabilidad cliente';
     }
 
     public function getListClientes()
@@ -27,5 +28,14 @@ class ContabilidadCliente extends ClientesAdapter implements ICliente
             }
         }
         return $personas;
+    }
+
+    public function find($id)
+    {
+        $personas_obj = $this->em->getRepository(ClienteContabilidad::class)->find($id);
+        return [
+            'id' => $personas_obj->getId(),
+            'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre()
+        ];
     }
 }

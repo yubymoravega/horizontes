@@ -8,6 +8,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\SubcuentaCriterioAnalisis;
 use App\Form\Contabilidad\Config\SubcuentaType;
+use App\Repository\Contabilidad\Config\SubcuentaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use phpDocumentor\Reflection\Types\This;

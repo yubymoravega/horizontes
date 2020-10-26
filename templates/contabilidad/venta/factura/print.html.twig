@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>factura</title>
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+    <style>
+        @media print {
+            #footer {
+                position: fixed;
+                display: block;
+                bottom: 0;
+            }
+        }
+
+        th {
+            padding: .6rem 0;
+            border: solid black 1px;
+            width: 80px;
+        }
+
+        td {
+            padding: 0 !important;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        .bg-gray {
+            background: darkgray;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid mt-3" style="width: 1000px;">
+    <div class="row">
+        <h3 class="col-9">FACTURA</h3>
+        <div class="col-3">
+            <p class="m-0"><span class="font-weight-bold">folio :</span> {{ factura.nro_factura }}</p>
+            <p class="m-0"><span class="font-weight-bold">fecha :</span> {{ factura.fecha_factura }}</p>
+        </div>
+    </div>
+    <table border="2" width="960px" class="mt-1">
+        <tbody>
+        <tr>
+            <td style="width: 455px;">
+                <div class="pl-1 font-weight-bold bg-gray">SUMINISTRADOR: Grupos Horizontes</div>
+                <div class="pl-1">Código:</div>
+                <div class="pl-1">Dirección:</div>
+            </td>
+            <td style="width: 455px;">
+                <div class="pl-1 font-weight-bold bg-gray">CLIENTE: {{ factura.cliente }}</div>
+                <div class="pl-1">Código:</div>
+                <div class="pl-1">Dirección:</div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 455px;">
+                <div class="pl-1">Cuenta Bancaria - CUP No:</div>
+                <div class="pl-1">Cuenta Bancaria - CUC No:</div>
+                <div class="pl-1">Nro de Identificacion Tributaria</div>
+            </td>
+            <td style="width: 455px;">
+                <div class="pl-1">Cuenta Bancaria - CUP No:</div>
+                <div class="pl-1">Cuenta Bancaria - CUC No:</div>
+                <div class="pl-1">Nro de Identificacion Tributaria</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="width: 455px;">
+                <div class="pl-1 font-weight-bold bg-gray text-center">CONCENTO DE LA OPERACION</div>
+                <div class="pl-1">----------</div>
+                <div class="pl-1">----------</div>
+                <div class="pl-1">----------</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="width: 455px;">
+                <div class="pl-1 font-weight-bold bg-gray text-center">DATOS DEL TRANSPORTISTA</div>
+                <div class="pl-1">----------</div>
+                <div class="pl-1">----------</div>
+                <div class="pl-1">----------</div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="min-height: 450px;">
+        <table border="0" width="960px">
+            <thead>
+            <th width="80" class="text-center"><strong>Código</strong></th>
+            <th colspan="2" class="text-center"><strong>Descripción</strong></th>
+            <th width="10" class="text-center"><strong>UM</strong></th>
+            <th width="100" class="text-center"><strong>Cantidad</strong></th>
+            <th width="100" class="text-center"><strong>Precio</strong></th>
+            <th width="100" class="text-center"><strong>Rec/Desc</strong></th>
+            <th width="100" class="text-center"><strong>Importe</strong></th>
+            </thead>
+            <tbody>
+            {% for item in mercancias %}
+                <tr>
+                    <td class="px-2" width="80">{{ item.codigo }}</td>
+                    <td class="px-2" colspan="2">{{ item.descripcion }}</td>
+                    <td class="text-center">{{ item.um }}</td>
+                    <td class="text-right px-2" width="100" class="text-right">{{ item.cantidad }}</td>
+                    <td class="text-right px-2" width="100" class="text-right">{{ item.precio }}</td>
+                    <td class="text-right px-2" width="100" class="text-right">{{ item.descuento_recarga }}</td>
+                    <td class="text-right px-2" width="100" class="text-right">{{ item.importe }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div id="footer" class="mb-3">
+        <table width="960px">
+            <tr style="height: 2px;">
+                <td class="pl-5 pt-2  text-right font-weight-bold" colspan="7" width="80">TOTAL</td>
+                <td class="pt-2 text-right font-weight-bold px-2" width="100"
+                    class="text-right">{{ importe_total|number_format(2) }}</td>
+            </tr>
+        </table>
+        <table border="1px" width="960px">
+            <thead>
+            <th width="230" class="py-1 bg-gray text-center">ENTREGADO-SUMINSTRADOR</th>
+            <th width="155" class="py-1 bg-gray text-center">RECIBO-COMPRADOR</th>
+            <th width="155" class="py-1 bg-gray text-center">TRANSPORTISTA</th>
+            </thead>
+            <tbody>
+            <tr class="mt-1">
+                <td style="width: 455px;">
+                    <div class="pl-1">Nombre y Apellidos:</div>
+                    <div class="pl-1">Cargo:</div>
+                    <div class="pl-1">Fecha:</div>
+                    <div class="pl-1">Firma:</div>
+
+                </td>
+                <td style="width: 455px;">
+                    <div class="pl-1">Nombre y Apellidos:</div>
+                    <div class="pl-1">Cargo:</div>
+                    <div class="pl-1">Fecha:</div>
+                    <div class="pl-1">Firma:</div>
+
+                </td>
+                <td style="width: 455px;">
+                    <div class="pl-1">Nombre y Apellidos:</div>
+                    <div class="pl-1">Cargo:</div>
+                    <div class="pl-1">Fecha:</div>
+                    <div class="pl-1">Firma:</div>
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
+</body>
+</html>

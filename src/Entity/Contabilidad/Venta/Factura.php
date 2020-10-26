@@ -6,9 +6,11 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
 use App\Repository\Contabilidad\Venta\FacturaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=FacturaRepository::class)
+ * @UniqueEntity(fields={"nro_factura","anno","id_unidad"}, message="contabilidad.venta.nro_factura_unique")
  */
 class Factura
 {
@@ -45,7 +47,8 @@ class Factura
     private $anno;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity=ContratosCliente::class)
+     * @ORM\JoinColumn(nullable=false)
      */
     private $id_contrato;
 
@@ -141,12 +144,12 @@ class Factura
         return $this;
     }
 
-    public function getIdContrato(): ?int
+    public function getIdContrato(): ?ContratosCliente
     {
         return $this->id_contrato;
     }
 
-    public function setIdContrato(int $id_contrato): self
+    public function setIdContrato(ContratosCliente $id_contrato): self
     {
         $this->id_contrato = $id_contrato;
 

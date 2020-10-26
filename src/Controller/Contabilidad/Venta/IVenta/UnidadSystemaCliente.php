@@ -4,6 +4,7 @@
 namespace App\Controller\Contabilidad\Venta\IVenta;
 
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UnidadSystemaCliente extends ClientesAdapter implements ICliente
@@ -11,6 +12,7 @@ class UnidadSystemaCliente extends ClientesAdapter implements ICliente
     public function __construct(EntityManagerInterface $em)
     {
         parent::__construct($em);
+        $this->tipo = 'unidad del sistema';
     }
 
     public function getListClientes()
@@ -27,5 +29,14 @@ class UnidadSystemaCliente extends ClientesAdapter implements ICliente
             }
         }
         return $personas;
+    }
+
+    public function find($id)
+    {
+        $personas_obj = $this->em->getRepository(Unidad::class)->find($id);
+        return [
+            'id' => $personas_obj->getId(),
+            'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre()
+        ];
     }
 }

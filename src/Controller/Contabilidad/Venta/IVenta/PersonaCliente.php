@@ -11,6 +11,7 @@ class PersonaCliente extends ClientesAdapter implements ICliente
     public function __construct(EntityManagerInterface $em)
     {
         parent::__construct($em);
+        $this->tipo = 'persona';
     }
 
     public function getListClientes()
@@ -27,5 +28,14 @@ class PersonaCliente extends ClientesAdapter implements ICliente
             }
         }
         return $personas;
+    }
+
+    public function find($id)
+    {
+        $personas_obj = $this->em->getRepository(Cliente::class)->find($id);
+        return [
+            'id' => $personas_obj->getId(),
+            'nombre' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos()
+        ];
     }
 }

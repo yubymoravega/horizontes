@@ -2,21 +2,29 @@
 
 namespace App\Repository\Contabilidad\Venta;
 
+use App\CoreContabilidad\ParanoidEntityRepository;
 use App\Entity\Contabilidad\Venta\Factura;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Factura|null find($id, $lockMode = null, $lockVersion = null)
- * @method Factura|null findOneBy(array $criteria, array $orderBy = null)
- * @method Factura[]    findAll()
- * @method Factura[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Class
+ * @method Factura|null find($id, $paranoid = true)
+ * @method Factura|null findOneBy(array $criteria, $paranoid = true, array $orderBy = null)
+ * @method Factura[]    findAll($paranoid = true)
+ * @method Factura[]    findBy(array $criteria, $paranoid = true, array $orderBy = null, $limit = null, $offset = null)
  */
-class FacturaRepository extends ServiceEntityRepository
+class FacturaRepository extends ParanoidEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Factura::class);
+        $this->setEntityClass(Factura::class);
+        $this->setRegistry($registry);
+        parent::__construct();
+    }
+    public function generateNroFactura($unidad)
+    {
+        $cantidad = $this->count(['anno' => \Date('Y'), 'id_unidad' => $unidad]);
+        return $cantidad + 1;
     }
 
     // /**

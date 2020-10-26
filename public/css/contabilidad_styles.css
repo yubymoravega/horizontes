@@ -95,8 +95,14 @@ input[type=number] {
 }
 
 .table-small-rows td {
-    padding-top: .2rem;
-    padding-bottom: .2rem;
+    padding: .2rem !important;
+    /*padding-bottom: .2rem !important;*/
+}
+
+.table-small-rows th {
+    padding-left: .4rem !important;
+    padding-right: .4rem !important;
+    text-align: center;
 }
 
 /* estilo impuesto por espesificidad */

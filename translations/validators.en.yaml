@@ -23,4 +23,6 @@ contabilidad:
     codigo_almacen: Ya existe un almacén registrado con ese código
     abreviatura_not_blank: El campo descripción está vacio !
     abreviatura_unique: La abreviatura ya está en uso !
+  venta:
+    nro_factura_unique: La factura ya está registrada
 

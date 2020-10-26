@@ -115,7 +115,7 @@ const CONTAB_MSG = {
     REQUIRED_CUENTA: 'seleccione una cuenta',
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
-    REQUIRED_OBLIGATORIO: 'El campo obligatorio!',
+    REQUIRED_OBLIGATORIO: 'campo obligatorio!',
     FORMAT_NO_CUENTA: 'el No. de la cuenta solo acepta letras y números',
 }
 

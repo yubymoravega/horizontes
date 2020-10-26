@@ -22,6 +22,16 @@ class CuentaRepository extends ParanoidEntityRepository
         parent::__construct();
     }
 
+    public function findObligacion()
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.activo = true')
+            ->andWhere('u.obligacion_deudora = true')
+            ->orWhere('u.obligacion_acreedora = true')
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Cuenta[] Returns an array of Cuenta objects
     //  */

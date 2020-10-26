@@ -69,6 +69,7 @@
                                             obligacion_acreedora:'{{ item.obligacion_aceedora }}' ,
                                             obligacion_deudora:'{{ item.obligacion_deudora }}' ,
                                             deudora:'{{ item.deudora }}' ,
+                                            produccion:'{{ item.produccion }}' ,
                                             nombre_tipo_cuenta:'{{ item.nombre_tipo_cuenta }}' ,
                                             criterios:'{{ item.criterios }}' ,
                                             id: '{{ item.id }}'
@@ -106,6 +107,7 @@
         function Print(url) {
             window.open(url, 'blank_')
         }
+
         function mostrarBtn() {
             $('#modal__btn__actualizar').hide()
             $('#modal__btn__aceptar').show()
@@ -120,7 +122,7 @@
             $('#modal__btn__aceptar').hide()
 
             const {
-                nro_cuenta = '', id = '', deudora = '', nombre = '',
+                nro_cuenta = '', id = '', deudora = '', nombre = '', produccion = '',
                 obligacion_deudora = '', obligacion_acreedora = '', criterios = ''
             } = config
 
@@ -131,18 +133,33 @@
             $('#cuenta_nro_cuenta').val(nro_cuenta)
             $('#cuenta_nombre').val(nombre)
             $('#id_criterio').val(criterios)
+
             if (obligacion_deudora == 'SI')
-                $('#cuenta_produccion').prop('checked', true)
+                $('#cuenta_obligacion_deudora').prop('checked', true)
             else
                 $('#cuenta_obligacion_deudora').prop('checked', false)
+
             if (obligacion_acreedora == 'SI')
                 $('#cuenta_obligacion_acreedora').prop('checked', true)
             else
                 $('#cuenta_obligacion_acreedora').prop('checked', false)
-            if (deudora == 'Deudora')
-                $('#cuenta_deudora').val(1)
+
+            if (produccion == 'SI')
+                $('#cuenta_produccion').prop('checked', true)
             else
-                $('#cuenta_deudora').val(0)
+                $('#cuenta_produccion').prop('checked', false)
+
+            switch (deudora) {
+                case "Deudora":
+                    $('#cuenta_deudora').val(1)
+                    break;
+                case "Acreedora":
+                    $('#cuenta_deudora').val(0)
+                    break;
+                case "Mixta":
+                    $('#cuenta_deudora').val(2)
+                    break;
+            }
 
         }
         $(document).ready(function () {
@@ -159,7 +176,7 @@
                         error_label.removeClass('hide')
                     } else {
                         error.addClass('ml-3')
-                        error.css('position','fixed')
+                        error.css('position', 'fixed')
                         $(element)
                             .closest("form")
                             .find("label[for='" + element.attr("id") + "']")

@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Repository\Contabilidad\Venta\MovimientoVentaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -77,6 +78,12 @@ class MovimientoVenta
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_factura;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_almacen;
 
     public function getId(): ?int
     {
@@ -223,6 +230,18 @@ class MovimientoVenta
     public function setIdFactura(?Factura $id_factura): self
     {
         $this->id_factura = $id_factura;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
 
         return $this;
     }
