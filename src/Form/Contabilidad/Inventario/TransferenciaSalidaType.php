@@ -48,12 +48,12 @@ class TransferenciaSalidaType extends AbstractType
                 'choice_label' => 'nro_subcuenta',
             ))
             ->add('id_unidad', ChoiceType::class, [
-                'label' => 'Unidad',
+                'label' => 'Unidad de Destino',
                 'attr' => ['class' => 'w-100'],
                 'choice_label' => 'nombre',
             ])
             ->add('id_almacen', ChoiceType::class, [
-                'label' => 'Almacen',
+                'label' => 'Almacen de Destino',
                 'attr' => ['class' => 'w-100'],
                 'choice_label' => 'descripcion',
             ])

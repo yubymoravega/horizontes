@@ -16,26 +16,30 @@
             </tr>
             </tbody>
         </table>
-        <table border="0" width="960px">
-            <thead>
-            <th class="text-center"><strong>Código</strong></th>
-            <th class="text-center"><strong>Descripción</strong></th>
-            <th width="10" class="text-center"><strong>UM</strong></th>
-            <th class="text-center"><strong>Cantidad</strong></th>
-            <th class="text-center"><strong>Precio</strong></th>
-            <th class="text-center"><strong>Importe</strong></th>
-            <th class="text-center"><strong>Existencia</strong></th>
-            </thead>
+        <table border="1" width="960px">
+            <tbody>
+            <tr>
+                <td width="80" class="text-center"><strong>Código</strong></td>
+                <td colspan="2" class="text-center"><strong>Descripción</strong></td>
+                <th width="80" class="text-center"><strong>UM</strong></th>
+                <td width="100" class="text-center"><strong>Cantidad</strong></td>
+                <td width="100" class="text-center"><strong>Precio</strong></td>
+                <td width="100" class="text-center"><strong>Importe</strong></td>
+                <td width="100" class="text-center"><strong>Existencia</strong></td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0px;" width="960px">
             <tbody>
             {% for item in mercancias %}
                 <tr>
-                    <td>{{ item.codigo }}</td>
-                    <td>{{ item.descripcion }}</td>
-                    <td width="10" class="text-center">{{ item.um }}</td>
-                    <td class="text-right">{{ item.cantidad }}</td>
-                    <td class="text-right">{{ item.precio }}</td>
-                    <td class="text-right">{{ item.importe }}</td>
-                    <td class="text-right">{{ item.existencia }}</td>
+                    <td width="80" class="text-center">{{ item.codigo }}</td>
+                    <td colspan="2">{{ item.descripcion }}</td>
+                    <td width="80" class="text-center">{{ item.um }}</td>
+                    <td width="100" class="text-right">{{ item.cantidad }}</td>
+                    <td width="100" class="text-right">{{ item.precio }}</td>
+                    <td width="100" class="text-right">{{ item.importe }}</td>
+                    <td width="100" class="text-right">{{ item.existencia }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -64,7 +68,7 @@
                 <td valign="TOP" width="155"><strong>Recepciona</strong></td>
                 <td valign="TOP" width="155"><strong>Contabiliza</strong></td>
                 <td valign="TOP" width="165"><strong>Submayor</strong></td>
-                <td valign="TOP" width="100" class="text-center"><strong> AS-{{ datos.nro_solicitud }}</strong></td>
+                <td width="100" class="text-center"><strong> AS-{{ datos.nro_solicitud }}</strong></td>
             </tr>
             </tbody>
         </table>

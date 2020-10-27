@@ -61,16 +61,16 @@
                 <hr color="dimgray" class="my-1 ml-2" size=3>
 
                 {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
-{#                <div class="row mt-0 p-0" id="cuenta_subcuenta_input">#}
-{#                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">#}
-{#                        <label for="nro_cuenta_input">Cuenta de inventario</label>#}
-{#                        <input type="text" readonly id="nro_cuenta_input" class="bg-dark-app form-control w-100">#}
-{#                    </div>#}
-{#                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">#}
-{#                        <label for="nro_subcuenta_input">Subcuenta de inventario</label>#}
-{#                        <input type="text" readonly id="nro_subcuenta_input" class="bg-dark-app form-control w-100">#}
-{#                    </div>#}
-{#                </div>#}
+                {#                <div class="row mt-0 p-0" id="cuenta_subcuenta_input">#}
+                {#                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">#}
+                {#                        <label for="nro_cuenta_input">Cuenta de inventario</label>#}
+                {#                        <input type="text" readonly id="nro_cuenta_input" class="bg-dark-app form-control w-100">#}
+                {#                    </div>#}
+                {#                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">#}
+                {#                        <label for="nro_subcuenta_input">Subcuenta de inventario</label>#}
+                {#                        <input type="text" readonly id="nro_subcuenta_input" class="bg-dark-app form-control w-100">#}
+                {#                    </div>#}
+                {#                </div>#}
                 <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
                     <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.mercancia.nro_cuenta_inventario) }}
@@ -140,7 +140,7 @@
                         <th width="110px">Importe</th>
                         <th width="110px">Precio</th>
                         <th width="120px">Nueva Exist</th>
-                        <th width="90px" hidden>Cuenta/Sub.</th>
+                        <th width="90px">Cuenta/Sub.</th>
                         <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
                         <th scope="col-1" hidden>UM</th>
                         <th scope="col-1" hidden>Descripcion</th>
@@ -225,11 +225,10 @@
         $(document).ready(function () {
             cargarDatosIniciales()
 
-            $("#select_nros").blur(function(){
-                if(flag == false){
+            $("#select_nros").blur(function () {
+                if (flag == false) {
                     resetFormulario()
-                }
-                else{
+                } else {
                     flag = false;
                 }
             });
@@ -289,8 +288,7 @@
                     } else {
                         alertTemplate('El campo código es obligatorio.', 'danger')
                     }
-                }
-                else{
+                } else {
                     $('#informe_recepcion_mercancia_descripcion').val('')
                     $('#informe_recepcion_mercancia_descripcion').attr('readonly', true)
                     $('#informe_recepcion_mercancia_id_unidad_medida').val(0)
@@ -494,11 +492,11 @@
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
-                        <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(6)} </td>
-                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
-<!--                        <td style="font-weight:400;" hidden>${getNro(cuenta)} - ${getNro(subcuenta)}</td>-->
+                        <td style="font-weight:400;" class="text-right"> ${cant}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(precio).toFixed(6)} </td>
+                        <td style="font-weight:400;" class="text-right">${parseFloat(nueva_existencia)}</td>
+                        <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -594,10 +592,10 @@
                             for (var i = 0; i < mercancias.length; i++) {
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
-                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td style="font-weight:400;" class="text-right">${parseFloat(mercancias[i]['existencia'])}</td>
                                     <td style="font-weight:400;">${mercancias[i]['cuenta_subcuenta']}</td>
                                     <td></td>
                                    </tr>`
@@ -678,6 +676,7 @@
                 form.submit()
             })
         }
+
         function getDataMercancia(codigo) {
             loadingModal.show("Cargando mercancia...")
             $.ajax({
@@ -695,7 +694,7 @@
                         $('#informe_recepcion_mercancia_nro_cuenta_inventario').addClass('read-only-select');
 
                         let nro_subcuenta = mercancias[0]['subcuenta_inv'];
-                        $('#informe_recepcion_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = '+nro_subcuenta+'>'+nro_subcuenta+'</option>');
+                        $('#informe_recepcion_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = ' + nro_subcuenta + '>' + nro_subcuenta + '</option>');
                         $('#informe_recepcion_mercancia_nro_subcuenta_inventario').addClass('read-only-select');
 
                         $('#informe_recepcion_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])

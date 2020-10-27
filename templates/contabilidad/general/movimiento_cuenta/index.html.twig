@@ -15,7 +15,9 @@
             <h6 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Movimiento de Cuentas
             </h6>
-
+            <div class="bg-dark-app">
+                <label for="" class="text-white text-uppercase"><strong>saldo inicial:</strong>{{ saldo_inicial }}</label>
+            </div>
             <button type="button" id="movimiento_cuenta_buscar" name="movimiento_cuenta[buscar]"
                     class="ml-auto btn-primary btn text-uppercase" style="width:100px" onclick="getDataByParams()">
                 Buscar
@@ -38,6 +40,9 @@
                 {{ form_widget(form.centro_costo,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
+                {{ form_widget(form.orden_trabajo,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm col-2">
                 {{ form_widget(form.elemento_gasto,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
@@ -45,6 +50,9 @@
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
                 {{ form_widget(form.almacen,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm col-2">
+                {{ form_widget(form.unidad,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             {{ form_end(form) }}
         </div>
@@ -75,12 +83,16 @@
         cbx_elemento_gasto = $('#movimiento_cuenta_elemento_gasto')
         cbx_expediente = $('#movimiento_cuenta_expediente')
         cbx_almacen = $('#movimiento_cuenta_almacen')
+        cbx_orden_trabajo = $('#movimiento_cuenta_orden_trabajo')
+        cbx_unidad = $('#movimiento_cuenta_unidad')
 
         function hiddenParents() {
             cbx_centro_costo.parent().hide()
             cbx_elemento_gasto.parent().hide()
             cbx_expediente.parent().hide()
             cbx_almacen.parent().hide()
+            cbx_unidad.parent().hide()
+            cbx_orden_trabajo.parent().hide()
         }
 
         hiddenParents()
@@ -123,6 +135,12 @@
                                 case "ALM":
                                     cbx_almacen.parent().show()
                                     break
+                                case "OT":
+                                    cbx_orden_trabajo.parent().show()
+                                    break
+                                case "UNID":
+                                    cbx_unidad.parent().show()
+                                    break
                             }
                         })
                         miniLoadin.close()
@@ -150,6 +168,8 @@
             cbx_elemento_gasto.prepend('<option selected = "false" value = "0" disabled> -- Elemento de Gasto -- </option>');
             cbx_expediente.prepend('<option selected = "false" value = "0" disabled> -- Expediente -- </option>');
             cbx_almacen.prepend('<option selected = "false" value = "0" disabled> -- Almacén -- </option>');
+            cbx_unidad.prepend('<option selected = "false" value = "0" disabled> -- Unidad -- </option>');
+            cbx_orden_trabajo.prepend('<option selected = "false" value = "0" disabled> -- Orden de trabajo -- </option>');
 
             loadingModal.show()
 
@@ -171,6 +191,12 @@
                     $(result.almacenes).each(function (pos, valor) {
                         $('#movimiento_cuenta_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
+                    $(result.unidad).each(function (pos, valor) {
+                        $('#movimiento_cuenta_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.orden_trabajo).each(function (pos, valor) {
+                        $('#movimiento_cuenta_orden_trabajo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
                     loadingModal.close()
                 },
                 error: function () {
@@ -183,7 +209,8 @@
                 'nro_cuenta': $('#movimiento_cuenta_nro_cuenta').val(),
                 'nro_subcuenta': $('#movimiento_cuenta_nro_subcuenta').val(),
                 'periodo': $('#movimiento_cuenta_periodo').val(),
-                'nro_cuenta': $('#movimiento_cuenta_nro_cuenta').val(),
+                'unidad': $('#movimiento_cuenta_unidad').val(),
+                'orden_trabajo': $('#movimiento_cuenta_orden_trabajo').val(),
                 'centro_costo': $('#movimiento_cuenta_centro_costo').val(),
                 'elemento_gasto': $('#movimiento_cuenta_elemento_gasto').val(),
                 'expediente': $('#movimiento_cuenta_expediente').val(),
@@ -203,9 +230,10 @@
                             $('#rows_datos').append(`<tr>
                                     <td style="font-weight:400;"> ${datos['tipo_comprobante']} </td>
                                     <td style="font-weight:400;"> ${datos['nro_comprobante']} </td>
-                                    <td style="font-weight:400;"> ${datos['nro_consecutivo']} </td>
+                                    <td style="font-weight:400;" class="text-center"> ${datos['nro_consecutivo']} </td>
                                     <td style="font-weight:400;" class="text-right"> ${datos['debito']} </td>
                                     <td style="font-weight:400;" class="text-right"> ${datos['credito']} </td>
+                                    <td style="font-weight:400;" class="text-right"> ${datos['total']} </td>
                                    </tr>`
                             );
                         })

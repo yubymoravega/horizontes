@@ -20,15 +20,6 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>
-                {#                <li class="nav-item dropdown">#}
-                {#                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"#}
-                {#                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
-                {#                        Nomencladores#}
-                {#                    </a>#}
-                {#                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
-                {#                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>#}
-                {#                    </div>#}
-                {#                </li>#}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -96,9 +87,13 @@
                         <a class="dropdown-item"
                            href="{{ url ('contabilidad_inventario_submayor_inventario_producto') }}">Submayor de
                             inventario por producto</a>
-                        <a class="dropdown-item" target="_blank"
-                           href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print') }}">Comprobante de
-                            anotaciones</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Comprobante de anotaciones</h6>
+                        <div class="dropdown-divider"></div>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" target="_blank"
+                           href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print_entrada') }}">Entrada</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" target="_blank"
+                           href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print_salida') }}">Salida</a>
                     </div>
                 </li>
             </ul>
@@ -159,7 +154,7 @@
                     <input id="_token_confirm_modal" type="hidden" name="_token" value="123...">
                     <div class="modal-footer">
                         <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">
-                            Cancelar
+                            Salir
                         </button>
                         <button type="submit" class="my-0 btn btn-danger">Aceptar</button>
                     </div>

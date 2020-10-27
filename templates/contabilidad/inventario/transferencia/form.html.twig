@@ -310,10 +310,10 @@
 
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
-                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td style="font-weight:400;" class="text-right">${parseFloat(mercancias[i]['existencia'])}</td>
                                     <td style="font-weight:400;">${mercancias[i]['cuenta_subcuenta']}</td>
                                     <td></td>
                                    </tr>`
@@ -567,10 +567,10 @@
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
-                        <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
-                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${cant}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(precio).toFixed(6)} </td>
+                        <td style="font-weight:400;" class="text-right">${parseFloat(nueva_existencia)}</td>
                         <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"

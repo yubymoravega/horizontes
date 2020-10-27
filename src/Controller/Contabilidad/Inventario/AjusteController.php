@@ -280,7 +280,7 @@ class AjusteController extends AbstractController
     public function getMercancia(EntityManagerInterface $em, Request $request, $codigo)
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getMercanciaByCod($em,$codigo,$id_almacen);
+        $row = AuxFunctions::getMercanciaByCod($em, $codigo, $id_almacen);
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
     }
 
@@ -291,7 +291,7 @@ class AjusteController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM','EXP']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EXP']);
 
         $monedas = $em->getRepository(Moneda::class)->findAll();
         $rows = [];
@@ -426,7 +426,7 @@ class AjusteController extends AbstractController
         $fecha_ajuste = '';
         if ($ajuste_obj && $obj_tipo_documento) {
             /** @var  $ajuste_obj Ajuste */
-            $almacen = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $almacen = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getCodigo() . ' - ' . $ajuste_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $observacion = $ajuste_obj->getObservacion();
             $fecha_ajuste = $ajuste_obj->getIdDocumento()->getFecha()->format('d/m/Y');
             $nro_solicitud = $ajuste_obj->getNroConcecutivo();
@@ -454,8 +454,8 @@ class AjusteController extends AbstractController
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
-                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
-                        'importe' => number_format($obj->getImporte(), 2, '.', ''),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3),
+                        'importe' => number_format($obj->getImporte(), 2),
                     );
                     $importe_total += $obj->getImporte();
                 }
@@ -465,7 +465,7 @@ class AjusteController extends AbstractController
         return $this->render('contabilidad/inventario/ajuste/print.html.twig', [
             'controller_name' => 'AjusteEntradaControllerPrint',
             'datos' => array(
-                'importe_total' => number_format($importe_total, 2, '.', ''),
+                'importe_total' => number_format($importe_total, 2),
                 'almacen' => $almacen,
                 'observacion' => $observacion,
                 'unidad' => $unidad,
@@ -480,26 +480,28 @@ class AjusteController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_ajuste_entrada_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em, Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
-        $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
+        /** @var Unidad $obj_unidad */
+        $obj_unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad();
+        $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
         $rows = [];
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
-        $arr_fecha_contable = explode('-',$fecha_contable);
+        $fecha_contable = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha_contable = explode('-', $fecha_contable);
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
-                "existencia" => number_format($obj->nueva_existencia,2,'.',''),
+                "existencia" => $obj->nueva_existencia,
                 "cantidad" => $obj->cant,
-                "precio" => number_format($obj->precio,2,'.',''),
-                "importe" => number_format($obj->importe, 2,'.','')
+                "precio" => number_format($obj->precio, 3, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
             ]);
         }
         return $this->render('contabilidad/inventario/ajuste/print.html.twig', [
@@ -509,7 +511,7 @@ class AjusteController extends AbstractController
                 'almacen' => $request->getSession()->get('selected_almacen/name'),
                 'observacion' => $datos['observacion'],
                 'unidad' => $unidad,
-                'fecha_ajuste' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
+                'fecha_ajuste' => $arr_fecha_contable[2] . '/' . $arr_fecha_contable[1] . '/' . $arr_fecha_contable[0],
                 'nro_solicitud' => $nro,
             ),
             'mercancias' => $rows,
@@ -555,7 +557,7 @@ class AjusteController extends AbstractController
                 'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                 'existencia' => $obj->getExistencia(),
                 'cantidad' => $obj->getCantidad(),
-                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() .' - '. $obj->getIdMercancia()->getNroSubcuentaInventario(),
+                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() . ' - ' . $obj->getIdMercancia()->getNroSubcuentaInventario(),
                 'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
                 'importe' => number_format($obj->getImporte(), 2, '.', ''),
             );

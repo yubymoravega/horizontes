@@ -44,6 +44,16 @@ class MovimientoCuentaType extends AbstractType
                 'label' => 'Expediente',
                 'choice_label' => 'expediente',
             ))
+            ->add('orden_trabajo', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Orden de Trabajo',
+                'choice_label' => 'orden_trabajo',
+            ))
+            ->add('unidad', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Unidad',
+                'choice_label' => 'unidad',
+            ))
             ->add('periodo', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Período'

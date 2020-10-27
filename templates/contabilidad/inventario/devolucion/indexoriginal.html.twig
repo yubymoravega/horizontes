@@ -5,7 +5,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Ajuste de Entrada </h1>
+                        <h1 class="text-reporte text-right mr-0">Devolución</h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -13,31 +13,23 @@
                 </div>
             </div>
             <div class="card-body">
-                {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'ajuste_entrada','autocomplete':"off"}}) }}
+                {{ form_start(formulario.nro_cuenta_acreedora, {'attr':{'id':'devolucion','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
-                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                    <div class="col-5 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_cuenta_acreedora) }}
                         {{ form_widget(formulario.nro_cuenta_acreedora) }}
                     </div>
-                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                    <div class="col-5 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.nro_subcuenta_acreedora) }}
                         {{ form_widget(formulario.nro_subcuenta_acreedora) }}
                     </div>
-                </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-8 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
-                        {{ form_label(formulario.observacion) }}
-                        {{ form_widget(formulario.observacion) }}
-                    </div>
-                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm pr-0 d-block">
                         {{ form_label(formulario.documento.id_moneda) }}
                         {{ form_widget(formulario.documento.id_moneda) }}
                     </div>
                 </div>
-
                 {{ form_end(formulario.nro_cuenta_acreedora) }}
-
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
                     <div class="px-2" style="background: dimgray; border-radius: .3rem;">
@@ -72,7 +64,7 @@
                     </div>
                     <div class="col-7 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.descripcion) }}
-                        {{ form_widget(formulario.mercancia.descripcion) }}
+                        {{ form_widget(formulario.mercancia.descripcion, {'attr':{'readonly':'true'}}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block pr-0">
                         {{ form_label(formulario.mercancia.id_unidad_medida) }}
@@ -137,7 +129,8 @@
                         </button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitAjuste">contabilizar</button>
+                        <button class='my-0 btn btn-secondary' id="btnSubbmitdevolucion">contabilizar
+                        </button>
                     </div>
                 </div>
 
@@ -148,16 +141,25 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+
+
+        $('#devolucion_mercancia_precio').removeAttr('disabled')
+        $('#devolucion_documento_importe_mercancia').attr('disabled', true)
+
         function Print_Ajuste() {
             if ($('#select_nros').val() == consecutivo) {
                 if (list_mercancia.length > 0) {
-                    const obsercacion = $("#ajuste_observacion").val()
+
+                    const unidad_origen = $("#devolucion_id_unidad option:selected").text()
+                    const almacen_origen = $("#devolucion_id_almacen option:selected").text()
                     const mercancia_json = JSON.stringify(list_mercancia)
+
                     $('body').append(`
-                    <form action='/contabilidad/inventario/ajuste-entrada/print_report_current/'
+                    <form action='/contabilidad/inventario/devolucion/print_report_current/'
                          method="post" id='form_print_current' target='_blank'>
                         <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
-                        <input type='text' hidden name='datos[observacion]' value='${obsercacion}'/>
+                        <input type='text' hidden name='datos[unidad_origen]' value='${unidad_origen}'/>
+                        <input type='text' hidden name='datos[almacen_origen]' value='${almacen_origen}'/>
                         <input type='hidden' name='mercancias' value='${mercancia_json}'/>
                         <input type='text' hidden name='nro' value="${consecutivo}" />
                     </form>`)
@@ -169,17 +171,15 @@
                     alertTemplate('No excisten mercancias para imprimir', 'danger')
 
             } else {
-                // imprimir alguno menor al consecutivo actual
-                const url = '/contabilidad/inventario/ajuste-entrada/print_report/' + $('#select_nros').val()
+                const url = '/contabilidad/inventario/devolucion/print_report/' + $('#select_nros').val()
                 window.open(url, 'blank_')
             }
-
         }
 
         function cancelar() {
-            const url = '/contabilidad/inventario/ajuste-entrada/delete/' + $('#select_nros').val()
+            const url = '/contabilidad/inventario/devolucion/delete/' + $('#select_nros').val()
             onDeleteConfirm({
-                message: 'Está seguro que desea cancelar el Ajuste de entrada?',
+                message: 'Está seguro que desea cancelar la devolucion?',
                 url
             })
         }
@@ -189,15 +189,17 @@
         let consecutivo = 0;
         let cuentas_inventarios = [];
         let cuentas_acreedoras = [];
-        loadingModal.show()
         let list_mercancia = []
         let importe_total = 0;
         let flag = false;
 
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        loadingModal.show()
+
         $(document).ready(function () {
             /** Ajax para obtener los nros consecutivos**/
             $.ajax({
-                url: '/contabilidad/inventario/ajuste-entrada/get-nros-ajustes',
+                url: '/contabilidad/inventario/devolucion/get-nros-devolucions',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -211,25 +213,16 @@
                 }
             })
 
-            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
-            $('#select_nros').on('change', function () {
-                if ($('#select_nros').val() == consecutivo) {
-                    $('#btnSubbmitAjuste').show()
-                } else {
-                    $('#btnSubbmitAjuste').hide()
-                }
-            })
-
             $("#select_nros").blur(function(){
                 if(flag == false){
                     //no dio enter
                     $(this).val(consecutivo)
-                    $('#ajuste_entrada').resetForm()
+                    $('#devolucion').resetForm()
                     $('#form_mercancia').resetForm()
-                    $('#btnSubbmitAjuste').show()
+                    $('#btnSubbmitdevolucion').show()
                     $('#btnImprimir').show()
                     $('#btnCancelar').hide()
-                    $('#ajuste_observacion').val('')
+                    // $('#ajuste_observacion').val('')
                     $('#rows_mercancias').find('tr').remove()
                     list_mercancia = []
                     loadingData()
@@ -239,63 +232,73 @@
                 }
             });
 
-            // $("#select_nros").blur(function(){
-            //     $(this).hide("slow");
-            // });
-
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
+                    $('#btnSubbmitdevolucion').show()
+                } else {
+                    $('#btnSubbmitdevolucion').hide()
+                }
+            })
             $('#select_nros').on('keyup', function (event) {
                 if (event.which == 13) {
-                    flag = true;
-                    console.info(flag)
-                    $('#ajuste_entrada').resetForm()
+                    flag = true
+                    $('#devolucion').resetForm()
                     $('#form_mercancia').resetForm()
                     $("#importe-total").text('$ 0.00')
                     $('#rows_mercancias').find('tr').remove()
 
-                    if ($('#select_nros').val() == consecutivo) {// si es el consecutivo
-                        $('#btnSubbmitAjuste').show()
+                    if ($('#select_nros').val() == consecutivo) {
+                        $('#btnSubbmitdevolucion').show()
                         $('#btnImprimir').show()
                         $('#btnCancelar').hide()
                         loadingData()
-                    } else if ($('#select_nros').val() > consecutivo) {// si es mayor
-                        $('#btnSubbmitAjuste').hide()
+                    } else if ($('#select_nros').val() > consecutivo) {
+                        $('#btnSubbmitdevolucion').hide()
                         $('#btnImprimir').hide()
                         $('#btnCancelar').hide()
-                        $('#ajuste_entrada select').find('option').remove()
+                        $('#devolucion select').find('option').remove()
                         alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
-                    } else if ($('#select_nros').val() == '') {// si no hay numero
-                        $('#btnSubbmitAjuste').hide()
+                    } else if ($('#select_nros').val() == '') {
+                        $('#btnSubbmitdevolucion').hide()
                         $('#btnImprimir').hide()
                         $('#btnCancelar').hide()
                         alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
-                    } else {// si es un Numero valido para cargar
+                    } else {
                         $('#btnImprimir').show()
-                        $('#btnSubbmitAjuste').hide()
+                        $('#btnSubbmitdevolucion').hide()
                         $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
                 }
             })
-            $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
             function llenarFormulario(nro) {
                 loadingModal.show()
                 $.ajax({
-                    url: '/contabilidad/inventario/ajuste-entrada/load-ajuste/' + nro,
+                    url: '/contabilidad/inventario/devolucion/load-devolucion/' + nro,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
                         if (result.success) {
                             let data = result.data;
-                            const cuenta_acreedora = $('#ajuste_nro_cuenta_acreedora')
-                            const subcuenta_acreedora = $('#ajuste_nro_subcuenta_acreedora')
-                            const moneda = $('#ajuste_documento_id_moneda')
-                            $('#ajuste_observacion').text(data.observaciones)
+                            const cuenta = $('#devolucion_mercancia_nro_cuenta_inventario')
+                            const subcuenta = $('#devolucion_mercancia_nro_subcuenta_inventario')
+                            const cuenta_acreedora = $('#devolucion_nro_cuenta_acreedora')
+                            const subcuenta_acreedora = $('#devolucion_nro_subcuenta_acreedora')
+                            const moneda = $('#devolucion_documento_id_moneda')
+                            const unidad = $('#devolucion_id_unidad')
+                            const almacen = $('#devolucion_id_almacen')
 
                             // datos del Formulario
-                            $('#ajuste_entrada select').find('option').remove()
+                            $('#devolucion select').find('option').remove()
+                            cuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_inventario} </option>`);
+                            subcuenta.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_cuenta_inventario} </option>`);
                             cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
                             subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_acreedora} </option>`);
                             moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
+                            unidad.prepend(`<option selected = "false" value = "0" disabled> ${data.unidad} </option>`);
+                            almacen.prepend(`<option selected = "false" value = "0" disabled> ${data.almacen} </option>`);
 
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
@@ -327,28 +330,33 @@
 
             const loadingData = function () {
                 loadingModal.show()
-                $('#ajuste_entrada select').find('option').remove()
-                $('#ajuste_entrada select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $('#devolucion select').find('option').remove()
+                $('#devolucion select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                 $('#form_mercancia').css('display', 'block')
 
-                $('#ajuste_mercancia_nro_subcuenta_inventario').find('option').remove()
-                $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-
                 $.ajax({
-                    url: '/contabilidad/inventario/ajuste-entrada/getCuentas',
+                    url: '/contabilidad/inventario/devolucion/getChoices',
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
                         cuentas_inventarios = result.cuentas_inventario
                         cuentas_acreedoras = result.cuentas_acreedoras
+                        $('#devolucion_mercancia_nro_subcuenta_inventario, #devolucion_mercancia_nro_cuenta_inventario').find('option').remove()
+                        $('#devolucion_mercancia_nro_subcuenta_inventario, #devolucion_mercancia_nro_cuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         $(result.cuentas_inventario).each(function (pos, valor) {
-                            $('#ajuste_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
-                        })
-                        $(result.cuentas_acreedoras).each(function (pos, valor) {
-                            $('#ajuste_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                            $('#devolucion_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
                         $(result.monedas).each(function (pos, valor) {
-                            $('#ajuste_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                            $('#devolucion_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.unidades).each(function (pos, valor) {
+                            $('#devolucion_id_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.almacenes).each(function (pos, valor) {
+                            $('#devolucion_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.cuentas_acreedoras).each(function (pos, valor) {
+                            $('#devolucion_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
                         loadingModal.close()
                     },
@@ -358,108 +366,114 @@
             }
             loadingData()
 
+
             $('#btnSearchMercancia').on('click', function () {
-                let codigo = $('#ajuste_mercancia_codigo').val()
-                if (codigo !== '') {
+                let codigo = $('#devolucion_mercancia_codigo').val()
+                if (codigo != '') {
                     getDataMercancia(codigo)
                 } else {
                     alertTemplate('El campo código es obligatorio.', 'danger')
                 }
             })
 
-            $('#ajuste_mercancia_codigo').on('keyup', function (e) {
+            $('#devolucion_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
-                    let codigo = $('#ajuste_mercancia_codigo').val()
-                    if (codigo !== '') {
+                    let codigo = $('#devolucion_mercancia_codigo').val()
+                    if (codigo != '') {
                         getDataMercancia(codigo)
                     } else {
                         alertTemplate('El campo código es obligatorio.', 'danger')
                     }
                 }
-            })
+                else{
+                    $('#devolucion_mercancia_descripcion').val('')
+                    $('#devolucion_mercancia_descripcion').attr('readonly', true)
+                    $('#devolucion_mercancia_id_unidad_medida').val(0)
+                    $('#devolucion_mercancia_id_unidad_medida').addClass('read-only-select');
 
-            $('#ajuste_documento_importe_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
-                let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
-                if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
-                    $('#ajuste_mercancia_precio').val(precio_final)
-                } else {
-                    $('#ajuste_mercancia_precio').val(0)
+                    $('#devolucion_mercancia_nro_cuenta_inventario').val(0)
+                    $('#devolucion_mercancia_nro_cuenta_inventario').addClass('read-only-select');
+
+                    $('#devolucion_mercancia_nro_subcuenta_inventario').val(0)
+                    $('#devolucion_mercancia_nro_subcuenta_inventario').addClass('read-only-select');
+
+                    $('#devolucion_mercancia_precio').val('')
+                    $('#devolucion_mercancia_existencia').val('')
                 }
             })
 
-            $('#ajuste_documento_cantidad_mercancia').on('keyup', function () {
-                let importe = parseFloat($('#ajuste_documento_importe_mercancia').val())
-                let cantidad = parseFloat($('#ajuste_documento_cantidad_mercancia').val())
-                if (importe > 0) {
-                    let precio_final = parseFloat(importe / cantidad).toFixed(5)
-                    $('#ajuste_mercancia_precio').val(precio_final)
+            $('#devolucion_mercancia_precio').on('keyup', function () {
+                let precio = parseFloat($(this).val())
+                let cantidad = parseFloat($('#devolucion_documento_cantidad_mercancia').val())
+                if (precio > 0) {
+                    let importe = parseFloat(precio * cantidad).toFixed(2)
+                    $('#devolucion_documento_importe_mercancia').val(importe)
                 } else {
-                    $('#ajuste_mercancia_precio').val(0)
+                    $('#devolucion_documento_importe_mercancia').val(0)
                 }
-                let existencia_inicial = (parseFloat($('#ajuste_mercancia_existencia').val()) > 0 || $('#ajuste_mercancia_existencia').val() != '') ? parseFloat($('#ajuste_mercancia_existencia').val()) : 0
-                $('#ajuste_mercancia_existencia_incremento').val(existencia_inicial + parseFloat($('#ajuste_documento_cantidad_mercancia').val()))
             })
 
-            $('#ajuste_mercancia_codigo').on('keyup', function () {
-                $('#ajuste_mercancia_descripcion').val('')
-                $('#ajuste_mercancia_descripcion').attr('readonly', true)
-                $('#ajuste_mercancia_id_unidad_medida').val(0)
-                $('#ajuste_mercancia_id_unidad_medida').addClass('read-only-select');
+            $('#devolucion_documento_cantidad_mercancia').on('keyup', function () {
+                let precio = parseFloat($('#devolucion_mercancia_precio').val())
+                let cantidad = parseFloat($(this).val()) || 0
 
-                $('#ajuste_mercancia_descripcion').val('')
-                $('#ajuste_mercancia_precio').val('')
-                $('#ajuste_mercancia_existencia').val('')
+                let importe = parseFloat(precio * cantidad).toFixed(2)
+                $('#devolucion_documento_importe_mercancia').val(importe)
+
+                let existencia_inicial = (parseFloat($('#devolucion_mercancia_existencia').val()) > 0 || $('#devolucion_mercancia_existencia').val() != '') ? parseFloat($('#devolucion_mercancia_existencia').val()) : 0
+                $('#devolucion_mercancia_existencia_incremento').val(existencia_inicial + cantidad)
             })
 
-            $('#ajuste_mercancia_nro_cuenta_inventario').on('change', function () {
-                $('#ajuste_mercancia_nro_subcuenta_inventario').find('option').remove()
+            $('#devolucion_mercancia_nro_cuenta_inventario').on('change', function () {
+                $('#devolucion_mercancia_nro_subcuenta_inventario').find('option').remove()
                 cuentas_inventarios.forEach(function (valor, pos) {
-                    if ($('#ajuste_mercancia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
-                        $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                    if ($('#devolucion_mercancia_nro_cuenta_inventario').val() == valor.nro_cuenta) {
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                            $('#ajuste_mercancia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            $('#devolucion_mercancia_nro_subcuenta_inventario').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })
             })
 
-            $('#ajuste_nro_cuenta_acreedora').on('change', function () {
-                $('#ajuste_nro_subcuenta_acreedora').find('option').remove()
+            $('#devolucion_nro_cuenta_acreedora').on('change', function () {
+                $('#devolucion_nro_subcuenta_acreedora').find('option').remove()
                 cuentas_acreedoras.forEach(function (valor, pos) {
-                    if ($('#ajuste_nro_cuenta_acreedora').val() == valor.nro_cuenta) {
-                        $('#ajuste_nro_subcuenta_acreedora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                    if ($('#devolucion_nro_cuenta_acreedora').val() == valor.nro_cuenta) {
+                        $('#devolucion_nro_subcuenta_acreedora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                         for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                            $('#ajuste_nro_subcuenta_acreedora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                            $('#devolucion_nro_subcuenta_acreedora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                         }
                     }
                 })
             })
 
-            const form_ajuste_entrada = $('#ajuste_entrada')
+            $('#devolucion_id_unidad').on('change', function () {
+                $('#devolucion_id_almacen').val(0)
+            })
 
-            form_ajuste_entrada.validate({
+            $('#devolucion_id_almacen').on('change', function () {
+                $('#devolucion_id_unidad').val(0)
+            })
+
+            const form_devolucion = $('#devolucion')
+
+            form_devolucion.validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
                     error.attr('style', 'font-size: .8rem;')
                     error.insertAfter(element);
                 },
                 rules: {
-                    'ajuste[observacion]': "required",
-                    'ajuste[nro_cuenta_inventario]': "required",
-                    'ajuste[nro_subcuenta_inventario]': "required",
-                    'ajuste[nro_cuenta_acreedora]': "required",
-                    'ajuste[nro_subcuenta_acreedora]': "required",
-                    'ajuste[documento][id_moneda]': "required",
+                    'devolucion[id_proveedor]': "required",
+                    'devolucion[nro_cuenta_acreedora]': "required",
+                    'devolucion[nro_subcuenta_acreedora]': "required",
+                    'devolucion[documento][id_moneda]': "required",
                 },
                 messages: {
-                    'ajuste[observacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'ajuste[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'ajuste[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'ajuste[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'ajuste[nro_subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'ajuste[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[nro_subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
@@ -471,39 +485,42 @@
                     error.insertAfter(element);
                 },
                 rules: {
-                    'ajuste[mercancia][codigo]': "required",
-                    'ajuste[mercancia][descripcion]': "required",
-                    'ajuste[mercancia][id_unidad_medida]': "required",
-                    'ajuste[documento][cantidad_mercancia]': "required",
-                    'ajuste[documento][importe_mercancia]': "required",
-                    'ajuste[mercancia][nro_cuenta_inventario]': "required",
-                    'ajuste[mercancia][nro_subcuenta_inventario]': "required",
+                    'devolucion[mercancia][codigo]': "required",
+                    'devolucion[mercancia][descripcion]': "required",
+                    'devolucion[mercancia][id_unidad_medida]': "required",
+                    'devolucion[documento][cantidad_mercancia]': "required",
+                    'devolucion[mercancia][precio]': "required",
+                    'devolucion[mercancia][nro_cuenta_inventario]': 'required',
+                    'devolucion[mercancia][nro_subcuenta_inventario]': 'required',
                 },
                 messages: {
-                    'ajuste[mercancia][codigo]': 'Obligatorio!',
-                    'ajuste[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'ajuste[mercancia][id_unidad_medida]': 'Obligatorio!',
-                    'ajuste[documento][cantidad_mercancia]': 'Obligatorio!',
-                    'ajuste[documento][importe_mercancia]': 'Obligatorio!',
-                    'ajuste[mercancia][nro_cuenta_inventario]': "Obligatorio!",
-                    'ajuste[mercancia][nro_subcuenta_inventario]': "Obligatorio!",
+                    'devolucion[mercancia][codigo]': 'Obligatorio!',
+                    'devolucion[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'devolucion[mercancia][id_unidad_medida]': 'Obligatorio!',
+                    'devolucion[documento][cantidad_mercancia]': 'Obligatorio!',
+                    'devolucion[mercancia][precio]': 'Obligatorio!',
+                    'devolucion[mercancia][nro_cuenta_inventario]': 'Obligatorio!',
+                    'devolucion[mercancia][nro_subcuenta_inventario]': 'Obligatorio!',
                 }
             })
 
-            $("#btnSubbmitAjuste").click(function (e) {
-                if (form_ajuste_entrada.valid()) {
+            $("#btnSubbmitdevolucion").click(function (e) {
+                if (form_devolucion.valid()) {
                     if (list_mercancia.length) {
-                        let data = form_ajuste_entrada.serializeArray()
+                        let data = form_devolucion.serializeArray()
                         loadingModal.show()
-                        data.push({name: 'ajuste_entrada[list_mercancia]', value: JSON.stringify(list_mercancia)})
+                        data.push({
+                            name: 'devolucion[list_mercancia]',
+                            value: JSON.stringify(list_mercancia)
+                        })
                         $.ajax({
-                            url: '/contabilidad/inventario/ajuste-entrada/form-add',
+                            url: '/contabilidad/inventario/devolucion/',
                             method: 'POST',
                             data: data,
                             dataType: 'json',
                             success: function (result) {
                                 if (result.success) {
-                                    window.location.replace('{{ path('contabilidad_inventario_ajuste_entrada_gestionar') }}')
+                                    window.location.replace('{{ path('contabilidad_inventario_devolucion') }}')
                                 } else {
                                     loadingModal.close()
                                     alertTemplate(result.msg)
@@ -513,25 +530,22 @@
                             }
                         })
                     } else {
-                        alertTemplate('El Ajuste de Entrada debe contener algunas mercancias', 'danger')
+                        alertTemplate('La Devolución de Entrada debe contener algunas mercancias', 'danger')
                     }
                 }
             });
 
-            /* let list_mercancia = []
-             let importe_total = 0;*/
-
             $('#btnAplicarMercancia').on('click', function () {
                 if (form_mercancia.valid()) {
-                    let codigo = $('#ajuste_mercancia_codigo').val()
-                    let cant = $('#ajuste_documento_cantidad_mercancia').val()
-                    let importe = $('#ajuste_documento_importe_mercancia').val()
-                    let precio = $('#ajuste_mercancia_precio').val()
-                    let nueva_existencia = $('#ajuste_mercancia_existencia_incremento').val()
-                    let um = $('#ajuste_mercancia_id_unidad_medida').val()
-                    let descripcion = $('#ajuste_mercancia_descripcion').val()
-                    let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val()
-                    let subcuenta = $('#ajuste_mercancia_nro_subcuenta_inventario').val()
+                    let codigo = $('#devolucion_mercancia_codigo').val()
+                    let cant = $('#devolucion_documento_cantidad_mercancia').val()
+                    let importe = $('#devolucion_documento_importe_mercancia').val()
+                    let precio = $('#devolucion_mercancia_precio').val()
+                    let nueva_existencia = $('#devolucion_mercancia_existencia_incremento').val()
+                    let um = $('#devolucion_mercancia_id_unidad_medida').val()
+                    let descripcion = $('#devolucion_mercancia_descripcion').val()
+                    let cuenta = $('#devolucion_mercancia_nro_cuenta_inventario').val()
+                    let subcuenta = $('#devolucion_mercancia_nro_subcuenta_inventario').val()
 
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
@@ -566,15 +580,13 @@
                         </td>
                         <td style="font-weight:400;" hidden> ${um} </td> </tr>`
                         );
-                        $('#ajuste_mercancia_codigo').val('')
-                        $('#ajuste_mercancia_descripcion').val('')
-                        $('#ajuste_mercancia_existencia').val('')
-                        $('#ajuste_documento_cantidad_mercancia').val('')
-                        $('#ajuste_documento_importe_mercancia').val('')
-                        $('#ajuste_mercancia_precio').val('')
-                        $('#ajuste_mercancia_existencia_incremento').val('')
-                        $('#ajuste_mercancia_nro_cuenta_inventario').val(0)
-                        $('#ajuste_mercancia_nro_subcuenta_inventario').val(0)
+                        $('#devolucion_mercancia_codigo').val('')
+                        $('#devolucion_mercancia_descripcion').val('')
+                        $('#devolucion_mercancia_existencia').val('')
+                        $('#devolucion_documento_cantidad_mercancia').val('')
+                        $('#devolucion_documento_importe_mercancia').val('')
+                        $('#devolucion_mercancia_precio').val('')
+                        $('#devolucion_mercancia_existencia_incremento').val('')
                     }
 
                 }
@@ -594,36 +606,36 @@
         function getDataMercancia(codigo) {
             loadingModal.show("Cargando mercancia...")
             $.ajax({
-                url: '/contabilidad/inventario/ajuste-entrada/getMercancia/' + codigo,
+                url: '/contabilidad/inventario/informe-recepcion/getMercancia/' + codigo,
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
                     mercancias = result.mercancias
                     if (mercancias.length > 0) {
-                        $('#ajuste_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                        $('#ajuste_mercancia_existencia').val(mercancias[0]['existencia'])
-                        $('#ajuste_mercancia_precio').val(mercancias[0]['precio_compra'])
+                        $('#devolucion_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                        $('#devolucion_mercancia_existencia').val(mercancias[0]['existencia'])
+                        $('#devolucion_mercancia_precio').val(mercancias[0]['precio_compra'])
 
-                        $('#ajuste_mercancia_nro_cuenta_inventario').val(mercancias[0]['cuenta'])
-                        $('#ajuste_mercancia_nro_cuenta_inventario').addClass('read-only-select');
+                        $('#devolucion_mercancia_nro_cuenta_inventario').val(mercancias[0]['cuenta'])
+                        $('#devolucion_mercancia_nro_cuenta_inventario').addClass('read-only-select');
 
                         let nro_subcuenta = mercancias[0]['subcuenta_inv'];
-                        $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = '+nro_subcuenta+'>'+nro_subcuenta+'</option>');
-                        $('#ajuste_mercancia_nro_subcuenta_inventario').addClass('read-only-select');
+                        $('#devolucion_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value = '+nro_subcuenta+'>'+nro_subcuenta+'</option>');
+                        $('#devolucion_mercancia_nro_subcuenta_inventario').addClass('read-only-select');
 
-                        $('#ajuste_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
-                        $('#ajuste_mercancia_id_unidad_medida').addClass('read-only-select');
-                        $('#ajuste_mercancia_descripcion').attr('readonly', true)
+                        $('#devolucion_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
+                        $('#devolucion_mercancia_id_unidad_medida').addClass('read-only-select');
+                        $('#devolucion_mercancia_descripcion').attr('readonly', true)
                     } else {
-                        $('#ajuste_mercancia_id_unidad_medida').val(0)
-                        $('#ajuste_mercancia_id_unidad_medida').removeClass('read-only-select');
+                        $('#devolucion_mercancia_id_unidad_medida').val(0)
+                        $('#devolucion_mercancia_id_unidad_medida').removeClass('read-only-select');
 
-                        $('#ajuste_mercancia_nro_cuenta_inventario').val(0)
-                        $('#ajuste_mercancia_nro_cuenta_inventario').removeClass('read-only-select');
+                        $('#devolucion_mercancia_nro_cuenta_inventario').val(0)
+                        $('#devolucion_mercancia_nro_cuenta_inventario').removeClass('read-only-select');
 
-                        $('#ajuste_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value =0 disabled >-- seleccione --</option>');
-                        $('#ajuste_mercancia_nro_subcuenta_inventario').removeClass('read-only-select');
-                        $('#ajuste_mercancia_descripcion').attr('readonly', false)
+                        $('#devolucion_mercancia_nro_subcuenta_inventario').prepend('<option selected = "false" value =0 disabled >-- seleccione --</option>');
+                        $('#devolucion_mercancia_nro_subcuenta_inventario').removeClass('read-only-select');
+                        $('#devolucion_mercancia_descripcion').attr('readonly', false)
 
                         alertTemplate('No existen mercancias con ese código')
                     }
@@ -635,4 +647,3 @@
         }
     </script>
 {% endblock %}
-

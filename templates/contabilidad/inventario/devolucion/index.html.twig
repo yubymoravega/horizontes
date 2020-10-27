@@ -125,7 +125,7 @@
                         <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
+                        <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Devolucion()">imprimir
                         </button>
                     </div>
                     <div class="ml-2">
@@ -146,20 +146,15 @@
         $('#devolucion_mercancia_precio').removeAttr('disabled')
         $('#devolucion_documento_importe_mercancia').attr('disabled', true)
 
-        function Print_Ajuste() {
+        function Print_Devolucion() {
             if ($('#select_nros').val() == consecutivo) {
                 if (list_mercancia.length > 0) {
-
-                    const unidad_origen = $("#devolucion_id_unidad option:selected").text()
-                    const almacen_origen = $("#devolucion_id_almacen option:selected").text()
                     const mercancia_json = JSON.stringify(list_mercancia)
 
                     $('body').append(`
                     <form action='/contabilidad/inventario/devolucion/print_report_current/'
                          method="post" id='form_print_current' target='_blank'>
                         <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
-                        <input type='text' hidden name='datos[unidad_origen]' value='${unidad_origen}'/>
-                        <input type='text' hidden name='datos[almacen_origen]' value='${almacen_origen}'/>
                         <input type='hidden' name='mercancias' value='${mercancia_json}'/>
                         <input type='text' hidden name='nro' value="${consecutivo}" />
                     </form>`)
@@ -179,7 +174,7 @@
         function cancelar() {
             const url = '/contabilidad/inventario/devolucion/delete/' + $('#select_nros').val()
             onDeleteConfirm({
-                message: 'Está seguro que desea cancelar la devolucion?',
+                message: 'Está seguro que desea cancelar la devolución?',
                 url
             })
         }
@@ -222,7 +217,6 @@
                     $('#btnSubbmitdevolucion').show()
                     $('#btnImprimir').show()
                     $('#btnCancelar').hide()
-                    // $('#ajuste_observacion').val('')
                     $('#rows_mercancias').find('tr').remove()
                     list_mercancia = []
                     loadingData()
@@ -287,8 +281,6 @@
                             const cuenta_acreedora = $('#devolucion_nro_cuenta_acreedora')
                             const subcuenta_acreedora = $('#devolucion_nro_subcuenta_acreedora')
                             const moneda = $('#devolucion_documento_id_moneda')
-                            const unidad = $('#devolucion_id_unidad')
-                            const almacen = $('#devolucion_id_almacen')
 
                             // datos del Formulario
                             $('#devolucion select').find('option').remove()
@@ -297,8 +289,6 @@
                             cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_acreedora} </option>`);
                             subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_acreedora} </option>`);
                             moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
-                            unidad.prepend(`<option selected = "false" value = "0" disabled> ${data.unidad} </option>`);
-                            almacen.prepend(`<option selected = "false" value = "0" disabled> ${data.almacen} </option>`);
 
                             $('#form_mercancia').css('display', 'none')
                             // datos de la mercancia
@@ -308,10 +298,10 @@
 
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
-                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td style="font-weight:400;" class="text-right">${parseFloat(mercancias[i]['existencia'])}</td>
                                     <td style="font-weight:400;">${mercancias[i]['cuenta_subcuenta']}</td>
                                     <td></td>
                                    </tr>`
@@ -348,12 +338,6 @@
                         })
                         $(result.monedas).each(function (pos, valor) {
                             $('#devolucion_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                        })
-                        $(result.unidades).each(function (pos, valor) {
-                            $('#devolucion_id_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                        })
-                        $(result.almacenes).each(function (pos, valor) {
-                            $('#devolucion_id_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                         })
                         $(result.cuentas_acreedoras).each(function (pos, valor) {
                             $('#devolucion_nro_cuenta_acreedora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
@@ -445,14 +429,6 @@
                         }
                     }
                 })
-            })
-
-            $('#devolucion_id_unidad').on('change', function () {
-                $('#devolucion_id_almacen').val(0)
-            })
-
-            $('#devolucion_id_almacen').on('change', function () {
-                $('#devolucion_id_unidad').val(0)
             })
 
             const form_devolucion = $('#devolucion')
@@ -567,10 +543,10 @@
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
-                        <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(6)} </td>
-                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${cant}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(precio).toFixed(6)} </td>
+                        <td style="font-weight:400;" class="text-right">${parseFloat(nueva_existencia)}</td>
                         <td style="font-weight:400;">${getNro(cuenta)} - ${getNro(subcuenta)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"

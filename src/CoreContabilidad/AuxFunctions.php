@@ -480,6 +480,7 @@ class AuxFunctions
                             $obj_cuenta = $item->getIdCuenta();
                             if (!empty($condiciones)) {
                                 $arr_cuentas_condicionadas = $cuenta_er->findBy($condiciones);
+//                                dd($arr_cuentas_condicionadas);
                                 if (in_array($obj_cuenta, $arr_cuentas_condicionadas)) {
                                     $flag = true;
                                 }
@@ -659,7 +660,9 @@ class AuxFunctions
             'analisis_1' => '',
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
-            'credito' => number_format($total, 2)
+            'credito' => number_format($total, 2),
+            'total' => $total
+
         );
         return $rows;
     }
@@ -766,7 +769,8 @@ class AuxFunctions
             'analisis_1' => '',
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total_general, 2),
-            'credito' => number_format($total_general, 2)
+            'credito' => number_format($total_general, 2),
+            'total' => $total_general
         );
 
         return $rows;
@@ -794,8 +798,11 @@ class AuxFunctions
             $i = 0;
             $total = 0;
             $total_general = 0;
+            $indicador = 0;
+            $t_ = 0;
             /** @var MovimientoMercancia $d */
             foreach ($arr_obj_movimiento_mercancia as $d) {
+                $t_ += floatval($d->getImporte());
                 if ($d->getIdCentroCosto() != null && $d->getIdElementoGasto() != null) {
                     $cc = $d->getIdCentroCosto()->getCodigo() . '-' . $d->getIdElementoGasto()->getCodigo();
                     if (!in_array($cc, $rep_arr)) {
@@ -840,11 +847,25 @@ class AuxFunctions
                             'analisis_1' => $d->getIdExpediente()->getCodigo(),
                             'analisis_2' => '', 'analisis_3' => '',
                             'debito' => number_format($total, 2),
-                            'credito' => ''
+                            'credito' => '',
                         );
                         $total_general += $total;
                     }
+                } else {
+                    $indicador = 1;
                 }
+            }
+            if ($indicador == 1) {
+                $rows[] = array(
+                    'nro_doc' => $nro_doc,
+                    'fecha' => $fecha_doc,
+                    'nro_cuenta' => $obj_ajuste_salida->getNroCuentaInventario(),
+                    'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
+                    'analisis_1' => $obj_ajuste_salida->getIdDocumento()->getIdAlmacen()->getCodigo(),
+                    'analisis_2' => '', 'analisis_3' => '',
+                    'debito' => $t_,
+                    'credito' => ''
+                );
             }
 
             $cuentas_ir = [];
@@ -898,8 +919,9 @@ class AuxFunctions
                 'nro_subcuenta' => '',
                 'analisis_1' => '',
                 'analisis_2' => '', 'analisis_3' => '',
-                'debito' => number_format($total_general, 2),
-                'credito' => number_format($total_general, 2)
+                'debito' => number_format($t_, 2),
+                'credito' => number_format($t_, 2),
+                'total' => $t_
             );
 
             return $rows;
@@ -988,7 +1010,8 @@ class AuxFunctions
                 'analisis_1' => '',
                 'analisis_2' => '', 'analisis_3' => '',
                 'debito' => number_format($obj_documento->getImporteTotal(), 2),
-                'credito' => number_format($obj_documento->getImporteTotal(), 2)
+                'credito' => number_format($obj_documento->getImporteTotal(), 2),
+                'total'=>$obj_documento->getImporteTotal()
             );
 
             return $rows;
@@ -1058,7 +1081,8 @@ class AuxFunctions
             'analisis_1' => '',
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($obj_documento->getImporteTotal(), 2),
-            'credito' => number_format($obj_documento->getImporteTotal(), 2)
+            'credito' => number_format($obj_documento->getImporteTotal(), 2),
+            'total'=>$obj_documento->getImporteTotal()
         );
 
         return $rows;
@@ -1158,7 +1182,8 @@ class AuxFunctions
             'analisis_1' => '',
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
-            'credito' => number_format($total, 2)
+            'credito' => number_format($total, 2),
+            'total'=>$total
         );
         return $rows;
     }
@@ -1249,7 +1274,6 @@ class AuxFunctions
             );
         }
 
-
         $rows[] = array(
             'nro_doc' => '',
             'fecha' => '',
@@ -1258,7 +1282,8 @@ class AuxFunctions
             'analisis_1' => '',
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
-            'credito' => number_format($total, 2)
+            'credito' => number_format($total, 2),
+            'total'=>$total
         );
         return $rows;
     }
@@ -1351,7 +1376,8 @@ class AuxFunctions
             'analisis_1' => '',
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
-            'credito' => number_format($total, 2)
+            'credito' => number_format($total, 2),
+            'total'=>$total
         );
         return $rows;
     }
@@ -1370,14 +1396,14 @@ class AuxFunctions
         foreach ($mercancia_arr as $obj) {
             /** @var Cuenta $obj_cuenta */
             $obj_cuenta = $cuenta_er->findOneBy([
-                'activo'=>true,
-                'nro_cuenta'=>$obj->getCuenta()
+                'activo' => true,
+                'nro_cuenta' => $obj->getCuenta()
             ]);
             /** @var Subcuenta $obj_subcuenta */
             $obj_subcuenta = $subcuenta_er->findOneBy([
-                'activo'=>true,
-                'nro_subcuenta'=>$obj->getNroSubcuentaInventario(),
-                'id_cuenta'=>$obj_cuenta
+                'activo' => true,
+                'nro_subcuenta' => $obj->getNroSubcuentaInventario(),
+                'id_cuenta' => $obj_cuenta
             ]);
             /**@var $obj Mercancia* */
             $row [] = array(
@@ -1385,11 +1411,13 @@ class AuxFunctions
                 'codigo' => $obj->getCodigo(),
                 'descripcion' => $obj->getDescripcion(),
                 'id_um' => $obj->getIdUnidadMedida()->getId(),
+                'um' => $obj->getIdUnidadMedida()->getAbreviatura(),
                 'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia(),
-                'subcuenta_inv'=>$obj_subcuenta->getNroSubcuenta().' - '.$obj_subcuenta->getDescripcion(),
-                'cuenta'=>$obj_cuenta->getNroCuenta().' - '.$obj_cuenta->getNombre(),
+                'subcuenta_inv' => $obj_subcuenta->getNroSubcuenta() . ' - ' . $obj_subcuenta->getDescripcion(),
+                'cuenta' => $obj_cuenta->getNroCuenta() . ' - ' . $obj_cuenta->getNombre(),
+                'importe' => $obj->getImporte(),
             );
         }
         return $row;
