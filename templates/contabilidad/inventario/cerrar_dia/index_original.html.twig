@@ -24,10 +24,10 @@
                       action="{{ path('contabilidad_inventario_cerrar_dia_cerrar') }}">
                     <div class="modal-body" id="confirm_body">
                         {{ message }}
-{#                        {% if error %}#}
-{#                        <input type="date" name="fecha_cierre" min="{{ fecha_minima }}" max="{{ fecha_maxima }}"#}
-{#                               value="{{ fecha_minima }}">#}
-{#                        {% endif %}#}
+                        {% if error %}
+                        <input type="date" name="fecha_cierre" min="{{ fecha_minima }}" max="{{ fecha_maxima }}"
+                               value="{{ fecha_minima }}">
+                        {% endif %}
                     </div>
                     <input type="hidden" name="_method" value="DELETE">
                     <input id="_token_confirm_modal" type="hidden" name="_token" value="123...">

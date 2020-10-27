@@ -15,7 +15,13 @@
             <h6 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Movimiento de Cuentas
             </h6>
-            {{ form_widget(form.buscar,{'attr': {'class': 'form-control ml-auto btn-primary','style':'width:100px'}}) }}
+            <div class="bg-dark-app">
+                <label for="" class="text-white text-uppercase"><strong>saldo inicial:</strong>{{ saldo_inicial }}</label>
+            </div>
+            <button type="button" id="movimiento_cuenta_buscar" name="movimiento_cuenta[buscar]"
+                    class="ml-auto btn-primary btn text-uppercase" style="width:100px" onclick="getDataByParams()">
+                Buscar
+            </button>
             {{ form_widget(form.limpiar,{'attr': {'class': 'form-control btn-outline-secondary ml-3','style':'width:100px'}}) }}
         </div>
 
@@ -34,6 +40,9 @@
                 {{ form_widget(form.centro_costo,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
+                {{ form_widget(form.orden_trabajo,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm col-2">
                 {{ form_widget(form.elemento_gasto,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
@@ -42,30 +51,25 @@
             <div class="form-group mt-0 input-group input-group-sm col-2">
                 {{ form_widget(form.almacen,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
+            <div class="form-group mt-0 input-group input-group-sm col-2">
+                {{ form_widget(form.unidad,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
             {{ form_end(form) }}
         </div>
         {# end header #}
 
 
         {# list #}
-        <table class="table-small-rows table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light" id="dashboard">
             <thead class="thead-dark">
-            <th width="100px">#</th>
-            <th width="350px" class="pr-0 pl-0">Almacén</th>
-            <th width="100px" class="pl-0 text-center pr-0">Fecha</th>
-            <th scope="col-1" class="pl-2">Usuario</th>
-            <th scope="col-1">Descripción</th>
+            <th width="100px" class="pr-0 pl-0 text-center">Tipo</th>
+            <th width="100px" class="pl-0 text-center pr-0">Número</th>
+            <th width="200px" class="pl-0 text-center pr-0">Documento</th>
+            <th width="200px" class="pl-0 text-center pr-0">Débito</th>
+            <th width="200px" class="pl-0 text-center pr-0">Crédito</th>
+            <th width="200px" class="pl-0 text-center pr-0">Saldo</th>
             </thead>
-            <tbody>
-            {#            {% for item in registro %}#}
-            {#                <tr>#}
-            {#                    <td style="font-weight:400;"><a href="imprimir/{{ item.id }}" class="text-white" title="VISUALIZAR {{ item.tipo_comprobante }}">{{ item.abreviatura_comprobante }}-{{ item.nro }}</a></td>#}
-            {#                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.almacen }}</td>#}
-            {#                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.fecha }}</td>#}
-            {#                    <td style="font-weight:400;">{{ item.usuario }}</td>#}
-            {#                    <td style="font-weight:400;">{{ item.descripcion }}</td>#}
-            {#                </tr>#}
-            {#            {% endfor %}#}
+            <tbody id="rows_datos">
             </tbody>
         </table>
         {# end list #}
@@ -74,18 +78,21 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-
         // vars
         cbx_centro_costo = $('#movimiento_cuenta_centro_costo')
         cbx_elemento_gasto = $('#movimiento_cuenta_elemento_gasto')
         cbx_expediente = $('#movimiento_cuenta_expediente')
         cbx_almacen = $('#movimiento_cuenta_almacen')
+        cbx_orden_trabajo = $('#movimiento_cuenta_orden_trabajo')
+        cbx_unidad = $('#movimiento_cuenta_unidad')
 
         function hiddenParents() {
             cbx_centro_costo.parent().hide()
             cbx_elemento_gasto.parent().hide()
             cbx_expediente.parent().hide()
             cbx_almacen.parent().hide()
+            cbx_unidad.parent().hide()
+            cbx_orden_trabajo.parent().hide()
         }
 
         hiddenParents()
@@ -103,7 +110,7 @@
                 }
             })
 
-            miniLoadin.show({msg:'cargando firltros...',target: '#row-id'})
+            miniLoadin.show({msg: 'cargando firltros...', target: '#row-id'})
             $.ajax({
                 url: '/contabilidad/config/cuenta/get-criterios/' + $(this).val(),
                 method: 'POST',
@@ -128,6 +135,12 @@
                                 case "ALM":
                                     cbx_almacen.parent().show()
                                     break
+                                case "OT":
+                                    cbx_orden_trabajo.parent().show()
+                                    break
+                                case "UNID":
+                                    cbx_unidad.parent().show()
+                                    break
                             }
                         })
                         miniLoadin.close()
@@ -139,7 +152,6 @@
         })
 
         function resetForm() {
-
             //ocultar los combobox
             $('#movimiento_cuenta_nro_cuenta').find('option').remove()
             $('#movimiento_cuenta_nro_cuenta').prepend('<option selected = "false" value = "0" disabled>-- Cuenta --</option>')
@@ -156,6 +168,8 @@
             cbx_elemento_gasto.prepend('<option selected = "false" value = "0" disabled> -- Elemento de Gasto -- </option>');
             cbx_expediente.prepend('<option selected = "false" value = "0" disabled> -- Expediente -- </option>');
             cbx_almacen.prepend('<option selected = "false" value = "0" disabled> -- Almacén -- </option>');
+            cbx_unidad.prepend('<option selected = "false" value = "0" disabled> -- Unidad -- </option>');
+            cbx_orden_trabajo.prepend('<option selected = "false" value = "0" disabled> -- Orden de trabajo -- </option>');
 
             loadingModal.show()
 
@@ -177,9 +191,54 @@
                     $(result.almacenes).each(function (pos, valor) {
                         $('#movimiento_cuenta_almacen').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
+                    $(result.unidad).each(function (pos, valor) {
+                        $('#movimiento_cuenta_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.orden_trabajo).each(function (pos, valor) {
+                        $('#movimiento_cuenta_orden_trabajo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
                     loadingModal.close()
                 },
                 error: function () {
+                }
+            })
+        }
+
+        function getDataByParams() {
+            let params = {
+                'nro_cuenta': $('#movimiento_cuenta_nro_cuenta').val(),
+                'nro_subcuenta': $('#movimiento_cuenta_nro_subcuenta').val(),
+                'periodo': $('#movimiento_cuenta_periodo').val(),
+                'unidad': $('#movimiento_cuenta_unidad').val(),
+                'orden_trabajo': $('#movimiento_cuenta_orden_trabajo').val(),
+                'centro_costo': $('#movimiento_cuenta_centro_costo').val(),
+                'elemento_gasto': $('#movimiento_cuenta_elemento_gasto').val(),
+                'expediente': $('#movimiento_cuenta_expediente').val(),
+                'almacen': $('#movimiento_cuenta_almacen').val()
+            }
+            loadingModal.show()
+            $.ajax({
+                url: '/contabilidad/general/movimiento-cuenta/getSubmayor',
+                method: 'POST',
+                dataType: 'json',
+                data: params,
+                success: function (result) {
+                    if (result.success) {
+                        console.log(result)
+                        $('#rows_datos').find('tr').remove()
+                        result.datos.forEach(datos => {
+                            $('#rows_datos').append(`<tr>
+                                    <td style="font-weight:400;"> ${datos['tipo_comprobante']} </td>
+                                    <td style="font-weight:400;"> ${datos['nro_comprobante']} </td>
+                                    <td style="font-weight:400;" class="text-center"> ${datos['nro_consecutivo']} </td>
+                                    <td style="font-weight:400;" class="text-right"> ${datos['debito']} </td>
+                                    <td style="font-weight:400;" class="text-right"> ${datos['credito']} </td>
+                                    <td style="font-weight:400;" class="text-right"> ${datos['total']} </td>
+                                   </tr>`
+                            );
+                        })
+                    }
+                    loadingModal.close()
                 }
             })
         }

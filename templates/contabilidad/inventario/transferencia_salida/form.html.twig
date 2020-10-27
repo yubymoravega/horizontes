@@ -1,49 +1,5 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-    {# Modal de Cuentas#}
-    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
-         data-keyboard="false"
-         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-dark">
-                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias</h4>
-                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body bg-dark-app" style="height: 600px;">
-                    <div style="height: 500px; overflow-y: auto;">
-                        <table class="table-small-rows table table-hover text-light">
-                            <thead class="thead-dark">
-                            <th style="width: 10px">Sel.</th>
-                            <th style="width: 160px">Código</th>
-                            <th scope="col-6">Descripción</th>
-                            <th style="width: 200px">Precio Compra</th>
-                            </thead>
-                            <tbody id="rows_table">
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex mt-4">
-                        <div class="mr-auto">
-                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                    aria-label="Cerrar">
-                                <span aria-hidden="true">Cancelar</span>
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
-                                    onclick="SeleccionarMercancia()"
-                                    data-dismiss="modal">Aceptar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
@@ -102,8 +58,8 @@
                                 {{ form_widget(formulario.mercancia.codigo) }}
                             </div>
                             <div class="col-1 mt-0 p-0">
-                                <button class="btn btn-secondary btn-sm" data-toggle="modal" type="button"
-                                        data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
+                                <button class="btn btn-secondary btn-sm" type="button"
+                                         id="btnSearchMercancia"><i
                                             class="fa fa-search"></i></button>
                             </div>
                         </div>
@@ -194,6 +150,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        let importe_real = 0;
         $('#transferencia_salida_id_centro_costo').hide()
         $('#transferencia_salida_id_elemento_gasto').hide()
 
@@ -240,6 +197,7 @@
         let cuentas_inventarios = [];
         let list_mercancia = []
         let importe_total = 0;
+        let flag = false;
 
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
         loadingModal.show()
@@ -262,6 +220,20 @@
                 }
             })
 
+            $("#select_nros").blur(function () {
+                if (flag == false) {
+                    $(this).val(consecutivo)
+                    $('#transferencia_salida').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    loadingData()
+                } else {
+                    flag = false;
+                }
+            });
+
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
             $('#select_nros').on('change', function () {
                 if ($('#select_nros').val() == consecutivo) {
@@ -272,6 +244,7 @@
             })
             $('#select_nros').on('keyup', function (event) {
                 if (event.which == 13) {
+                    flag = true;
                     $('#transferencia_salida').resetForm()
                     $('#form_mercancia').resetForm()
                     $("#importe-total").text('$ 0.00')
@@ -334,10 +307,10 @@
 
                                 $('#rows_mercancias').append(`<tr>
                                     <td class="px-2" style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td class="px-2" style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
-                                    <td class="px-2" style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
-                                    <td class="px-2" style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${mercancias[i]['cantidad']}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td class="px-2 text-right" style="font-weight:400;" >${parseFloat(mercancias[i]['existencia'])}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -387,84 +360,28 @@
 
 
             $('#btnSearchMercancia').on('click', function () {
-                $('#rows_table').find('tr').remove();
                 let codigo = $('#transferencia_salida_mercancia_codigo').val()
-                let cuenta = $('#transferencia_salida_nro_cuenta_inventario').val()
-                $.ajax({
-                    url: '/contabilidad/inventario/transferencia-salida/getMercancia/' + codigo + ',' + cuenta,
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        mercancias = result.mercancias
-                        $(result.mercancias).each(function (pos, valor) {
-                            $('#rows_table').append('<tr>' +
-                                '<td style="font-weight:400;"> ' +
-                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                                '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
-                                '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
-                            );
-                        })
-                    },
-                    error: function () {
-                    }
-                })
+                if (codigo != '') {
+                    getDataMercancia(codigo)
+                } else {
+                    alertTemplate('El campo código es obligatorio.', 'danger')
+                }
             })
-            let importe_real = 0
             $('#transferencia_salida_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
                     let codigo = $('#transferencia_salida_mercancia_codigo').val()
-                    let cuenta = $('#transferencia_salida_nro_cuenta_inventario').val()
-                    if (!!cuenta && !!codigo) {
-                        let nro = cuenta.split(' - ')[0];
-                        loadingModal.show("cargando mercancia...")
-                        $.ajax({
-                            url: '/contabilidad/inventario/transferencia-salida/getMercancia/' + codigo + ',' + nro,
-                            method: 'POST',
-                            dataType: 'json',
-                            success: function (result) {
-                                mercancias = result.mercancias
-                                if (mercancias.length > 0) {
-                                    importe_real = mercancias[0]['importe_real']
-                                    $('#transferencia_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
-                                    $('#transferencia_salida_mercancia_existencia').val(mercancias[0]['existencia'])
-                                    $('#transferencia_salida_mercancia_precio').val(parseFloat(mercancias[0]['precio_compra']).toFixed(5))
-                                    $('#true_precio_mercancia').val(mercancias[0]['precio_compra'])
-                                    $('#transferencia_salida_mercancia_id_unidad_medida').find('option').remove()
-                                    $('#transferencia_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "1">' + mercancias[0]['um'] + ' </option>');
-
-                                } else {
-                                    alertTemplate('No existen mercancias con ese código')
-                                    resertFormMercancia()
-                                }
-                                loadingModal.close()
-                            },
-                            error: function () {
-                                resertFormMercancia()
-                            }
-                        })
+                    if (codigo != '') {
+                        getDataMercancia(codigo)
                     } else {
-                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                        alertTemplate('El campo código no deben estar vacios.', 'danger')
                         resertFormMercancia()
                     }
-                }else{
+                } else {
                     resertFormMercancia()
                 }
             })
 
-            function resertFormMercancia() {
-                $('#transferencia_salida_mercancia_descripcion').val('')
-                $('#transferencia_salida_mercancia_existencia').val('')
-                $('#transferencia_salida_mercancia_precio').val('')
-                $('#true_precio_mercancia').val('')
-                $('#transferencia_salida_mercancia_id_unidad_medida').find('option').remove()
-                $('#transferencia_salida_documento_importe_mercancia').val('')
-                $('#transferencia_salida_mercancia_existencia_decremento').val('')
-                $('#transferencia_salida_documento_cantidad_mercancia').val('')
-                $('#resto_importe').val('')
-                importe_real = 0
-            }
+
 
             $('#transferencia_salida_documento_cantidad_mercancia').on('keyup', function () {
                 let cantidad = parseFloat($('#transferencia_salida_documento_cantidad_mercancia').val())
@@ -474,9 +391,9 @@
                 if (cantidad <= existencia) {
                     if (cantidad > 0) {
                         let importe = parseFloat(precio * cantidad).toFixed(2)
+                        let resto = parseFloat(importe_real - importe).toFixed(2)
                         $('#transferencia_salida_documento_importe_mercancia').val(importe)
-                        let existencia = parseFloat(importe_real - importe).toFixed(2);
-                        $('#resto_importe').val(existencia)
+                        $('#resto_importe').val(resto)
                     } else {
                         $('#transferencia_salida_documento_importe_mercancia').val(0)
                     }
@@ -616,10 +533,10 @@
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                        <td class="px-2" style="font-weight:400;"> ${codigo}</td>
-                        <td class="px-2" style="font-weight:400;"> ${cant}</td>
-                        <td class="px-2" style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td class="px-2" style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
-                        <td class="px-2" style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${cant}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(importe).toFixed(2)}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(precio).toFixed(6)} </td>
+                        <td class="px-2 text-right" style="font-weight:400;" >${parseFloat(nueva_existencia)}</td>
                         <td class="px-2" style="font-weight:400;" hidden> ${descripcion}</td>
                         <td class="px-2"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -665,6 +582,48 @@
             }
         }
 
+        function getDataMercancia(codigo){
+            loadingModal.show("Cargando mercancia...")
+            $.ajax({
+                url: '/contabilidad/inventario/transferencia-salida/getMercancia/' + codigo,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    mercancias = result.mercancias
+                    if (mercancias.length > 0) {
+                        importe_real = mercancias[0]['importe']
+                        $('#transferencia_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                        $('#transferencia_salida_mercancia_existencia').val(mercancias[0]['existencia'])
+                        $('#transferencia_salida_mercancia_precio').val(parseFloat(mercancias[0]['precio_compra']).toFixed(5))
+                        $('#true_precio_mercancia').val(mercancias[0]['precio_compra'])
+                        $('#transferencia_salida_mercancia_id_unidad_medida').find('option').remove()
+                        $('#transferencia_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "'+mercancias[0]['id_um']+'">' + mercancias[0]['um'] + ' </option>');
+                        // $('#transferencia_salida_mercancia_id_unidad_medida').val(mercancias[0]['id_um'])
+                        $('#transferencia_salida_mercancia_id_unidad_medida').addClass('read-only-select');
+                    } else {
+                        alertTemplate('No existen mercancias con ese código', 'danger')
+                        resertFormMercancia()
+                    }
+                    loadingModal.close()
+                },
+                error: function () {
+                    resertFormMercancia()
+                }
+            })
+        }
+
+        function resertFormMercancia() {
+            $('#transferencia_salida_mercancia_descripcion').val('')
+            $('#transferencia_salida_mercancia_existencia').val('')
+            $('#transferencia_salida_mercancia_precio').val('')
+            $('#true_precio_mercancia').val('')
+            $('#transferencia_salida_mercancia_id_unidad_medida').find('option').remove()
+            $('#transferencia_salida_documento_importe_mercancia').val('')
+            $('#transferencia_salida_mercancia_existencia_decremento').val('')
+            $('#transferencia_salida_documento_cantidad_mercancia').val('')
+            $('#resto_importe').val('')
+            importe_real = 0
+        }
 
     </script>
 {% endblock %}

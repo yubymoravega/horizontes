@@ -174,11 +174,11 @@
             <div>
                 <table class="table-small-rows table table-hover text-light">
                     <thead class="thead-dark">
-                    <th width="120px">Cod.</th>
-                    <th width="110px">Cant.</th>
+                    <th width="120px">Código</th>
+                    <th width="110px">Cantidad</th>
                     <th width="110px">Importe</th>
                     <th width="110px">Precio</th>
-                    <th scope="col-1">Nueva Exist</th>
+                    <th scope="col-1" class="text-right">Nueva Existencia</th>
                     <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
                     <th scope="col-1" hidden>UM</th>
                     <th scope="col-1" hidden>Descripcion</th>
@@ -248,6 +248,7 @@
         let cuentas_inventarios = [];
         let eliminados = [];
         let importe_total = 0;
+        let falg = false;
         let list_mercancia = []
 
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
@@ -256,9 +257,25 @@
         $(document).ready(function () {
             cargarDatosIniciales()
 
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    $(this).val(consecutivo)
+                    resetFormMercancia()
+                    resetFormulario()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    cargarDatosIniciales()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
             /** BLOQUE JQuery DEL SELECTOR DE NUMEROS CONSECUTIVOS DEL DOCUMENTO**/
             $('#select_nros').on('keyup', function (e) {
                 if (e.which == 13) {
+                    flag = true;
                     $('#orden_trabajo_row').hide()
                     if ($('#select_nros').val() != '') {
                         if (eliminados.includes($('#select_nros').val())) {
@@ -548,10 +565,10 @@
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
-                        <td style="font-weight:400;"> ${cant}</td>
-                        <td style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
-                        <td style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${cant}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(importe).toFixed(2)}</td>
+                        <td style="font-weight:400;" class="text-right"> ${parseFloat(precio).toFixed(6)} </td>
+                        <td style="font-weight:400;" class="text-right">${parseFloat(nueva_existencia)}</td>
                         <td style="font-weight:400;" hidden> ${descripcion}</td>
                         <td> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -702,10 +719,10 @@
                             for (var i = 0; i < mercancias.length; i++) {
                                 $('#rows_mercancias').append(`<tr>
                                     <td style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
-                                    <td style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
-                                    <td style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${mercancias[i]['cantidad']}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td style="font-weight:400;" class="text-right"> ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td style="font-weight:400;" class="text-right">${parseFloat(mercancias[i]['existencia'])}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -724,6 +741,7 @@
         }
 
         function cargarDatosIniciales() {
+            loadingModal.show()
             $('#btnCancelar').hide()
             $('#vale_salida_fecha_solicitud').attr('type', 'date')
             $('#vale_salida_documento_importe_mercancia').prop('disabled', true)

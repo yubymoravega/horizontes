@@ -11,11 +11,14 @@ use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
+use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\DevolucionType;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Inventario\DevolucionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Integer;
@@ -269,42 +272,12 @@ class DevolucionController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{params}", name="contabilidad_inventario_devolucion_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_devolucion_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request, $params)
+    public function getMercancia(EntityManagerInterface $em, Request $request, $codigo)
     {
-        $arr = explode(',', $params);
-        $codigo = $arr[0];
-        $cuenta = $arr[1];
-        $em = $this->getDoctrine()->getManager();
-        if ($codigo == -1 || $codigo == '-1')
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'activo' => true,
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'cuenta' => $cuenta
-            ));
-        else
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'activo' => true,
-                'codigo' => $codigo,
-                'cuenta' => $cuenta
-            ));
-
-        $row = array();
-        foreach ($mercancia_arr as $obj) {
-            /**@var $obj Mercancia* */
-            $row [] = array(
-                'id' => $obj->getId(),
-                'codigo' => $obj->getCodigo(),
-                'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
-                'id_almacen' => $obj->getIdAmlacen(),
-                'idum' => $obj->getIdUnidadMedida()->getId(),
-                'um' => $obj->getIdUnidadMedida()->getAbreviatura(),
-                'existencia' => $obj->getExistencia()
-            );
-        }
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $row = AuxFunctions::getMercanciaByCod($em,$codigo,$id_almacen);
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
     }
 
@@ -437,4 +410,116 @@ class DevolucionController extends AbstractController
         );
         return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'devolución cargada con éxito.']);
     }
+
+    /**
+     * @Route("/print_report/{nro}", name="contabilidad_inventario_devolucion_print",methods={"GET"})
+     */
+    public function print(EntityManagerInterface $em, $nro)
+    {
+        $devolucion_er = $em->getRepository(Devolucion::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+
+        $devolucion_obj = $devolucion_er->findOneBy(array(
+            'activo' => true,
+            'nro_concecutivo' => $nro
+        ));
+
+        $obj_tipo_documento = $tipo_documento_er->find(9);
+        $rows = [];
+        $almacen = '';
+        $observacion = '';
+        $importe_total = 0;
+        $unidad = '';
+        $nro_solicitud = '';
+        $fecha_devolucion = '';
+        if ($devolucion_obj && $obj_tipo_documento) {
+            /** @var  $devolucion_obj Devolucion */
+            $almacen = $devolucion_obj->getIdDocumento()->getIdAlmacen()->getCodigo() . ' - ' . $devolucion_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $fecha_devolucion = $devolucion_obj->getIdDocumento()->getFecha()->format('d/m/Y');
+            $nro_solicitud = $devolucion_obj->getNroConcecutivo();
+            $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+                'id_tipo_documento' => $obj_tipo_documento->getId(),
+                'id_documento' => $devolucion_obj->getIdDocumento()->getId(),
+                'activo' => true
+            ));
+
+            if (!empty($arr_movimiento_mercancia)) {
+                /** @var  $mov_mercancia MovimientoMercancia */
+                $unidad = $devolucion_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getCodigo().' - '.$devolucion_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getNombre();
+                foreach ($arr_movimiento_mercancia as $obj) {
+                    /**@var $obj MovimientoMercancia* */
+                    $rows[] = array(
+                        'id' => $obj->getIdMercancia()->getId(),
+                        'codigo' => $obj->getIdMercancia()->getCodigo(),
+                        'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
+                        'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                        'existencia' => $obj->getExistencia(),
+                        'cantidad' => $obj->getCantidad(),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3),
+                        'importe' => number_format($obj->getImporte(), 2),
+                    );
+                    $importe_total += $obj->getImporte();
+                }
+            }
+
+        }
+        return $this->render('contabilidad/inventario/devolucion/print.html.twig', [
+            'controller_name' => 'AjusteEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($importe_total, 2),
+                'almacen' => $almacen,
+                'observacion' => $observacion,
+                'unidad' => $unidad,
+                'fecha_devolucion' => $fecha_devolucion,
+                'nro_solicitud' => $nro_solicitud
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+    }
+
+    /**
+     * @Route("/print_report_current/", name="contabilidad_inventario_devolucion_print_report_current",methods={"GET","POST"})
+     */
+    public function printCurrent(EntityManagerInterface $em, Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    {
+        $datos = $request->get('datos');
+        $mercancias = json_decode($request->get('mercancias'));
+        $nro = $request->get('nro');
+        /** @var Unidad $obj_unidad */
+        $obj_unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad();
+        $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
+        $rows = [];
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha_contable = explode('-', $fecha_contable);
+        foreach ($mercancias as $obj) {
+            array_push($rows, [
+                "id" => 0,
+                "codigo" => $obj->codigo,
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
+                "descripcion" => $obj->descripcion,
+                "existencia" => $obj->nueva_existencia,
+                "cantidad" => $obj->cant,
+                "precio" => number_format($obj->precio, 3, '.', ''),
+                "importe" => number_format($obj->importe, 2, '.', '')
+            ]);
+        }
+        return $this->render('contabilidad/inventario/devolucion/print.html.twig', [
+            'controller_name' => 'DevolucionControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($datos['importe_total'], 2, '.', ''),
+                'almacen' => $request->getSession()->get('selected_almacen/name'),
+                'unidad' => $unidad,
+                'fecha_devolucion' => $arr_fecha_contable[2] . '/' . $arr_fecha_contable[1] . '/' . $arr_fecha_contable[0],
+                'nro_solicitud'=>$nro
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+
+    }
+
+
 }

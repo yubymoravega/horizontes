@@ -85,22 +85,19 @@ class InventarioController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $session = $request->getSession();
         $almacen_id = $request->get('almacenes_select');
-//        dd($request->get('almacenes_select'));
-//        $name_almacen = $request->get('name_almacen');
 
         $session->set('selected_almacen/id', $almacen_id);
         $fecha_sistema = AuxFunctions::getDateToClose($em, $almacen_id);
-//        dd($fecha_sistema);
         $arr_part_fecha = explode('-', $fecha_sistema);
         $fecha = $arr_part_fecha[2] . '/' . $arr_part_fecha[1] . '/' . $arr_part_fecha[0];
         $session->set('date_system', $fecha);
-        $session->set('min_date', $fecha_sistema);
+        $session->set('min_date', '2020-10-01');
         $session->set('max_date', Date('Y-m-d'));
 
 
         $id_usuario = $this->getUser();
         $almacen_obj = $em->getRepository(Almacen::class)->find($almacen_id);
-        $name_almacen = $almacen_obj->getDescripcion();
+        $name_almacen = $almacen_obj->getCodigo().' - '.$almacen_obj->getDescripcion();
         $session->set('selected_almacen/name', $name_almacen);
         if ($almacen_obj && $id_usuario) {
             //buscar nuevamente que ningun usuario este usando el almacen
@@ -109,7 +106,6 @@ class InventarioController extends AbstractController
                 'id_almacen' => $almacen_obj
             ));
             if (!$obj_almacen_ocupado) {
-//                dd('add');
                 $nuevo_almacen_ocupado = new AlmacenOcupado();
                 $nuevo_almacen_ocupado
                     ->setIdAlmacen($almacen_obj)
@@ -117,14 +113,12 @@ class InventarioController extends AbstractController
                 try {
                     $em->persist($nuevo_almacen_ocupado);
                     $em->flush();
-//                    dd('sasa');
                     $this->addFlash('success', 'Usted se encuentra trabajando dento del almacén ' . $name_almacen);
                 } catch (FileException $e) {
                     return $e->getMessage();
                 }
             }
         }
-//        return new JsonResponse(['success' => true]);
         return $this->redirectToRoute('inventario');
     }
 
@@ -191,6 +185,17 @@ class InventarioController extends AbstractController
             'id_almacen' => $almacen_obj
         ));
 
+        if(empty($movimientos_mercancias_arr) && !$obj_cierre_abierto){
+            $arr_split_fecha = explode('-', $fecha_seleccionada);
+            $session = $request->getSession();
+            $fecha = $arr_split_fecha[2] . '/' . $arr_split_fecha[1] . '/' . $arr_split_fecha[0];
+            $session->set('date_system', $fecha);
+            $session->set('min_date', $fecha_seleccionada);
+            $session->set('max_date', Date('Y-m-d'));
+            $this->addFlash('success', 'Fecha cambiada satisfactoriamente');
+            return $this->redirectToRoute('inventario');
+        }
+
         $debitos = 0;
         $creditos = 0;
         /** @var MovimientoMercancia $obj_mercancia */
@@ -235,7 +240,6 @@ class InventarioController extends AbstractController
             $session->set('date_system', $fecha);
             $session->set('min_date', $fecha_seleccionada);
             $session->set('max_date', Date('Y-m-d'));
-
 
             $this->addFlash('success', 'Fecha cambiada satisfactoriamente');
             return $this->redirectToRoute('inventario');

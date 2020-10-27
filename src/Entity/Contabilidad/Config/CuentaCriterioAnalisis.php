@@ -29,6 +29,11 @@ class CuentaCriterioAnalisis
      */
     private $id_criterio_analisis;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $orden;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -54,6 +59,18 @@ class CuentaCriterioAnalisis
     public function setIdCriterioAnalisis(?CriterioAnalisis $id_criterio_analisis): self
     {
         $this->id_criterio_analisis = $id_criterio_analisis;
+
+        return $this;
+    }
+
+    public function getOrden(): ?int
+    {
+        return $this->orden;
+    }
+
+    public function setOrden(?int $orden): self
+    {
+        $this->orden = $orden;
 
         return $this;
     }

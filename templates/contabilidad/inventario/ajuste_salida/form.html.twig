@@ -254,6 +254,7 @@
         let cuentas_acreedoras = [];
         let list_mercancia = []
         let importe_total = 0;
+        let flag = false;
         loadingModal.show()
 
         $(document).ready(function () {
@@ -275,6 +276,25 @@
 
             $('#ajuste_salida_id_elemento_gasto, #ajuste_salida_id_centro_costo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
 
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    //no dio enter
+                    $(this).val(consecutivo)
+                    $('#ajuste_salida').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $('#btnSubbmitAjuste').show()
+                    $('#btnImprimir').show()
+                    $('#btnCancelar').hide()
+                    $('#ajuste_salida_observacion').val('')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    loadingData()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
             /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
             $('#select_nros').on('change', function () {
                 if ($('#select_nros').val() == consecutivo) {
@@ -285,6 +305,7 @@
             })
             $('#select_nros').on('keyup', function (event) {
                 if (event.which == 13) {
+                    flag = true;
                     $('#ajuste_salida').resetForm()
                     $('#ajuste_salida_observacion').text('')
                     $('#form_mercancia').resetForm()
@@ -361,10 +382,10 @@
 
                                 $('#rows_mercancias').append(`<tr>
                                     <td class="px-2" style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
-                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['cantidad']}</td>
-                                    <td class="px-2" style="font-weight:400;"> ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
-                                    <td class="px-2" style="font-weight:400;"> ${parseFloat(mercancias[i]['precio']).toFixed(2)} </td>
-                                    <td class="px-2" style="font-weight:400;">${parseFloat(mercancias[i]['existencia']).toFixed(2)}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${mercancias[i]['cantidad']}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td class="px-2 text-right" style="font-weight:400;" >${parseFloat(mercancias[i]['existencia'])}</td>
                                     <td></td>
                                    </tr>`
                                 );
@@ -721,10 +742,10 @@
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td class="px-2" style="font-weight:400;"> ${codigo}</td>
-                        <td class="px-2" style="font-weight:400;"> ${cant}</td>
-                        <td class="px-2" style="font-weight:400;"> ${parseFloat(importe).toFixed(2)}</td>
-                        <td class="px-2" style="font-weight:400;"> ${parseFloat(precio).toFixed(2)} </td>
-                        <td class="px-2" style="font-weight:400;">${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${cant}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(importe).toFixed(2)}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(precio).toFixed(6)} </td>
+                        <td class="px-2 text-right" style="font-weight:400;" >${parseFloat(nueva_existencia)}</td>
                         <td class="px-2" style="font-weight:400;" hidden> ${descripcion}</td>
                         <td class="px-2"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">

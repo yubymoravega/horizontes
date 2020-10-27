@@ -299,7 +299,7 @@ class AjusteSalidaController extends AbstractController
 //        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
 //            array('activo' => true, 'id_unidad' => $unidad)
 //        );
-        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['GAT', 'EXP']);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM','GAT', 'EXP'],['deudora'=>true]);
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
         $rows = [];
@@ -438,7 +438,7 @@ class AjusteSalidaController extends AbstractController
         $fecha_ajuste = '';
         if ($ajuste_obj && $obj_tipo_documento) {
             /** @var  $ajuste_obj Ajuste */
-            $almacen = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $almacen = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getCodigo().' - '.$ajuste_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $observacion = $ajuste_obj->getObservacion();
             $fecha_ajuste = $ajuste_obj->getIdDocumento()->getFecha()->format('d/m/Y');
             $nro_solicitud = $ajuste_obj->getNroConcecutivo();
@@ -450,13 +450,9 @@ class AjusteSalidaController extends AbstractController
 
             if (!empty($arr_movimiento_mercancia)) {
                 /** @var  $mov_mercancia MovimientoMercancia */
-                $mov_mercancia = $arr_movimiento_mercancia[0];
-                $id_usuario_movimiento = $mov_mercancia->getIdUsuario()->getId();
-                /** @var Empleado $obj_empleado */
-                $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
-                    'id_usuario' => $id_usuario_movimiento
-                ));
-                $unidad = $obj_empleado->getIdUnidad()->getNombre();
+                /** @var Unidad $obj_unidad */
+                $obj_unidad = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad();
+                $unidad = $obj_unidad->getCodigo().' - '.$obj_unidad->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
                     /**@var $obj MovimientoMercancia* */
                     $rows[] = array(
@@ -466,10 +462,8 @@ class AjusteSalidaController extends AbstractController
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
-//                        'centro_costo' => $obj->getIdCentroCosto()->getNombre(),
-//                        'elemento_gasto' => $obj->getIdElementoGasto()->getDescripcion(),
-                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
-                        'importe' => number_format($obj->getImporte(), 2, '.', ''),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3),
+                        'importe' => number_format($obj->getImporte(), 2),
                     );
                     $importe_total += $obj->getImporte();
                 }
@@ -480,7 +474,7 @@ class AjusteSalidaController extends AbstractController
         return $this->render('contabilidad/inventario/ajuste_salida/print.html.twig', [
             'controller_name' => 'AjusteEntradaControllerPrint',
             'datos' => array(
-                'importe_total' => number_format($importe_total, 2, '.', ''),
+                'importe_total' => number_format($importe_total, 2),
                 'almacen' => $almacen,
                 'observacion' => $observacion,
                 'unidad' => $unidad,
@@ -495,23 +489,28 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_ajuste_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
-        $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
+        /** @var Unidad $obj_unidad */
+        $obj_unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad();
+        $unidad = $obj_unidad->getCodigo().' - '.$obj_unidad->getNombre();
         $rows = [];
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
+        $arr_fecha_contable = explode('-',$fecha_contable);
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
                 "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
-                "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
+                "existencia" => $obj->nueva_existencia,
                 "cantidad" => $obj->cant,
-                "precio" => number_format($obj->precio, 2, '.', ''),
-                "importe" => number_format($obj->importe, 2, '.', '')
+                "precio" => number_format($obj->precio, 3),
+                "importe" => number_format($obj->importe, 2)
             ]);
         }
         return $this->render('contabilidad/inventario/ajuste_salida/print.html.twig', [
@@ -521,7 +520,7 @@ class AjusteSalidaController extends AbstractController
                 'almacen' => $request->getSession()->get('selected_almacen/name'),
                 'observacion' => $datos['observacion'],
                 'unidad' => $unidad,
-                'fecha_ajuste' => '10/10/1010',
+                'fecha_ajuste' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
                 'nro_solicitud' => $nro,
             ),
             'mercancias' => $rows,

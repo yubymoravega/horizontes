@@ -187,7 +187,7 @@ class ValeSalidaController extends AbstractController
     public function gestionarVale(EntityManagerInterface $em, Request $request, OrdenTrabajoRepository $ordenTrabajoRepository)
     {
         $form = $this->createForm(ValeSalidaType::class);
-        $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $id_almacen =  $request->getSession()->get('selected_almacen/id');
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
@@ -521,7 +521,7 @@ class ValeSalidaController extends AbstractController
                 'id_documento' => $vale_salida_obj->getIdDocumento()->getId(),
                 'activo' => true
             ));
-
+            $str_orden = "";
             if (!empty($arr_movimiento_mercancia)) {
                 /** @var  $mov_mercancia MovimientoMercancia */
                 $mov_mercancia = $arr_movimiento_mercancia[0];
@@ -532,6 +532,9 @@ class ValeSalidaController extends AbstractController
                 ));
                 $unidad = $obj_empleado->getIdUnidad()->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
+                    if($obj->getIdOrdenTrabajo()){
+                        $str_orden = $str_orden . $obj->getIdOrdenTrabajo()->getCodigo().',';
+                    }
                     /**@var $obj MovimientoMercancia* */
                     $rows[] = array(
                         'id' => $obj->getIdMercancia()->getId(),
@@ -547,7 +550,7 @@ class ValeSalidaController extends AbstractController
                     $importe_total += $obj->getImporte();
                 }
             }
-
+            $str_orden = substr($str_orden,0,-1);
         }
 
         return $this->render('contabilidad/inventario/vale_salida/print.html.twig', [
@@ -558,6 +561,7 @@ class ValeSalidaController extends AbstractController
                 'fecha' => $fecha_solicitud,
                 'nro_solicitud' => $nro_solicitud,
                 'unidad' => $unidad,
+                'ot'=>$str_orden,
                 'fecha_vale' => $fecha_vale,
                 'nro_consecutivo' => $nro_consecutivo
             ),
@@ -569,16 +573,20 @@ class ValeSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_vale_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
         $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
         $rows = [];
-
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
+        $arr_fecha_contable = explode('-',$fecha_contable);
+        $str_orden = "";
 //        dd($mercancias);
         foreach ($mercancias as $obj) {
+            $str_orden = $str_orden .$obj->codigo_ot.",";
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
@@ -592,6 +600,7 @@ class ValeSalidaController extends AbstractController
             ]);
         }
 
+        $str_orden = substr($str_orden,0,-1);
         return $this->render('contabilidad/inventario/vale_salida/print.html.twig', [
             'controller_name' => 'AjusteEntradaControllerPrint',
             'datos' => array(
@@ -600,7 +609,8 @@ class ValeSalidaController extends AbstractController
                 'fecha' => date("d/m/Y", strtotime($datos["fecha_solicitud"])),
                 'nro_solicitud' => $datos["nro_solicitud"],
                 'unidad' => $unidad,
-                'fecha_vale' => '10/10/1010',
+                'ot'=>$str_orden,
+                'fecha_vale' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
                 'nro_consecutivo' => $nro
             ),
             'mercancias' => $rows,
