@@ -35,9 +35,9 @@ class RemesasController extends AbstractController
     }
 
     /**
-     * @Route("/remesas.add/{tel}", name="remesas.add")
+     * @Route("/remesas.add/{tel}/{pais}", name="remesas.add")
      */
-    public function add($tel, Request $request)
+    public function add($tel,$pais, Request $request)
     {
         $ClienteBeneficiario = new ClienteBeneficiario();
 
@@ -51,7 +51,7 @@ class RemesasController extends AbstractController
         $formulario = $this->createForm(
             ClienteBeneficiarioType::class,
             $ClienteBeneficiario,
-            array('action' => $this->generateUrl('remesas.add', array('tel' => $tel)), 'method' => 'POST')
+            array('action' => $this->generateUrl('remesas.add', array('tel' => $tel,'pais' => $pais)), 'method' => 'POST')
         );
 
         $formulario->handleRequest($request);
@@ -70,7 +70,7 @@ class RemesasController extends AbstractController
                 'Agregado'
             );
 
-            return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $tel]);
+            return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $tel,'pais' => $pais]);
         } else {
 
             return $this->render('remesas/add-beneficiario.html.twig', [

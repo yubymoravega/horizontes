@@ -584,12 +584,14 @@ class FacturaController extends AbstractController
         return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
     }
 
-       /**
+    /**
      * @Route("factura/formulario/", name="factura/formulario")
      */
     public function formulario(){
 
         return $this->render('factura/formulario.html.twig');
     }
+
+    
 
 }
