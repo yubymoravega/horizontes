@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Trasacciones; 
 use App\Entity\User;  
+use App\Entity\Cotizacion;  
 use App\Entity\ReporteEfectivo;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collection\ArrayCollection;
@@ -41,57 +42,57 @@ class EfectivoController extends AbstractController
     }
 
     /**
-   * @Route("/efectivo/usd/{monto}", name="efectivo/usd")
+   * @Route("/efectivo/usd/{monto}/{id}", name="efectivo/usd")
    */
-  public function efectivoUSD($monto)
+  public function efectivoUSD($monto,$id)
   {
     $monto = number_format($monto, 2, '.', '');
-    return $this->render('efectivo/usd.html.twig',['monto' => $monto,'moneda' => "USD"]);
+    return $this->render('efectivo/usd.html.twig',['monto' => $monto,'moneda' => "USD",'id' => $id]);
   }
 
   /**
-   * @Route("/efectivo/dop/{monto}", name="efectivo/dop")
+   * @Route("/efectivo/dop/{monto}/{id}", name="efectivo/dop")
    */
-  public function efectivoDOP($monto)
+  public function efectivoDOP($monto,$id)
   {
     $monto = number_format($monto, 2, '.', '');
-    return $this->render('efectivo/dop.html.twig',['monto' => $monto,'moneda' => "DOP"]);
+    return $this->render('efectivo/dop.html.twig',['monto' => $monto,'moneda' => "DOP",'id' => $id]);
   }
 
   /**
-   * @Route("/efectivo/eur/{monto}", name="efectivo/eur")
+   * @Route("/efectivo/eur/{monto}/{id}", name="efectivo/eur")
    */
-  public function efectivoEUR($monto)
+  public function efectivoEUR($monto,$id)
   {
     $monto = number_format($monto, 2, '.', '');
-    return $this->render('efectivo/eur.html.twig',['monto' => $monto,'moneda' => 'EUR']);
+    return $this->render('efectivo/eur.html.twig',['monto' => $monto,'moneda' => 'EUR','id' => $id]);
   }
 
     /**
-   * @Route("/efectivo/cuc/{monto}", name="efectivo/cuc")
+   * @Route("/efectivo/cuc/{monto}/{id}", name="efectivo/cuc")
    */
-  public function efectivoCUC($monto)
+  public function efectivoCUC($monto,$id)
   {
     $monto = number_format($monto, 2, '.', '');
-    return $this->render('efectivo/cuc.html.twig',['moneda' => "CUC",'monto' => $monto]);
+    return $this->render('efectivo/cuc.html.twig',['moneda' => "CUC",'monto' => $monto,'id' => $id]);
   }
 
    /**
-   * @Route("/efectivo/cup/{monto}", name="efectivo/cup")
+   * @Route("/efectivo/cup/{monto}/{id}", name="efectivo/cup")
    */
-  public function efectivoCUP($monto)
+  public function efectivoCUP($monto,$id)
   {
     $monto = number_format($monto, 2, '.', '');
-    return $this->render('efectivo/cup.html.twig',['moneda' => 'CUP','monto' => $monto]);
+    return $this->render('efectivo/cup.html.twig',['moneda' => 'CUP','monto' => $monto,'id' => $id]);
   }
 
     /**
-   * @Route("/efectivo/banco", name="efectivo/banco")
+   * @Route("/efectivo/banco/{id}", name="efectivo/banco")
    */
-  public function deposito()
+  public function deposito($id)
   {
     //$monto = number_format($monto, 2, '.', '');
-    return $this->render('efectivo/banco.html.twig');
+    return $this->render('efectivo/banco.html.twig',['id'=>$id]);
   }
 
   /**
@@ -99,6 +100,7 @@ class EfectivoController extends AbstractController
    */
   public function depositoSave(Request $request)
   {
+      
     $dataBase = $this->getDoctrine()->getManager();
 
     $trasacciones = new Trasacciones();
@@ -143,22 +145,29 @@ class EfectivoController extends AbstractController
 
     $date = new DateTime('NOW');  
     $trasacciones->setFecha( $date);  
+    
 
     $user =  $this->getUser();
 
     $trasacciones->setEmpleado($user->getUsername());  
 
     $trasacciones->setMoneda($dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre());
+    $trasacciones->setidCotizacion($request->get('0')); 
 
     $dataBase->persist($trasacciones);
     $dataBase->flush();
+
+    $cotizacion = $this->getDoctrine()->getRepository(Cotizacion::class)->find($request->get('0'));
+
+    $cotizacion->setEdit('0'); 
+    $dataBase->flush($cotizacion);
 
     $this->addFlash(
       'success',
       'Pago Agregado'
   );
 
-    return $this->redirectToRoute('efectivo/banco/reporte');
+    return $this->redirectToRoute('checkout/pago/cotizacion/',['id'=>$request->get('0')]);
 
 
   }
@@ -244,9 +253,9 @@ class EfectivoController extends AbstractController
   }
 
      /**
-   * @Route("/efectivo/save/{monto}/{moneda}/{cambio}", name="efectivo/save")
+   * @Route("/efectivo/save/{monto}/{moneda}/{cambio}/{id}", name="efectivo/save")
    */
-  public function efectivoSave($monto,$moneda,$cambio)
+  public function efectivoSave($monto,$moneda,$cambio,$id)
   {
 
    $dataBase = $this->getDoctrine()->getManager();
@@ -264,18 +273,23 @@ class EfectivoController extends AbstractController
    $reporteEfectivo->setCambio($cambio);
 
    $reporteEfectivo->setMonto($monto);
-   //$reporteEfectivo->setCambio($cambio);
+   $reporteEfectivo->setIdCotizacion($id);
    $reporteEfectivo->setMoneda($moneda);
 
    $dataBase->persist($reporteEfectivo);
    $dataBase->flush();
+
+   $cotizacion = $this->getDoctrine()->getRepository(Cotizacion::class)->find($id);
+
+   $cotizacion->setEdit('0'); 
+   $dataBase->flush($cotizacion);
 
    $this->addFlash(
      'success',
      'Pago Agregado'
  );
 
-   return $this->redirectToRoute('efectivo/reporte');
+ return $this->redirectToRoute('checkout/pago/cotizacion/',['id'=>$id]);
 
   }
 

@@ -22,6 +22,11 @@ class Trasacciones
      */
     private $Transaccion;
 
+     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $idCotizacion;
+
     /**
      * @ORM\Column(type="string", length=255)
      */
@@ -171,6 +176,18 @@ class Trasacciones
     public function setMoneda(string $moneda): self
     {
         $this->moneda = $moneda;
+
+        return $this;
+    }
+
+    public function getidCotizacion(): ?string
+    {
+        return $this->idCotizacion;
+    }
+
+    public function setidCotizacion(string $idCotizacion): self
+    {
+        $this->idCotizacion = $idCotizacion;
 
         return $this;
     }

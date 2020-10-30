@@ -26,7 +26,7 @@ $.ajax({
             url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/home/moneda/select/"+$( "#currency option:selected" ).val(),
             dataType: 'json',
             success: function (data) { 
-                window.location.href = "/home";
+                window.location.href = window.location.pathname;
         
             }}); 
 

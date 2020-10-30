@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+	{% include 'breadcrumbs.html.twig' %}
+
+<section class="section novi-background section-66 section-sm-bottom-110">
+	<div class="container">
+		<h1 class="text-reporte">Metodo de pago
+		</h1>
+		<hr class="divider bg-mantis">
+
+    <div class="cards-list">
+
+		<div id="monto" class="card 1">
+			<div class="card_image">
+				<img src="{{ asset('images/money.svg') }}" />
+			</div>
+			<div class="card_title title-white">
+				
+			</div>
+		</div>
+
+		<div class="card 2">
+			<div class="card_image">
+					<img src="{{ asset('images/credit-card.svg') }}" />
+			</div>
+			<div class="card_title title-white">
+				
+			</div>
+		</div>
+
+		<div id="banco" class="card 3">
+			<div class="card_image">
+					<img src="{{ asset('images/money-transfer.svg') }}" />
+			</div>
+			<div class="card_title">
+				
+			</div>
+		</div>
+
+	</div>
+
+	</div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="montoEfectivo" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Monto Efectivo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+       <input type="text" class="form-control" id="monto" placeholder="Monto">
+	   <p id="error"></p>
+      </div>
+      <div class="modal-footer">
+       
+        <button type="button" id='guardar'  class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+
+		p.texto-servicio {
+			font-size: 23px;
+			font-weight: 100;
+		}
+		.cards-list {
+			z-index: 0;
+			width: 100%;
+			display: flex;
+			justify-content: space-around;
+			flex-wrap: wrap;
+		}
+
+		.card {
+			margin: 30px auto !important;
+			width: 300px;
+			height: 300px;
+			border-radius: 40px;
+			box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
+			cursor: pointer;
+			transition: 0.4s;
+		}
+
+		.card .card_image {
+			width: inherit;
+			height: inherit;
+			border-radius: 40px;
+		}
+
+		.card .card_image img {
+			width: inherit;
+			height: inherit;
+			border-radius: 40px;
+			object-fit: cover;
+		}
+
+		.card .card_title {
+			text-align: center;
+			border-radius: 0 0 40px 40px;
+			font-family: sans-serif;
+			font-weight: bold;
+			font-size: 30px;
+			margin-top: -80px;
+			height: 40px;
+		}
+
+		.card:hover {
+			transform: scale(0.9, 0.9);
+			box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
+		}
+
+		.title-white {
+			color: white;
+		}
+
+		.title-black {
+			color: black;
+		}
+
+		@media all and(max-width: 500px) {
+			.card-list {
+				/* On small screens, we are no longer using row direction but column */
+				flex-direction: column;
+			}
+		}
+	</style>
+
+{% endblock %} 
+
+{% block javascripts %}
+{{parent()}}
+<script>
+
+$( "#monto" ).click(function() {
+
+	window.location.href = "/efectivo/{{moneda}}/"+{{monto}}+"/"+{{id}};
+});
+
+$( "#banco" ).click(function() {
+
+ window.location.href = "/efectivo/banco/"+{{id}};
+
+});
+
+$( "#efectivo" ).click(function() {
+
+  $("#montoEfectivo").modal("show");
+
+	$( "#guardar" ).click(function() {
+
+	if($( "#monto" ).val() > 0){
+
+		 window.location.href = "/efectivo/{{moneda}}/"+$( "#monto" ).val()+"/"+{{id}};
+	
+	}else{
+		 $("#error").css("color", "red");
+		 $("#error").text("Monto requerido");
+	}
+
+ 
+});
+
+
+
+});
+
+
+$('#monto').on('input', function () {
+this.value = this.value.replace(/[^0-9-.]/g, '');
+});
+</script>
+
+{% endblock %}

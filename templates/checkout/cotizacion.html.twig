@@ -63,12 +63,12 @@
 								</table>
 							</div>
 							<div class="offset-top-10 text-right">
-								<p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp; &nbsp; ${{data.total}} {{moneda}}</p>
+								<p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
                                 <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuesto: &nbsp; &nbsp; &nbsp; $0.00 {{moneda}}</p>
-                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp; &nbsp; ${{data.total}} {{moneda}}</p>
+                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
                                 <a  onClick="carrito('{{ id }}');" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
 									<span class="novi-icon icon mdi mdi-chevron-double-right"></span> Carrito</a>
-                                     <a  class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
+                                     <a onClick="cobrar('{{ id }}');" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
 									<span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
 							</div>
 						</div>
@@ -108,6 +108,8 @@
     </div>
 </div>
 
+
+
 {% endblock %}
 
 
@@ -126,8 +128,12 @@ function carrito(id) {
         window.location.href = "/checkout/cotizacion/carrito/"+id;
 
       });
+  }; 
 
- 
+  function cobrar(id) {
+
+	  window.location.href = "/factura/metodo/pago/"+id+"/"+{{total}};
+
   }; 
 
 

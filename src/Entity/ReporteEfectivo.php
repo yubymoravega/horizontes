@@ -38,6 +38,11 @@ class ReporteEfectivo
     private $cambio;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $idCotizacion;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $moneda;
@@ -103,6 +108,18 @@ class ReporteEfectivo
     public function setMoneda(string $moneda): self
     {
         $this->moneda = $moneda;
+
+        return $this;
+    }
+
+    public function getIdCotizacion(): ?string
+    {
+        return $this->moneda;
+    }
+
+    public function setIdCotizacion(string $idCotizacion): self
+    {
+        $this->idCotizacion = $idCotizacion;
 
         return $this;
     }

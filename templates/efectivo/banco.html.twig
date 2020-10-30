@@ -14,7 +14,7 @@
      </div>
 	<div class="container d-flex justify-content-center">
               
-		<form id="banco" action="{{ path('efectivo/banco/save/') }}" method="POST">
+		<form id="banco" action="{{ path('efectivo/banco/save/',[id]) }}" method="POST">
 			<div class="form-row">
 				<div class="form-group col-md-6">
 					<label style="color:white;" for="inputState">Transaccion</label>

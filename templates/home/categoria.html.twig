@@ -36,7 +36,7 @@
 
 	<div class="cards-list">
 	
-		<div class="card 1">
+		<div id="remesa" class="card 1">
 			<div class="card_image">
 				<img src="{{ asset('images/servicios/REMESAS.jpg') }}"/>
 			</div>
@@ -159,6 +159,12 @@ minlength: "Minimo 8 Caracteres"
 $('#tel').on('input', function () {
 this.value = this.value.replace(/[^0-9]/g, '');
 });
+
+$( "#remesa" ).click(function() {
+  
+  window.location.href = "/remesas/pais/"+{{tel}};
+});
+
 	</script>
 
 {% endblock %}

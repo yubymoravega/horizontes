@@ -1053,7 +1053,7 @@ $("#messageBox").text("Cambio debe ser mayor o igual que $0.00");
 $("#messageBox").css({"display": ""});
 } else {
 $("#messageBox").css({"display": "none"});
-var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/efectivo/save/{{monto}}/{{moneda}}/"+document.getElementById("cambio").textContent;
+var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/efectivo/save/{{monto}}/{{moneda}}/"+document.getElementById("cambio").textContent+"/"+{{id}};
 
  window.location.href = url;
 }

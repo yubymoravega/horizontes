@@ -21,14 +21,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 
 class RemesasController extends AbstractController
 {
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, HttpClientInterface $client)
     {
         // 3. Update the value of the private entityManager variable through injection
         $this->entityManager = $entityManager;
+        $this->client = $client;
     }
 
     /**
@@ -428,13 +431,41 @@ class RemesasController extends AbstractController
 
             $reglasRemesas->setIdMonedaPais($id); 
 
-            $dataBase->persist($reglasRemesas);
-            $dataBase->flush();
-          
-            $this->addFlash(
-                'success',
-                'Regla Agregada'
-            );
+            $reglasAll = $dataBase->getRepository(ReglasRemesas::class)->findBy(['idMonedaPais'=>$reglasRemesas->getIdMonedaPais()]);
+
+            $con = count($reglasAll);
+            $validacion = 0;
+            $contador = 0;
+
+            while ($contador < $con) {
+
+                if($reglasRemesas->getDesde() > $reglasAll[$contador]->getDesde() & $reglasRemesas->getDesde() > $reglasAll[$contador]->getHasta()){
+
+                    $validacion++;
+
+                }else{
+
+                    $this->addFlash(
+                        'error',
+                        'Una regla no puede chocar con la otra'
+                    );
+                    return $this->redirectToRoute('remesas/reglas', ['id' => $id]);
+
+                }
+            $contador++;}
+
+            if($con == $validacion){
+
+                $dataBase->persist($reglasRemesas);
+                $dataBase->flush();
+              
+                $this->addFlash(
+                    'success',
+                    'Regla Agregada'
+                );
+            }
+
+            
 
             return $this->redirectToRoute('remesas/reglas', ['id' => $id]);
         }
@@ -642,5 +673,71 @@ class RemesasController extends AbstractController
         return new Response(round($total, 2));
 
        
+    }
+
+     /**
+     * @Route("/remesas/prueba/", name="remesas/prueba")
+     */
+    public function prueba()
+    {
+       /* $response = $this->client->request('POST', 'http://www.virtualrg.com/wsfamily/service1.asmx', [
+            'json' => [
+               'mCustomerID' => '4327861528',
+                'mAPIKey' => 'rnl370fwi6',
+              'mKeyValue' => 'abce123456',
+              'mDenomination' => 'CUC',
+              'mAmount' => '10.00',
+              'mNote' => 'Remesa de prueba',
+              'mSourceName' => 'Jose Miguel De Jesus',
+              'mSourcePhoneNo' => '8095648845',
+              'mTargetFirstName' => 'Adrian',
+              'mTargetLastName' => 'Gonzales',
+              'mTargetFirstName2' => '',
+              'mTargetLastName2' => '',
+              'mTargetAddress' => 'Calle esquina municipio',
+              'mProvinceID' => '32',
+              'mMunicipalityID' => '3204',
+              'mTargetPhoneNo' => '53914814',
+              'mTargetPhoneNo2' => '',
+          
+            ]
+          ]);*/
+
+
+         /* $response = $this->client->request('POST', 'http://www.virtualrg.com/wsfamily/service1.asmx', [
+            'gh' => [    
+              'mCustomerID' => '4327861528',
+              'mAPIKey' => 'rnl370fwi6',
+              'mOrderNo' => 'CF0000119984',           
+            ]
+          ]);
+
+    $respuesta = $response->getStatusCode(); */
+
+    $client = new \Soapclient('http://www.virtualrg.com/wsfamily/service1.asmx?WSDL',);
+
+   $respuesta = $client->Family_Transaction([
+  'mCustomerID' => '4327861528',
+  'mAPIKey' => 'rnl370fwi6',
+  'mKeyValue' => 'abce123458',
+  'mDenomination' => 'CUC',
+  'mAmount' => '10.00',
+  'mNote' => 'Remesa de prueba',
+  'mSourceName' => 'Jose Miguel De Jesus',
+  'mSourcePhoneNo' => '8095648845',
+  'mTargetFirstName' => 'Adrian',
+  'mTargetLastName' => 'Gonzales',
+  'mTargetFirstName2' => '',
+  'mTargetLastName2' => '',
+  'mTargetAddress' => 'Calle esquina municipio',
+  'mProvinceID' => '32',
+  'mMunicipalityID' => '3204',
+  'mTargetPhoneNo' => '53914814',
+  'mTargetPhoneNo2' => '',
+        ]);
+   
+
+    return new Response($respuesta->mOrderNo);
+   // return new Response("200"); CF0000120321
     }
 }

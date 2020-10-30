@@ -78,6 +78,7 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
@@ -1060,7 +1061,7 @@ class FrameworkExtension extends Extension
 
         if (null !== $jsonManifestPath) {
             $definitionName = 'assets.json_manifest_version_strategy';
-            if (0 === strpos(parse_url($jsonManifestPath, PHP_URL_SCHEME), 'http')) {
+            if (0 === strpos(parse_url($jsonManifestPath, \PHP_URL_SCHEME), 'http')) {
                 $definitionName = 'assets.remote_json_manifest_version_strategy';
             }
 
@@ -1927,9 +1928,12 @@ class FrameworkExtension extends Extension
             unset($scopeConfig['scope']);
 
             if (null === $scope) {
+                $baseUri = $scopeConfig['base_uri'];
+                unset($scopeConfig['base_uri']);
+
                 $container->register($name, ScopingHttpClient::class)
                     ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference($httpClientId), $scopeConfig['base_uri'], $scopeConfig])
+                    ->setArguments([new Reference($httpClientId), $baseUri, $scopeConfig])
                     ->addTag('http_client.client')
                 ;
             } else {
@@ -1973,12 +1977,13 @@ class FrameworkExtension extends Extension
         }
 
         $classToServices = [
-            SesTransportFactory::class => 'mailer.transport_factory.amazon',
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',
-            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
+            MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
+            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
             PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
             SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
+            SesTransportFactory::class => 'mailer.transport_factory.amazon',
         ];
 
         foreach ($classToServices as $class => $service) {
