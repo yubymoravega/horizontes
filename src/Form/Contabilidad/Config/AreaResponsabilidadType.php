@@ -2,27 +2,26 @@
 
 namespace App\Form\Contabilidad\Config;
 
-use App\Entity\Contabilidad\Config\TipoMovimiento;
+use App\Entity\Contabilidad\Config\AreaResponsabilidad;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TipoMovimientoType extends AbstractType
+class AreaResponsabilidadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('codigo',TextType::class)
-            ->add('descripcion', TextType::class)
+            ->add('codigo')
+            ->add('nombre')
+
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => TipoMovimiento::class,
+            'data_class' => AreaResponsabilidad::class,
         ]);
     }
 }

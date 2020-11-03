@@ -294,7 +294,7 @@ class CuentaController extends AbstractController
         $form = $this->createForm(CuentaType::class, $cuenta);
         $form->handleRequest($request);
         $errors = $validator->validate($cuenta);
-        if ($form->isValid() && $form->isSubmitted()) {
+//        if ($form->isValid() && $form->isSubmitted()) {
             try {
                 $naturaleza = $request->get('cuenta')['deudora'];
                 $field_deudora = true;
@@ -321,7 +321,6 @@ class CuentaController extends AbstractController
                     }
                 }
                 //adiciono los nuevos criterios asociados a las cuentas
-
 
                 $id_criterio_uno = isset($request->get('cuenta')['id_criterio_uno']) ? $request->get('cuenta')['id_criterio_uno'] : '';
                 $id_criterio_dos = isset($request->get('cuenta')['id_criterio_dos']) ? $request->get('cuenta')['id_criterio_dos'] : '';
@@ -378,7 +377,7 @@ class CuentaController extends AbstractController
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
-        }
+//        }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
         return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
     }

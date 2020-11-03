@@ -10,6 +10,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoCuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
@@ -18,6 +19,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use Doctrine\ORM\EntityManager;
@@ -165,6 +167,7 @@ class AuxFunctions
         $user = $config['config']['user'];
         $alias = $config['config']['alias'];
         $password = $config['config']['password'];
+
         $transport = (new \Swift_SmtpTransport($host, $port))
             ->setUsername($user)
             ->setPassword($password);
@@ -300,6 +303,66 @@ class AuxFunctions
             'obligacion_acreedora' => true
         ));
         foreach ($arr_cuentas_acreedoras as $cuenta) {
+            /**@var $cuenta Cuenta */
+
+            //------aqui cargo las subcuentas de la cuenta
+            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                'activo' => true,
+                'id_cuenta' => $cuenta->getId()
+            ));
+            $rows = [];
+            if (!empty($arr_obj_subcuentas)) {
+                foreach ($arr_obj_subcuentas as $subcuenta) {
+                    /**@var $subcuenta Subcuenta* */
+                    $rows [] = array(
+                        'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                        'id' => $subcuenta->getId()
+                    );
+                }
+            }
+
+            $row_acreedoras [] = array(
+                'nro_cuenta' => trim($cuenta->getNroCuenta()) . ' - ' . trim($cuenta->getNombre()),
+                'id' => $cuenta->getId(),
+                'sub_cuenta' => $rows
+            );
+        }
+        return $row_acreedoras;
+    }
+    public static function getCuentasMovimientosEntradaActivoFijo($em)
+    {
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $row_acreedoras = array();
+        $row = [];
+
+        $tipo_capital_contable = $em->getRepository(TipoCuenta::class)->find(11);
+        $tipo_reguladora = $em->getRepository(TipoCuenta::class)->find(6);
+
+        $arr_cuentas_obligacion_acreedoras = $cuenta_er->findBy(array(
+            'activo' => true,
+            'obligacion_acreedora' => true
+        ));
+        $arr_cuentas_acreedoras = $cuenta_er->findBy(array(
+            'activo' => true,
+            'deudora' => false
+        ));
+        $arr_cuentas_capital_contable = $cuenta_er->findBy(array(
+            'activo' => true,
+            'id_tipo_cuenta' => $tipo_capital_contable
+        ));
+        $arr_cuentas_reguladora = $cuenta_er->findBy(array(
+            'activo' => true,
+            'id_tipo_cuenta' => $tipo_reguladora
+        ));
+
+        $row = array_merge($row,$arr_cuentas_obligacion_acreedoras);
+        $row = array_merge($row,$arr_cuentas_acreedoras);
+        $row = array_merge($row,$arr_cuentas_capital_contable);
+        $row = array_merge($row,$arr_cuentas_reguladora);
+
+        foreach ($row as $cuenta) {
             /**@var $cuenta Cuenta */
 
             //------aqui cargo las subcuentas de la cuenta
@@ -648,6 +711,91 @@ class AuxFunctions
             'nro_cuenta' => $nro_cuenta_acreedora,
             'nro_subcuenta' => $nro_subcuenta_acreedora,
             'analisis_1' => $cod_proveedor,
+            'analisis_2' => '', 'analisis_3' => '',
+            'debito' => '',
+            'credito' => number_format($total, 2)
+        );
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => '',
+            'nro_subcuenta' => '',
+            'analisis_1' => '',
+            'analisis_2' => '', 'analisis_3' => '',
+            'debito' => number_format($total, 2),
+            'credito' => number_format($total, 2),
+            'total' => $total
+
+        );
+        return $rows;
+    }
+
+    public static function getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        //informe recepcion mercancia
+        $obj_informe = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'producto' => true
+        ));
+        /**@var $obj_informe InformeRecepcion* */
+        $nro_doc = 'IRP' . '-' . $obj_informe->getNroConcecutivo();
+        $nro_cuenta_acreedora = $obj_informe->getNroCuentaAcreedora();
+        $nro_subcuenta_acreedora = $obj_informe->getNroSubcuentaAcreedora();
+        $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+        $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_documento' => $obj_documento,
+            'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+        ));
+        $total = 0;
+        //totalizar importe
+        $cuentas_ir = [];
+        foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+            $total += floatval($obj_movimiento_mercancia->getImporte());
+            /**@var $obj_movimiento_mercancia MovimientoProducto */
+            $nro_cuenta = $obj_movimiento_mercancia->getIdProducto()->getCuenta();
+            $sub_cuenta = $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario();
+            if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+            }
+        }
+        foreach ($cuentas_ir as $key => $cuenta) {
+            $parte = 0;
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoProducto */
+                if ($obj_movimiento_mercancia->getIdProducto()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario() == $cuenta) {
+                    $parte += floatval($obj_movimiento_mercancia->getImporte());
+                }
+            }
+            $dat = explode(':', $cuenta);
+            if ($key == 0)
+                $rows[] = array(
+                    'nro_doc' => $nro_doc,
+                    'fecha' => $fecha_doc,
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '', 'analisis_3' => '',
+                    'debito' => number_format($parte, 2),
+                    'credito' => ''
+                );
+            else
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $dat[0],
+                    'nro_subcuenta' => $dat[1],
+                    'analisis_1' => $cod_almacen,
+                    'analisis_2' => '', 'analisis_3' => '',
+                    'debito' => number_format($parte, 2),
+                    'credito' => ''
+                );
+        }
+        $rows[] = array(
+            'nro_doc' => '',
+            'fecha' => '',
+            'nro_cuenta' => $nro_cuenta_acreedora,
+            'nro_subcuenta' => $nro_subcuenta_acreedora,
+            'analisis_1' => $cod_almacen,
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => '',
             'credito' => number_format($total, 2)

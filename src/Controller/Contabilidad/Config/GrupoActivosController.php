@@ -3,9 +3,7 @@
 namespace App\Controller\Contabilidad\Config;
 
 use App\CoreContabilidad\AuxFunctions;
-use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\GrupoActivos;
-use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Form\Contabilidad\Config\GrupoActivosType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,11 +34,8 @@ class GrupoActivosController extends AbstractController
             $row [] = array(
                 'id' => $item->getId(),
                 'descripcion' => $item->getDescripcion(),
-                'por_ciento_deprecia_anno' => $item->getPorcientoDepreciaAnno(),
-                'id_cuenta' => $item->getIdCuenta()->getId(),
-                'nro_cuenta' => $item->getIdCuenta()->getNroCuenta(),
-                'id_subcuenta' => $item->getIdSubcuenta()->getId(),
-                'nro_subcuenta' => $item->getIdSubcuenta()->getNroSubcuenta(),
+                'codigo' => $item->getCodigo(),
+                'por_ciento_deprecia_anno' => $item->getPorcientoDepreciaAnno()
             );
         }
         return $this->render('contabilidad/config/grupo_activos/index.html.twig', [
@@ -49,6 +44,8 @@ class GrupoActivosController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
+
 
     /**
      * @Route("/add", name="contabilidad_config_grupo_activos_add", methods={"POST"})
@@ -60,7 +57,6 @@ class GrupoActivosController extends AbstractController
         /** @var GrupoActivos $grupo_activos */
         $grupo_activos = $form->getData();
         $errors = $validator->validate($grupo_activos);
-
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $grupo_activos->setActivo(true);

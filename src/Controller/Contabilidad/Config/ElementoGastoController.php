@@ -51,6 +51,7 @@ class ElementoGastoController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
     /**
      * @Route("/add", name="contabilidad_config_elemento_gasto_add",methods={"POST"})
      */

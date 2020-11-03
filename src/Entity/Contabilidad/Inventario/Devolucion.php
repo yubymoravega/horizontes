@@ -3,6 +3,8 @@
 namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Repository\Contabilidad\Inventario\DevolucionRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -60,6 +62,21 @@ class Devolucion
      * @ORM\Column(type="string", length=255)
      */
     private $nro_concecutivo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CentroCosto::class)
+     */
+    private $id_centro_costo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
+     */
+    private $id_elemento_gasto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
+     */
+    private $id_orden_tabajo;
 
     public function getId(): ?int
     {
@@ -158,6 +175,42 @@ class Devolucion
     public function setNroConcecutivo(string $nro_concecutivo): self
     {
         $this->nro_concecutivo = $nro_concecutivo;
+
+        return $this;
+    }
+
+    public function getIdCentroCosto(): ?CentroCosto
+    {
+        return $this->id_centro_costo;
+    }
+
+    public function setIdCentroCosto(?CentroCosto $id_centro_costo): self
+    {
+        $this->id_centro_costo = $id_centro_costo;
+
+        return $this;
+    }
+
+    public function getIdElementoGasto(): ?ElementoGasto
+    {
+        return $this->id_elemento_gasto;
+    }
+
+    public function setIdElementoGasto(?ElementoGasto $id_elemento_gasto): self
+    {
+        $this->id_elemento_gasto = $id_elemento_gasto;
+
+        return $this;
+    }
+
+    public function getIdOrdenTabajo(): ?OrdenTrabajo
+    {
+        return $this->id_orden_tabajo;
+    }
+
+    public function setIdOrdenTabajo(?OrdenTrabajo $id_orden_tabajo): self
+    {
+        $this->id_orden_tabajo = $id_orden_tabajo;
 
         return $this;
     }

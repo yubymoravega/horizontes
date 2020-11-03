@@ -14,6 +14,7 @@ use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Form\Contabilidad\Inventario\AjusteType;
@@ -218,35 +219,47 @@ class AjusteController extends AbstractController
                                 ->setIdMercancia($new_mercancia)
                                 ->setExistencia($cantidad_mercancia);
                         } else {
+                            $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
+                            $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
                             if ($obj_mercancia->getCuenta() == $cuenta_inventario) {
-                                if ($obj_mercancia->getActivo() == false) {
-                                    $obj_mercancia
-                                        ->setExistencia(0)
-                                        ->setActivo(true)
-                                        ->setImporte(0);
-                                    $em->persist($obj_mercancia);
-                                }
                                 /**@var $obj_mercancia Mercancia* */
-                                if ($obj_mercancia->getExistencia() == 0) {
-                                    $obj_mercancia
-                                        ->setExistencia($cantidad_mercancia)
-                                        ->setActivo(true)
-                                        ->setImporte($importe_mercancia);
-                                } else {
-                                    $existencia_actualizada = $obj_mercancia->getExistencia() + $cantidad_mercancia;
-                                    $importe_actualizado = floatval($obj_mercancia->getImporte() + floatval($importe_mercancia));
-                                    $obj_mercancia
-                                        ->setExistencia($existencia_actualizada)
-                                        ->setActivo(true)
-                                        ->setImporte($importe_actualizado);
-                                }
-                                $em->persist($obj_mercancia);
+                                $obj_mercancia
+                                    ->setExistencia($existencia_actualizada)
+                                    ->setActivo(true)
+//                                    ->setCuenta($cuenta_inventario)
+//                                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                                    ->setImporte($importe_actualizado);
+                                $movimiento_mercancia
+                                    ->setIdMercancia($obj_mercancia)
+                                    ->setExistencia($obj_mercancia->getExistencia());
+
                             } else {
-                                return new JsonResponse(['success' => false, 'msg' => 'Existen productos relacionada a cuentas de inventario diferente a la seleccionada.']);
+                                if($obj_mercancia->getExistencia()>0)
+                                    return new JsonResponse(['success' => false, 'msg' => 'La mercancia '.$obj_mercancia->getCodigo().' tiene existencia en almacén, no puede cambiar las cuentas.']);
+                                else{
+                                    //hago un duplicado de la mercancia porque debe estar en 0
+                                    $obj_mercancia->setActivo(false);
+                                    $nueva_mercancia_duplicada = new Mercancia();
+                                    $nueva_mercancia_duplicada
+                                        ->setIdUnidadMedida($obj_mercancia->getIdUnidadMedida())
+                                        ->setActivo(true)
+                                        ->setDescripcion($obj_mercancia->getDescripcion())
+                                        ->setExistencia($cantidad_mercancia)
+                                        ->setIdAmlacen($obj_mercancia->getIdAmlacen())
+                                        ->setCodigo($obj_mercancia->getCodigo())
+                                        ->setCuenta($cuenta_inventario)
+                                        ->setNroSubcuentaInventario($subcuenta_inventario)
+                                        ->setNroCuentaAcreedora($obj_mercancia->getNroCuentaAcreedora())
+                                        ->setNroSubcuentaAcreedora($obj_mercancia->getNroSubcuentaAcreedora())
+                                        ->setImporte(floatval($importe_mercancia));
+                                    $em->persist($nueva_mercancia_duplicada);
+                                    $movimiento_mercancia
+                                        ->setIdMercancia($nueva_mercancia_duplicada)
+                                        ->setExistencia($nueva_mercancia_duplicada->getExistencia());
+                                }
+
                             }
-                            $movimiento_mercancia
-                                ->setIdMercancia($obj_mercancia)
-                                ->setExistencia($obj_mercancia->getExistencia());
+                            $em->persist($obj_mercancia);
                         }
                         $em->persist($movimiento_mercancia);
                     }
@@ -401,22 +414,31 @@ class AjusteController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_ajuste_entrada_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $ajuste_entrada_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $ajuste_obj = $ajuste_entrada_er->findOneBy(array(
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $ajuste_arr = $ajuste_entrada_er->findBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => true,
+            'anno'=>$year_
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'AJUSTE DE ENTRADA',
-            'activo' => true
-        ));
+        /** @var Ajuste $element */
+        foreach ($ajuste_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $ajuste_obj = $element;
+        }
+
+        $obj_tipo_documento = $tipo_documento_er->find(3);
         $rows = [];
         $almacen = '';
         $observacion = '';
@@ -523,7 +545,7 @@ class AjusteController extends AbstractController
     /**
      * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_entrada_ajuste",methods={"GET","POST"})
      */
-    public function loadAjuste(EntityManagerInterface $em, $nro)
+    public function loadAjuste(EntityManagerInterface $em, Request $request, $nro)
     {
         $ajuste_entrada_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -531,11 +553,19 @@ class AjusteController extends AbstractController
         $cuentas = $em->getRepository(Cuenta::class);
         $subcuentas = $em->getRepository(Subcuenta::class);
 
-        $ajuste_obj = $ajuste_entrada_er->findOneBy(array(
-            'activo' => true,
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $ajuste_arr = $ajuste_entrada_er->findBy(array(
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => true,
+            'anno' => $today->format('Y')
         ));
+        /** @var Ajuste $ajuste */
+        foreach ($ajuste_arr as $ajuste) {
+            if ($ajuste->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $ajuste_obj = $ajuste;
+        }
 
         if (!$ajuste_obj) {
             return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de entrada no existe o fue cancelado.']);

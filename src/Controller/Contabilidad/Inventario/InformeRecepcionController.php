@@ -474,20 +474,32 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/print-report/{nro}", name="contabilidad_inventario_informe_recepcion_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $year_ = Date('Y');
-        $informe_obj = $informe_recepcion_er->findOneBy(array(
+
+        $obj_tipo_documento = $tipo_documento_er->find(1);
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $informe_arr = $informe_recepcion_er->findBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
             'producto' => false,
             'anno' => $year_
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->find(1);
+        /** @var InformeRecepcion $element */
+        foreach ($informe_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $informe_obj = $element;
+        }
+
         $rows = [];
         $almacen = '';
         $cod_proveedor = '';
@@ -610,19 +622,27 @@ class InformeRecepcionController extends AbstractController
     /**
      * @Route("/getInforme/{nro}", name="contabilidad_inventario_informe_recepcion_get_informe",methods={"POST"})
      */
-    public function getInforme(EntityManagerInterface $em, $nro)
+    public function getInforme(EntityManagerInterface $em,Request $request, $nro)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
         $cuenta_er = $em->getRepository(Cuenta::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
-        $year_ = Date('Y');
-        $informe_obj = $informe_recepcion_er->findOneBy(array(
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $informe_arr = $informe_recepcion_er->findBy(array(
             'nro_concecutivo' => $nro,
-            'anno' => $year_,
-            'producto' => false
+            'producto' => false,
+            'anno' => $today->format('Y')
         ));
+        /** @var InformeRecepcion $element */
+        foreach ($informe_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $informe_obj = $element;
+        }
 
         if (!$informe_obj) {
             return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de informe no existe.']);

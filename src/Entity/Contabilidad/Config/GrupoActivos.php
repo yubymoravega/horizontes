@@ -36,17 +36,10 @@ class GrupoActivos
      * @ORM\Column(type="boolean")
      */
     private $activo;
-
     /**
-     * @ORM\ManyToOne(targetEntity=Cuenta::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=255)
      */
-    private $id_cuenta;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Subcuenta::class)
-     */
-    private $id_subcuenta;
+    private $codigo;
 
     public function getId(): ?int
     {
@@ -89,26 +82,14 @@ class GrupoActivos
         return $this;
     }
 
-    public function getIdCuenta(): ?Cuenta
+    public function getCodigo(): ?string
     {
-        return $this->id_cuenta;
+        return $this->codigo;
     }
 
-    public function setIdCuenta(?Cuenta $id_cuenta): self
+    public function setCodigo(string $codigo): self
     {
-        $this->id_cuenta = $id_cuenta;
-
-        return $this;
-    }
-
-    public function getIdSubcuenta(): ?Subcuenta
-    {
-        return $this->id_subcuenta;
-    }
-
-    public function setIdSubcuenta(?Subcuenta $id_subcuenta): self
-    {
-        $this->id_subcuenta = $id_subcuenta;
+        $this->codigo = $codigo;
 
         return $this;
     }

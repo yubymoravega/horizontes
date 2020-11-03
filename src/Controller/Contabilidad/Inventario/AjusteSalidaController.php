@@ -166,6 +166,7 @@ class AjusteSalidaController extends AbstractController
                 $expediente = null;
                 // Verificar el criterio de analisis de EXP esta en esta cuenta
                 if ($codigo_exp != null) {
+                    $fecha_expediente = \DateTime::createFromFormat('Y-m-d', $today);
                     // Verificar si existe el Expediente sino hacerlo nuevo
                     $expediente = $expedienteRepository->findOneBy(['codigo' => $codigo_exp, 'anno' => $year_]);
                     if (!$expediente) {
@@ -173,6 +174,7 @@ class AjusteSalidaController extends AbstractController
                         $expediente->setCodigo($codigo_exp)
                             ->setDescripcion($descripcion_exp)
                             ->setIdUnidad($alamcen->getIdUnidad())
+                            ->setAnno($fecha_expediente->format('Y'))
                             ->setActivo(true);
                         $em->persist($expediente);
                     } else if ($descripcion_exp != $expediente->getDescripcion())
@@ -299,7 +301,7 @@ class AjusteSalidaController extends AbstractController
 //        $row_centro_costo = $em->getRepository(CentroCosto::class)->findBy(
 //            array('activo' => true, 'id_unidad' => $unidad)
 //        );
-        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM','GAT', 'EXP'],['deudora'=>true]);
+        $row_deudoras = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'GAT', 'EXP'], ['deudora' => true]);
         $monedas = $em->getRepository(Moneda::class)->findAll();
 
         $rows = [];
@@ -413,22 +415,31 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_ajuste_salida_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
-        $ajuste_salida_er = $em->getRepository(Ajuste::class);
+        $ajuste_entrada_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $ajuste_obj = $ajuste_salida_er->findOneBy(array(
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $ajuste_arr = $ajuste_entrada_er->findBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => false
+            'entrada' => false,
+            'anno'=>$year_
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'id' => self::$TIPO_DOC_AJUSTE_SALIDA,
-            'activo' => true
-        ));
+        /** @var Ajuste $element */
+        foreach ($ajuste_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $ajuste_obj = $element;
+        }
+
+        $obj_tipo_documento = $tipo_documento_er->find(4);
         $rows = [];
         $almacen = '';
         $observacion = '';
@@ -438,7 +449,7 @@ class AjusteSalidaController extends AbstractController
         $fecha_ajuste = '';
         if ($ajuste_obj && $obj_tipo_documento) {
             /** @var  $ajuste_obj Ajuste */
-            $almacen = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getCodigo().' - '.$ajuste_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $almacen = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getCodigo() . ' - ' . $ajuste_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $observacion = $ajuste_obj->getObservacion();
             $fecha_ajuste = $ajuste_obj->getIdDocumento()->getFecha()->format('d/m/Y');
             $nro_solicitud = $ajuste_obj->getNroConcecutivo();
@@ -452,7 +463,7 @@ class AjusteSalidaController extends AbstractController
                 /** @var  $mov_mercancia MovimientoMercancia */
                 /** @var Unidad $obj_unidad */
                 $obj_unidad = $ajuste_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad();
-                $unidad = $obj_unidad->getCodigo().' - '.$obj_unidad->getNombre();
+                $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
                     /**@var $obj MovimientoMercancia* */
                     $rows[] = array(
@@ -489,18 +500,18 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_ajuste_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em, Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
         /** @var Unidad $obj_unidad */
         $obj_unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad();
-        $unidad = $obj_unidad->getCodigo().' - '.$obj_unidad->getNombre();
+        $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
         $rows = [];
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
-        $arr_fecha_contable = explode('-',$fecha_contable);
+        $fecha_contable = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha_contable = explode('-', $fecha_contable);
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
@@ -520,7 +531,7 @@ class AjusteSalidaController extends AbstractController
                 'almacen' => $request->getSession()->get('selected_almacen/name'),
                 'observacion' => $datos['observacion'],
                 'unidad' => $unidad,
-                'fecha_ajuste' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
+                'fecha_ajuste' => $arr_fecha_contable[2] . '/' . $arr_fecha_contable[1] . '/' . $arr_fecha_contable[0],
                 'nro_solicitud' => $nro,
             ),
             'mercancias' => $rows,
@@ -531,7 +542,7 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/load-ajuste/{nro}", name="contabilidad_inventario_load_salida_ajuste",methods={"GET","POST"})
      */
-    public function loadAjuste(EntityManagerInterface $em, $nro)
+    public function loadAjuste(EntityManagerInterface $em, Request $request, $nro)
     {
         $ajuste_salida_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -539,11 +550,19 @@ class AjusteSalidaController extends AbstractController
         $cuentas = $em->getRepository(Cuenta::class);
         $subcuentas = $em->getRepository(Subcuenta::class);
 
-        $ajuste_obj = $ajuste_salida_er->findOneBy(array(
-            'activo' => true,
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $ajuste_arr = $ajuste_salida_er->findBy(array(
             'nro_concecutivo' => $nro,
-            'entrada' => false
+            'entrada' => false,
+            'anno' => $today->format('Y')
         ));
+        /** @var Ajuste $ajuste */
+        foreach ($ajuste_arr as $ajuste) {
+            if ($ajuste->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $ajuste_obj = $ajuste;
+        }
 
         if (!$ajuste_obj) {
             return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro del ajuste de salida no existe o fue cancelado.']);

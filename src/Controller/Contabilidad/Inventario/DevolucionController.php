@@ -5,7 +5,9 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
@@ -16,10 +18,12 @@ use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Form\Contabilidad\Inventario\DevolucionType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Inventario\DevolucionRepository;
+use App\Repository\Contabilidad\Inventario\OrdenTrabajoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -108,6 +112,25 @@ class DevolucionController extends AbstractController
                     ->setIdAlmacen($almacen)
                     ->setActivo(true);
 
+                if(isset($devolucion['id_centro_costo'])){
+                    $centro_costo = $em->getRepository(CentroCosto::class)->find($devolucion['id_centro_costo']);
+                    $devolucion_obj
+                        ->setIdCentroCosto($centro_costo);
+                }
+                if(isset($devolucion['id_elemento_gasto'])){
+                    $elemento_gasto = $em->getRepository(ElementoGasto::class)->find($devolucion['id_elemento_gasto']);
+                    $devolucion_obj
+                        ->setIdElementoGasto($elemento_gasto);
+                }
+                if(isset($devolucion['cod_ot'])){
+                    $ot = $em->getRepository(OrdenTrabajo::class)->findOneBy([
+                        'codigo'=>$devolucion['cod_ot'],
+                        'id_almacen'=>$almacen,
+                        'id_unidad'=>$almacen->getIdUnidad()
+                    ]);
+                    $devolucion_obj
+                        ->setIdOrdenTabajo($ot);
+                }
                 $em->persist($devolucion_obj);
 
                 /**
@@ -249,11 +272,11 @@ class DevolucionController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
+        $row_acreedoras = AuxFunctions::getCuentasProduccion($em);
 
         $monedas = $em->getRepository(Moneda::class)->findAll();
         $rows = [];
-        if ($monedas) {
+        if (!empty($monedas)) {
             foreach ($monedas as $item) {
                 /**@var $item Moneda */
                 $rows [] = array(
@@ -262,11 +285,41 @@ class DevolucionController extends AbstractController
                 );
             }
         }
+        $elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
+        $rows_elemento_gasto = [];
+        if (!empty($elemento_gasto)) {
+            foreach ($elemento_gasto as $eg) {
+                /**@var $eg ElementoGasto */
+                $rows_elemento_gasto [] = array(
+                    'id' => $eg->getId(),
+                    'nombre' => $eg->getCodigo().' - '. $eg->getDescripcion()
+                );
+            }
+        }
+
+        $user = $this->getUser();
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_usuario'=>$user]);
+        $rows_centro_costo = [];
+        if($empleado){
+            $centro_costo_arr = $em->getRepository(CentroCosto::class)->findBy(['id_unidad'=>$empleado->getIdUnidad()]);
+            if(!empty($centro_costo_arr)){
+                /** @var CentroCosto $cc */
+                foreach ($centro_costo_arr as $cc){
+                    $rows_centro_costo[]=array(
+                        'id'=>$cc->getId(),
+                        'nombre'=>$cc->getCodigo().' - '.$cc->getNombre()
+                    );
+                }
+            }
+        }
 
         return new JsonResponse([
             'cuentas_inventario' => $row_inventario,
             'cuentas_acreedoras' => $row_acreedoras,
             'monedas' => $rows,
+            'elemento_gasto' => $rows_elemento_gasto,
+            'centro_costo' => $rows_centro_costo,
             'success' => true
         ]);
     }
@@ -354,7 +407,7 @@ class DevolucionController extends AbstractController
     /**
      * @Route("/load-devolucion/{nro}", name="contabilidad_inventario_load_devolucion",methods={"GET","POST"})
      */
-    public function load(EntityManagerInterface $em, $nro)
+    public function load(EntityManagerInterface $em,Request $request, $nro)
     {
         $devolucion_er = $em->getRepository(Devolucion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -365,8 +418,8 @@ class DevolucionController extends AbstractController
         $devolucion_obj = $devolucion_er->findOneBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
+            'id_almacen'=>$request->getSession()->get('selected_almacen/id')
         ));
-
         if (!$devolucion_obj) {
             return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro de la Devolución no existe o fue Cancelada.']);
         }
@@ -406,7 +459,11 @@ class DevolucionController extends AbstractController
             'id_moneda' => $devolucion_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $devolucion_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,
-            'mercancias' => $rows_movimientos
+            'mercancias' => $rows_movimientos,
+            'cod_ot'=>$devolucion_obj->getIdOrdenTabajo()?$devolucion_obj->getIdOrdenTabajo()->getCodigo():'',
+            'desc_ot'=>$devolucion_obj->getIdOrdenTabajo()?$devolucion_obj->getIdOrdenTabajo()->getDescripcion():'',
+            'centro_costo'=>$devolucion_obj->getIdCentroCosto()?$devolucion_obj->getIdCentroCosto()->getCodigo().' - '.$devolucion_obj->getIdCentroCosto()->getNombre():'',
+            'elemento_gasto'=>$devolucion_obj->getIdElementoGasto()?$devolucion_obj->getIdElementoGasto()->getCodigo().' - '.$devolucion_obj->getIdElementoGasto()->getDescripcion():'',
         );
         return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'devolución cargada con éxito.']);
     }
@@ -414,16 +471,27 @@ class DevolucionController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_devolucion_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $devolucion_er = $em->getRepository(Devolucion::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $devolucion_obj = $devolucion_er->findOneBy(array(
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $devolucion_arr = $devolucion_er->findBy(array(
             'activo' => true,
-            'nro_concecutivo' => $nro
+            'nro_concecutivo' => $nro,
+            'anno'=>$year_
         ));
+        /** @var Devolucion $element */
+        foreach ($devolucion_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $devolucion_obj = $element;
+        }
 
         $obj_tipo_documento = $tipo_documento_er->find(9);
         $rows = [];
@@ -521,5 +589,31 @@ class DevolucionController extends AbstractController
 
     }
 
+    /**
+     * @Route("/dinamic-files/{nro}", name="contabilidad_inventario_devolucion_dinamic",methods={"GET","POST"})
+     */
+    public function dinamic(EntityManagerInterface $em, $nro)
+    {
+        $no_cuenta = AuxFunctions::getNro($nro);
+        $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
+
+        return new JsonResponse(['data' => $respuesta, 'success' => true]);
+
+    }
+
+    /**
+     * @Route("/get-orden-trabajo/{codigo}")
+     */
+    public function getOrden($codigo, Request $request,
+                             OrdenTrabajoRepository $ordenTrabajoRepository,
+                             AlmacenRepository $almacenRepository)
+    {
+        $almacen = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')]);
+        $orden = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo, 'id_almacen' => $almacen]);
+        if ($orden) {
+            return new JsonResponse(['data' => $orden->getDescripcion(), 'success' => true]);
+        }
+        return new JsonResponse(['data' => null, 'success' => false]);
+    }
 
 }

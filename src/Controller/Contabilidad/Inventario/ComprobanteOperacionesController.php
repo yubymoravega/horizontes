@@ -158,7 +158,8 @@ class ComprobanteOperacionesController extends AbstractController
                 $rows = array_merge($rows, $datos_informe);
             } //informe recepcion producto
             elseif ($id_tipo_documento == 2) {
-
+                $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_informe);
             } //Ajuste de entrada
             elseif ($id_tipo_documento == 3) {
                 $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);

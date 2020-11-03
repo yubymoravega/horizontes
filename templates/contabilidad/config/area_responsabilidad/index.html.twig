@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Tipos de Movimiento de Activos Fijos
+                Area de Responsabilidad
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
@@ -24,37 +24,38 @@
         </div>
         {# end header #}
 
-        {# Modal de adicionar#}
-
-        {{ include('contabilidad/config/tipo_movimiento/form_modal.html.twig',{title: 'Adicionar'}) }}
+        {{ include('contabilidad/config/area_responsabilidad/form_modal.html.twig', {title: 'Adicionar Area de Responsabilidad'}) }}
 
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-1">Código</th>
-            <th scope="col-2">Descripción</th>
+            <th width="200px">Código</th>
+            <th scope="col-6">Nombre</th>
+            <th scope="col-3" hidden>Unidad</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
-            {% for item in tipo_movimiento %}
+            {% for item in area_responsabilidad %}
                 <tr>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
-                    <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;" hidden>{{ item.unidad }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
+                                        id_unidad: '{{ item.id_unidad }}',
                                         codigo:'{{ item.codigo }}',
-                                        descripcion:'{{ item.descripcion }}' ,
+                                        nombre:'{{ item.nombre }}' ,
                                         id: '{{ item.id }}'
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-danger btn-sm ml-2" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar el tipo de movimiento: {{ item.codigo }} ?',
-                                        url:'{{ path('contabilidad_config_tipo_movimiento_delete',{id: item.id}) }}',
+                                        message:'Está seguro que desea eliminar el área de responsabilidad: {{ item.nombre }} ?',
+                                        url:'{{ path('contabilidad_config_area_responsabilidad_delete',{id: item.id}) }}',
                                         _token: '{{ csrf_token('delete' ~ item.id) }}'
                                         })">
                             <i class="fa fa-trash"></i>
@@ -71,6 +72,8 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        const TEXT_SELECT = '... seleccione ...';
+
         function mostrarBtn() {
             $('#modal__btn__actualizar').hide()
             $('#modal__btn__aceptar').show()
@@ -80,18 +83,20 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {id = '', codigo = '', descripcion = ''} = config
+            const {id = '', codigo = '', nombre = '',id_unidad = ''} = config
 
             $('#modal__form__id').modal('show')
-            $('#modal__form__label__id').text("Modificar " + descripcion)
+            $('#modal__form__label__id').text("Modificar " + nombre)
 
-            $('#tipo_movimiento_descripcion').val(descripcion)
-            $('#tipo_movimiento_codigo').val(codigo)
-            $('#id_tipo_movimiento').val(id)
+            // nombre, codigo, id
+            $('#area_responsabilidad_nombre').val(nombre)
+            $('#area_responsabilidad_codigo').val(codigo)
+            // $('#area_responsabilidad_id_unidad').val(id_unidad)
+            $('#id_area_responsabilidad').val(id)
         }
 
         $(document).ready(function () {
-            // init
+            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
             $('#modal__btn__actualizar').hide()
 
             // validacion del formulario
@@ -111,39 +116,38 @@
                     }
                 },
                 rules: {
-                    'tipo_movimiento[descripcion]': "required",
-                    'tipo_movimiento[codigo]': "required",
+                    'area_responsabilidad[nombre]': "required",
+                    'area_responsabilidad[codigo]': "required",
+                    // 'area_responsabilidad[id_unidad]': "required",
                 },
                 messages: {
-                    'tipo_movimiento[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'tipo_movimiento[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'area_responsabilidad[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'area_responsabilidad[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    // 'area_responsabilidad[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
 
             $('#modal__btn__aceptar').on('click', function () {
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/tipo-movimiento/add`)
+                formulario.attr('action', `/contabilidad/config/area-responsabilidad/add`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
-
-                const id_tipo_movimiento = $('#id_tipo_movimiento').val()
+                const id_area_responsabilidad = $('#id_area_responsabilidad').val()
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/tipo-movimiento/upd/${id_tipo_movimiento}`)
+                formulario.attr('action', `/contabilidad/config/area-responsabilidad/${id_area_responsabilidad}`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
-
-            $('#gestionartipo_movimientoModal').on('show.bs.modal', function (event) {
+            $('#modal__form__id').on('show.bs.modal', function (event) {
                 validateForm.resetForm()
-                $('#modal__form__label__id').text('Adicionar tipo de movimiento')
+                $('#modal__form__label__id').text('Adicionar Area de Responsabilidad')
             })
         })
     </script>
 {% endblock %}
-

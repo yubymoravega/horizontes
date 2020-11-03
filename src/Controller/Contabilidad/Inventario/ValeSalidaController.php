@@ -357,17 +357,20 @@ class ValeSalidaController extends AbstractController
         $vale_salida_er = $em->getRepository(ValeSalida::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $documento_er = $em->getRepository(Documento::class);
-        $almacen_er = $em->getRepository(Almacen::class);
-        $year_ = Date('Y');
-        $alamcen = $request->getSession()->get('alamcen/id');
-        $documento_obj = $documento_er->findBy(['id_almacen' => $almacen_er->find($alamcen), 'id_tipo_documento' => $tipo_documento_er->find(7), 'anno' => $year_]);
-        $vale_obj = $vale_salida_er->findOneBy(array(
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $elements_arr = $vale_salida_er->findBy(array(
             'nro_consecutivo' => $nro,
             'producto' => false,
-            'anno' => $year_
+            'anno' => $today->format('Y')
         ));
-
+        /** @var ValeSalida $element */
+        foreach ($elements_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $vale_obj = $element;
+        }
 
         if (!$vale_obj) {
             return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de vale no existe.']);
@@ -489,17 +492,29 @@ class ValeSalidaController extends AbstractController
      * @Route("/print-report/{nro}", name="contabilidad_inventario_vale_salida_print",methods={"GET"})
      */
     public
-    function print(EntityManagerInterface $em, $nro)
+    function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $year_ = Date('Y');
-        $vale_salida_obj = $vale_salida_er->findOneBy(array(
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $vale_salida_arr = $vale_salida_er->findBy(array(
             'nro_consecutivo' => $nro,
             'producto' => false,
             'anno' => $year_
         ));
+
+        /** @var ValeSalida $element */
+        foreach ($vale_salida_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $vale_salida_obj = $element;
+        }
+
 
         $obj_tipo_documento = $tipo_documento_er->find(7);
         $rows = [];

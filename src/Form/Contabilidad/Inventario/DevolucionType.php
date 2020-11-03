@@ -6,6 +6,7 @@ use App\CoreContabilidad\AuxFunctions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\EntityManagerInterface;
@@ -46,6 +47,24 @@ class DevolucionType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Cuenta acreedora',
                 'choice_label' => 'nro_cuenta',
+            ))
+            ->add('id_centro_costo', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Centro costo',
+                'choice_label' => 'codigo',
+            ))
+            ->add('id_elemento_gasto', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Elemento de gasto',
+                'choice_label' => 'codigo',
+            ))
+            ->add('cod_ot', TextType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Código OT'
+            ))
+            ->add('desc_ot', TextType::class, array(
+                'attr' => ['class' => 'w-100', 'readonly'=>true],
+                'label' => 'Descripción OT'
             ))
             ->add('list_mercancia', HiddenType::class);
     }

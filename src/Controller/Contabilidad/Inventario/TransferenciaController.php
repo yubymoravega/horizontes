@@ -17,6 +17,7 @@ use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\TransferenciaType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
@@ -324,7 +325,7 @@ class TransferenciaController extends AbstractController
                 if ($item->getId() != $obj_almacen->getId())
                     $rows_almcen [] = array(
                         'id' => $item->getId(),
-                        'nombre' => $item->getCodigo().' - '.$item->getDescripcion()
+                        'nombre' => $item->getCodigo() . ' - ' . $item->getDescripcion()
                     );
             }
         }
@@ -441,17 +442,29 @@ class TransferenciaController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $transferencia_entrada_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $transferencia_arr = $transferencia_entrada_er->findBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => true,
+            'anno'=>$year_
         ));
+
+        /** @var Transferencia $element */
+        foreach ($transferencia_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $transferencia_obj = $element;
+        }
 
         $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
         $rows = [];
@@ -558,7 +571,7 @@ class TransferenciaController extends AbstractController
     /**
      * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia",methods={"GET","POST"})
      */
-    public function loadTranferencia(EntityManagerInterface $em, $nro)
+    public function loadTranferencia(EntityManagerInterface $em, Request $request, $nro)
     {
         $transferencia_entrada_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -566,11 +579,19 @@ class TransferenciaController extends AbstractController
         $cuentas = $em->getRepository(Cuenta::class);
         $subcuentas = $em->getRepository(Subcuenta::class);
 
-        $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
-            'activo' => true,
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $elements_arr = $transferencia_entrada_er->findBy(array(
             'nro_concecutivo' => $nro,
-            'entrada' => true
+            'entrada' => true,
+            'anno' => $today->format('Y')
         ));
+        /** @var Transferencia $element */
+        foreach ($elements_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $transferencia_obj = $element;
+        }
 
         if (!$transferencia_obj) {
             return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro de la Tranferencia no existe o fue Cancelada.']);
@@ -606,8 +627,8 @@ class TransferenciaController extends AbstractController
             'id' => $transferencia_obj->getId(),
             'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuenta_acred->getNombre(),
             'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuenta_acred->getDescripcion(),
-            'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo().' - '.$transferencia_obj->getIdUnidad()->getNombre() : '',
-            'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo().' - '.$transferencia_obj->getIdAlmacen()->getDescripcion() : '',
+            'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo() . ' - ' . $transferencia_obj->getIdUnidad()->getNombre() : '',
+            'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
             'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,

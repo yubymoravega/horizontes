@@ -387,17 +387,29 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_salida_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
-        $transferencia_salida_er = $em->getRepository(Transferencia::class);
+        $transferencia_entrada_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $transferencia_obj = $transferencia_salida_er->findOneBy(array(
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $transferencia_arr = $transferencia_entrada_er->findBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
-            'entrada' => false
+            'entrada' => false,
+            'anno'=>$year_
         ));
+
+        /** @var Transferencia $element */
+        foreach ($transferencia_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $transferencia_obj = $element;
+        }
 
         $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_SALIDA);
         $rows = [];
@@ -508,18 +520,26 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia_salida",methods={"GET","POST"})
      */
-    public function loadTranferencia(EntityManagerInterface $em, $nro,
+    public function loadTranferencia(EntityManagerInterface $em, Request $request, $nro,
                                      CuentaRepository $cuentas, SubcuentaRepository $subcuentas)
     {
         $transferencia_salida_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $transferencia_obj = $transferencia_salida_er->findOneBy(array(
-            'activo' => true,
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $elements_arr = $transferencia_salida_er->findBy(array(
             'nro_concecutivo' => $nro,
-            'entrada' => false
+            'entrada' => false,
+            'anno' => $today->format('Y')
         ));
+        /** @var Transferencia $element */
+        foreach ($elements_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $transferencia_obj = $element;
+        }
 
         if (!$transferencia_obj) {
             return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro de la Tranferencia no existe o fue Cancelada.']);

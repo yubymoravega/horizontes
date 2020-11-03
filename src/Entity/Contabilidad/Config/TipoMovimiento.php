@@ -31,6 +31,11 @@ class TipoMovimiento
      */
     private $activo;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $codigo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -56,6 +61,18 @@ class TipoMovimiento
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getCodigo(): ?string
+    {
+        return $this->codigo;
+    }
+
+    public function setCodigo(string $codigo): self
+    {
+        $this->codigo = $codigo;
 
         return $this;
     }

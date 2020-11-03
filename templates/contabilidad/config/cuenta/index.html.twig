@@ -113,7 +113,7 @@
             $('#modal__btn__actualizar').hide()
             let ids = ['id_criterio_uno', 'id_criterio_dos', 'id_criterio_tres', 'id_criterio_cuatro','id_tipo_cuenta']
             for (let i = 0; i < ids.length; i++) {
-                $("#cuenta_" + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $("#cuenta_" + ids[i]).prepend('<option selected = "false" value = "0"> -- seleccione -- </option>');
             }
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({

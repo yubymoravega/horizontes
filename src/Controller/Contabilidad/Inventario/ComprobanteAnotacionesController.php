@@ -95,6 +95,7 @@ class ComprobanteAnotacionesController extends AbstractController
         }
         return $rows;
     }
+
     public function getDataEntrada($request, $em)
     {
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -118,7 +119,8 @@ class ComprobanteAnotacionesController extends AbstractController
                 $rows = array_merge($rows, $datos_informe);
             } //informe recepcion producto
             elseif ($id_tipo_documento == 2) {
-
+                $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_informe);
             } //Ajuste de entrada
             elseif ($id_tipo_documento == 3) {
                 $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
@@ -135,6 +137,7 @@ class ComprobanteAnotacionesController extends AbstractController
         }
         return $rows;
     }
+
     public function getDataSalida($request, $em)
     {
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
@@ -183,8 +186,8 @@ class ComprobanteAnotacionesController extends AbstractController
 
         $rows = $this->getDataEntrada($request, $em);
         $total = 0;
-        foreach ($rows as $d){
-            if(isset($d['total'])){
+        foreach ($rows as $d) {
+            if (isset($d['total'])) {
                 $total += floatval($d['total']);
             }
         }
@@ -197,12 +200,12 @@ class ComprobanteAnotacionesController extends AbstractController
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
-            'total'=>$total
+            'total' => $total
         );
         $paginator = $pagination->paginate(
             $rows,
             $request->query->getInt('page', $request->get("page") || 1), /*page number*/
-            15, /*limit per page*/
+            30, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
         return $this->render('contabilidad/inventario/comprobante_anotaciones/print.html.twig', [
@@ -212,6 +215,7 @@ class ComprobanteAnotacionesController extends AbstractController
             'estado' => ' de Entrada'
         ]);
     }
+
     /**
      * @Route("/salida/print", name="contabilidad_inventario_comprobante_anotaciones_print_salida")
      */
@@ -219,9 +223,9 @@ class ComprobanteAnotacionesController extends AbstractController
     {
         $rows = $this->getDataSalida($request, $em);
         $total = 0;
-        foreach ($rows as $d){
-            if(isset($d['total'])){
-                $total+= floatval($d['total']);
+        foreach ($rows as $d) {
+            if (isset($d['total'])) {
+                $total += floatval($d['total']);
             }
         }
         $rows[] = array(
@@ -233,7 +237,7 @@ class ComprobanteAnotacionesController extends AbstractController
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
-            'total'=>$total
+            'total' => $total
         );
 
         $paginator = $pagination->paginate(
@@ -242,7 +246,7 @@ class ComprobanteAnotacionesController extends AbstractController
             15, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
-          //dd($total);
+        //dd($total);
 
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         /** @var Almacen $almacen_obj */

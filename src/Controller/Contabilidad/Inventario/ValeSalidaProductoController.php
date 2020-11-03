@@ -14,6 +14,7 @@ use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
@@ -461,17 +462,28 @@ class ValeSalidaProductoController extends AbstractController
     /**
      * @Route("/print-report/{nro}", name="contabilidad_inventario_vale_salida_producto_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $nro)
+    function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $vale_salida_er = $em->getRepository(ValeSalida::class);
-        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $year_ = Date('Y');
-        $vale_salida_obj = $vale_salida_er->findOneBy(array(
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $vale_salida_arr = $vale_salida_er->findBy(array(
             'nro_consecutivo' => $nro,
             'producto' => true,
             'anno' => $year_
         ));
+
+        /** @var ValeSalida $element */
+        foreach ($vale_salida_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $vale_salida_obj = $element;
+        }
 
         $obj_tipo_documento = $tipo_documento_er->find(8);
         $rows = [];
