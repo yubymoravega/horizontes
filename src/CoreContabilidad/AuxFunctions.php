@@ -330,6 +330,59 @@ class AuxFunctions
         }
         return $row_acreedoras;
     }
+
+    public static function getCuentasByTipo(EntityManagerInterface $em, array $tipos)
+    {
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $tipo_cuenta_er = $em->getRepository(TipoCuenta::class);
+
+        /** 1- Obtener las cuentas que cumplan con al menos 1 criterio de los contenidos en $criterios ***/
+        $cuentas_by_tipos = [];
+        if (!empty($tipos)) {
+            foreach ($tipos as $id) {
+                $obj_tipo_cuenta = $tipo_cuenta_er->find($id);
+                if ($obj_tipo_cuenta) {
+                    $arr_cuentas = $cuenta_er->findBy([
+                        'activo' => true,
+                        'id_tipo_cuenta' => $obj_tipo_cuenta
+                    ]);
+                    /** @var Cuenta $item */
+                    foreach ($arr_cuentas as $item) {
+                        //busco las subcuentas de la cuenta seleccionada
+                        $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                            'activo' => true,
+                            'id_cuenta' => $item
+                        ));
+                        $rows = [];
+                        if (!empty($arr_obj_subcuentas)) {
+                            foreach ($arr_obj_subcuentas as $subcuenta) {
+                                /**@var $subcuenta Subcuenta* */
+                                $rows [] = array(
+                                    'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                                    'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                                    'id' => $subcuenta->getId()
+                                );
+                            }
+                        }
+                        // en rows tengo todas las subcuentas
+
+                        //verifico que no este repetida
+                        $array_to_insert = array(
+                            'nro_cuenta' => trim($item->getNroCuenta()) . ' - ' . trim($item->getNombre()),
+                            'id_cuenta' => trim($item->getId()),
+                            'sub_cuenta' => $rows
+                        );
+                        if (!in_array($array_to_insert, $cuentas_by_tipos))
+                            $cuentas_by_tipos [] = $array_to_insert;
+
+                    }
+                }
+            }
+        }
+        return $cuentas_by_tipos;
+    }
+
     public static function getCuentasMovimientosEntradaActivoFijo($em)
     {
         $cuenta_er = $em->getRepository(Cuenta::class);
@@ -357,10 +410,10 @@ class AuxFunctions
             'id_tipo_cuenta' => $tipo_reguladora
         ));
 
-        $row = array_merge($row,$arr_cuentas_obligacion_acreedoras);
-        $row = array_merge($row,$arr_cuentas_acreedoras);
-        $row = array_merge($row,$arr_cuentas_capital_contable);
-        $row = array_merge($row,$arr_cuentas_reguladora);
+        $row = array_merge($row, $arr_cuentas_obligacion_acreedoras);
+        $row = array_merge($row, $arr_cuentas_acreedoras);
+        $row = array_merge($row, $arr_cuentas_capital_contable);
+        $row = array_merge($row, $arr_cuentas_reguladora);
 
         foreach ($row as $cuenta) {
             /**@var $cuenta Cuenta */
@@ -509,6 +562,28 @@ class AuxFunctions
         if (!empty($arr))
             return $arr[0];
         return '';
+    }
+
+    public static function getPaises()
+    {
+        $arr_paises = ['AUSTRIA', 'BELGICA', 'BULGARIA', 'CHIPRE', 'DINAMARCA', 'ESPAÑA', 'FINLANDIA', 'FRANCIA', 'GRECIA', 'HUNGRIA', 'IRLANDA', 'ITALIA', 'LUXEMBURGO', 'MALTA',
+            'PAISES BAJOS', 'POLONIA', 'PORTUGAL', 'REINO UNIDO', 'ALEMANIA', 'RUMANIA', 'SUECIA', 'LETONIA', 'ESTONIA', 'LITUANIA', 'REPUBLICA CHECA', 'REPUBLICA ESLOVACA',
+            'ESLOVENIA', 'ALBANIA', 'ISLANDIA', 'LIECHTENSTEIN', 'MONACO', 'NORUEGA', 'ANDORRA', 'SAN MARINO', 'SANTA SEDE', 'SUIZA', 'UCRANIA', 'MOLDAVIA', 'BELARUS', 'GEORGIA', 'BOSNIA Y HERZEGOVINA',
+            'CROACIA', 'ARMENIA', 'RUSIA', 'MACEDONIA', 'SERBIA', 'MONTENEGRO', 'GUERNESEY', 'SVALBARD Y JAN MAYEN', 'ISLAS FEROE', 'ISLA DE MAN', 'GIBRALTAR', 'ISLAS DEL CANAL', 'JERSEY', 'ISLAS ALAND',
+            'TURQUIA', 'BURKINA FASO', 'ANGOLA', 'ARGELIA', 'BENIN', 'BOTSWANA', 'BURUNDI', 'CABO VERDE', 'CAMERUN', 'COMORES', 'CONGO', 'COSTA DE MARFIL', 'DJIBOUTI', 'EGIPTO', 'ETIOPIA', 'GABON', 'GAMBIA',
+            'GHANA', 'GUINEA', 'GUINEA-BISSAU', 'GUINEA ECUATORIAL', 'KENIA', 'LESOTHO', 'LIBERIA', 'LIBIA', 'MADAGASCAR', 'MALAWI', 'MALI', 'MARRUECOS', 'MAURICIO', 'MAURITANIA', 'MOZAMBIQUE', 'NAMIBIA',
+            'NIGER', 'NIGERIA', 'REPUBLICA CENTROAFRICANA', 'SUDAFRICA', 'RUANDA', 'SANTO TOME Y PRINCIPE', 'SENEGAL', 'SEYCHELLES', 'SIERRA LEONA', 'SOMALIA', 'SUDAN', 'SWAZILANDIA', 'TANZANIA', 'CHAD', 'TOGO',
+            'TUNEZ', 'UGANDA', 'REP.DEMOCRATICA DEL CONGO', 'ZAMBIA', 'ZIMBABWE', 'ERITREA', 'SANTA HELENA', 'REUNION', 'MAYOTTE', 'SAHARA OCCIDENTAL', 'CANADA', 'ESTADOS UNIDOS DE AMERICA', 'MEXICO', 'SAN PEDRO Y MIQUELON',
+            'GROENLANDIA', 'ANTIGUA Y BARBUDA', 'BAHAMAS', 'BARBADOS', 'BELICE', 'COSTA RICA', 'CUBA', 'DOMINICA', 'EL SALVADOR', 'GRANADA', 'GUATEMALA', 'HAITI', 'HONDURAS', 'JAMAICA', 'NICARAGUA', 'PANAMA', 'SAN VICENTE Y LAS GRANADINAS',
+            'REPUBLICA DOMINICANA', 'TRINIDAD Y TOBAGO', 'SANTA LUCIA', 'SAN CRISTOBAL Y NIEVES', 'ISLAS CAIMÁN', 'ISLAS TURCAS Y CAICOS', 'ISLAS VÍRGENES DE LOS ESTADOS UNIDOS', 'GUADALUPE', 'ANTILLAS HOLANDESAS', 'SAN MARTIN (PARTE FRANCESA)',
+            'ARUBA', 'MONTSERRAT', 'ANGUILLA', 'SAN BARTOLOME', 'MARTINICA', 'PUERTO RICO', 'BERMUDAS', 'ISLAS VIRGENES BRITANICAS', 'ARGENTINA', 'BOLIVIA', 'BRASIL', 'COLOMBIA', 'CHILE', 'ECUADOR', 'GUYANA', 'PARAGUAY', 'PERU', 'SURINAM', 'URUGUAY', 'VENEZUELA',
+            'GUAYANA FRANCESA', 'ISLAS MALVINAS', 'AFGANISTAN', 'ARABIA SAUDI', 'BAHREIN', 'BANGLADESH', 'MYANMAR', 'CHINA', 'EMIRATOS ARABES UNIDOS', 'FILIPINAS', 'INDIA', 'INDONESIA', 'IRAQ', 'IRAN', 'ISRAEL', 'JAPON', 'JORDANIA', 'CAMBOYA', 'KUWAIT', 'LAOS', 'LIBANO',
+            'MALASIA', 'MALDIVAS', 'MONGOLIA', 'NEPAL', 'OMAN', 'PAKISTAN', 'QATAR', 'COREA', 'COREA DEL NORTE', 'SINGAPUR', 'SIRIA', 'SRI LANKA', 'TAILANDIA', 'VIETNAM', 'BRUNEI', 'ISLAS MARSHALL', 'YEMEN', 'AZERBAIYAN', 'KAZAJSTAN', 'KIRGUISTAN', 'TADYIKISTAN', 'TURKMENISTAN',
+            'UZBEKISTAN', 'ISLAS MARIANAS DEL NORTE', 'PALESTINA', 'HONG KONG', 'BHUTÁN', 'GUAM', 'MACAO', 'AUSTRALIA', 'FIJI', 'NUEVA ZELANDA', 'PAPUA NUEVA GUINEA', 'ISLAS SALOMON', 'SAMOA', 'TONGA', 'VANUATU', 'MICRONESIA', 'TUVALU', 'ISLAS COOK', 'NAURU', 'PALAOS', 'TIMOR ORIENTAL',
+            'POLINESIA FRANCESA', 'ISLA NORFOLK', 'KIRIBATI', 'NIUE', 'ISLAS PITCAIRN', 'TOKELAU', 'NUEVA CALEDONIA', 'WALLIS Y FORTUNA', 'SAMOA AMERICANA'
+        ];
+        sort($arr_paises);
+        return $arr_paises;
     }
 
     /**
@@ -1159,7 +1234,7 @@ class AuxFunctions
                 'analisis_2' => '', 'analisis_3' => '',
                 'debito' => number_format($obj_documento->getImporteTotal(), 2),
                 'credito' => number_format($obj_documento->getImporteTotal(), 2),
-                'total'=>$obj_documento->getImporteTotal()
+                'total' => $obj_documento->getImporteTotal()
             );
 
             return $rows;
@@ -1230,7 +1305,7 @@ class AuxFunctions
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($obj_documento->getImporteTotal(), 2),
             'credito' => number_format($obj_documento->getImporteTotal(), 2),
-            'total'=>$obj_documento->getImporteTotal()
+            'total' => $obj_documento->getImporteTotal()
         );
 
         return $rows;
@@ -1331,7 +1406,7 @@ class AuxFunctions
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
-            'total'=>$total
+            'total' => $total
         );
         return $rows;
     }
@@ -1431,7 +1506,7 @@ class AuxFunctions
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
-            'total'=>$total
+            'total' => $total
         );
         return $rows;
     }
@@ -1525,7 +1600,7 @@ class AuxFunctions
             'analisis_2' => '', 'analisis_3' => '',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
-            'total'=>$total
+            'total' => $total
         );
         return $rows;
     }

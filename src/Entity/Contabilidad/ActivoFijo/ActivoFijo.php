@@ -3,13 +3,9 @@
 namespace App\Entity\Contabilidad\ActivoFijo;
 
 use App\Entity\Contabilidad\Config\AreaResponsabilidad;
-use App\Entity\Contabilidad\Config\Cuenta;
-use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\GrupoActivos;
-use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
 use App\Entity\Contabilidad\Config\Unidad;
-use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Repository\Contabilidad\ActivoFijo\ActivoFijoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -154,6 +150,11 @@ class ActivoFijo
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_unidad;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $fecha_ultima_depreciacion;
 
     public function getId(): ?int
     {
@@ -456,6 +457,18 @@ class ActivoFijo
     public function setIdUnidad(?Unidad $id_unidad): self
     {
         $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
+    public function getFechaUltimaDepreciacion(): ?\DateTimeInterface
+    {
+        return $this->fecha_ultima_depreciacion;
+    }
+
+    public function setFechaUltimaDepreciacion(?\DateTimeInterface $fecha_ultima_depreciacion): self
+    {
+        $this->fecha_ultima_depreciacion = $fecha_ultima_depreciacion;
 
         return $this;
     }

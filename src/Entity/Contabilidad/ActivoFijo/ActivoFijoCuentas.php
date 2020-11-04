@@ -2,8 +2,8 @@
 
 namespace App\Entity\Contabilidad\ActivoFijo;
 
-use App\Entity\COntabilidad\Config\AreaResponsabilidad;
-use App\Entity\COntabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\AreaResponsabilidad;
+use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
