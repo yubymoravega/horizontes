@@ -606,8 +606,8 @@ class FacturaController extends AbstractController
         $filename = 'factura.pdf';
 
        
-
-             //return $this->render('factura/cash.html.twig',['json' => \json_decode($cotizacion->getJson())]);
+                
+             return $this->render('factura/cash.html.twig',['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
         return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
     }
 
