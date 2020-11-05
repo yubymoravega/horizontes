@@ -26,6 +26,10 @@ use  Endroid\QrCode\LabelAlignment;
 use  Endroid\QrCode\QrCode;
 use  Endroid\QrCode\Response\QrCodeResponse;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class FacturaController extends AbstractController
 {
      // 2. Expose the EntityManager in the class level
@@ -467,6 +471,64 @@ class FacturaController extends AbstractController
 
         $efectivo = $dataBase->getRepository(ReporteEfectivo::class)->findBy(['idCotizacion'=>$cotizacion->getId()]);
         $clienteOrigen = $dataBase->getRepository(Cliente::class)->findby(['telefono' => $factura->getIdCliente()]);
+
+        $nombreCliente = $clienteOrigen[0]->getNombre()." ".$clienteOrigen[0]->getApellidos();
+        $idFactura = $factura->getId();
+
+          // Instantiation and passing `true` enables exceptions
+          $mail = new PHPMailer(true);
+
+          try {
+              //Server settings
+              //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+              $mail->isSMTP();                                            // Send using SMTP
+              $mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
+              $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+              $mail->Username   = 'programacion.grupohorizontes@gmail.com';                     // SMTP username
+              $mail->Password   = '8095648845jm';                               // SMTP password
+              $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+              $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+          
+              //Recipients
+              $mail->setFrom($clienteOrigen[0]->getCorreo(), 'Solyag');
+              $mail->addAddress($clienteOrigen[0]->getCorreo(), 'Solyag');     // Add a recipient
+          
+              // Content
+              $mail->isHTML(true);                                  // Set email format to HTML
+              $mail->Subject = 'Solyag Factuta '.$nombreCliente;
+              $mail->Body    = "<table cellspacing='0' cellpadding='0' border='0' style='color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <tbody><tr width='100%'> <td valign='top' align='left' style='background:#eef0f1;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <table style='border:none;padding:0 18px;margin:50px auto;width:500px'> <tbody> <tr width='100%' height='60'> <td valign='top' align='left' style='border-top-left-radius:4px;border-top-right-radius:4px;background:black; bottom left repeat-x;padding:10px 18px;text-align:center'> <img height='40' width='125' src='https://solyag.com/wp-content/uploads/2020/11/22-scaled.jpg' title='Trello' style='font-weight:bold;font-size:18px;color:#fff;vertical-align:top' class='CToWUd'> </td> </tr> <tr width='100%'> <td valign='top' align='left' style='background:#fff;padding:18px'>
+  
+              <h1 style='text-align:center !important; font-size:20px;margin:16px 0;color:#333;'> Factura PDF <br>  $nombreCliente</h1>
+             
+              <p style='text-align:center !important;'> Click para descargar la factura PDF </p>
+             
+              <div style='background:#f6f7f8;border-radius:3px'> <br>
+             
+              <p style='text-align:center !important; font:15px/1.25em 'Helvetica Neue',Arial,Helvetica;margin-bottom:0;text-align:center'> <a href='https://solyag.online/factura/pdf/$idFactura' style='border-radius:3px;background:#3aa54c;color:#fff;display:block;font-weight:700;font-size:16px;line-height:1.25em;margin:24px auto 6px;padding:10px 18px;text-decoration:none;width:180px' target='_blank'>Ver PDF</a> </p>
+             
+              <br><br> </div>
+             
+              <p style='text-align:center; font:14px/1.25em 'Helvetica Neue',Arial,Helvetica;color:#333'> 
+                <strong style='text-align:center;' >SOLYAG S.R.L RNC: 1-32-13041-3 </strong><br>
+                       Calle. Juan S Ramirez esq Wenceslao Alvarez<br>
+                      Zona Universitaria, Santo Domingo, Rep Dom <br>
+                      Tel: +1-305-400-4243 & +1-809-770-2266
+               
+               </p>
+             
+              </td>
+             
+              </tr>
+             
+              </tbody> </table> </td> </tr></tbody> </table>";
+             // $mail->AltBody = 'hola';
+          
+              $mail->send();
+             
+          } catch (Exception $e) {
+              
+             
+          }
         
         $html = $this->renderView("factura/pdf.html.twig",
         ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
@@ -543,6 +605,8 @@ class FacturaController extends AbstractController
         ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
         $filename = 'factura.pdf';
 
+       
+
              //return $this->render('factura/cash.html.twig',['json' => \json_decode($cotizacion->getJson())]);
         return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
     }
@@ -590,6 +654,18 @@ class FacturaController extends AbstractController
     public function formulario(){
 
         return $this->render('factura/formulario.html.twig');
+    }
+
+
+    /**
+     * @Route("factura/email/", name="factura/email")
+     */
+    public function email(){
+
+      
+       
+        return new Response('enviado');
+       
     }
 
     
