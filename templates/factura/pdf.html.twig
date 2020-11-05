@@ -106,7 +106,7 @@
       <tbody>
           
 {% for data in json %}
-<tr>  <td> <img style="width: 90px;"  src = "http://127.0.0.1:8000/qr-code/https://solyag.online/factura/pdf/servicio/{{id}}/{{data.mOrderNo}}.png" /> </td>
+<tr>  <td> <img style="width: 90px;"  src = "https://solyag.online/qr-code/https://solyag.online/factura/pdf/servicio/{{id}}/{{data.mOrderNo}}.png" /> </td>
         <td> <p  class="mayuscula"> {{data.servicio}} - {{data.primerNombre}} {{data.primerApellido}} {{data.segundoApellido}}</P> 
         </td>
          <td class="text-right"> {{data.mOrderNo}} </td>
