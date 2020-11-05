@@ -1,4 +1,4 @@
-{% extends 'contabilidad/activo_fijo/index.html.twig' %}
+{% extends 'base.html.twig' %}
 {% block content %}
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 70rem;">
@@ -149,7 +149,7 @@
                            class="btn btn-outline-secondary" id="btn_cancelar">Salir</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">Salvar</button>
+                        <button class='my-0 btn btn-secondary' id="btnSubbmit">Guardar</button>
                     </div>
                 </div>
 
@@ -166,14 +166,14 @@
 
         const loadingData = function () {
             loadingModal.show()
-            let ids = ['activo_fijo_id_grupo_activo','activo_fijo_activo_fijo_cuentas_id_cuenta_activo','activo_fijo_activo_fijo_cuentas_id_cuenta_depreciacion',
-            'activo_fijo_activo_fijo_cuentas_id_cuenta_gasto','activo_fijo_id_area_responsabilidad','activo_fijo_activo_fijo_cuentas_id_subcuenta_activo',
-            'activo_fijo_activo_fijo_cuentas_id_centro_costo_activo','activo_fijo_activo_fijo_cuentas_id_area_responsabilidad_activo','activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion',
-            'activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto','activo_fijo_activo_fijo_cuentas_id_centro_costo_gasto',
-            'activo_fijo_activo_fijo_cuentas_id_elemento_gasto_gasto','activo_fijo_pais']
+            let ids = ['activo_fijo_id_grupo_activo', 'activo_fijo_activo_fijo_cuentas_id_cuenta_activo', 'activo_fijo_activo_fijo_cuentas_id_cuenta_depreciacion',
+                'activo_fijo_activo_fijo_cuentas_id_cuenta_gasto', 'activo_fijo_id_area_responsabilidad', 'activo_fijo_activo_fijo_cuentas_id_subcuenta_activo',
+                'activo_fijo_activo_fijo_cuentas_id_centro_costo_activo', 'activo_fijo_activo_fijo_cuentas_id_area_responsabilidad_activo', 'activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion',
+                'activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto', 'activo_fijo_activo_fijo_cuentas_id_centro_costo_gasto',
+                'activo_fijo_activo_fijo_cuentas_id_elemento_gasto_gasto', 'activo_fijo_pais']
             for (let i = 0; i < ids.length; i++) {
                 $('#' + ids[i]).find('option').remove()
-                $('#'+ ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $('#' + ids[i]).prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
             }
             $.ajax({
                 url: '/contabilidad/activo-fijo/getData',
@@ -181,7 +181,7 @@
                 dataType: 'json',
                 success: function (result) {
                     cuentas_activo = result.cuenta_activo
-                    cuentas_depreciacion =result.cuenta_depreciacion
+                    cuentas_depreciacion = result.cuenta_depreciacion
                     cuentas_gasto = result.cuenta_gasto
                     $(result.cuenta_activo).each(function (pos, valor) {
                         $('#activo_fijo_activo_fijo_cuentas_id_cuenta_activo').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
@@ -193,7 +193,7 @@
                         $('#activo_fijo_activo_fijo_cuentas_id_cuenta_gasto').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
                     $(result.paises).each(function (pos, valor) {
-                        $('#activo_fijo_pais').append('<option value = "' + valor + '">' + valor+ '</option>');
+                        $('#activo_fijo_pais').append('<option value = "' + valor + '">' + valor + '</option>');
                     })
                     $(result.centro_costo).each(function (pos, valor) {
                         $('#activo_fijo_activo_fijo_cuentas_id_centro_costo_activo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
@@ -224,10 +224,9 @@
         //----Eventos donde cargo las subcuentas de las cuentas seleccionadas
         $('#activo_fijo_activo_fijo_cuentas_id_cuenta_activo').on('change', function () {
             $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_activo').find('option').remove()
-            console.info(cuentas_activo)
+            $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_activo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
             cuentas_activo.forEach(function (valor, pos) {
                 if ($('#activo_fijo_activo_fijo_cuentas_id_cuenta_activo').val() == valor.nro_cuenta) {
-                    $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_activo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                     for (var i = 0; i < valor.sub_cuenta.length; i++) {
                         $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_activo').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                     }
@@ -236,10 +235,9 @@
         })
         $('#activo_fijo_activo_fijo_cuentas_id_cuenta_depreciacion').on('change', function () {
             $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion').find('option').remove()
-            console.info(cuentas_activo)
-            cuentas_activo.forEach(function (valor, pos) {
+            $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            cuentas_depreciacion.forEach(function (valor, pos) {
                 if ($('#activo_fijo_activo_fijo_cuentas_id_cuenta_depreciacion').val() == valor.nro_cuenta) {
-                    $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                     for (var i = 0; i < valor.sub_cuenta.length; i++) {
                         $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                     }
@@ -248,15 +246,111 @@
         })
         $('#activo_fijo_activo_fijo_cuentas_id_cuenta_gasto').on('change', function () {
             $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto').find('option').remove()
-            console.info(cuentas_activo)
-            cuentas_activo.forEach(function (valor, pos) {
+            $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            cuentas_gasto.forEach(function (valor, pos) {
                 if ($('#activo_fijo_activo_fijo_cuentas_id_cuenta_gasto').val() == valor.nro_cuenta) {
-                    $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
                     for (var i = 0; i < valor.sub_cuenta.length; i++) {
                         $('#activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
                     }
                 }
             })
+        })
+
+        const form_ajuste_entrada = $('#ajuste_entrada')
+
+        form_ajuste_entrada.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'ajuste[observacion]': "required",
+                'ajuste[nro_cuenta_inventario]': "required",
+                'ajuste[nro_subcuenta_inventario]': "required",
+                'ajuste[nro_cuenta_acreedora]': "required",
+                'ajuste[nro_subcuenta_acreedora]': "required",
+                'ajuste[documento][id_moneda]': "required",
+            },
+            messages: {
+                'ajuste[observacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'ajuste[nro_cuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'ajuste[nro_subcuenta_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'ajuste[nro_cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'ajuste[nro_subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'ajuste[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+            }
+        })
+        $(document).ready(function () {
+            const form_activo_fijo = $('#activo_fijo')
+            form_activo_fijo.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'activo_fijo[nro_inventario]': "required",
+                    'activo_fijo[fecha_alta]': "required",
+                    'activo_fijo[id_grupo_activo]': "required",
+                    'activo_fijo[descripcion]': "required",
+                    'activo_fijo[id_area_responsabilidad]': "required",
+                    'activo_fijo[valor_inicial]': "required",
+                    'activo_fijo[valor_real]': "required",
+                    'activo_fijo[annos_vida_util]': "required",
+                    'activo_fijo[pais]': "required",
+                    'activo_fijo[modelo]': "required",
+                    'activo_fijo[tipo]': "required",
+                    'activo_fijo[marca]': "required",
+
+                    'activo_fijo[activo_fijo_cuentas][id_cuenta_activo]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_subcuenta_activo]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_centro_costo_activo]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_area_responsabilidad_activo]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_cuenta_depreciacion]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_subcuenta_depreciacion]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_cuenta_gasto]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_subcuenta_gasto]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_centro_costo_gasto]': "required",
+                    'activo_fijo[activo_fijo_cuentas][id_elemento_gasto_gasto]': "required"
+                },
+                messages: {
+                    'activo_fijo[nro_inventario]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[fecha_alta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[id_grupo_activo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[id_area_responsabilidad]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[valor_inicial]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[valor_real]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[annos_vida_util]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[pais]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[modelo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[tipo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[marca]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+
+                    'activo_fijo[activo_fijo_cuentas][id_cuenta_activo]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_subcuenta_activo]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_centro_costo_activo]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_area_responsabilidad_activo]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_cuenta_depreciacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[activo_fijo_cuentas][id_subcuenta_depreciacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'activo_fijo[activo_fijo_cuentas][id_cuenta_gasto]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_subcuenta_gasto]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_centro_costo_gasto]': 'Obligatorio!',
+                    'activo_fijo[activo_fijo_cuentas][id_elemento_gasto_gasto]': 'Obligatorio!'
+                }
+            })
+
+            //Adicionar activo fijo
+            $("#btnSubbmit").click(function (e) {
+                if (form_activo_fijo.valid()) {
+                    form_activo_fijo.attr('method', `POST`)
+                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar`)
+                    form_activo_fijo.submit()
+                    if (validateForm.errorList.length === 0) loadingModal.show()
+                }
+            });
+
         })
     </script>
 {% endblock %}

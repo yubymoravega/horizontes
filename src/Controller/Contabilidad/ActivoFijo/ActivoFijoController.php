@@ -4,13 +4,17 @@ namespace App\Controller\Contabilidad\ActivoFijo;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
+use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\Depreciacion;
 use App\Entity\Contabilidad\Config\AreaResponsabilidad;
 use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\GrupoActivos;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Form\Contabilidad\ActivoFijo\ActivoFijoType;
+use App\Form\Contabilidad\ActivoFijo\MovimientoActivoFijoType;
 use App\Form\Contabilidad\Inventario\AjusteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +22,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class ActivoFijoController
@@ -35,30 +40,30 @@ class ActivoFijoController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $id_usuario = $this->getUser()->getId();
 
-        $unidad = AuxFunctions::getUnidad($em,$id_usuario);
+        $unidad = AuxFunctions::getUnidad($em, $id_usuario);
 
         $arr_activos_fijos = $em->getRepository(ActivoFijo::class)->findBy(array(
-            'id_unidad'=>$unidad->getId(),
-            'activo'=>true
+            'id_unidad' => $unidad->getId(),
+            'activo' => true
         ));
         $rows = [];
-        if(!empty($arr_activos_fijos)){
+        if (!empty($arr_activos_fijos)) {
             /** @var ActivoFijo $obj */
-            foreach ($arr_activos_fijos as $obj){
+            foreach ($arr_activos_fijos as $obj) {
                 $rows[] = array(
-                    'nro_inv'=>$obj->getNroInventario(),
-                    'descripcion'=>$obj->getDescripcion(),
-                    'importe'=>$obj->getImporte(),
-                    'fecha'=>$obj->getFecha()->format('d/m/Y'),
-                    'grupo_activos'=>$obj->getIdGrupoActivo()->getDescripcion(),
-                    'proveedor'=>$obj->getIdProveedor()->getNombre(),
-                    'id'=>$obj->getId()
-                 );
+                    'nro_inv' => $obj->getNroInventario(),
+                    'descripcion' => $obj->getDescripcion(),
+                    'importe' => $obj->getImporte(),
+                    'fecha' => $obj->getFecha()->format('d/m/Y'),
+                    'grupo_activos' => $obj->getIdGrupoActivo()->getDescripcion(),
+                    'proveedor' => $obj->getIdProveedor()->getNombre(),
+                    'id' => $obj->getId()
+                );
             }
         }
         return $this->render('contabilidad/activo_fijo/activo_fijo/index.html.twig', [
             'controller_name' => 'ActivoFijoController',
-            'activos_fijos'=>$rows
+            'activos_fijos' => $rows
         ]);
     }
 
@@ -70,11 +75,11 @@ class ActivoFijoController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $id_usuario = $this->getUser()->getId();
         $depreciacion_er = $em->getRepository(Depreciacion::class);
-        $unidad = AuxFunctions::getUnidad($em,$id_usuario);
+        $unidad = AuxFunctions::getUnidad($em, $id_usuario);
 
         $arr_activos_fijos = $em->getRepository(ActivoFijo::class)->findBy(array(
-            'id_unidad'=>$unidad->getId(),
-            'activo'=>true
+            'id_unidad' => $unidad->getId(),
+            'activo' => true
         ));
         $rows = [];
 
@@ -82,23 +87,22 @@ class ActivoFijoController extends AbstractController
         $year_ = date('Y');
         $month_ = date('m');
         $deprecio = false;
-        if(!empty($arr_activos_fijos)){
+        if (!empty($arr_activos_fijos)) {
             /** @var ActivoFijo $obj */
-            foreach ($arr_activos_fijos as $obj){
+            foreach ($arr_activos_fijos as $obj) {
                 $depreciacion_obj = $depreciacion_er->findOneBy(array(
-                    'mes'=>$month_,
-                    'anno'=>$year_,
-                    'id_activo_fijo'=>$obj->getId()
+                    'mes' => $month_,
+                    'anno' => $year_,
+                    'id_activo_fijo' => $obj->getId()
                 ));
 
-                if($depreciacion_obj){
-                    $this->addFlash('error','Ya se realizó la depreciación de los activos fijos de su unidad para este mes.');
+                if ($depreciacion_obj) {
+                    $this->addFlash('error', 'Ya se realizó la depreciación de los activos fijos de su unidad para este mes.');
                     break;
-                }
-                else{
+                } else {
 
                     $porciento_deprecia = $obj->getIdGrupoActivo()->getPorcientoDepreciaAnno();
-                    if($porciento_deprecia){
+                    if ($porciento_deprecia) {
                         $importe = $obj->getImporte() * floatval($porciento_deprecia);
                         $deprecio = true;
                         $nueva_depreciacion = new Depreciacion();
@@ -112,12 +116,11 @@ class ActivoFijoController extends AbstractController
                     }
                 }
             }
-            if($deprecio){
+            if ($deprecio) {
                 try {
                     $em->flush();
-                    $this->addFlash('success','Drepreciación realizada con éxito.');
-                }
-                catch (FileException $e) {
+                    $this->addFlash('success', 'Drepreciación realizada con éxito.');
+                } catch (FileException $e) {
                     return $e->getMessage();
                 }
             }
@@ -132,29 +135,147 @@ class ActivoFijoController extends AbstractController
     {
         $form = $this->createForm(ActivoFijoType::class);
 
+        $error = null;
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $activo_fijo = $request->get('activo_fijo');
+            $nro_inventario = $activo_fijo['nro_inventario'];
+            $fecha_alta = isset($activo_fijo['fecha_alta']) ? \DateTime::createFromFormat('Y-m-d', $activo_fijo['fecha_alta']) : null;
+            $id_grupo_activo = $activo_fijo['id_grupo_activo'];
+            $descripcion = $activo_fijo['descripcion'];
+            $id_area_responsabilidad = $activo_fijo['id_area_responsabilidad'];
+            $valor_inicial = $activo_fijo['valor_inicial'];
+            $depreciacion_acumulada = (isset($activo_fijo['depreciacion_acumulada'])&& $activo_fijo['depreciacion_acumulada']!='')?$activo_fijo['depreciacion_acumulada']:0;
+            $valor_real = $activo_fijo['valor_real'];
+            $fecha_ultima_depreciacion = (isset($activo_fijo['fecha_ultima_depreciacion']) && $activo_fijo['fecha_ultima_depreciacion']!= '') ? \DateTime::createFromFormat('Y-m-d', $activo_fijo['fecha_ultima_depreciacion']) : null;;
+            $annos_vida_util = $activo_fijo['annos_vida_util'];
+            $pais = $activo_fijo['pais'];
+            $modelo = $activo_fijo['modelo'];
+            $tipo = $activo_fijo['tipo'];
+            $marca = $activo_fijo['marca'];
+            $nro_motor = $activo_fijo['nro_motor'];
+            $nro_serie = $activo_fijo['nro_serie'];
+            $nro_chapa = $activo_fijo['nro_chapa'];
+            $nro_chasis = $activo_fijo['nro_chasis'];
+            $combustible = $activo_fijo['combustible'];
+
+            $activo_fijo_cuentas = $activo_fijo['activo_fijo_cuentas'];
+            $id_cuenta_activo = $activo_fijo_cuentas['id_cuenta_activo'];
+            $id_subcuenta_activo = $activo_fijo_cuentas['id_subcuenta_activo'];
+            $id_centro_costo_activo = $activo_fijo_cuentas['id_centro_costo_activo'];
+            $id_area_responsabilidad_activo = $activo_fijo_cuentas['id_area_responsabilidad_activo'];
+            $id_cuenta_depreciacion = $activo_fijo_cuentas['id_cuenta_depreciacion'];
+            $id_subcuenta_depreciacion = $activo_fijo_cuentas['id_subcuenta_depreciacion'];
+            $id_cuenta_gasto = $activo_fijo_cuentas['id_cuenta_gasto'];
+            $id_subcuenta_gasto = $activo_fijo_cuentas['id_subcuenta_gasto'];
+            $id_centro_costo_gasto = $activo_fijo_cuentas['id_centro_costo_gasto'];
+            $id_elemento_gasto_gasto = $activo_fijo_cuentas['id_elemento_gasto_gasto'];
+
+            $duplicate = $em->getRepository(ActivoFijo::class)->findOneBy([
+                'nro_inventario'=>$nro_inventario,
+                'id_unidad'=>AuxFunctions::getUnidad($em, $this->getUser())
+            ]);
+            if($duplicate)
+                return new JsonResponse(['success'=>false,'msg'=>'Ya existe un activo fijo en la empresa con el nro de invetario especificado']);
+
+            $nro_cuenta_activo = explode(' - ',$id_cuenta_activo)[0];
+            $nro_subcuenta_activo = explode(' - ',$id_subcuenta_activo)[0];
+            $nro_cuenta_depreciacion = explode(' - ',$id_cuenta_depreciacion)[0];
+            $nro_subcuenta_depreciacion = explode(' - ',$id_subcuenta_depreciacion)[0];
+            $nro_cuenta_gasto = explode(' - ',$id_cuenta_gasto)[0];
+            $nro_subcuenta_gasto = explode(' - ',$id_subcuenta_gasto)[0];
+
+            $obj_cuenta_activo = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>$nro_cuenta_activo,'activo'=>true]);
+            $obj_cuenta_depreciacion = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>$nro_cuenta_depreciacion,'activo'=>true]);
+            $obj_cuenta_gasto = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>$nro_cuenta_gasto,'activo'=>true]);
+
+            $obj_subcuenta_activo = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta'=>$nro_subcuenta_activo,'activo'=>true,'id_cuenta'=>$obj_cuenta_activo]);
+            $obj_subcuenta_depreciacion = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta'=>$nro_subcuenta_depreciacion,'activo'=>true,'id_cuenta'=>$obj_cuenta_depreciacion]);
+            $obj_subcuenta_gasto = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta'=>$nro_subcuenta_gasto,'activo'=>true,'id_cuenta'=>$obj_cuenta_gasto]);
+
+            $new_activo_fijo = new ActivoFijo();
+            $new_activo_fijo
+                ->setActivo(true)
+                ->setNroConsecutivo(1)
+                ->setIdUnidad(AuxFunctions::getUnidad($em, $this->getUser()))
+                ->setDescripcion($descripcion)
+                ->setAnnosVidaUtil($annos_vida_util)
+                ->setCombustible($combustible)
+                ->setDepreciacionAcumulada($depreciacion_acumulada)
+                ->setFechaAlta($fecha_alta)
+                ->setFechaBaja(null)
+                ->setFechaUltimaDepreciacion($fecha_ultima_depreciacion)
+                ->setIdAreaResponsabilidad($em->getRepository(AreaResponsabilidad::class)->find($id_area_responsabilidad))
+                ->setIdGrupoActivo($em->getRepository(GrupoActivos::class)->find($id_grupo_activo))
+                ->setIdTipoMovimiento(null)
+                ->setIdTipoMovimientoBaja(null)
+                ->setMarca($marca)
+                ->setModelo($modelo)
+                ->setNroChapa($nro_chapa)
+                ->setNroChasis($nro_chasis)
+                ->setNroInventario($nro_inventario)
+                ->setNroMotor($nro_motor)
+                ->setNroSerie($nro_serie)
+                ->setPais($pais)
+                ->setTipo($tipo)
+                ->setValorInicial($valor_inicial)
+                ->setValorReal($valor_real)
+                ->setNroDocumentoBaja(null);
+            $em->persist($new_activo_fijo);
+
+            $new_activo_fijo_cuentas = new ActivoFijoCuentas();
+            $new_activo_fijo_cuentas
+                ->setIdActivo($new_activo_fijo)
+                ->setIdAreaResponsabilidadActivo($em->getRepository(AreaResponsabilidad::class)->find($id_area_responsabilidad_activo))
+                ->setIdCentroCostoActivo($em->getRepository(CentroCosto::class)->find($id_centro_costo_activo))
+                ->setIdCentroCostoGasto($em->getRepository(CentroCosto::class)->find($id_centro_costo_gasto))
+                ->setIdElementoGastoGasto($em->getRepository(ElementoGasto::class)->find($id_elemento_gasto_gasto))
+                ->setIdCuentaActivo($obj_cuenta_activo)
+                ->setIdCuentaDepreciacion($obj_cuenta_depreciacion)
+                ->setIdCuentaGasto($obj_cuenta_gasto)
+                ->setIdSubcuentaActivo($obj_subcuenta_activo)
+                ->setIdSubcuentaDepreciacion($obj_subcuenta_depreciacion)
+                ->setIdSubcuentaGasto($obj_subcuenta_gasto);
+            $em->persist($new_activo_fijo_cuentas);
+
+            try {
+                $em->flush();
+                $form_apertura = $this->createForm(MovimientoActivoFijoType::class,
+                    ['nro_inventatio'=>$new_activo_fijo->getNroInventario(),'descripcion'=>$new_activo_fijo->getDescripcion()]);
+
+                return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
+                    'controller_name' => 'CRUDActivoFijo',
+                    'formulario' => $form_apertura->createView(),
+                ]);
+
+            } catch (FileException $e) {
+                return $e->getMessage();
+            }
+        }
         return $this->render('contabilidad/activo_fijo/activo_fijo/form.html.twig', [
-            'controller_name' => 'CRUDActivoFijo',
+            'controller_name' => 'AperturaController',
             'formulario' => $form->createView()
         ]);
     }
+
     /**
      * @Route("/getData", name="contabilidad_activo_fijo_get_data", methods={"POST"})
      */
     public function getData(EntityManagerInterface $em, Request $request)
     {
-        $cuenta_activo = AuxFunctions::getCuentasByTipo($em,[3]);
-        $cuenta_depreciacion = AuxFunctions::getCuentasByTipo($em,[6]);
-        $cuenta_gasto = AuxFunctions::getCuentasByTipo($em,[14]);
+        $cuenta_activo = AuxFunctions::getCuentasByTipo($em, [3]);
+        $cuenta_depreciacion = AuxFunctions::getCuentasByTipo($em, [6]);
+        $cuenta_gasto = AuxFunctions::getCuentasByTipo($em, [14]);
         $paises = AuxFunctions::getPaises();
 
-        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $arr_centros_costo = $em->getRepository(CentroCosto::class)->findBy([
-            'id_unidad'=>$unidad,
-            'activo'=>true
+            'id_unidad' => $unidad,
+            'activo' => true
         ]);
         $arr_area_repsonsabilidad = $em->getRepository(AreaResponsabilidad::class)->findBy([
-            'id_unidad'=>$unidad,
-            'activo'=>true
+            'id_unidad' => $unidad,
+            'activo' => true
         ]);
         $arr_elemento_gasto = $em->getRepository(ElementoGasto::class)->findAll();
 
@@ -166,38 +287,35 @@ class ActivoFijoController extends AbstractController
         $rows_ga = [];
 
         /** @var CentroCosto $item */
-        foreach ($arr_centros_costo as $item){
-            $rows_cc[]=array(
-                'id'=>$item->getId(),
-                'nombre'=>$item->getCodigo().' - '. $item->getNombre()
+        foreach ($arr_centros_costo as $item) {
+            $rows_cc[] = array(
+                'id' => $item->getId(),
+                'nombre' => $item->getCodigo() . ' - ' . $item->getNombre()
             );
         }
         /** @var AreaResponsabilidad $item */
-        foreach ($arr_area_repsonsabilidad as $item){
-            $rows_ar[]=array(
-                'id'=>$item->getId(),
-                'nombre'=>$item->getCodigo().' - '. $item->getNombre()
+        foreach ($arr_area_repsonsabilidad as $item) {
+            $rows_ar[] = array(
+                'id' => $item->getId(),
+                'nombre' => $item->getCodigo() . ' - ' . $item->getNombre()
             );
         }
         /** @var ElementoGasto $item */
-        foreach ($arr_elemento_gasto as $item){
-            $rows_eg[]=array(
-                'id'=>$item->getId(),
-                'nombre'=>$item->getCodigo().' - '. $item->getDescripcion()
+        foreach ($arr_elemento_gasto as $item) {
+            $rows_eg[] = array(
+                'id' => $item->getId(),
+                'nombre' => $item->getCodigo() . ' - ' . $item->getDescripcion()
             );
         }
         /** @var GrupoActivos $item */
-        foreach ($arr_grupo_activos as $item){
-            $rows_ga[]=array(
-                'id'=>$item->getId(),
-                'nombre'=>$item->getCodigo().' - '. $item->getDescripcion()
+        foreach ($arr_grupo_activos as $item) {
+            $rows_ga[] = array(
+                'id' => $item->getId(),
+                'nombre' => $item->getCodigo() . ' - ' . $item->getDescripcion()
             );
         }
-        return new JsonResponse(['success'=>true,'cuenta_activo'=>$cuenta_activo,'cuenta_depreciacion'=>$cuenta_depreciacion,
-            'cuenta_gasto'=>$cuenta_gasto,'paises'=>$paises,'centro_costo'=>$rows_cc,'area_responsabilidad'=>$rows_ar,
-            'elemento_gasto'=>$rows_eg,'grupo_activos'=>$rows_ga]);
+        return new JsonResponse(['success' => true, 'cuenta_activo' => $cuenta_activo, 'cuenta_depreciacion' => $cuenta_depreciacion,
+            'cuenta_gasto' => $cuenta_gasto, 'paises' => $paises, 'centro_costo' => $rows_cc, 'area_responsabilidad' => $rows_ar,
+            'elemento_gasto' => $rows_eg, 'grupo_activos' => $rows_ga]);
     }
-
-
-
 }

@@ -28,7 +28,7 @@ class ActivoFijo
 
     /**
      * @ORM\ManyToOne(targetEntity=TipoMovimiento::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_tipo_movimiento;
 

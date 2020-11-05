@@ -1,4 +1,4 @@
-{% extends 'contabilidad/activo_fijo/index.html.twig' %}
+{% extends 'base.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="card-body">
-                {{ form_start(formulario, {'attr':{'id':'apertura','autocomplete':"off"}}) }}
+                {{ form_start(formulario, {'attr':{'id':'movimiento_activo_fijo','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                     <div class="row mt-0 ml-0 p-0">
@@ -53,7 +53,7 @@
                 {{ form_end(formulario) }}
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('inventario') }}"
+                        <a href="{{ url('activo_fijo') }}"
                            class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                     </div>
                     <div class="ml-2">
@@ -123,7 +123,7 @@
                     alertTemplate('El campo código es obligatorio.', 'danger')
                 }
             } else {
-                $('#movimiento_activo_fijo_descripcion').val()
+                $('#movimiento_activo_fijo_descripcion').val('')
             }
         })
 
@@ -136,11 +136,11 @@
                 success: function (result) {
                     if (result.descripcion != '') {
                         $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
+                        loadingModal.close()
                     } else {
                         window.open('/contabilidad/activo-fijo/gestionar', '_self');
                         alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }
-                    loadingModal.close()
                 },
                 error: function () {
                 }
@@ -148,8 +148,7 @@
         }
 
         $(document).ready(function () {
-            const form_activo_fijo = $('#movimiento_activo_fijo')
-
+            let form_activo_fijo = $('#movimiento_activo_fijo')
             form_activo_fijo.validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
@@ -174,5 +173,14 @@
                 }
             })
         })
+
+        $("#btnSubbmitApertura").click(function (e) {
+            if ($('#movimiento_activo_fijo').valid()) {
+                $('#movimiento_activo_fijo').attr('method', `POST`)
+                $('#movimiento_activo_fijo').attr('action', `/contabilidad/activo-fijo/apertura/`)
+                $('#movimiento_activo_fijo').submit()
+                if (validateForm.errorList.length === 0) loadingModal.show()
+            }
+        });
     </script>
 {% endblock %}

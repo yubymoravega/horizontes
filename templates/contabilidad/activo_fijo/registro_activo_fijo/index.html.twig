@@ -1,0 +1,67 @@
+{% extends 'contabilidad/activo_fijo/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Registro de Activos Fijos
+            </h4>
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir Registro de Activos"
+                    onclick="Print('{{ path('contabilidad_activo_fijo_registro_print') }}')">
+                <i class="fa fa-print"></i>
+            </button>
+        </div>
+        {# end header #}
+
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="150px">Nro. Inv</th>
+            <th scope="col-1">Descripción</th>
+            <th width="150px">Grupo de Activo</th>
+            <th width="150px">Cuenta/Subcuenta</th>
+            <th width="100px">Imprimir</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                <tr>
+                    <td class="row-group-subconta" colspan="5">{{ item.area_responsabilidad }}</td>
+                </tr>
+                {% for new_item in item.datos %}
+                    <tr>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.nro_inventario }}</td>
+                        <td style="font-weight:400;">{{ new_item.descripcion }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.cuenta_subcuenta }}</td>
+                        <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning" title="Imprimir Ficha" {#onclick="Print_Comprobante({{ new_item.id }})"#}></i></td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+        function Print_Comprobante(id) {
+            let url = '/contabilidad/general/registro-comprobantes/detalles/' + id
+            window.open(url, 'blank_')
+        }
+    </script>
+{% endblock %}
