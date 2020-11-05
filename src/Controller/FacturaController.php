@@ -607,7 +607,7 @@ class FacturaController extends AbstractController
 
        
                 
-             return $this->render('factura/pdf.html.twig',['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+             //return $this->render('factura/pdf.html.twig',['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
         return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
     }
 
