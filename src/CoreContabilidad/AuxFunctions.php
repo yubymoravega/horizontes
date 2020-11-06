@@ -3,6 +3,7 @@
 namespace App\CoreContabilidad;
 
 
+use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CriterioAnalisis;
@@ -12,6 +13,9 @@ use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoCuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
+use App\Entity\Contabilidad\Config\TipoMovimiento;
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Devolucion;
@@ -1646,4 +1650,20 @@ class AuxFunctions
         return $row;
     }
 
+    /**
+     * @param EntityManagerInterface $em instancia del Doctrine EntityManagerInterface
+     * @param TipoMovimiento $tipo_movimiento_obj tipo de movimiento a realizar
+     * @param Unidad $unidad_obj unidad para la cual se busca el nro
+     * @param int $anno anno para del movimiento
+     * @return int retorna el numero consecutivo para el movimiento de activo fijo a realizar
+     */
+    public static function getConsecutivoActivoFijo(EntityManagerInterface $em,$tipo_movimiento_obj,$unidad_obj,$anno){
+        $arr_movimientos = $em->getRepository(MovimientoActivoFijo::class)->findBy([
+            'id_unidad'=>$unidad_obj,
+            'id_tipo_movimiento'=>$tipo_movimiento_obj,
+            'anno'=>$anno
+        ]);
+
+        return count($arr_movimientos)+1;
+    }
 }

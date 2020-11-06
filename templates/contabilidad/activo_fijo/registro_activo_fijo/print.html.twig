@@ -23,11 +23,11 @@
             <tbody>
             {% for item in datos %}
                 <tr>
-                    <td style="background-color: gainsboro" colspan="5" class="font-weight-bold text-left">{{ item.area_responsabilidad }}</td>
+                    <td style="background-color: gainsboro" colspan="5" class="font-weight-bold text-left border-bottom border-top">{{ item.area_responsabilidad }}</td>
                 </tr>
                 {% for new_item in item.datos %}
                     <tr>
-                        <td style="font-weight:400;" class="text-center">{{ new_item.nro_inventario }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ new_item.nro_inventario }}</td>
                         <td style="font-weight:400;" class="text-left">{{ new_item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
                         <td style="font-weight:400;" class="text-center">{{ new_item.cuenta_subcuenta }}</td>

@@ -12,6 +12,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\GrupoActivos;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Form\Contabilidad\ActivoFijo\ActivoFijoType;
 use App\Form\Contabilidad\ActivoFijo\MovimientoActivoFijoType;
