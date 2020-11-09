@@ -493,7 +493,6 @@ class AuxFunctions
     public static function getCuentasOnlyProduccion($em)
     {
         $subcuenta_er = $em->getRepository(Subcuenta::class);
-        $cuenta_er = $em->getRepository(Cuenta::class);
 
         $row_inventario = array();
         $arr_cuentas_produccion = $em->getRepository(Cuenta::class)->findBy(array(
@@ -1813,6 +1812,7 @@ class AuxFunctions
      * @param int $anno anno para del movimiento
      * @return int retorna el numero consecutivo para el movimiento de activo fijo a realizar
      */
+
     public static function getConsecutivoActivoFijo(EntityManagerInterface $em, $tipo_movimiento_obj, $unidad_obj, $anno)
     {
         $arr_movimientos = $em->getRepository(MovimientoActivoFijo::class)->findBy([
@@ -1822,5 +1822,6 @@ class AuxFunctions
         ]);
 
         return count($arr_movimientos) + 1;
+
     }
 }
