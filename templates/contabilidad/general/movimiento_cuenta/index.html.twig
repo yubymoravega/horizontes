@@ -10,21 +10,22 @@
     <div class="container-fluid">
 
         {# header #}
-        {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
         <div class="d-flex align-items-center">
-            <h6 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+            <h6 class="display-4 mb-0 mr-2 title-table text-light">
                 Movimiento de Cuentas
             </h6>
+            <input type="number" class="mr-auto mt-2" style="width:80px" id="anno" name="anno">
             <div class="bg-dark-app">
-                <label for="" class="text-white text-uppercase"><strong>saldo inicial:</strong>{{ saldo_inicial }}</label>
+                <label for="" class="text-white text-uppercase font-weight-bold" id="saldo_inicial">saldo
+                    inicial:</label>
             </div>
             <button type="button" id="movimiento_cuenta_buscar" name="movimiento_cuenta[buscar]"
                     class="ml-auto btn-primary btn text-uppercase" style="width:100px" onclick="getDataByParams()">
                 Buscar
             </button>
-            {{ form_widget(form.limpiar,{'attr': {'class': 'form-control btn-outline-secondary ml-3','style':'width:100px'}}) }}
         </div>
 
+        {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
         <div class="mt-0 row" id="row-id">
             <div class="form-group input-group input-group-sm col-2">
                 {{ form_widget(form.nro_cuenta,{'attr': {'class': 'form-control w-100'}}) }}
@@ -78,13 +79,118 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        // vars
-        cbx_centro_costo = $('#movimiento_cuenta_centro_costo')
-        cbx_elemento_gasto = $('#movimiento_cuenta_elemento_gasto')
-        cbx_expediente = $('#movimiento_cuenta_expediente')
-        cbx_almacen = $('#movimiento_cuenta_almacen')
-        cbx_orden_trabajo = $('#movimiento_cuenta_orden_trabajo')
-        cbx_unidad = $('#movimiento_cuenta_unidad')
+        //DECLARACION DE VARIABLES
+        let cbx_centro_costo = $('#movimiento_cuenta_centro_costo')
+        let cbx_elemento_gasto = $('#movimiento_cuenta_elemento_gasto')
+        let cbx_expediente = $('#movimiento_cuenta_expediente')
+        let cbx_almacen = $('#movimiento_cuenta_almacen')
+        let cbx_orden_trabajo = $('#movimiento_cuenta_orden_trabajo')
+        let cbx_unidad = $('#movimiento_cuenta_unidad')
+        let anno = new Date().getFullYear();
+        let mes = new Date().getMonth();
+        let cuenta = [];
+        let arr_meses = ['Acumulado', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+        const form_modal_target = $('#form_modal_target')
+        $('#anno').val(anno)
+
+        ///Validacion de los campos obligatorios para la busqueda
+        form_modal_target.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'anno': "required",
+                'movimiento_cuenta[nro_cuenta]': "required",
+                'movimiento_cuenta[periodo]': "required",
+
+            },
+            messages: {
+                'anno': 'Obligratorio!',
+                'movimiento_cuenta[nro_cuenta]': 'Obligratorio!',
+                'movimiento_cuenta[periodo]': 'Obligratorio!',
+            }
+        })
+
+        $(document).ready(function (event) {
+            $('#anno').on('keyup', function (event) {
+                $('#dashboard').find('td').remove()
+                $('#saldo_inicial').hide()
+                if (event.which == 13) {
+                    resetForm()
+                    $('#movimiento_cuenta_periodo').find('option').remove()
+                    $('#movimiento_cuenta_periodo').prepend('<option selected = "false" value = "0" disabled> -- Período -- </option>');
+                    if ($('#anno').val() == anno) {
+                        for (let i = 0; i < mes + 2; i++) {
+                            $('#movimiento_cuenta_periodo').append('<option value = ' + i + '>' + arr_meses[i] + '</option>');
+                        }
+                    }
+                    if ($('#anno').val() > anno || $('#anno').val() == '') {
+                        alertTemplate('El mayor número permitido es ' + anno + '.', 'danger')
+                        $('#anno').val(anno)
+                        resetForm()
+                    } else {
+                        for (let i = 0; i < 13; i++) {
+                            $('#movimiento_cuenta_periodo').append('<option value = ' + i + '>' + arr_meses[i] + '</option>');
+                        }
+                    }
+                }
+            })
+
+            //Evento que se ejecuta cuando se cambia la seleccion de la cuenta
+            $('#movimiento_cuenta_nro_cuenta').on('change', function () {
+                $('#movimiento_cuenta_nro_subcuenta').find('option').remove()
+                cuenta.forEach(function (valor, pos) {
+                    if ($('#movimiento_cuenta_nro_cuenta').val() == valor.nro_cuenta) {
+                        $('#movimiento_cuenta_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            $('#movimiento_cuenta_nro_subcuenta').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+
+                miniLoadin.show({msg: 'Cargando firltros...', target: '#row-id'})
+                $.ajax({
+                    url: '/contabilidad/config/cuenta/get-criterios/' + $(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        cl(result)
+
+                        if (result.success) {
+                            hiddenParents()
+                            result.data.forEach(data => {
+                                switch (data) {
+                                    case "CCT":
+                                        cbx_centro_costo.parent().show()
+                                        break
+                                    case "EG":
+                                        cbx_elemento_gasto.parent().show()
+                                        cl('dentro')
+                                        break
+                                    case "EXP":
+                                        cbx_expediente.parent().show()
+                                        break
+                                    case "ALM":
+                                        cbx_almacen.parent().show()
+                                        break
+                                    case "OT":
+                                        cbx_orden_trabajo.parent().show()
+                                        break
+                                    case "UNID":
+                                        cbx_unidad.parent().show()
+                                        break
+                                }
+                            })
+                            miniLoadin.close()
+                        }
+
+
+                    }
+                })
+            })
+        })
 
         function hiddenParents() {
             cbx_centro_costo.parent().hide()
@@ -95,74 +201,19 @@
             cbx_orden_trabajo.parent().hide()
         }
 
-        hiddenParents()
-
-        let cuenta = [];
-        resetForm()
-        $('#movimiento_cuenta_nro_cuenta').on('change', function () {
-            $('#movimiento_cuenta_nro_subcuenta').find('option').remove()
-            cuenta.forEach(function (valor, pos) {
-                if ($('#movimiento_cuenta_nro_cuenta').val() == valor.nro_cuenta) {
-                    $('#movimiento_cuenta_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-                    for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                        $('#movimiento_cuenta_nro_subcuenta').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
-                    }
-                }
-            })
-
-            miniLoadin.show({msg: 'cargando firltros...', target: '#row-id'})
-            $.ajax({
-                url: '/contabilidad/config/cuenta/get-criterios/' + $(this).val(),
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    cl(result)
-
-                    if (result.success) {
-                        hiddenParents()
-                        result.data.forEach(data => {
-                            switch (data) {
-                                case "CCT":
-                                    cbx_centro_costo.parent().show()
-                                    break
-                                case "EG":
-                                    cbx_elemento_gasto.parent().show()
-                                    cl('dentro')
-                                    break
-                                case "EXP":
-                                    cbx_expediente.parent().show()
-                                    break
-                                case "ALM":
-                                    cbx_almacen.parent().show()
-                                    break
-                                case "OT":
-                                    cbx_orden_trabajo.parent().show()
-                                    break
-                                case "UNID":
-                                    cbx_unidad.parent().show()
-                                    break
-                            }
-                        })
-                        miniLoadin.close()
-                    }
-
-
-                }
-            })
-        })
-
         function resetForm() {
+            $('#saldo_inicial').hide()
+            $('#dashboard').find('td').remove()
             //ocultar los combobox
             $('#movimiento_cuenta_nro_cuenta').find('option').remove()
             $('#movimiento_cuenta_nro_cuenta').prepend('<option selected = "false" value = "0" disabled>-- Cuenta --</option>')
             $('#movimiento_cuenta_nro_subcuenta').find('option').remove()
             $('#movimiento_cuenta_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- Subcuenta -- </option>');
             $('#movimiento_cuenta_periodo').find('option').remove()
-            $('#movimiento_cuenta_periodo').prepend([
-                '<option selected = "false" value = "0" disabled> -- Período -- </option>',
-                '<option value = "1">Período actual</option>',
-                '<option value = "2">Acumulado </option>'
-            ]);
+            $('#movimiento_cuenta_periodo').prepend('<option selected = "false" value = "0" disabled> -- Período -- </option>');
+            for (let i = 0; i < mes + 2; i++) {
+                $('#movimiento_cuenta_periodo').append('<option value = ' + i + '>' + arr_meses[i] + '</option>');
+            }
 
             cbx_centro_costo.prepend('<option selected = "false" value = "0" disabled> -- Centro de Costo -- </option>');
             cbx_elemento_gasto.prepend('<option selected = "false" value = "0" disabled> -- Elemento de Gasto -- </option>');
@@ -171,8 +222,8 @@
             cbx_unidad.prepend('<option selected = "false" value = "0" disabled> -- Unidad -- </option>');
             cbx_orden_trabajo.prepend('<option selected = "false" value = "0" disabled> -- Orden de trabajo -- </option>');
 
+            hiddenParents()
             loadingModal.show()
-
             $.ajax({
                 url: '/contabilidad/general/movimiento-cuenta/getDatos',
                 method: 'POST',
@@ -209,29 +260,35 @@
         }
 
         function getDataByParams() {
-            let params = {
-                'nro_cuenta': $('#movimiento_cuenta_nro_cuenta').val(),
-                'nro_subcuenta': $('#movimiento_cuenta_nro_subcuenta').val(),
-                'periodo': $('#movimiento_cuenta_periodo').val(),
-                'unidad': $('#movimiento_cuenta_unidad').val(),
-                'orden_trabajo': $('#movimiento_cuenta_orden_trabajo').val(),
-                'centro_costo': $('#movimiento_cuenta_centro_costo').val(),
-                'elemento_gasto': $('#movimiento_cuenta_elemento_gasto').val(),
-                'expediente': $('#movimiento_cuenta_expediente').val(),
-                'almacen': $('#movimiento_cuenta_almacen').val()
-            }
-            loadingModal.show()
-            $.ajax({
-                url: '/contabilidad/general/movimiento-cuenta/getSubmayor',
-                method: 'POST',
-                dataType: 'json',
-                data: params,
-                success: function (result) {
-                    if (result.success) {
-                        console.log(result)
-                        $('#rows_datos').find('tr').remove()
-                        result.datos.forEach(datos => {
-                            $('#rows_datos').append(`<tr>
+            if($('#anno').val() == '')
+                $('#anno').val(anno)
+            if (form_modal_target.valid()) {
+                let params = {
+                    'anno': $('#anno').val(),
+                    'nro_cuenta': $('#movimiento_cuenta_nro_cuenta').val(),
+                    'nro_subcuenta': $('#movimiento_cuenta_nro_subcuenta').val(),
+                    'periodo': $('#movimiento_cuenta_periodo').val(),
+                    'unidad': $('#movimiento_cuenta_unidad').val(),
+                    'orden_trabajo': $('#movimiento_cuenta_orden_trabajo').val(),
+                    'centro_costo': $('#movimiento_cuenta_centro_costo').val(),
+                    'elemento_gasto': $('#movimiento_cuenta_elemento_gasto').val(),
+                    'expediente': $('#movimiento_cuenta_expediente').val(),
+                    'almacen': $('#movimiento_cuenta_almacen').val()
+                }
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/general/movimiento-cuenta/getSubmayor',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: params,
+                    success: function (result) {
+                        if (result.success) {
+                            console.log(result)
+                            $('#saldo_inicial').show()
+                            $('#saldo_inicial').text('saldo inicial: ' + result.saldo_inicial)
+                            $('#rows_datos').find('tr').remove()
+                            result.datos.forEach(datos => {
+                                $('#rows_datos').append(`<tr>
                                     <td style="font-weight:400;"> ${datos['tipo_comprobante']} </td>
                                     <td style="font-weight:400;"> ${datos['nro_comprobante']} </td>
                                     <td style="font-weight:400;" class="text-center"> ${datos['nro_consecutivo']} </td>
@@ -239,12 +296,16 @@
                                     <td style="font-weight:400;" class="text-right"> ${datos['credito']} </td>
                                     <td style="font-weight:400;" class="text-right"> ${datos['total']} </td>
                                    </tr>`
-                            );
-                        })
+                                );
+                            })
+                        }
+                        loadingModal.close()
                     }
-                    loadingModal.close()
-                }
-            })
+                })
+            }
         }
+
+        hiddenParents()
+        resetForm()
     </script>
 {% endblock %}
