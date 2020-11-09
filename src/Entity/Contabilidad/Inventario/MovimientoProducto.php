@@ -90,6 +90,16 @@ class MovimientoProducto
      */
     private $id_almacen;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
+     */
+    private $id_orden_trabajo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Expediente::class)
+     */
+    private $id_expediente;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -247,6 +257,30 @@ class MovimientoProducto
     public function setIdAlmacen(?Almacen $id_almacen): self
     {
         $this->id_almacen = $id_almacen;
+
+        return $this;
+    }
+
+    public function getIdOrdenTrabajo(): ?OrdenTrabajo
+    {
+        return $this->id_orden_trabajo;
+    }
+
+    public function setIdOrdenTrabajo(?OrdenTrabajo $id_orden_trabajo): self
+    {
+        $this->id_orden_trabajo = $id_orden_trabajo;
+
+        return $this;
+    }
+
+    public function getIdExpediente(): ?Expediente
+    {
+        return $this->id_expediente;
+    }
+
+    public function setIdExpediente(?Expediente $id_expediente): self
+    {
+        $this->id_expediente = $id_expediente;
 
         return $this;
     }

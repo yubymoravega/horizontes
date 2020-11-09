@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2020 at 05:09 AM
+-- Generation Time: Nov 09, 2020 at 05:08 AM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.8
 
@@ -31,19 +31,51 @@ CREATE TABLE `activo_fijo` (
   `id` int(11) NOT NULL,
   `id_unidad_id` int(11) NOT NULL,
   `id_grupo_activo_id` int(11) NOT NULL,
-  `id_proveedor_id` int(11) NOT NULL,
-  `id_tipo_documento_activo_id` int(11) DEFAULT NULL,
-  `id_cuenta_deprecia_id` int(11) NOT NULL,
-  `id_elemento_gasto_id` int(11) NOT NULL,
+  `id_tipo_movimiento_baja_id` int(11) DEFAULT NULL,
   `nro_inventario` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `importe` double NOT NULL,
+  `valor_inicial` double NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fecha` date NOT NULL,
+  `fecha_alta` date NOT NULL,
   `activo` tinyint(1) NOT NULL,
-  `nro_cuenta_deprecia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `baja` tinyint(1) DEFAULT NULL,
   `fecha_baja` date DEFAULT NULL,
-  `motivo_baja` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `pais` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id_tipo_movimiento_id` int(11) DEFAULT NULL,
+  `id_area_responsabilidad_id` int(11) NOT NULL,
+  `nro_consecutivo` int(11) NOT NULL,
+  `nro_documento_baja` int(11) DEFAULT NULL,
+  `depreciacion_acumulada` double DEFAULT NULL,
+  `valor_real` double DEFAULT NULL,
+  `annos_vida_util` double NOT NULL,
+  `modelo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tipo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `marca` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_motor` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_serie` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_chapa` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nro_chasis` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `combustible` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fecha_ultima_depreciacion` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activo_fijo_cuentas`
+--
+
+CREATE TABLE `activo_fijo_cuentas` (
+  `id` int(11) NOT NULL,
+  `id_activo_id` int(11) NOT NULL,
+  `id_cuenta_activo_id` int(11) NOT NULL,
+  `id_subcuenta_activo_id` int(11) NOT NULL,
+  `id_centro_costo_activo_id` int(11) NOT NULL,
+  `id_area_responsabilidad_activo_id` int(11) NOT NULL,
+  `id_cuenta_depreciacion_id` int(11) NOT NULL,
+  `id_subcuenta_depreciacion_id` int(11) NOT NULL,
+  `id_cuenta_gasto_id` int(11) NOT NULL,
+  `id_subcuenta_gasto_id` int(11) NOT NULL,
+  `id_centro_costo_gasto_id` int(11) NOT NULL,
+  `id_elemento_gasto_gasto_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -83,8 +115,15 @@ CREATE TABLE `ajuste` (
 --
 
 INSERT INTO `ajuste` (`id`, `id_documento_id`, `nro_cuenta_inventario`, `observacion`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_concecutivo`, `anno`, `activo`, `entrada`, `nro_subcuenta_acreedora`) VALUES
-(2, 47, '183', 'Reunificando codigos de productos del mismo embalaje\r\n', '0010', '', '1', 2020, 1, 0, ''),
-(3, 48, '183', 'Runificando Codigos de Productos con el mismo embalaje', '0020', '183', '1', 2020, 1, 1, '0020');
+(5, 64, '696', 'Reunificando codigos en el alamcen por productos de igual embalaje', '0099', '', '1', 2020, 1, 0, ''),
+(6, 65, '', 'Contabilizando unificacion de codigos de productos de igual embalaje', '', '697', '1', 2020, 1, 1, '0099'),
+(7, 72, '696', 'Cambiando los productos que entraron a la cuenta 183  de materias primas para la cuenta 189 Mercancias para la Venta', '0099', '', '1', 2020, 1, 0, ''),
+(8, 73, '', 'REGISTRANDO  SOBRANTE EN CONTEO FISICO', '', '332', '2', 2020, 1, 1, '0020'),
+(9, 74, '332', 'REgistrando faltante detectado en conteo fisico al almacen', '0020', '', '2', 2020, 1, 0, ''),
+(10, 75, '', 'Cambio de cuenta contable', '', '697', '1', 2020, 1, 1, '0099'),
+(11, 76, '696', 'Rectificando código del producto', '0099', '', '2', 2020, 1, 0, ''),
+(12, 77, '696', 'Ajustando cuentas', '0099', '', '3', 2020, 1, 0, ''),
+(13, 78, '', 'Ajustando cuentas', '', '697', '2', 2020, 1, 1, '0099');
 
 -- --------------------------------------------------------
 
@@ -106,7 +145,8 @@ CREATE TABLE `almacen` (
 
 INSERT INTO `almacen` (`id`, `id_unidad_id`, `descripcion`, `activo`, `codigo`) VALUES
 (1, 1, 'Almacen de Matriales y Mercancias', 1, '01'),
-(2, 1, 'Almacen', 1, '02');
+(2, 1, 'Almacen Mercancias para la Venta', 1, '02'),
+(3, 1, 'Almacen de Productos Terminados', 1, '03');
 
 -- --------------------------------------------------------
 
@@ -125,7 +165,21 @@ CREATE TABLE `almacen_ocupado` (
 --
 
 INSERT INTO `almacen_ocupado` (`id`, `id_almacen_id`, `id_usuario_id`) VALUES
-(55, 2, 1);
+(138, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `area_responsabilidad`
+--
+
+CREATE TABLE `area_responsabilidad` (
+  `id` int(11) NOT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -182,7 +236,9 @@ INSERT INTO `centro_costo` (`id`, `id_unidad_id`, `activo`, `codigo`, `nombre`) 
 (2, 1, 1, '02', 'Combo de Aseo'),
 (3, 1, 1, '03', 'Combo de Medicina'),
 (4, 1, 1, '04', 'Combo de Comida'),
-(5, 1, 1, '05', 'Articulos de Ferreteria');
+(5, 1, 1, '05', 'Articulos de Ferreteria'),
+(6, 1, 1, '06', 'Direccion de la Unidad'),
+(7, 1, 1, '07', 'Produccion y Venta');
 
 -- --------------------------------------------------------
 
@@ -193,6 +249,7 @@ INSERT INTO `centro_costo` (`id`, `id_unidad_id`, `activo`, `codigo`, `nombre`) 
 CREATE TABLE `cierre` (
   `id` int(11) NOT NULL,
   `id_almacen_id` int(11) NOT NULL,
+  `id_usuario_id` int(11) DEFAULT NULL,
   `diario` tinyint(1) NOT NULL,
   `mes` int(11) DEFAULT NULL,
   `anno` int(11) NOT NULL,
@@ -207,9 +264,19 @@ CREATE TABLE `cierre` (
 -- Dumping data for table `cierre`
 --
 
-INSERT INTO `cierre` (`id`, `id_almacen_id`, `diario`, `mes`, `anno`, `fecha`, `saldo`, `abierto`, `debito`, `credito`) VALUES
-(8, 2, 1, 10, 2020, '2020-10-13', 0, 0, 57346.15, 960.95212),
-(9, 2, 1, 10, 2020, '2020-10-14', 56385.19788, 1, 0, 0);
+INSERT INTO `cierre` (`id`, `id_almacen_id`, `id_usuario_id`, `diario`, `mes`, `anno`, `fecha`, `saldo`, `abierto`, `debito`, `credito`) VALUES
+(17, 1, 1, 1, 10, 2020, '2020-10-20', 6353.89, 0, 7312.19, 958.3),
+(18, 1, 1, 1, 10, 2020, '2020-10-21', 6353.89, 0, 95.21, 2168.97),
+(20, 1, 1, 1, 10, 2020, '2020-10-22', 4280.13, 0, 0, 0),
+(21, 2, 1, 1, 10, 2020, '2020-10-21', 0, 0, 2073.76, 0),
+(22, 2, 1, 1, 10, 2020, '2020-10-22', 2073.76, 0, 0, 0),
+(23, 2, 1, 1, 11, 2020, '2020-10-23', 2073.76, 0, 44647.52, 4147.52),
+(24, 1, 1, 1, 11, 2020, '2020-10-23', 4280.13, 0, 580.56, 32.88),
+(27, 2, 1, 1, 11, 2020, '2020-10-24', 42573.76, 1, 0, 0),
+(28, 1, 1, 1, 10, 2020, '2020-10-25', 4827.81, 1, 0, 0),
+(29, 3, 1, 1, 11, 2020, '2020-10-23', 0, 0, 378.26, 0),
+(30, 3, 1, 1, 11, 2020, '2020-10-25', 378.26, 0, 1325, 0),
+(31, 3, 1, 1, 11, 2020, '2020-10-26', 1703.26, 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -320,6 +387,33 @@ CREATE TABLE `cliente_reporte` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `comprobante_cierre`
+--
+
+CREATE TABLE `comprobante_cierre` (
+  `id` int(11) NOT NULL,
+  `id_comprobante_id` int(11) NOT NULL,
+  `id_cierre_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `comprobante_cierre`
+--
+
+INSERT INTO `comprobante_cierre` (`id`, `id_comprobante_id`, `id_cierre_id`) VALUES
+(1, 3, 21),
+(2, 3, 22),
+(3, 3, 23),
+(4, 4, 17),
+(5, 4, 18),
+(6, 4, 20),
+(7, 4, 24),
+(8, 5, 29),
+(9, 5, 30);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `configuracion_inicial`
 --
 
@@ -391,6 +485,52 @@ INSERT INTO `criterio_analisis` (`id`, `nombre`, `abreviatura`, `activo`) VALUES
 (15, 'ACCIONISTAS', 'ACC', 1),
 (16, 'CUENTAS DE INGRESOS', 'ING', 1),
 (17, 'CUENTAS DE GASTOS', 'GAT', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cuadre_diario`
+--
+
+CREATE TABLE `cuadre_diario` (
+  `id` int(11) NOT NULL,
+  `id_cuenta_id` int(11) NOT NULL,
+  `id_subcuenta_id` int(11) NOT NULL,
+  `id_cierre_id` int(11) NOT NULL,
+  `id_almacen_id` int(11) NOT NULL,
+  `str_analisis` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `saldo` decimal(10,2) NOT NULL,
+  `debito` double NOT NULL,
+  `credito` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cuadre_diario`
+--
+
+INSERT INTO `cuadre_diario` (`id`, `id_cuenta_id`, `id_subcuenta_id`, `id_cierre_id`, `id_almacen_id`, `str_analisis`, `fecha`, `saldo`, `debito`, `credito`) VALUES
+(4, 10, 65, 17, 1, '01', '2020-10-20', '0.00', 367.41, 44.35),
+(5, 10, 66, 17, 1, '01', '2020-10-20', '0.00', 175.03, 40.05),
+(6, 10, 67, 17, 1, '01', '2020-10-20', '0.00', 6769.75, 873.9),
+(7, 10, 65, 18, 1, '01', '2020-10-21', '323.06', 91.25, 143.41),
+(8, 10, 66, 18, 1, '01', '2020-10-21', '134.98', 3.96, 14.36),
+(9, 10, 67, 18, 1, '01', '2020-10-21', '5895.85', 0, 2011.2),
+(10, 10, 65, 21, 2, '02', '2020-10-21', '0.00', 52.16, 0),
+(11, 10, 66, 21, 2, '02', '2020-10-21', '0.00', 10.4, 0),
+(12, 10, 67, 21, 2, '02', '2020-10-21', '0.00', 2011.2, 0),
+(25, 10, 65, 23, 2, '02', '2020-10-23', '52.16', 52.16, 104.32),
+(26, 10, 66, 23, 2, '02', '2020-10-23', '10.40', 10.4, 20.8),
+(27, 10, 67, 23, 2, '02', '2020-10-23', '2011.20', 204, 2215.2),
+(28, 15, 59, 23, 2, '02', '2020-10-23', '0.00', 10500, 0),
+(29, 15, 60, 23, 2, '02', '2020-10-23', '0.00', 52.16, 0),
+(30, 15, 61, 23, 2, '02', '2020-10-23', '0.00', 10.4, 0),
+(31, 15, 62, 23, 2, '02', '2020-10-23', '0.00', 33818.4, 1807.2),
+(32, 10, 65, 24, 1, '01', '2020-10-23', '270.90', 0, 8.29),
+(33, 10, 66, 24, 1, '01', '2020-10-23', '124.58', 18.77, 2.95),
+(34, 10, 67, 24, 1, '01', '2020-10-23', '3884.65', 561.79, 21.64),
+(35, 14, 4, 29, 3, '03', '2020-10-23', '0.00', 378.26, 0),
+(36, 14, 4, 30, 3, '03', '2020-10-25', '378.26', 1325, 0);
 
 -- --------------------------------------------------------
 
@@ -484,8 +624,8 @@ INSERT INTO `cuenta` (`id`, `id_tipo_cuenta_id`, `nro_cuenta`, `nombre`, `deudor
 (66, 13, 806, 'Impuestos por las Ventas', 1, 0, 0, 1, 0, 0),
 (67, 2, 810, 'Costo de Ventas de Produccion', 1, 0, 0, 1, 0, 0),
 (68, 13, 815, 'Costo de Ventas de Mercancias', 1, 0, 0, 1, 0, 0),
-(69, 2, 823, 'Gastos de Administracion', 1, 0, 0, 1, 0, 0),
-(70, 2, 819, 'Gastos de Distribucion y Ventas', 1, 0, 0, 1, 0, 0),
+(69, 13, 823, 'Gastos de Administracion', 1, 0, 0, 1, 0, 0),
+(70, 13, 819, 'Gastos de Distribucion y Ventas', 1, 0, 0, 1, 0, 0),
 (71, 13, 839, 'Gastos por Perdidas en Tasas de Cambio', 1, 0, 0, 1, 0, 0),
 (72, 13, 845, 'Gastos por Perdidas', 1, 0, 0, 1, 0, 0),
 (73, 13, 850, 'Gastos por Faltantes', 1, 0, 0, 1, 0, 0),
@@ -496,7 +636,8 @@ INSERT INTO `cuenta` (`id`, `id_tipo_cuenta_id`, `nro_cuenta`, `nombre`, `deudor
 (78, 14, 924, 'Ingresos por Variacion de Tasas de Cambio', 0, 0, 0, 1, 0, 0),
 (79, 14, 930, 'Ingresos por Sobrantes de Bienes', 0, 0, 0, 1, 0, 0),
 (80, 14, 950, 'Otros Ingresos', 0, 0, 0, 1, 0, 0),
-(81, 14, 953, 'Ingresos por Donaciones Recibidas', 0, 0, 0, 1, 0, 0);
+(81, 14, 953, 'Ingresos por Donaciones Recibidas', 0, 0, 0, 1, 0, 0),
+(82, 15, 999, 'Resultados', 0, 0, 0, 1, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -529,91 +670,75 @@ INSERT INTO `cuentas_cliente` (`id`, `id_moneda_id`, `id_cliente_id`, `nro_cuent
 CREATE TABLE `cuenta_criterio_analisis` (
   `id` int(11) NOT NULL,
   `id_cuenta_id` int(11) NOT NULL,
-  `id_criterio_analisis_id` int(11) NOT NULL
+  `id_criterio_analisis_id` int(11) NOT NULL,
+  `orden` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `cuenta_criterio_analisis`
 --
 
-INSERT INTO `cuenta_criterio_analisis` (`id`, `id_cuenta_id`, `id_criterio_analisis_id`) VALUES
-(10, 3, 6),
-(11, 5, 14),
-(13, 6, 6),
-(14, 4, 15),
-(15, 7, 8),
-(16, 8, 6),
-(18, 10, 1),
-(19, 11, 1),
-(21, 13, 1),
-(23, 12, 1),
-(26, 14, 1),
-(28, 16, 1),
-(29, 17, 1),
-(30, 18, 6),
-(31, 19, 6),
-(32, 20, 6),
-(33, 21, 4),
-(34, 22, 12),
-(35, 22, 13),
-(36, 23, 2),
-(37, 24, 4),
-(38, 25, 6),
-(39, 26, 6),
-(43, 35, 6),
-(48, 38, 6),
-(51, 36, 6),
-(52, 37, 6),
-(54, 39, 6),
-(55, 40, 6),
-(57, 43, 6),
-(58, 44, 8),
-(59, 45, 6),
-(60, 46, 6),
-(65, 48, 6),
-(66, 50, 11),
-(67, 51, 6),
-(68, 52, 6),
-(69, 55, 15),
-(74, 15, 1),
-(75, 69, 3),
-(76, 69, 5),
-(77, 69, 17),
-(79, 27, 5),
-(80, 28, 11),
-(81, 29, 11),
-(82, 30, 11),
-(83, 31, 6),
-(84, 31, 8),
-(85, 56, 15),
-(90, 65, 17),
-(96, 64, 4),
-(97, 64, 5),
-(98, 66, 17),
-(100, 68, 17),
-(101, 71, 17),
-(102, 72, 17),
-(103, 73, 17),
-(104, 74, 17),
-(109, 75, 16),
-(110, 77, 16),
-(111, 78, 16),
-(112, 79, 16),
-(113, 80, 16),
-(114, 81, 16),
-(115, 76, 3),
-(116, 76, 16),
-(120, 67, 3),
-(121, 67, 17),
-(122, 70, 3),
-(123, 70, 5),
-(124, 70, 17),
-(125, 61, 1),
-(126, 61, 2),
-(127, 62, 1),
-(128, 62, 2),
-(129, 63, 3),
-(130, 63, 5);
+INSERT INTO `cuenta_criterio_analisis` (`id`, `id_cuenta_id`, `id_criterio_analisis_id`, `orden`) VALUES
+(10, 3, 6, NULL),
+(11, 5, 14, NULL),
+(13, 6, 6, NULL),
+(14, 4, 15, NULL),
+(15, 7, 8, NULL),
+(16, 8, 6, NULL),
+(18, 10, 1, NULL),
+(19, 11, 1, NULL),
+(21, 13, 1, NULL),
+(23, 12, 1, NULL),
+(26, 14, 1, NULL),
+(28, 16, 1, NULL),
+(29, 17, 1, NULL),
+(30, 18, 6, NULL),
+(31, 19, 6, NULL),
+(32, 20, 6, NULL),
+(33, 21, 4, NULL),
+(36, 23, 2, NULL),
+(37, 24, 4, NULL),
+(38, 25, 6, NULL),
+(39, 26, 6, NULL),
+(43, 35, 6, NULL),
+(48, 38, 6, NULL),
+(51, 36, 6, NULL),
+(52, 37, 6, NULL),
+(54, 39, 6, NULL),
+(55, 40, 6, NULL),
+(57, 43, 6, NULL),
+(58, 44, 8, NULL),
+(59, 45, 6, NULL),
+(60, 46, 6, NULL),
+(65, 48, 6, NULL),
+(66, 50, 11, NULL),
+(67, 51, 6, NULL),
+(68, 52, 6, NULL),
+(69, 55, 15, NULL),
+(74, 15, 1, NULL),
+(79, 27, 5, NULL),
+(80, 28, 11, NULL),
+(81, 29, 11, NULL),
+(82, 30, 11, NULL),
+(83, 31, 6, NULL),
+(84, 31, 8, NULL),
+(85, 56, 15, NULL),
+(96, 64, 4, NULL),
+(97, 64, 5, NULL),
+(134, 22, 13, 1),
+(135, 22, 12, 2),
+(136, 61, 2, 1),
+(137, 61, 1, 2),
+(138, 63, 3, 1),
+(139, 63, 10, 2),
+(140, 63, 5, 3),
+(141, 62, 2, 1),
+(142, 62, 1, 2),
+(143, 67, 3, 1),
+(148, 70, 3, 1),
+(149, 70, 5, 2),
+(151, 69, 5, 1),
+(153, 76, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -646,6 +771,35 @@ CREATE TABLE `depreciacion` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `devolucion`
+--
+
+CREATE TABLE `devolucion` (
+  `id` int(11) NOT NULL,
+  `id_documento_id` int(11) DEFAULT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `id_almacen_id` int(11) NOT NULL,
+  `nro_cuenta` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nro_subcuenta` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `anno` int(11) NOT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `nro_concecutivo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_centro_costo_id` int(11) DEFAULT NULL,
+  `id_elemento_gasto_id` int(11) DEFAULT NULL,
+  `id_orden_tabajo_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `devolucion`
+--
+
+INSERT INTO `devolucion` (`id`, `id_documento_id`, `id_unidad_id`, `id_almacen_id`, `nro_cuenta`, `nro_subcuenta`, `anno`, `activo`, `nro_concecutivo`, `id_centro_costo_id`, `id_elemento_gasto_id`, `id_orden_tabajo_id`) VALUES
+(3, 81, 1, 1, '700', '0020', 2020, 1, '1', 4, 3, 2),
+(4, 82, 1, 1, '700', '0020', 2020, 1, '2', 3, 7, 6);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `doctrine_migration_versions`
 --
 
@@ -654,6 +808,13 @@ CREATE TABLE `doctrine_migration_versions` (
   `executed_at` datetime DEFAULT NULL,
   `execution_time` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `doctrine_migration_versions`
+--
+
+INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
+('DoctrineMigrations\\Version20201108220959', '2020-11-08 23:10:19', 2306);
 
 -- --------------------------------------------------------
 
@@ -678,28 +839,42 @@ CREATE TABLE `documento` (
 --
 
 INSERT INTO `documento` (`id`, `id_almacen_id`, `id_unidad_id`, `id_moneda_id`, `importe_total`, `fecha`, `activo`, `id_tipo_documento_id`, `anno`) VALUES
-(28, 2, 1, 1, 238.91, '2020-10-09', 1, 1, 2020),
-(29, 2, 1, 1, 128.5, '2020-10-09', 1, 1, 2020),
-(30, 2, 1, 1, 26.08556, '2020-10-09', 1, 7, 2020),
-(31, 2, 1, 1, 129.3, '2020-10-10', 1, 1, 2020),
-(32, 2, 1, 1, 45.73, '2020-10-10', 1, 1, 2020),
-(33, 2, 1, 1, 4399.35, '2020-10-10', 1, 1, 2020),
-(34, 2, 1, 1, 2370.4, '2020-10-10', 1, 1, 2020),
-(35, 2, 1, 1, 26.08556, '2020-10-10', 0, 7, 2020),
-(36, 2, 1, 1, 18.25, '2020-10-10', 1, 7, 2020),
-(37, 2, 1, 1, 311.64048, '2020-10-10', 1, 7, 2020),
-(38, 2, 1, 1, 18.25989, '2020-10-10', 1, 7, 2020),
-(39, 2, 1, 1, 21.80333, '2020-10-10', 1, 7, 2020),
-(40, 2, 1, 1, 560.95286, '2020-10-10', 1, 7, 2020),
-(41, 2, 1, 1, 30000, '2020-10-11', 0, 1, 2020),
-(42, 2, 1, 1, 30000, '2020-10-11', 1, 1, 2020),
-(43, 2, 1, 1, 3000, '2020-10-11', 1, 1, 2020),
-(44, 2, 1, 1, 6000, '2020-10-11', 1, 1, 2020),
-(45, 2, 1, 1, 1500, '2020-10-11', 1, 1, 2020),
-(46, 2, 1, 1, 7000, '2020-10-11', 1, 1, 2020),
-(47, 2, 1, 1, 3.96, '2020-10-11', 1, 4, 2020),
-(48, 2, 1, 1, 3.96, '2020-10-11', 1, 3, 2020),
-(49, 2, 1, 1, 2530, '2020-10-14', 1, 1, 2020);
+(52, 1, 1, 1, 238.91, '2020-10-20', 1, 1, 2020),
+(53, 1, 1, 1, 128.5, '2020-10-20', 1, 1, 2020),
+(54, 1, 1, 1, 129.3, '2020-10-20', 1, 1, 2020),
+(55, 1, 1, 1, 45.73, '2020-10-20', 1, 1, 2020),
+(56, 1, 1, 1, 4399.35, '2020-10-20', 1, 1, 2020),
+(57, 1, 1, 1, 2370.4, '2020-10-20', 1, 1, 2020),
+(58, 1, 1, 1, 26.09, '2020-10-20', 1, 7, 2020),
+(59, 1, 1, 1, 18.25, '2020-10-20', 1, 7, 2020),
+(60, 1, 1, 1, 312.11, '2020-10-20', 1, 7, 2020),
+(61, 1, 1, 1, 18.26, '2020-10-20', 1, 7, 2020),
+(62, 1, 1, 1, 21.8, '2020-10-20', 1, 7, 2020),
+(63, 1, 1, 1, 561.79, '2020-10-20', 1, 7, 2020),
+(64, 1, 1, 1, 95.21, '2020-10-21', 1, 4, 2020),
+(65, 1, 1, 1, 95.21, '2020-10-21', 1, 3, 2020),
+(66, 1, 1, 1, 2073.76, '2020-10-21', 1, 6, 2020),
+(67, 2, 1, 1, 2073.76, '2020-10-21', 1, 5, 2020),
+(68, 2, 1, 1, 30000, '2020-10-23', 1, 1, 2020),
+(69, 2, 1, 1, 3000, '2020-10-23', 1, 1, 2020),
+(70, 2, 1, 1, 6000, '2020-10-23', 1, 1, 2020),
+(71, 2, 1, 1, 1500, '2020-10-23', 1, 1, 2020),
+(72, 2, 1, 1, 2073.76, '2020-10-23', 1, 4, 2020),
+(73, 1, 1, 1, 0.52, '2020-10-23', 1, 3, 2020),
+(74, 1, 1, 1, 2.85, '2020-10-23', 1, 4, 2020),
+(75, 2, 1, 1, 2073.76, '2020-10-23', 1, 3, 2020),
+(76, 2, 1, 1, 1807.2, '2020-10-23', 1, 4, 2020),
+(77, 2, 1, 1, 266.56, '2020-10-23', 1, 4, 2020),
+(78, 2, 1, 1, 2073.76, '2020-10-23', 1, 3, 2020),
+(81, 1, 1, 1, 18.25, '2020-10-23', 1, 9, 2020),
+(82, 1, 1, 1, 561.79, '2020-10-23', 1, 9, 2020),
+(83, 1, 1, 1, 30.03, '2020-10-23', 1, 7, 2020),
+(84, 1, 1, 1, 83.59, '2020-10-25', 1, 7, 2020),
+(85, 1, 1, 1, 1241.41, '2020-10-25', 1, 7, 2020),
+(86, 3, 1, 1, 338.2, '2020-10-23', 1, 2, 2020),
+(87, 3, 1, 1, 40.06, '2020-10-23', 1, 2, 2020),
+(88, 3, 1, 1, 1048.86, '2020-10-25', 1, 2, 2020),
+(89, 3, 1, 1, 276.14, '2020-10-25', 1, 2, 2020);
 
 -- --------------------------------------------------------
 
@@ -779,6 +954,28 @@ INSERT INTO `empleado` (`id`, `id_unidad_id`, `id_cargo_id`, `id_usuario_id`, `n
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `expediente`
+--
+
+CREATE TABLE `expediente` (
+  `id` int(11) NOT NULL,
+  `id_unidad_id` int(11) DEFAULT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `anno` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `expediente`
+--
+
+INSERT INTO `expediente` (`id`, `id_unidad_id`, `codigo`, `descripcion`, `activo`, `anno`) VALUES
+(1, 1, '01', 'Faltante de Shampu', 1, 2020);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `factura`
 --
 
@@ -791,7 +988,7 @@ CREATE TABLE `factura` (
   `id_cliente` int(11) NOT NULL,
   `nro_factura` int(11) NOT NULL,
   `anno` int(11) NOT NULL,
-  `id_contrato` int(11) NOT NULL,
+  `id_contrato_id` int(11) NOT NULL,
   `cuenta_obligacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subcuenta_obligacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `activo` tinyint(1) NOT NULL
@@ -805,11 +1002,10 @@ CREATE TABLE `factura` (
 
 CREATE TABLE `grupo_activos` (
   `id` int(11) NOT NULL,
-  `id_cuenta_id` int(11) NOT NULL,
-  `id_subcuenta_id` int(11) DEFAULT NULL,
   `porciento_deprecia_anno` double NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -839,19 +1035,20 @@ CREATE TABLE `informe_recepcion` (
 --
 
 INSERT INTO `informe_recepcion` (`id`, `id_documento_id`, `id_proveedor_id`, `nro_cuenta_inventario`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`, `nro_concecutivo`, `anno`, `codigo_factura`, `fecha_factura`, `activo`, `producto`) VALUES
-(18, 28, 1, '183', '0010', '405', '0010', '1', 2020, '25', '2020-10-01', 1, 0),
-(19, 29, 2, '183', '0010', '405', '0010', '2', 2020, '152', '2020-10-01', 1, 0),
-(20, 31, 3, '183', '0020', '405', '0010', '3', 2020, '68', '2020-10-01', 1, 0),
-(21, 32, 4, '183', '0020', '405', '0010', '4', 2020, '3520', '2020-10-01', 1, 0),
-(22, 33, 5, '183', '0030', '405', '0010', '5', 2020, '45-152', '2020-10-01', 1, 0),
-(23, 34, 6, '183', '0030', '405', '0010', '6', 2020, '20381', '2020-10-01', 1, 0),
-(24, 41, 3, '189', '0040', '405', '0010', '7', 2020, '31', '2020-10-01', 0, 0),
-(25, 42, 9, '189', '0040', '405', '0010', '8', 2020, '31', '2020-10-01', 1, 0),
-(26, 43, 7, '189', '0040', '405', '0010', '9', 2020, '250', '2020-10-01', 1, 0),
-(27, 44, 8, '189', '0010', '405', '0010', '10', 2020, '1025', '2020-10-01', 1, 0),
-(28, 45, 7, '189', '0010', '405', '0010', '11', 2020, '295', '2020-10-01', 1, 0),
-(29, 46, 10, '189', '0040', '405', '0010', '12', 2020, '45-152', '2020-10-01', 1, 0),
-(30, 49, 1, '183', '0010', '405', '0010', '13', 2020, 'FI-123', '2020-10-13', 1, 0);
+(31, 52, 1, '', '', '405', '0010', '1', 2020, '25', '2020-10-20', 1, 0),
+(32, 53, 2, '', '', '405', '0010', '2', 2020, '152', '2020-10-20', 1, 0),
+(33, 54, 3, '', '', '405', '0010', '3', 2020, '68', '2020-10-01', 1, 0),
+(34, 55, 4, '', '', '405', '0010', '4', 2020, '189', '2020-10-13', 1, 0),
+(35, 56, 5, '', '', '405', '0010', '5', 2020, '1095', '2020-10-16', 1, 0),
+(36, 57, 6, '', '', '405', '0010', '6', 2020, '20381', '2020-10-17', 1, 0),
+(37, 68, 9, '', '', '405', '0010', '1', 2020, '31', '2020-10-02', 1, 0),
+(38, 69, 7, '', '', '405', '0010', '2', 2020, '250', '2020-10-09', 1, 0),
+(39, 70, 8, '', '', '405', '0010', '3', 2020, '1025', '2020-10-08', 1, 0),
+(40, 71, 7, '', '', '405', '0010', '4', 2020, '295', '2020-10-15', 1, 0),
+(41, 86, NULL, '', '', '700', '0050', '1', 2020, NULL, NULL, 1, 1),
+(42, 87, NULL, '', '', '700', '0050', '2', 2020, NULL, NULL, 1, 1),
+(43, 88, NULL, '', '', '700', '0050', '3', 2020, NULL, NULL, 1, 1),
+(44, 89, NULL, '', '', '700', '0050', '4', 2020, NULL, NULL, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -891,26 +1088,35 @@ CREATE TABLE `mercancia` (
 --
 
 INSERT INTO `mercancia` (`id`, `id_amlacen_id`, `id_unidad_medida_id`, `codigo`, `cuenta`, `descripcion`, `existencia`, `importe`, `activo`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`) VALUES
-(29, 2, 13, '1046-01', '183', 'Detergente', 575, 116.728, 1, NULL, NULL, NULL),
-(30, 2, 13, '1046-51', '183', 'Jabón', 365, 36.68655, 1, NULL, NULL, NULL),
-(31, 2, 13, '1046-12', '183', 'Shampu', 365, 91.25, 1, NULL, NULL, NULL),
-(32, 2, 13, '108051', '183', 'Jabón', 200, 28.4, 1, NULL, NULL, NULL),
-(33, 2, 13, '1075-23', '183', 'Shampu', 200, 70, 1, NULL, NULL, NULL),
-(34, 2, 13, '1080-01', '183', 'Jamon 250 grs', 100, 50.25, 1, NULL, NULL, NULL),
-(35, 2, 8, '1080-010', '183', 'Arroz', 650, 33.8, 1, NULL, NULL, NULL),
-(36, 2, 10, '1080-025', '183', 'Aceite', 185, 27.21, 1, NULL, NULL, NULL),
-(37, 2, 8, '1070-02', '183', 'Jamon 250 grs', 45, 20.34, 1, NULL, NULL, NULL),
-(38, 2, 8, '1070-015', '183', 'Arroz', 75, 3.37667, 1, NULL, NULL, NULL),
-(39, 2, 10, '1070-030', '183', 'Aceite', 0, 0, 0, NULL, NULL, NULL),
-(40, 2, 13, '2571-02', '183', 'Dipirona', 680, 680.90667, 1, NULL, NULL, NULL),
-(41, 2, 13, '263543', '183', 'Omeprazol', 455, 4111.20666, 1, NULL, NULL, NULL),
-(42, 2, 13, '1070-040', '183', 'Vitamina C', 455, 1105.04333, 1, NULL, NULL, NULL),
-(43, 2, 13, '2013151', '189', 'Split de 2.0 Ton', 70, 17000, 1, '0040', '405', '0010'),
-(44, 2, 13, '20131453', '189', 'Split de 1.5 ', 50, 10000, 1, '0040', '405', '0010'),
-(45, 2, 13, '20131452', '189', 'Split de 1.0 Ton', 70, 10000, 1, '0040', '405', '0010'),
-(46, 2, 13, '2018340', '189', 'Reacargas', 250, 4500, 1, '0040', '405', '0010'),
-(47, 2, 13, '2018342', '189', 'Recargas 30 USD', 200, 6000, 1, '0010', '405', '0010'),
-(48, 2, 13, '1046-02', '183', 'Jabón de tocador Oasis', 12365, 2510, 1, '0010', '405', '0010');
+(49, 1, 13, '104601', '183', 'Detergente', 90, 15.43, 1, '0010', '405', '0010'),
+(50, 1, 13, '104651', '183', 'Jabon', 195, 19.6, 1, '0010', '405', '0010'),
+(51, 1, 13, '104612', '183', 'Shampu', 0, 0, 0, '0010', '405', '0010'),
+(52, 1, 13, '108051', '183', 'Jabon', 200, 28.4, 1, '0010', '405', '0010'),
+(53, 1, 13, '1075-23', '183', 'Shampu', 405, 115.59, 1, '0010', '405', '0010'),
+(54, 1, 13, '108001', '183', 'Jamon 250 grs', 120, 60.3, 1, '0020', '405', '0010'),
+(55, 1, 8, '1080010', '183', 'Arroz', 560, 29.12, 1, '0020', '405', '0010'),
+(56, 1, 10, '1080025', '183', 'Aceite', 185, 27.26, 1, '0020', '405', '0010'),
+(57, 1, 13, '107002', '183', 'Jamon de 300grs', 45, 20.34, 1, '0020', '405', '0010'),
+(58, 1, 8, '1070015', '183', 'Arroz', 75, 3.38, 1, '0020', '405', '0010'),
+(59, 1, 10, '1070030', '183', 'Aceite', 0, 0, 0, '0020', '405', '0010'),
+(60, 1, 13, '257102', '183', 'Dipirona', 325, 331.5, 1, '0030', '405', '0010'),
+(61, 1, 13, '263543', '183', 'Omeprazol', 200, 1807.07, 1, '0030', '405', '0010'),
+(62, 1, 13, '1070040', '183', 'Vitamina C', 395, 959.32, 1, '0030', '405', '0010'),
+(63, 1, 13, '2571002', '183', 'Dipirona', 90, 85.5, 1, '0030', '405', '0010'),
+(64, 2, 13, '104601', '183', 'Detergente', 0, 0, 0, '0010', '697', '0020'),
+(65, 2, 8, '1080010', '183', 'Arroz', 0, 0, 0, '0020', '697', '0020'),
+(66, 2, 13, '257102', '183', 'Dipiroma', 0, 0, 0, '0030', '697', '0020'),
+(67, 2, 13, '263543', '183', 'Omeprazol', 0, 0, 0, '0030', '697', '0020'),
+(68, 2, 13, '2013151', '189', 'Split de 2.0 t', 50, 12500, 1, '0040', '405', '0010'),
+(69, 2, 13, '20131453', '189', 'Split de 1.5 t', 50, 10000, 1, '0040', '405', '0010'),
+(70, 2, 13, '20131452', '189', 'Split de 1.0 t', 50, 7500, 1, '0040', '405', '0010'),
+(71, 2, 13, '2018340', '189', 'Reacrgas 20 usd', 250, 4500, 1, '0010', '405', '0010'),
+(72, 2, 13, '2018342', '189', 'Reacarga 30 usd', 200, 6000, 1, '0010', '405', '0010'),
+(73, 2, 13, '2635.43', '189', 'Omeprazol', 0, 0, 0, '0040', '697', '0099'),
+(74, 2, 13, '104601', '189', 'Detergente', 305, 52.16, 1, '0020', '697', '0020'),
+(75, 2, 8, '1080010', '189', 'Arroz', 200, 10.4, 1, '0030', '697', '0020'),
+(76, 2, 13, '257102', '189', 'Dipiroma', 200, 204, 1, '0040', '697', '0020'),
+(77, 2, 13, '263543', '189', 'Omeprazol', 200, 1807.2, 1, '0040', '697', '0020');
 
 -- --------------------------------------------------------
 
@@ -975,6 +1181,28 @@ CREATE TABLE `movimiento` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `movimiento_activo_fijo`
+--
+
+CREATE TABLE `movimiento_activo_fijo` (
+  `id` int(11) NOT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `id_activo_fijo_id` int(11) NOT NULL,
+  `id_tipo_movimiento_id` int(11) NOT NULL,
+  `id_cuenta_id` int(11) NOT NULL,
+  `id_subcuenta_id` int(11) NOT NULL,
+  `id_usuario_id` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `fundamentacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entrada` tinyint(1) NOT NULL,
+  `nro_consecutivo` int(11) NOT NULL,
+  `anno` int(11) NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `movimiento_mercancia`
 --
 
@@ -992,68 +1220,105 @@ CREATE TABLE `movimiento_mercancia` (
   `fecha` date NOT NULL,
   `activo` tinyint(1) NOT NULL,
   `entrada` tinyint(1) NOT NULL,
-  `id_almacen_id` int(11) DEFAULT NULL
+  `id_almacen_id` int(11) DEFAULT NULL,
+  `id_expediente_id` int(11) DEFAULT NULL,
+  `id_orden_trabajo_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `movimiento_mercancia`
 --
 
-INSERT INTO `movimiento_mercancia` (`id`, `id_mercancia_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`, `id_almacen_id`) VALUES
-(57, 29, 28, 1, 1, NULL, NULL, 450, 81.18, 450, '2020-10-13', 1, 1, 2),
-(58, 30, 28, 1, 1, NULL, NULL, 450, 45.23, 450, '2020-10-13', 1, 1, 2),
-(59, 31, 28, 1, 1, NULL, NULL, 450, 112.5, 450, '2020-10-13', 1, 1, 2),
-(60, 29, 29, 1, 1, NULL, NULL, 200, 30.1, 650, '2020-10-13', 1, 1, 2),
-(61, 32, 29, 1, 1, NULL, NULL, 200, 28.4, 200, '2020-10-13', 1, 1, 2),
-(62, 33, 29, 1, 1, NULL, NULL, 200, 70, 200, '2020-10-13', 1, 1, 2),
-(63, 29, 30, 7, 1, 2, 2, 50, 8.56, 600, '2020-10-13', 1, 0, 2),
-(64, 30, 30, 7, 1, 2, 2, 50, 5.02556, 400, '2020-10-13', 1, 0, 2),
-(65, 31, 30, 7, 1, 2, 2, 50, 12.5, 400, '2020-10-13', 1, 0, 2),
-(66, 34, 31, 1, 1, NULL, NULL, 120, 60.3, 120, '2020-10-13', 1, 1, 2),
-(67, 35, 31, 1, 1, NULL, NULL, 750, 39, 750, '2020-10-13', 1, 1, 2),
-(68, 36, 31, 1, 1, NULL, NULL, 200, 30, 200, '2020-10-13', 1, 1, 2),
-(69, 37, 32, 1, 1, NULL, NULL, 70, 31.64, 70, '2020-10-13', 1, 1, 2),
-(70, 38, 32, 1, 1, NULL, NULL, 225, 10.13, 225, '2020-10-13', 1, 1, 2),
-(71, 39, 32, 1, 1, NULL, NULL, 30, 3.96, 30, '2020-10-13', 1, 1, 2),
-(72, 40, 33, 1, 1, NULL, NULL, 550, 561, 550, '2020-10-13', 1, 1, 2),
-(73, 41, 33, 1, 1, NULL, NULL, 325, 3073.3, 325, '2020-10-13', 1, 1, 2),
-(74, 42, 33, 1, 1, NULL, NULL, 325, 765.05, 325, '2020-10-13', 1, 1, 2),
-(75, 40, 34, 1, 1, NULL, NULL, 200, 190, 750, '2020-10-13', 1, 1, 2),
-(76, 41, 34, 1, 1, NULL, NULL, 200, 1670.4, 525, '2020-10-13', 1, 1, 2),
-(77, 42, 34, 1, 1, NULL, NULL, 200, 510, 525, '2020-10-13', 1, 1, 2),
-(78, 29, 35, 7, 1, 2, 2, 50, 8.56, 550, '2020-10-13', 0, 0, 2),
-(79, 30, 35, 7, 1, 2, 2, 50, 5.02556, 350, '2020-10-13', 0, 0, 2),
-(80, 31, 35, 7, 1, 2, 2, 50, 12.5, 350, '2020-10-13', 0, 0, 2),
-(81, 34, 36, 7, 1, 4, 3, 20, 10.05, 100, '2020-10-13', 1, 0, 2),
-(82, 35, 36, 7, 1, 4, 3, 100, 5.2, 650, '2020-10-13', 1, 0, 2),
-(83, 36, 36, 7, 1, 4, 3, 20, 3, 180, '2020-10-13', 1, 0, 2),
-(84, 40, 37, 7, 1, 3, 7, 25, 25.03333, 725, '2020-10-13', 1, 0, 2),
-(85, 41, 37, 7, 1, 3, 7, 25, 225.89048, 500, '2020-10-13', 1, 0, 2),
-(86, 42, 37, 7, 1, 3, 7, 25, 60.71667, 500, '2020-10-13', 1, 0, 2),
-(87, 29, 38, 7, 1, 2, 2, 35, 5.992, 515, '2020-10-13', 1, 0, 2),
-(88, 30, 38, 7, 1, 2, 2, 35, 3.51789, 315, '2020-10-13', 1, 0, 2),
-(89, 31, 38, 7, 1, 2, 2, 35, 8.75, 315, '2020-10-13', 1, 0, 2),
-(90, 37, 39, 7, 1, 4, 3, 25, 11.3, 45, '2020-10-13', 1, 0, 2),
-(91, 38, 39, 7, 1, 4, 3, 150, 6.75333, 75, '2020-10-13', 1, 0, 2),
-(92, 36, 39, 7, 1, 4, 3, 25, 3.75, 155, '2020-10-13', 1, 0, 2),
-(93, 40, 40, 7, 1, 3, 7, 45, 45.06, 680, '2020-10-13', 1, 0, 2),
-(94, 41, 40, 7, 1, 3, 7, 45, 406.60286, 455, '2020-10-13', 1, 0, 2),
-(95, 42, 40, 7, 1, 3, 7, 45, 109.29, 455, '2020-10-13', 1, 0, 2),
-(96, 43, 41, 1, 1, NULL, NULL, 50, 12500, 50, '2020-10-13', 0, 1, 2),
-(97, 44, 41, 1, 1, NULL, NULL, 50, 10000, 50, '2020-10-13', 0, 1, 2),
-(98, 45, 41, 1, 1, NULL, NULL, 50, 7500, 50, '2020-10-13', 0, 1, 2),
-(99, 43, 42, 1, 1, NULL, NULL, 50, 12500, 50, '2020-10-13', 1, 1, 2),
-(100, 44, 42, 1, 1, NULL, NULL, 50, 10000, 50, '2020-10-13', 1, 1, 2),
-(101, 45, 42, 1, 1, NULL, NULL, 50, 7500, 50, '2020-10-13', 1, 1, 2),
-(102, 46, 43, 1, 1, NULL, NULL, 150, 3000, 150, '2020-10-13', 1, 1, 2),
-(103, 47, 44, 1, 1, NULL, NULL, 200, 6000, 200, '2020-10-13', 1, 1, 2),
-(104, 46, 45, 1, 1, NULL, NULL, 100, 1500, 250, '2020-10-13', 1, 1, 2),
-(105, 43, 46, 1, 1, NULL, NULL, 20, 4500, 70, '2020-10-13', 1, 1, 2),
-(106, 45, 46, 1, 1, NULL, NULL, 20, 2500, 70, '2020-10-13', 1, 1, 2),
-(107, 39, 47, 4, 1, NULL, NULL, 30, 3.96, 0, '2020-10-13', 1, 0, 2),
-(108, 36, 48, 3, 1, NULL, NULL, 30, 3.96, 185, '2020-10-13', 1, 1, 2),
-(109, 29, 49, 1, 1, NULL, NULL, 10, 20, 575, '2020-10-13', 1, 1, 2),
-(110, 48, 49, 1, 1, NULL, NULL, 12365, 2510, 12365, '2020-10-13', 1, 1, 2);
+INSERT INTO `movimiento_mercancia` (`id`, `id_mercancia_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`, `id_almacen_id`, `id_expediente_id`, `id_orden_trabajo_id`) VALUES
+(113, 49, 52, 1, 1, NULL, NULL, 450, 81.18, 450, '2020-10-20', 1, 1, 1, NULL, NULL),
+(114, 50, 52, 1, 1, NULL, NULL, 450, 45.23, 450, '2020-10-20', 1, 1, 1, NULL, NULL),
+(115, 51, 52, 1, 1, NULL, NULL, 450, 112.5, 450, '2020-10-20', 1, 1, 1, NULL, NULL),
+(116, 49, 53, 1, 1, NULL, NULL, 200, 30.1, 650, '2020-10-20', 1, 1, 1, NULL, NULL),
+(117, 52, 53, 1, 1, NULL, NULL, 200, 28.4, 200, '2020-10-20', 1, 1, 1, NULL, NULL),
+(118, 53, 53, 1, 1, NULL, NULL, 200, 70, 200, '2020-10-20', 1, 1, 1, NULL, NULL),
+(119, 54, 54, 1, 1, NULL, NULL, 120, 60.3, 120, '2020-10-20', 1, 1, 1, NULL, NULL),
+(120, 55, 54, 1, 1, NULL, NULL, 750, 39, 750, '2020-10-20', 1, 1, 1, NULL, NULL),
+(121, 56, 54, 1, 1, NULL, NULL, 200, 30, 200, '2020-10-20', 1, 1, 1, NULL, NULL),
+(122, 57, 55, 1, 1, NULL, NULL, 70, 31.64, 70, '2020-10-20', 1, 1, 1, NULL, NULL),
+(123, 58, 55, 1, 1, NULL, NULL, 225, 10.13, 225, '2020-10-20', 1, 1, 1, NULL, NULL),
+(124, 59, 55, 1, 1, NULL, NULL, 30, 3.96, 30, '2020-10-20', 1, 1, 1, NULL, NULL),
+(125, 60, 56, 1, 1, NULL, NULL, 550, 561, 550, '2020-10-20', 1, 1, 1, NULL, NULL),
+(126, 61, 56, 1, 1, NULL, NULL, 325, 3073.3, 325, '2020-10-20', 1, 1, 1, NULL, NULL),
+(127, 62, 56, 1, 1, NULL, NULL, 325, 765.05, 325, '2020-10-20', 1, 1, 1, NULL, NULL),
+(128, 61, 57, 1, 1, NULL, NULL, 200, 1670.4, 525, '2020-10-20', 1, 1, 1, NULL, NULL),
+(129, 63, 57, 1, 1, NULL, NULL, 200, 190, 200, '2020-10-20', 1, 1, 1, NULL, NULL),
+(130, 62, 57, 1, 1, NULL, NULL, 200, 510, 525, '2020-10-20', 1, 1, 1, NULL, NULL),
+(131, 49, 58, 7, 1, 2, 2, 50, 8.56, 600, '2020-10-20', 1, 0, 1, NULL, 1),
+(132, 50, 58, 7, 1, 2, 2, 50, 5.03, 400, '2020-10-20', 1, 0, 1, NULL, 1),
+(133, 51, 58, 7, 1, 2, 2, 50, 12.5, 400, '2020-10-20', 1, 0, 1, NULL, 1),
+(134, 54, 59, 7, 1, 4, 3, 20, 10.05, 100, '2020-10-20', 1, 0, 1, NULL, 2),
+(135, 55, 59, 7, 1, 4, 3, 100, 5.2, 650, '2020-10-20', 1, 0, 1, NULL, 2),
+(136, 56, 59, 7, 1, 4, 3, 20, 3, 180, '2020-10-20', 1, 0, 1, NULL, 2),
+(137, 60, 60, 7, 1, 3, 7, 25, 25.5, 525, '2020-10-20', 1, 0, 1, NULL, 3),
+(138, 61, 60, 7, 1, 3, 7, 25, 225.89, 500, '2020-10-20', 1, 0, 1, NULL, 3),
+(139, 62, 60, 7, 1, 3, 7, 25, 60.72, 500, '2020-10-20', 1, 0, 1, NULL, 3),
+(140, 49, 61, 7, 1, 2, 2, 35, 5.99, 565, '2020-10-20', 1, 0, 1, NULL, 4),
+(141, 50, 61, 7, 1, 2, 2, 35, 3.52, 365, '2020-10-20', 1, 0, 1, NULL, 4),
+(142, 51, 61, 7, 1, 2, 2, 35, 8.75, 365, '2020-10-20', 1, 0, 1, NULL, 4),
+(143, 57, 62, 7, 1, 4, 3, 25, 11.3, 45, '2020-10-20', 1, 0, 1, NULL, 5),
+(144, 58, 62, 7, 1, 4, 3, 150, 6.75, 75, '2020-10-20', 1, 0, 1, NULL, 5),
+(145, 56, 62, 7, 1, 4, 3, 25, 3.75, 155, '2020-10-20', 1, 0, 1, NULL, 5),
+(146, 60, 63, 7, 1, 3, 7, 45, 45.9, 480, '2020-10-20', 1, 0, 1, NULL, 6),
+(147, 61, 63, 7, 1, 3, 7, 45, 406.6, 455, '2020-10-20', 1, 0, 1, NULL, 6),
+(148, 62, 63, 7, 1, 3, 7, 45, 109.29, 455, '2020-10-20', 1, 0, 1, NULL, 6),
+(149, 51, 64, 4, 1, NULL, NULL, 365, 91.25, 0, '2020-10-21', 1, 0, 1, NULL, NULL),
+(150, 59, 64, 4, 1, NULL, NULL, 30, 3.96, 0, '2020-10-21', 1, 0, 1, NULL, NULL),
+(151, 53, 65, 3, 1, NULL, NULL, 365, 91.25, 565, '2020-10-21', 1, 1, 1, NULL, NULL),
+(152, 56, 65, 3, 1, NULL, NULL, 30, 3.96, 185, '2020-10-21', 1, 1, 1, NULL, NULL),
+(153, 49, 66, 6, 1, NULL, NULL, 305, 52.16, 260, '2020-10-21', 1, 0, 1, NULL, NULL),
+(154, 55, 66, 6, 1, NULL, NULL, 200, 10.4, 450, '2020-10-21', 1, 0, 1, NULL, NULL),
+(155, 60, 66, 6, 1, NULL, NULL, 200, 204, 280, '2020-10-21', 1, 0, 1, NULL, NULL),
+(156, 61, 66, 6, 1, NULL, NULL, 200, 1807.2, 255, '2020-10-21', 1, 0, 1, NULL, NULL),
+(157, 64, 67, 5, 1, NULL, NULL, 305, 52.16, 305, '2020-10-21', 1, 1, 2, NULL, NULL),
+(158, 65, 67, 5, 1, NULL, NULL, 200, 10.4, 200, '2020-10-21', 1, 1, 2, NULL, NULL),
+(159, 66, 67, 5, 1, NULL, NULL, 200, 204, 200, '2020-10-21', 1, 1, 2, NULL, NULL),
+(160, 67, 67, 5, 1, NULL, NULL, 200, 1807.2, 200, '2020-10-21', 1, 1, 2, NULL, NULL),
+(161, 68, 68, 1, 1, NULL, NULL, 50, 12500, 50, '2020-10-23', 1, 1, 2, NULL, NULL),
+(162, 69, 68, 1, 1, NULL, NULL, 50, 10000, 50, '2020-10-23', 1, 1, 2, NULL, NULL),
+(163, 70, 68, 1, 1, NULL, NULL, 50, 7500, 50, '2020-10-23', 1, 1, 2, NULL, NULL),
+(164, 71, 69, 1, 1, NULL, NULL, 150, 3000, 150, '2020-10-23', 1, 1, 2, NULL, NULL),
+(165, 72, 70, 1, 1, NULL, NULL, 200, 6000, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(166, 71, 71, 1, 1, NULL, NULL, 100, 1500, 250, '2020-10-23', 1, 1, 2, NULL, NULL),
+(167, 64, 72, 4, 1, NULL, NULL, 305, 52.16, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(168, 65, 72, 4, 1, NULL, NULL, 200, 10.4, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(169, 66, 72, 4, 1, NULL, NULL, 200, 204, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(170, 67, 72, 4, 1, NULL, NULL, 200, 1807.2, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(171, 55, 73, 3, 1, NULL, NULL, 10, 0.52, 460, '2020-10-23', 1, 1, 1, NULL, NULL),
+(172, 53, 74, 4, 1, NULL, NULL, 10, 2.85, 555, '2020-10-23', 1, 0, 1, 1, NULL),
+(173, 64, 75, 3, 1, NULL, NULL, 305, 52.16, 305, '2020-10-23', 1, 1, 2, NULL, NULL),
+(174, 65, 75, 3, 1, NULL, NULL, 200, 10.4, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(175, 66, 75, 3, 1, NULL, NULL, 200, 204, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(176, 73, 75, 3, 1, NULL, NULL, 200, 1807.2, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(177, 73, 76, 4, 1, NULL, NULL, 200, 1807.2, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(178, 64, 77, 4, 1, NULL, NULL, 305, 52.16, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(179, 65, 77, 4, 1, NULL, NULL, 200, 10.4, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(180, 66, 77, 4, 1, NULL, NULL, 200, 204, 0, '2020-10-23', 1, 0, 2, NULL, NULL),
+(181, 74, 78, 3, 1, NULL, NULL, 305, 52.16, 305, '2020-10-23', 1, 1, 2, NULL, NULL),
+(182, 75, 78, 3, 1, NULL, NULL, 200, 10.4, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(183, 76, 78, 3, 1, NULL, NULL, 200, 204, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(184, 77, 78, 3, 1, NULL, NULL, 200, 1807.2, 200, '2020-10-23', 1, 1, 2, NULL, NULL),
+(185, 54, 81, 9, 1, NULL, NULL, 20, 10.05, 120, '2020-10-23', 1, 1, 1, NULL, NULL),
+(186, 55, 81, 9, 1, NULL, NULL, 100, 5.2, 560, '2020-10-23', 1, 1, 1, NULL, NULL),
+(187, 56, 81, 9, 1, NULL, NULL, 20, 3, 205, '2020-10-23', 1, 1, 1, NULL, NULL),
+(188, 60, 82, 9, 1, NULL, NULL, 45, 45.9, 325, '2020-10-23', 1, 1, 1, NULL, NULL),
+(189, 61, 82, 9, 1, NULL, NULL, 45, 406.6, 300, '2020-10-23', 1, 1, 1, NULL, NULL),
+(190, 62, 82, 9, 1, NULL, NULL, 45, 109.29, 500, '2020-10-23', 1, 1, 1, NULL, NULL),
+(191, 49, 83, 7, 1, 6, 2, 20, 3.43, 240, '2020-10-23', 1, 0, 1, NULL, NULL),
+(192, 50, 83, 7, 1, 6, 2, 20, 2.01, 345, '2020-10-23', 1, 0, 1, NULL, NULL),
+(193, 62, 83, 7, 1, 6, 7, 5, 12.14, 495, '2020-10-23', 1, 0, 1, NULL, NULL),
+(194, 63, 83, 7, 1, 6, 7, 10, 9.5, 190, '2020-10-23', 1, 0, 1, NULL, NULL),
+(195, 56, 83, 7, 1, 6, 3, 20, 2.95, 185, '2020-10-23', 1, 0, 1, NULL, NULL),
+(196, 49, 84, 7, 1, 2, 2, 150, 25.71, 90, '2020-10-25', 1, 0, 1, NULL, 7),
+(197, 50, 84, 7, 1, 2, 2, 150, 15.07, 195, '2020-10-25', 1, 0, 1, NULL, 7),
+(198, 53, 84, 7, 1, 2, 2, 150, 42.81, 405, '2020-10-25', 1, 0, 1, NULL, 7),
+(199, 61, 85, 7, 1, 3, 7, 100, 903.54, 200, '2020-10-25', 1, 0, 1, NULL, 8),
+(200, 62, 85, 7, 1, 3, 7, 100, 242.87, 395, '2020-10-25', 1, 0, 1, NULL, 8),
+(201, 63, 85, 7, 1, 3, 7, 100, 95, 90, '2020-10-25', 1, 0, 1, NULL, 8);
 
 -- --------------------------------------------------------
 
@@ -1075,8 +1340,24 @@ CREATE TABLE `movimiento_producto` (
   `fecha` date NOT NULL,
   `activo` tinyint(1) NOT NULL,
   `entrada` tinyint(1) NOT NULL,
-  `id_almacen_id` int(11) DEFAULT NULL
+  `id_almacen_id` int(11) DEFAULT NULL,
+  `id_orden_trabajo_id` int(11) DEFAULT NULL,
+  `id_expediente_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `movimiento_producto`
+--
+
+INSERT INTO `movimiento_producto` (`id`, `id_producto_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`, `id_almacen_id`, `id_orden_trabajo_id`, `id_expediente_id`) VALUES
+(1, 1, 86, 2, 1, 2, NULL, 50, 26.09, 50, '2020-10-23', 1, 1, 3, 1, NULL),
+(2, 2, 86, 2, 1, 3, NULL, 25, 312.11, 25, '2020-10-23', 1, 1, 3, 3, NULL),
+(3, 3, 87, 2, 1, 2, NULL, 35, 18.26, 35, '2020-10-23', 1, 1, 3, 4, NULL),
+(4, 4, 87, 2, 1, 4, NULL, 25, 21.8, 25, '2020-10-23', 1, 1, 3, 5, NULL),
+(5, 5, 88, 2, 1, 2, NULL, 100, 55.73, 100, '2020-10-25', 1, 1, 3, 7, NULL),
+(6, 6, 88, 2, 1, 3, NULL, 80, 993.13, 80, '2020-10-25', 1, 1, 3, 8, NULL),
+(7, 5, 89, 2, 1, 2, NULL, 50, 27.86, 150, '2020-10-25', 1, 1, 3, 7, NULL),
+(8, 6, 89, 2, 1, 3, NULL, 20, 248.28, 100, '2020-10-25', 1, 1, 3, 8, NULL);
 
 -- --------------------------------------------------------
 
@@ -1097,7 +1378,8 @@ CREATE TABLE `movimiento_venta` (
   `subcuenta_deudora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `id_almacen_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1156,6 +1438,36 @@ CREATE TABLE `obligacion_pago` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `orden_trabajo`
+--
+
+CREATE TABLE `orden_trabajo` (
+  `id` int(11) NOT NULL,
+  `id_unidad_id` int(11) DEFAULT NULL,
+  `id_almacen_id` int(11) DEFAULT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `anno` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `orden_trabajo`
+--
+
+INSERT INTO `orden_trabajo` (`id`, `id_unidad_id`, `id_almacen_id`, `codigo`, `descripcion`, `activo`, `anno`) VALUES
+(1, 1, 1, '01', 'Combo de Aseo 1era Clase', 1, 2020),
+(2, 1, 1, '02', 'Combo de Alimento 2da Clase', 1, 2020),
+(3, 1, 1, '03', 'Combo de Medicamentos Clase 1', 1, 2020),
+(4, 1, 1, '04', 'Combo de Aseo 2da Clase', 1, 2020),
+(5, 1, 1, '05', 'Combo de Alimento Clase 2', 1, 2020),
+(6, 1, 1, '06', 'Combo de Medicina Clase 1', 1, 2020),
+(7, 1, 1, '7', 'Combo de Aseo', 1, 2020),
+(8, 1, 1, '9', 'Combo de Medicina', 1, 2020);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `producto`
 --
 
@@ -1173,6 +1485,18 @@ CREATE TABLE `producto` (
   `nro_cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `producto`
+--
+
+INSERT INTO `producto` (`id`, `id_amlacen_id`, `id_unidad_medida_id`, `codigo`, `cuenta`, `descripcion`, `existencia`, `importe`, `activo`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`) VALUES
+(1, 3, 13, 'OT-01', '188', 'Combo de Aseo', 50, 26.09, 1, '0020', '700', '0050'),
+(2, 3, 13, 'OT-03', '188', 'Combo de Medicamento', 25, 312.11, 1, '0020', '700', '0050'),
+(3, 3, 13, 'OT-04', '188', 'Combo de Aseo', 35, 18.26, 1, '0020', '700', '0050'),
+(4, 3, 13, 'OT-05', '188', 'Combo de Alimento', 25, 21.8, 1, '0020', '700', '0050'),
+(5, 3, 13, 'OT-07', '188', 'Combo de Aseo', 150, 83.59, 1, '0020', '700', '0050'),
+(6, 3, 13, 'OT-09', '188', 'Combo de Medicamento', 100, 1241.41, 1, '0020', '700', '0050');
 
 -- --------------------------------------------------------
 
@@ -1226,12 +1550,23 @@ CREATE TABLE `registro_comprobantes` (
   `id_unidad_id` int(11) NOT NULL,
   `id_tipo_comprobante_id` int(11) NOT NULL,
   `id_usuario_id` int(11) NOT NULL,
+  `id_almacen_id` int(11) NOT NULL,
   `nro_consecutivo` int(11) NOT NULL,
   `fecha` date NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `debito` double NOT NULL,
-  `credito` double NOT NULL
+  `credito` double NOT NULL,
+  `anno` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `registro_comprobantes`
+--
+
+INSERT INTO `registro_comprobantes` (`id`, `id_unidad_id`, `id_tipo_comprobante_id`, `id_usuario_id`, `id_almacen_id`, `nro_consecutivo`, `fecha`, `descripcion`, `debito`, `credito`, `anno`) VALUES
+(3, 1, 2, 1, 2, 1, '2020-10-24', 'CONTABILIZANDO MOVIMIENTOS DE INVENTARIOS DEL ALMACEN 02 DE MERACANCIAS PARA LA VENTA DESDE EL 21 AL 23 DE OCTUBRE DE 2020', 50868.8, 50868.8, 2020),
+(4, 1, 2, 1, 1, 2, '2020-10-25', 'Contabilizazando Movimientos de Inventarios del Almacen de Materias Primas desde el 20 al 23 de Octubre de 2020', 11148.11, 11148.11, 2020),
+(5, 1, 2, 1, 3, 3, '2020-10-26', 'Contabilizando movimientos de inventarios del almacen de produccion terminada desde el 23 al 25 de Octubre de 2020', 1703.26, 1703.26, 2020);
 
 -- --------------------------------------------------------
 
@@ -1241,6 +1576,28 @@ CREATE TABLE `registro_comprobantes` (
 
 CREATE TABLE `reset_password_request` (
   `id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `saldo_cuentas`
+--
+
+CREATE TABLE `saldo_cuentas` (
+  `id` int(11) NOT NULL,
+  `id_cuenta_id` int(11) NOT NULL,
+  `id_subcuenta_id` int(11) NOT NULL,
+  `id_centro_costo_id` int(11) DEFAULT NULL,
+  `id_elemento_gasto_id` int(11) DEFAULT NULL,
+  `id_almacen_id` int(11) DEFAULT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `id_proveedor_id` int(11) DEFAULT NULL,
+  `id_expediente_id` int(11) DEFAULT NULL,
+  `id_orden_trabajo_id` int(11) DEFAULT NULL,
+  `mes` int(11) NOT NULL,
+  `anno` int(11) NOT NULL,
+  `saldo` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1347,7 +1704,9 @@ INSERT INTO `subcuenta` (`id`, `id_cuenta_id`, `nro_subcuenta`, `descripcion`, `
 (65, 10, '0010', 'Materiales y Productos Aseo', 1, 1, 0),
 (66, 10, '0020', 'Materiales y Produtos de Alimentos', 1, 1, 0),
 (67, 10, '0030', 'Materiales y Productos de Medicamentos', 1, 1, 0),
-(68, 10, '0999', 'Otros Materiales', 1, 1, 0);
+(68, 10, '0999', 'Otros Materiales', 1, 1, 0),
+(69, 50, '0010', 'Medios Monetarios', 0, 1, 0),
+(70, 50, '0020', 'Recursos Materiales', 0, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -1390,11 +1749,8 @@ INSERT INTO `subcuenta_criterio_analisis` (`id`, `id_subcuenta_id`, `id_criterio
 (29, 47, 2),
 (30, 48, 1),
 (31, 49, 1),
-(36, 50, 10),
-(37, 51, 10),
 (38, 52, 11),
 (39, 53, 11),
-(40, 54, 10),
 (41, 55, 4),
 (42, 55, 6),
 (43, 56, 4),
@@ -1407,7 +1763,16 @@ INSERT INTO `subcuenta_criterio_analisis` (`id`, `id_subcuenta_id`, `id_criterio
 (54, 66, 1),
 (55, 67, 1),
 (56, 68, 1),
-(57, 65, 1);
+(57, 65, 1),
+(58, 50, 3),
+(59, 50, 10),
+(64, 69, 11),
+(65, 70, 11),
+(66, 51, 3),
+(67, 51, 5),
+(68, 51, 10),
+(69, 54, 3),
+(70, 54, 10);
 
 -- --------------------------------------------------------
 
@@ -1472,9 +1837,17 @@ CREATE TABLE `test_crud` (
 CREATE TABLE `tipo_comprobante` (
   `id` int(11) NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `boolean` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `abreviatura` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tipo_comprobante`
+--
+
+INSERT INTO `tipo_comprobante` (`id`, `descripcion`, `activo`, `abreviatura`) VALUES
+(1, 'COMPROBANTE DE APERTURA', 1, 'AP'),
+(2, 'COMPROBANTE DE OPERACIONES', 1, '00');
 
 -- --------------------------------------------------------
 
@@ -1557,7 +1930,8 @@ CREATE TABLE `tipo_documento_activo_fijo` (
 CREATE TABLE `tipo_movimiento` (
   `id` int(11) NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `activo` tinyint(1) NOT NULL,
+  `codigo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1580,6 +1954,14 @@ CREATE TABLE `transferencia` (
   `entrada` tinyint(1) NOT NULL,
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `transferencia`
+--
+
+INSERT INTO `transferencia` (`id`, `id_documento_id`, `id_unidad_id`, `id_almacen_id`, `nro_cuenta_inventario`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_concecutivo`, `anno`, `activo`, `entrada`, `nro_subcuenta_acreedora`) VALUES
+(2, 66, NULL, 2, '696', '0020', '', '1', 2020, 1, 0, ''),
+(3, 67, NULL, 1, '', '', '697', '1', 2020, 1, 1, '0020');
 
 -- --------------------------------------------------------
 
@@ -1680,13 +2062,15 @@ CREATE TABLE `vale_salida` (
 --
 
 INSERT INTO `vale_salida` (`id`, `id_documento_id`, `activo`, `nro_consecutivo`, `anno`, `fecha_solicitud`, `nro_solicitud`, `nro_cuenta_deudora`, `nro_subcuenta_deudora`, `producto`) VALUES
-(8, 30, 1, '1', 2020, '2020-10-01', '1', '700', '0020', 0),
-(9, 35, 0, '2', 2020, '2020-10-01', '1', '700', '0020', 0),
-(10, 36, 1, '3', 2020, '2020-10-01', '2', '700', '0020', 0),
-(11, 37, 1, '4', 2020, '2020-10-01', '3', '700', '0020', 0),
-(12, 38, 1, '5', 2020, '2020-10-01', '4', '700', '0020', 0),
-(13, 39, 1, '6', 2020, '2020-10-01', '5', '700', '0020', 0),
-(14, 40, 1, '7', 2020, '2020-10-01', '6', '700', '0020', 0);
+(15, 58, 1, '1', 2020, '2020-10-20', '1', '700', '0020', 0),
+(16, 59, 1, '2', 2020, '2020-10-20', '2', '700', '0020', 0),
+(17, 60, 1, '3', 2020, '2020-10-20', '3', '700', '0020', 0),
+(18, 61, 1, '4', 2020, '2020-10-20', '4', '700', '0020', 0),
+(19, 62, 1, '5', 2020, '2020-10-20', '5', '700', '0020', 0),
+(20, 63, 1, '6', 2020, '2020-10-20', '6', '700', '0020', 0),
+(21, 83, 1, '7', 2020, '2020-10-23', '7', '823', '', 0),
+(22, 84, 1, '8', 2020, '2020-10-25', '8', '700', '0020', 0),
+(23, 85, 1, '9', 2020, '2020-10-25', '9', '700', '0020', 0);
 
 --
 -- Indexes for dumped tables
@@ -1699,10 +2083,26 @@ ALTER TABLE `activo_fijo`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_75EBC93E1D34FA6B` (`id_unidad_id`),
   ADD KEY `IDX_75EBC93E4A667A2B` (`id_grupo_activo_id`),
-  ADD KEY `IDX_75EBC93EE8F12801` (`id_proveedor_id`),
-  ADD KEY `IDX_75EBC93EA1BE243F` (`id_tipo_documento_activo_id`),
-  ADD KEY `IDX_75EBC93EEB3145A8` (`id_cuenta_deprecia_id`),
-  ADD KEY `IDX_75EBC93EF66372E9` (`id_elemento_gasto_id`);
+  ADD KEY `IDX_75EBC93EDB763453` (`id_tipo_movimiento_id`),
+  ADD KEY `IDX_75EBC93E6FBA0327` (`id_tipo_movimiento_baja_id`),
+  ADD KEY `IDX_75EBC93ED410562` (`id_area_responsabilidad_id`);
+
+--
+-- Indexes for table `activo_fijo_cuentas`
+--
+ALTER TABLE `activo_fijo_cuentas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_E0DF2901C84BDE84` (`id_activo_id`),
+  ADD KEY `IDX_E0DF290186762CC7` (`id_cuenta_activo_id`),
+  ADD KEY `IDX_E0DF29014476721E` (`id_subcuenta_activo_id`),
+  ADD KEY `IDX_E0DF29012955A16D` (`id_centro_costo_activo_id`),
+  ADD KEY `IDX_E0DF29014C675596` (`id_area_responsabilidad_activo_id`),
+  ADD KEY `IDX_E0DF290174A5FFBA` (`id_cuenta_depreciacion_id`),
+  ADD KEY `IDX_E0DF2901549C81D9` (`id_subcuenta_depreciacion_id`),
+  ADD KEY `IDX_E0DF290180C608FA` (`id_cuenta_gasto_id`),
+  ADD KEY `IDX_E0DF290157677646` (`id_subcuenta_gasto_id`),
+  ADD KEY `IDX_E0DF2901A950EE53` (`id_centro_costo_gasto_id`),
+  ADD KEY `IDX_E0DF2901A752F04B` (`id_elemento_gasto_gasto_id`);
 
 --
 -- Indexes for table `activo_fijo_movimiento_activo_fijo`
@@ -1736,6 +2136,13 @@ ALTER TABLE `almacen_ocupado`
   ADD KEY `IDX_AA5360587EB2C349` (`id_usuario_id`);
 
 --
+-- Indexes for table `area_responsabilidad`
+--
+ALTER TABLE `area_responsabilidad`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_F469C2BA1D34FA6B` (`id_unidad_id`);
+
+--
 -- Indexes for table `cargo`
 --
 ALTER TABLE `cargo`
@@ -1759,7 +2166,8 @@ ALTER TABLE `centro_costo`
 --
 ALTER TABLE `cierre`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `IDX_D0DCFCC739161EBF` (`id_almacen_id`);
+  ADD KEY `IDX_D0DCFCC739161EBF` (`id_almacen_id`),
+  ADD KEY `IDX_D0DCFCC77EB2C349` (`id_usuario_id`);
 
 --
 -- Indexes for table `cierre_diario`
@@ -1794,6 +2202,14 @@ ALTER TABLE `cliente_reporte`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `comprobante_cierre`
+--
+ALTER TABLE `comprobante_cierre`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_D03EA4C51800963C` (`id_comprobante_id`),
+  ADD KEY `IDX_D03EA4C545F8C94C` (`id_cierre_id`);
+
+--
 -- Indexes for table `configuracion_inicial`
 --
 ALTER TABLE `configuracion_inicial`
@@ -1814,6 +2230,16 @@ ALTER TABLE `contratos_cliente`
 --
 ALTER TABLE `criterio_analisis`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cuadre_diario`
+--
+ALTER TABLE `cuadre_diario`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_60ABEFD91ADA4D3F` (`id_cuenta_id`),
+  ADD KEY `IDX_60ABEFD92D412F53` (`id_subcuenta_id`),
+  ADD KEY `IDX_60ABEFD945F8C94C` (`id_cierre_id`),
+  ADD KEY `IDX_60ABEFD939161EBF` (`id_almacen_id`);
 
 --
 -- Indexes for table `cuenta`
@@ -1853,6 +2279,18 @@ ALTER TABLE `depreciacion`
   ADD KEY `IDX_D618AE145832E72E` (`id_activo_fijo_id`);
 
 --
+-- Indexes for table `devolucion`
+--
+ALTER TABLE `devolucion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_524D9F676601BA07` (`id_documento_id`),
+  ADD KEY `IDX_524D9F671D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_524D9F6739161EBF` (`id_almacen_id`),
+  ADD KEY `IDX_524D9F67C59B01FF` (`id_centro_costo_id`),
+  ADD KEY `IDX_524D9F67F66372E9` (`id_elemento_gasto_id`),
+  ADD KEY `IDX_524D9F675074DD86` (`id_orden_tabajo_id`);
+
+--
 -- Indexes for table `doctrine_migration_versions`
 --
 ALTER TABLE `doctrine_migration_versions`
@@ -1884,20 +2322,26 @@ ALTER TABLE `empleado`
   ADD KEY `IDX_D9D9BF52D1E12F15` (`id_cargo_id`);
 
 --
+-- Indexes for table `expediente`
+--
+ALTER TABLE `expediente`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_D59CA4131D34FA6B` (`id_unidad_id`);
+
+--
 -- Indexes for table `factura`
 --
 ALTER TABLE `factura`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_F9EBA0091D34FA6B` (`id_unidad_id`),
-  ADD KEY `IDX_F9EBA0097EB2C349` (`id_usuario_id`);
+  ADD KEY `IDX_F9EBA0097EB2C349` (`id_usuario_id`),
+  ADD KEY `IDX_F9EBA00968BCB606` (`id_contrato_id`);
 
 --
 -- Indexes for table `grupo_activos`
 --
 ALTER TABLE `grupo_activos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `IDX_50ADD6F61ADA4D3F` (`id_cuenta_id`),
-  ADD KEY `IDX_50ADD6F62D412F53` (`id_subcuenta_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `informe_recepcion`
@@ -1952,6 +2396,18 @@ ALTER TABLE `movimiento`
   ADD KEY `IDX_C8FF107A4F781EA` (`id_unidad_destino_id`);
 
 --
+-- Indexes for table `movimiento_activo_fijo`
+--
+ALTER TABLE `movimiento_activo_fijo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_A985A0DA1D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_A985A0DA5832E72E` (`id_activo_fijo_id`),
+  ADD KEY `IDX_A985A0DADB763453` (`id_tipo_movimiento_id`),
+  ADD KEY `IDX_A985A0DA1ADA4D3F` (`id_cuenta_id`),
+  ADD KEY `IDX_A985A0DA2D412F53` (`id_subcuenta_id`),
+  ADD KEY `IDX_A985A0DA7EB2C349` (`id_usuario_id`);
+
+--
 -- Indexes for table `movimiento_mercancia`
 --
 ALTER TABLE `movimiento_mercancia`
@@ -1962,7 +2418,9 @@ ALTER TABLE `movimiento_mercancia`
   ADD KEY `IDX_44876BD77EB2C349` (`id_usuario_id`),
   ADD KEY `IDX_44876BD7C59B01FF` (`id_centro_costo_id`),
   ADD KEY `IDX_44876BD7F66372E9` (`id_elemento_gasto_id`),
-  ADD KEY `IDX_44876BD739161EBF` (`id_almacen_id`);
+  ADD KEY `IDX_44876BD739161EBF` (`id_almacen_id`),
+  ADD KEY `IDX_44876BD7F5DBAF2B` (`id_expediente_id`),
+  ADD KEY `IDX_44876BD771381BB3` (`id_orden_trabajo_id`);
 
 --
 -- Indexes for table `movimiento_producto`
@@ -1975,14 +2433,17 @@ ALTER TABLE `movimiento_producto`
   ADD KEY `IDX_FFC0EDFC7EB2C349` (`id_usuario_id`),
   ADD KEY `IDX_FFC0EDFCC59B01FF` (`id_centro_costo_id`),
   ADD KEY `IDX_FFC0EDFCF66372E9` (`id_elemento_gasto_id`),
-  ADD KEY `IDX_FFC0EDFC39161EBF` (`id_almacen_id`);
+  ADD KEY `IDX_FFC0EDFC39161EBF` (`id_almacen_id`),
+  ADD KEY `IDX_FFC0EDFC71381BB3` (`id_orden_trabajo_id`),
+  ADD KEY `IDX_FFC0EDFCF5DBAF2B` (`id_expediente_id`);
 
 --
 -- Indexes for table `movimiento_venta`
 --
 ALTER TABLE `movimiento_venta`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `IDX_8E3F7AE555C5F988` (`id_factura_id`);
+  ADD KEY `IDX_8E3F7AE555C5F988` (`id_factura_id`),
+  ADD KEY `IDX_8E3F7AE539161EBF` (`id_almacen_id`);
 
 --
 -- Indexes for table `municipios`
@@ -2005,6 +2466,14 @@ ALTER TABLE `obligacion_pago`
   ADD KEY `IDX_403C9B3BE8F12801` (`id_proveedor_id`),
   ADD KEY `IDX_403C9B3B6601BA07` (`id_documento_id`),
   ADD KEY `IDX_403C9B3B1D34FA6B` (`id_unidad_id`);
+
+--
+-- Indexes for table `orden_trabajo`
+--
+ALTER TABLE `orden_trabajo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_4158A0241D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_4158A02439161EBF` (`id_almacen_id`);
 
 --
 -- Indexes for table `producto`
@@ -2033,13 +2502,29 @@ ALTER TABLE `registro_comprobantes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_B2D1B2B21D34FA6B` (`id_unidad_id`),
   ADD KEY `IDX_B2D1B2B2EF5F7851` (`id_tipo_comprobante_id`),
-  ADD KEY `IDX_B2D1B2B27EB2C349` (`id_usuario_id`);
+  ADD KEY `IDX_B2D1B2B27EB2C349` (`id_usuario_id`),
+  ADD KEY `IDX_B2D1B2B239161EBF` (`id_almacen_id`);
 
 --
 -- Indexes for table `reset_password_request`
 --
 ALTER TABLE `reset_password_request`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `saldo_cuentas`
+--
+ALTER TABLE `saldo_cuentas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_BB2B71AE1ADA4D3F` (`id_cuenta_id`),
+  ADD KEY `IDX_BB2B71AE2D412F53` (`id_subcuenta_id`),
+  ADD KEY `IDX_BB2B71AEC59B01FF` (`id_centro_costo_id`),
+  ADD KEY `IDX_BB2B71AEF66372E9` (`id_elemento_gasto_id`),
+  ADD KEY `IDX_BB2B71AE39161EBF` (`id_almacen_id`),
+  ADD KEY `IDX_BB2B71AE1D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_BB2B71AEE8F12801` (`id_proveedor_id`),
+  ADD KEY `IDX_BB2B71AEF5DBAF2B` (`id_expediente_id`),
+  ADD KEY `IDX_BB2B71AE71381BB3` (`id_orden_trabajo_id`);
 
 --
 -- Indexes for table `stripe_factura`
@@ -2163,6 +2648,12 @@ ALTER TABLE `activo_fijo`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `activo_fijo_cuentas`
+--
+ALTER TABLE `activo_fijo_cuentas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `activo_fijo_movimiento_activo_fijo`
 --
 ALTER TABLE `activo_fijo_movimiento_activo_fijo`
@@ -2172,19 +2663,25 @@ ALTER TABLE `activo_fijo_movimiento_activo_fijo`
 -- AUTO_INCREMENT for table `ajuste`
 --
 ALTER TABLE `ajuste`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `almacen`
 --
 ALTER TABLE `almacen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `almacen_ocupado`
 --
 ALTER TABLE `almacen_ocupado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=139;
+
+--
+-- AUTO_INCREMENT for table `area_responsabilidad`
+--
+ALTER TABLE `area_responsabilidad`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `cargo`
@@ -2202,13 +2699,13 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT for table `centro_costo`
 --
 ALTER TABLE `centro_costo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `cierre`
 --
 ALTER TABLE `cierre`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `cierre_diario`
@@ -2241,6 +2738,12 @@ ALTER TABLE `cliente_reporte`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `comprobante_cierre`
+--
+ALTER TABLE `comprobante_cierre`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `configuracion_inicial`
 --
 ALTER TABLE `configuracion_inicial`
@@ -2259,10 +2762,16 @@ ALTER TABLE `criterio_analisis`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
+-- AUTO_INCREMENT for table `cuadre_diario`
+--
+ALTER TABLE `cuadre_diario`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
 -- AUTO_INCREMENT for table `cuenta`
 --
 ALTER TABLE `cuenta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT for table `cuentas_cliente`
@@ -2274,7 +2783,7 @@ ALTER TABLE `cuentas_cliente`
 -- AUTO_INCREMENT for table `cuenta_criterio_analisis`
 --
 ALTER TABLE `cuenta_criterio_analisis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
 
 --
 -- AUTO_INCREMENT for table `custom_user`
@@ -2289,10 +2798,16 @@ ALTER TABLE `depreciacion`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `devolucion`
+--
+ALTER TABLE `devolucion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `documento`
 --
 ALTER TABLE `documento`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT for table `elemento_gasto`
@@ -2304,6 +2819,12 @@ ALTER TABLE `elemento_gasto`
 -- AUTO_INCREMENT for table `empleado`
 --
 ALTER TABLE `empleado`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `expediente`
+--
+ALTER TABLE `expediente`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
@@ -2322,7 +2843,7 @@ ALTER TABLE `grupo_activos`
 -- AUTO_INCREMENT for table `informe_recepcion`
 --
 ALTER TABLE `informe_recepcion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `instrumento_cobro`
@@ -2334,7 +2855,7 @@ ALTER TABLE `instrumento_cobro`
 -- AUTO_INCREMENT for table `mercancia`
 --
 ALTER TABLE `mercancia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `mercancia_producto`
@@ -2355,16 +2876,22 @@ ALTER TABLE `movimiento`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `movimiento_activo_fijo`
+--
+ALTER TABLE `movimiento_activo_fijo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `movimiento_mercancia`
 --
 ALTER TABLE `movimiento_mercancia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=202;
 
 --
 -- AUTO_INCREMENT for table `movimiento_producto`
 --
 ALTER TABLE `movimiento_producto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `movimiento_venta`
@@ -2391,10 +2918,16 @@ ALTER TABLE `obligacion_pago`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `orden_trabajo`
+--
+ALTER TABLE `orden_trabajo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT for table `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `proveedor`
@@ -2412,12 +2945,18 @@ ALTER TABLE `provincias`
 -- AUTO_INCREMENT for table `registro_comprobantes`
 --
 ALTER TABLE `registro_comprobantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `reset_password_request`
 --
 ALTER TABLE `reset_password_request`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `saldo_cuentas`
+--
+ALTER TABLE `saldo_cuentas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -2430,13 +2969,13 @@ ALTER TABLE `stripe_factura`
 -- AUTO_INCREMENT for table `subcuenta`
 --
 ALTER TABLE `subcuenta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT for table `subcuenta_criterio_analisis`
 --
 ALTER TABLE `subcuenta_criterio_analisis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT for table `subcuenta_proveedor`
@@ -2454,12 +2993,6 @@ ALTER TABLE `tasa_cambio`
 -- AUTO_INCREMENT for table `test_crud`
 --
 ALTER TABLE `test_crud`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `tipo_comprobante`
---
-ALTER TABLE `tipo_comprobante`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -2484,7 +3017,7 @@ ALTER TABLE `tipo_movimiento`
 -- AUTO_INCREMENT for table `transferencia`
 --
 ALTER TABLE `transferencia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `unidad`
@@ -2502,7 +3035,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `vale_salida`
 --
 ALTER TABLE `vale_salida`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Constraints for dumped tables
@@ -2514,10 +3047,25 @@ ALTER TABLE `vale_salida`
 ALTER TABLE `activo_fijo`
   ADD CONSTRAINT `FK_75EBC93E1D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
   ADD CONSTRAINT `FK_75EBC93E4A667A2B` FOREIGN KEY (`id_grupo_activo_id`) REFERENCES `grupo_activos` (`id`),
-  ADD CONSTRAINT `FK_75EBC93EA1BE243F` FOREIGN KEY (`id_tipo_documento_activo_id`) REFERENCES `tipo_documento_activo_fijo` (`id`),
-  ADD CONSTRAINT `FK_75EBC93EE8F12801` FOREIGN KEY (`id_proveedor_id`) REFERENCES `proveedor` (`id`),
-  ADD CONSTRAINT `FK_75EBC93EEB3145A8` FOREIGN KEY (`id_cuenta_deprecia_id`) REFERENCES `cuenta` (`id`),
-  ADD CONSTRAINT `FK_75EBC93EF66372E9` FOREIGN KEY (`id_elemento_gasto_id`) REFERENCES `elemento_gasto` (`id`);
+  ADD CONSTRAINT `FK_75EBC93E6FBA0327` FOREIGN KEY (`id_tipo_movimiento_baja_id`) REFERENCES `tipo_movimiento` (`id`),
+  ADD CONSTRAINT `FK_75EBC93ED410562` FOREIGN KEY (`id_area_responsabilidad_id`) REFERENCES `area_responsabilidad` (`id`),
+  ADD CONSTRAINT `FK_75EBC93EDB763453` FOREIGN KEY (`id_tipo_movimiento_id`) REFERENCES `tipo_movimiento` (`id`);
+
+--
+-- Constraints for table `activo_fijo_cuentas`
+--
+ALTER TABLE `activo_fijo_cuentas`
+  ADD CONSTRAINT `FK_E0DF29012955A16D` FOREIGN KEY (`id_centro_costo_activo_id`) REFERENCES `centro_costo` (`id`),
+  ADD CONSTRAINT `FK_E0DF29014476721E` FOREIGN KEY (`id_subcuenta_activo_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_E0DF29014C675596` FOREIGN KEY (`id_area_responsabilidad_activo_id`) REFERENCES `area_responsabilidad` (`id`),
+  ADD CONSTRAINT `FK_E0DF2901549C81D9` FOREIGN KEY (`id_subcuenta_depreciacion_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_E0DF290157677646` FOREIGN KEY (`id_subcuenta_gasto_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_E0DF290174A5FFBA` FOREIGN KEY (`id_cuenta_depreciacion_id`) REFERENCES `cuenta` (`id`),
+  ADD CONSTRAINT `FK_E0DF290180C608FA` FOREIGN KEY (`id_cuenta_gasto_id`) REFERENCES `cuenta` (`id`),
+  ADD CONSTRAINT `FK_E0DF290186762CC7` FOREIGN KEY (`id_cuenta_activo_id`) REFERENCES `cuenta` (`id`),
+  ADD CONSTRAINT `FK_E0DF2901A752F04B` FOREIGN KEY (`id_elemento_gasto_gasto_id`) REFERENCES `elemento_gasto` (`id`),
+  ADD CONSTRAINT `FK_E0DF2901A950EE53` FOREIGN KEY (`id_centro_costo_gasto_id`) REFERENCES `centro_costo` (`id`),
+  ADD CONSTRAINT `FK_E0DF2901C84BDE84` FOREIGN KEY (`id_activo_id`) REFERENCES `activo_fijo` (`id`);
 
 --
 -- Constraints for table `activo_fijo_movimiento_activo_fijo`
@@ -2546,6 +3094,12 @@ ALTER TABLE `almacen_ocupado`
   ADD CONSTRAINT `FK_AA5360587EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`);
 
 --
+-- Constraints for table `area_responsabilidad`
+--
+ALTER TABLE `area_responsabilidad`
+  ADD CONSTRAINT `FK_F469C2BA1D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`);
+
+--
 -- Constraints for table `centro_costo`
 --
 ALTER TABLE `centro_costo`
@@ -2555,7 +3109,8 @@ ALTER TABLE `centro_costo`
 -- Constraints for table `cierre`
 --
 ALTER TABLE `cierre`
-  ADD CONSTRAINT `FK_D0DCFCC739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`);
+  ADD CONSTRAINT `FK_D0DCFCC739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
+  ADD CONSTRAINT `FK_D0DCFCC77EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `cierre_diario`
@@ -2563,6 +3118,13 @@ ALTER TABLE `cierre`
 ALTER TABLE `cierre_diario`
   ADD CONSTRAINT `FK_F3D0CD8939161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_F3D0CD897EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `comprobante_cierre`
+--
+ALTER TABLE `comprobante_cierre`
+  ADD CONSTRAINT `FK_D03EA4C51800963C` FOREIGN KEY (`id_comprobante_id`) REFERENCES `registro_comprobantes` (`id`),
+  ADD CONSTRAINT `FK_D03EA4C545F8C94C` FOREIGN KEY (`id_cierre_id`) REFERENCES `cierre` (`id`);
 
 --
 -- Constraints for table `configuracion_inicial`
@@ -2577,6 +3139,15 @@ ALTER TABLE `configuracion_inicial`
 ALTER TABLE `contratos_cliente`
   ADD CONSTRAINT `FK_29A5BB47374388F5` FOREIGN KEY (`id_moneda_id`) REFERENCES `moneda` (`id`),
   ADD CONSTRAINT `FK_29A5BB477BF9CE86` FOREIGN KEY (`id_cliente_id`) REFERENCES `cliente_contabilidad` (`id`);
+
+--
+-- Constraints for table `cuadre_diario`
+--
+ALTER TABLE `cuadre_diario`
+  ADD CONSTRAINT `FK_60ABEFD91ADA4D3F` FOREIGN KEY (`id_cuenta_id`) REFERENCES `cuenta` (`id`),
+  ADD CONSTRAINT `FK_60ABEFD92D412F53` FOREIGN KEY (`id_subcuenta_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_60ABEFD939161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
+  ADD CONSTRAINT `FK_60ABEFD945F8C94C` FOREIGN KEY (`id_cierre_id`) REFERENCES `cierre` (`id`);
 
 --
 -- Constraints for table `cuenta`
@@ -2611,6 +3182,17 @@ ALTER TABLE `depreciacion`
   ADD CONSTRAINT `FK_D618AE145832E72E` FOREIGN KEY (`id_activo_fijo_id`) REFERENCES `activo_fijo` (`id`);
 
 --
+-- Constraints for table `devolucion`
+--
+ALTER TABLE `devolucion`
+  ADD CONSTRAINT `FK_524D9F671D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_524D9F6739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
+  ADD CONSTRAINT `FK_524D9F675074DD86` FOREIGN KEY (`id_orden_tabajo_id`) REFERENCES `orden_trabajo` (`id`),
+  ADD CONSTRAINT `FK_524D9F676601BA07` FOREIGN KEY (`id_documento_id`) REFERENCES `documento` (`id`),
+  ADD CONSTRAINT `FK_524D9F67C59B01FF` FOREIGN KEY (`id_centro_costo_id`) REFERENCES `centro_costo` (`id`),
+  ADD CONSTRAINT `FK_524D9F67F66372E9` FOREIGN KEY (`id_elemento_gasto_id`) REFERENCES `elemento_gasto` (`id`);
+
+--
 -- Constraints for table `documento`
 --
 ALTER TABLE `documento`
@@ -2628,18 +3210,18 @@ ALTER TABLE `empleado`
   ADD CONSTRAINT `FK_D9D9BF52D1E12F15` FOREIGN KEY (`id_cargo_id`) REFERENCES `cargo` (`id`);
 
 --
+-- Constraints for table `expediente`
+--
+ALTER TABLE `expediente`
+  ADD CONSTRAINT `FK_D59CA4131D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`);
+
+--
 -- Constraints for table `factura`
 --
 ALTER TABLE `factura`
   ADD CONSTRAINT `FK_F9EBA0091D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_F9EBA00968BCB606` FOREIGN KEY (`id_contrato_id`) REFERENCES `contratos_cliente` (`id`),
   ADD CONSTRAINT `FK_F9EBA0097EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`);
-
---
--- Constraints for table `grupo_activos`
---
-ALTER TABLE `grupo_activos`
-  ADD CONSTRAINT `FK_50ADD6F61ADA4D3F` FOREIGN KEY (`id_cuenta_id`) REFERENCES `cuenta` (`id`),
-  ADD CONSTRAINT `FK_50ADD6F62D412F53` FOREIGN KEY (`id_subcuenta_id`) REFERENCES `subcuenta` (`id`);
 
 --
 -- Constraints for table `informe_recepcion`
@@ -2672,15 +3254,28 @@ ALTER TABLE `movimiento`
   ADD CONSTRAINT `FK_C8FF107ADB763453` FOREIGN KEY (`id_tipo_movimiento_id`) REFERENCES `tipo_movimiento` (`id`);
 
 --
+-- Constraints for table `movimiento_activo_fijo`
+--
+ALTER TABLE `movimiento_activo_fijo`
+  ADD CONSTRAINT `FK_A985A0DA1ADA4D3F` FOREIGN KEY (`id_cuenta_id`) REFERENCES `cuenta` (`id`),
+  ADD CONSTRAINT `FK_A985A0DA1D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_A985A0DA2D412F53` FOREIGN KEY (`id_subcuenta_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_A985A0DA5832E72E` FOREIGN KEY (`id_activo_fijo_id`) REFERENCES `activo_fijo` (`id`),
+  ADD CONSTRAINT `FK_A985A0DA7EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_A985A0DADB763453` FOREIGN KEY (`id_tipo_movimiento_id`) REFERENCES `tipo_movimiento` (`id`);
+
+--
 -- Constraints for table `movimiento_mercancia`
 --
 ALTER TABLE `movimiento_mercancia`
   ADD CONSTRAINT `FK_44876BD739161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_44876BD76601BA07` FOREIGN KEY (`id_documento_id`) REFERENCES `documento` (`id`),
+  ADD CONSTRAINT `FK_44876BD771381BB3` FOREIGN KEY (`id_orden_trabajo_id`) REFERENCES `orden_trabajo` (`id`),
   ADD CONSTRAINT `FK_44876BD77A4F962` FOREIGN KEY (`id_tipo_documento_id`) REFERENCES `tipo_documento` (`id`),
   ADD CONSTRAINT `FK_44876BD77EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
   ADD CONSTRAINT `FK_44876BD79F287F54` FOREIGN KEY (`id_mercancia_id`) REFERENCES `mercancia` (`id`),
   ADD CONSTRAINT `FK_44876BD7C59B01FF` FOREIGN KEY (`id_centro_costo_id`) REFERENCES `centro_costo` (`id`),
+  ADD CONSTRAINT `FK_44876BD7F5DBAF2B` FOREIGN KEY (`id_expediente_id`) REFERENCES `expediente` (`id`),
   ADD CONSTRAINT `FK_44876BD7F66372E9` FOREIGN KEY (`id_elemento_gasto_id`) REFERENCES `elemento_gasto` (`id`);
 
 --
@@ -2690,15 +3285,18 @@ ALTER TABLE `movimiento_producto`
   ADD CONSTRAINT `FK_FFC0EDFC39161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC6601BA07` FOREIGN KEY (`id_documento_id`) REFERENCES `documento` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC6E57A479` FOREIGN KEY (`id_producto_id`) REFERENCES `producto` (`id`),
+  ADD CONSTRAINT `FK_FFC0EDFC71381BB3` FOREIGN KEY (`id_orden_trabajo_id`) REFERENCES `orden_trabajo` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC7A4F962` FOREIGN KEY (`id_tipo_documento_id`) REFERENCES `tipo_documento` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFC7EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFCC59B01FF` FOREIGN KEY (`id_centro_costo_id`) REFERENCES `centro_costo` (`id`),
+  ADD CONSTRAINT `FK_FFC0EDFCF5DBAF2B` FOREIGN KEY (`id_expediente_id`) REFERENCES `expediente` (`id`),
   ADD CONSTRAINT `FK_FFC0EDFCF66372E9` FOREIGN KEY (`id_elemento_gasto_id`) REFERENCES `elemento_gasto` (`id`);
 
 --
 -- Constraints for table `movimiento_venta`
 --
 ALTER TABLE `movimiento_venta`
+  ADD CONSTRAINT `FK_8E3F7AE539161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_8E3F7AE555C5F988` FOREIGN KEY (`id_factura_id`) REFERENCES `factura` (`id`);
 
 --
@@ -2716,6 +3314,13 @@ ALTER TABLE `obligacion_pago`
   ADD CONSTRAINT `FK_403C9B3BE8F12801` FOREIGN KEY (`id_proveedor_id`) REFERENCES `proveedor` (`id`);
 
 --
+-- Constraints for table `orden_trabajo`
+--
+ALTER TABLE `orden_trabajo`
+  ADD CONSTRAINT `FK_4158A0241D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_4158A02439161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`);
+
+--
 -- Constraints for table `producto`
 --
 ALTER TABLE `producto`
@@ -2727,8 +3332,23 @@ ALTER TABLE `producto`
 --
 ALTER TABLE `registro_comprobantes`
   ADD CONSTRAINT `FK_B2D1B2B21D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_B2D1B2B239161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_B2D1B2B27EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`),
   ADD CONSTRAINT `FK_B2D1B2B2EF5F7851` FOREIGN KEY (`id_tipo_comprobante_id`) REFERENCES `tipo_comprobante` (`id`);
+
+--
+-- Constraints for table `saldo_cuentas`
+--
+ALTER TABLE `saldo_cuentas`
+  ADD CONSTRAINT `FK_BB2B71AE1ADA4D3F` FOREIGN KEY (`id_cuenta_id`) REFERENCES `cuenta` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AE1D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AE2D412F53` FOREIGN KEY (`id_subcuenta_id`) REFERENCES `subcuenta` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AE39161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AE71381BB3` FOREIGN KEY (`id_orden_trabajo_id`) REFERENCES `orden_trabajo` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AEC59B01FF` FOREIGN KEY (`id_centro_costo_id`) REFERENCES `centro_costo` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AEE8F12801` FOREIGN KEY (`id_proveedor_id`) REFERENCES `proveedor` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AEF5DBAF2B` FOREIGN KEY (`id_expediente_id`) REFERENCES `expediente` (`id`),
+  ADD CONSTRAINT `FK_BB2B71AEF66372E9` FOREIGN KEY (`id_elemento_gasto_id`) REFERENCES `elemento_gasto` (`id`);
 
 --
 -- Constraints for table `subcuenta`

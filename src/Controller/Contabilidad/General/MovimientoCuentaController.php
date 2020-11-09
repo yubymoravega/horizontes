@@ -16,10 +16,12 @@ use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\ComprobanteCierre;
 use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\SaldoCuentas;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
@@ -31,6 +33,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
@@ -58,6 +61,7 @@ class MovimientoCuentaController extends AbstractController
      */
     public function getSumbayor(EntityManagerInterface $em, Request $request)
     {
+
         //params to view
         $nro_cuenta = $request->request->get('nro_cuenta');
         $nro_subcuenta = $request->request->get('nro_subcuenta');
@@ -98,7 +102,9 @@ class MovimientoCuentaController extends AbstractController
             $saldo_partida = $obj_saldo_cuenta?$obj_saldo_cuenta->getSaldo():0;
             /** @var RegistroComprobantes $comp */
             foreach ($comprobantes as $comp) {
-                $comprobante_cierre = $em->getRepository(ComprobanteCierre::class)->findBy(['id_comprobante' => $comp->getId()]);
+                $comprobante_cierre = $em->getRepository(ComprobanteCierre::class)->findBy([
+                    'id_comprobante' => $comp->getId()
+                ]);
                 foreach ($comprobante_cierre as $cc) {
                     $cierre = $cc->getIdCierre();
                     $row_movimientos = $this->getDataDetalles($request, $em, $cierre->getFecha(), $comp->getIdAlmacen());
@@ -107,14 +113,15 @@ class MovimientoCuentaController extends AbstractController
                             if ($d['nro_cuenta'] == $arr_cuenta[0] && $d['nro_subcuenta'] == $arr_subcuenta[0]) {
                                 if ($obj_cuenta->getDeudora() || $obj_cuenta->getMixta()) {
                                     if ($d['debito'] != '')
-                                        $saldo_inicial += $this->getNumberByString($d['debito']);
-                                    else
-                                        $saldo_inicial -= $this->getNumberByString($d['credito']);
+                                    $saldo_inicial += $this->getNumberByString($d['debito']);
+                                else
+                                    $saldo_inicial -= $this->getNumberByString($d['credito']);
                                 }
-                                elseif (!$obj_cuenta->getDeudora() && !$obj_cuenta->getMixta()){
-                                    if ($d['debito'] != '')
+                            elseif (!$obj_cuenta->getDeudora() && !$obj_cuenta->getMixta()){
+
+                                if ($d['debito'] != '')
                                         $saldo_inicial -= $this->getNumberByString($d['debito']);
-                                    else
+                                    else if ($d['credito'] != '' )
                                         $saldo_inicial += $this->getNumberByString($d['credito']);
                                 }
                                 $row[] = array(
@@ -286,11 +293,42 @@ class MovimientoCuentaController extends AbstractController
                 );
             }
         }
+
+        $orden_trabajo_arr = $em->getRepository(OrdenTrabajo::class)->findBy([
+            'id_unidad'=>$empleado->getIdUnidad(),
+            'anno'=>Date('Y')
+        ]);
+        $expediente_arr = $em->getRepository(Expediente::class)->findBy([
+            'id_unidad'=>$empleado->getIdUnidad(),
+            'anno'=>Date('Y')
+        ]);
+        $row_ot = [];
+        $row_exp = [];
+
+        /** @var OrdenTrabajo $element */
+        foreach ($orden_trabajo_arr as $element){
+            $row_ot[]= array(
+                'nombre'=>$element->getCodigo().' - '.$element->getDescripcion(),
+                'id'=>$element->getId()
+            );
+        }
+        /** @var Expediente $element */
+        foreach ($expediente_arr as $element){
+            $row_exp[]= array(
+                'nombre'=>$element->getCodigo().' - '.$element->getDescripcion(),
+                'id'=>$element->getId()
+            );
+        }
+
+
+
         return new JsonResponse([
             'cuentas_inventario' => $rows_cuentas,
             'elemento_gasto' => $rows,
             'centro_costo' => $centros_costo,
             'almacenes' => $almacenes,
+            'ordenes' => $row_ot,
+            'expedientes' => $row_exp,
             'success' => true
         ]);
 
@@ -322,7 +360,8 @@ class MovimientoCuentaController extends AbstractController
                 $rows = array_merge($rows, $datos_informe);
             } //informe recepcion producto
             elseif ($id_tipo_documento == 2) {
-
+                $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_informe);
             } //Ajuste de entrada
             elseif ($id_tipo_documento == 3) {
                 $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);

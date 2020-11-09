@@ -179,6 +179,7 @@
                 dataType: 'json',
                 success: function (result) {
                     cuenta = result.cuentas_inventario
+                    centro_costo = result.cuentas_inventario
                     $(result.cuentas_inventario).each(function (pos, valor) {
                         $('#movimiento_cuenta_nro_cuenta').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                     })
@@ -194,8 +195,11 @@
                     $(result.unidad).each(function (pos, valor) {
                         $('#movimiento_cuenta_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
-                    $(result.orden_trabajo).each(function (pos, valor) {
+                    $(result.ordenes).each(function (pos, valor) {
                         $('#movimiento_cuenta_orden_trabajo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    })
+                    $(result.expedientes).each(function (pos, valor) {
+                        $('#movimiento_cuenta_expediente').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
                     loadingModal.close()
                 },

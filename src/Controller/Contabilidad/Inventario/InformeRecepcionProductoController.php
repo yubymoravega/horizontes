@@ -5,18 +5,23 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\SubcuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\SubcuentaProveedor;
@@ -26,6 +31,7 @@ use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -84,7 +90,7 @@ class InformeRecepcionProductoController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-            $list_mercancia = json_decode($request->get('informe_recepcion')['list_mercancia'], true);
+            $list_mercancia = json_decode($request->get('informe_recepcion_producto')['list_mercancia'], true);
             if ($this->isCsrfTokenValid('authenticate', $request->get('_token'))) {
                 $informe_recepcion = $request->get('informe_recepcion_producto');
                 $tipo_documento_er = $em->getRepository(TipoDocumento::class);
@@ -109,10 +115,11 @@ class InformeRecepcionProductoController extends AbstractController
                         'anno' => $year_,
                         'producto' => true
                     ));
+//                    dd($informes_recepcion_arr,);
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
                         /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto() != true)
+                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
                             $contador++;
                     }
                     $consecutivo = $contador + 1;
@@ -187,7 +194,7 @@ class InformeRecepcionProductoController extends AbstractController
                             $unidad_medida = $mercancia['um'];
 
                             $importe_total += floatval($importe_mercancia);
-
+//                            $orden_trabajo = $em->getRepository(OrdenTrabajo::class)->
                             //------ADICIONANDO EN LA TABLA DE MOVIMIENTOMERCANCIA
                             $movimiento_mercancia = new MovimientoProducto();
                             $movimiento_mercancia
@@ -196,10 +203,33 @@ class InformeRecepcionProductoController extends AbstractController
                                 ->setEntrada(true)
                                 ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                                 ->setCantidad($cantidad_mercancia)
-                                ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                                ->setFecha($obj_date)
                                 ->setIdDocumento($documento)
                                 ->setIdTipoDocumento($obj_tipo_documento)
                                 ->setIdUsuario($this->getUser());
+                            if(isset($mercancia['codigo_ot'])&& $mercancia['codigo_ot']!=''){
+                                $movimiento_mercancia
+                                    ->setIdOrdenTrabajo($em->getRepository(OrdenTrabajo::class)->findOneBy([
+                                        'codigo'=>$mercancia['codigo_ot'],
+                                        'activo'=>true,
+                                        'anno'=>Date('Y'),
+                                        'id_unidad'=>$id_unidad
+                                    ]));
+                            }
+                            if(isset($mercancia['codigo_exp'])&& $mercancia['codigo_exp']!=''){
+                                $movimiento_mercancia
+                                    ->setIdExpediente($em->getRepository(Expediente::class)->findOneBy([
+                                        'codigo'=>$mercancia['codigo_exp'],
+                                        'activo'=>true,
+                                        'anno'=>Date('Y'),
+                                        'id_unidad'=>$id_unidad
+                                    ]));
+                            }
+                            if(isset($mercancia['id_centro_costo'])&& $mercancia['id_centro_costo']!=''){
+                                $movimiento_mercancia
+                                    ->setIdCentroCosto($em->getRepository(CentroCosto::class)->find($mercancia['id_centro_costo']));
+                            }
+
 
                             //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
                             $obj_mercancia = $mercancia_er->findOneBy(array(
@@ -279,7 +309,18 @@ class InformeRecepcionProductoController extends AbstractController
             'codigo' => $codigo,
         ));
         $row = array();
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
         foreach ($productos_arr as $obj) {
+            $obj_cuenta = $cuenta_er->findOneBy([
+                'nro_cuenta'=>$obj->getCuenta(),
+                'activo'=>true
+            ]);
+            $obj_subcuenta = $subcuenta_er->findOneBy([
+                'nro_subcuenta'=>$obj->getNroSubcuentaInventario(),
+                'id_cuenta'=>$obj_cuenta,
+                'activo'=>true
+            ]);
             /**@var $obj Producto* */
             $row [] = array(
                 'id' => $obj->getId(),
@@ -289,8 +330,8 @@ class InformeRecepcionProductoController extends AbstractController
                 'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
                 'id_almacen' => $obj->getIdAmlacen(),
                 'existencia' => $obj->getExistencia(),
-                'cuenta'=> $obj->getCuenta(),
-                'subcuenta'=> $obj->getNroSubcuentaInventario(),
+                'cuenta'=> $obj_cuenta->getNroCuenta().' - '.$obj_cuenta->getNombre(),
+                'subcuenta'=> $obj_subcuenta->getNroSubcuenta().' - '.$obj_subcuenta->getDescripcion(),
                 'cuenta_acreedora'=> $obj->getNroCuentaAcreedora(),
                 'subcuenta_acreedora'=> $obj->getNroSubcuentaAcreedora()
             );
@@ -305,7 +346,7 @@ class InformeRecepcionProductoController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
-        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
+        $row_acreedoras = AuxFunctions::getCuentasOnlyProduccionAcreedora($em);
         $row_moneda = $em->getRepository(Moneda::class)->findAll();
         $monedas = [];
         foreach ($row_moneda as $moneda) {
@@ -315,7 +356,20 @@ class InformeRecepcionProductoController extends AbstractController
                 'id' => $moneda->getId(),
             );
         }
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas' => $monedas, 'success' => true]);
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $arr_centro_costo = $em->getRepository(CentroCosto::class)->findBy([
+            'id_unidad'=>$unidad,
+            'activo'=>true
+        ]);
+        $centro_costo = [];
+        /** @var CentroCosto $d */
+        foreach ($arr_centro_costo as $d){
+            $centro_costo[] = array(
+                'id'=>$d->getId(),
+                'nombre'=>$d->getCodigo().' - '.$d->getNombre()
+            );
+        }
+        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'monedas' => $monedas, 'centro_costo' => $centro_costo, 'success' => true]);
     }
 
     /**
@@ -415,7 +469,7 @@ class InformeRecepcionProductoController extends AbstractController
     public function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
-        $movimiento_producto_er = $em->getRepository(MovimientoMercancia::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
         $obj_tipo_documento = $tipo_documento_er->find(2);
@@ -448,11 +502,11 @@ class InformeRecepcionProductoController extends AbstractController
             $fecha_informe = $informe_obj->getIdDocumento()->getFecha()->format('d/m/Y');
             $nro_solicitud = $informe_obj->getNroConcecutivo();
             $arr_movimiento_producto = $movimiento_producto_er->findBy(array(
-                'id_tipo_documento' => $obj_tipo_documento->getId(),
+                'id_tipo_documento' => $obj_tipo_documento,
                 'id_documento' => $informe_obj->getIdDocumento()->getId(),
                 'activo' => true
             ));
-
+//dd($informe_obj,$obj_tipo_documento);
             if (!empty($arr_movimiento_producto)) {
                 /** @var  $mov_producto MovimientoProducto */
                 $mov_producto = $arr_movimiento_producto[0];
@@ -471,7 +525,7 @@ class InformeRecepcionProductoController extends AbstractController
                         'descripcion' => $obj->getIdProducto()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
-                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 6, '.', ''),
                         'importe' => number_format($obj->getImporte(), 2, '.', ''),
                     );
                     $importe_total += $obj->getImporte();
@@ -479,6 +533,7 @@ class InformeRecepcionProductoController extends AbstractController
             }
 
         }
+//        dd($rows);
         return $this->render('contabilidad/inventario/informe_recepcion_producto/print.html.twig', [
             'controller_name' => 'InformeRecepcionControllerPrint',
             'datos' => array(
@@ -493,14 +548,43 @@ class InformeRecepcionProductoController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/dinamic-files/{nro}", name="contabilidad_inventario_informe_recepcion_producto_dinamic",methods={"GET","POST"})
+     */
+    public function dinamic(EntityManagerInterface $em, $nro)
+    {
+        $arr_nros = explode('-',$nro);
+        $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy([
+            'nro_cuenta'=>$arr_nros[0],
+            'activo'=>true
+        ]);
+        $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+            'nro_subcuenta'=>$arr_nros[1],
+            'id_cuenta'=>$obj_cuenta
+        ]);
+
+        $arr_criterios_subcuenta = $em->getRepository(SubcuentaCriterioAnalisis::class)->findBy([
+            'id_subcuenta'=>$obj_subcuenta
+        ]);
+        $arr_criterios = [];
+
+        $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+        /** @var SubcuentaCriterioAnalisis $obj */
+        foreach ($arr_criterios_subcuenta as $obj) {
+            $criterio_obj = $criterio_analisis_er->findOneBy(['id' => $obj->getIdCriterioAnalisis()]);
+            array_push($arr_criterios, $criterio_obj->getAbreviatura());
+        }
+        return new JsonResponse(['data' => $arr_criterios, 'success' => true]);
+
+    }
 
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_informe_producto_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository, EntityManagerInterface $em)
     {
         $datos = $request->get('datos');
-        $mercancias = json_decode($request->get('mercancias'));
+        $mercancias = json_decode($request->get('productos'));
         $nro = $request->get('nro');
         $unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad()->getNombre();
         $rows = [];
@@ -512,7 +596,7 @@ class InformeRecepcionProductoController extends AbstractController
                 "descripcion" => $obj->descripcion,
                 "existencia" => number_format($obj->nueva_existencia, 2, '.', ''),
                 "cantidad" => $obj->cant,
-                "precio" => number_format($obj->precio, 2, '.', ''),
+                "precio" => number_format($obj->precio, 6, '.', ''),
                 "importe" => number_format($obj->importe, 2, '.', '')
             ]);
         }
@@ -522,7 +606,7 @@ class InformeRecepcionProductoController extends AbstractController
                 'importe_total' => number_format($datos['importe_total'], 2, '.', ''),
                 'almacen' => $request->getSession()->get('selected_almacen/name'),
                 'unidad' => $unidad,
-                'fecha_informe' => '10/10/1010',
+                'fecha_informe' => AuxFunctions::getDateToClose($em,$request->getSession()->get('selected_almacen/id')),
                 'nro_solicitud' => $nro,
             ),
             'mercancias' => $rows,
@@ -547,6 +631,7 @@ class InformeRecepcionProductoController extends AbstractController
             'producto' => true,
             'anno' => $today->format('Y')
         ));
+//        dd($informe_arr);
         /** @var InformeRecepcion $element */
         foreach ($informe_arr as $element) {
             if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
@@ -590,11 +675,16 @@ class InformeRecepcionProductoController extends AbstractController
             );
             $importe_total += $obj->getImporte();
         }
-
+        /** @var Subcuenta $subcuenta */
+        $subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+            'nro_subcuenta'=>$informe_obj->getNroSubcuentaAcreedora(),
+            'activo'=>true,
+            'id_cuenta'=>$em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>$informe_obj->getNroCuentaAcreedora(),'activo'=>true])
+        ]);
         $rows = array(
             'id' => $informe_obj->getId(),
             'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora() . ' - ' . $cuenta_er->findOneBy(['nro_cuenta' => $informe_obj->getNroCuentaAcreedora()])->getNombre(),
-            'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuenta_er->findOneBy(['nro_subcuenta' => $informe_obj->getNroSubcuentaAcreedora()])->getDescripcion(),
+            'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora() . ' - ' .$subcuenta->getDescripcion() ,
             'id_moneda' => $informe_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $informe_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,

@@ -42,7 +42,7 @@
                         <td style="font-weight:400;">{{ new_item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
                         <td style="font-weight:400;" class="text-center">{{ new_item.cuenta_subcuenta }}</td>
-                        <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning" title="Imprimir Ficha" {#onclick="Print_Comprobante({{ new_item.id }})"#}></i></td>
+                        <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning" title="Imprimir Ficha" onclick="Print_Activo({{ new_item.id }})"></i></td>
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -59,8 +59,8 @@
         function Print(url) {
             window.open(url, 'blank_')
         }
-        function Print_Comprobante(id) {
-            let url = '/contabilidad/general/registro-comprobantes/detalles/' + id
+        function Print_Activo(id) {
+            let url = '/contabilidad/activo-fijo/registro/print-ficha/' + id
             window.open(url, 'blank_')
         }
     </script>

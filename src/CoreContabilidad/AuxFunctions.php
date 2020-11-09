@@ -3,8 +3,10 @@
 namespace App\CoreContabilidad;
 
 
+use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
@@ -12,14 +14,19 @@ use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoCuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
+use App\Entity\Contabilidad\Config\TipoMovimiento;
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use Doctrine\ORM\EntityManager;
@@ -483,6 +490,80 @@ class AuxFunctions
         return $row_acreedoras;
     }
 
+    public static function getCuentasOnlyProduccion($em)
+    {
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+
+        $row_inventario = array();
+        $arr_cuentas_produccion = $em->getRepository(Cuenta::class)->findBy(array(
+            'produccion' => true,
+            'activo' => true
+        ));
+        foreach ($arr_cuentas_produccion as $item) {
+            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                'activo' => true,
+                'id_cuenta' => $item->getId()
+            ));
+            $rows = [];
+            if (!empty($arr_obj_subcuentas)) {
+                foreach ($arr_obj_subcuentas as $subcuenta) {
+                    /**@var $subcuenta Subcuenta* */
+                    $rows [] = array(
+                        'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                        'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                        'id' => $subcuenta->getId()
+                    );
+                }
+            }
+
+            $row_inventario [] = array(
+                'nro_cuenta' => trim($item->getNroCuenta()) . ' - ' . trim($item->getNombre()),
+                'id_cuenta' => trim($item->getId()),
+                'sub_cuenta' => $rows
+            );
+        }
+        return $row_inventario;
+    }
+
+
+    public static function getCuentasOnlyProduccionAcreedora($em)
+    {
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+
+        $row_inventario = array();
+        $arr_cuentas_produccion = $em->getRepository(Cuenta::class)->findBy(array(
+            'produccion' => true,
+            'activo' => true
+        ));
+        foreach ($arr_cuentas_produccion as $item) {
+            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
+                'activo' => true,
+                'id_cuenta' => $item->getId()
+            ));
+            $rows = [];
+            if (!empty($arr_obj_subcuentas)) {
+                foreach ($arr_obj_subcuentas as $subcuenta) {
+                    /**@var $subcuenta Subcuenta* */
+                    if (!$subcuenta->getDeudora())
+                        $rows [] = array(
+                            'nro_cuenta' => $subcuenta->getIdCuenta()->getNroCuenta(),
+                            'nro_subcuenta' => trim($subcuenta->getNroSubcuenta()) . ' - ' . trim($subcuenta->getDescripcion()),
+                            'id' => $subcuenta->getId()
+                        );
+                }
+            }
+
+            $row_inventario [] = array(
+                'nro_cuenta' => trim($item->getNroCuenta()) . ' - ' . trim($item->getNombre()),
+                'id_cuenta' => trim($item->getId()),
+                'sub_cuenta' => $rows
+            );
+        }
+        return $row_inventario;
+    }
+
     public static function getCuentasProduccion($em)
     {
         $subcuenta_er = $em->getRepository(Subcuenta::class);
@@ -518,20 +599,18 @@ class AuxFunctions
         }
 
         //cuentas de gasto
-        $obj_criterio = $em->getRepository(CriterioAnalisis::class)->findOneBy(array(
-            'abreviatura' => 'GAT',
-            'activo' => true
-        ));
+        $obj_tipo_cuenta = $em->getRepository(TipoCuenta::class)->find(13);
 
         $rows_gasto = [];
-        if ($obj_criterio) {
-            $arr_cuentas_criterio = $em->getRepository(CuentaCriterioAnalisis::class)->findBy(array(
-                'id_criterio_analisis' => $obj_criterio
+        if ($obj_tipo_cuenta) {
+            $arr_cuentas = $em->getRepository(Cuenta::class)->findBy(array(
+                'id_tipo_cuenta' => $obj_tipo_cuenta,
+                'activo' => true
             ));
-            foreach ($arr_cuentas_criterio as $item) {
+            foreach ($arr_cuentas as $item) {
                 $arr_obj_subcuentas = $subcuenta_er->findBy(array(
                     'activo' => true,
-                    'id_cuenta' => $item->getIdCuenta()
+                    'id_cuenta' => $item->getId()
                 ));
                 $rows = [];
                 if (!empty($arr_obj_subcuentas)) {
@@ -544,10 +623,9 @@ class AuxFunctions
                         );
                     }
                 }
-
                 $row_inventario [] = array(
-                    'nro_cuenta' => trim($item->getIdCuenta()->getNroCuenta()) . ' - ' . trim($item->getIdCuenta()->getNombre()),
-                    'id_cuenta' => trim($item->getIdCuenta()->getId()),
+                    'nro_cuenta' => trim($item->getNroCuenta()) . ' - ' . trim($item->getNombre()),
+                    'id_cuenta' => trim($item->getId()),
                     'sub_cuenta' => $rows
                 );
             }
@@ -824,6 +902,7 @@ class AuxFunctions
         $total = 0;
         //totalizar importe
         $cuentas_ir = [];
+        $arr_criterios = [];
         foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
             $total += floatval($obj_movimiento_mercancia->getImporte());
             /**@var $obj_movimiento_mercancia MovimientoProducto */
@@ -831,6 +910,13 @@ class AuxFunctions
             $sub_cuenta = $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario();
             if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
                 $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+            }
+            $id_cc = $obj_movimiento_mercancia->getIdCentroCosto() ? $obj_movimiento_mercancia->getIdCentroCosto()->getId() : '';
+            $id_ot = $obj_movimiento_mercancia->getIdOrdenTrabajo() ? $obj_movimiento_mercancia->getIdOrdenTrabajo()->getId() : '';
+            $id_exp = $obj_movimiento_mercancia->getIdExpediente() ? $obj_movimiento_mercancia->getIdExpediente()->getId() : '';
+            $str = $id_cc . '-' . $id_ot . '-' . $id_exp;
+            if (!in_array($str, $arr_criterios)) {
+                $arr_criterios[count($arr_criterios)] = $str;
             }
         }
         foreach ($cuentas_ir as $key => $cuenta) {
@@ -865,16 +951,52 @@ class AuxFunctions
                     'credito' => ''
                 );
         }
-        $rows[] = array(
-            'nro_doc' => '',
-            'fecha' => '',
-            'nro_cuenta' => $nro_cuenta_acreedora,
-            'nro_subcuenta' => $nro_subcuenta_acreedora,
-            'analisis_1' => $cod_almacen,
-            'analisis_2' => '', 'analisis_3' => '',
-            'debito' => '',
-            'credito' => number_format($total, 2)
-        );
+        foreach ($arr_criterios as $criterio) {
+            /** @var MovimientoProducto $obj_movimiento_mercancia */
+            $total_credito = 0;
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                $id_cc = $obj_movimiento_mercancia->getIdCentroCosto() ? $obj_movimiento_mercancia->getIdCentroCosto()->getId() : '';
+                $id_ot = $obj_movimiento_mercancia->getIdOrdenTrabajo() ? $obj_movimiento_mercancia->getIdOrdenTrabajo()->getId() : '';
+                $id_exp = $obj_movimiento_mercancia->getIdExpediente() ? $obj_movimiento_mercancia->getIdExpediente()->getId() : '';
+                $str = $id_cc . '-' . $id_ot . '-' . $id_exp;
+                if ($str == $criterio) {
+                    $total_credito += $obj_movimiento_mercancia->getImporte();
+                }
+            }
+            $arr_analisis = explode('-', $criterio);
+            if ($arr_analisis[2]!=''){
+                $codigo = $em->getRepository(Expediente::class)->find($arr_analisis[2])->getCodigo();
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $nro_cuenta_acreedora,
+                    'nro_subcuenta' => $nro_subcuenta_acreedora,
+                    'analisis_1' => $codigo,
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'debito' => '',
+                    'credito' => number_format($total_credito, 2)
+                );
+            }
+            if ($arr_analisis[0]!=''){
+
+
+                $codigo_cc = $em->getRepository(CentroCosto::class)->find($arr_analisis[0])->getCodigo();
+                $codigo_ot = $em->getRepository(OrdenTrabajo::class)->find($arr_analisis[1])->getCodigo();
+                $rows[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $nro_cuenta_acreedora,
+                    'nro_subcuenta' => $nro_subcuenta_acreedora,
+                    'analisis_1' => $codigo_cc,
+                    'analisis_2' => $codigo_ot,
+                    'analisis_3' => '',
+                    'debito' => '',
+                    'credito' => number_format($total_credito, 2)
+                );
+            }
+        }
+
         $rows[] = array(
             'nro_doc' => '',
             'fecha' => '',
@@ -1574,23 +1696,61 @@ class AuxFunctions
         $arr_criterios = self::getCriterioByCuenta($nro_cuenta_acreedora, $em);
         $analisis1 = '';
         $analisis2 = '';
-        foreach ($arr_criterios as $abreviatura) {
+        $arr = [];
+        foreach ($arr_criterios as $key => $abreviatura) {
             if ($abreviatura == 'ALM')
-                $analisis1 = $cod_almacen;
+                $analisis = $cod_almacen;
             elseif ($abreviatura == 'UNID')
-                $analisis2 = $em->getRepository(Almacen::class)->findOneBy(['codigo' => $cod_almacen, 'activo' => true])->getIdUnidad()->getCodigo();
+                $analisis = $em->getRepository(Almacen::class)->findOneBy(['codigo' => $cod_almacen, 'activo' => true])->getIdUnidad()->getCodigo();
+            elseif ($abreviatura == 'CCT')
+                $analisis = $obj_devolucion->getIdCentroCosto()->getCodigo();
+            elseif ($abreviatura == 'OT')
+                $analisis = $obj_devolucion->getIdOrdenTabajo()->getCodigo();
+            elseif ($abreviatura == 'EG')
+                $analisis = $obj_devolucion->getIdElementoGasto()->getCodigo();
+
+            $arr[$key] = $analisis;
         }
-        $rows[] = array(
-            'nro_doc' => '',
-            'fecha' => '',
-            'nro_cuenta' => $nro_cuenta_acreedora,
-            'nro_subcuenta' => $nro_subcuenta_acreedora,
-            'analisis_1' => $analisis1,
-            'analisis_2' => $analisis2,
-            'analisis_3' => '',
-            'debito' => '',
-            'credito' => number_format($total, 2)
-        );
+
+        if (count($arr) == 3) {
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $nro_cuenta_acreedora,
+                'nro_subcuenta' => $nro_subcuenta_acreedora,
+                'analisis_1' => $arr[0],
+                'analisis_2' => $arr[1],
+                'analisis_3' => $arr[2],
+                'debito' => '',
+                'credito' => number_format($total, 2)
+            );
+        }
+        if (count($arr) == 2) {
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $nro_cuenta_acreedora,
+                'nro_subcuenta' => $nro_subcuenta_acreedora,
+                'analisis_1' => $arr[0],
+                'analisis_2' => $arr[1],
+                'analisis_3' => '',
+                'debito' => '',
+                'credito' => number_format($total, 2)
+            );
+        }
+        if (count($arr) == 1) {
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $nro_cuenta_acreedora,
+                'nro_subcuenta' => $nro_subcuenta_acreedora,
+                'analisis_1' => $arr[0],
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'debito' => '',
+                'credito' => number_format($total, 2)
+            );
+        }
         $rows[] = array(
             'nro_doc' => '',
             'fecha' => '',
@@ -1646,4 +1806,21 @@ class AuxFunctions
         return $row;
     }
 
+    /**
+     * @param EntityManagerInterface $em instancia del Doctrine EntityManagerInterface
+     * @param TipoMovimiento $tipo_movimiento_obj tipo de movimiento a realizar
+     * @param Unidad $unidad_obj unidad para la cual se busca el nro
+     * @param int $anno anno para del movimiento
+     * @return int retorna el numero consecutivo para el movimiento de activo fijo a realizar
+     */
+    public static function getConsecutivoActivoFijo(EntityManagerInterface $em, $tipo_movimiento_obj, $unidad_obj, $anno)
+    {
+        $arr_movimientos = $em->getRepository(MovimientoActivoFijo::class)->findBy([
+            'id_unidad' => $unidad_obj,
+            'id_tipo_movimiento' => $tipo_movimiento_obj,
+            'anno' => $anno
+        ]);
+
+        return count($arr_movimientos) + 1;
+    }
 }

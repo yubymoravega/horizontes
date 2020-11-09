@@ -140,11 +140,11 @@ class SubmayorInventarioProductoController extends AbstractController
                         'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
                         'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
                         'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
-                        'importe_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getImporte() : '',
+                        'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(),2) : '',
                         'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
-                        'importe_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getImporte(),
+                        'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(),2),
                         'cant_existencia' => $obj_mivimiento->getExistencia(),
-                        'importe_existencia' => round(($obj_mivimiento->getExistencia() * ($obj_mivimiento->getImporte() / $obj_mivimiento->getCantidad())), 2)
+                        'importe_existencia' => number_format(round(($obj_mivimiento->getExistencia() * ($obj_mivimiento->getImporte() / $obj_mivimiento->getCantidad())), 2),2)
                     );
                 }
             }
@@ -172,7 +172,7 @@ class SubmayorInventarioProductoController extends AbstractController
                         'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
                         'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
                         'cant_existencia' => $obj_mivimiento->getExistencia(),
-                        'importe_existencia' => $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte()
+                        'importe_existencia' => $obj_mivimiento->getEntrada() ? number_format(($saldo_anterior + $obj_mivimiento->getImporte()),2) : number_format(($saldo_anterior - $obj_mivimiento->getImporte()),2)
                     );
                     $saldo_anterior = $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
                 }

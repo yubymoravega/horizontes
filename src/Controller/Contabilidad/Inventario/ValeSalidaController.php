@@ -651,10 +651,9 @@ class ValeSalidaController extends AbstractController
      */
     public function getOrden($codigo, Request $request,
                              OrdenTrabajoRepository $ordenTrabajoRepository,
-                             AlmacenRepository $almacenRepository)
+                             AlmacenRepository $almacenRepository,EntityManagerInterface $em)
     {
-        $almacen = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')]);
-        $orden = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo, 'id_almacen' => $almacen]);
+        $orden = $ordenTrabajoRepository->findOneBy(['codigo' => $codigo, 'id_unidad' => AuxFunctions::getUnidad($em,$this->getUser())]);
         if ($orden) {
             return new JsonResponse(['data' => $orden->getDescripcion(), 'success' => true]);
         }

@@ -76,7 +76,10 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        $('#btnCancelar').hide()
         let cuentas = [];
+        let consecutivo = '';
+
         const loadingData = function () {
             loadingModal.show()
             $('#movimiento_activo_fijo_id_cuenta').find('option').remove()
@@ -90,6 +93,10 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
                     cuentas = result.cuentas;
                     $(result.cuentas).each(function (pos, valor) {
                         $('#movimiento_activo_fijo_id_cuenta').append('<option value = "' + valor.id + '">' + valor.nro_cuenta + '</option>');
@@ -182,5 +189,81 @@
                 if (validateForm.errorList.length === 0) loadingModal.show()
             }
         });
+
+        $('#select_nros').on('keyup', function (e) {
+            if (e.which == 13) {
+                if ($('#select_nros').val() != '') {
+                    if ($('#select_nros').val() == consecutivo) {
+                        $('#btnSubbmitApertura').show()
+                        $('#btnImprimir').show()
+                        $('#btnCancelar').hide()
+                        resetFormulario()
+                    } else if ($('#select_nros').val() > consecutivo) {
+                        $('#btnSubbmitApertura').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        resetFormulario()
+                        alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                    } else {
+                        $('#btnImprimir').show()
+                        $('#btnSubbmitApertura').hide()
+                        $('#btnCancelar').show()
+                        llenarFormulario($('#select_nros').val())
+                    }
+                } else {
+                    $('#btnImprimir').hide()
+                    $('#btnSubbmitApertura').hide()
+                    $('#btnCancelar').hide()
+                    alertTemplate('Tiene que introducir el número del apertura de salida', 'danger')
+                }
+            }
+        })
+
+        function resetFormulario() {
+            $('#btnCancelar').hide()
+            $('#btnImprimir').show()
+            $('#btnSubbmitApertura').show()
+            $('#movimiento_activo_fijo_fecha').attr('type', 'date')
+            $('#movimiento_activo_fijo')[0].reset()
+            loadingData()
+        }
+
+        function llenarFormulario(nro) {
+            if (nro < 1) {
+                alertTemplate('El menor número permitido es 1', 'danger')
+                resetFormulario()
+            } else {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/activo-fijo/apertura/getApertura/' + nro,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success == true) {
+                            let apertura = result.apertura;
+                            $('#movimiento_activo_fijo_id_subcuenta').find('option').remove()
+                            $('#movimiento_activo_fijo_id_cuenta').find('option').remove()
+
+                            $('#movimiento_activo_fijo_nro_inventatio').val(apertura.nro_inv);
+                            $('#movimiento_activo_fijo_descripcion').val(apertura.desc);
+
+                            $('#movimiento_activo_fijo_id_cuenta').prepend('<option selected value = ' + apertura.nro_cuenta + '>' + apertura.nro_cuenta + '</option>');
+                            $('#movimiento_activo_fijo_id_subcuenta').prepend('<option selected value = ' + apertura.nro_subcuenta + '>' + apertura.nro_subcuenta + '</option>');
+                            $('#movimiento_activo_fijo_fecha').attr('type', 'text')
+                            $('#movimiento_activo_fijo_fecha').val(apertura.fecha);
+
+                            $('#movimiento_activo_fijo_fundamentacion').val(apertura.fundamentacion);
+                            loadingModal.close()
+                        }
+                        if (result.success == false) {
+                            loadingModal.close()
+                            alertTemplate(result.message, 'danger')
+                        }
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+        }
     </script>
 {% endblock %}

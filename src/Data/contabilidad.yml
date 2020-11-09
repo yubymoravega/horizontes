@@ -42,3 +42,26 @@ configuraciones:
     - id: 2
       name: "COMPROBANTE DE OPERACIONES"
       abreviatura: "00"
+
+  tipo_movimiento:
+    - id: 1
+      name: "APERTURA"
+      abreviatura: "AP"
+    - id: 2
+      name: "COMPRA"
+      abreviatura: "A"
+    - id: 3
+      name: "TRASLADO INTERNO"
+      abreviatura: "TI"
+    - id: 4
+      name: "TRASLADOS ENVIADOS"
+      abreviatura: "TE"
+    - id: 5
+      name: "TRASLADOS RECIVIDOS"
+      abreviatura: "TR"
+    - id: 6
+      name: "BAJAS DE ACTIVOS"
+      abreviatura: "BA"
+    - id: 7
+      name: "VENTA DE ACTIVOS"
+      abreviatura: "VA"

@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
 use App\Form\Contabilidad\ActivoFijo\MovimientoActivoFijoType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,24 +44,24 @@ class AperturaController extends AbstractController
             $anno = $fecha->format('Y');
 
             $user = $this->getUser();
-            $obj_unidad = AuxFunctions::getUnidad($em,$user);
+            $obj_unidad = AuxFunctions::getUnidad($em, $user);
             $obj_activo = $em->getRepository(ActivoFijo::class)->findOneBy([
-                'nro_inventario'=>$nro_inventatio,
-                'descripcion'=>$descripcion,
-                'activo'=>true,
-                'id_unidad'=>$obj_unidad
+                'nro_inventario' => $nro_inventatio,
+                'descripcion' => $descripcion,
+                'activo' => true,
+                'id_unidad' => $obj_unidad
             ]);
 
-            if(!$obj_activo)
-                return new JsonResponse(['success'=>false,'msg'=>'El Activo Fijo no existe, en esta unidad']);
+            if (!$obj_activo)
+                return new JsonResponse(['success' => false, 'msg' => 'El Activo Fijo no existe, en esta unidad']);
 
             $duplicate = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
-                'activo'=>true,
-                'id_activo_fijo'=>$obj_activo,
-                'id_unidad'=>$obj_unidad
+                'activo' => true,
+                'id_activo_fijo' => $obj_activo,
+                'id_unidad' => $obj_unidad
             ]);
-            if($duplicate){
-                $this->addFlash('error','El Activo Fijo ya existe, en esta unidad');
+            if ($duplicate) {
+                $this->addFlash('error', 'El Activo Fijo ya existe, en esta unidad');
                 return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
                     'controller_name' => 'AperturaController',
                     'formulario' => $form->createView()
@@ -85,14 +86,13 @@ class AperturaController extends AbstractController
             $em->persist($new_movimiento);
             try {
                 $em->flush();
-            }
-            catch (FileException $em){
+            } catch (FileException $em) {
                 return $em->getMessage();
             }
         }
         return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
             'controller_name' => 'AperturaController',
-            'formulario' => $form->createView()
+            'formulario' => $form->createView(),
         ]);
     }
 
@@ -102,27 +102,60 @@ class AperturaController extends AbstractController
     public function getCuentas(Request $request, EntityManagerInterface $em)
     {
         $row = AuxFunctions::getCuentasMovimientosEntradaActivoFijo($em);
+        $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find(1);
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         return new JsonResponse([
             'cuentas' => $row,
-            'success' => true
+            'success' => true,
+            'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, Date('Y'))
         ]);
     }
+
     /**
      * @Route("/getNroInv/{nro_inv}", name="contabilidad_activo_fijo_apertura_get_nro_inv", methods={"POST"})
      */
-    public function getNroInv(Request $request, EntityManagerInterface $em,$nro_inv)
+    public function getNroInv(Request $request, EntityManagerInterface $em, $nro_inv)
     {
         $user = $this->getUser();
-        $id_unidad = AuxFunctions::getUnidad($em,$user);
+        $id_unidad = AuxFunctions::getUnidad($em, $user);
         /** @var ActivoFijo $obj_activo_fijo */
         $obj_activo_fijo = $em->getRepository(ActivoFijo::class)->findOneBy([
-            'id_unidad'=>$id_unidad,
-            'activo'=>true,
-            'nro_inventario'=>$nro_inv
+            'id_unidad' => $id_unidad,
+            'activo' => true,
+            'nro_inventario' => $nro_inv
         ]);
         return new JsonResponse([
-            'descripcion'=>$obj_activo_fijo?$obj_activo_fijo->getDescripcion():'',
-            'id'=>$obj_activo_fijo?$obj_activo_fijo->getDescripcion():'',
+            'descripcion' => $obj_activo_fijo ? $obj_activo_fijo->getDescripcion() : '',
+            'id' => $obj_activo_fijo ? $obj_activo_fijo->getId() : '',
+            'success' => true
+        ]);
+    }
+
+    /**
+     * @Route("/getApertura/{nro}", name="contabilidad_activo_fijo_apertura_get_nro_inv", methods={"POST"})
+     */
+    public function getApertura(Request $request, EntityManagerInterface $em, $nro)
+    {
+        $user = $this->getUser();
+        $id_unidad = AuxFunctions::getUnidad($em, $user);
+        /** @var MovimientoActivoFijo $obj_movimiento_activo_fijo */
+        $obj_movimiento_activo_fijo = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
+            'id_tipo_movimiento' => $em->getRepository(TipoMovimiento::class)->find(1),
+            'anno' => Date('Y'),
+            'id_unidad' => $id_unidad,
+            'nro_consecutivo' => $nro
+        ]);
+        $row = array(
+            'nro_inv' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getNroInventario(),
+            'desc' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getDescripcion(),
+            'fecha' => $obj_movimiento_activo_fijo->getFecha()->format('d/m/Y'),
+            'fundamentacion' => $obj_movimiento_activo_fijo->getFundamentacion(),
+            'nro_cuenta'=>$obj_movimiento_activo_fijo->getIdCuenta()->getNroCuenta().' - '.$obj_movimiento_activo_fijo->getIdCuenta()->getNombre(),
+            'nro_subcuenta'=>$obj_movimiento_activo_fijo->getIdSubcuenta()->getNroSubcuenta().' - '.$obj_movimiento_activo_fijo->getIdSubcuenta()->getDescripcion(),
+
+        );
+        return new JsonResponse([
+            'apertura'=>$row,
             'success' => true
         ]);
     }

@@ -21,13 +21,13 @@
     {# list #}
     <table class="table-small-rows table table-hover text-light">
       <thead class="thead-dark">
-      <th width="10px">#</th>
-      <th scope="col-1">Nombre</th>
+      <th width="80px" class="text-center">#</th>
+      <th scope="col-1" class="text-left">Nombre</th>
       </thead>
       <tbody>
       {% for item in tipo_documento %}
         <tr>
-          <td style="font-weight:400;">{{ item.numero }}</td>
+          <td style="font-weight:400;" class="text-center">{{ item.numero }}</td>
           <td style="font-weight:400;">{{ item.nombre }}</td>
         </tr>
       {% endfor %}

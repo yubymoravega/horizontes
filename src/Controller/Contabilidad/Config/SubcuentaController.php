@@ -210,7 +210,7 @@ class SubcuentaController extends AbstractController
                 ));
                 if ($obj_duplicado_nro_cuenta && $obj_duplicado_nro_cuenta->getId() != $subcuenta->getId()) {
                     $this->addFlash('error', "Existe una subcuenta con el mismo nro.");
-                } elseif ($obj_duplicado_descripcion && $obj_duplicado_nro_cuenta->getId() != $subcuenta->getId()) {
+                } elseif ($obj_duplicado_descripcion && $obj_duplicado_descripcion->getId() != $subcuenta->getId()) {
                     $this->addFlash('error', "Existe una subcuenta con la misma descripción.");
                 } else {
                     $em->flush();
