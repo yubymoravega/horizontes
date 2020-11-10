@@ -1,0 +1,69 @@
+{% extends 'contabilidad/general/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Balance de Comprobación de Saldo
+            </h4>
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
+                    title="Imprimir Registro de Comprobantes"
+                    onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">
+                <i class="fa fa-print"></i>
+            </button>
+        </div>
+        {# end header #}
+
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <tr class="bg-dark font-weight-bold">
+                <td rowspan="2" width="100px">Cuenta</td>
+                <td rowspan="2" width="100px">Subcuenta</td>
+                <td rowspan="2" class="text-center">Descripción de la cuenta</td>
+                <td colspan="2" width="260px" class="text-center">Mes</td>
+                <td colspan="2" width="260px" class="text-center">Acumulado</td>
+            </tr>
+            <tr class="bg-dark font-weight-bold">
+                <td width="130px" class="text-center">Débito</td>
+                <td width="130px" class="text-center">Crédito</td>
+                <td width="130px" class="text-center">Débito</td>
+                <td width="130px" class="text-center">Crédito</td>
+            </tr>
+            <tbody>
+            {% for item in cuentas %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.cuenta }}</td>
+                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
+                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
+                    <td style="font-weight:400;" class="text-center"></td>
+                    <td style="font-weight:400;" class="text-right"></td>
+                    <td style="font-weight:400;" class="text-right"></td>
+                    <td style="font-weight:400;" class="text-right"></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+        <div class="navigation">
+            {{ knp_pagination_render(cuentas) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+    </script>
+{% endblock %}

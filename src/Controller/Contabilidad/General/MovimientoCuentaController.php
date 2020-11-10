@@ -22,10 +22,12 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
+use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\SaldoCuentas;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\User;
 use App\Form\Contabilidad\General\MovimientoCuentaType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -62,19 +64,59 @@ class MovimientoCuentaController extends AbstractController
     public function getSumbayor(EntityManagerInterface $em, Request $request)
     {
         //params to view
+        $centro_costo = $request->request->get('centro_costo');
+        $orden_trabajo = $request->request->get('orden_trabajo');
+        $elemento_gasto = $request->request->get('elemento_gasto');
+        $expediente = $request->request->get('expediente');
         $periodo = $request->request->get('periodo');
         $nro_cuenta = $request->request->get('nro_cuenta');
         $anno = $request->request->get('anno');
         $nro_subcuenta = $request->request->get('nro_subcuenta');
         $almacen = $request->request->get('almacen');
+        $cliente = $request->request->get('cliente');
+        $proveedor = $request->request->get('proveedor');
+
         $cuenta_er = $em->getRepository(Cuenta::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
+
         $arr_cuenta = explode(' - ', $nro_cuenta);
         $arr_subcuenta = (isset($nro_subcuenta) && $nro_subcuenta != '') ? explode(' - ', $nro_subcuenta) : '';
 
         /** @var Cuenta $obj_cuenta */
         $obj_cuenta = $cuenta_er->findOneBy(['nro_cuenta' => $arr_cuenta[0], 'activo' => true]);
 
+        $arr_criterio = AuxFunctions::getCriterioByCuenta($obj_cuenta->getNroCuenta(),$em);
+        $rows_data_criterios = [];
+        foreach ($arr_criterio as $key=>$abreviatura_crietrio){
+            if($abreviatura_crietrio == 'CCT'){
+                if(isset($centro_costo) && $centro_costo !=0)
+                    $rows_data_criterios[count($rows_data_criterios)]= $em->getRepository(CentroCosto::class)->find($centro_costo)->getCodigo();
+            }
+            if($abreviatura_crietrio == 'OT'){
+                if(isset($orden_trabajo) && $orden_trabajo !=0)
+                    $rows_data_criterios[count($rows_data_criterios)]= $em->getRepository(OrdenTrabajo::class)->find($orden_trabajo)->getCodigo();
+            }
+            if($abreviatura_crietrio == 'EG'){
+                if(isset($elemento_gasto) && $elemento_gasto !=0)
+                    $rows_data_criterios[count($rows_data_criterios)]= $em->getRepository(ElementoGasto::class)->find($elemento_gasto)->getCodigo();
+            }
+            if($abreviatura_crietrio == 'ALM'){
+                if(isset($almacen) && $almacen !=0)
+                    $rows_data_criterios[count($rows_data_criterios)]= $em->getRepository(Almacen::class)->find($almacen)->getCodigo();
+            }
+            if($abreviatura_crietrio == 'EXP'){
+                if(isset($expediente) && $expediente !=0)
+                    $rows_data_criterios[count($rows_data_criterios)]= $em->getRepository(Expediente::class)->find($expediente)->getCodigo();
+            }
+            if($abreviatura_crietrio == 'CLIPRO'){
+                if(isset($cliente) && $cliente !=0){
+                    $rows_data_criterios[$key]= $em->getRepository(ClienteContabilidad::class)->find($cliente);
+                }
+                else if(isset($proveedor) && $proveedor !=0){
+                    $rows_data_criterios[$key]= $em->getRepository(Proveedor::class)->find($proveedor)->getCodigo();
+                }
+            }
+        }
         /** @var User $user */
         $user = $this->getUser();
         /** @var Empleado $empleado */
@@ -88,18 +130,18 @@ class MovimientoCuentaController extends AbstractController
 
             /*** Aqui traemos el movimiento de la cuenta solamente***/
             if ($arr_subcuenta == '') {
-                $data = $this->getDataOnlyAccount($em, $obj_unidad, $anno, $periodo, $obj_cuenta, null);
+                $data = $this->getDataOnlyAccount($em, $obj_unidad, $anno, $periodo, $obj_cuenta, null,$rows_data_criterios);
                 return new JsonResponse($data);
             } else {
 
                 /*** Aqui traemos el movimiento de la cuenta y la subcuenta***/
                 /** @var Subcuenta $obj_subcuenta */
                 $obj_subcuenta = $subcuenta_er->findOneBy(['nro_subcuenta' => $arr_subcuenta[0], 'activo' => true, 'id_cuenta' => $obj_cuenta]);
-                $data = $this->getDataOnlyAccount($em, $obj_unidad, $anno, $periodo, $obj_cuenta, $obj_subcuenta);
+                $data = $this->getDataOnlyAccount($em, $obj_unidad, $anno, $periodo, $obj_cuenta, $obj_subcuenta,$rows_data_criterios);
                 return new JsonResponse($data);
             }
         }
-        return new JsonResponse(['success' => true, 'datos' => $row, 'saldo_inicial' => number_format($saldo_partida, 2)]);
+//        return new JsonResponse(['success' => true, 'datos' => $row, 'saldo_inicial' => number_format($saldo_partida, 2)]);
     }
 
     /**
@@ -109,9 +151,10 @@ class MovimientoCuentaController extends AbstractController
      * @param $month int mes que analizaremos, si el valor es 0 significa que es acumulado, en otro caso hace referencia al numero del mes
      * @param $account_obj Cuenta cuenta de la que estamos buscado la información
      * @param $obj_subcuenta Subcuenta subcuenta de la que estamos buscado la información
+     * @param $rows_data_criterios array arreglo con los codigos de los criterios a buscar
      * @return array con los datos del los documentos para los parametros especificados
      */
-    public function getDataOnlyAccount($em, $obj_unidad, $year, $month, $account_obj, $obj_subcuenta)
+    public function getDataOnlyAccount($em, $obj_unidad, $year, $month, $account_obj, $obj_subcuenta,$rows_data_criterios)
     {
         /*** (1)-para buscar el saldo inicial de la cuenta solamente, busco los saldos iniciales
          * para el espacio de tiempo especificado de
@@ -143,10 +186,10 @@ class MovimientoCuentaController extends AbstractController
         foreach ($comprobantes as $comp) {
             if ($month != 0) {
                 if ($comp->getFecha()->format('m') == $month) {
-                    $row = array_merge($row, $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null));
+                    $row = array_merge($row, $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null,$rows_data_criterios));
                 }
             } else {
-                $row = array_merge($row, $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null));
+                $row = array_merge($row, $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null,$rows_data_criterios));
             }
         }
         return ['success' => true, 'datos' => $row, 'saldo_inicial' => number_format($saldo_inicial_cuenta, 2)];
@@ -158,72 +201,142 @@ class MovimientoCuentaController extends AbstractController
      * @param $account_obj Cuenta cuenta que estamos analizando
      * @param $saldo_inicial_calculo float saldo inicio de la cuneta obtenido de la entidad "SaldoCuentas"
      * @param $obj_subcuenta Subcuenta subcuenta que queremos analizar
+     * @param $rows_data_criterios array con los codigos de los criterios de analisis a buscar
      * @return array con los datos del los documentos para los parametros especificados
      */
-    public function getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta)
+    public function getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta,$rows_data_criterios)
     {
         $row = [];
         $comprobante_cierre = $em->getRepository(ComprobanteCierre::class)->findBy([
             'id_comprobante' => $comp->getId()
         ]);
+
         foreach ($comprobante_cierre as $cc) {
             $cierre = $cc->getIdCierre();
             $row_movimientos = $this->getDataDetalles($em, $cierre->getFecha(), $comp->getIdAlmacen());
             foreach ($row_movimientos as $movimiento) {
-                foreach ($movimiento['datos'] as $d) {
-                    if ($d['nro_cuenta'] == $account_obj->getNroCuenta()) {
-                        if ($obj_subcuenta) {
-                            if ($obj_subcuenta->getNroSubcuenta() == $d['nro_subcuenta']) {
-                                if ($account_obj->getDeudora() || $account_obj->getMixta()) {
-                                    if ($d['debito'] != '')
-                                        $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
-                                    else
-                                        $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
-                                } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
+                    foreach ($movimiento['datos'] as $d) {
+                        if ($d['nro_cuenta'] == $account_obj->getNroCuenta()) {
+                            if ($obj_subcuenta) {
+                                if ($obj_subcuenta->getNroSubcuenta() == $d['nro_subcuenta']) {
+                                    if(!empty($rows_data_criterios)){
+                                        if($this->containCriteria($rows_data_criterios,$d)){
+                                            if ($account_obj->getDeudora() || $account_obj->getMixta()) {
+                                                if ($d['debito'] != '')
+                                                    $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                                else
+                                                    $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
+                                            } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
 
-                                    if ($d['debito'] != '')
-                                        $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
-                                    else if ($d['credito'] != '')
-                                        $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                                if ($d['debito'] != '')
+                                                    $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                                else if ($d['credito'] != '')
+                                                    $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                            }
+                                            $row[] = array(
+                                                'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
+                                                'nro_comprobante' => $comp->getNroConsecutivo(),
+                                                'nro_consecutivo' => $movimiento['nro_doc'],
+                                                'debito' => $d['debito'] != '' ? $d['debito'] : '',
+                                                'credito' => $d['credito'] != '' ? $d['credito'] : '',
+                                                'total' => number_format($saldo_inicial_calculo, 2)
+                                            );
+                                        }
+                                    }
+                                    else{
+                                        if ($account_obj->getDeudora() || $account_obj->getMixta()) {
+                                            if ($d['debito'] != '')
+                                                $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                            else
+                                                $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
+                                        } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
+
+                                            if ($d['debito'] != '')
+                                                $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                            else if ($d['credito'] != '')
+                                                $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                        }
+                                        $row[] = array(
+                                            'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
+                                            'nro_comprobante' => $comp->getNroConsecutivo(),
+                                            'nro_consecutivo' => $movimiento['nro_doc'],
+                                            'debito' => $d['debito'] != '' ? $d['debito'] : '',
+                                            'credito' => $d['credito'] != '' ? $d['credito'] : '',
+                                            'total' => number_format($saldo_inicial_calculo, 2)
+                                        );
+                                    }
                                 }
-                                $row[] = array(
-                                    'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
-                                    'nro_comprobante' => $comp->getNroConsecutivo(),
-                                    'nro_consecutivo' => $movimiento['nro_doc'],
-                                    'debito' => $d['debito'] != '' ? $d['debito'] : '',
-                                    'credito' => $d['credito'] != '' ? $d['credito'] : '',
-                                    'total' => number_format($saldo_inicial_calculo, 2)
-                                );
-                            }
-                        } else {
-                            if ($account_obj->getDeudora() || $account_obj->getMixta()) {
-                                if ($d['debito'] != '')
-                                    $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
-                                else
-                                    $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
-                            } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
+                            } else {
+                                if (!empty($rows_data_criterios)){
 
-                                if ($d['debito'] != '')
-                                    $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
-                                else if ($d['credito'] != '')
-                                    $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                    if($this->containCriteria($rows_data_criterios,$d)){
+                                        if ($account_obj->getDeudora() || $account_obj->getMixta()) {
+                                            if ($d['debito'] != '')
+                                                $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                            else
+                                                $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
+                                        } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
+
+                                            if ($d['debito'] != '')
+                                                $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                            else if ($d['credito'] != '')
+                                                $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                        }
+                                        $row[] = array(
+                                            'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
+                                            'nro_comprobante' => $comp->getNroConsecutivo(),
+                                            'nro_consecutivo' => $movimiento['nro_doc'],
+                                            'debito' => $d['debito'] != '' ? $d['debito'] : '',
+                                            'credito' => $d['credito'] != '' ? $d['credito'] : '',
+                                            'total' => number_format($saldo_inicial_calculo, 2)
+                                        );
+                                    }
+                                }
+                                else{
+                                    if ($account_obj->getDeudora() || $account_obj->getMixta()) {
+                                        if ($d['debito'] != '')
+                                            $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                        else
+                                            $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
+                                    } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
+
+                                        if ($d['debito'] != '')
+                                            $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                        else if ($d['credito'] != '')
+                                            $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                    }
+                                    $row[] = array(
+                                        'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
+                                        'nro_comprobante' => $comp->getNroConsecutivo(),
+                                        'nro_consecutivo' => $movimiento['nro_doc'],
+                                        'debito' => $d['debito'] != '' ? $d['debito'] : '',
+                                        'credito' => $d['credito'] != '' ? $d['credito'] : '',
+                                        'total' => number_format($saldo_inicial_calculo, 2)
+                                    );
+                                }
                             }
-                            $row[] = array(
-                                'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
-                                'nro_comprobante' => $comp->getNroConsecutivo(),
-                                'nro_consecutivo' => $movimiento['nro_doc'],
-                                'debito' => $d['debito'] != '' ? $d['debito'] : '',
-                                'credito' => $d['credito'] != '' ? $d['credito'] : '',
-                                'total' => number_format($saldo_inicial_calculo, 2)
-                            );
                         }
                     }
-                }
             }
         }
         return $row;
     }
 
+    public function containCriteria($arr_criteria,$arr_element){
+        if(count($arr_criteria)==3){
+            if($arr_element['analisis_1'] == $arr_criteria[0] && $arr_element['analisis_2'] == $arr_criteria[1] && $arr_element['analisis_3'] == $arr_criteria[2])
+                return true;
+        }
+        if(count($arr_criteria)==2){
+            if($arr_element['analisis_1'] == $arr_criteria[0] && $arr_element['analisis_2'] == $arr_criteria[1])
+                return true;
+        }
+        if(count($arr_criteria)==1){
+            if($arr_element['analisis_1'] == $arr_criteria[0])
+                return true;
+        }
+        return false;
+    }
 
     public function getNro(EntityManagerInterface $em, $obj_documento)
     {
@@ -404,6 +517,15 @@ class MovimientoCuentaController extends AbstractController
             );
         }
 
+        $proveedores = $em->getRepository(Proveedor::class)->findAll();
+
+        /** @var Proveedor $element */
+        foreach ($proveedores as $element) {
+            $row_prov[] = array(
+                'nombre' => $element->getCodigo() . ' - ' . $element->getNombre(),
+                'id' => $element->getId()
+            );
+        }
 
         return new JsonResponse([
             'cuentas_inventario' => $rows_cuentas,
@@ -412,6 +534,8 @@ class MovimientoCuentaController extends AbstractController
             'almacenes' => $almacenes,
             'ordenes' => $row_ot,
             'expedientes' => $row_exp,
+            'cliente'=>[],
+            'proveedor'=>$row_prov,
             'success' => true
         ]);
 
