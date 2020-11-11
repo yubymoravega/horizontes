@@ -183,13 +183,19 @@ class MovimientoCuentaController extends AbstractController
         ));
         $row = [];
         /** @var RegistroComprobantes $comp */
+
         foreach ($comprobantes as $comp) {
             if ($month != 0) {
                 if ($comp->getFecha()->format('m') == $month) {
-                    $row = array_merge($row, $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null,$rows_data_criterios));
+                    $data_function = $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null,$rows_data_criterios);
+                    $row = array_merge($row, $data_function['datos']);
+                    $saldo_inicial_calculo = $data_function['saldo'];
+
                 }
             } else {
-                $row = array_merge($row, $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null,$rows_data_criterios));
+                $data_function = $this->getDatosCuentaPorComprobante($em, $comp, $account_obj, $saldo_inicial_calculo, $obj_subcuenta ? $obj_subcuenta : null,$rows_data_criterios);
+                $row = array_merge($row, $data_function['datos']);
+                $saldo_inicial_calculo = $data_function['saldo'];
             }
         }
         return ['success' => true, 'datos' => $row, 'saldo_inicial' => number_format($saldo_inicial_cuenta, 2)];
@@ -319,7 +325,7 @@ class MovimientoCuentaController extends AbstractController
                     }
             }
         }
-        return $row;
+        return ['datos'=>$row,'saldo'=>$saldo_inicial_calculo];
     }
 
     public function containCriteria($arr_criteria,$arr_element){

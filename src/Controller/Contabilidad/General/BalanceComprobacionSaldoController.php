@@ -30,14 +30,14 @@ class BalanceComprobacionSaldoController extends AbstractController
                 'activo'=>true,
                 'id_cuenta'=>$cuenta
             ]);
+            $row[] = array(
+                'cuenta'=>$cuenta->getNroCuenta(),
+                'descripcion'=>$cuenta->getNombre(),
+                'id_cuenta'=>$cuenta->getId(),
+                'subcuenta'=>'',
+                'id_subcuenta'=>''
+            );
             if(!empty($arr_subcuentas)){
-                $row[] = array(
-                    'cuenta'=>$cuenta->getNroCuenta(),
-                    'descripcion'=>$cuenta->getNombre(),
-                    'id_cuenta'=>$cuenta->getId(),
-                    'subcuenta'=>'',
-                    'id_subcuenta'=>''
-                );
                 /** @var Subcuenta $subcuenta */
                 foreach ($arr_subcuentas as $subcuenta){
                     $row[] = array(
