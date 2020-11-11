@@ -1,0 +1,40 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Registro de Activos Fijos {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Registro de activos Fijos
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Unidad: </strong> {{ unidad_codigo }} : {{ unidad_nombre }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0" width="960px" class="text-center">
+            <thead>
+            <th width="90px">Nro. Inv.</th>
+            <th width="120px">Descripcion</th>
+            <th width="175px">Grupo Activo</th>
+            <th width="200px">Cta/Scta</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                <tr>
+                    <td style="background-color: gainsboro" colspan="5" class="font-weight-bold text-left border-bottom border-top">{{ item.area_responsabilidad }}</td>
+                </tr>
+                {% for new_item in item.datos %}
+                    <tr>
+                        <td style="font-weight:400;" class="text-left">{{ new_item.nro_inventario }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ new_item.descripcion }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.cuenta_subcuenta }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
