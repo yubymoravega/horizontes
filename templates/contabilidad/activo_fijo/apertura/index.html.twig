@@ -1,4 +1,4 @@
-{% extends 'contabilidad/activo_fijo/index.html.twig' %}
+{% extends 'base.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -20,9 +20,19 @@
                 </div>
             </div>
             <div class="card-body">
-                {{ form_start(formulario, {'attr':{'id':'apertura','autocomplete':"off"}}) }}
+                {{ form_start(formulario, {'attr':{'id':'movimiento_activo_fijo','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="row mt-0 ml-0 p-0">
+                        <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                            {{ form_label(formulario.nro_inventatio) }}
+                            {{ form_widget(formulario.nro_inventatio) }}
+                        </div>
+                        <div class="col-8 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                            {{ form_label(formulario.descripcion) }}
+                            {{ form_widget(formulario.descripcion,{'attr':{'readonly':'true'}}) }}
+                        </div>
+                    </div>
                     <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(formulario.id_cuenta) }}
                         {{ form_widget(formulario.id_cuenta) }}
@@ -36,33 +46,21 @@
                         {{ form_widget(formulario.fecha,{'attr':{'class':'w-100'}}) }}
                     </div>
                 </div>
-                <div class="row mt-0 p-0">
-                    <div class="col-4 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
-                        {{ form_label(formulario.nro_inventatio) }}
-                        {{ form_widget(formulario.nro_inventatio) }}
-                    </div>
-                    <div class="col-8 mt-0 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.descripcion) }}
-                        {{ form_widget(formulario.descripcion,{'attr':{'readonly':'true'}}) }}
-                    </div>
-                </div>
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
                     {{ form_label(formulario.fundamentacion) }}
                     {{ form_widget(formulario.fundamentacion) }}
                 </div>
                 {{ form_end(formulario) }}
-
-
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('inventario') }}"
+                        <a href="{{ url('activo_fijo') }}"
                            class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar" >cancelar</button>
+                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnImprimir" >imprimir
+                        <button class='my-0 btn btn-secondary' id="btnImprimir">imprimir
                         </button>
                     </div>
                     <div class="ml-2">
@@ -78,7 +76,10 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        $('#btnCancelar').hide()
         let cuentas = [];
+        let consecutivo = '';
+
         const loadingData = function () {
             loadingModal.show()
             $('#movimiento_activo_fijo_id_cuenta').find('option').remove()
@@ -92,6 +93,10 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
                     cuentas = result.cuentas;
                     $(result.cuentas).each(function (pos, valor) {
                         $('#movimiento_activo_fijo_id_cuenta').append('<option value = "' + valor.id + '">' + valor.nro_cuenta + '</option>');
@@ -124,11 +129,11 @@
                 } else {
                     alertTemplate('El campo código es obligatorio.', 'danger')
                 }
-            }
-            else{
-                $('#movimiento_activo_fijo_descripcion').val()
+            } else {
+                $('#movimiento_activo_fijo_descripcion').val('')
             }
         })
+
         function getData(codigo) {
             loadingModal.show("Cargando activo fijo...")
             $.ajax({
@@ -138,19 +143,19 @@
                 success: function (result) {
                     if (result.descripcion != '') {
                         $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
+                        loadingModal.close()
                     } else {
-                        window.open();
-                        alertTemplate('En la unidad no existen activos fijos con ese código','danger')
+                        window.open('/contabilidad/activo-fijo/gestionar', '_self');
+                        alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }
-                    loadingModal.close()
                 },
                 error: function () {
                 }
             })
         }
-        $(document).ready(function () {
-            const form_activo_fijo = $('#movimiento_activo_fijo')
 
+        $(document).ready(function () {
+            let form_activo_fijo = $('#movimiento_activo_fijo')
             form_activo_fijo.validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
@@ -175,5 +180,90 @@
                 }
             })
         })
+
+        $("#btnSubbmitApertura").click(function (e) {
+            if ($('#movimiento_activo_fijo').valid()) {
+                $('#movimiento_activo_fijo').attr('method', `POST`)
+                $('#movimiento_activo_fijo').attr('action', `/contabilidad/activo-fijo/apertura/`)
+                $('#movimiento_activo_fijo').submit()
+                if (validateForm.errorList.length === 0) loadingModal.show()
+            }
+        });
+
+        $('#select_nros').on('keyup', function (e) {
+            if (e.which == 13) {
+                if ($('#select_nros').val() != '') {
+                    if ($('#select_nros').val() == consecutivo) {
+                        $('#btnSubbmitApertura').show()
+                        $('#btnImprimir').show()
+                        $('#btnCancelar').hide()
+                        resetFormulario()
+                    } else if ($('#select_nros').val() > consecutivo) {
+                        $('#btnSubbmitApertura').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        resetFormulario()
+                        alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                    } else {
+                        $('#btnImprimir').show()
+                        $('#btnSubbmitApertura').hide()
+                        $('#btnCancelar').show()
+                        llenarFormulario($('#select_nros').val())
+                    }
+                } else {
+                    $('#btnImprimir').hide()
+                    $('#btnSubbmitApertura').hide()
+                    $('#btnCancelar').hide()
+                    alertTemplate('Tiene que introducir el número del apertura de salida', 'danger')
+                }
+            }
+        })
+
+        function resetFormulario() {
+            $('#btnCancelar').hide()
+            $('#btnImprimir').show()
+            $('#btnSubbmitApertura').show()
+            $('#movimiento_activo_fijo_fecha').attr('type', 'date')
+            $('#movimiento_activo_fijo')[0].reset()
+            loadingData()
+        }
+
+        function llenarFormulario(nro) {
+            if (nro < 1) {
+                alertTemplate('El menor número permitido es 1', 'danger')
+                resetFormulario()
+            } else {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/activo-fijo/apertura/getApertura/' + nro,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success == true) {
+                            let apertura = result.apertura;
+                            $('#movimiento_activo_fijo_id_subcuenta').find('option').remove()
+                            $('#movimiento_activo_fijo_id_cuenta').find('option').remove()
+
+                            $('#movimiento_activo_fijo_nro_inventatio').val(apertura.nro_inv);
+                            $('#movimiento_activo_fijo_descripcion').val(apertura.desc);
+
+                            $('#movimiento_activo_fijo_id_cuenta').prepend('<option selected value = ' + apertura.nro_cuenta + '>' + apertura.nro_cuenta + '</option>');
+                            $('#movimiento_activo_fijo_id_subcuenta').prepend('<option selected value = ' + apertura.nro_subcuenta + '>' + apertura.nro_subcuenta + '</option>');
+                            $('#movimiento_activo_fijo_fecha').attr('type', 'text')
+                            $('#movimiento_activo_fijo_fecha').val(apertura.fecha);
+
+                            $('#movimiento_activo_fijo_fundamentacion').val(apertura.fundamentacion);
+                            loadingModal.close()
+                        }
+                        if (result.success == false) {
+                            loadingModal.close()
+                            alertTemplate(result.message, 'danger')
+                        }
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+        }
     </script>
 {% endblock %}

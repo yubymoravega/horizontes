@@ -54,11 +54,20 @@ class MovimientoCuentaType extends AbstractType
                 'label' => 'Unidad',
                 'choice_label' => 'unidad',
             ))
+            ->add('cliente', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Cliente',
+                'choice_label' => 'cliente',
+            ))
+            ->add('proveedor', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Proveedor',
+                'choice_label' => 'proveedor',
+            ))
             ->add('periodo', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Período'
             ))
-         ->add('limpiar', ResetType::class, ['attr'=> ['class' => 'btn btn-outlined-secondary']])
         ;
     }
 

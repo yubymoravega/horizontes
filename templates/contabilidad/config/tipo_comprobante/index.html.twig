@@ -21,16 +21,16 @@
     {# list #}
     <table class="table-small-rows table table-hover text-light">
       <thead class="thead-dark">
-      <th width="10px">#</th>
-      <th scope="col-1">Nombre</th>
-      <th scope="col-1">Abreviatura</th>
+      <th width="80px">#</th>
+      <th width="140px" class="text-center">Abreviatura</th>
+      <th scope="col-1" class="text-left">Nombre</th>
       </thead>
       <tbody>
       {% for item in tipo_comprobante %}
         <tr>
-          <td style="font-weight:400;">{{ item.numero }}</td>
+          <td style="font-weight:400;" class="text-center">{{ item.numero }}</td>
+          <td style="font-weight:400;" class="text-center">{{ item.abreviatura }}</td>
           <td style="font-weight:400;">{{ item.nombre }}</td>
-          <td style="font-weight:400;">{{ item.abreviatura }}</td>
         </tr>
       {% endfor %}
       </tbody>

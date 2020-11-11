@@ -53,7 +53,8 @@ class ComprobanteOperacionesController extends AbstractController
         $registro_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_tipo_comprobante' => $em->getRepository(TipoComprobante::class)->find(2),
             'id_unidad' => $obj_unidad,
-            'anno' => $year_
+            'anno' => $year_,
+            'id_almacen'=>$almacen_obj
         ));
 
         $arr_cierre = $cierre_er->findBy(array(
@@ -145,6 +146,7 @@ class ComprobanteOperacionesController extends AbstractController
             'activo' => true,
             'fecha' => $fecha
         ));
+//        dd($arr_obj_documentos);
         foreach ($arr_obj_documentos as $obj_documento) {
             /**@var $obj_documento Documento* */
             $nro_doc = '';
@@ -224,7 +226,8 @@ class ComprobanteOperacionesController extends AbstractController
         $registro_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_tipo_comprobante' => $em->getRepository(TipoComprobante::class)->find(2),
             'id_unidad' => $obj_unidad,
-            'anno' => $year_
+            'anno' => $year_,
+            'id_almacen'=>$almacen_obj
         ));
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(

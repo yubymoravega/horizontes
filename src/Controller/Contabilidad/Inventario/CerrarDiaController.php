@@ -91,7 +91,6 @@ class CerrarDiaController extends AbstractController
         $fecha_inicio = AuxFunctions::getDateToClose($em, $id_almacen);
 //        $fecha_seleccionada = $request->get('fecha_cierre');
 
-
         /**@var Cierre $obj_cierre_abierto */
         $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_inicio;
 //        $today = $fecha_inicio;
@@ -104,6 +103,7 @@ class CerrarDiaController extends AbstractController
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
+
 
         $debitos = 0;
         $creditos = 0;
@@ -148,9 +148,9 @@ class CerrarDiaController extends AbstractController
             $existencia_almacen_importe += floatval($productos->getImporte());
         }
 
+
         $saldo_apertura = $obj_cierre_abierto ? $obj_cierre_abierto->getSaldo() : 0;
         //verificar que los debitos menos los creditos = existencia en almacen
-        $x = $saldo_apertura + $debitos - $creditos;
         if (round($existencia_almacen_importe, 5) == round(($saldo_apertura + $debitos - $creditos), 5)) {
             if (!$obj_cierre_abierto) {
                 //no se ha realizado ningun cierre, o sea es el primero que se efectuara
@@ -208,7 +208,7 @@ class CerrarDiaController extends AbstractController
                 'message' => 'El día no pudo ser cerrado por diferencia de valores: Sumbayor de inventario = ' . $saldo_apertura . ', Débitos = ' . $debitos . ', Creditos = ' . $creditos . ', y Existencia en almacén = ' . $existencia_almacen_importe
             ]);
         }
-//        $em->flush();
+        $em->flush();
         $obj_cierre_to_cuadre = $em->getRepository(Cierre::class)->findOneBy(array(
             'fecha' => \DateTime::createFromFormat('Y-m-d', $today),
             'id_almacen' => $almacen_obj,
@@ -231,10 +231,8 @@ class CerrarDiaController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/get", name="getData")
-     */
-    public function getDataCuadreDiario(EntityManagerInterface $em, Request $request, $objCierre)
+
+    public function getDataCuadreDiarioMercancia(EntityManagerInterface $em, Request $request, $objCierre)
     {
         /** @var Cierre $objCierre */
         $movimiento_mercancias_er = $em->getRepository(MovimientoMercancia::class);
@@ -372,6 +370,155 @@ class CerrarDiaController extends AbstractController
         return true;
     }
 
+    public function getDataCuadreDiarioProducto(EntityManagerInterface $em, Request $request, $objCierre)
+    {
+        /** @var Cierre $objCierre */
+        $movimiento_productos_er = $em->getRepository(MovimientoProducto::class);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
+
+        $movimientos_productos_arr = $movimiento_productos_er->findBy(array(
+            'fecha' => $objCierre->getFecha(),
+            'activo' => true,
+            'id_almacen' => $almacen_obj
+        ));
+
+        $arr_duplicate = [];
+        /** @var MovimientoProducto $element */
+        foreach ($movimientos_productos_arr as $element) {
+            $centro_costo = $element->getIdCentroCosto() ? $element->getIdCentroCosto()->getCodigo() : '';
+            $elemento_gasto = $element->getIdElementoGasto() ? $element->getIdElementoGasto()->getCodigo() : '';
+            $expediente = $element->getIdExpediente() ? $element->getIdExpediente()->getCodigo() : '';
+            $almacen = $element->getIdAlmacen() ? $element->getIdAlmacen()->getCodigo() : '';
+            $orden_trabajo = $element->getIdOrdenTrabajo() ? $element->getIdOrdenTrabajo()->getCodigo() : '';
+            $str_creiterios = '-';
+            if (in_array('ALM', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                $str_creiterios = $str_creiterios . $almacen . '-';
+            }
+            if (in_array('CLIPRO', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                $proveedor = $em->getRepository(InformeRecepcion::class)->findOneBy($element->getIdDocumento()->getId())->getIdProveedor()->getCodigo();
+                $str_creiterios = $str_creiterios . $proveedor . '-';
+            }
+            if (in_array('EXP', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                $str_creiterios = $str_creiterios . $expediente . '-';
+            }
+            if (in_array('CCT', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                $str_creiterios = $str_creiterios . $centro_costo . '-';
+            }
+            if (in_array('OT', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                $str_creiterios = $str_creiterios . $orden_trabajo . '-';
+            }
+            if (in_array('EG', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                $str_creiterios = $str_creiterios . $elemento_gasto . '-';
+            }
+
+            $str = $element->getIdProducto()->getCuenta() . '-' . $element->getIdProducto()->getNroSubcuentaInventario() . substr($str_creiterios, 0, -1);
+
+            if (!in_array($str, $arr_duplicate)) {
+                $arr_duplicate[count($arr_duplicate)] = $str;
+            }
+        }
+        sort($arr_duplicate);
+        foreach ($arr_duplicate as $cuentas_subcuentas) {
+            $debitos = 0;
+            $creditos = 0;
+            $saldo_final = 0;
+            $descripcion = 0;
+            $i = 0;
+            /** @var MovimientoProducto $element */
+            foreach ($movimientos_productos_arr as $element) {
+                $centro_costo = $element->getIdCentroCosto() ? $element->getIdCentroCosto()->getCodigo() : '';
+                $elemento_gasto = $element->getIdElementoGasto() ? $element->getIdElementoGasto()->getCodigo() : '';
+                $expediente = $element->getIdExpediente() ? $element->getIdExpediente()->getCodigo() : '';
+                $almacen = $element->getIdAlmacen() ? $element->getIdAlmacen()->getCodigo() : '';
+                $orden_trabajo = $element->getIdOrdenTrabajo() ? $element->getIdOrdenTrabajo()->getCodigo() : '';
+                $str_creiterios = '-';
+                if (in_array('ALM', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                    $str_creiterios = $str_creiterios . $almacen . '-';
+                }
+                if (in_array('CLIPRO', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                    $proveedor = $em->getRepository(InformeRecepcion::class)->findOneBy($element->getIdDocumento()->getId())->getIdProveedor()->getCodigo();
+                    $str_creiterios = $str_creiterios . $proveedor . '-';
+                }
+                if (in_array('EXP', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                    $str_creiterios = $str_creiterios . $expediente . '-';
+                }
+                if (in_array('CCT', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                    $str_creiterios = $str_creiterios . $centro_costo . '-';
+                }
+                if (in_array('OT', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                    $str_creiterios = $str_creiterios . $orden_trabajo . '-';
+                }
+                if (in_array('EG', AuxFunctions::getCriterioByCuenta($element->getIdProducto()->getCuenta(), $em))) {
+                    $str_creiterios = $str_creiterios . $elemento_gasto . '-';
+                }
+
+                $str = $element->getIdProducto()->getCuenta() . '-' . $element->getIdProducto()->getNroSubcuentaInventario() . substr($str_creiterios, 0, -1);
+
+                if ($cuentas_subcuentas == $str) {
+                    if ($element->getEntrada()) {
+                        $debitos += $element->getImporte();
+                    } else {
+                        $creditos += $element->getImporte();
+                    }
+                }
+            }
+            $analisis = substr($str_creiterios, 1, -1);
+            $arr_cuenta_subcuenta = explode('-', $cuentas_subcuentas);
+
+//            saldo anterior
+            $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => $arr_cuenta_subcuenta[0], 'activo' => true]);
+            $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                'nro_subcuenta' => $arr_cuenta_subcuenta[1],
+                'id_cuenta' => $obj_cuenta,
+                'activo' => true
+            ]);
+
+            // aqui verifico que la cuenta y subcuenta este acorde a la existenecia en almacen
+//            if(!$this->isEqual($em,$request,$obj_cuenta,$obj_subcuenta,$movimientos_mercancias_arr)){
+//                return false;
+//            }
+
+            $arr_cuadre = $em->getRepository(CuadreDiario::class)->findBy(array(
+                'id_cuenta' => $obj_cuenta,
+                'id_subcuenta' => $obj_subcuenta,
+                'id_almacen' => $almacen_obj
+            ));
+            if (empty($arr_cuadre)) {
+                $saldo_inicial = 0;
+            } else {
+                /** @var CuadreDiario $cuadre */
+                $cuadre = $arr_cuadre[count($arr_cuadre) - 1];
+                $saldo_inicial = $cuadre->getSaldo() + $cuadre->getDebito() - $cuadre->getCredito();
+            }
+            $new_cuadre_diario = new CuadreDiario();
+            $new_cuadre_diario
+                ->setFecha($objCierre->getFecha())
+                ->setDebito($debitos)
+                ->setCredito($creditos)
+                ->setSaldo($saldo_inicial)
+                ->setIdAlmacen($almacen_obj)
+                ->setStrAnalisis($analisis)
+                ->setIdCuenta($obj_cuenta)
+                ->setIdSubcuenta($obj_subcuenta)
+                ->setIdCierre($objCierre);
+            $em->persist($new_cuadre_diario);
+        }
+        $em->flush();
+        return true;
+    }
+
+
+    /**
+     * @Route("/get", name="getData")
+     */
+    public function getDataCuadreDiario(EntityManagerInterface $em, Request $request, $objCierre)
+    {
+        if($this->getDataCuadreDiarioMercancia($em, $request, $objCierre) && $this->getDataCuadreDiarioProducto($em, $request, $objCierre))
+            return true;
+        return false;
+    }
+
 
     public function isEqual(EntityManagerInterface $em, Request $request,Cuenta $obj_cuenta,Subcuenta $obj_subcuenta,$movimientos_mercancias_arr)
     {
@@ -420,10 +567,10 @@ class CerrarDiaController extends AbstractController
                 'analisis' => $cuadre->getStrAnalisis(),
                 'descripcion' => $cuadre->getIdCuenta()->getNombre(),
                 'desglose' => array(
-                    'entrada' => $cuadre->getDebito(),
-                    'salida' => $cuadre->getCredito(),
-                    'saldo_final' => $cuadre->getSaldo() + $cuadre->getDebito() - $cuadre->getCredito(),
-                    'saldo_inicial' => $cuadre->getSaldo()
+                    'entrada' => number_format($cuadre->getDebito(),2),
+                    'salida' => number_format($cuadre->getCredito(),2),
+                    'saldo_final' => number_format(($cuadre->getSaldo() + $cuadre->getDebito() - $cuadre->getCredito()),2),
+                    'saldo_inicial' => number_format($cuadre->getSaldo(),2)
                 )
             );
             $total_entrada += $cuadre->getDebito();
@@ -435,8 +582,8 @@ class CerrarDiaController extends AbstractController
             'almacen' => $objCierre->getIdAlmacen()->getCodigo() . ' : ' . $objCierre->getIdAlmacen()->getDescripcion(),
             'unidad' => $objCierre->getIdAlmacen()->getIdUnidad()->getCodigo() . ': ' . $objCierre->getIdAlmacen()->getIdUnidad()->getNombre(),
             'fecha' => $objCierre->getFecha()->format('d/m/Y'),
-            'total_entrada' => $total_entrada,
-            'total_salida' => $total_salida,
+            'total_entrada' => number_format($total_entrada,2),
+            'total_salida' => number_format($total_salida,2),
         ]);
     }
 
