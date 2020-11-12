@@ -48,7 +48,7 @@ class Factura
 
     /**
      * @ORM\ManyToOne(targetEntity=ContratosCliente::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_contrato;
 

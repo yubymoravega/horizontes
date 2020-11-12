@@ -841,7 +841,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'value_1'=>$obj_movimiento_mercancia->getIdMercancia()->getIdAmlacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -852,7 +858,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'value_1'=>$obj_movimiento_mercancia->getIdMercancia()->getIdAmlacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -863,8 +875,14 @@ class AuxFunctions
             'nro_cuenta' => $nro_cuenta_acreedora,
             'nro_subcuenta' => $nro_subcuenta_acreedora,
             'analisis_1' => $cod_proveedor,
-            'analisis_2' => '', 'analisis_3' => '',
+            'value_1'=>$obj_informe->getIdProveedor()->getNombre(),
+            'value_2'=>'',
+            'value_3'=>'',
+            'analisis_2' => '',
+            'analisis_3' => '',
             'debito' => '',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
             'credito' => number_format($total, 2)
         );
         $rows[] = array(
@@ -873,7 +891,13 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '', 'analisis_3' => '',
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1'=>'',
+            'value_2'=>'',
+            'value_3'=>'',
+            'mes'=>$obj_movimiento_mercancia->getFecha()->format('m'),
+            'anno'=>$obj_movimiento_mercancia->getFecha()->format('Y'),
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
             'total' => $total
@@ -934,7 +958,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'value_1'=>$obj_movimiento_mercancia->getIdProducto()->getIdAmlacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -945,7 +975,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'value_1'=>$obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -964,7 +1000,9 @@ class AuxFunctions
             }
             $arr_analisis = explode('-', $criterio);
             if ($arr_analisis[2]!=''){
-                $codigo = $em->getRepository(Expediente::class)->find($arr_analisis[2])->getCodigo();
+                /** @var Expediente $expediente */
+                $expediente = $em->getRepository(Expediente::class)->find($arr_analisis[2]);
+                $codigo = $expediente->getCodigo();
                 $rows[] = array(
                     'nro_doc' => '',
                     'fecha' => '',
@@ -973,15 +1011,22 @@ class AuxFunctions
                     'analisis_1' => $codigo,
                     'analisis_2' => '',
                     'analisis_3' => '',
+                    'value_1'=>$expediente->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
                     'debito' => '',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'credito' => number_format($total_credito, 2)
                 );
             }
             if ($arr_analisis[0]!=''){
-
-
-                $codigo_cc = $em->getRepository(CentroCosto::class)->find($arr_analisis[0])->getCodigo();
-                $codigo_ot = $em->getRepository(OrdenTrabajo::class)->find($arr_analisis[1])->getCodigo();
+                /** @var OrdenTrabajo $ot */
+                $ot =$em->getRepository(OrdenTrabajo::class)->find($arr_analisis[1]);
+                /** @var CentroCosto $cc */
+                $cc = $em->getRepository(CentroCosto::class)->find($arr_analisis[0]);
+                $codigo_cc = $cc->getCodigo();
+                $codigo_ot = $ot->getCodigo();
                 $rows[] = array(
                     'nro_doc' => '',
                     'fecha' => '',
@@ -990,6 +1035,11 @@ class AuxFunctions
                     'analisis_1' => $codigo_cc,
                     'analisis_2' => $codigo_ot,
                     'analisis_3' => '',
+                    'value_1'=>$cc->getNombre(),
+                    'value_2'=>$ot->getDescripcion(),
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => '',
                     'credito' => number_format($total_credito, 2)
                 );
@@ -1002,7 +1052,13 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '', 'analisis_3' => '',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1'=>'',
+            'value_2'=>'',
+            'value_3'=>'',
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
             'total' => $total
@@ -1054,6 +1110,11 @@ class AuxFunctions
                     'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
                     'analisis_2' => $d->getIdOrdenTrabajo() ? $d->getIdOrdenTrabajo()->getCodigo() : '',
                     'analisis_3' => $d->getIdElementoGasto()->getCodigo(),
+                    'value_1'=>$d->getIdCentroCosto()->getNombre(),
+                    'value_2'=>$d->getIdOrdenTrabajo() ? $d->getIdOrdenTrabajo()->getDescripcion() : '',
+                    'value_3'=>$d->getIdElementoGasto()->getDescripcion(),
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($total, 2),
                     'credito' => ''
                 );
@@ -1088,7 +1149,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_vale_salida->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'credito' => number_format($parte, 2),
                     'debito' => ''
                 );
@@ -1099,7 +1166,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_vale_salida->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'credito' => number_format($parte, 2),
                     'debito' => ''
                 );
@@ -1111,7 +1184,13 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '', 'analisis_3' => '',
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1' => '',
+            'value_2' => '',
+            'value_3' => '',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
             'debito' => number_format($total_general, 2),
             'credito' => number_format($total_general, 2),
             'total' => $total_general
@@ -1167,6 +1246,11 @@ class AuxFunctions
                             'analisis_1' => $d->getIdCentroCosto()->getCodigo(),
                             'analisis_2' => $d->getIdElementoGasto()->getCodigo(),
                             'analisis_3' => '',
+                            'value_1'=>$d->getIdCentroCosto()->getNombre(),
+                            'value_2'=>$d->getIdElementoGasto()->getDescripcion(),
+                            'value_3'=>'',
+                            'mes'=>$obj_documento->getFecha()->format('m'),
+                            'anno'=>$obj_documento->getFecha()->format('Y'),
                             'debito' => number_format($total, 2),
                             'credito' => ''
                         );
@@ -1189,7 +1273,13 @@ class AuxFunctions
                             'nro_cuenta' => $obj_ajuste_salida->getNroCuentaInventario(),
                             'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
                             'analisis_1' => $d->getIdExpediente()->getCodigo(),
-                            'analisis_2' => '', 'analisis_3' => '',
+                            'analisis_2' => '',
+                            'analisis_3' => '',
+                            'value_1'=>$d->getIdExpediente()->getDescripcion(),
+                            'value_2'=>'',
+                            'value_3'=>'',
+                            'mes'=>$obj_documento->getFecha()->format('m'),
+                            'anno'=>$obj_documento->getFecha()->format('Y'),
                             'debito' => number_format($total, 2),
                             'credito' => '',
                         );
@@ -1206,7 +1296,13 @@ class AuxFunctions
                     'nro_cuenta' => $obj_ajuste_salida->getNroCuentaInventario(),
                     'nro_subcuenta' => $obj_ajuste_salida->getNroSubcuentaInventario(),
                     'analisis_1' => $obj_ajuste_salida->getIdDocumento()->getIdAlmacen()->getCodigo(),
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_ajuste_salida->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => $t_,
                     'credito' => ''
                 );
@@ -1239,7 +1335,13 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '', 'analisis_3' => '',
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1'=>$obj_ajuste_salida->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                        'value_2'=>'',
+                        'value_3'=>'',
+                        'mes'=>$obj_documento->getFecha()->format('m'),
+                        'anno'=>$obj_documento->getFecha()->format('Y'),
                         'credito' => number_format($parte, 2),
                         'debito' => ''
                     );
@@ -1250,7 +1352,13 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '', 'analisis_3' => '',
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1'=>$obj_ajuste_salida->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                        'value_2'=>'',
+                        'value_3'=>'',
+                        'mes'=>$obj_documento->getFecha()->format('m'),
+                        'anno'=>$obj_documento->getFecha()->format('Y'),
                         'credito' => number_format($parte, 2),
                         'debito' => ''
                     );
@@ -1262,7 +1370,13 @@ class AuxFunctions
                 'nro_cuenta' => '',
                 'nro_subcuenta' => '',
                 'analisis_1' => '',
-                'analisis_2' => '', 'analisis_3' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1' => '',
+                'value_2' => '',
+                'value_3' => '',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => number_format($t_, 2),
                 'credito' => number_format($t_, 2),
                 'total' => $t_
@@ -1316,7 +1430,13 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '', 'analisis_3' => '',
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1'=>$obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                        'value_2'=>'',
+                        'value_3'=>'',
+                        'mes'=>$obj_documento->getFecha()->format('m'),
+                        'anno'=>$obj_documento->getFecha()->format('Y'),
                         'debito' => number_format($parte, 2),
                         'credito' => ''
                     );
@@ -1327,7 +1447,13 @@ class AuxFunctions
                         'nro_cuenta' => $dat[0],
                         'nro_subcuenta' => $dat[1],
                         'analisis_1' => $cod_almacen,
-                        'analisis_2' => '', 'analisis_3' => '',
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1'=>$obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                        'value_2'=>'',
+                        'value_3'=>'',
+                        'mes'=>$obj_documento->getFecha()->format('m'),
+                        'anno'=>$obj_documento->getFecha()->format('Y'),
                         'debito' => number_format($parte, 2),
                         'credito' => ''
                     );
@@ -1340,7 +1466,13 @@ class AuxFunctions
                 'nro_cuenta' => $obj_ajuste_entrada->getNroCuentaAcreedora(),
                 'nro_subcuenta' => $obj_ajuste_entrada->getNroSubcuentanroAcreedora(),
                 'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
-                'analisis_2' => '', 'analisis_3' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1'=>$obj_documento->getIdAlmacen()->getDescripcion(),
+                'value_2'=>'',
+                'value_3'=>'',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => '',
                 'credito' => number_format($obj_documento->getImporteTotal(), 2)
             );
@@ -1352,7 +1484,13 @@ class AuxFunctions
                 'nro_cuenta' => '',
                 'nro_subcuenta' => '',
                 'analisis_1' => '',
-                'analisis_2' => '', 'analisis_3' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1' => '',
+                'value_2' => '',
+                'value_3' => '',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => number_format($obj_documento->getImporteTotal(), 2),
                 'credito' => number_format($obj_documento->getImporteTotal(), 2),
                 'total' => $obj_documento->getImporteTotal()
@@ -1387,7 +1525,13 @@ class AuxFunctions
             'nro_cuenta' => $obj_transferencia_salida->getNroCuentaInventario(),
             'nro_subcuenta' => $obj_transferencia_salida->getNroSubcuentaInventario(),
             'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
-            'analisis_2' => '', 'analisis_3' => '',
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1'=>$obj_documento->getIdAlmacen()->getDescripcion(),
+            'value_2'=>'',
+            'value_3'=>'',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
             'debito' => number_format($obj_documento->getImporteTotal(), 2),
             'credito' => ''
         );
@@ -1411,7 +1555,13 @@ class AuxFunctions
                     'nro_cuenta' => $d->getIdMercancia()->getCuenta(),
                     'nro_subcuenta' => $d->getIdMercancia()->getNroSubcuentaInventario(),
                     'analisis_1' => $d->getIdAlmacen()->getCodigo(),
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$d->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'credito' => number_format($total, 2),
                     'debito' => ''
                 );
@@ -1423,7 +1573,13 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '', 'analisis_3' => '',
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1' => '',
+            'value_2' => '',
+            'value_3' => '',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
             'debito' => number_format($obj_documento->getImporteTotal(), 2),
             'credito' => number_format($obj_documento->getImporteTotal(), 2),
             'total' => $obj_documento->getImporteTotal()
@@ -1477,7 +1633,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_transferencia_entrada->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1488,7 +1650,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_transferencia_entrada->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1501,7 +1669,13 @@ class AuxFunctions
                 'nro_cuenta' => $nro_cuenta_acreedora,
                 'nro_subcuenta' => $nro_subcuenta_acreedora,
                 'analisis_1' => $obj_transferencia_entrada->getIdAlmacen()->getCodigo(),
-                'analisis_2' => '', 'analisis_3' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1'=>$obj_transferencia_entrada->getIdAlmacen()->getDescripcion(),
+                'value_2'=>'',
+                'value_3'=>'',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1514,6 +1688,11 @@ class AuxFunctions
                 'analisis_2' => $obj_transferencia_entrada->getIdUnidad()->getCodigo(),
                 'analisis_3' => '',
                 'analisis_1' => '',
+                'value_1'=>$obj_transferencia_entrada->getIdUnidad()->getNombre(),
+                'value_2'=>'',
+                'value_3'=>'',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1524,7 +1703,13 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '', 'analisis_3' => '',
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1' => '',
+            'value_2' => '',
+            'value_3' => '',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
             'total' => $total
@@ -1676,7 +1861,13 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_devolucion->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
@@ -1687,28 +1878,44 @@ class AuxFunctions
                     'nro_cuenta' => $dat[0],
                     'nro_subcuenta' => $dat[1],
                     'analisis_1' => $cod_almacen,
-                    'analisis_2' => '', 'analisis_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1'=>$obj_devolucion->getIdDocumento()->getIdAlmacen()->getDescripcion(),
+                    'value_2'=>'',
+                    'value_3'=>'',
+                    'mes'=>$obj_documento->getFecha()->format('m'),
+                    'anno'=>$obj_documento->getFecha()->format('Y'),
                     'debito' => number_format($parte, 2),
                     'credito' => ''
                 );
         }
         $arr_criterios = self::getCriterioByCuenta($nro_cuenta_acreedora, $em);
-        $analisis1 = '';
-        $analisis2 = '';
         $arr = [];
+        $arr_value = [];
         foreach ($arr_criterios as $key => $abreviatura) {
-            if ($abreviatura == 'ALM')
+            if ($abreviatura == 'ALM'){
                 $analisis = $cod_almacen;
-            elseif ($abreviatura == 'UNID')
-                $analisis = $em->getRepository(Almacen::class)->findOneBy(['codigo' => $cod_almacen, 'activo' => true])->getIdUnidad()->getCodigo();
-            elseif ($abreviatura == 'CCT')
+                $desc = $obj_devolucion->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            }
+            elseif ($abreviatura == 'UNID'){
+                $desc = $obj_devolucion->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getNombre();
+                $analisis = $obj_devolucion->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getCodigo();
+            }
+            elseif ($abreviatura == 'CCT'){
                 $analisis = $obj_devolucion->getIdCentroCosto()->getCodigo();
-            elseif ($abreviatura == 'OT')
+                $desc = $obj_devolucion->getIdCentroCosto()->getNombre();
+            }
+            elseif ($abreviatura == 'OT'){
                 $analisis = $obj_devolucion->getIdOrdenTabajo()->getCodigo();
-            elseif ($abreviatura == 'EG')
+                $desc = $obj_devolucion->getIdOrdenTabajo()->getDescripcion();
+            }
+            elseif ($abreviatura == 'EG'){
                 $analisis = $obj_devolucion->getIdElementoGasto()->getCodigo();
+                $desc = $obj_devolucion->getIdElementoGasto()->getDescripcion();
+            }
 
             $arr[$key] = $analisis;
+            $arr_value[$key] = $desc;
         }
 
         if (count($arr) == 3) {
@@ -1720,6 +1927,11 @@ class AuxFunctions
                 'analisis_1' => $arr[0],
                 'analisis_2' => $arr[1],
                 'analisis_3' => $arr[2],
+                'value_1' => $arr_value[0],
+                'value_2' => $arr_value[1],
+                'value_3' => $arr_value[2],
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1733,6 +1945,11 @@ class AuxFunctions
                 'analisis_1' => $arr[0],
                 'analisis_2' => $arr[1],
                 'analisis_3' => '',
+                'value_1' => $arr_value[0],
+                'value_2' => $arr_value[1],
+                'value_3' => '',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1746,6 +1963,11 @@ class AuxFunctions
                 'analisis_1' => $arr[0],
                 'analisis_2' => '',
                 'analisis_3' => '',
+                'value_1' => $arr_value[0],
+                'value_2' => '',
+                'value_3' => '',
+                'mes'=>$obj_documento->getFecha()->format('m'),
+                'anno'=>$obj_documento->getFecha()->format('Y'),
                 'debito' => '',
                 'credito' => number_format($total, 2)
             );
@@ -1756,7 +1978,13 @@ class AuxFunctions
             'nro_cuenta' => '',
             'nro_subcuenta' => '',
             'analisis_1' => '',
-            'analisis_2' => '', 'analisis_3' => '',
+            'analisis_2' => '',
+            'analisis_3' => '',
+            'value_1' => '',
+            'value_2' => '',
+            'value_3' => '',
+            'mes'=>$obj_documento->getFecha()->format('m'),
+            'anno'=>$obj_documento->getFecha()->format('Y'),
             'debito' => number_format($total, 2),
             'credito' => number_format($total, 2),
             'total' => $total
@@ -1823,5 +2051,22 @@ class AuxFunctions
 
         return count($arr_movimientos) + 1;
 
+    }
+
+    public static function getNumberByString($number)
+    {
+        $arr_number = explode(',', $number);
+        if (count($arr_number) > 1) {
+            $complete = floatval($arr_number[0]) * 1000;
+            $faraccion_arr = explode('.', $arr_number[1]);
+            if (count($faraccion_arr) > 1) {
+                $complete += (floatval($faraccion_arr[0]) + (floatval($faraccion_arr[1]) / 100));
+            } else {
+                $complete += floatval($arr_number[1]);
+            }
+        } else {
+            $complete = floatval($number);
+        }
+        return $complete;
     }
 }

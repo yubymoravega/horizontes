@@ -227,17 +227,16 @@ class MovimientoCuentaController extends AbstractController
                             if ($obj_subcuenta->getNroSubcuenta() == $d['nro_subcuenta']) {
                                 if (!empty($rows_data_criterios)) {
                                     if ($this->containCriteria($rows_data_criterios, $d)) {
-                                        if ($account_obj->getDeudora() || $account_obj->getMixta()) {
+                                        if ($obj_subcuenta->getDeudora() ) {
                                             if ($d['debito'] != '')
-                                                $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                                $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['debito']);
                                             else
-                                                $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
-                                        } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
-
+                                                $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['credito']);
+                                        } elseif (!$obj_subcuenta->getDeudora()) {
                                             if ($d['debito'] != '')
-                                                $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                                $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['debito']);
                                             else if ($d['credito'] != '')
-                                                $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                                $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['credito']);
                                         }
                                         $row[] = array(
                                             'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
@@ -249,17 +248,16 @@ class MovimientoCuentaController extends AbstractController
                                         );
                                     }
                                 } else {
-                                    if ($account_obj->getDeudora() || $account_obj->getMixta()) {
+                                    if ($obj_subcuenta->getDeudora()) {
                                         if ($d['debito'] != '')
-                                            $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                            $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['debito']);
                                         else
-                                            $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
-                                    } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
-
+                                            $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['credito']);
+                                    } elseif (!$obj_subcuenta->getDeudora()) {
                                         if ($d['debito'] != '')
-                                            $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                            $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['debito']);
                                         else if ($d['credito'] != '')
-                                            $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                            $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['credito']);
                                     }
                                     $row[] = array(
                                         'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
@@ -277,15 +275,15 @@ class MovimientoCuentaController extends AbstractController
                                 if ($this->containCriteria($rows_data_criterios, $d)) {
                                     if ($account_obj->getDeudora() || $account_obj->getMixta()) {
                                         if ($d['debito'] != '')
-                                            $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                            $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['debito']);
                                         else
-                                            $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
+                                            $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['credito']);
                                     } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
 
                                         if ($d['debito'] != '')
-                                            $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                            $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['debito']);
                                         else if ($d['credito'] != '')
-                                            $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                            $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['credito']);
                                     }
                                     $row[] = array(
                                         'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
@@ -299,15 +297,15 @@ class MovimientoCuentaController extends AbstractController
                             } else {
                                 if ($account_obj->getDeudora() || $account_obj->getMixta()) {
                                     if ($d['debito'] != '')
-                                        $saldo_inicial_calculo += $this->getNumberByString($d['debito']);
+                                        $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['debito']);
                                     else
-                                        $saldo_inicial_calculo -= $this->getNumberByString($d['credito']);
+                                        $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['credito']);
                                 } elseif (!$account_obj->getDeudora() && !$account_obj->getMixta()) {
 
                                     if ($d['debito'] != '')
-                                        $saldo_inicial_calculo -= $this->getNumberByString($d['debito']);
+                                        $saldo_inicial_calculo -= AuxFunctions::getNumberByString($d['debito']);
                                     else if ($d['credito'] != '')
-                                        $saldo_inicial_calculo += $this->getNumberByString($d['credito']);
+                                        $saldo_inicial_calculo += AuxFunctions::getNumberByString($d['credito']);
                                 }
                                 $row[] = array(
                                     'tipo_comprobante' => $comp->getIdTipoComprobante()->getAbreviatura(),
@@ -613,23 +611,5 @@ class MovimientoCuentaController extends AbstractController
             $rows = [];
         }
         return !empty($retur_rows) ? $retur_rows : [];
-    }
-
-    public
-    function getNumberByString($number)
-    {
-        $arr_number = explode(',', $number);
-        if (count($arr_number) > 1) {
-            $complete = floatval($arr_number[0]) * 1000;
-            $faraccion_arr = explode('.', $arr_number[1]);
-            if (count($faraccion_arr) > 1) {
-                $complete += (floatval($faraccion_arr[0]) + (floatval($faraccion_arr[1]) / 100));
-            } else {
-                $complete += floatval($arr_number[1]);
-            }
-        } else {
-            $complete = floatval($number);
-        }
-        return $complete;
     }
 }

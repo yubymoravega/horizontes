@@ -266,7 +266,6 @@
                     'factura[fecha_factura]': "required",
                     'factura[tipo_cliente]': "required",
                     'factura[id_cliente]': "required",
-                    'factura[id_contrato]': "required",
                     'factura[cuenta_obligacion]': "required",
                     'factura[subcuenta_obligacion]': "required",
                 },
@@ -275,7 +274,6 @@
                     'factura[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[tipo_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'factura[id_contrato]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[cuenta_obligacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[subcuenta_obligacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
@@ -293,7 +291,7 @@
                     'movimiento_venta[um]': "required",
                     'movimiento_venta[cantidad]': "required",
                     'movimiento_venta[precio]': "required",
-                    'movimiento_venta[descuento_recarga]': "required",
+                    // 'movimiento_venta[descuento_recarga]': "required",
                     'movimiento_venta[importe]': "required",
                     'movimiento_venta[existencia]': "required",
                     'movimiento_venta[cuenta_deudora]': "required",
@@ -308,7 +306,7 @@
                     'movimiento_venta[um]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[cantidad]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[precio]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'movimiento_venta[descuento_recarga]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    // 'movimiento_venta[descuento_recarga]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[importe]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[existencia]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -518,9 +516,9 @@
                     if (lista_mercancias.length) {
                         // proceso de facturación
                         const mercancias = JSON.stringify(lista_mercancias)
-                        form_factura.append(`<input type="text" name="mercancias" value='${mercancias}' />`)
-                        form_factura.append(`<input type="text" name="importe_total" value='${importe_total}' />`)
-                        form_factura.append(txt_nroFactura)
+                        form_factura.append(`<input type="text" hidden name="mercancias" value='${mercancias}' />`)
+                        form_factura.append(`<input type="text" hidden name="importe_total" value='${importe_total}' />`)
+                        // form_factura.append(txt_nroFactura)
                         loadingModal.show()
                         form_factura.submit()
                     } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
