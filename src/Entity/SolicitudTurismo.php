@@ -316,7 +316,7 @@ class SolicitudTurismo
         return $this->vueloComentario;
     }
 
-    public function setVueloComentario(?string $vueloComentario): self
+    public function setVueloComentario(string $vueloComentario): self
     {
         $this->vueloComentario = $vueloComentario;
 
@@ -340,7 +340,7 @@ class SolicitudTurismo
         return $this->hotelNombre;
     }
 
-    public function setHotelNombre(?string $hotelNombre): self
+    public function setHotelNombre(string $hotelNombre): self
     {
         $this->hotelNombre = $hotelNombre;
 
@@ -352,7 +352,7 @@ class SolicitudTurismo
         return $this->hotelCategoria;
     }
 
-    public function setHotelCategoria(?string $hotelCategoria): self
+    public function setHotelCategoria(string $hotelCategoria): self
     {
         $this->hotelCategoria = $hotelCategoria;
 
@@ -364,7 +364,7 @@ class SolicitudTurismo
         return $this->hotelPlan;
     }
 
-    public function setHotelPlan(?string $hotelPlan): self
+    public function setHotelPlan(string $hotelPlan): self
     {
         $this->hotelPlan = $hotelPlan;
 
@@ -376,7 +376,7 @@ class SolicitudTurismo
         return $this->hotelComentario;
     }
 
-    public function setHotelComentario(?string $hotelComentario): self
+    public function setHotelComentario(string $hotelComentario): self
     {
         $this->hotelComentario = $hotelComentario;
 
@@ -388,7 +388,7 @@ class SolicitudTurismo
         return $this->tranferLlegada;
     }
 
-    public function setTranferLlegada(?string $tranferLlegada): self
+    public function setTranferLlegada(string $tranferLlegada): self
     {
         $this->tranferLlegada = $tranferLlegada;
 
@@ -412,7 +412,7 @@ class SolicitudTurismo
         return $this->tramferLugar;
     }
 
-    public function setTramferLugar(?string $tramferLugar): self
+    public function setTramferLugar(string $tramferLugar): self
     {
         $this->tramferLugar = $tramferLugar;
 
@@ -424,7 +424,7 @@ class SolicitudTurismo
         return $this->tramferDestino;
     }
 
-    public function setTramferDestino(?string $tramferDestino): self
+    public function setTramferDestino(string $tramferDestino): self
     {
         $this->tramferDestino = $tramferDestino;
 
@@ -436,7 +436,7 @@ class SolicitudTurismo
         return $this->tramferVehiculo;
     }
 
-    public function setTramferVehiculo(?string $tramferVehiculo): self
+    public function setTramferVehiculo(string $tramferVehiculo): self
     {
         $this->tramferVehiculo = $tramferVehiculo;
 
@@ -448,7 +448,7 @@ class SolicitudTurismo
         return $this->tramferComentario;
     }
 
-    public function setTramferComentario(?string $tramferComentario): self
+    public function setTramferComentario(string $tramferComentario): self
     {
         $this->tramferComentario = $tramferComentario;
 
@@ -460,14 +460,14 @@ class SolicitudTurismo
         return $this->tourNombre;
     }
 
-    public function setTourNombre(?string $tourNombre): self
+    public function setTourNombre(string $tourNombre): self
     {
         $this->tourNombre = $tourNombre;
 
         return $this;
     }
 
-    public function getTourFecha(): string
+    public function getTourFecha():? string
     {
         return $this->tourFecha;
     }
@@ -484,7 +484,7 @@ class SolicitudTurismo
         return $this->tourComentario;
     }
 
-    public function setTourComentario(?string $tourComentario): self
+    public function setTourComentario(string $tourComentario): self
     {
         $this->tourComentario = $tourComentario;
 
@@ -496,7 +496,7 @@ class SolicitudTurismo
         return $this->tourCantidadAdultos;
     }
 
-    public function setTourCantidadAdultos(?string $tourCantidadAdultos): self
+    public function setTourCantidadAdultos(string $tourCantidadAdultos): self
     {
         $this->tourCantidadAdultos = $tourCantidadAdultos;
 
@@ -508,7 +508,7 @@ class SolicitudTurismo
         return $this->tourCantidadNinos;
     }
 
-    public function setTourCantidadNinos(?string $tourCantidadNinos): self
+    public function setTourCantidadNinos(string $tourCantidadNinos): self
     {
         $this->tourCantidadNinos = $tourCantidadNinos;
 
@@ -520,7 +520,7 @@ class SolicitudTurismo
         return $this->RentTipoVehiculo;
     }
 
-    public function setRentTipoVehiculo(?string $RentTipoVehiculo): self
+    public function setRentTipoVehiculo(string $RentTipoVehiculo): self
     {
         $this->RentTipoVehiculo = $RentTipoVehiculo;
 
@@ -532,7 +532,7 @@ class SolicitudTurismo
         return $this->rentLugarRecogida;
     }
 
-    public function setRentLugarRecogida(?string $rentLugarRecogida): self
+    public function setRentLugarRecogida(string $rentLugarRecogida): self
     {
         $this->rentLugarRecogida = $rentLugarRecogida;
 
@@ -544,7 +544,7 @@ class SolicitudTurismo
         return $this->rentLugarEntrega;
     }
 
-    public function setRentLugarEntrega(?string $rentLugarEntrega): self
+    public function setRentLugarEntrega(string $rentLugarEntrega): self
     {
         $this->rentLugarEntrega = $rentLugarEntrega;
 
