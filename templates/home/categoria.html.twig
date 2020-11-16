@@ -19,7 +19,7 @@
 			
 		</div>
 
-		<div class="card 3">
+		<div id="turismo" class="card 3">
 			<div class="card_image">
 				<img src="{{ asset('images/servicios/turismo.png') }}"/>
 			</div>
@@ -146,6 +146,11 @@ this.value = this.value.replace(/[^0-9]/g, '');
 $( "#remesa" ).click(function() {
   
   window.location.href = "/remesas/pais/"+{{tel}};
+});
+
+$( "#turismo" ).click(function() {
+  
+  window.location.href = "/turismo/solicitud/"+{{tel}};
 });
 
 	</script>
