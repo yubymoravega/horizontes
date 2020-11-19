@@ -29,7 +29,11 @@
             <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0 offset-top-30 offset-lg-top-0">
                <h4 style="color: white; text-align: left;">Hotel</h4>
              <ul style="color: white; " class="list  list-marked">
-                <li><strong>Destino:</strong>  {{solicitud.hotelDestino}}</li>
+                <li><strong>Desde:</strong>  {{solicitud.hotelDesde}}</li> 
+				 <li><strong>Hasta:</strong>  {{solicitud.hotelHasta}}</li>
+				 <li><strong>Adultos:</strong>  {{solicitud.hotelAdultos}}</li>
+				 <li><strong>Niños:</strong>  {{solicitud.hotelNinos}}</li>
+				<li><strong>Destino:</strong>  {{solicitud.hotelDestino}}</li>
                 <li><strong>Nombre Hotel:</strong>  {{solicitud.hotelNombre}}</li>
                 <li><strong>Categoria:</strong>  {{solicitud.hotelCategoria}}</li>
                 <li><strong>Hotel Plan:</strong>  {{solicitud.hotelPlan}}</li>
@@ -40,7 +44,9 @@
             <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0 offset-top-30 offset-lg-top-0">
              <h4 style="color: white; text-align: left;">Transfer</h4>
              <ul style="color: white; " class="list  list-marked">
-              <li><strong>LLegada:</strong>  {{solicitud.tranferLlegada}}</li>
+              <li><strong>Adultos:</strong>  {{solicitud.tramferAdultos}}</li>
+			  <li><strong>Niños:</strong>  {{solicitud.tramferNinos}}</li>
+			  <li><strong>LLegada:</strong>  {{solicitud.tranferLlegada}}</li>
               <li><strong>Salida:</strong>  {{solicitud.tramferSalida}}</li>
               <li><strong>Lugar:</strong>  {{solicitud.tramferLugar}}</li>
               <li><strong>Destino:</strong>  {{solicitud.tramferDestino}}</li>
@@ -65,8 +71,8 @@
               <ul style="color: white; " class="list  list-marked">
                 <li><strong>Nombre:</strong>  {{solicitud.tourNombre}}</li>
                 <li><strong>Fecha:</strong>  {{solicitud.tourFecha}}</li>
-                <li><strong>Adultos:</strong>  {{solicitud.tourCantidadAdultos}}</li>
-                <li><strong>Niños:</strong>  {{solicitud.tourCantidadNinos}}</li>
+                <li><strong>Adultos:</strong> </li>
+                <li><strong>Niños:</strong>  </li>
                  <li><strong>Comentario:</strong>  {{solicitud.tourComentario}}</li>
                
               </ul>
@@ -79,6 +85,7 @@
               <li><strong>Entrega:</strong>  {{solicitud.rentLugarEntrega}}</li>
               <li><strong>Desde:</strong>  {{solicitud.rentFechaDesde}}</li>
               <li><strong>Hasta:</strong>  {{solicitud.rentFechaHasta}}</li>
+			   <li><strong>Cantidad Personas:</strong>  {{solicitud.rentCantidadPersonas}}</li>
               <li><strong>Comentario:</strong>  {{solicitud.rentComentario	}}</li>
                
               </ul>

@@ -75,6 +75,15 @@
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 						
+
+					<div class="col">
+					Cantidad Adultos{{ form_widget(formulario.hotelAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Cantidad Adultos'}}) }}
+					</div>	
+
+					<div class="col">
+					Cantidad Niños{{ form_widget(formulario.hotelNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+					</div>	
+
 					<div class="col">
 					Destino{{ form_widget(formulario.hotelDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
 					</div>	
@@ -83,10 +92,7 @@
 						Nombre Hotel{{ form_widget(formulario.hotelNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Nombre Hotel'}}) }}
 						</div>
 						
-						<div class="col">
-						Categoria
-						{{ form_widget(formulario.hotelCategoria, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'hotelCategoria'}}) }}
-						</div>
+					
 						<span class="input-group-append"></div>
 					</div>
 					
@@ -94,6 +100,11 @@
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
+							<div class="col">
+						Categoria
+						{{ form_widget(formulario.hotelCategoria, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'hotelCategoria'}}) }}
+						</div>
+
 						<div class="col">
 								Plan Hotel{{ form_widget(formulario.hotelPlan, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Hotel Plan'}}) }}
                            
@@ -121,6 +132,14 @@
 					<div class="input-group input-group-sm">
 						
 					<div class="col">
+					Adultos {{ form_widget(formulario.tramferAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
+					</div>	
+
+						<div class="col">
+					Niños {{ form_widget(formulario.tramferNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+					</div>	
+
+					<div class="col">
 					Fecha {{ form_widget(formulario.tranferLlegada, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha'}}) }}
 					</div>	
 						
@@ -128,10 +147,7 @@
 						Fecha Salida{{ form_widget(formulario.tramferSalida, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
 						</div>
 						
-						<div class="col">
-						Lugar
-						{{ form_widget(formulario.tramferLugar, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar'}}) }}
-						</div>
+					
 						<span class="input-group-append"></div>
 					</div>
 					
@@ -139,6 +155,11 @@
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
+							<div class="col">
+						Lugar
+						{{ form_widget(formulario.tramferLugar, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar'}}) }}
+						</div>
+
 						<div class="col">
 								Destino{{ form_widget(formulario.tramferDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
                            
@@ -147,6 +168,16 @@
 						<div class="col">	
 							Tipo Vehiculo{{ form_widget(formulario.tramferVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
 						</div>
+
+							<span class="input-group-append"></div>
+
+                        	
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+					
 
                         <div class="col">	
 								Comentario{{ form_widget(formulario.tramferComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
@@ -163,6 +194,14 @@
 					<div class="input-group input-group-sm">
 						
 					<div class="col">
+					Adultos {{ form_widget(formulario.tourAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
+					</div>	
+
+					<div class="col">
+					Niños {{ form_widget(formulario.tourNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+					</div>	
+
+					<div class="col">
 					Tour {{ form_widget(formulario.tourNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tour'}}) }}
 					</div>	
 						
@@ -170,22 +209,12 @@
 						Fecha Salida{{ form_widget(formulario.tourFecha, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
 						</div>
 						
-						<div class="col">
-						Adultos
-						{{ form_widget(formulario.tourCantidadAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
-						</div>
 						<span class="input-group-append"></div>
 					</div>
 					
-  
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
-						<div class="col">
-							Niños	{{ form_widget(formulario.tourCantidadNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
-                           
-							</div>
-
 						<div class="col">	
 							Comentario{{ form_widget(formulario.tourComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
 						</div>
@@ -199,6 +228,10 @@
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 						
+						<div class="col">
+					Cantidad De Personas {{ form_widget(formulario.rentCantidadPersonas, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Cantidad De Personas'}}) }}
+					</div>	
+
 					<div class="col">
 					Tipo Vehiculo {{ form_widget(formulario.RentTipoVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
 					</div>	
@@ -214,7 +247,6 @@
 						<span class="input-group-append"></div>
 					</div>
 					
-  
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
@@ -227,22 +259,29 @@
 							Fecha Hasta{{ form_widget(formulario.rentFechaHasta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Hasta'}}) }}
 						</div>
 
+                        	
+						</div>
+
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						
                         	<div class="col">	
 							Comentario{{ form_widget(formulario.rentComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
 						</div>
-
-                        	
+	
 						</div>
 							
-							
-							
+	
 						</div>
 
-                        
 						</div>
 
 			</div>
-                              <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
+
+	                <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
 							{{ form_end(formulario) }}
 							<div></section>
 <style>
@@ -253,6 +292,7 @@ margin-right: 25px;
 
 }
 
+select.form-control{height: 50px !important;}
 .no-margin{margin: 0px;}
 
 form#form_add_beneficiario {

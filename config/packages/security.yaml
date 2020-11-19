@@ -49,5 +49,6 @@ security:
           - { path: '^/contabilidad', roles: [ ROLE_ADMIN] }
           - { path: '^/contabilidad/config', roles: [ ROLE_ADMIN] }
           - { path: '^/config', roles: [ ROLE_ADMIN] }
+          - { path: '^/turismo', roles: [ ROLE_USER] }
 
           

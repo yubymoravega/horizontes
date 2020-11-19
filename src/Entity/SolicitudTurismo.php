@@ -122,15 +122,6 @@ class SolicitudTurismo
      */
     private $tourComentario;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $tourCantidadAdultos;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $tourCantidadNinos;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -197,6 +188,125 @@ class SolicitudTurismo
      */
     private $nombreCliente;
 
+     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $hotelAdultos;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $hotelNinos;
+
+     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tramferAdultos;
+
+     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tramferNinos;
+
+     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tourNinos;
+
+     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tourAdultos;
+
+      /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $rentCantidadPersonas;
+
+    public function getRentCantidadPersonas(): ?string
+    {
+        return $this->rentCantidadPersonas;
+    }
+
+    public function setRentCantidadPersonas(string $rentCantidadPersonas): self
+    {
+        $this->rentCantidadPersonas = $rentCantidadPersonas;
+
+        return $this;
+    }
+
+    public function getTourNinos(): ?string
+    {
+        return $this->tourNinos;
+    }
+
+    public function setTourNinos(string $tourNinos): self
+    {
+        $this->tourNinos = $tourNinos;
+
+        return $this;
+    }
+
+    public function getTourAdultos(): ?string
+    {
+        return $this->tourAdultos;
+    }
+
+    public function setTourAdultos(string $tourAdultos): self
+    {
+        $this->tourAdultos = $tourAdultos;
+
+        return $this;
+    }
+
+    public function getTramferNinos(): ?string
+    {
+        return $this->tramferNinos;
+    }
+
+    public function setTramferNinos(string $tramferNinos): self
+    {
+        $this->tramferNinos = $tramferNinos;
+
+        return $this;
+    }
+
+
+    public function getTramferAdultos(): ?string
+    {
+        return $this->tramferAdultos;
+    }
+
+    public function setTramferAdultos(string $tramferAdultos): self
+    {
+        $this->tramferAdultos = $tramferAdultos;
+
+        return $this;
+    }
+
+    public function getHotelNinos(): ?string
+    {
+        return $this->hotelNinos;
+    }
+
+    public function setHotelNinos(string $hotelNinos): self
+    {
+        $this->hotelNinos = $hotelNinos;
+
+        return $this;
+    }
+
+    public function getHotelAdultos(): ?string
+    {
+        return $this->hotelAdultos;
+    }
+
+    public function setHotelAdultos(string $hotelAdultos): self
+    {
+        $this->hotelAdultos = $hotelAdultos;
+
+        return $this;
+    }
 
     public function getNombreCliente(): ?string
     {
@@ -491,29 +601,6 @@ class SolicitudTurismo
         return $this;
     }
 
-    public function getTourCantidadAdultos(): ?string
-    {
-        return $this->tourCantidadAdultos;
-    }
-
-    public function setTourCantidadAdultos(string $tourCantidadAdultos): self
-    {
-        $this->tourCantidadAdultos = $tourCantidadAdultos;
-
-        return $this;
-    }
-
-    public function getTourCantidadNinos(): ?string
-    {
-        return $this->tourCantidadNinos;
-    }
-
-    public function setTourCantidadNinos(string $tourCantidadNinos): self
-    {
-        $this->tourCantidadNinos = $tourCantidadNinos;
-
-        return $this;
-    }
 
     public function getRentTipoVehiculo(): ?string
     {
@@ -599,7 +686,7 @@ class SolicitudTurismo
         return $this;
     }
 
-    public function getHotelDesde(): string
+    public function getHotelDesde(): ?string
     {
         return $this->hotelDesde;
     }
@@ -611,7 +698,7 @@ class SolicitudTurismo
         return $this;
     }
 
-    public function getHotelHasta(): string
+    public function getHotelHasta(): ?string
     {
         return $this->hotelHasta;
     }

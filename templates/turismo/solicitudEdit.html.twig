@@ -31,16 +31,54 @@
 					<div class="input-group input-group-sm">
 						
 					<div class="col">
-					Adultos{{ form_widget(formulario.vueloCantidadAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
-					</div>	
+						Adultos
+						<select id="solicitud_turismo_vueloCantidadAdultos" name="solicitud_turismo[vueloCantidadAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in vueloAdultos %}
+
+						{% if origen ==  solicitud.vueloCantidadAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
 						
 						<div class="col">
-						Niños{{ form_widget(formulario.vueloCantidadNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+						Niños
+						<select id="solicitud_turismo_vueloCantidadNinos" name="solicitud_turismo[vueloCantidadNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in vueloNinos %}
+
+						{% if origen ==  solicitud.vueloCantidadNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
 						</div>
 						
 						<div class="col">
 						Origen
-						{{ form_widget(formulario.vueloOrigen, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Origen'}}) }}
+						<select id="solicitud_turismo_vueloOrigen" name="solicitud_turismo[vueloOrigen]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in vueloOrigen %}
+
+						{% if origen.nombre ==  solicitud.vueloOrigen %}
+						<option selected value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% else %}
+   						<option value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
 						</div>
 						<span class="input-group-append"></div>
 					</div>
@@ -50,9 +88,20 @@
 						<div class="input-group input-group-sm">
 						
 						<div class="col">
-								Destino{{ form_widget(formulario.VueloDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
-                           
-							</div>
+						Destino
+						<select id="solicitud_turismo_VueloDestino" name="solicitud_turismo[VueloDestino]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in vueloDestino %}
+
+						{% if destino.nombre ==  solicitud.vueloDestino %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
 
 						<div class="col">	
 							Fecha{{ form_widget(formulario.vueloIda, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Origen'}}) }}
@@ -75,18 +124,76 @@
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 						
+
+						<div class="col">
+						Cantidad Adultos
+						<select id="solicitud_turismo_hotelAdultos" name="solicitud_turismo[hotelAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in hotelAdultos %}
+
+						{% if origen ==  solicitud.hotelAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
+							
+
 					<div class="col">
-					Destino{{ form_widget(formulario.hotelDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
-					</div>	
+						Cantidad Niños
+						<select id="solicitud_turismo_hotelNinos" name="solicitud_turismo[hotelNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in hotelNinos %}
+
+						{% if origen ==  solicitud.hotelNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
 						
+						</select>
+						</div>
+
 						<div class="col">
-						Nombre Hotel{{ form_widget(formulario.hotelNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Nombre Hotel'}}) }}
+						Destino
+						<select id="solicitud_turismo_hotelDestino" name="solicitud_turismo[hotelDestino]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in hotelDestino %}
+
+						{% if destino.nombre ==  solicitud.vueloDestino %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+						
+							<div class="col">
+						Nombre Hotel
+						<select id="solicitud_turismo_hotelNombre" name="solicitud_turismo[hotelNombre]" class="fomulario form-control" placeholder="Nombre Hotel">
+						{% for origen in hotelOrigen %}
+
+						{% if origen.nombre ==  solicitud.hotelNombre %}
+						<option selected value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% else %}
+   						<option value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
 						</div>
 						
-						<div class="col">
-						Categoria
-						{{ form_widget(formulario.hotelCategoria, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'hotelCategoria'}}) }}
-						</div>
+					
 						<span class="input-group-append"></div>
 					</div>
 					
@@ -94,6 +201,11 @@
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
+							<div class="col">
+						Categoria
+						{{ form_widget(formulario.hotelCategoria, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'hotelCategoria'}}) }}
+						</div>
+
 						<div class="col">
 								Plan Hotel{{ form_widget(formulario.hotelPlan, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Hotel Plan'}}) }}
                            
@@ -121,6 +233,38 @@
 					<div class="input-group input-group-sm">
 						
 					<div class="col">
+						Cantidad Adultos
+						<select id="solicitud_turismo_tramferAdultos" name="solicitud_turismo[tramferAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in transferAdultos %}
+
+						{% if origen ==  solicitud.tramferAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+
+					<div class="col">
+						Niños
+						<select id="solicitud_turismo_tramferNinos" name="solicitud_turismo[tramferNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in transferNinos %}
+
+						{% if origen ==  solicitud.tramferNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+
+					<div class="col">
 					Fecha {{ form_widget(formulario.tranferLlegada, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha'}}) }}
 					</div>	
 						
@@ -128,10 +272,7 @@
 						Fecha Salida{{ form_widget(formulario.tramferSalida, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
 						</div>
 						
-						<div class="col">
-						Lugar
-						{{ form_widget(formulario.tramferLugar, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar'}}) }}
-						</div>
+					
 						<span class="input-group-append"></div>
 					</div>
 					
@@ -140,13 +281,50 @@
 						<div class="input-group input-group-sm">
 						
 						<div class="col">
-								Destino{{ form_widget(formulario.tramferDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
-                           
-							</div>
+						Lugar
+						<select id="solicitud_turismo_tramferLugar" name="solicitud_turismo[tramferLugar]" class="fomulario form-control" placeholder="Lugar">
+						{% for destino in transferOrigen %}
+
+						{% if destino.nombre ==  solicitud.tramferLugar %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+
+						<div class="col">
+						Destino
+						<select id="solicitud_turismo_tramferDestino" name="solicitud_turismo[tramferDestino]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in transferDestino %}
+
+						{% if destino.nombre ==  solicitud.tramferDestino %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
 
 						<div class="col">	
 							Tipo Vehiculo{{ form_widget(formulario.tramferVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
 						</div>
+
+							<span class="input-group-append"></div>
+
+                        	
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+					
 
                         <div class="col">	
 								Comentario{{ form_widget(formulario.tramferComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
@@ -163,29 +341,63 @@
 					<div class="input-group input-group-sm">
 						
 					<div class="col">
-					Tour {{ form_widget(formulario.tourNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tour'}}) }}
-					</div>	
+						Cantidad Adultos
+						<select id="solicitud_turismo_tourAdultos" name="solicitud_turismo[tourAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in tourAdultos %}
+
+						{% if origen ==  solicitud.tourAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+
+					<div class="col">
+						Niños
+						<select id="solicitud_turismo_tourNinos" name="solicitud_turismo[tourNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in tourNinos %}
+
+						{% if origen ==  solicitud.tourNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>		
+
+					<div class="col">
+						Tour Nombre
+						<select id="solicitud_turismo_tourNombre" name="solicitud_turismo[tourNombre]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in tourNombre %}
+
+						{% if destino.nombre ==  solicitud.tourNombre %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
 						
 						<div class="col">
 						Fecha Salida{{ form_widget(formulario.tourFecha, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
 						</div>
 						
-						<div class="col">
-						Adultos
-						{{ form_widget(formulario.tourCantidadAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
-						</div>
 						<span class="input-group-append"></div>
 					</div>
 					
-  
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
-						<div class="col">
-							Niños	{{ form_widget(formulario.tourCantidadNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
-                           
-							</div>
-
 						<div class="col">	
 							Comentario{{ form_widget(formulario.tourComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
 						</div>
@@ -199,22 +411,50 @@
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 						
+						<div class="col">
+					Cantidad De Personas {{ form_widget(formulario.rentCantidadPersonas, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Cantidad De Personas'}}) }}
+					</div>	
+
 					<div class="col">
 					Tipo Vehiculo {{ form_widget(formulario.RentTipoVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
 					</div>	
 						
 						<div class="col">
-						Lugar Recogida{{ form_widget(formulario.rentLugarRecogida, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar Recogida'}}) }}
+						Lugar Recogida
+						<select id="solicitud_turismo_rentLugarRecogida" name="solicitud_turismo[rentLugarRecogida]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in renteLugarRecogida %}
+
+						{% if destino.nombre ==  solicitud.rentLugarRecogida %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
 						</div>
 						
 						<div class="col">
 						Lugar Entrega
-						{{ form_widget(formulario.rentLugarEntrega, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar Entrega'}}) }}
+						<select id="solicitud_turismo_rentLugarEntrega" name="solicitud_turismo[rentLugarEntrega]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in rentLugarEntrega %}
+
+						{% if destino.nombre ==  solicitud.rentLugarEntrega %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
 						</div>
+
+
 						<span class="input-group-append"></div>
 					</div>
 					
-  
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
@@ -227,23 +467,30 @@
 							Fecha Hasta{{ form_widget(formulario.rentFechaHasta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Hasta'}}) }}
 						</div>
 
+                        	
+						</div>
+
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						
                         	<div class="col">	
 							Comentario{{ form_widget(formulario.rentComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
 						</div>
-
-                        	
+	
 						</div>
 							
-							
-							
+	
 						</div>
 
-                        
 						</div>
 
 			</div>
-                              <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
-							{{ form_end(formulario) }}
+
+	                <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
+								{{ form_end(formulario, {'render_rest': false}) }}
 							<div></section>
 
 
