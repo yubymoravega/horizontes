@@ -16,14 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class BalanceComprobacionSaldoController
+ * Class BalanceComprobacionSaldoCuentaSubcuentaController
  * @package App\Controller\Contabilidad\General
- * @Route("/contabilidad/general/balance-comprobacion-saldo")
+ * @Route("/contabilidad/general/balance-comprobacion-saldo-cuenta-subcuenta")
  */
-class BalanceComprobacionSaldoController extends AbstractController
+class BalanceComprobacionSaldoCuentaSubcuentaController extends AbstractController
 {
     /**
-     * @Route("/", name="contabilidad_general_balance_comprobacion_saldo")
+     * @Route("/", name="contabilidad_general_balance_comprobacion_saldo_cuenta_subcuenta")
      */
     public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
@@ -70,33 +70,11 @@ class BalanceComprobacionSaldoController extends AbstractController
                         'debito_mes' => '',
                         'index' => 1
                     );
-                    $data_analisis = $this->getDataByParams($data_almacenes, $cuenta->getNroCuenta(), $subcuenta->getNroSubcuenta(), Date('m') - 1, Date('Y'));
                     $total_debito_subcuenta_acumulado = 0;
                     $total_credito_subcuenta_acumulado = 0;
                     $total_debito_subcuenta_mes = 0;
                     $total_credito_subcuenta_mes = 0;
-                    foreach ($data_analisis as $data) {
-                        $total_debito_subcuenta_acumulado += $data['debito_acumulado'];
-                        $total_credito_subcuenta_acumulado += $data['credito_acumulado'];
-                        $total_debito_subcuenta_mes += $data['debito_mes'];
-                        $total_credito_subcuenta_mes += $data['credito_mes'];//
-                        $row[] = array(
-                            'cuenta' => '',
-                            'subcuenta' => '',
-                            'descripcion' => $data['descripcion'],
-                            'id_cuenta' => $cuenta->getId(),
-                            'id_subcuenta' => $subcuenta->getId(),
-                            'credito_mes' => $data['credito_mes'] > 0 ? number_format($data['credito_mes'], 2) : '',
-                            'debito_mes' => $data['debito_mes'] > 0 ? number_format($data['debito_mes'], 2) : '',
-                            'credito_acumulado' => $data['credito_acumulado'] > 0 ? number_format($data['credito_acumulado'], 2) : '',
-                            'debito_acumulado' => $data['debito_acumulado'] > 0 ? number_format($data['debito_acumulado'], 2) : '',
-                            'index' => $data['index']
-                        );
-                    }
-                    $row[count($row) - count($data_analisis) - 1]['credito_acumulado'] = $total_credito_subcuenta_acumulado > 0 ? number_format($total_credito_subcuenta_acumulado, 2) : '';
-                    $row[count($row) - count($data_analisis) - 1]['debito_acumulado'] = $total_debito_subcuenta_acumulado > 0 ? number_format($total_debito_subcuenta_acumulado, 2) : '';
-                    $row[count($row) - count($data_analisis) - 1]['credito_mes'] = $total_credito_subcuenta_mes > 0 ? number_format($total_credito_subcuenta_mes, 2) : '';
-                    $row[count($row) - count($data_analisis) - 1]['debito_mes'] = $total_debito_subcuenta_mes > 0 ? number_format($total_debito_subcuenta_mes, 2) : '';
+
 
                     $total_credito_cuenta_acumulado += $total_credito_subcuenta_acumulado;
                     $total_debito_cuenta_acumulado += $total_debito_subcuenta_acumulado;
@@ -121,7 +99,7 @@ class BalanceComprobacionSaldoController extends AbstractController
             30, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
-        return $this->render('contabilidad/general/balance_comprobacion_saldo/index.html.twig', [
+        return $this->render('contabilidad/general/balance_comprobacion_saldo_cuenta_subcuenta/index.html.twig', [
             'controller_name' => 'BalanceComprobacionSaldoController',
             'cuentas' => $paginator
         ]);
@@ -133,91 +111,30 @@ class BalanceComprobacionSaldoController extends AbstractController
         /***Criterio de analisis 1*/
         $repet_criteria = [];
         $repet_desc = [];
+        $total_debito = 0;
+        $total_credito = 0;
+        $total_debito_mes = 0;
+        $total_credito_mes = 0;
         foreach ($rows_data as $data) {
-            if (!in_array($data['analisis_1'], $repet_criteria) && $data['nro_cuenta'] == $cuenta && $data['nro_subcuenta'] == $subcuenta) {
-                $repet_criteria[count($repet_criteria)] = $data['analisis_1'];
-                $repet_desc[count($repet_desc)] = $data['value_1'];
+            if ($data['nro_cuenta'] == $cuenta && $data['nro_subcuenta'] == $subcuenta) {
+                $total_debito += AuxFunctions::getNumberByString($data['debito']);
+                $total_credito += AuxFunctions::getNumberByString($data['credito']);
+                if ($data['mes'] == $mes && $data['anno'] == $anno) {
+                    $total_debito_mes += AuxFunctions::getNumberByString($data['debito']);
+                    $total_credito_mes += AuxFunctions::getNumberByString($data['credito']);
+                }
             }
+        }
+        $row[] = array(
+            'debito_acumulado' => $total_debito,
+            'credito_acumulado' => $total_credito,
+            'debito_mes' => $total_debito_mes,
+            'credito_mes' => $total_credito_mes,
+            'descripcion' => '',
+            'index' => 1
+        );
 
-        }
-        foreach ($repet_criteria as $key => $criteria) {
-            $total_debito = 0;
-            $total_credito = 0;
-            $total_debito_mes = 0;
-            $total_credito_mes = 0;
-            $row_analisis_2 = [];
-            $row_analisis_3 = [];
-            foreach ($rows_data as $data) {
-                if ($data['analisis_1'] == $criteria && $data['nro_cuenta'] == $cuenta && $data['nro_subcuenta'] == $subcuenta) {
-                    $total_debito += AuxFunctions::getNumberByString($data['debito']);
-                    $total_credito += AuxFunctions::getNumberByString($data['credito']);
-                    if ($data['mes'] == $mes && $data['anno'] == $anno) {
-                        $total_debito_mes += AuxFunctions::getNumberByString($data['debito']);
-                        $total_credito_mes += AuxFunctions::getNumberByString($data['credito']);
-                    }
-                    if ($data['analisis_2'] != '') {
-                        $row_analisis_2[] = array(
-                            'debito_acumulado' => AuxFunctions::getNumberByString($data['debito']),
-                            'credito_acumulado' => AuxFunctions::getNumberByString($data['credito']),
-                            'debito_mes' => AuxFunctions::getNumberByString($data['debito']),
-                            'credito_mes' => AuxFunctions::getNumberByString($data['credito']),
-                            'descripcion' => $data['analisis_2'] . ' - ' . $data['value_2'],
-                            'index' => 2,
-                            'analisis_2' => $data['analisis_2'],
-                            'analisis_3' => '',
-                        );
-                        if ($data['analisis_3'] != '') {
-                            $row_analisis_3[] = array(
-                                'debito_acumulado' => AuxFunctions::getNumberByString($data['debito']),
-                                'credito_acumulado' => AuxFunctions::getNumberByString($data['credito']),
-                                'debito_mes' => AuxFunctions::getNumberByString($data['debito']),
-                                'credito_mes' => AuxFunctions::getNumberByString($data['credito']),
-                                'descripcion' => $data['analisis_3'] . ' - ' . $data['value_3'],
-                                'index' => 3,
-                                'analisis_3' => $data['analisis_3'],
-                                'analisis_2' => $data['analisis_2'],
-                            );
-                            $row_analisis_2 = array_merge($row_analisis_2, $row_analisis_3);
-                            $row_analisis_3 = [];
-                        }
-                    }
-                }
-            }
-            $union = [];
-            if (!empty($row_analisis_2)) {
-                $repet_criteria_2 = [];
-                $repet_criteria_3 = [];
-                foreach ($row_analisis_2 as $a2) {
-                    if (!in_array($a2['analisis_2'], $repet_criteria_2))
-                        $repet_criteria_2[count($repet_criteria_2)] = $a2['analisis_2'];
-                }
-//                dd($repet_criteria_2);
-                foreach ($repet_criteria_2 as $c2) {
-                    foreach ($row_analisis_2 as $a2) {
-                        if ($a2['analisis_2'] == $c2) {
-                            $union[] = array(
-                                'descripcion' => $a2['descripcion'],
-                                'index' => $a2['index'],
-                                'debito_acumulado' => $a2['debito_acumulado'],
-                                'credito_acumulado' => $a2['credito_acumulado'],
-                                'debito_mes' => $a2['debito_mes'],
-                                'credito_mes' => $a2['credito_mes'],
-                            );
-                        }
-                    }
-                }
-//                dd($union,$row_analisis_2);
-            }
-            $row[] = array(
-                'debito_acumulado' => $total_debito,
-                'credito_acumulado' => $total_credito,
-                'debito_mes' => $total_debito_mes,
-                'credito_mes' => $total_credito_mes,
-                'descripcion' => $criteria . ' - ' . $repet_desc[$key],
-                'index' => 1
-            );
-            $row = array_merge($row, $union);
-        }
+
         return $row;
     }
 
@@ -273,6 +190,10 @@ class BalanceComprobacionSaldoController extends AbstractController
                 }//devolucion
                 elseif ($id_tipo_documento == 9) {
                     $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_devolucion);
+                }//Ventas
+                elseif ($id_tipo_documento == 10) {
+                    $datos_devolucion = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_devolucion);
                 }
             }

@@ -13,6 +13,8 @@ use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
+use App\Entity\Contabilidad\Venta\Factura;
+use App\Entity\Contabilidad\Venta\FacturaDocumento;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -223,6 +225,9 @@ class SubmayorInventarioProductoController extends AbstractController
             case 9:
                 $prefijo = 'DEV';
                 break;
+            case 10:
+                $prefijo = 'FACT';
+                break;
         }
         return $prefijo;
     }
@@ -254,6 +259,13 @@ class SubmayorInventarioProductoController extends AbstractController
                 'id_documento' => $id_documento
             ));
             return $vale_salida ? $vale_salida->getNroConsecutivo() : '-';
+        } elseif ($id_tipo_documento == 10) {
+            //Factura
+            /** @var FacturaDocumento $factura_documento */
+            $factura_documento = $em->getRepository(FacturaDocumento::class)->findOneBy(array(
+                'id_documento' => $id_documento
+            ));
+            return $factura_documento ? $factura_documento->getIdFactura()->getNroFactura() : '-';
         }
         return 0;
     }

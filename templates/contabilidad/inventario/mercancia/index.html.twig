@@ -33,10 +33,10 @@
             <thead class="thead-dark">
             <th width="130px">Códico</th>
             <th scope="col-1">Descripción</th>
-            <th width="50px">UM</th>
-            <th width="120px">Existencia</th>
-            <th width="80px">Precio</th>
-            <th width="80px">Importe</th>
+            <th width="100px">UM</th>
+            <th width="160px">Existencia</th>
+            <th width="150px">Precio</th>
+            <th width="150px">Importe</th>
             </thead>
             <tbody>
             <tr>
@@ -53,7 +53,7 @@
                         <td style="font-weight:400;">{{ new_item.codigo }}</td>
                         <td style="font-weight:400;">{{ new_item.descripcion }}</td>
                         <td style="font-weight:400;">{{ new_item.unidad_medida }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ new_item.existencia }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.existencia }}</td>
                         <td style="font-weight:400;" class="text-right">{{ new_item.precio }}</td>
                         <td style="font-weight:400;" class="text-right">{{ new_item.importe }}</td>
                     </tr>
@@ -63,7 +63,7 @@
         </table>
         {# end list #}
         {% else %}
-            <h3 class="text-light text-center">No se exixte mercancia registrada en el sistema para el almacén!!!</h3>
+            <h3 class="text-light text-center">No se exixte mercancia registrada en el almacén!!!</h3>
         {% endif %}
     </div>
 {% endblock %}

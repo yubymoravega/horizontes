@@ -89,6 +89,16 @@
                         {{ form_widget(form_factura.id_contrato) }}
                     </div>
                 </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.cuenta_obligacion) }}
+                        {{ form_widget(form_factura.cuenta_obligacion) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.subcuenta_obligacion) }}
+                        {{ form_widget(form_factura.subcuenta_obligacion) }}
+                    </div>
+                </div>
                 {{ form_end(form_factura) }}
 
                 {# --------- Venta de Mercancias o Productos --------------#}
@@ -152,7 +162,27 @@
                         {{ form_label(form_venta.existencia) }}
                         {{ form_widget(form_venta.existencia) }}
                     </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.cuenta_acreedora) }}
+                        {{ form_widget(form_venta.cuenta_acreedora) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.subcuenta_acreedora) }}
+                        {{ form_widget(form_venta.subcuenta_acreedora) }}
+                    </div>
                     <input type="hidden" id="id_almacen">
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.cuenta_deudora) }}
+                        {{ form_widget(form_venta.cuenta_deudora) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.subcuenta_deudora) }}
+                        {{ form_widget(form_venta.subcuenta_deudora) }}
+                    </div>
                 </div>
                 <div class="row mt-0 p-0">
                     <button class="btn btn-secondary btn-sm ml-auto mr-3" type="button" id="btnAplicarMercancia">
@@ -167,7 +197,7 @@
                         <th style="width: 50px;">Codigo</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
-                        <th>Descuento</th>
+                        <th>Desc./Rec.</th>
                         <th>Importe</th>
                         <th scope="col-1">Nueva Exist</th>
                         <th style="width: 45px;"><i class="fa fa-minus-circle text-danger"></i></th>
@@ -250,6 +280,12 @@
             /** selects  */
             const cbx_tipoCliente = $('#factura_tipo_cliente')
             const cbx_cliente = $('#factura_id_cliente')
+            const cbx_cuentaObligacion = $('#factura_cuenta_obligacion')
+            const cbx_subcuentaObligacion = $('#factura_subcuenta_obligacion')
+            const cbx_cuentaDeudora = $('#movimiento_venta_cuenta_deudora')
+            const cbx_subcuentaDeudora = $('#movimiento_venta_subcuenta_deudora')
+            const cbx_cuentaAcreedora = $('#movimiento_venta_cuenta_acreedora')
+            const cbx_subcuentaAcreedora = $('#movimiento_venta_subcuenta_acreedora')
             const cbx_tipo = $('#movimiento_venta_mercancia')
 
             /**  inputs */
@@ -280,14 +316,16 @@
                     'factura[fecha_factura]': "required",
                     'factura[tipo_cliente]': "required",
                     'factura[id_cliente]': "required",
-
+                    'factura[cuenta_obligacion]': "required",
+                    'factura[subcuenta_obligacion]': "required",
                 },
                 messages: {
                     'factura[nro_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[tipo_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-
+                    'factura[cuenta_obligacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[subcuenta_obligacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
             form_movimientoventa.validate({
@@ -306,6 +344,10 @@
                     // 'movimiento_venta[descuento_recarga]': "required",
                     'movimiento_venta[importe]': "required",
                     'movimiento_venta[existencia]': "required",
+                    'movimiento_venta[cuenta_deudora]': "required",
+                    'movimiento_venta[subcuenta_deudora]': "required",
+                    'movimiento_venta[cuenta_acreedora]': "required",
+                    'movimiento_venta[subcuenta_acreedora]': "required",
                 },
                 messages: {
                     'movimiento_venta[mercancia]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -317,6 +359,10 @@
                     // 'movimiento_venta[descuento_recarga]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[importe]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_venta[existencia]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[subcuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
 
@@ -357,6 +403,43 @@
                 })
             })
 
+            /** cargar las subcuentas de la cuenta seleccionada */
+            const loadSubcuentas = function () {
+                const nro_cuenta = $(this).val()
+                const id_select = $(this).attr('id')
+                loadingModal.show()
+                $.ajax({
+                    url: `/contabilidad/venta/factura/get-subcuentas-bycuenta/${nro_cuenta}`,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            let subcuenta = null;
+                            switch (id_select) {
+                                case cbx_cuentaObligacion.attr('id'):
+                                    subcuenta = cbx_subcuentaObligacion
+                                    break;
+                                case cbx_cuentaAcreedora.attr('id'):
+                                    subcuenta = cbx_subcuentaAcreedora
+                                    break;
+                                case cbx_cuentaDeudora.attr('id'):
+                                    subcuenta = cbx_subcuentaDeudora
+                                    break;
+                            }
+                            subcuenta.find('option').remove()
+                            subcuenta.prepend(`<option value = 0 selected=false disabled> --- seleccine --- </option>`)
+                            result.data.forEach(el => subcuenta.append(`<option value="${el.nro_subcuenta}">${el.nombre}</option>`))
+
+                        } else {
+
+                        }
+                        loadingModal.close()
+                    }
+                })
+            }
+            cbx_cuentaObligacion.on('change', loadSubcuentas)
+            cbx_cuentaAcreedora.on('change', loadSubcuentas)
+            cbx_cuentaDeudora.on('change', loadSubcuentas)
 
             txt_codigoMercancia.on('keyup', function (event) {
                 if (event.which == 13) {
@@ -369,6 +452,10 @@
                     txt_descuento_recargaMercancia.val('')
                     txt_importeMercancia.val('')
                     txt_existenciaMercancia.val('')
+                    cbx_cuentaDeudora.val(0)
+                    cbx_subcuentaDeudora.val(0)
+                    cbx_cuentaAcreedora.val(0)
+                    cbx_subcuentaAcreedora.val(0)
                 }
             })
 
@@ -383,6 +470,10 @@
                 txt_descuento_recargaMercancia.val('')
                 txt_importeMercancia.val('')
                 txt_existenciaMercancia.val('')
+                cbx_cuentaDeudora.val(0)
+                cbx_subcuentaDeudora.val(0)
+                cbx_cuentaAcreedora.val(0)
+                cbx_subcuentaAcreedora.val(0)
             }
 
             /**
@@ -419,9 +510,13 @@
                     const um = txt_umMercancia.val()
                     const cantidad = txt_cantidadMercancia.val()
                     const precio = txt_precioMercancia.val()
-                    const descuento_recatrga = txt_descuento_recargaMercancia.val()==''?0:txt_descuento_recargaMercancia.val()
+                    const descuento_recatrga = txt_descuento_recargaMercancia.val()
                     const importe = txt_importeMercancia.val()
                     const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
+                    const cuenta_deudora = cbx_cuentaDeudora.val()
+                    const subcuenta_deudora = cbx_subcuentaDeudora.val()
+                    const cuenta_acreedora = cbx_cuentaAcreedora.val()
+                    const subcuenta_acreedora = cbx_subcuentaAcreedora.val()
                     const id_almacen = $('#id_almacen').val()
 
                     //validar que el codigo no se repita
@@ -430,10 +525,10 @@
                     } else {
 
                         lista_mercancias.push({
-                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,id_almacen
+                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,
+                            cuenta_deudora, cuenta_acreedora, subcuenta_deudora, subcuenta_acreedora, id_almacen
                         })
-                        let importe_movimiento = (parseFloat(importe) - parseFloat(descuento_recatrga))
-                        importe_total += importe_movimiento
+                        importe_total += (parseFloat(importe) + parseFloat(descuento_recatrga))
                         label_importeTotal.text('$' + importe_total.toFixed(2))
 
                         tabla_mercancias.append(`<tr>
@@ -442,7 +537,7 @@
                         <td> ${cantidad}</td>
                         <td> ${parseFloat(precio).toFixed(2)} </td>
                         <td> ${parseFloat(descuento_recatrga).toFixed(2)} </td>
-                        <td> ${parseFloat(importe_movimiento).toFixed(2)}</td>
+                        <td> ${parseFloat(importe).toFixed(2)}</td>
                         <td> ${parseFloat(nueva_existencia).toFixed(2)}</td>
                         <td style="width: 45px;"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
@@ -512,6 +607,8 @@
                             $('#movimiento_venta_um').val(data.um)
                             $('#movimiento_venta_existencia').val(data.existencia)
                             $('#movimiento_venta_codigo').val(data.codigo)
+                            // $('#movimiento_venta_cuenta_acreedora').val(data.nro_cuenta_acreedora)
+                            // $('#movimiento_venta_subcuenta_acreedora').val(data.nro_subcuenta_acreedora)
                             $('#id_almacen').val(data.id_almacen)
                         } else {
                             $('#listarMercanciasModal').modal('hide')
@@ -535,6 +632,8 @@
                     $('#movimiento_venta_descripcion').val(mercancia[i]['descripcion'])
                     $('#movimiento_venta_um').val(mercancia[i]['um'])
                     $('#movimiento_venta_existencia').val(mercancia[i]['existencia'])
+                    $('#movimiento_venta_cuenta_acreedora').val(mercancia[i]['nro_cuenta_acreedora'])
+                    $('#movimiento_venta_subcuenta_acreedora').val(mercancia[i]['nro_subcuenta_acreedora'])
                     $('#id_almacen').val(mercancia[i]['id_almacen'])
                     $('#movimiento_venta_codigo').val(mercancia[i]['codigo'])
                     break

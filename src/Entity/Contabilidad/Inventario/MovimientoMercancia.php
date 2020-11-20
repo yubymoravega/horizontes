@@ -6,6 +6,7 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\User;
 use App\Repository\Contabilidad\Inventario\EntradaMercanciaRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -101,6 +102,21 @@ class MovimientoMercancia
      *  @ORM\JoinColumn(nullable=true)
      */
     private $id_orden_trabajo;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cuenta;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_subcuenta_deudora;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Factura::class)
+     */
+    private $id_factura;
 
     public function getId(): ?int
     {
@@ -283,6 +299,42 @@ class MovimientoMercancia
     public function setIdOrdenTrabajo(?OrdenTrabajo $id_orden_trabajo): self
     {
         $this->id_orden_trabajo = $id_orden_trabajo;
+
+        return $this;
+    }
+
+    public function getCuenta(): ?string
+    {
+        return $this->cuenta;
+    }
+
+    public function setCuenta(?string $cuenta): self
+    {
+        $this->cuenta = $cuenta;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaDeudora(): ?string
+    {
+        return $this->nro_subcuenta_deudora;
+    }
+
+    public function setNroSubcuentaDeudora(?string $nro_subcuenta_deudora): self
+    {
+        $this->nro_subcuenta_deudora = $nro_subcuenta_deudora;
+
+        return $this;
+    }
+
+    public function getIdFactura(): ?Factura
+    {
+        return $this->id_factura;
+    }
+
+    public function setIdFactura(?Factura $id_factura): self
+    {
+        $this->id_factura = $id_factura;
 
         return $this;
     }

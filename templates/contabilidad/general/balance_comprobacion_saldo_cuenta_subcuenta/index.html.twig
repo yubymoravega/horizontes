@@ -12,13 +12,13 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Balance de Comprobación de Saldo
+                Balance de Comprobación de Saldo Cuenta y Subcuenta
             </h4>
-            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
-                    title="Imprimir Registro de Comprobantes"
-                    onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">
-                <i class="fa fa-print"></i>
-            </button>
+{#            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"#}
+{#                    title="Imprimir Registro de Comprobantes"#}
+{#                    onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">#}
+{#                <i class="fa fa-print"></i>#}
+{#            </button>#}
         </div>
         {# end header #}
 
@@ -66,7 +66,7 @@
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
                         {% if item.index == 2 or item.index == '2' %}
                             <td style="font-weight:400;" class="pl-0 pr-0"><a
-                                        >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>{{ item.descripcion }}</td>
+                                >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>{{ item.descripcion }}</td>
                         {% elseif item.index == 3 or item.index == '3' %}
                             <td style="font-weight:400;" class="pl-0 pr-0"><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>{{ item.descripcion }}
                             </td>

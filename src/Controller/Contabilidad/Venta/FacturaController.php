@@ -4,7 +4,18 @@ namespace App\Controller\Contabilidad\Venta;
 
 use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
 use App\Controller\Contabilidad\Venta\IVenta\ICliente;
+use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Inventario\Documento;
+use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Venta\Factura;
+use App\Entity\Contabilidad\Venta\FacturaDocumento;
 use App\Entity\Contabilidad\Venta\MovimientoVenta;
 use App\Entity\Contabilidad\Venta\ObligacionCobro;
 use App\Form\Contabilidad\Venta\FacturaType;
@@ -40,97 +51,193 @@ class FacturaController extends AbstractController
                           FacturaRepository $facturaRepository, ContratosClienteRepository $contratosClienteRepository,
                           MercanciaRepository $mercanciaRepository, AlmacenRepository $almacenRepository, ValidatorInterface $validator)
     {
+        $factura_er = $em->getRepository(Factura::class);
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $arr_factura = $factura_er->findBy([
+            'id_unidad' => $unidad,
+            'anno' => Date('Y')
+        ]);
         $form_factura = $this->createForm(FacturaType::class);
         $form_factura->handleRequest($request);
         $form_venta = $this->createForm(MovimientoVentaType::class);
-        $unidad = $empleadoRepository->findOneBy(['id_usuario' => $this->getUser()])->getIdUnidad();
 
         if ($form_factura->isSubmitted()) {
             $factura_request = $request->get('factura');
             $mercancias_request = json_decode($request->get('mercancias'));
+
             $importe_total = $request->get('importe_total');
-            $contrato = $contratosClienteRepository->find($factura_request['id_contrato']);
+            if (isset($factura_request['id_contrato']) && $factura_request['id_contrato'] != '')
+                $contrato = $contratosClienteRepository->find($factura_request['id_contrato']);
             $fecha_factura = \DateTime::createFromFormat('Y-m-d', $factura_request['fecha_factura']);
 
             /** 1. Crear Factura */
             $factura = new Factura();
-            $factura->setNroFactura($factura_request['nro_factura']);
-            $factura->setFechaFactura($fecha_factura);
-            $factura->setTipoCliente($factura_request['tipo_cliente']);
-            $factura->setIdCliente($factura_request['id_cliente']);
-            $factura->setIdContrato($contrato);
-            $factura->setCuentaObligacion($factura_request['cuenta_obligacion']);
-            $factura->setSubcuentaObligacion($factura_request['subcuenta_obligacion']);
-            $factura->setAnno($factura_request['anno']);
+            $factura
+                ->setNroFactura(count($arr_factura) + 1)
+                ->setFechaFactura($fecha_factura)
+                ->setTipoCliente($factura_request['tipo_cliente'])
+                ->setIdCliente($factura_request['id_cliente']);
+            if (isset($factura_request['id_contrato']) && $factura_request['id_contrato'] != '')
+                $factura->setIdContrato($contrato);
+            $factura
+                ->setAnno($factura_request['anno'])
+                ->setActivo(true)
+                ->setContabilizada(false)
+                ->setIdUsuario($this->getUser())
+                ->setIdUnidad($unidad)
+                ->setImporte($importe_total);
 
-            $factura->setActivo(true);
-            $factura->setIdUsuario($this->getUser());
-            $factura->setIdUnidad($unidad);
-
-            /** validar si ya existe la factura antes de salvarla */
-            $errors = $validator->validate($factura);
-            if ($errors->count()) {
-                $form_factura = $this->createForm(FacturaType::class);
-                $factura_new = new Factura();
-                $factura_new->setNroFactura($facturaRepository->generateNroFactura($unidad));
-                $form_factura->setData($factura_new);
-                $this->addFlash('error', $errors->get(0)->getMessage());
-                return $this->render('contabilidad/venta/factura/index.html.twig', [
-                    'form_factura' => $form_factura->createView(),
-                    'form_venta' => $form_venta->createView(),
-                ]);
-            }
             $em->persist($factura);
-
-            $almacen = $almacenRepository->find(2);
-
+            $em->flush();
+            $arr_unique = [];
+            $arr_movimiento_venta_id = [];
             /** 2. movimiento de venta x mercancias */
-            foreach ($mercancias_request as $mercancia_obj) {
-                $movimiento_venta = new MovimientoVenta();
-                $movimiento_venta->setMercancia($mercancia_obj->tipo == '1' ? true : false);
-                $movimiento_venta->setCodigo($mercancia_obj->codigo);
-                $movimiento_venta->setCantidad($mercancia_obj->cantidad);
-                $movimiento_venta->setPrecio($mercancia_obj->precio);
-                $movimiento_venta->setDescuentoRecarga($mercancia_obj->descuento_recatrga);
-                $movimiento_venta->setExistencia($mercancia_obj->nueva_existencia);
-                $movimiento_venta->setCuentaDeudora($mercancia_obj->cuenta_deudora);
-                $movimiento_venta->setCuentaAcreedora($mercancia_obj->cuenta_acreedora);
-                $movimiento_venta->setSubcuentaDeudora($mercancia_obj->subcuenta_deudora);
-                $movimiento_venta->setSubcuentaAcreedora($mercancia_obj->subcuenta_acreedora);
+            foreach ($mercancias_request as $key => $mercancia_obj) {
+                if (!in_array($mercancia_obj->id_almacen, $arr_unique)) {
+                    $arr_unique[count($arr_unique)] = $mercancia_obj->id_almacen;
+                }
+                if($mercancia_obj->tipo == '1'){
+                    $elemento = $mercanciaRepository->findOneBy([
+                        'codigo' => $mercancia_obj->codigo,
+                        'id_amlacen' => $mercancia_obj->id_almacen,
+                        'activo' => true
+                    ]);
+                    $existencia_anterior = floatval($elemento->getExistencia());
+                    $importe_anterior = floatval($elemento->getImporte());
+                    $precio = round(($importe_anterior / $existencia_anterior), 6);
+                } else {
+                    $elemento = $em->getRepository(Producto::class)->findOneBy([
+                        'codigo' => $mercancia_obj->codigo,
+                        'id_amlacen' => $mercancia_obj->id_almacen,
+                        'activo' => true
+                    ]);
+                    $existencia_anterior = floatval($elemento->getExistencia());
+                    $importe_anterior = floatval($elemento->getImporte());
+                    $precio = round(($importe_anterior / $existencia_anterior), 6);
 
-                $movimiento_venta->setActivo(true);
-                $movimiento_venta->setIdAlmacen($almacen);// modificar por el almacén de la mercancia
-                $movimiento_venta->setIdFactura($factura);
+                }
+                $movimiento_venta = new MovimientoVenta();
+                $movimiento_venta
+                    ->setMercancia($mercancia_obj->tipo == '1' ? true : false)
+                    ->setCodigo($mercancia_obj->codigo)
+                    ->setCantidad($mercancia_obj->cantidad)
+                    ->setPrecio($mercancia_obj->precio)
+                    ->setDescuentoRecarga($mercancia_obj->descuento_recatrga)
+                    ->setExistencia($mercancia_obj->nueva_existencia)
+                    ->setActivo(true)
+                    ->setCuenta('-')
+                    ->setCosto($precio)
+                    ->setAnno($fecha_factura->format('Y'))
+                    ->setNroSubcuentaDeudora('-')
+                    ->setIdAlmacen($almacenRepository->find($mercancia_obj->id_almacen))
+                    ->setIdFactura($factura);
+
                 $em->persist($movimiento_venta);
 
-                /** 3. Mercancia disminuir la existencia y importe para mantener el precio */
-                $mercancia = $mercanciaRepository->findOneBy(['codigo' => $mercancia_obj->codigo, 'id_amlacen' => $almacen]); // almacén
-//                dd(floatval($mercancia->getExistencia()));
-                $exisntencia_anterior = floatval($mercancia->getExistencia());
-                $importe_anterior = floatval($mercancia->getImporte());
-                $precio = $importe_anterior / $exisntencia_anterior;
-                $mercancia->setExistencia($mercancia_obj->nueva_existencia);
-                $mercancia->setImporte($precio * floatval($mercancia_obj->nueva_existencia));
-                $em->flush($mercancia);
+                $arr_movimiento_venta_id[$key] = $movimiento_venta->getId();
+            }
+            ////aqui iteramos sobre el arreglo de almacenes sin repetir
+            foreach ($arr_unique as $item) {
+                $fecha_inventario = AuxFunctions::getDateToClose($em, $item);
+                $importe_documento = 0;
+                /** Creo el documento */
+                $document = new Documento();
+                $document
+                    ->setActivo(true)
+                    ->setIdTipoDocumento($em->getRepository(TipoDocumento::class)->find(10))
+                    ->setIdAlmacen($em->getRepository(Almacen::class)->find($item))
+                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha_inventario))
+                    ->setAnno($fecha_factura->format('Y'))
+                    ->setIdMoneda($em->getRepository(Moneda::class)->find(1))
+                    ->setIdUnidad($unidad);
+                $em->persist($document);
+                /// volvemos a iterar por el arreglo de mercancias
+                foreach ($mercancias_request as $mercancia_obj) {
+                    if ($mercancia_obj->id_almacen == $item) {
+                        /** 3. Mercancia disminuir la existencia y importe para mantener el precio */
+                        if ($mercancia_obj->tipo == '1') {
+                            $elemento = $mercanciaRepository->findOneBy([
+                                'codigo' => $mercancia_obj->codigo,
+                                'id_amlacen' => $mercancia_obj->id_almacen,
+                                'activo' => true
+                            ]);
+                        } else {
+                            $elemento = $em->getRepository(Producto::class)->findOneBy([
+                                'codigo' => $mercancia_obj->codigo,
+                                'id_amlacen' => $mercancia_obj->id_almacen,
+                                'activo' => true
+                            ]);
+                        }
+                        /** Rebajo en almacen el importe y la cantidad, dando paso a la nueva existencia*/
+                        $existencia_anterior = floatval($elemento->getExistencia());
+                        $importe_anterior = floatval($elemento->getImporte());
+                        $precio = round(($importe_anterior / $existencia_anterior), 6);
+                        $elemento->setImporte($precio * floatval($elemento->getExistencia() - floatval($mercancia_obj->cantidad)));
+                        $elemento->setExistencia($elemento->getExistencia() - floatval($mercancia_obj->cantidad));
+                        $em->persist($elemento);
+
+                        /** Calcular el importe total del codumento**/
+                        $importe_documento += floatval($precio * floatval($mercancia_obj->cantidad));
+
+                        /** Movimiento de mercancia o producto, tipo documento VENTA(10)*/
+                        if ($mercancia_obj->tipo == '1') {
+                            $new_movimiento_inventario = new MovimientoMercancia();
+                            $new_movimiento_inventario
+                                ->setIdAlmacen($em->getRepository(Almacen::class)->find($mercancia_obj->id_almacen))
+                                ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha_inventario))
+                                ->setIdTipoDocumento($em->getRepository(TipoDocumento::class)->find(10))
+                                ->setEntrada(false)
+                                ->setCantidad(floatval($mercancia_obj->cantidad))
+                                ->setExistencia($elemento->getExistencia())
+                                ->setActivo(false)
+                                ->setIdUsuario($this->getUser())
+                                ->setImporte($precio * floatval($mercancia_obj->cantidad))
+                                ->setIdDocumento($document)
+                                ->setIdFactura($factura)
+                                ->setIdMercancia($elemento);
+                        } else {
+                            $new_movimiento_inventario = new MovimientoProducto();
+                            $new_movimiento_inventario
+                                ->setIdAlmacen($em->getRepository(Almacen::class)->find($mercancia_obj->id_almacen))
+                                ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha_inventario))
+                                ->setIdTipoDocumento($em->getRepository(TipoDocumento::class)->find(10))
+                                ->setEntrada(false)
+                                ->setCantidad(floatval($mercancia_obj->cantidad))
+                                ->setExistencia($elemento->getExistencia())
+                                ->setActivo(false)
+                                ->setIdUsuario($this->getUser())
+                                ->setImporte($precio * floatval($mercancia_obj->cantidad))
+                                ->setIdDocumento($document)
+                                ->setIdFactura($factura)
+                                ->setIdProducto($elemento);
+                        }
+                        $em->persist($new_movimiento_inventario);
+
+                        $movimiento_venta_obj = $em->getRepository(MovimientoVenta::class)->findOneBy([
+                            'id_factura' => $factura,
+                            'id_almacen' => $mercancia_obj->id_almacen,
+                            'codigo' => $mercancia_obj->codigo
+                        ]);
+
+                        /*********** REVISAR A PARTIR DE AQUI *****/
+                        $new_factura_documento = new FacturaDocumento();
+                        $new_factura_documento
+                            ->setIdDocumento($document)
+                            ->setIdFactura($factura)
+                            ->setIdMovimientoVenta($movimiento_venta_obj);
+                        $em->persist($new_factura_documento);
+                    }
+                }
+                $document
+                    ->setImporteTotal($importe_documento);
             }
 
-            /** 4. Rebajar el importe total del resto del contrato */
-            $contrato->setResto(floatval($contrato->getResto()) - floatval($importe_total));
-            $em->flush($contrato);
 
-            /** 5. crear obligación de cobro */
-            $obligacion_cobro = new ObligacionCobro();
-            $obligacion_cobro->setIdCliente($factura_request['id_cliente']);
-            $obligacion_cobro->setTipoCliente($factura_request['tipo_cliente']);
-            $obligacion_cobro->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $factura_request['fecha_factura']));
-            $obligacion_cobro->setImporteFactura($importe_total);
-            $obligacion_cobro->setCuentaObligacion($factura_request['cuenta_obligacion']);
-            $obligacion_cobro->setSubcuentaObligacion($factura_request['subcuenta_obligacion']);
-            $obligacion_cobro->setRestoPagar($importe_total);
-            $obligacion_cobro->setLiquidada(false);
-            $obligacion_cobro->setActivo(true);
-            $obligacion_cobro->setIdFactura($factura);
-            $em->persist($obligacion_cobro);
+            /** 4. Rebajar el importe total del resto del contrato */
+            if (isset($factura_request['id_contrato']) && $factura_request['id_contrato'] != '') {
+                $contrato->setResto(floatval($contrato->getResto()) - floatval($importe_total));
+                $em->persist($contrato);
+            }
 
             $em->flush();
             $this->addFlash('success', 'Factura ' . $factura->getNroFactura() . ' registrada satisfactoraiamente');
@@ -156,38 +263,43 @@ class FacturaController extends AbstractController
                                 MovimientoVentaRepository $movimientoVentaRepository, CuentaRepository $cuentaRepository, SubcuentaRepository $subcuentaRepository,
                                 EmpleadoRepository $empleadoRepository)
     {
+
         // validar que la factura exista
-        $unidad = $empleadoRepository->findOneBy(['id_usuario' => $this->getUser()])->getIdUnidad();
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         if ($nro >= $facturaRepository->generateNroFactura($unidad)) {
             $this->addFlash('error', 'La factura ' . $nro . ' aún no ha sido procesada');
             return $this->redirectToRoute('contabilidad_venta_factura');
         }
 
-        $factura_obj = $facturaRepository->findOneBy(['nro_factura' => $nro]);
-        if(!empty($factura_obj))
-        {
+        $factura_obj = $facturaRepository->findOneBy([
+            'nro_factura' => $nro,
+            'id_unidad' => $unidad,
+            'activo' => true,
+            'anno' => Date('Y')
+        ]);
+        if (!$factura_obj) {
             $this->addFlash('error', 'La factura ' . $nro . ' fue cancelada');
             return $this->redirectToRoute('contabilidad_venta_factura');
         }
         $mercancias = $movimientoVentaRepository->findBy(['id_factura' => $factura_obj]);
 
         $cliente = ClientesAdapter::getClienteFactory($em, $factura_obj->getTipoCliente());
-        $contrato = $factura_obj->getIdContrato();
-        $cuenta = $cuentaRepository->findOneBy(['nro_cuenta' => $factura_obj->getCuentaObligacion()]);
-        $subcuenta = $subcuentaRepository->findOneBy([
+        $contrato = $factura_obj->getIdContrato() ? $factura_obj->getIdContrato() : '';
+        $cuenta = $factura_obj->getCuentaObligacion() ? $cuentaRepository->findOneBy(['nro_cuenta' => $factura_obj->getCuentaObligacion()]) : '';
+        $subcuenta = $factura_obj->getSubcuentaObligacion() ? ($subcuentaRepository->findOneBy([
             'nro_subcuenta' => $factura_obj->getSubcuentaObligacion(),
-            'id_cuenta' => $cuenta]);
+            'id_cuenta' => $cuenta])) : '';
         $factura = [
             'nro_factura' => $factura_obj->getNroFactura(),
             'fecha_factura' => $factura_obj->getFechaFactura()->format('d/m/Y'),
             'tipo_cliente' => $cliente->getTipo(),
             'cliente' => $cliente->find($factura_obj->getIdCliente())['nombre'],
-            'contrato' => $contrato->getNroContrato() . ' - '
+            'contrato' => $contrato ? ($contrato->getNroContrato() . ' - '
                 . $contrato->getIdCliente()->getNombre() . ' | $'
                 . $contrato->getImporte() . ' ( '
-                . $contrato->getFechaAprobado()->format('d/m/Y') . ' )',
-            'cuenta_obligacion' => $cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre(),
-            'subcuenta_obligacion' => $subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion(),
+                . $contrato->getFechaAprobado()->format('d/m/Y') . ' )') : '',
+            'cuenta_obligacion' => $cuenta != '' ? ($cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()) : '',
+            'subcuenta_obligacion' => $subcuenta != '' ? ($subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion()) : '',
         ];
 
         $importe_total = 0;
@@ -244,7 +356,7 @@ class FacturaController extends AbstractController
         $em->persist($obligacion_cobro);
 
         $em->flush();
-        $this->addFlash('success','Factura número: '.$nro.' cancela');
+        $this->addFlash('success', 'Factura número: ' . $nro . ' cancela');
         return $this->redirectToRoute('contabilidad_venta_factura');
 
     }
@@ -254,42 +366,60 @@ class FacturaController extends AbstractController
      */
     public function print(EntityManagerInterface $em, $nro, FacturaRepository $facturaRepository,
                           MovimientoVentaRepository $movimientoVentaRepository, CuentaRepository $cuentaRepository, SubcuentaRepository $subcuentaRepository,
-                          EmpleadoRepository $empleadoRepository, MercanciaRepository $mercanciaRepository)
+                          ProductoRepository $productoRepository, MercanciaRepository $mercanciaRepository)
     {
 
         // validar que la factura exista
-        $unidad = $empleadoRepository->findOneBy(['id_usuario' => $this->getUser()])->getIdUnidad();
+        /** @var Unidad $unidad */
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         if ($nro >= $facturaRepository->generateNroFactura($unidad)) {
             $this->addFlash('error', 'La factura ' . $nro . ' aún no ha sido procesada');
             return $this->redirectToRoute('contabilidad_venta_factura');
         }
 
-        $factura_obj = $facturaRepository->findOneBy(['nro_factura' => $nro]);
+        $factura_obj = $facturaRepository->findOneBy([
+            'nro_factura' => $nro,
+            'id_unidad' => $unidad,
+            'activo' => true,
+            'anno' => Date('Y')
+        ]);
         $mercancias = $movimientoVentaRepository->findBy(['id_factura' => $factura_obj]);
 
         $cliente = ClientesAdapter::getClienteFactory($em, $factura_obj->getTipoCliente());
-        $contrato = $factura_obj->getIdContrato();
-        $cuenta = $cuentaRepository->findOneBy(['nro_cuenta' => $factura_obj->getCuentaObligacion()]);
-        $subcuenta = $subcuentaRepository->findOneBy([
+        $contrato = $factura_obj->getIdContrato() ? $factura_obj->getIdContrato() : '';
+        $cuenta = $factura_obj->getCuentaObligacion() ? $cuentaRepository->findOneBy(['nro_cuenta' => $factura_obj->getCuentaObligacion()]) : '';
+        $subcuenta = $factura_obj->getSubcuentaObligacion() ? ($subcuentaRepository->findOneBy([
             'nro_subcuenta' => $factura_obj->getSubcuentaObligacion(),
-            'id_cuenta' => $cuenta]);
+            'id_cuenta' => $cuenta])) : '';
         $factura = [
             'nro_factura' => $factura_obj->getNroFactura(),
             'fecha_factura' => $factura_obj->getFechaFactura()->format('d/m/Y'),
             'tipo_cliente' => $cliente->getTipo(),
-            'cliente' => $cliente->find($factura_obj->getIdCliente())['nombre'],
-            'contrato' => $contrato->getNroContrato() . ' - '
+            'cliente' => $cliente->find($factura_obj->getIdCliente())['name'],
+            'codigo_cliente' => $cliente->find($factura_obj->getIdCliente())['codigo'],
+            'contrato' => $contrato ? ($contrato->getNroContrato() . ' - '
                 . $contrato->getIdCliente()->getNombre() . ' | $'
                 . $contrato->getImporte() . ' ( '
-                . $contrato->getFechaAprobado()->format('d/m/Y') . ' )',
-            'cuenta_obligacion' => $cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre(),
-            'subcuenta_obligacion' => $subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion(),
+                . $contrato->getFechaAprobado()->format('d/m/Y') . ' )') : '',
+            'cuenta_obligacion' => $cuenta != '' ? ($cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()) : '',
+            'subcuenta_obligacion' => $subcuenta != '' ? ($subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion()) : '',
         ];
 
         $importe_total = 0;
         $mercancia_arr = [];
         foreach ($mercancias as $mercancia) {
-            $mercancia_obj = $mercanciaRepository->findOneBy(['codigo' => $mercancia->getCodigo()]);
+            if ($mercancia->getMercancia())
+                $mercancia_obj = $mercanciaRepository->findOneBy([
+                    'codigo' => $mercancia->getCodigo(),
+                    'id_amlacen' => $mercancia->getIdAlmacen(),
+                    'activo' => true
+                ]);
+            else
+                $mercancia_obj = $productoRepository->findOneBy([
+                    'codigo' => $mercancia->getCodigo(),
+                    'id_amlacen' => $mercancia->getIdAlmacen(),
+                    'activo' => true
+                ]);
             array_push($mercancia_arr,
                 [
                     'id' => $mercancia->getId(),
@@ -304,10 +434,17 @@ class FacturaController extends AbstractController
                 ]);
             $importe_total += $mercancia->getPrecio() * $mercancia->getCantidad();
         }
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_unidad' => $unidad, 'id_usuario' => $factura_obj->getIdUsuario()]);
         return $this->render('contabilidad/venta/factura/print.html.twig', [
             'factura' => $factura,
             'mercancias' => $mercancia_arr,
-            'importe_total' => floatval($importe_total)
+            'importe_total' => floatval($importe_total),
+            'suministrador' => $unidad->getNombre(),
+            'cod_suministrador' => $unidad->getCodigo(),
+            'usuario' => $empleado->getNombre(),
+            'cargo' => $empleado->getIdCargo()->getNombre()
+
         ]);
     }
 
@@ -389,25 +526,46 @@ class FacturaController extends AbstractController
     /**
      * @Route("/get-mercancia-producto", name="cont_venta_get_mercancia_producto", methods={"POST"})
      */
-    public function getMercanciaProducto(Request $request, MercanciaRepository $mercanciaRepository, ProductoRepository $productoRepository)
+    public function getMercanciaProducto(EntityManagerInterface $em, Request $request, MercanciaRepository $mercanciaRepository, ProductoRepository $productoRepository)
     {
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $arr_almacenes = $em->getRepository(Almacen::class)->findBy(['activo' => true, 'id_unidad' => $unidad]);
+        $row_almacenes = [];
+        /** @var Almacen $almacen */
+        foreach ($arr_almacenes as $key => $almacen) {
+            $row_almacenes[$key] = $almacen->getId();
+        }
+
         $tipo = $request->get('tipo');
         $codigo = $request->get('codigo');
-        $mercancia_producto = $tipo == 1
-            ? $mercanciaRepository->findOneBy(['codigo' => $codigo])
-            : $productoRepository->findOneBy(['codigo' => $codigo]);
-        return new JsonResponse(['success' => true,
-            'data' => [
-                'id' => $mercancia_producto->getId(),
-                'codigo' => $mercancia_producto->getCodigo(),
-                'descripcion' => $mercancia_producto->getDescripcion(),
-                'um' => $mercancia_producto->getIdUnidadMedida()->getAbreviatura(),
-                'existencia' => $mercancia_producto->getExistencia(),
-                'nro_cuenta_acreedora' => $mercancia_producto->getNroCuentaAcreedora(),
-                'nro_subcuenta_acreedora' => $mercancia_producto->getNroSubcuentaAcreedora(),
-            ]
-        ]);
+        if ($request->get('codigo') == '' || !isset($codigo)) {
+            $mercancia_producto_arr = $tipo == 1
+                ? $mercanciaRepository->findBy(['activo' => true])
+                : $productoRepository->findBy(['activo' => true]);
+        } else {
+            $mercancia_producto_arr = $tipo == 1
+                ? $mercanciaRepository->findBy(['codigo' => $codigo, 'activo' => true])
+                : $productoRepository->findBy(['codigo' => $codigo, 'activo' => true]);
+        }
+        $row_data = [];
+        foreach ($mercancia_producto_arr as $d) {
+            if (in_array($d->getIdAmlacen()->getId(), $row_almacenes))
+                if ($d->getIdAmlacen()->getDescripcion() == 'Almacén Mercancias para la Venta'
+                    || $d->getIdAmlacen()->getDescripcion() == 'Almacén de Productos Terminados')
+                    if ($d->getExistencia() > 0)
+                        $row_data[] = array(
+                            'id' => $d->getId(),
+                            'codigo' => $d->getCodigo(),
+                            'descripcion' => $d->getDescripcion(),
+                            'um' => $d->getIdUnidadMedida()->getAbreviatura(),
+                            'existencia' => $d->getExistencia(),
+                            'nro_cuenta_acreedora' => $d->getNroCuentaAcreedora(),
+                            'nro_subcuenta_acreedora' => $d->getNroSubcuentaAcreedora(),
+                            'cuenta' => $d->getCuenta(),
+                            'subcuenta' => $d->getNroSubcuentaInventario(),
+                            'id_almacen' => $d->getIdAmlacen()->getId()
+                        );
+        }
+        return new JsonResponse(['success' => true, 'data' => $row_data]);
     }
-
-
 }

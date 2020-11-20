@@ -49,26 +49,6 @@ class MovimientoVenta
     private $existencia;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $cuenta_deudora;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $subcuenta_deudora;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $cuenta_acreedora;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $subcuenta_acreedora;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $activo;
@@ -84,6 +64,26 @@ class MovimientoVenta
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_almacen;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $cuenta;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nro_subcuenta_deudora;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $costo;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $anno;
 
     public function getId(): ?int
     {
@@ -162,54 +162,6 @@ class MovimientoVenta
         return $this;
     }
 
-    public function getCuentaDeudora(): ?string
-    {
-        return $this->cuenta_deudora;
-    }
-
-    public function setCuentaDeudora(?string $cuenta_deudora): self
-    {
-        $this->cuenta_deudora = $cuenta_deudora;
-
-        return $this;
-    }
-
-    public function getSubcuentaDeudora(): ?string
-    {
-        return $this->subcuenta_deudora;
-    }
-
-    public function setSubcuentaDeudora(?string $subcuenta_deudora): self
-    {
-        $this->subcuenta_deudora = $subcuenta_deudora;
-
-        return $this;
-    }
-
-    public function getCuentaAcreedora(): ?string
-    {
-        return $this->cuenta_acreedora;
-    }
-
-    public function setCuentaAcreedora(?string $cuenta_acreedora): self
-    {
-        $this->cuenta_acreedora = $cuenta_acreedora;
-
-        return $this;
-    }
-
-    public function getSubcuentaAcreedora(): ?string
-    {
-        return $this->subcuenta_acreedora;
-    }
-
-    public function setSubcuentaAcreedora(?string $subcuenta_acreedora): self
-    {
-        $this->subcuenta_acreedora = $subcuenta_acreedora;
-
-        return $this;
-    }
-
     public function getActivo(): ?bool
     {
         return $this->activo;
@@ -242,6 +194,54 @@ class MovimientoVenta
     public function setIdAlmacen(?Almacen $id_almacen): self
     {
         $this->id_almacen = $id_almacen;
+
+        return $this;
+    }
+
+    public function getCuenta(): ?string
+    {
+        return $this->cuenta;
+    }
+
+    public function setCuenta(string $cuenta): self
+    {
+        $this->cuenta = $cuenta;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaDeudora(): ?string
+    {
+        return $this->nro_subcuenta_deudora;
+    }
+
+    public function setNroSubcuentaDeudora(string $nro_subcuenta_deudora): self
+    {
+        $this->nro_subcuenta_deudora = $nro_subcuenta_deudora;
+
+        return $this;
+    }
+
+    public function getCosto(): ?float
+    {
+        return $this->costo;
+    }
+
+    public function setCosto(?float $costo): self
+    {
+        $this->costo = $costo;
+
+        return $this;
+    }
+
+    public function getAnno(): ?int
+    {
+        return $this->anno;
+    }
+
+    public function setAnno(?int $anno): self
+    {
+        $this->anno = $anno;
 
         return $this;
     }
