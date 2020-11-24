@@ -69,25 +69,6 @@ class FacturaType extends AbstractType
                 },
 
             ])
-            ->add('cuenta_obligacion', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Cuentas obligación',
-                'choices' => (function () {
-                    $cuentas = $this->em->getRepository(Cuenta::class)->findObligacion();
-                    $cuentas_obj = [];
-                    if (!empty($cuentas)) {
-                        foreach ($cuentas as $cuenta) {
-                            /** @var Cuenta $cuenta */
-                            $cuentas_obj[$cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()] = $cuenta->getNroCuenta();
-                        }
-                    }
-                    return $cuentas_obj;
-                })()
-            ])
-            ->add('subcuenta_obligacion', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Subcuenta obligación',
-            ])
             ->add('anno', HiddenType::class, [
                 'data' => Date('Y')
             ]);

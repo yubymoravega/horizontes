@@ -53,9 +53,9 @@ class ClientesAdapter
     public static function getTypeClientes()
     {
         return [
-            'persona' => self::$PERSONA,
-            'unidad del sistema' => self::$UNIDAD_SISTEMA,
-            'cliente contabilidad' => self::$CLIENTE_CONTABILIDAD
+            'Persona Natural' => self::$PERSONA,
+            'Cliente Inerno' => self::$UNIDAD_SISTEMA,
+            'Cliente Externo' => self::$CLIENTE_CONTABILIDAD
         ];
     }
 }

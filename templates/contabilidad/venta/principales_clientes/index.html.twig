@@ -1,0 +1,34 @@
+{% extends 'contabilidad/venta/index.html.twig' %}
+
+{% block title %}Principales Clientes{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de los Principales Clientes
+            </h4>
+        </div>
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th>Tipo de cliente</th>
+            <th>Cliente</th>
+            <th width="240px">Cantidad de Facturas</th>
+            <th width="220px">Importe Facturado</th>
+            </thead>
+            <tbody>
+            {% for item in clientes %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.tipo_cliente }}</td>
+                    <td style="font-weight:400;">{{ item.cliente }}</td>
+                    <td style="font-weight:400;" class="text-center">{{ item.cant_facturas}}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.importe }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}

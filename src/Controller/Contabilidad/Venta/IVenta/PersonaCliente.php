@@ -23,7 +23,9 @@ class PersonaCliente extends ClientesAdapter implements ICliente
                 /** @var Cliente $obj */
                 array_push($personas, [
                     'id' => $obj->getId(),
-                    'nombre' => $obj->getNombre() . ' ' . $obj->getApellidos()
+                    'nombre' => $obj->getNombre() . ' ' . $obj->getApellidos(),
+                    'name' => $obj->getNombre() . ' ' . $obj->getApellidos(),
+                    'codigo' => $obj->getCorreo()
                 ]);
             }
         }
@@ -35,7 +37,9 @@ class PersonaCliente extends ClientesAdapter implements ICliente
         $personas_obj = $this->em->getRepository(Cliente::class)->find($id);
         return [
             'id' => $personas_obj->getId(),
-            'nombre' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos()
+            'nombre' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos(),
+            'name' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos(),
+            'codigo' => $personas_obj->getCorreo()
         ];
     }
 }

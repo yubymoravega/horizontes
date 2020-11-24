@@ -23,7 +23,9 @@ class ContabilidadCliente extends ClientesAdapter implements ICliente
                 /** @var ClienteContabilidad $obj */
                 array_push($personas, [
                     'id' => $obj->getId(),
-                    'nombre' => $obj->getCodigo() . ' - ' . $obj->getNombre()
+                    'nombre' => $obj->getCodigo() . ' - ' . $obj->getNombre(),
+                    'codigo' => $obj->getCodigo() ,
+                    'name'=>$obj->getNombre()
                 ]);
             }
         }
@@ -35,7 +37,9 @@ class ContabilidadCliente extends ClientesAdapter implements ICliente
         $personas_obj = $this->em->getRepository(ClienteContabilidad::class)->find($id);
         return [
             'id' => $personas_obj->getId(),
-            'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre()
+            'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre(),
+            'codigo' => $personas_obj->getCodigo() ,
+            'name'=>$personas_obj->getNombre()
         ];
     }
 }

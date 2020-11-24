@@ -25,7 +25,8 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Registro de Comprobante</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Movimiento de Cuentas</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de comprobación de Saldo</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Saldo</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Cuentas y Subcuentas </a>
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -36,6 +37,16 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{{ url ('contabilidad_config_expedientes') }}">Expedientes</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_config_orden_trabajo') }}">Ordenes de Trabajo</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Operaciones
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_expedientes') }}">Comprobante de Operaciones</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_comprobante_venta') }}">Generar Comprobante de Venta</a>
                 </div>
             </li>
         </ul>

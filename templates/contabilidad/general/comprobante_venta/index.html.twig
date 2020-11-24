@@ -1,0 +1,608 @@
+{% extends 'contabilidad/general/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="modal fade" id="formVentaModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="formVentaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 1050px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="formVentaModalLabel">Contabilizar Factura</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app" style="height: 600px;">
+                    <div style="height: 500px;">
+                        {{ form_start(form.cuenta_nominal_acreedora,{'attr': {'class': 'text-left','id':'form','method':'POST'}}) }}
+                        <div class="row mt-0 p-0" id="row-id-deudora">
+                            <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                            <input type="hidden" id="id_factura" name="id_factura">
+                            <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                                {{ form_label(form.cuenta_obligacion_deudora) }}
+                                {{ form_widget(form.cuenta_obligacion_deudora) }}
+                            </div>
+                            <div class="col-6 mt-0 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                                {{ form_label(form.subcuenta_obligacion_deudora) }}
+                                {{ form_widget(form.subcuenta_obligacion_deudora) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.centro_costo_deudora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.orden_trabajo_deudora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.elemento_gasto_deudora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.expediente_deudora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                        </div>
+                        <div class="row mt-0 p-0" id="row-id-acreedora">
+                            <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                                {{ form_label(form.cuenta_nominal_acreedora) }}
+                                {{ form_widget(form.cuenta_nominal_acreedora) }}
+                            </div>
+                            <div class="col-6 mt-0 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                                {{ form_label(form.subcuenta_nominal_acreedora) }}
+                                {{ form_widget(form.subcuenta_nominal_acreedora) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.centro_costo_acreedora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.orden_trabajo_acreedora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.elemento_gasto_acreedora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="form-group mt-0 input-group input-group-sm col-2">
+                                {{ form_widget(form.expediente_acreedora,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                        </div>
+                        {{ form_end(form.cuenta_nominal_acreedora) }}
+                        <div class="d-flex align-items-center mt-3 pl-2">
+                            <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias y Productos de la
+                                Factura</h3>
+                        </div>
+                        <hr color="dimgray" class="my-1 ml-2" size=3>
+                        {{ form_start(form.mercancias_factura, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
+                            <div class="row mt-0 p-0" id="row-id">
+                                <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                                    {{ form_label(form.mercancias_factura.mercancias_productos) }}
+                                    {{ form_widget(form.mercancias_factura.mercancias_productos) }}
+                                </div>
+                                <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                                    {{ form_label(form.mercancias_factura.cuenta_costo) }}
+                                    {{ form_widget(form.mercancias_factura.cuenta_costo) }}
+                                </div>
+                                <div class="col-3 mt-0 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                                    {{ form_label(form.mercancias_factura.subcuenta_costo) }}
+                                    {{ form_widget(form.mercancias_factura.subcuenta_costo) }}
+                                </div>
+                                <div class="col-2 mt-4 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                                    <button class="btn btn-secondary btn-sm ml-auto mr-3" type="button"
+                                            id="btnAplicarMercancia">
+                                        ADICIONAR
+                                    </button>
+                                </div>
+                                <div class="form-group mt-0 input-group input-group-sm col-2">
+                                    {{ form_widget(form.mercancias_factura.centro_costo,{'attr': {'class': 'form-control w-100'}}) }}
+                                </div>
+                                <div class="form-group mt-0 input-group input-group-sm col-2">
+                                    {{ form_widget(form.mercancias_factura.orden_trabajo,{'attr': {'class': 'form-control w-100'}}) }}
+                                </div>
+                                <div class="form-group mt-0 input-group input-group-sm col-2">
+                                    {{ form_widget(form.mercancias_factura.elemento_gasto,{'attr': {'class': 'form-control w-100'}}) }}
+                                </div>
+                                <div class="form-group mt-0 input-group input-group-sm col-2">
+                                    {{ form_widget(form.mercancias_factura.expediente,{'attr': {'class': 'form-control w-100'}}) }}
+                                </div>
+                            </div>
+                        {{ form_end(form.mercancias_factura) }}
+
+                        <table class="table-small-rows table table-hover text-light">
+                            <thead class="thead-dark">
+                            <th style="width: 280px">Mercancias y Productos</th>
+                            <th style="width: 150px">Cuenta/Subcuenta</th>
+                            <th style="width: 120px">Análisis 1</th>
+                            <th style="width: 120px">Análisis 2</th>
+                            <th style="width: 120px">Análisis 3</th>
+                            <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+                            </thead>
+                            <tbody id="rows_table">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Salir</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-secondary" id="btnContabilizarFactura"
+                                    onclick="ContabilizarFactura()">Contabilizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de Facturas
+            </h4>
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
+                    title="Imprimir Registro de Comprobantes"
+                    onclick="">
+                <i class="fa fa-plus"> Generar Comprobante</i>
+            </button>
+        </div>
+        {# end header #}
+
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="100px">Nro. Fact</th>
+            <th width="400px" class="pr-0 pl-0">Fecha</th>
+            <th width="90px" class="pl-0 text-center pr-0">Importe</th>
+            <th width="100px">Seleccionar cuentas</th>
+            </thead>
+            <tbody>
+            {% for item in facturas %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nro_factura }}</td>
+                    <td style="font-weight:400;" class="pl-0 pr-0 text-center">{{ item.fecha }}</td>
+                    <td style="font-weight:400;" class="pl-0 pr-0 text-right">{{ item.importe }}</td>
+                    <td style="font-weight:400;" class="text-center">
+                        <i class="fa-edit btn-sm btn-warning" title="Completar información"
+                           onclick="showForm({{ item.id }})"></i>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        let cbx_centro_costo = $('#comprobante_venta_mercancias_factura_centro_costo')
+        let cbx_elemento_gasto = $('#comprobante_venta_mercancias_factura_elemento_gasto')
+        let cbx_expediente = $('#comprobante_venta_mercancias_factura_expediente')
+        let cbx_orden_trabajo = $('#comprobante_venta_mercancias_factura_orden_trabajo')
+        let cbx_centro_costo_acreedora = $('#comprobante_venta_centro_costo_acreedora')
+        let cbx_elemento_gasto_acreedora = $('#comprobante_venta_elemento_gasto_acreedora')
+        let cbx_expediente_acreedora = $('#comprobante_venta_expediente_acreedora')
+        let cbx_orden_trabajo_acreedora = $('#comprobante_venta_orden_trabajo_acreedora')
+        let cbx_centro_costo_deudora = $('#comprobante_venta_centro_costo_deudora')
+        let cbx_elemento_gasto_deudora = $('#comprobante_venta_elemento_gasto_deudora')
+        let cbx_expediente_deudora = $('#comprobante_venta_expediente_deudora')
+        let cbx_orden_trabajo_deudora = $('#comprobante_venta_orden_trabajo_deudora')
+        let mercancias = [];
+        let mercancias_temp = [];
+        let list_mercancias_cuentas = [];
+        let criterios_costos = [];
+
+        $(document).ready(function (event) {
+            /*** Validacion de campos ***/
+            const form = $('#form')
+            const form_mercancias = $('#form_mercancia')
+
+            form.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'comprobante_venta[cuenta_obligacion_deudora]': "required",
+                    'comprobante_venta[subcuenta_obligacion_deudora]': "required",
+                    'comprobante_venta[centro_costo_deudora]': "required",
+                    'comprobante_venta[orden_trabajo_deudora]': "required",
+                    'comprobante_venta[elemento_gasto_deudora]': "required",
+                    'comprobante_venta[expediente_deudora]': "required",
+
+                    'comprobante_venta[cuenta_nominal_acreedora]': "required",
+                    'comprobante_venta[subcuenta_nominal_acreedora]': "required",
+                    'comprobante_venta[centro_costo_acreedora]': "required",
+                    'comprobante_venta[orden_trabajo_acreedora]': "required",
+                    'comprobante_venta[elemento_gasto_acreedora]': "required",
+                    'comprobante_venta[expediente_acreedora]': "required",
+                },
+                messages: {
+                    'comprobante_venta[cuenta_obligacion_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[subcuenta_obligacion_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[centro_costo_deudora]': '!Obligratorio',
+                    'comprobante_venta[orden_trabajo_deudora]': '!Obligratorio',
+                    'comprobante_venta[elemento_gasto_deudora]': '!Obligratorio',
+                    'comprobante_venta[expediente_deudora]': '!Obligratorio',
+
+                    'comprobante_venta[cuenta_nominal_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[subcuenta_nominal_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[centro_costo_acreedora]': '!Obligratorio',
+                    'comprobante_venta[orden_trabajo_acreedora]': '!Obligratorio',
+                    'comprobante_venta[elemento_gasto_acreedora]': '!Obligratorio',
+                    'comprobante_venta[expediente_acreedora]': '!Obligratorio',
+                }
+            })
+            form_mercancias.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'comprobante_venta[mercancias_factura][mercancias_productos]': "required",
+                    'comprobante_venta[mercancias_factura][cuenta_costo]': "required",
+                    'comprobante_venta[mercancias_factura][subcuenta_costo]': "required",
+                    'comprobante_venta[mercancias_factura][centro_costo]': "required",
+                    'comprobante_venta[mercancias_factura][orden_trabajo]': "required",
+                    'comprobante_venta[mercancias_factura][expediente]': "required",
+                },
+                messages: {
+                    'comprobante_venta[mercancias_factura][mercancias_productos]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[mercancias_factura][cuenta_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[mercancias_factura][subcuenta_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'comprobante_venta[mercancias_factura][centro_costo]': '!Obligratorio',
+                    'comprobante_venta[mercancias_factura][orden_trabajo]': '!Obligratorio',
+                    'comprobante_venta[mercancias_factura][elemento_gasto]': '!Obligratorio',
+                    'comprobante_venta[mercancias_factura][expediente]': '!Obligratorio',
+                }
+            })
+
+            $('#comprobante_venta_mercancias_factura_cuenta_costo').on('change', function () {
+                miniLoadin.show({msg: 'Cargando criterios de análisis...', target: '#row-id'})
+                $('#comprobante_venta_mercancias_factura_subcuenta_costo').find('option').remove()
+                $('#comprobante_venta_mercancias_factura_subcuenta_costo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $.ajax({
+                    url: '/contabilidad/config/cuenta/get-criterios/' + $(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            hiddenParents()
+                            criterios_costos = result.data
+                            result.data.forEach(data => {
+                                switch (data) {
+                                    case "CCT":
+                                        cbx_centro_costo.parent().show()
+                                        break
+                                    case "EG":
+                                        cbx_elemento_gasto.parent().show()
+                                        break
+                                    case "EXP":
+                                        cbx_expediente.parent().show()
+                                        break
+                                    case "OT":
+                                        cbx_orden_trabajo.parent().show()
+                                        break
+                                }
+                            })
+                            result.subcuentas.forEach(
+                                el => $('#comprobante_venta_mercancias_factura_subcuenta_costo').append(`<option value = "${el.nro}">${el.descripcion} </option>`)
+                            )
+                            miniLoadin.close()
+                        }
+                    }
+                })
+            })
+            $('#comprobante_venta_cuenta_obligacion_deudora').on('change', function () {
+                miniLoadin.show({msg: 'Cargando criterios de análisis...', target: '#row-id-deudora'})
+                $('#comprobante_venta_subcuenta_obligacion_deudora').find('option').remove()
+                $('#comprobante_venta_subcuenta_obligacion_deudora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
+                $.ajax({
+                    url: '/contabilidad/config/cuenta/get-criterios/' + $(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            hiddenParents_deudora()
+                            result.data.forEach(data => {
+                                switch (data) {
+                                    case "CCT":
+                                        cbx_centro_costo_deudora.parent().show()
+                                        break
+                                    case "EG":
+                                        cbx_elemento_gasto_deudora.parent().show()
+                                        break
+                                    case "EXP":
+                                        cbx_expediente_deudora.parent().show()
+                                        break
+                                    case "OT":
+                                        cbx_orden_trabajo_deudora.parent().show()
+                                        break
+                                }
+                            })
+                            result.subcuentas.forEach(
+                                el => $('#comprobante_venta_subcuenta_obligacion_deudora').append(`<option value = "${el.nro}">${el.descripcion} </option>`)
+                            )
+                            miniLoadin.close()
+                        }
+
+
+                    }
+                })
+            })
+            $('#comprobante_venta_cuenta_nominal_acreedora').on('change', function () {
+                miniLoadin.show({msg: 'Cargando criterios de análisis...', target: '#row-id-acreedora'})
+                $('#comprobante_venta_subcuenta_nominal_acreedora').find('option').remove()
+                $('#comprobante_venta_subcuenta_nominal_acreedora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                $.ajax({
+                    url: '/contabilidad/config/cuenta/get-criterios/' + $(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            hiddenParents_acreedora()
+                            result.data.forEach(data => {
+                                switch (data) {
+                                    case "CCT":
+                                        cbx_centro_costo_acreedora.parent().show()
+                                        break
+                                    case "EG":
+                                        cbx_elemento_gasto_acreedora.parent().show()
+                                        break
+                                    case "EXP":
+                                        cbx_expediente_acreedora.parent().show()
+                                        break
+                                    case "OT":
+                                        cbx_orden_trabajo_acreedora.parent().show()
+                                        break
+                                }
+                            })
+                            result.subcuentas.forEach(
+                                el => $('#comprobante_venta_subcuenta_nominal_acreedora').append(`<option value = "${el.nro}">${el.descripcion} </option>`)
+                            )
+                            miniLoadin.close()
+                        }
+
+
+                    }
+                })
+            })
+
+            $('#btnAplicarMercancia').on('click', function () {
+                if (form_mercancias.valid()){
+                    let cuenta_seleccionada = $('#comprobante_venta_mercancias_factura_cuenta_costo option:selected').val()
+                    let subcuenta_seleccionada = $('#comprobante_venta_mercancias_factura_subcuenta_costo option:selected').val()
+                    let centro_costo = $('#comprobante_venta_mercancias_factura_centro_costo option:selected').val()
+                    let orden_tabajo = $('#comprobante_venta_mercancias_factura_orden_trabajo option:selected').val()
+                    let elemento_gasto = $('#comprobante_venta_mercancias_factura_elemento_gasto option:selected').val()
+                    let expediente = $('#comprobante_venta_mercancias_factura_expediente option:selected').val()
+
+                    let id_movimiento_venta = $('#comprobante_venta_mercancias_factura_mercancias_productos').val()
+                    let codigo = '';
+                    /** Eliminar el elemento seleccionado del listado de mercancias y productos**/
+                    for (let i = 0; i < mercancias.length; i++) {
+                        if (mercancias[i]['id_movimiento_venta'] == id_movimiento_venta) {
+                            mercancias_temp.push(mercancias[i])
+                            codigo = mercancias[i]['mercancia']
+                            mercancias.splice(i, 1);
+                        }
+                    }
+                    /***Listado de elementos adicionados en la tabla */
+                    list_mercancias_cuentas.push({
+                        codigo,
+                        id_movimiento_venta,
+                        cuenta_seleccionada,
+                        subcuenta_seleccionada,
+                        centro_costo,
+                        orden_tabajo,
+                        elemento_gasto,
+                        expediente
+                    })
+                    let values_criterios = [];
+                    if (criterios_costos.length>0){
+                        criterios_costos.forEach(data => {
+                            switch (data) {
+                                case "CCT":
+                                    values_criterios[values_criterios.length]=$('#comprobante_venta_mercancias_factura_centro_costo option:selected').text()
+                                    break
+                                case "EG":
+                                    values_criterios[values_criterios.length]=$('#comprobante_venta_mercancias_factura_elemento_gasto option:selected').text()
+                                    break
+                                case "EXP":
+                                    values_criterios[values_criterios.length]=$('#comprobante_venta_mercancias_factura_expediente option:selected').text()
+                                    break
+                                case "OT":
+                                    values_criterios[values_criterios.length]=$('#comprobante_venta_mercancias_factura_orden_trabajo option:selected').text()
+                                    break
+                            }
+                        })
+                    }
+                    if(values_criterios.length==0){
+                        values_criterios[0]=' '
+                        values_criterios[1]=' '
+                        values_criterios[2]=' '
+                    }
+                    if(values_criterios.length==1){
+                        values_criterios[1]=' '
+                        values_criterios[2]=' '
+                    }
+                    if(values_criterios.length==2){
+                        values_criterios[2]=' '
+                    }
+
+                    $('#rows_table').append(`<tr>
+                        <td style="font-weight:400;"> ${codigo}</td>
+                        <td style="font-weight:400;" hidden> ${id_movimiento_venta}</td>
+                        <td style="font-weight:400;" > ${cuenta_seleccionada}/${subcuenta_seleccionada}</td>
+                        <td style="font-weight:400;" > ${values_criterios[0]}</td>
+                        <td style="font-weight:400;" > ${values_criterios[1]}</td>
+                        <td style="font-weight:400;" > ${values_criterios[2]}</td>
+                        <td> <button type="button"
+                            class="btn ml-3 btn-outline-danger btn-sm borrar" title="Eliminar" id-movimiento-venta="${id_movimiento_venta}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td>
+                        `
+                    );
+                    $('#form_mercancia')[0].reset()
+                    hiddenParents()
+                    /** Volver a restaurar el selec sin el elemento eliminado***/
+                    $('#comprobante_venta_mercancias_factura_mercancias_productos').find('option').remove()
+                    $('#comprobante_venta_mercancias_factura_mercancias_productos').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                    mercancias.forEach(
+                        el => $('#comprobante_venta_mercancias_factura_mercancias_productos').append(`<option value = "${el.id_movimiento_venta}">${el.mercancia} </option>`)
+                    )
+                }
+            })
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                let id_delete =$(this).closest('tr').find('td')[1].innerHTML
+                $(this).closest('tr').remove()
+                for(let j = 0; j<mercancias_temp.length; j++){
+                    if(mercancias_temp[j]['id_movimiento_venta'] == id_delete.trim()){
+                        mercancias.push(mercancias_temp[j])
+                        mercancias_temp.splice(j, 1);
+                        break
+                    }
+                }
+                for(let i = 0; i< list_mercancias_cuentas.length; i++){
+                    let id_listado =list_mercancias_cuentas[i]['id']
+                    if(id_listado === id_delete.trim()){
+                        list_mercancias_cuentas.splice(i, 1);
+                        break
+                    }
+                }
+                /** Volver a restaurar el selec sin el elemento eliminado***/
+                $('#comprobante_venta_mercancias_factura_mercancias_productos').find('option').remove()
+                $('#comprobante_venta_mercancias_factura_mercancias_productos').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                mercancias.forEach(
+                    el => $('#comprobante_venta_mercancias_factura_mercancias_productos').append(`<option value = "${el.id_movimiento_venta}">${el.mercancia} </option>`)
+                )
+            })
+        })
+
+        function showForm(id) {
+            loadingModal.show()
+            $.ajax({
+                url: '/contabilidad/general/comprobante-venta/getListadoMercancias/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        $('#id_factura').val(id)
+                        $('#comprobante_venta_mercancias_factura_mercancias_productos').find('option').remove()
+                        $('#comprobante_venta_mercancias_factura_mercancias_productos').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        mercancias = result.data;
+                        result.data.forEach(
+                            el => $('#comprobante_venta_mercancias_factura_mercancias_productos').append(`<option value = "${el.id_movimiento_venta}">${el.mercancia} </option>`)
+                        )
+                    }
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+            $('#formVentaModal').modal('show')
+
+        }
+
+        function hiddenParents() {
+            cbx_centro_costo.parent().hide()
+            cbx_elemento_gasto.parent().hide()
+            cbx_expediente.parent().hide()
+            cbx_orden_trabajo.parent().hide()
+
+            $('#comprobante_venta_mercancias_factura_centro_costo').val(0)
+            $('#comprobante_venta_mercancias_factura_elemento_gasto').val(0)
+            $('#comprobante_venta_mercancias_factura_expediente').val(0)
+            $('#comprobante_venta_mercancias_factura_orden_trabajo').val(0)
+        }
+
+        function hiddenParents_deudora() {
+            cbx_centro_costo_deudora.parent().hide()
+            cbx_elemento_gasto_deudora.parent().hide()
+            cbx_expediente_deudora.parent().hide()
+            cbx_orden_trabajo_deudora.parent().hide()
+
+            $('#comprobante_venta_centro_costo_deudora').val(0)
+            $('#comprobante_venta_elemento_gasto_deudora').val(0)
+            $('#comprobante_venta_expediente_deudora').val(0)
+            $('#comprobante_venta_orden_trabajo_deudora').val(0)
+        }
+
+        function hiddenParents_acreedora() {
+            cbx_centro_costo_acreedora.parent().hide()
+            cbx_elemento_gasto_acreedora.parent().hide()
+            cbx_expediente_acreedora.parent().hide()
+            cbx_orden_trabajo_acreedora.parent().hide()
+
+            $('#comprobante_venta_centro_costo_acreedora').val(0)
+            $('#comprobante_venta_elemento_gasto_acreedora').val(0)
+            $('#comprobante_venta_expediente_acreedora').val(0)
+            $('#comprobante_venta_orden_trabajo_acreedora').val(0)
+        }
+        cbx_centro_costo.prepend('<option selected = "false" value = "0"> -- Centro de Costo -- </option>');
+        cbx_elemento_gasto.prepend('<option selected = "false" value = "0"> -- Elemento de Gasto -- </option>');
+        cbx_expediente.prepend('<option selected = "false" value = "0"> -- Expediente -- </option>');
+        cbx_orden_trabajo.prepend('<option selected = "false" value = "0"> -- Orden de trabajo -- </option>');
+
+        cbx_centro_costo_deudora.prepend('<option selected = "false" value = "0"> -- Centro de Costo -- </option>');
+        cbx_elemento_gasto_deudora.prepend('<option selected = "false" value = "0"> -- Elemento de Gasto -- </option>');
+        cbx_expediente_deudora.prepend('<option selected = "false" value = "0"> -- Expediente -- </option>');
+        cbx_orden_trabajo_deudora.prepend('<option selected = "false" value = "0"> -- Orden de trabajo -- </option>');
+
+        cbx_centro_costo_acreedora.prepend('<option selected = "false" value = "0"> -- Centro de Costo -- </option>');
+        cbx_elemento_gasto_acreedora.prepend('<option selected = "false" value = "0"> -- Elemento de Gasto -- </option>');
+        cbx_expediente_acreedora.prepend('<option selected = "false" value = "0"> -- Expediente -- </option>');
+        cbx_orden_trabajo_acreedora.prepend('<option selected = "false" value = "0"> -- Orden de trabajo -- </option>');
+
+        hiddenParents()
+        hiddenParents_acreedora()
+        hiddenParents_deudora()
+
+        function ContabilizarFactura() {
+            if(mercancias.length>0){
+                alertTemplate('Quedan mercancias o productos de la factura por contabilizar.', 'danger')
+            }
+            else{
+                if ($('#form').valid()) {
+
+                    let data = $('#form').serializeArray()
+                    data.push({
+                        name: 'comprobante_venta[list_mercancia]',
+                        value: JSON.stringify(list_mercancias_cuentas)
+                    })
+                    loadingModal.show()
+                    $.ajax({
+                        url: '/contabilidad/general/comprobante-venta/contabilizar-factura',
+                        method: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.success) {
+                                window.location.replace('{{ path('contabilidad_general_comprobante_venta') }}')
+                            } else {
+                                alertTemplate(result.msg)
+                            }
+                            loadingModal.close()
+                        },
+                        error: function () {
+                        }
+                    })
+                }
+            }
+        }
+    </script>
+{% endblock %}

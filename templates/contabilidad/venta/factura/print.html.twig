@@ -40,52 +40,50 @@
 <body>
 <div class="container-fluid mt-3" style="width: 1000px;">
     <div class="row">
-        <h3 class="col-9">FACTURA</h3>
+        <h3 class="col-9">FACTURA
+            <img style="margin-left: -10px;" width="150" height="57" src="/images/logo-viajes-horizontes.png" alt="">
+        </h3>
         <div class="col-3">
-            <p class="m-0"><span class="font-weight-bold">folio :</span> {{ factura.nro_factura }}</p>
-            <p class="m-0"><span class="font-weight-bold">fecha :</span> {{ factura.fecha_factura }}</p>
+            <p class="m-0"><span class="font-weight-bold">Nro. Factura :</span> {{ factura.nro_factura }}</p>
+            <p class="m-0"><span class="font-weight-bold">Fecha :</span> {{ factura.fecha_factura }}</p>
         </div>
     </div>
     <table border="2" width="960px" class="mt-1">
         <tbody>
         <tr>
             <td style="width: 455px;">
-                <div class="pl-1 font-weight-bold bg-gray">SUMINISTRADOR: Grupos Horizontes</div>
-                <div class="pl-1">Código:</div>
-                <div class="pl-1">Dirección:</div>
+                <div class="pl-1 font-weight-bold bg-gray">SUMINISTRADOR: {{ suministrador }}</div>
+                <div class="pl-1"><strong>Código: </strong> {{ cod_suministrador }}</div>
+                <div class="pl-1"><strong>Dirección: </strong></div>
             </td>
             <td style="width: 455px;">
                 <div class="pl-1 font-weight-bold bg-gray">CLIENTE: {{ factura.cliente }}</div>
-                <div class="pl-1">Código:</div>
-                <div class="pl-1">Dirección:</div>
+                <div class="pl-1"><strong>Código: </strong>{{ factura.codigo_cliente }}</div>
+                <div class="pl-1"><strong>Dirección: </strong></div>
             </td>
         </tr>
         <tr>
             <td style="width: 455px;">
-                <div class="pl-1">Cuenta Bancaria - CUP No:</div>
-                <div class="pl-1">Cuenta Bancaria - CUC No:</div>
-                <div class="pl-1">Nro de Identificacion Tributaria</div>
+                <div class="pl-1"><strong>Cuenta Bancaria - CUP No: </strong></div>
+                <div class="pl-1"><strong>Cuenta Bancaria - CUC No: </strong></div>
+                <div class="pl-1"><strong>Nro de Identificacion Tributaria: </strong></div>
             </td>
             <td style="width: 455px;">
-                <div class="pl-1">Cuenta Bancaria - CUP No:</div>
-                <div class="pl-1">Cuenta Bancaria - CUC No:</div>
-                <div class="pl-1">Nro de Identificacion Tributaria</div>
+                <div class="pl-1"><strong>Cuenta Bancaria - CUP No:</strong></div>
+                <div class="pl-1"><strong>Cuenta Bancaria - CUC No:</strong></div>
+                <div class="pl-1"><strong>Nro de Identificacion Tributaria</strong></div>
             </td>
         </tr>
         <tr>
             <td colspan="2" style="width: 455px;">
                 <div class="pl-1 font-weight-bold bg-gray text-center">CONCENTO DE LA OPERACION</div>
-                <div class="pl-1">----------</div>
-                <div class="pl-1">----------</div>
-                <div class="pl-1">----------</div>
+                <div class="pl-1" style="height: 80px !important;"></div>
             </td>
         </tr>
         <tr>
             <td colspan="2" style="width: 455px;">
                 <div class="pl-1 font-weight-bold bg-gray text-center">DATOS DEL TRANSPORTISTA</div>
-                <div class="pl-1">----------</div>
-                <div class="pl-1">----------</div>
-                <div class="pl-1">----------</div>
+                <div class="pl-1" style="height: 80px !important;"></div>
             </td>
         </tr>
         </tbody>
@@ -133,25 +131,24 @@
             <tbody>
             <tr class="mt-1">
                 <td style="width: 455px;">
-                    <div class="pl-1">Nombre y Apellidos:</div>
-                    <div class="pl-1">Cargo:</div>
-                    <div class="pl-1">Fecha:</div>
-                    <div class="pl-1">Firma:</div>
+                    <div class="pl-1"><strong>Nombre y Apellidos:</strong>{{ usuario }}</div>
+                    <div class="pl-1"><strong>Cargo:</strong> {{ cargo }}</div>
+                    <div class="pl-1"><strong>Fecha:</strong> {{ factura.fecha_factura }}</div>
+                    <div class="pl-1"><strong>Firma:</strong></div>
 
                 </td>
                 <td style="width: 455px;">
-                    <div class="pl-1">Nombre y Apellidos:</div>
-                    <div class="pl-1">Cargo:</div>
-                    <div class="pl-1">Fecha:</div>
-                    <div class="pl-1">Firma:</div>
+                    <div class="pl-1"><strong>Nombre y Apellidos:</strong></div>
+                    <div class="pl-1"><strong>Cargo:</strong></div>
+                    <div class="pl-1"><strong>Fecha:</strong></div>
+                    <div class="pl-1"><strong>Firma:</strong></div>
 
                 </td>
                 <td style="width: 455px;">
-                    <div class="pl-1">Nombre y Apellidos:</div>
-                    <div class="pl-1">Cargo:</div>
-                    <div class="pl-1">Fecha:</div>
-                    <div class="pl-1">Firma:</div>
-
+                    <div class="pl-1"><strong>Nombre y Apellidos:</strong></div>
+                    <div class="pl-1"><strong>Cargo:</strong></div>
+                    <div class="pl-1"><strong>Fecha:</strong></div>
+                    <div class="pl-1"><strong>Firma:</strong></div>
                 </td>
             </tr>
             </tbody>

@@ -20,6 +20,10 @@ configuraciones:
       name: "VALE DE SALIDA PRODUCTO"
     - id: 9
       name: "DEVOLUCION"
+    - id: 10
+      name: "VENTA"
+    - id: 11
+      name: "DEVOLUCION VENTA"
 
   modulo:
     - id: 1

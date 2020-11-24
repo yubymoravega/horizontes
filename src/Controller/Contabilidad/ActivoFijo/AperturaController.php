@@ -132,7 +132,7 @@ class AperturaController extends AbstractController
     }
 
     /**
-     * @Route("/getApertura/{nro}", name="contabilidad_activo_fijo_apertura_get_nro_inv", methods={"POST"})
+     * @Route("/getApertura/{nro}", name="contabilidad_activo_fijo_apertura_get_apertura", methods={"POST"})
      */
     public function getApertura(Request $request, EntityManagerInterface $em, $nro)
     {
@@ -159,6 +159,4 @@ class AperturaController extends AbstractController
             'success' => true
         ]);
     }
-
-
 }

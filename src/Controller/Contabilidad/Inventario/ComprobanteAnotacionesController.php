@@ -88,7 +88,7 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 8) {
                 $rows = array_merge($rows, []);
             }//devolucion
-            elseif ($id_tipo_documento == 9) {
+            elseif ($id_tipo_documento == 90) {
                 $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_devolucion);
             }
@@ -170,6 +170,10 @@ class ComprobanteAnotacionesController extends AbstractController
             } //vale salida de producto
             elseif ($id_tipo_documento == 8) {
                 $rows = array_merge($rows, []);
+            } //Factura
+            elseif ($id_tipo_documento == 10) {
+                $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_venta);
             }
         }
         return $rows;

@@ -49,61 +49,13 @@ class MovimientoVentaType extends AbstractType
             ])
             ->add('descuento_recarga', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
-                'label' => 'Descuento/Recarga'
+                'label' => 'Descuento',
+                'required'=>false
             ])
             ->add('existencia', NumberType::class, [
                 'attr' => ['class' => 'w-100', 'readonly' => true]
             ])
-            ->add('cuenta_deudora', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Cuentas deudora',
-                'choices' => (function () {
-                    $cuentas = $this->em->getRepository(Cuenta::class)->findBy(['obligacion_acreedora' => true]);
-                    $cuentas_obj = [];
-                    if (!empty($cuentas)) {
-                        foreach ($cuentas as $cuenta) {
-                            /** @var Cuenta $cuenta */
-                            $cuentas_obj[$cuenta->getNroCuenta() .' - '. $cuenta->getNombre()] = $cuenta->getNroCuenta();
-                        }
-                    }
-//                    dd($cuentas_obj);
-                    return $cuentas_obj;
-                })()
-            ])
-            /*->add('cuenta_deudora', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Cuentas deudora',
-                'class' => Cuenta::class,
-                'choice_value' => 'nro_cuenta',
-                'choice_label' => function (Cuenta $value) {
-                    return $value->getNroCuenta() . ' - ' . $value->getNombre();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.obligacion_acreedora = true');
-                },
-            ])*/
-            ->add('subcuenta_deudora', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-            ])
-            ->add('cuenta_acreedora', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Cuentas acreedora',
-                'class' => Cuenta::class,
-                'choice_value' => 'nro_cuenta',
-                'choice_label' => function (Cuenta $value) {
-                    return $value->getNroCuenta() . ' - ' . $value->getNombre();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.obligacion_deudora = true');
-                },
-            ])
-            ->add('subcuenta_acreedora', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-            ]);
+        ;
     }
 
     /*public function configureOptions(OptionsResolver $resolver)

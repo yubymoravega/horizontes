@@ -2,7 +2,11 @@
 
 namespace App\Entity\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\CentroCosto;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Inventario\Expediente;
+use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\User;
 use App\Repository\Contabilidad\Venta\FacturaRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -48,19 +52,30 @@ class Factura
 
     /**
      * @ORM\ManyToOne(targetEntity=ContratosCliente::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_contrato;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $cuenta_obligacion;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255,nullable=true)
      */
     private $subcuenta_obligacion;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cuenta_nominal_acreedora;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $subcuenta_nominal_acreedora;
+
 
     /**
      * @ORM\Column(type="boolean")
@@ -78,6 +93,56 @@ class Factura
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_usuario;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $importe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CentroCosto::class)
+     */
+    private $id_centro_costo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
+     */
+    private $id_orden_trabajo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
+     */
+    private $id_elemento_gasto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Expediente::class)
+     */
+    private $id_expediente;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CentroCosto::class)
+     */
+    private $id_centro_costo_acreedor;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
+     */
+    private $id_orden_trabajo_acreedor;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
+     */
+    private $id_elemento_gasto_acreedor;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Expediente::class)
+     */
+    private $id_expediente_acreedor;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $contabilizada;
 
     public function getId(): ?int
     {
@@ -212,6 +277,150 @@ class Factura
     public function setIdUsuario(?User $id_usuario): self
     {
         $this->id_usuario = $id_usuario;
+
+        return $this;
+    }
+
+    public function getImporte(): ?float
+    {
+        return $this->importe;
+    }
+
+    public function setImporte(float $importe): self
+    {
+        $this->importe = $importe;
+
+        return $this;
+    }
+
+    public function getCuentaAcreedora(): ?string
+    {
+        return $this->cuenta_nominal_acreedora;
+    }
+
+    public function setCuentaAcreedora(?string $cuenta_acreedora): self
+    {
+        $this->cuenta_nominal_acreedora = $cuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getSubcuentaAcreedora(): ?string
+    {
+        return $this->subcuenta_nominal_acreedora;
+    }
+
+    public function setSubcuentaAcreedora(?string $subcuenta_acreedora): self
+    {
+        $this->subcuenta_nominal_acreedora = $subcuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getIdCentroCosto(): ?CentroCosto
+    {
+        return $this->id_centro_costo;
+    }
+
+    public function setIdCentroCosto(?CentroCosto $id_centro_costo): self
+    {
+        $this->id_centro_costo = $id_centro_costo;
+
+        return $this;
+    }
+
+    public function getIdOrdenTrabajo(): ?OrdenTrabajo
+    {
+        return $this->id_orden_trabajo;
+    }
+
+    public function setIdOrdenTrabajo(?OrdenTrabajo $id_orden_trabajo): self
+    {
+        $this->id_orden_trabajo = $id_orden_trabajo;
+
+        return $this;
+    }
+
+    public function getIdElementoGasto(): ?ElementoGasto
+    {
+        return $this->id_elemento_gasto;
+    }
+
+    public function setIdElementoGasto(?ElementoGasto $id_elemento_gasto): self
+    {
+        $this->id_elemento_gasto = $id_elemento_gasto;
+
+        return $this;
+    }
+
+    public function getIdExpediente(): ?Expediente
+    {
+        return $this->id_expediente;
+    }
+
+    public function setIdExpediente(?Expediente $id_expediente): self
+    {
+        $this->id_expediente = $id_expediente;
+
+        return $this;
+    }
+
+    public function getIdCentroCostoAcreedor(): ?CentroCosto
+    {
+        return $this->id_centro_costo_acreedor;
+    }
+
+    public function setIdCentroCostoAcreedor(?CentroCosto $id_centro_costo_acreedor): self
+    {
+        $this->id_centro_costo_acreedor = $id_centro_costo_acreedor;
+
+        return $this;
+    }
+
+    public function getIdOrdenTrabajoAcreedor(): ?OrdenTrabajo
+    {
+        return $this->id_orden_trabajo_acreedor;
+    }
+
+    public function setIdOrdenTrabajoAcreedor(?OrdenTrabajo $id_orden_trabajo_acreedor): self
+    {
+        $this->id_orden_trabajo_acreedor = $id_orden_trabajo_acreedor;
+
+        return $this;
+    }
+
+    public function getIdElementoGastoAcreedor(): ?ElementoGasto
+    {
+        return $this->id_elemento_gasto_acreedor;
+    }
+
+    public function setIdElementoGastoAcreedor(?ElementoGasto $id_elemento_gasto_acreedor): self
+    {
+        $this->id_elemento_gasto_acreedor = $id_elemento_gasto_acreedor;
+
+        return $this;
+    }
+
+    public function getIdExpedienteAcreedor(): ?Expediente
+    {
+        return $this->id_expediente_acreedor;
+    }
+
+    public function setIdExpedienteAcreedor(?Expediente $id_expediente_acreedor): self
+    {
+        $this->id_expediente_acreedor = $id_expediente_acreedor;
+
+        return $this;
+    }
+
+    public function getContabilizada(): ?bool
+    {
+        return $this->contabilizada;
+    }
+
+    public function setContabilizada(?bool $contabilizada): self
+    {
+        $this->contabilizada = $contabilizada;
 
         return $this;
     }

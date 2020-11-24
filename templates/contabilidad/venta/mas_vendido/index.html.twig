@@ -1,0 +1,55 @@
+{% extends 'contabilidad/venta/index.html.twig' %}
+
+{% block title %}Productos más vendidos{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de los Productos más Vendidos
+            </h4>
+        </div>
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th>Código</th>
+            <th>Nombre</th>
+            <th width="240px">Cantidad de productos</th>
+            <th width="240px">Cantidad de Facturas</th>
+            <th width="220px">Importe Facturado</th>
+            </thead>
+            <tbody>
+            {% if cant_productos >0 %}
+                <tr>
+                    <td colspan="5" class="row-group-subconta text-uppercase">Productos</td>
+                </tr>
+                {% for item in productos %}
+                    <tr>
+                        <td style="font-weight:400;">{{ item.codigo }}</td>
+                        <td style="font-weight:400;">{{ item.nombre }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ item.cant_productos }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ item.cant_facturas }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.importe }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            {% if cant_mercancias>0 %}
+                <tr>
+                    <td colspan="5" class="row-group-subconta text-uppercase">Mercancías</td>
+                </tr>
+                {% for item in mercancias %}
+                    <tr> class="text-right"
+                        <td style="font-weight:400;">{{ item.codigo }}</td>
+                        <td style="font-weight:400;">{{ item.nombre }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ item.cant_productos }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ item.cant_facturas }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.importe }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}

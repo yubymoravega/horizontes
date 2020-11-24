@@ -295,88 +295,88 @@ class CuentaController extends AbstractController
         $form->handleRequest($request);
         $errors = $validator->validate($cuenta);
 //        if ($form->isValid() && $form->isSubmitted()) {
-            try {
-                $naturaleza = $request->get('cuenta')['deudora'];
-                $field_deudora = true;
-                $field_mixta = false;
-                if ($naturaleza == 0) {
-                    $field_deudora = false;
-                } elseif ($naturaleza == 2) {
-                    $field_deudora = false;
-                    $field_mixta = true;
-                }
-                $cuenta
-                    ->setActivo(true)
-                    ->setDeudora($field_deudora)
-                    ->setMixta($field_mixta);
-                $em->persist($cuenta);
-                $cuenta_criterio_analisis_er = $em->getRepository(CuentaCriterioAnalisis::class);
-                //elimino los registros de criterios y cuentas de la tabla CuentaCriterioAnalisis
-                $arr_criterios_cuenta = $cuenta_criterio_analisis_er->findBy(array(
-                    'id_cuenta' => $cuenta
-                ));
-                if (!empty($arr_criterios_cuenta)) {
-                    foreach ($arr_criterios_cuenta as $obj_cuenta_criterio) {
-                        $em->remove($obj_cuenta_criterio);
-                    }
-                }
-                //adiciono los nuevos criterios asociados a las cuentas
-
-                $id_criterio_uno = isset($request->get('cuenta')['id_criterio_uno']) ? $request->get('cuenta')['id_criterio_uno'] : '';
-                $id_criterio_dos = isset($request->get('cuenta')['id_criterio_dos']) ? $request->get('cuenta')['id_criterio_dos'] : '';
-                $id_criterio_tres = isset($request->get('cuenta')['id_criterio_tres']) ? $request->get('cuenta')['id_criterio_tres'] : '';
-                $id_criterio_cuatro = isset($request->get('cuenta')['id_criterio_cuatro']) ? $request->get('cuenta')['id_criterio_cuatro'] : '';
-                $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
-                if ($id_criterio_uno !== '') {
-                    $obj_criterio = $criterio_analisis_er->find($id_criterio_uno);
-                    if ($obj_criterio) {
-                        $cuenta_criterio = new CuentaCriterioAnalisis();
-                        $cuenta_criterio
-                            ->setIdCuenta($cuenta)
-                            ->setOrden(1)
-                            ->setIdCriterioAnalisis($obj_criterio);
-                        $em->persist($cuenta_criterio);
-                    }
-                }
-                if ($id_criterio_dos !== '') {
-                    $obj_criterio = $criterio_analisis_er->find($id_criterio_dos);
-                    if ($obj_criterio) {
-                        $cuenta_criterio = new CuentaCriterioAnalisis();
-                        $cuenta_criterio
-                            ->setIdCuenta($cuenta)
-                            ->setOrden(2)
-                            ->setIdCriterioAnalisis($obj_criterio);
-                        $em->persist($cuenta_criterio);
-                    }
-                }
-                if ($id_criterio_tres !== '') {
-                    $obj_criterio = $criterio_analisis_er->find($id_criterio_tres);
-                    if ($obj_criterio) {
-                        $cuenta_criterio = new CuentaCriterioAnalisis();
-                        $cuenta_criterio
-                            ->setIdCuenta($cuenta)
-                            ->setOrden(3)
-                            ->setIdCriterioAnalisis($obj_criterio);
-                        $em->persist($cuenta_criterio);
-                    }
-                }
-                if ($id_criterio_cuatro !== '') {
-                    $obj_criterio = $criterio_analisis_er->find($id_criterio_cuatro);
-                    if ($obj_criterio) {
-                        $cuenta_criterio = new CuentaCriterioAnalisis();
-                        $cuenta_criterio
-                            ->setIdCuenta($cuenta)
-                            ->setOrden(4)
-                            ->setIdCriterioAnalisis($obj_criterio);
-                        $em->persist($cuenta_criterio);
-                    }
-                }
-
-                $em->flush();
-                $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
-            } catch (FileException $exception) {
-                return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+        try {
+            $naturaleza = $request->get('cuenta')['deudora'];
+            $field_deudora = true;
+            $field_mixta = false;
+            if ($naturaleza == 0) {
+                $field_deudora = false;
+            } elseif ($naturaleza == 2) {
+                $field_deudora = false;
+                $field_mixta = true;
             }
+            $cuenta
+                ->setActivo(true)
+                ->setDeudora($field_deudora)
+                ->setMixta($field_mixta);
+            $em->persist($cuenta);
+            $cuenta_criterio_analisis_er = $em->getRepository(CuentaCriterioAnalisis::class);
+            //elimino los registros de criterios y cuentas de la tabla CuentaCriterioAnalisis
+            $arr_criterios_cuenta = $cuenta_criterio_analisis_er->findBy(array(
+                'id_cuenta' => $cuenta
+            ));
+            if (!empty($arr_criterios_cuenta)) {
+                foreach ($arr_criterios_cuenta as $obj_cuenta_criterio) {
+                    $em->remove($obj_cuenta_criterio);
+                }
+            }
+            //adiciono los nuevos criterios asociados a las cuentas
+
+            $id_criterio_uno = isset($request->get('cuenta')['id_criterio_uno']) ? $request->get('cuenta')['id_criterio_uno'] : '';
+            $id_criterio_dos = isset($request->get('cuenta')['id_criterio_dos']) ? $request->get('cuenta')['id_criterio_dos'] : '';
+            $id_criterio_tres = isset($request->get('cuenta')['id_criterio_tres']) ? $request->get('cuenta')['id_criterio_tres'] : '';
+            $id_criterio_cuatro = isset($request->get('cuenta')['id_criterio_cuatro']) ? $request->get('cuenta')['id_criterio_cuatro'] : '';
+            $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+            if ($id_criterio_uno !== '') {
+                $obj_criterio = $criterio_analisis_er->find($id_criterio_uno);
+                if ($obj_criterio) {
+                    $cuenta_criterio = new CuentaCriterioAnalisis();
+                    $cuenta_criterio
+                        ->setIdCuenta($cuenta)
+                        ->setOrden(1)
+                        ->setIdCriterioAnalisis($obj_criterio);
+                    $em->persist($cuenta_criterio);
+                }
+            }
+            if ($id_criterio_dos !== '') {
+                $obj_criterio = $criterio_analisis_er->find($id_criterio_dos);
+                if ($obj_criterio) {
+                    $cuenta_criterio = new CuentaCriterioAnalisis();
+                    $cuenta_criterio
+                        ->setIdCuenta($cuenta)
+                        ->setOrden(2)
+                        ->setIdCriterioAnalisis($obj_criterio);
+                    $em->persist($cuenta_criterio);
+                }
+            }
+            if ($id_criterio_tres !== '') {
+                $obj_criterio = $criterio_analisis_er->find($id_criterio_tres);
+                if ($obj_criterio) {
+                    $cuenta_criterio = new CuentaCriterioAnalisis();
+                    $cuenta_criterio
+                        ->setIdCuenta($cuenta)
+                        ->setOrden(3)
+                        ->setIdCriterioAnalisis($obj_criterio);
+                    $em->persist($cuenta_criterio);
+                }
+            }
+            if ($id_criterio_cuatro !== '') {
+                $obj_criterio = $criterio_analisis_er->find($id_criterio_cuatro);
+                if ($obj_criterio) {
+                    $cuenta_criterio = new CuentaCriterioAnalisis();
+                    $cuenta_criterio
+                        ->setIdCuenta($cuenta)
+                        ->setOrden(4)
+                        ->setIdCriterioAnalisis($obj_criterio);
+                    $em->persist($cuenta_criterio);
+                }
+            }
+
+            $em->flush();
+            $this->addFlash('success', "Cuenta actualizada satisfactoriamente");
+        } catch (FileException $exception) {
+            return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
+        }
 //        }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
         return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
@@ -390,19 +390,19 @@ class CuentaController extends AbstractController
         $cuenta_arr = $em->getRepository(Cuenta::class)->findAll();
         $cuenta_criterio_er = $em->getRepository(CuentaCriterioAnalisis::class);
         /** @var Cuenta $cuenta_obj */
-        foreach ($cuenta_arr as $cuenta_obj){
-            $arr_cuentas_criterios = $cuenta_criterio_er->findBy(['id_cuenta'=>$cuenta_obj]);
-            if (!empty($arr_cuentas_criterios)){
+        foreach ($cuenta_arr as $cuenta_obj) {
+            $arr_cuentas_criterios = $cuenta_criterio_er->findBy(['id_cuenta' => $cuenta_obj]);
+            if (!empty($arr_cuentas_criterios)) {
                 /** @var CuentaCriterioAnalisis $cuenta_criterio */
-                foreach ($arr_cuentas_criterios as $key=>$cuenta_criterio){
+                foreach ($arr_cuentas_criterios as $key => $cuenta_criterio) {
                     $cuenta_criterio
-                        ->setOrden($key+1);
+                        ->setOrden($key + 1);
                     $em->persist($cuenta_criterio);
                 }
             }
         }
         $em->flush();
-        $this->addFlash('success','Relaciones actualizadas satisfactoriamente');
+        $this->addFlash('success', 'Relaciones actualizadas satisfactoriamente');
         return $this->redirectToRoute('contabilidad_config_cuenta', ['page' => $request->get("page")]);
     }
 
@@ -475,7 +475,19 @@ class CuentaController extends AbstractController
     {
         $no_cuenta = AuxFunctions::getNro($nro);
         $respuesta = AuxFunctions::getCriterioByCuenta($no_cuenta, $em);
-        return new JsonResponse(['data' => $respuesta, 'success' => true]);
+
+        $id_cuenta = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => $no_cuenta, 'activo' => true])->getId();
+        $subcuentas = $em->getRepository(Subcuenta::class)->findBy(['id_cuenta' => $id_cuenta, 'activo' => true]);
+        $row = [];
+        foreach ($subcuentas as $item) {
+            /**@var $item Subcuenta** */
+            $row [] = array(
+                'id' => $item->getId(),
+                'nro' => $item->getNroSubcuenta(),
+                'descripcion' => $item->getNroSubcuenta() . ' - ' . $item->getDescripcion(),
+            );
+        }
+        return new JsonResponse(['data' => $respuesta, 'success' => true, 'subcuentas' => $row]);
     }
 
 }
