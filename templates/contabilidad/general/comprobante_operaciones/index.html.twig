@@ -1,0 +1,393 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+
+            <div class="container">
+                <div class="row mt-0 p-0">
+                    <div class="col-10">
+                        <h1 class="text-reporte text-right mr-0">Comprobante de Operaciones</h1>
+                    </div>
+                    <div class="col-2 mt-0 px-0 d-flex align-items-center">
+                        <span class="h5 text-light m-0 mr-2">#</span>
+                        {#<input type="number" id="select_nros" value="{{ nro_factura }}" class="w-25">#}
+                        {{ form_widget(form.nro_comprobante) }}
+                    </div>
+                </div>
+            </div>
+
+            {# --------- Datos de la venta --------------#}
+            <div class="card-body">
+                {{ form_start(form.tipo_comprobante,{'attr': {'class': 'text-left','id':'form','method':'POST'}}) }}
+                <div class="row mt-0 p-0">
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.tipo_comprobante) }}
+                        {{ form_widget(form.tipo_comprobante) }}
+                    </div>
+                    <div class="col-8 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.documento) }}
+                        {{ form_widget(form.documento) }}
+                    </div>
+                </div>
+                <div class="mt-0 pr-0 form-group input-group input-group-sm d-block">
+                    {{ form_label(form.explicacion) }}
+                    {{ form_widget(form.explicacion) }}
+                </div>
+                {{ form_end(form.tipo_comprobante) }}
+
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Operaciones</h3>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+                {{ form_start(form.cuentas_comprobantes, {'attr':{'id':'form_cuentas_comprobante','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0" id="row-id-acreedora">
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.cuentas_comprobantes.nro_cuenta) }}
+                        {{ form_widget(form.cuentas_comprobantes.nro_cuenta) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.cuentas_comprobantes.nro_subcuenta) }}
+                        {{ form_widget(form.cuentas_comprobantes.nro_subcuenta) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0" id="row-id">
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.centro_costo) }}
+                        {{ form_widget(form.cuentas_comprobantes.centro_costo,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.orden_trabajo) }}
+                        {{ form_widget(form.cuentas_comprobantes.orden_trabajo,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.elemento_gasto) }}
+                        {{ form_widget(form.cuentas_comprobantes.elemento_gasto,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.expediente) }}
+                        {{ form_widget(form.cuentas_comprobantes.expediente,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.almacen) }}
+                        {{ form_widget(form.cuentas_comprobantes.almacen,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.unidad) }}
+                        {{ form_widget(form.cuentas_comprobantes.unidad,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.cliente) }}
+                        {{ form_widget(form.cuentas_comprobantes.cliente,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                        {{ form_label(form.cuentas_comprobantes.proveedor) }}
+                        {{ form_widget(form.cuentas_comprobantes.proveedor,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0" id="row-id-acreedora">
+                    <div class="col-5 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.cuentas_comprobantes.debito) }}
+                        {{ form_widget(form.cuentas_comprobantes.debito) }}
+                    </div>
+                    <div class="col-5 mt-0 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.cuentas_comprobantes.credito) }}
+                        {{ form_widget(form.cuentas_comprobantes.credito) }}
+                    </div>
+                    <div class="col-2 mt-4 pl-3 pr-3 form-group input-group input-group-sm d-block">
+                        <button class="btn btn-secondary btn-sm ml-auto mr-3" type="button"
+                                id="btnAplicarMercancia">
+                            ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                {{ form_end(form.cuentas_comprobantes) }}
+
+                <div class="mt-3">
+                    <table class="table-small-rows table table-hover text-light">
+                        <thead class="thead-dark">
+                        <th style="width: 85px;">Cuenta</th>
+                        <th style="width: 50px;">Subcuenta</th>
+                        <th style="width: 85px;">Análisis 1</th>
+                        <th style="width: 85px;">Análisis 2</th>
+                        <th style="width: 85px;">Análisis 3</th>
+                        <th style="width: 85px;">Análisis 4</th>
+                        <th style="width: 85px;">Débito</th>
+                        <th style="width: 85px;">Crédito</th>
+                        <th style="width: 45px;"><i class="fa fa-minus-circle text-danger"></i></th>
+                        </thead>
+                        <tbody id="rows_operaciones">
+                        </tbody>
+                    </table>
+                    <table class="table-small-rows table table-hover text-light">
+                        <thead>
+                        <th style="width: 85px;">Total</th>
+                        <th style="width: 50px;"></th>
+                        <th style="width: 85px;"></th>
+                        <th style="width: 85px;"></th>
+                        <th style="width: 85px;"></th>
+                        <th style="width: 85px;"></th>
+                        <th style="width: 85px;" class="text-right font-weight-bold"><label  id="total_debito"></label></th>
+                        <th style="width: 85px;" class="text-right font-weight-bold"><label id="total_credito"></label></th>
+                        <th style="width: 45px;"></th>
+                        </thead>
+                        <tbody id="rows_operaciones">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a href="{{ url('general') }}"
+                       class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button type="button" class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Vale()">
+                        imprimir
+                    </button>
+                </div>
+                <div class="ml-2">
+                    <button type="button" class='my-0 btn btn-secondary' id="btnSubmitFactura">Facturar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#total_credito').text(0)
+        $('#total_debito').text(0)
+        const form_cuentas_comprobante = $('#form_cuentas_comprobante')
+        /** variables  */
+        let criterios = [];
+        let lista_cuentas_comprobante = []
+        let mercancia = [];
+        let debito_total = 0;
+        let credito_total = 0;
+        let importe_total = 0
+        let cbx_centro_costo = $('#comprobante_operaciones_cuentas_comprobantes_centro_costo')
+        let cbx_orden_trabajo = $('#comprobante_operaciones_cuentas_comprobantes_orden_trabajo')
+        let cbx_elemento_gasto = $('#comprobante_operaciones_cuentas_comprobantes_elemento_gasto')
+        let cbx_expediente = $('#comprobante_operaciones_cuentas_comprobantes_expediente')
+        let cbx_almacen = $('#comprobante_operaciones_cuentas_comprobantes_almacen')
+        let cbx_unidad = $('#comprobante_operaciones_cuentas_comprobantes_unidad')
+        let cbx_cliente = $('#comprobante_operaciones_cuentas_comprobantes_cliente')
+        let cbx_proveedor = $('#comprobante_operaciones_cuentas_comprobantes_proveedor')
+        $('#comprobante_operaciones_cuentas_comprobantes_nro_cuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
+        function hiddenParents() {
+            cbx_centro_costo.parent().hide()
+            cbx_orden_trabajo.parent().hide()
+            cbx_elemento_gasto.parent().hide()
+            cbx_expediente.parent().hide()
+            cbx_almacen.parent().hide()
+            cbx_unidad.parent().hide()
+            cbx_cliente.parent().hide()
+            cbx_proveedor.parent().hide()
+
+            $('#comprobante_operaciones_cuentas_comprobantes_centro_costo').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_orden_trabajo').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_elemento_gasto').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_expediente').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_almacen').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_unidad').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_cliente').val(0)
+            $('#comprobante_operaciones_cuentas_comprobantes_proveedor').val(0)
+        }
+
+        hiddenParents()
+        form_cuentas_comprobante.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'comprobante_operaciones[cuentas_comprobantes][nro_cuenta]': "required",
+                'comprobante_operaciones[cuentas_comprobantes][nro_subcuenta]': "required",
+                'comprobante_operaciones[cuentas_comprobantes][centro_costo]': "required",
+                'comprobante_operaciones[cuentas_comprobantes][orden_trabajo]': "required",
+                'comprobante_operaciones[cuentas_comprobantes][elemento_gasto]': "required",
+                'comprobante_operaciones[cuentas_comprobantes][expediente]': "required",
+            },
+            messages: {
+                'comprobante_operaciones[cuentas_comprobantes][nro_cuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[cuentas_comprobantes][nro_subcuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[cuentas_comprobantes][centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[cuentas_comprobantes][orden_trabajo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[cuentas_comprobantes][elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[cuentas_comprobantes][expediente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+            }
+        })
+        $('#comprobante_operaciones_cuentas_comprobantes_nro_cuenta').on('change', function () {
+            miniLoadin.show({msg: 'Cargando criterios de análisis...', target: '#row-id-acreedora'})
+            $('#comprobante_operaciones_cuentas_comprobantes_nro_subcuenta').find('option').remove()
+            $('#comprobante_operaciones_cuentas_comprobantes_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            $.ajax({
+                url: '/contabilidad/config/cuenta/get-criterios-subcuentas/' + $(this).val(),
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        hiddenParents()
+                        criterios = result.data
+                        result.data.forEach(data => {
+                            switch (data) {
+                                case "CCT":
+                                    cbx_centro_costo.parent().show()
+                                    break
+                                case "EG":
+                                    cbx_elemento_gasto.parent().show()
+                                    break
+                                case "EXP":
+                                    cbx_expediente.parent().show()
+                                    break
+                                case "OT":
+                                    cbx_orden_trabajo.parent().show()
+                                    break
+                                case "ALM":
+                                    cbx_almacen.parent().show()
+                                    break
+                                case "UNID":
+                                    cbx_unidad.parent().show()
+                                    break
+                                case "CLIPRO":
+                                    cbx_proveedor.parent().show()
+                                    cbx_cliente.parent().show()
+                                    break
+                            }
+                        })
+                        result.subcuentas.forEach(
+                            el => $('#comprobante_operaciones_cuentas_comprobantes_nro_subcuenta').append(`<option value = "${el.nro}">${el.descripcion} </option>`)
+                        )
+                        miniLoadin.close()
+                    }
+
+
+                }
+            })
+        })
+
+        $('#btnAplicarMercancia').on('click', function () {
+            let debito = $('#comprobante_operaciones_cuentas_comprobantes_debito').val()
+            let credito = $('#comprobante_operaciones_cuentas_comprobantes_credito').val()
+            if (form_cuentas_comprobante.valid() && (debito > 0 || credito > 0)) {
+                let cuenta = $('#comprobante_operaciones_cuentas_comprobantes_nro_cuenta option:selected').val()
+                let text_cuenta = $('#comprobante_operaciones_cuentas_comprobantes_nro_cuenta option:selected').text()
+                let subcuenta = $('#comprobante_operaciones_cuentas_comprobantes_nro_subcuenta option:selected').val()
+
+                let array_cuenta = text_cuenta.split(' - ');
+
+                let centro_costo = $('#comprobante_operaciones_cuentas_comprobantes_centro_costo option:selected').val()
+                let orden_tabajo = $('#comprobante_operaciones_cuentas_comprobantes_orden_trabajo option:selected').val()
+                let elemento_gasto = $('#comprobante_operaciones_cuentas_comprobantes_elemento_gasto option:selected').val()
+                let expediente = $('#comprobante_operaciones_cuentas_comprobantes_expediente option:selected').val()
+                let almacen = $('#comprobante_operaciones_cuentas_comprobantes_almacen option:selected').val()
+                let unidad = $('#comprobante_operaciones_cuentas_comprobantes_unidad option:selected').val()
+                let cliente = $('#comprobante_operaciones_cuentas_comprobantes_cliente option:selected').val()
+                let proveedor = $('#comprobante_operaciones_cuentas_comprobantes_proveedor option:selected').val()
+                let index = lista_cuentas_comprobante.length
+                /***Listado de elementos adicionados en la tabla */
+                lista_cuentas_comprobante.push({
+                    index,
+                    cuenta,
+                    subcuenta,
+                    centro_costo,
+                    orden_tabajo,
+                    elemento_gasto,
+                    expediente,
+                    almacen,
+                    unidad,
+                    cliente,
+                    proveedor,
+                    debito,
+                    credito
+                })
+                let arr = [];
+                let values_criterios = [];
+                if (criterios.length > 0) {
+                    criterios.forEach(data => {
+                        switch (data) {
+                            case "CCT":
+                                arr = $('#comprobante_operaciones_cuentas_comprobantes_centro_costo option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "EG":
+                                arr = $('#comprobante_operaciones_cuentas_comprobantes_elemento_gasto option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "EXP":
+                                arr = $('#comprobante_operaciones_cuentas_comprobantes_expediente option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "OT":
+                                arr = $('#comprobante_operaciones_cuentas_comprobantes_orden_trabajo option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "ALM":
+                                arr = $('#comprobante_operaciones_cuentas_comprobantes_almacen option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "UNID":
+                                arr = $('#comprobante_operaciones_cuentas_comprobantes_unidad option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "CLIPRO":
+                                if ($('#comprobante_operaciones_cuentas_comprobantes_cliente option:selected').val() > 0) {
+                                    arr = $('#comprobante_operaciones_cuentas_comprobantes_cliente option:selected').text().split(' - ')
+                                    values_criterios[values_criterios.length] = arr[0]
+                                } else {
+                                    if ($('#comprobante_operaciones_cuentas_comprobantes_proveedor option:selected').val() > 0) {
+                                        arr = $('#comprobante_operaciones_cuentas_comprobantes_proveedor option:selected').text().split(' - ')
+                                        values_criterios[values_criterios.length] =  arr[0]
+                                    }
+                                }
+                                break
+                        }
+                    })
+                }
+                let debito_mostrar = Number.parseFloat(debito).toFixed(2)
+                let credito_mostrar = Number.parseFloat(credito).toFixed(2)
+                $('#rows_operaciones').append(`<tr>
+                        <td style="font-weight:400; width: 85px;"> ${array_cuenta[0]}</td>
+                        <td style="font-weight:400; width: 85px;"> ${subcuenta}</td>
+                        <td style="font-weight:400; width: 85px;" > ${values_criterios.length > 0 ? values_criterios[0] : ''}</td>
+                        <td style="font-weight:400; width: 85px;" > ${values_criterios.length > 1 ? values_criterios[1] : ''}</td>
+                        <td style="font-weight:400; width: 85px;" > ${values_criterios.length > 2 ? values_criterios[2] : ''}</td>
+                        <td style="font-weight:400; width: 85px;" > ${values_criterios.length > 3 ? values_criterios[3] : ''}</td>
+                        <td style="font-weight:400; width: 85px;" class="text-right" > ${debito_mostrar}</td>
+                        <td style="font-weight:400; width: 85px;" class="text-right"> ${credito_mostrar}</td>
+                        <td style="font-weight:400; width: 85px;" class="text-right" hidden> ${debito}</td>
+                        <td style="font-weight:400; width: 85px;" class="text-right" hidden> ${credito}</td>
+                        <td> <button type="button"
+                            class="btn ml-3 btn-outline-danger btn-sm borrar" title="Eliminar" index="${index}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td>
+                        `
+                );
+                debito_total += Number.parseFloat(debito)
+                credito_total += Number.parseFloat(credito)
+                $("#total_debito").text(debito_total.toFixed(2))
+                $("#total_credito").text(credito_total.toFixed(2))
+                $('#form_cuentas_comprobante')[0].reset()
+                hiddenParents()
+            }
+        })
+        $(document).on('click', '.borrar', function (event) {
+           event.preventDefault();
+            const lista = lista_cuentas_comprobante.find(e => e.index == $(this).attr('index'))
+            debito_total -= Number.parseFloat(lista.debito)
+            credito_total -= Number.parseFloat(lista.credito)
+            $("#total_debito").text(debito_total.toFixed(2))
+            $("#total_credito").text(credito_total.toFixed(2))
+            lista_cuentas_comprobante = lista_cuentas_comprobante.filter(e => e.index != $(this).attr('index'))
+            $(this).closest('tr').remove()
+        })
+
+    </script>
+{% endblock %}

@@ -118,29 +118,31 @@ class MercanciaController extends AbstractController
         $row_producto = [];
         if (!empty($mercancia_arr)) {
             foreach ($mercancia_arr as $mercancia_obj) {
-                $row_mercancia[] = array(
-                    'codigo' => $mercancia_obj->getCodigo(),
-                    'descripcion' => $mercancia_obj->getDescripcion(),
-                    'unidad_medida' => strtoupper($mercancia_obj->getIdUnidadMedida()->getAbreviatura()),
-                    'existencia' => $mercancia_obj->getExistencia(),
-                    'precio' => number_format(($mercancia_obj->getImporte() / $mercancia_obj->getExistencia()), 5, '.', ''),
-                    'importe' => number_format($mercancia_obj->getImporte(), 2)
-                );
+                if ($mercancia_obj->getExistencia() > 0)
+                    $row_mercancia[] = array(
+                        'codigo' => $mercancia_obj->getCodigo(),
+                        'descripcion' => $mercancia_obj->getDescripcion(),
+                        'unidad_medida' => strtoupper($mercancia_obj->getIdUnidadMedida()->getAbreviatura()),
+                        'existencia' => $mercancia_obj->getExistencia(),
+                        'precio' => number_format(($mercancia_obj->getImporte() / $mercancia_obj->getExistencia()), 5, '.', ''),
+                        'importe' => number_format($mercancia_obj->getImporte(), 2)
+                    );
                 $total += floatval($mercancia_obj->getImporte());
             }
 //            $total += floatval($mercancia_obj->getImporte());
         }
         if (!empty($producto_arr)) {
             foreach ($producto_arr as $producto_obj) {
-                /**@var $producto_obj Producto* */
-                $row_producto[] = array(
-                    'codigo' => $producto_obj->getCodigo(),
-                    'descripcion' => $producto_obj->getDescripcion(),
-                    'unidad_medida' => $producto_obj->getIdUnidadMedida()->getNombre(),
-                    'existencia' => $producto_obj->getExistencia(),
-                    'precio' => number_format(($producto_obj->getImporte() / $producto_obj->getExistencia()), 5, '.', ''),
-                    'importe' => number_format($producto_obj->getImporte(), 2)
-                );
+                if ($producto_obj->getExistencia() > 0)
+                    /**@var $producto_obj Producto* */
+                    $row_producto[] = array(
+                        'codigo' => $producto_obj->getCodigo(),
+                        'descripcion' => $producto_obj->getDescripcion(),
+                        'unidad_medida' => $producto_obj->getIdUnidadMedida()->getNombre(),
+                        'existencia' => $producto_obj->getExistencia(),
+                        'precio' => number_format(($producto_obj->getImporte() / $producto_obj->getExistencia()), 5, '.', ''),
+                        'importe' => number_format($producto_obj->getImporte(), 2)
+                    );
                 $total += floatval($producto_obj->getImporte());
             }
         }

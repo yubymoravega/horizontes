@@ -96,7 +96,7 @@ class FacturaController extends AbstractController
                 if (!in_array($mercancia_obj->id_almacen, $arr_unique)) {
                     $arr_unique[count($arr_unique)] = $mercancia_obj->id_almacen;
                 }
-                if($mercancia_obj->tipo == '1'){
+                if ($mercancia_obj->tipo == '1') {
                     $elemento = $mercanciaRepository->findOneBy([
                         'codigo' => $mercancia_obj->codigo,
                         'id_amlacen' => $mercancia_obj->id_almacen,
@@ -171,9 +171,11 @@ class FacturaController extends AbstractController
                         /** Rebajo en almacen el importe y la cantidad, dando paso a la nueva existencia*/
                         $existencia_anterior = floatval($elemento->getExistencia());
                         $importe_anterior = floatval($elemento->getImporte());
-                        $precio = round(($importe_anterior / $existencia_anterior), 6);
+                        $precio = $importe_anterior / $existencia_anterior;
                         $elemento->setImporte($precio * floatval($elemento->getExistencia() - floatval($mercancia_obj->cantidad)));
                         $elemento->setExistencia($elemento->getExistencia() - floatval($mercancia_obj->cantidad));
+                        if ($elemento->getExistencia() - floatval($mercancia_obj->cantidad) == 0)
+                            $elemento->setActivo(false);
                         $em->persist($elemento);
 
                         /** Calcular el importe total del codumento**/
@@ -451,13 +453,18 @@ class FacturaController extends AbstractController
     /**
      * @Route("/print-current", name="print_factura_current" , methods={"POST","GET"})
      */
-    public function printCurrent(Request $request, FacturaRepository $facturaRepository,
-                                 EmpleadoRepository $empleadoRepository, MercanciaRepository $mercanciaRepository)
+    public function printCurrent(EntityManagerInterface $em, Request $request, FacturaRepository $facturaRepository,
+                                 EmpleadoRepository $empleadoRepository, ProductoRepository $productoRepository,
+                                 MercanciaRepository $mercanciaRepository)
     {
 
         $mercancias = json_decode($request->get('mercancias'));
         $factura = $request->get('datos');
-
+        $arr = explode(' - ', $factura['cliente']);
+        $factura['codigo_cliente'] = $arr[0];
+        $factura['cliente'] = $arr[1];
+        if ($factura['contrato'] == ' --- seleccine --- ')
+            $factura['contrato'] = '';
         // validar que la factura exista
         $unidad = $empleadoRepository->findOneBy(['id_usuario' => $this->getUser()])->getIdUnidad();
         if ($factura['nro_factura'] > $facturaRepository->generateNroFactura($unidad)) {
@@ -466,9 +473,20 @@ class FacturaController extends AbstractController
         }
         $importe_total = $factura['importe_total'];
         $mercancia_arr = [];
-
+//dd($mercancias);
         foreach ($mercancias as $mercancia) {
-            $mercancia_obj = $mercanciaRepository->findOneBy(['codigo' => $mercancia->codigo]);
+            if ($mercancia->tipo == '1')
+                $mercancia_obj = $mercanciaRepository->findOneBy([
+                    'codigo' => $mercancia->codigo,
+                    'id_amlacen' => $mercancia->id_almacen,
+                    'activo' => true
+                ]);
+            else
+                $mercancia_obj = $productoRepository->findOneBy([
+                    'codigo' => $mercancia->codigo,
+                    'id_amlacen' => $mercancia->id_almacen,
+                    'activo' => true
+                ]);
             array_push($mercancia_arr,
                 [
                     'id' => '',
@@ -482,10 +500,19 @@ class FacturaController extends AbstractController
 
                 ]);
         }
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_unidad' => $unidad,
+            'id_usuario' => $this->getUser()]);
+
         return $this->render('contabilidad/venta/factura/print.html.twig', [
             'factura' => $factura,
             'mercancias' => $mercancia_arr,
-            'importe_total' => floatval($importe_total)
+            'importe_total' => floatval($importe_total),
+            'suministrador' => $unidad->getNombre(),
+            'cod_suministrador' => $unidad->getCodigo(),
+            'usuario' => $empleado->getNombre(),
+            'cargo' => $empleado->getIdCargo()->getNombre()
+
         ]);
     }
 
@@ -538,6 +565,7 @@ class FacturaController extends AbstractController
 
         $tipo = $request->get('tipo');
         $codigo = $request->get('codigo');
+        $fecha = $request->get('fecha');
         if ($request->get('codigo') == '' || !isset($codigo)) {
             $mercancia_producto_arr = $tipo == 1
                 ? $mercanciaRepository->findBy(['activo' => true])
@@ -548,23 +576,30 @@ class FacturaController extends AbstractController
                 : $productoRepository->findBy(['codigo' => $codigo, 'activo' => true]);
         }
         $row_data = [];
+
         foreach ($mercancia_producto_arr as $d) {
-            if (in_array($d->getIdAmlacen()->getId(), $row_almacenes))
+            if (in_array($d->getIdAmlacen()->getId(), $row_almacenes)) {
                 if ($d->getIdAmlacen()->getDescripcion() == 'Almacén Mercancias para la Venta'
-                    || $d->getIdAmlacen()->getDescripcion() == 'Almacén de Productos Terminados')
-                    if ($d->getExistencia() > 0)
-                        $row_data[] = array(
-                            'id' => $d->getId(),
-                            'codigo' => $d->getCodigo(),
-                            'descripcion' => $d->getDescripcion(),
-                            'um' => $d->getIdUnidadMedida()->getAbreviatura(),
-                            'existencia' => $d->getExistencia(),
-                            'nro_cuenta_acreedora' => $d->getNroCuentaAcreedora(),
-                            'nro_subcuenta_acreedora' => $d->getNroSubcuentaAcreedora(),
-                            'cuenta' => $d->getCuenta(),
-                            'subcuenta' => $d->getNroSubcuentaInventario(),
-                            'id_almacen' => $d->getIdAmlacen()->getId()
-                        );
+                    || $d->getIdAmlacen()->getDescripcion() == 'Almacén de Productos Terminados') {
+                    $fecha_contable = AuxFunctions::getDateToClose($em, $d->getIdAmlacen()->getId());
+                    if ($fecha == $fecha_contable) {
+                        if ($d->getExistencia() > 0) {
+                            $row_data[] = array(
+                                'id' => $d->getId(),
+                                'codigo' => $d->getCodigo(),
+                                'descripcion' => $d->getDescripcion(),
+                                'um' => $d->getIdUnidadMedida()->getAbreviatura(),
+                                'existencia' => $d->getExistencia(),
+                                'nro_cuenta_acreedora' => $d->getNroCuentaAcreedora(),
+                                'nro_subcuenta_acreedora' => $d->getNroSubcuentaAcreedora(),
+                                'cuenta' => $d->getCuenta(),
+                                'subcuenta' => $d->getNroSubcuentaInventario(),
+                                'id_almacen' => $d->getIdAmlacen()->getId()
+                            );
+                        }
+                    }
+                }
+            }
         }
         return new JsonResponse(['success' => true, 'data' => $row_data]);
     }

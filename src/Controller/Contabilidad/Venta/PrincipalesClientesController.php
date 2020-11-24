@@ -54,7 +54,7 @@ class PrincipalesClientesController extends AbstractController
                 }
             }
             $clientes[]=array(
-                'cliente'=>$this->getCliente($tipo,$id_cliente,$em),
+                'cliente'=>$this->getCliente($id_tipo,$id_cliente,$em),
                 'tipo_cliente'=>$this->getTipoCliente($id_tipo),
                 'cant_facturas'=>$cant_facturas,
                 'importe'=>number_format($importe_total,2),

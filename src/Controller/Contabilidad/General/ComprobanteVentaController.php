@@ -3,16 +3,24 @@
 namespace App\Controller\Contabilidad\General;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Cliente;
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\ElementoGasto;
+use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\General\FacturasComprobante;
+use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\ComprobanteCierre;
 use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Producto;
+use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\Contabilidad\Venta\MovimientoVenta;
 use App\Form\Contabilidad\General\ComprobanteVentaType;
@@ -59,6 +67,146 @@ class ComprobanteVentaController extends AbstractController
     }
 
     /**
+     * @Route("/generar", name="contabilidad_general_comprobante_venta_generar", methods={"POST","GET"})
+     */
+    public function GenerarComprobante(EntityManagerInterface $em, Request $request)
+    {
+        /** @var Unidad $unidad */
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $facturas = $em->getRepository(Factura::class)->findBy([
+            'contabilizada' => true,
+            'activo' => true,
+            'anno' => Date('Y'),
+            'id_unidad' => $unidad
+        ]);
+        $facturas_contabiliazadas = $em->getRepository(FacturasComprobante::class)->findBy([
+            'anno' => Date('Y'),
+            'id_unidad' => $unidad
+        ]);
+        $arr_facturas = [];
+        $data = [];
+        $arr_ids = [];
+        /** @var FacturasComprobante $d */
+        foreach ($facturas_contabiliazadas as $d){
+            $arr_ids[count($arr_ids)]= $d->getIdFactura()->getId();
+        }
+        foreach ($facturas as $fac) {
+            if (!in_array($fac->getId(), $arr_ids))
+                $arr_facturas[] = $fac;
+        }
+        $movimiento_venta_er = $em->getRepository(MovimientoVenta::class);
+        /** @var Factura $factura */
+        $total_debito = 0;
+        $total_credito = 0;
+        $cliente_extero = $em->getRepository(ClienteContabilidad::class);
+        $cliente_interno = $em->getRepository(Unidad::class);
+        $persona_natural = $em->getRepository(Cliente::class);
+        foreach ($arr_facturas as $factura) {
+            $row = [];
+            $total_debito += $factura->getImporte();
+            $mes = $factura->getFechaFactura()->format('m');
+            $anno = $factura->getFechaFactura()->format('Y');
+            $nro_doc = 'FACT-' . $factura->getNroFactura();
+            /** Addiciono la factura con la cuenta de obligacion */
+            if ($factura->getTipoCliente() == 1) {
+                $cliente = $persona_natural->find($factura->getIdCliente())->getNombre();
+            } elseif ($factura->getTipoCliente() == 2) {
+                $cliente = $cliente_interno->find($factura->getIdCliente())->getCodigo();
+            } elseif ($factura->getTipoCliente() == 3) {
+                $cliente = $cliente_extero->find($factura->getIdCliente())->getCodigo();
+            }
+
+            $row[] = array(
+                'nro_doc' => $nro_doc,
+                'fecha' => $factura->getFechaFactura()->format('d/m/Y'),
+                'nro_cuenta' => $factura->getCuentaObligacion(),
+                'nro_subcuenta' => $factura->getSubcuentaObligacion(),
+                'analisis_1' => $cliente,
+                'value_1' => '',
+                'value_2' => '',
+                'value_3' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'mes' => $mes,
+                'anno' => $anno,
+                'debito' => number_format($factura->getImporte(), 2),
+                'credito' => ''
+            );
+            $arr_movimientos = $movimiento_venta_er->findBy(['id_factura' => $factura]);
+            $str_criterio = [];
+            /** @var MovimientoVenta $movimiento_venta */
+            foreach ($arr_movimientos as $movimiento_venta) {
+                $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora() . '-' .
+                    $movimiento_venta->getIdCentroCostoAcreedor() . '-' . $movimiento_venta->getIdOrdenTrabajoAcreedor() . '' .
+                    $movimiento_venta->getIdElementoGastoAcreedor() . '-' . $movimiento_venta->getIdExpedienteAcreedor();
+                if (!in_array($srt_movimiento, $str_criterio))
+                    $str_criterio[count($str_criterio)] = $srt_movimiento;
+            }
+            $total = 0;
+            foreach ($str_criterio as $criterio) {
+                $credito = 0;
+                foreach ($arr_movimientos as $movimiento_venta) {
+                    $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora() . '-' .
+                        $movimiento_venta->getIdCentroCostoAcreedor() . '-' . $movimiento_venta->getIdOrdenTrabajoAcreedor() . '' .
+                        $movimiento_venta->getIdElementoGastoAcreedor() . '-' . $movimiento_venta->getIdExpedienteAcreedor();
+                    if ($criterio == $srt_movimiento) {
+                        $credito += ($movimiento_venta->getCantidad() * $movimiento_venta->getPrecio());
+                    }
+                }
+                $total += $credito;
+                $arr_criterios = explode('-', $criterio);
+                /** Voy adicionando los mivimientos de la venta con las cuentas acreedoras */
+                $row[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $arr_criterios[0],
+                    'nro_subcuenta' => $arr_criterios[1],
+                    'analisis_1' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes' => $mes,
+                    'anno' => $anno,
+                    'debito' => '',
+                    'credito' => number_format($credito, 2)
+                );
+            }
+            $row[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => '',
+                'nro_subcuenta' => '',
+                'analisis_1' => '',
+                'value_1' => '',
+                'value_2' => '',
+                'value_3' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'mes' => '',
+                'anno' => '',
+                'debito' => number_format($total, 2),
+                'credito' => number_format($total, 2)
+            );
+            $data [] = array(
+                'nro_doc' => $nro_doc,
+                'datos' => $row
+            );
+        }
+
+        return $this->render('contabilidad/general/comprobante_venta/comprobante.html.twig', [
+            'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
+            'fecha' => Date('d-m-Y'),
+            'datos' => $data,
+            'total_debito' => number_format($total_debito, 2),
+            'total_credito' => number_format($total_debito, 2),
+            'debito' => $total_debito,
+            'credito' => $total_debito
+        ]);
+    }
+
+    /**
      * @Route("/getListadoMercancias/{id}", name="contabilidad_general_getListado", methods={"POST"})
      */
     public function getMercancias(EntityManagerInterface $em, $id)
@@ -91,12 +239,6 @@ class ComprobanteVentaController extends AbstractController
         $orden_trabajo_deudora = $comprobante_venta['orden_trabajo_deudora'];
         $elemento_gasto_deudora = $comprobante_venta['elemento_gasto_deudora'];
         $expediente_deudora = $comprobante_venta['expediente_deudora'];
-        $cuenta_nominal_acreedora = $comprobante_venta['cuenta_nominal_acreedora'];
-        $subcuenta_nominal_acreedora = $comprobante_venta['subcuenta_nominal_acreedora'];
-        $centro_costo_acreedora = $comprobante_venta['centro_costo_acreedora'];
-        $orden_trabajo_acreedora = $comprobante_venta['orden_trabajo_acreedora'];
-        $elemento_gasto_acreedora = $comprobante_venta['elemento_gasto_acreedora'];
-        $expediente_acreedora = $comprobante_venta['expediente_acreedora'];
         $id_factura = $request->get('id_factura');
 
         $list_mercancia = json_decode($comprobante_venta['list_mercancia'], true);
@@ -117,25 +259,32 @@ class ComprobanteVentaController extends AbstractController
         $factura
             ->setCuentaObligacion($cuenta_obligacion_deudora)
             ->setSubcuentaObligacion($subcuenta_obligacion_deudora)
-            ->setCuentaAcreedora($cuenta_nominal_acreedora)
             ->setContabilizada(true)
-            ->setSubcuentaAcreedora($subcuenta_nominal_acreedora)
             ->setIdCentroCosto($centro_costo_er->find($centro_costo_deudora) ? $centro_costo_er->find($centro_costo_deudora) : null)
-            ->setIdCentroCostoAcreedor($centro_costo_er->find($centro_costo_acreedora) ? $centro_costo_er->find($centro_costo_acreedora) : null)
             ->setIdOrdenTrabajo($orden_trabajo_er->find($orden_trabajo_deudora) ? $orden_trabajo_er->find($orden_trabajo_deudora) : null)
-            ->setIdOrdenTrabajoAcreedor($orden_trabajo_er->find($orden_trabajo_acreedora) ? $orden_trabajo_er->find($orden_trabajo_acreedora) : null)
             ->setIdElementoGasto($elemento_gasto_er->find($elemento_gasto_deudora) ? $elemento_gasto_er->find($elemento_gasto_deudora) : null)
-            ->setIdElementoGastoAcreedor($elemento_gasto_er->find($elemento_gasto_acreedora) ? $elemento_gasto_er->find($elemento_gasto_acreedora) : null)
-            ->setIdExpediente($expediente_er->find($expediente_deudora) ? $expediente_er->find($expediente_deudora) : null)
-            ->setIdExpedienteAcreedor($expediente_er->find($expediente_acreedora) ? $expediente_er->find($expediente_acreedora) : null);
+            ->setIdExpediente($expediente_er->find($expediente_deudora) ? $expediente_er->find($expediente_deudora) : null);
         $em->persist($factura);
         foreach ($list_mercancia as $mercancias) {
+            $cuenta_nominal_acreedora = $mercancias['cuenta_nominal_acreedora'];
+            $subcuenta_nominal_acreedora = $mercancias['subcuenta_nominal_acreedora'];
+            $centro_costo_acreedora = $mercancias['centro_costo_acreedora'];
+            $orden_trabajo_acreedora = $mercancias['orden_tabajo_acreedora'];
+            $elemento_gasto_acreedora = $mercancias['elemento_gasto_acreedora'];
+            $expediente_acreedora = $mercancias['expediente_acreedora'];
+
             /** @var MovimientoVenta $movimiento_venta */
             $movimiento_venta = $movimiento_venta_er->find($mercancias['id_movimiento_venta']);
             if ($movimiento_venta) {
                 /** 2. actualizo el movimiento de venta***/
                 $movimiento_venta
                     ->setCuenta($mercancias['cuenta_seleccionada'])
+                    ->setCuentaAcreedora($cuenta_nominal_acreedora)
+                    ->setSubcuentaAcreedora($subcuenta_nominal_acreedora)
+                    ->setIdElementoGastoAcreedor($elemento_gasto_er->find($elemento_gasto_acreedora) ? $elemento_gasto_er->find($elemento_gasto_acreedora) : null)
+                    ->setIdCentroCostoAcreedor($centro_costo_er->find($centro_costo_acreedora) ? $centro_costo_er->find($centro_costo_acreedora) : null)
+                    ->setIdOrdenTrabajoAcreedor($orden_trabajo_er->find($orden_trabajo_acreedora) ? $orden_trabajo_er->find($orden_trabajo_acreedora) : null)
+                    ->setIdExpedienteAcreedor($expediente_er->find($expediente_acreedora) ? $expediente_er->find($expediente_acreedora) : null)
                     ->setNroSubcuentaDeudora($mercancias['subcuenta_seleccionada']);
                 $em->persist($movimiento_venta);
             }
@@ -146,7 +295,7 @@ class ComprobanteVentaController extends AbstractController
                 $obj_mercancia = $mercancia_er->findOneBy([
                     'id_amlacen' => $movimiento_venta->getIdAlmacen(),
                     'codigo' => $movimiento_venta->getCodigo(),
-                    'activo' => true
+//                    'activo' => true
                 ]);
                 /** @var MovimientoMercancia $obj_movimiento_mercancia */
                 $obj_movimiento_mercancia = $movimiento_mercnacia_er->findOneBy([
@@ -173,7 +322,7 @@ class ComprobanteVentaController extends AbstractController
                 $obj_producto = $producto_er->findOneBy([
                     'id_amlacen' => $movimiento_venta->getIdAlmacen(),
                     'codigo' => $movimiento_venta->getCodigo(),
-                    'activo' => true
+//                    'activo' => true
                 ]);
                 /** @var MovimientoProducto $obj_movimiento_producto */
                 $obj_movimiento_producto = $movimiento_producto_er->findOneBy([
@@ -198,5 +347,74 @@ class ComprobanteVentaController extends AbstractController
         $em->flush();
         $this->addFlash('success', 'Factura contabilizada satisfactoriamente.');
         return new JsonResponse(['success' => true]);
+    }
+
+    /**
+     * @Route("/save", name="contabilidad_general_comprobante_venta_guardar")
+     */
+    public function save(EntityManagerInterface $em, Request $request)
+    {
+        $observacion = $request->get('observacion');
+        $debito = $request->get('debito');
+        $credito = $request->get('credito');
+
+        /** @var Unidad $obj_unidad */
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $fecha = Date('Y-m-d');
+        $arr_fecha = explode('-', $fecha);
+        $year_ = intval($arr_fecha[0]);
+
+        $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+            'id_unidad' => $obj_unidad,
+            'anno' => $year_
+        ));
+        $nro_consecutivo = count($arr_registros) + 1;
+
+        $new_registro = new RegistroComprobantes();
+        $new_registro
+            ->setDescripcion($observacion)
+            ->setIdUsuario($this->getUser())
+            ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+            ->setAnno($year_)
+            ->setTipo(2)
+            ->setCredito(floatval($credito))
+            ->setDebito(floatval($debito))
+            ->setIdTipoComprobante($em->getRepository(TipoComprobante::class)->find(2))
+            ->setIdUnidad($obj_unidad)
+            ->setNroConsecutivo($nro_consecutivo);
+        $em->persist($new_registro);
+
+        $facturas = $em->getRepository(Factura::class)->findBy([
+            'contabilizada' => true,
+            'activo' => true,
+            'anno' => Date('Y'),
+            'id_unidad' => $obj_unidad
+        ]);
+        $facturas_comprobante = $em->getRepository(FacturasComprobante::class)->findBy([
+            'anno' => Date('Y'),
+            'id_unidad' => $obj_unidad
+        ]);
+        $fact = [];
+        /** @var FacturasComprobante $d */
+        foreach ($facturas_comprobante as $d){
+            $fact[count($fact)]= $d->getIdFactura()->getId();
+        }
+        foreach ($facturas as $fac) {
+            if (!in_array($fac->getId(), $fact)){
+                $fact_comp = new FacturasComprobante();
+                $fact_comp
+                    ->setIdFactura($fac)
+                    ->setIdUnidad($obj_unidad)
+                    ->setAnno(Date('Y'))
+                    ->setIdComprobante($new_registro);
+                $em->persist($fact_comp);
+            }
+        }
+        $em->flush();
+        return $this->render('contabilidad/general/comprobante_venta/success.html.twig', [
+            'controller_name' => 'ComprobanteOperacionesController',
+            'title' => '!!Exito',
+            'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' . $new_registro->getIdTipoComprobante()->getAbreviatura() . '-' . $nro_consecutivo . ', para ver detalles consulte el registro de comprobantes .'
+        ]);
     }
 }

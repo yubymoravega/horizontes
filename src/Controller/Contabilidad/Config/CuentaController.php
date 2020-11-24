@@ -490,4 +490,27 @@ class CuentaController extends AbstractController
         return new JsonResponse(['data' => $respuesta, 'success' => true, 'subcuentas' => $row]);
     }
 
+    /**
+     * $nro - numero de la cuenta
+     * {Array} - Criterios de analicis de la cuenta
+     * @Route("/get-criterios-subcuentas/{id}", name="contabilidad_config_get_criterios_subcuentas" ,methods={"POST"})
+     */
+    public function getCriteriosSubcuentas(EntityManagerInterface $em, $id)
+    {
+        $cuenta = $em->getRepository(Cuenta::class)->find($id);
+        $respuesta = AuxFunctions::getCriterioByCuenta($cuenta->getNroCuenta(), $em);
+
+        $subcuentas = $em->getRepository(Subcuenta::class)->findBy(['id_cuenta' => $id, 'activo' => true]);
+        $row = [];
+        foreach ($subcuentas as $item) {
+            /**@var $item Subcuenta** */
+            $row [] = array(
+                'id' => $item->getId(),
+                'nro' => $item->getNroSubcuenta(),
+                'descripcion' => $item->getNroSubcuenta() . ' - ' . $item->getDescripcion(),
+            );
+        }
+        return new JsonResponse(['data' => $respuesta, 'success' => true, 'subcuentas' => $row]);
+    }
+
 }

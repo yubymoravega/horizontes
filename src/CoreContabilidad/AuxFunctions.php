@@ -1612,27 +1612,34 @@ class AuxFunctions
             $id_factura = $arr_obj_movimiento_mercancia[0]->getIdFactura();
         }
 
+        $arr_datos_costo = [];
+        /** @var MovimientoMercancia $movimiento */
+        foreach ($arr_obj_movimiento_mercancia as $movimiento){
+            if(!in_array(($movimiento->getCuenta().'-'.$movimiento->getNroSubcuentaDeudora()),$arr_datos_costo)){
+                $arr_datos_costo[count($arr_datos_costo)] =$movimiento->getCuenta().'-'.$movimiento->getNroSubcuentaDeudora();
+            }
+        }
         /** @var Documento $obj_documento */
         $obj_factura = $em->getRepository(Factura::class)->find($id_factura);
         /**@var $obj_factura Factura* */
         $nro_doc = 'FACT' . '-' . $obj_factura->getNroFactura();
         $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
-
-//        dd($nro_doc, $arr_obj_movimiento_mercancia);
         //totalizar importe
         $rep_arr = [];
 
         $i = 0;
         $total_general = 0;
+
+        $arr = explode('-',$arr_datos_costo[0]);
         $rows[] = array(
             'nro_doc' => $nro_doc,
             'fecha' => $fecha_doc,
-            'nro_cuenta' => $obj_factura->getCuentaObligacion(),
-            'nro_subcuenta' => $obj_factura->getSubcuentaObligacion(),
-            'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
+            'nro_cuenta' => $arr[0],
+            'nro_subcuenta' => $arr[1],
+            'analisis_1' => '',
             'analisis_2' => '',
             'analisis_3' => '',
-            'value_1' => $obj_documento->getIdAlmacen()->getDescripcion(),
+            'value_1' => '',
             'value_2' => '',
             'value_3' => '',
             'mes' => $obj_documento->getFecha()->format('m'),

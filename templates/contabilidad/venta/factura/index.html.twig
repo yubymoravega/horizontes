@@ -202,6 +202,7 @@
     {{ parent() }}
     <script>
         let mercancia = [];
+        let fecha = '';
 
         /** Imprimir factura */
         function Print_Vale() {
@@ -333,6 +334,11 @@
                 }
             })
 
+            $('#factura_fecha_factura').change(function () {
+                fecha = $(this).val()
+                $('#rows_mercancias').find('tr').remove();
+                resetFormMercancia()
+            })
             /** obtener los clientes por el tipo cliente seleccionado */
             cbx_tipoCliente.on('change', function () {
                 cbx_cliente.find('option').remove()
@@ -360,7 +366,10 @@
 
             txt_codigoMercancia.on('keyup', function (event) {
                 if (event.which == 13) {
-                    buscarProducto()
+                    if (fecha == '')
+                        alertTemplate('Debe seleccionar la fecha para buscar las mercancías o productos', 'danger')
+                    else
+                        buscarProducto()
                 } else {
                     txt_descripMercancia.val('')
                     txt_umMercancia.val('')
@@ -419,7 +428,7 @@
                     const um = txt_umMercancia.val()
                     const cantidad = txt_cantidadMercancia.val()
                     const precio = txt_precioMercancia.val()
-                    const descuento_recatrga = txt_descuento_recargaMercancia.val()==''?0:txt_descuento_recargaMercancia.val()
+                    const descuento_recatrga = txt_descuento_recargaMercancia.val() == '' ? 0 : txt_descuento_recargaMercancia.val()
                     const importe = txt_importeMercancia.val()
                     const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
                     const id_almacen = $('#id_almacen').val()
@@ -430,7 +439,7 @@
                     } else {
 
                         lista_mercancias.push({
-                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,id_almacen
+                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia, id_almacen
                         })
                         let importe_movimiento = (parseFloat(importe) - parseFloat(descuento_recatrga))
                         importe_total += importe_movimiento
@@ -483,49 +492,53 @@
         })
 
         function buscarProducto() {
-            loadingModal.show()
-            $.ajax({
-                method: 'POST',
-                url: '{{ path('cont_venta_get_mercancia_producto') }}',
-                data: {tipo: $('#movimiento_venta_mercancia').val(), codigo: $('#movimiento_venta_codigo').val()},
-                success: function (result) {
-                    if (result.success) {
-                        $('#rows_table').find('tr').remove();
-                        if (result.data.length > 1) {
-                            mercancia = result.data
-                            $(result.data).each(function (pos, valor) {
-                                $('#rows_table').append('<tr>' +
-                                    '<td style="font-weight:400;"> ' +
-                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
-                                    '</td>' +
-                                    '<td style="font-weight:400;" class="text-center"> ' + valor.cuenta + '/' + valor.subcuenta + '</td>' +
-                                    '<td style="font-weight:400;" class="text-center"> ' + valor.codigo + '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
-                                    '<td style="font-weight:400;" class="text-right"> ' + valor.existencia + '</td> </tr>'
-                                );
-                            })
-                            $('#listarMercanciasModal').modal('show')
-                        } else if (result.data.length == 1) {
-                            $('#listarMercanciasModal').modal('hide')
-                            const data = result.data[0]
-                            $('#movimiento_venta_descripcion').val(data.descripcion)
-                            $('#movimiento_venta_um').val(data.um)
-                            $('#movimiento_venta_existencia').val(data.existencia)
-                            $('#movimiento_venta_codigo').val(data.codigo)
-                            $('#id_almacen').val(data.id_almacen)
-                        } else {
-                            $('#listarMercanciasModal').modal('hide')
-                            let type = $('#movimiento_venta_mercancia').val() == 1 ? 'mercancías' : 'producto'
-                            alertTemplate('No existen ' + type + ' con el código especificado.', 'danger')
+            if (fecha == '')
+                alertTemplate('Debe seleccionar la fecha para buscar las mercancías o productos', 'danger')
+            else{
+                loadingModal.show()
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ path('cont_venta_get_mercancia_producto') }}',
+                    data: {tipo: $('#movimiento_venta_mercancia').val(), codigo: $('#movimiento_venta_codigo').val(),fecha :fecha},
+                    success: function (result) {
+                        if (result.success) {
+                            $('#rows_table').find('tr').remove();
+                            if (result.data.length > 1) {
+                                mercancia = result.data
+                                $(result.data).each(function (pos, valor) {
+                                    $('#rows_table').append('<tr>' +
+                                        '<td style="font-weight:400;"> ' +
+                                        '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
+                                        '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.cuenta + '/' + valor.subcuenta + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.codigo + '</td>' +
+                                        '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                        '<td style="font-weight:400;" class="text-right"> ' + valor.existencia + '</td> </tr>'
+                                    );
+                                })
+                                $('#listarMercanciasModal').modal('show')
+                            } else if (result.data.length == 1) {
+                                $('#listarMercanciasModal').modal('hide')
+                                const data = result.data[0]
+                                $('#movimiento_venta_descripcion').val(data.descripcion)
+                                $('#movimiento_venta_um').val(data.um)
+                                $('#movimiento_venta_existencia').val(data.existencia)
+                                $('#movimiento_venta_codigo').val(data.codigo)
+                                $('#id_almacen').val(data.id_almacen)
+                            } else {
+                                $('#listarMercanciasModal').modal('hide')
+                                let type = $('#movimiento_venta_mercancia').val() == 1 ? 'mercancías' : 'producto'
+                                alertTemplate('No existen ' + type + ' con el código especificado.', 'danger')
+                            }
                         }
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        loadingModal.close()
+                        alertTemplate('Error interno, verifique el código', 'danger')
                     }
-                    loadingModal.close()
-                },
-                error: function (error) {
-                    loadingModal.close()
-                    alertTemplate('Error interno, verifique el código', 'danger')
-                }
-            })
+                })
+            }
         }
 
         function SeleccionarMercancia() {

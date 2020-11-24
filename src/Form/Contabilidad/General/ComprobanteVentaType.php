@@ -37,25 +37,7 @@ class  ComprobanteVentaType extends AbstractType
         $this->id_unidad = $obj_unidad->getId();
 
         $builder
-            ->add('cuenta_nominal_acreedora', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Cuentas Nominal Acreedora',
-                'choices' => (function () {
-                    $cuentas = $this->em->getRepository(Cuenta::class)->findBy(['id_tipo_cuenta' => 14]);
-                    $cuentas_obj = [];
-                    if (!empty($cuentas)) {
-                        foreach ($cuentas as $cuenta) {
-                            /** @var Cuenta $cuenta */
-                            $cuentas_obj[$cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()] = $cuenta->getNroCuenta();
-                        }
-                    }
-                    return $cuentas_obj;
-                })()
-            ])
-            ->add('subcuenta_nominal_acreedora', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Subcuentas Nominal Acreedora',
-            ])
+
             ->add('cuenta_obligacion_deudora', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Cuentas de Obligación Deudora',
@@ -122,68 +104,6 @@ class  ComprobanteVentaType extends AbstractType
 
             ])
             ->add('orden_trabajo_deudora', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Orden de trabajo',
-                'class' => OrdenTrabajo::class,
-                'choice_value' => 'id',
-                'choice_label' => function (OrdenTrabajo $eg) {
-                    return $eg->getCodigo() . ' - ' . $eg->getDescripcion();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.id_unidad = :val')
-                        ->setParameter('val', $this->id_unidad);
-                }
-
-            ])
-            ->add('centro_costo_acreedora', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Centro de costo',
-                'class' => CentroCosto::class,
-                'choice_value' => 'id',
-                'choice_label' => function (CentroCosto $eg) {
-                    return $eg->getCodigo() . ' - ' . $eg->getNombre();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.id_unidad = :val')
-                        ->setParameter('val', $this->id_unidad);
-                }
-
-            ])
-            ->add('elemento_gasto_acreedora', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Elemento de gasto',
-                'class' => ElementoGasto::class,
-                'choice_value' => 'id',
-                'choice_label' => function (ElementoGasto $eg) {
-                    return $eg->getCodigo() . ' - ' . $eg->getDescripcion();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true');
-                }
-
-            ])
-            ->add('expediente_acreedora', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Expediente',
-                'class' => Expediente::class,
-                'choice_value' => 'id',
-                'choice_label' => function (Expediente $eg) {
-                    return $eg->getCodigo() . ' - ' . $eg->getDescripcion();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->andWhere('u.id_unidad = :val')
-                        ->setParameter('val', $this->id_unidad);
-                }
-
-            ])
-            ->add('orden_trabajo_acreedora', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Orden de trabajo',
                 'class' => OrdenTrabajo::class,

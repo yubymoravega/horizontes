@@ -274,6 +274,10 @@ class BalanceComprobacionSaldoController extends AbstractController
                 elseif ($id_tipo_documento == 9) {
                     $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_devolucion);
+                }//Venta
+                elseif ($id_tipo_documento == 10) {
+                    $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
                 }
             }
         }

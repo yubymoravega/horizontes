@@ -66,7 +66,7 @@ class RegistroComprobantes
 
     /**
      * @ORM\ManyToOne(targetEntity=Almacen::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $id_almacen;
 
@@ -74,6 +74,11 @@ class RegistroComprobantes
      * @ORM\Column(type="integer")
      */
     private $anno;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $tipo;
 
     public function getId(): ?int
     {
@@ -196,6 +201,18 @@ class RegistroComprobantes
     public function setAnno(int $anno): self
     {
         $this->anno = $anno;
+
+        return $this;
+    }
+
+    public function getTipo(): ?int
+    {
+        return $this->tipo;
+    }
+
+    public function setTipo(?int $tipo): self
+    {
+        $this->tipo = $tipo;
 
         return $this;
     }

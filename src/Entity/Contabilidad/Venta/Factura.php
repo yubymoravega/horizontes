@@ -66,16 +66,6 @@ class Factura
      */
     private $subcuenta_obligacion;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $cuenta_nominal_acreedora;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $subcuenta_nominal_acreedora;
-
 
     /**
      * @ORM\Column(type="boolean")
@@ -118,26 +108,6 @@ class Factura
      * @ORM\ManyToOne(targetEntity=Expediente::class)
      */
     private $id_expediente;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=CentroCosto::class)
-     */
-    private $id_centro_costo_acreedor;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
-     */
-    private $id_orden_trabajo_acreedor;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
-     */
-    private $id_elemento_gasto_acreedor;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Expediente::class)
-     */
-    private $id_expediente_acreedor;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -293,30 +263,6 @@ class Factura
         return $this;
     }
 
-    public function getCuentaAcreedora(): ?string
-    {
-        return $this->cuenta_nominal_acreedora;
-    }
-
-    public function setCuentaAcreedora(?string $cuenta_acreedora): self
-    {
-        $this->cuenta_nominal_acreedora = $cuenta_acreedora;
-
-        return $this;
-    }
-
-    public function getSubcuentaAcreedora(): ?string
-    {
-        return $this->subcuenta_nominal_acreedora;
-    }
-
-    public function setSubcuentaAcreedora(?string $subcuenta_acreedora): self
-    {
-        $this->subcuenta_nominal_acreedora = $subcuenta_acreedora;
-
-        return $this;
-    }
-
     public function getIdCentroCosto(): ?CentroCosto
     {
         return $this->id_centro_costo;
@@ -361,54 +307,6 @@ class Factura
     public function setIdExpediente(?Expediente $id_expediente): self
     {
         $this->id_expediente = $id_expediente;
-
-        return $this;
-    }
-
-    public function getIdCentroCostoAcreedor(): ?CentroCosto
-    {
-        return $this->id_centro_costo_acreedor;
-    }
-
-    public function setIdCentroCostoAcreedor(?CentroCosto $id_centro_costo_acreedor): self
-    {
-        $this->id_centro_costo_acreedor = $id_centro_costo_acreedor;
-
-        return $this;
-    }
-
-    public function getIdOrdenTrabajoAcreedor(): ?OrdenTrabajo
-    {
-        return $this->id_orden_trabajo_acreedor;
-    }
-
-    public function setIdOrdenTrabajoAcreedor(?OrdenTrabajo $id_orden_trabajo_acreedor): self
-    {
-        $this->id_orden_trabajo_acreedor = $id_orden_trabajo_acreedor;
-
-        return $this;
-    }
-
-    public function getIdElementoGastoAcreedor(): ?ElementoGasto
-    {
-        return $this->id_elemento_gasto_acreedor;
-    }
-
-    public function setIdElementoGastoAcreedor(?ElementoGasto $id_elemento_gasto_acreedor): self
-    {
-        $this->id_elemento_gasto_acreedor = $id_elemento_gasto_acreedor;
-
-        return $this;
-    }
-
-    public function getIdExpedienteAcreedor(): ?Expediente
-    {
-        return $this->id_expediente_acreedor;
-    }
-
-    public function setIdExpedienteAcreedor(?Expediente $id_expediente_acreedor): self
-    {
-        $this->id_expediente_acreedor = $id_expediente_acreedor;
 
         return $this;
     }

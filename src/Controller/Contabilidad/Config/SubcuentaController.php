@@ -258,7 +258,7 @@ class SubcuentaController extends AbstractController
         }
         return $this->redirectToRoute('contabilidad_config_subcuenta',
             [
-                'id_cuenta' => $id_cuenta->getId(),
+                'id_cuenta' => $id_cuenta,
                 'page' => $request->get("page")
             ]);
     }

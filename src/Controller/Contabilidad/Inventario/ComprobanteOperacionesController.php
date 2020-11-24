@@ -189,6 +189,10 @@ class ComprobanteOperacionesController extends AbstractController
             elseif ($id_tipo_documento == 9) {
                 $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_devolucion);
+            }//ventas
+            elseif ($id_tipo_documento == 10) {
+                $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_venta);
             }
             $retur_rows [] = array(
                 'nro_doc' => $rows[0]['nro_doc'],
@@ -242,6 +246,7 @@ class ComprobanteOperacionesController extends AbstractController
             ->setIdUsuario($this->getUser())
             ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
             ->setAnno($year_)
+            ->setTipo(1)
             ->setCredito(floatval($credito))
             ->setDebito(floatval($debito))
             ->setIdAlmacen($obj_almacen)

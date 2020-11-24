@@ -151,7 +151,7 @@ class CerrarDiaController extends AbstractController
 
         $saldo_apertura = $obj_cierre_abierto ? $obj_cierre_abierto->getSaldo() : 0;
         //verificar que los debitos menos los creditos = existencia en almacen
-        if (round($existencia_almacen_importe, 5) == round(($saldo_apertura + $debitos - $creditos), 5)) {
+        if (round($existencia_almacen_importe, 2) == round(($saldo_apertura + $debitos - $creditos), 2)) {
             if (!$obj_cierre_abierto) {
                 //no se ha realizado ningun cierre, o sea es el primero que se efectuara
                 //hago el cierre del dia
