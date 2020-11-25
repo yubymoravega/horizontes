@@ -252,6 +252,8 @@ class TurismoController extends AbstractController
             $solicitud->setTramferLugar($_POST["solicitud_turismo"]["tramferLugar"]);
             $solicitud->setTramferDestino($_POST["solicitud_turismo"]["tramferDestino"]);
 
+            $solicitud->setTramferIdaVuelta($_POST["solicitud_turismo"]["tramferIdaVuelta"]);
+
             $solicitud->setTourNombre($_POST["solicitud_turismo"]["tourNombre"]);
             $solicitud->setRentLugarRecogida($_POST["solicitud_turismo"]["rentLugarRecogida"]);
             $solicitud->setRentLugarEntrega($_POST["solicitud_turismo"]["rentLugarEntrega"]);

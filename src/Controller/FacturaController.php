@@ -668,6 +668,36 @@ class FacturaController extends AbstractController
        
     }
 
+    /**
+     * @Route("factura/cotizacion/form", name="factura/cotizacion/form/")
+     */
+    public function cotizacionForm(){
+
+        return $this->render('factura/cotizacionForm.html.twig');
+    }
+
+
+     /**
+     * @Route("factura/cotizacion/form/datos/", name="factura/cotizacion/form/datos/")
+     */
+    public function cotizacionFormDatos(){
+
+        //return new Response(var_dump($_POST));
+
+        $datos = array("comprobanteFiscal" => $_POST["comprobanteFiscal"], "tipoDocumento" => $_POST["tipoDocumento"],
+        "moneda" => $_POST["moneda"],"impuesto" => $_POST["impuesto"],"impuestoValor" => $_POST["impuestoValor"]);
+        return $this->render('factura/cotizacionFormDescripcion.html.twig',["datos" =>  $datos]);
+    }
+
+     /**
+     * @Route("factura/cotizacion/form/datos/pdf/", name="factura/cotizacion/form/datos/pdf")
+     */
+    public function cotizacionFormDatosPdf(){
+
+        //return new Response(var_dump($_POST);
+        return $this->render('factura/cotizacionFormDescripcion.html.twig');
+    }
+
     
 
 }

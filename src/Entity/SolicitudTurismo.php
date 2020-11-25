@@ -208,6 +208,12 @@ class SolicitudTurismo
      */
     private $tramferNinos;
 
+
+      /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tramferIdaVuelta;
+
      /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -222,6 +228,18 @@ class SolicitudTurismo
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $rentCantidadPersonas;
+
+    public function getTramferIdaVuelta(): ?string
+    {
+        return $this->tramferIdaVuelta;
+    }
+
+    public function setTramferIdaVuelta(string $tramferIdaVuelta): self
+    {
+        $this->tramferIdaVuelta = $tramferIdaVuelta;
+
+        return $this;
+    }
 
     public function getRentCantidadPersonas(): ?string
     {

@@ -296,6 +296,21 @@
 						</select>
 						</div>
 
+							<div class="col">
+						Ida & Vuelta
+						<select id="solicitud_turismo_tramferIdaVuelta" name="solicitud_turismo[tramferIdaVuelta]" class="fomulario form-control" placeholder="Lugar">
+						
+						{% if solicitud.tramferIdaVuelta ==  "Solo Ida" %}
+						<option selected value="{{solicitud.tramferIdaVuelta}}">{{solicitud.tramferIdaVuelta}}</option>
+						<option  value="Ida & Vuelta">Ida & Vuelta</option>
+						{% else %}
+						<option selected value="Ida & Vuelta">Ida & Vuelta</option>
+   						<option  value="Solo Ida">Solo Ida</option>
+						{% endif %}
+
+						</select>
+						</div>
+
 						<div class="col">
 						Destino
 						<select id="solicitud_turismo_tramferDestino" name="solicitud_turismo[tramferDestino]" class="fomulario form-control" placeholder="Destino">

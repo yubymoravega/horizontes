@@ -276,8 +276,12 @@ class SolicitudTurismoType extends AbstractType
                     '10' => 10,
                 ]], ['required'=> false])
             ->add('rentCantidadPersonas',  null, ['required'=> false])
-            //->add('empleado')
-           // ->add('idCliente')
+            ->add('tramferIdaVuelta'  ,  ChoiceType::class, [
+                'choices'  => [
+                    '-' => null,
+                    'Solo Ida' => "Solo Ida",
+                    'Ida & Vuelta' => "Ida & Vuelta",
+                ]], ['required'=> false])
         ;
     }
 
