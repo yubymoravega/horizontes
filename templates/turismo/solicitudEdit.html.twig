@@ -303,9 +303,17 @@
 						{% if solicitud.tramferIdaVuelta ==  "Solo Ida" %}
 						<option selected value="{{solicitud.tramferIdaVuelta}}">{{solicitud.tramferIdaVuelta}}</option>
 						<option  value="Ida & Vuelta">Ida & Vuelta</option>
+						<option selected value="-">-</option>
+						{% elseif solicitud.tramferIdaVuelta == "-" %}
+						<option selected value="-">-</option>
+						<option  value="Ida & Vuelta">Ida & Vuelta</option>
+   						<option  value="Solo Ida">Solo Ida</option>
+						
 						{% else %}
+						<option selected value="-">-</option>
 						<option selected value="Ida & Vuelta">Ida & Vuelta</option>
    						<option  value="Solo Ida">Solo Ida</option>
+
 						{% endif %}
 
 						</select>

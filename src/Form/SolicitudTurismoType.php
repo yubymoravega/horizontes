@@ -279,6 +279,7 @@ class SolicitudTurismoType extends AbstractType
             ->add('tramferIdaVuelta'  ,  ChoiceType::class, [
                 'choices'  => [
                     '-' => null,
+                    '-' => "-",
                     'Solo Ida' => "Solo Ida",
                     'Ida & Vuelta' => "Ida & Vuelta",
                 ]], ['required'=> false])
