@@ -11,6 +11,18 @@
         {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
     <div class="form-group input-group input-group-sm d-block">
+        <label for="unidad_telefono" class="font-weight-bold">Teléfono</label>
+        {{ form_widget(form.telefono,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="unidad_correo" class="font-weight-bold">Correo</label>
+        {{ form_widget(form.correo,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="unidad_direccion" class="font-weight-bold">Dirección</label>
+        {{ form_widget(form.direccion,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
         <label for="unidad_id_padre" class="font-weight-bold">Subordinada a</label>
         {{ form_widget(form.id_padre,{'attr': {'class': 'form-control w-100'}}) }}
     </div>

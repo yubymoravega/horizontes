@@ -41,6 +41,21 @@ class Unidad
      */
     private $codigo;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $direccion;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $telefono;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $correo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +105,42 @@ class Unidad
     public function setCodigo(?string $codigo): self
     {
         $this->codigo = $codigo;
+
+        return $this;
+    }
+
+    public function getDireccion(): ?string
+    {
+        return $this->direccion;
+    }
+
+    public function setDireccion(?string $direccion): self
+    {
+        $this->direccion = $direccion;
+
+        return $this;
+    }
+
+    public function getTelefono(): ?string
+    {
+        return $this->telefono;
+    }
+
+    public function setTelefono(?string $telefono): self
+    {
+        $this->telefono = $telefono;
+
+        return $this;
+    }
+
+    public function getCorreo(): ?string
+    {
+        return $this->correo;
+    }
+
+    public function setCorreo(?string $correo): self
+    {
+        $this->correo = $correo;
 
         return $this;
     }

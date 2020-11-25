@@ -120,6 +120,11 @@ class MovimientoVenta
      */
     private $id_expediente_acreedor;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $descripcion;
+
 
     public function getId(): ?int
     {
@@ -349,6 +354,18 @@ class MovimientoVenta
     public function setAnno(?int $anno): self
     {
         $this->anno = $anno;
+
+        return $this;
+    }
+
+    public function getDescripcion(): ?string
+    {
+        return $this->descripcion;
+    }
+
+    public function setDescripcion(?string $descripcion): self
+    {
+        $this->descripcion = $descripcion;
 
         return $this;
     }

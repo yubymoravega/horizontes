@@ -29,17 +29,23 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Código</th>
-            <th scope="col-2">Nombre</th>
+            <th width="80">Código</th>
+            <th scope="col-3" >Nombre</th>
             <th scope="col-3">Subordinada a</th>
+            <th scope="col-1">Teléfono</th>
+            <th scope="col-1">Correo</th>
+            <th scope="col-2">Direccion</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in unidades %}
                 <tr>
-                    <td style="font-weight:400;">{{ item.codigo }}</td>
-                    <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.padre_nombre }}</td>
+                    <td style="font-weight:400;" >{{ item.codigo }}</td>
+                    <td style="font-weight:400;" >{{ item.nombre }}</td>
+                    <td style="font-weight:400;" >{{ item.padre_nombre }}</td>
+                    <td style="font-weight:400;" >{{ item.telefono }}</td>
+                    <td style="font-weight:400;" >{{ item.correo }}</td>
+                    <td style="font-weight:400;">{{ item.direccion }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
@@ -48,6 +54,9 @@
                                         padre_nombre:'{{ item.padre_nombre }}',
                                         nombre:'{{ item.nombre }}' ,
                                         codigo:'{{ item.codigo }}' ,
+                                        correo:'{{ item.correo }}' ,
+                                        telefono:'{{ item.telefono }}' ,
+                                        direccion:'{{ item.direccion }}' ,
                                         id: '{{ item.id }}'
                                         })">
                             <i class="fa fa-edit"></i>
@@ -86,7 +95,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {nombre = '',codigo='', id = '', id_padre = ''} = config
+            const {nombre = '',codigo='', id = '', telefono = '', correo = '', direccion = '', id_padre = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
@@ -95,6 +104,9 @@
             $('#unidad_id_padre').val(id_padre)
             $('#unidad_codigo').val(codigo)
             $('#unidad_nombre').val(nombre)
+            $('#unidad_telefono').val(telefono)
+            $('#unidad_correo').val(correo)
+            $('#unidad_direccion').val(direccion)
             $('#id_unidad').val(id)
         }
 
@@ -122,10 +134,16 @@
                 rules: {
                     'unidad[nombre]': "required",
                     'unidad[codigo]': "required",
+                    'unidad[telefono]': "required",
+                    'unidad[correo]': "required",
+                    'unidad[direccion]': "required",
                 },
                 messages: {
                     'unidad[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'unidad[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'unidad[telefono]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'unidad[correo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'unidad[direccion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {

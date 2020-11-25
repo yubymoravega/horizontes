@@ -71,8 +71,10 @@
                 <div class="row mt-0 p-0">
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                     <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
-                        {{ form_label(form_factura.fecha_factura) }}
-                        {{ form_widget(form_factura.fecha_factura) }}
+{#                        {{ form_label(form_factura.fecha_factura) }}#}
+{#                        {{ form_widget(form_factura.fecha_factura) }}#}
+                        <label for="factura_fecha_factura"> Fecha de la factura</label>
+                        <input type="text" value="{{ fecha }}" id="factura_fecha_factura" name="factura[fecha_factura]" class="w-100 form-control" readonly="readonly">
                     </div>
                     <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.tipo_cliente) }}
@@ -84,9 +86,13 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0 mb-3">
-                    <div class="col-12 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                    <div class="col-8 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.id_contrato) }}
                         {{ form_widget(form_factura.id_contrato) }}
+                    </div>
+                    <div class="col-4 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.ncf) }}
+                        {{ form_widget(form_factura.ncf) }}
                     </div>
                 </div>
                 {{ form_end(form_factura) }}
@@ -154,8 +160,14 @@
                     </div>
                     <input type="hidden" id="id_almacen">
                 </div>
+                <div class="row mt-0">
+                    <div class="col-12 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.descripcion_venta) }}
+                        {{ form_widget(form_venta.descripcion_venta) }}
+                    </div>
+                </div>
                 <div class="row mt-0 p-0">
-                    <button class="btn btn-secondary btn-sm ml-auto mr-3" type="button" id="btnAplicarMercancia">
+                    <button class="btn btn-secondary btn-sm mt-2 ml-auto mr-3" type="button" id="btnAplicarMercancia">
                         ADICIONAR
                     </button>
                 </div>
@@ -173,6 +185,7 @@
                         <th style="width: 45px;"><i class="fa fa-minus-circle text-danger"></i></th>
                         <th scope="col-1" hidden>UM</th>
                         <th scope="col-1" hidden>Descripcion</th>
+                        <th scope="col-1" hidden>Descripcion venta</th>
                         </thead>
                         <tbody id="rows_mercancias">
                         </tbody>
@@ -202,7 +215,7 @@
     {{ parent() }}
     <script>
         let mercancia = [];
-        let fecha = '';
+        let fecha = $("#factura_fecha_factura").val();
 
         /** Imprimir factura */
         function Print_Vale() {
@@ -211,6 +224,8 @@
                 const fecha_factura = $("#factura_fecha_factura").val()
                 const contrato = $('#factura_id_contrato option:selected').text()
                 const cliente = $("#factura_id_cliente option:selected").text()
+                const tipo_cliente = $("#factura_tipo_cliente option:selected").val()
+                const ncf_value = $("#factura_ncf").val()
 
                 const mercancia_json = JSON.stringify(lista_mercancias)
                 $('body').append(`
@@ -221,6 +236,8 @@
                         <input type='text' hidden name='datos[fecha_factura]' value='${fecha_factura}'/>
                         <input type='text' hidden name='datos[contrato]' value='${contrato}'/>
                         <input type='text' hidden name='datos[cliente]' value='${cliente}'/>
+                        <input type='text' hidden name='datos[tipo_cliente]' value='${tipo_cliente}'/>
+                        <input type='text' hidden name='datos[ncf]' value='${ncf_value}'/>
                         <input type='hidden' name='mercancias' value='${mercancia_json}'/>
                     </form>`)
 
@@ -257,6 +274,7 @@
             const txt_nroFactura = $('#factura_nro_factura')
             const txt_codigoMercancia = $('#movimiento_venta_codigo')
             const txt_descripMercancia = $('#movimiento_venta_descripcion')
+            const txt_descrionMercanciaVenta = $('#movimiento_venta_descripcion_venta')
             const txt_umMercancia = $('#movimiento_venta_um')
             const txt_cantidadMercancia = $('#movimiento_venta_cantidad')
             const txt_precioMercancia = $('#movimiento_venta_precio')
@@ -281,6 +299,7 @@
                     'factura[fecha_factura]': "required",
                     'factura[tipo_cliente]': "required",
                     'factura[id_cliente]': "required",
+                    'factura[ncf]': "required",
 
                 },
                 messages: {
@@ -288,6 +307,7 @@
                     'factura[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[tipo_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[ncf]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
 
                 }
             })
@@ -334,11 +354,11 @@
                 }
             })
 
-            $('#factura_fecha_factura').change(function () {
-                fecha = $(this).val()
-                $('#rows_mercancias').find('tr').remove();
-                resetFormMercancia()
-            })
+            // $('#factura_fecha_factura').change(function () {
+            //     fecha = $(this).val()
+            //     $('#rows_mercancias').find('tr').remove();
+            //     resetFormMercancia()
+            // })
             /** obtener los clientes por el tipo cliente seleccionado */
             cbx_tipoCliente.on('change', function () {
                 cbx_cliente.find('option').remove()
@@ -378,6 +398,7 @@
                     txt_descuento_recargaMercancia.val('')
                     txt_importeMercancia.val('')
                     txt_existenciaMercancia.val('')
+                    txt_descrionMercanciaVenta.val('')
                 }
             })
 
@@ -386,6 +407,7 @@
                 cbx_tipo.val(0)
                 txt_codigoMercancia.val('')
                 txt_descripMercancia.val('')
+                txt_descrionMercanciaVenta.val('')
                 txt_umMercancia.val('')
                 txt_cantidadMercancia.val('')
                 txt_precioMercancia.val('')
@@ -432,16 +454,16 @@
                     const importe = txt_importeMercancia.val()
                     const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
                     const id_almacen = $('#id_almacen').val()
+                    const descripcion_venta = $('#movimiento_venta_descripcion_venta').val()
 
                     //validar que el codigo no se repita
                     if (lista_mercancias.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
-
                         lista_mercancias.push({
-                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia, id_almacen
+                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia, id_almacen,descripcion_venta
                         })
-                        let importe_movimiento = (parseFloat(importe) - parseFloat(descuento_recatrga))
+                        let importe_movimiento = (parseFloat(importe) + parseFloat(descuento_recatrga))
                         importe_total += importe_movimiento
                         label_importeTotal.text('$' + importe_total.toFixed(2))
 

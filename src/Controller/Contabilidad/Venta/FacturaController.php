@@ -68,8 +68,7 @@ class FacturaController extends AbstractController
             $importe_total = $request->get('importe_total');
             if (isset($factura_request['id_contrato']) && $factura_request['id_contrato'] != '')
                 $contrato = $contratosClienteRepository->find($factura_request['id_contrato']);
-            $fecha_factura = \DateTime::createFromFormat('Y-m-d', $factura_request['fecha_factura']);
-
+            $fecha_factura = \DateTime::createFromFormat('d-m-Y', $factura_request['fecha_factura']);
             /** 1. Crear Factura */
             $factura = new Factura();
             $factura
@@ -85,10 +84,11 @@ class FacturaController extends AbstractController
                 ->setContabilizada(false)
                 ->setIdUsuario($this->getUser())
                 ->setIdUnidad($unidad)
-                ->setImporte($importe_total);
+                ->setImporte($importe_total)
+                ->setNcf($factura_request['ncf']);
 
             $em->persist($factura);
-            $em->flush();
+            //$em->flush();
             $arr_unique = [];
             $arr_movimiento_venta_id = [];
             /** 2. movimiento de venta x mercancias */
@@ -122,11 +122,12 @@ class FacturaController extends AbstractController
                     ->setCodigo($mercancia_obj->codigo)
                     ->setCantidad($mercancia_obj->cantidad)
                     ->setPrecio($mercancia_obj->precio)
-                    ->setDescuentoRecarga($mercancia_obj->descuento_recatrga)
+                    ->setDescuentoRecarga(AuxFunctions::getNumberByString($mercancia_obj->descuento_recatrga))
                     ->setExistencia($mercancia_obj->nueva_existencia)
                     ->setActivo(true)
                     ->setCuenta('-')
                     ->setCosto($precio)
+                    ->setDescripcion($mercancia_obj->descripcion_venta)
                     ->setAnno($fecha_factura->format('Y'))
                     ->setNroSubcuentaDeudora('-')
                     ->setIdAlmacen($almacenRepository->find($mercancia_obj->id_almacen))
@@ -233,17 +234,24 @@ class FacturaController extends AbstractController
                 $document
                     ->setImporteTotal($importe_documento);
             }
-
-
             /** 4. Rebajar el importe total del resto del contrato */
             if (isset($factura_request['id_contrato']) && $factura_request['id_contrato'] != '') {
                 $contrato->setResto(floatval($contrato->getResto()) - floatval($importe_total));
                 $em->persist($contrato);
             }
-
             $em->flush();
             $this->addFlash('success', 'Factura ' . $factura->getNroFactura() . ' registrada satisfactoraiamente');
         }
+
+        $almacenes = $almacenRepository->findBy(['id_unidad' => $unidad, 'activo' => true]);
+        /** @var Almacen $almacen */
+        $fecha_start = \DateTime::createFromFormat('Y-m-d', '2020-01-01');
+        foreach ($almacenes as $almacen) {
+            $fecha_almacen = AuxFunctions::getDateToCloseDate($em, $almacen->getId());
+            if ($fecha_almacen > $fecha_start)
+                $fecha_start = $fecha_almacen;
+        }
+
 
         // generar número de factura ?
         $form_factura = $this->createForm(FacturaType::class);
@@ -251,10 +259,13 @@ class FacturaController extends AbstractController
         $factura_new->setNroFactura($facturaRepository->generateNroFactura($unidad));
         $form_factura->setData($factura_new);
 
+
+//        dd($fecha_start->format('d-m-Y'));
         return $this->render('contabilidad/venta/factura/index.html.twig', [
             'controller_name' => 'FacturaController',
             'form_factura' => $form_factura->createView(),
             'form_venta' => $form_venta->createView(),
+            'fecha' => $fecha_start->format('d-m-Y')
         ]);
     }
 
@@ -399,12 +410,19 @@ class FacturaController extends AbstractController
             'tipo_cliente' => $cliente->getTipo(),
             'cliente' => $cliente->find($factura_obj->getIdCliente())['name'],
             'codigo_cliente' => $cliente->find($factura_obj->getIdCliente())['codigo'],
+            'telefono_cliente' => $cliente->find($factura_obj->getIdCliente())['telefono'],
+            'direccion_cliente' => $cliente->find($factura_obj->getIdCliente())['direccion'],
             'contrato' => $contrato ? ($contrato->getNroContrato() . ' - '
                 . $contrato->getIdCliente()->getNombre() . ' | $'
                 . $contrato->getImporte() . ' ( '
                 . $contrato->getFechaAprobado()->format('d/m/Y') . ' )') : '',
             'cuenta_obligacion' => $cuenta != '' ? ($cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()) : '',
             'subcuenta_obligacion' => $subcuenta != '' ? ($subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion()) : '',
+            'ncf' => $factura_obj->getNcf(),
+            'nombre_unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
+            'direccion_unidad' => $unidad->getDireccion(),
+            'telefono_unidad' => $unidad->getTelefono(),
+            'correo_unidad' => $unidad->getCorreo(),
         ];
 
         $importe_total = 0;
@@ -427,14 +445,14 @@ class FacturaController extends AbstractController
                     'id' => $mercancia->getId(),
                     'codigo' => $mercancia->getCodigo(),
                     'descripcion' => $mercancia_obj->getDescripcion(),
+                    'descripcion_venta' => $mercancia->getDescripcion(),
                     'um' => $mercancia_obj->getIdUnidadMedida()->getAbreviatura(),
                     'cantidad' => $mercancia->getCantidad(),
                     'precio' => number_format($mercancia->getPrecio(), 2, '.', ''),
                     'descuento_recarga' => number_format($mercancia->getDescuentoRecarga(), 2, '.', ''),
-                    'importe' => number_format($mercancia->getPrecio() * $mercancia->getCantidad(), 2, '.', ''),
-
+                    'importe' => number_format($mercancia->getPrecio() * $mercancia->getCantidad() + $mercancia->getDescuentoRecarga(), 2, '.', ''),
                 ]);
-            $importe_total += $mercancia->getPrecio() * $mercancia->getCantidad();
+            $importe_total += $mercancia->getPrecio() * $mercancia->getCantidad() + $mercancia->getDescuentoRecarga();
         }
         /** @var Empleado $empleado */
         $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_unidad' => $unidad, 'id_usuario' => $factura_obj->getIdUsuario()]);
@@ -457,23 +475,40 @@ class FacturaController extends AbstractController
                                  EmpleadoRepository $empleadoRepository, ProductoRepository $productoRepository,
                                  MercanciaRepository $mercanciaRepository)
     {
-
-        $mercancias = json_decode($request->get('mercancias'));
-        $factura = $request->get('datos');
-        $arr = explode(' - ', $factura['cliente']);
-        $factura['codigo_cliente'] = $arr[0];
-        $factura['cliente'] = $arr[1];
-        if ($factura['contrato'] == ' --- seleccine --- ')
-            $factura['contrato'] = '';
-        // validar que la factura exista
         $unidad = $empleadoRepository->findOneBy(['id_usuario' => $this->getUser()])->getIdUnidad();
-        if ($factura['nro_factura'] > $facturaRepository->generateNroFactura($unidad)) {
-            $this->addFlash('error', 'La factura ' . $factura['nro_factura'] . ' aún no ha sido procesada');
+        $mercancias = json_decode($request->get('mercancias'));
+        $factura_data = $request->get('datos');
+
+        $cliente = ClientesAdapter::getClienteFactory($em, $factura_data['tipo_cliente']);
+        $nombre_cliente = trim($factura_data['cliente']);
+        $cliente_arr = $cliente->findByName($nombre_cliente);
+        $factura['cliente'] = $cliente_arr['name'];
+        $factura['codigo_cliente'] = $cliente_arr['codigo'];
+        $factura['telefono_cliente'] = $cliente_arr['telefono'];
+        $factura['direccion_cliente'] = $cliente_arr['direccion'];
+        $factura['ncf'] = $factura_data['ncf'];
+        $factura['fecha_factura'] = $factura_data['fecha_factura'];
+        $factura['nombre_unidad'] = $unidad->getCodigo() . ' - ' . $unidad->getNombre();
+        $factura['direccion_unidad'] = $unidad->getDireccion();
+        $factura['telefono_unidad'] = $unidad->getTelefono();
+        $factura['correo_unidad'] = $unidad->getCorreo();
+
+        if ($factura_data['contrato'] == ' --- seleccine --- ')
+            $factura['contrato'] = '';
+        else {
+            //not implemente yet
+            $factura['contrato'] = '';
+        }
+
+        // validar que la factura exista
+
+        if ($factura_data['nro_factura'] > $facturaRepository->generateNroFactura($unidad)) {
+            $this->addFlash('error', 'La factura ' . $factura_data['nro_factura'] . ' aún no ha sido procesada');
             return $this->redirectToRoute('contabilidad_venta_factura');
         }
-        $importe_total = $factura['importe_total'];
+        $importe_total = $factura_data['importe_total'];
         $mercancia_arr = [];
-//dd($mercancias);
+
         foreach ($mercancias as $mercancia) {
             if ($mercancia->tipo == '1')
                 $mercancia_obj = $mercanciaRepository->findOneBy([
@@ -494,9 +529,10 @@ class FacturaController extends AbstractController
                     'descripcion' => $mercancia_obj->getDescripcion(),
                     'um' => $mercancia_obj->getIdUnidadMedida()->getAbreviatura(),
                     'cantidad' => $mercancia->cantidad,
+                    'descripcion_venta' => $mercancia->descripcion_venta,
                     'precio' => number_format($mercancia->precio, 2, '.', ''),
                     'descuento_recarga' => number_format($mercancia->descuento_recatrga, 2, '.', ''),
-                    'importe' => number_format(floatval($mercancia->precio) * floatval($mercancia->cantidad), 2, '.', ''),
+                    'importe' => number_format(floatval($mercancia->precio) * floatval($mercancia->cantidad) + floatval($mercancia->descuento_recatrga), 2, '.', ''),
 
                 ]);
         }
@@ -565,7 +601,8 @@ class FacturaController extends AbstractController
 
         $tipo = $request->get('tipo');
         $codigo = $request->get('codigo');
-        $fecha = $request->get('fecha');
+//        $fecha = $request->get('fecha');
+        $fecha = \DateTime::createFromFormat('d-m-Y', $request->get('fecha'));
         if ($request->get('codigo') == '' || !isset($codigo)) {
             $mercancia_producto_arr = $tipo == 1
                 ? $mercanciaRepository->findBy(['activo' => true])
@@ -581,8 +618,9 @@ class FacturaController extends AbstractController
             if (in_array($d->getIdAmlacen()->getId(), $row_almacenes)) {
                 if ($d->getIdAmlacen()->getDescripcion() == 'Almacén Mercancias para la Venta'
                     || $d->getIdAmlacen()->getDescripcion() == 'Almacén de Productos Terminados') {
-                    $fecha_contable = AuxFunctions::getDateToClose($em, $d->getIdAmlacen()->getId());
-                    if ($fecha == $fecha_contable) {
+                    $fecha_contable = AuxFunctions::getDateToCloseDate($em, $d->getIdAmlacen()->getId());
+
+                    if ($fecha_contable->format('d-m-Y') == $fecha->format('d-m-Y')) {
                         if ($d->getExistencia() > 0) {
                             $row_data[] = array(
                                 'id' => $d->getId(),

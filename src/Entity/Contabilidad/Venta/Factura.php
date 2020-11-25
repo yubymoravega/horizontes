@@ -114,6 +114,12 @@ class Factura
      */
     private $contabilizada;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $ncf;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -322,4 +328,17 @@ class Factura
 
         return $this;
     }
+
+    public function getNcf(): ?string
+    {
+        return $this->ncf;
+    }
+
+    public function setNcf(?string $ncf): self
+    {
+        $this->ncf = $ncf;
+
+        return $this;
+    }
+
 }

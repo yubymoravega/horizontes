@@ -33,6 +33,9 @@ class UnidadController extends AbstractController
                 'id' => $item->getId(),
                 'codigo' => $item->getCodigo(),
                 'nombre' => $item->getNombre(),
+                'correo' => $item->getCorreo(),
+                'telefono' => $item->getTelefono(),
+                'direccion' => $item->getDireccion(),
                 'id_padre' => $item->getIdPadre() ? $item->getIdPadre()->getId() : '',
                 'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : ''
             );

@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -37,6 +38,11 @@ class MovimientoVentaType extends AbstractType
             ->add('codigo')
             ->add('descripcion', TextType::class, [
                 'attr' => ['class' => 'w-100', 'readonly' => true],
+                'label'=>'Nombre de la mercnacía o producto'
+            ])
+            ->add('descripcion_venta', TextareaType::class, [
+                'attr' => ['class' => 'w-100'],
+                'label'=>'Descripción de la venta'
             ])
             ->add('um', TextType::class, [
                 'attr' => ['class' => 'w-100', 'readonly' => true]
@@ -49,7 +55,7 @@ class MovimientoVentaType extends AbstractType
             ])
             ->add('descuento_recarga', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
-                'label' => 'Descuento',
+                'label' => 'Recarga (Impuesto)',
                 'required'=>false
             ])
             ->add('existencia', NumberType::class, [

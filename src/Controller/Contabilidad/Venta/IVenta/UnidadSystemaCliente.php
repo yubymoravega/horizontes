@@ -40,7 +40,35 @@ class UnidadSystemaCliente extends ClientesAdapter implements ICliente
             'id' => $personas_obj->getId(),
             'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre(),
             'codigo' => $personas_obj->getCodigo() ,
-            'name'=>$personas_obj->getNombre()
+            'name'=>$personas_obj->getNombre(),
+            'telefono'=> $personas_obj->getTelefono(),
+            'direccion'=> $personas_obj->getDireccion(),
+        ];
+    }
+    public function findByName($name)
+    {
+        $arr = explode(' - ', $name);
+        $personas_obj = $this->em->getRepository(Unidad::class)->findOneBy([
+            'codigo' => $arr[0],
+            'nombre' => $arr[1],
+            'activo' => true
+        ]);
+        if ($personas_obj)
+            return [
+                'id' => $personas_obj->getId(),
+                'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre(),
+                'codigo' => $personas_obj->getCodigo(),
+                'name' => $personas_obj->getNombre(),
+                'telefono' => $personas_obj->getTelefono(),
+                'direccion' => $personas_obj->getDireccion(),
+            ];
+        return [
+            'id' => '',
+            'nombre' => '',
+            'name' => '',
+            'codigo' => '',
+            'telefono' => '',
+            'direccion' => '',
         ];
     }
 }

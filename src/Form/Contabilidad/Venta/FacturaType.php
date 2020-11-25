@@ -33,12 +33,10 @@ class FacturaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('fecha_factura', DateType::class, [
-                'input' => 'datetime',
-                'label' => 'Fecha de la factura',
-                'attr' => ['class' => 'w-100'],
-                'widget' => 'single_text',
-            ])
+//            ->add('fecha_factura', TextType::class, [
+//                'label' => 'Fecha de la factura',
+//                'attr' => ['class' => 'w-100', 'readonly' => true]
+//            ])
             ->add('tipo_cliente', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Tipo cliente',
@@ -51,6 +49,10 @@ class FacturaType extends AbstractType
             ])
             ->add('nro_factura', TextType::class, [
                 'attr' => ['class' => 'w-50 form-control form-control-sm mr-2']
+            ])
+            ->add('ncf', TextType::class, [
+                'attr' => ['class' => 'w-100 form-control form-control-sm mr-2'],
+                'label'=>'NCF'
             ])
             ->add('id_contrato', EntityType::class, [
                 'attr' => ['class' => 'w-100'],

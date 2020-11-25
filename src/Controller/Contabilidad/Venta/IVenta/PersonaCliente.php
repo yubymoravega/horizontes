@@ -39,7 +39,34 @@ class PersonaCliente extends ClientesAdapter implements ICliente
             'id' => $personas_obj->getId(),
             'nombre' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos(),
             'name' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos(),
-            'codigo' => $personas_obj->getCorreo()
+            'codigo' => $personas_obj->getCorreo(),
+            'telefono' => $personas_obj->getTelefono(),
+            'direccion' => $personas_obj->getDireccion(),
+        ];
+    }
+
+    public function findByName($name)
+    {
+        $personas_arr = $this->em->getRepository(Cliente::class)->findAll();
+        /** @var Cliente $personas_obj */
+        foreach ($personas_arr as $personas_obj) {
+            if (($personas_obj->getNombre() . ' ' . $personas_obj->getApellidos()) == $name)
+                return [
+                    'id' => $personas_obj->getId(),
+                    'nombre' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos(),
+                    'name' => $personas_obj->getNombre() . ' ' . $personas_obj->getApellidos(),
+                    'codigo' => $personas_obj->getCorreo(),
+                    'telefono' => $personas_obj->getTelefono(),
+                    'direccion' => $personas_obj->getDireccion(),
+                ];
+        }
+        return [
+            'id' => '',
+            'nombre' => '',
+            'name' => '',
+            'codigo' => '',
+            'telefono' => '',
+            'direccion' => '',
         ];
     }
 }
