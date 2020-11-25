@@ -1,0 +1,644 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {# Modal de Cuentas#}
+    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias o
+                        productos</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app" style="height: 600px;">
+                    <div style="height: 500px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light">
+                            <thead class="thead-dark">
+                            <th style="width: 10px">Sel.</th>
+                            <th style="width: 160px">Cta/Subcta</th>
+                            <th style="width: 160px">Código</th>
+                            <th scope="col-6">Descripción</th>
+                            <th style="width: 200px">Existencia</th>
+                            </thead>
+                            <tbody id="rows_table">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
+                                    onclick="SeleccionarMercancia()"
+                                    data-dismiss="modal">Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+
+            <div class="container">
+                <div class="row mt-0 p-0">
+                    <div class="col-8">
+                        <h1 class="text-reporte text-right mr-0">Factura </h1>
+                    </div>
+                    <div class="col-4 mt-0 px-0 d-flex align-items-center">
+                        <span class="h5 text-light m-0 mr-2">#</span>
+                        {#<input type="number" id="select_nros" value="{{ nro_factura }}" class="w-25">#}
+                        {{ form_widget(form_factura.nro_factura) }}
+                    </div>
+                </div>
+            </div>
+
+            {# --------- Datos de la venta --------------#}
+            <div class="card-body">
+                {{ form_start(form_factura,{'attr': {'class': 'text-left','id':'form_factura','method':'POST'}}) }}
+                {#                {{ form_widget(form_factura.nro_factura, {'arrt':{'type':'hidden'}}) }}#}
+                <div class="row mt-0 p-0">
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.fecha_factura) }}
+                        {{ form_widget(form_factura.fecha_factura) }}
+                    </div>
+                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.tipo_cliente) }}
+                        {{ form_widget(form_factura.tipo_cliente) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.id_cliente) }}
+                        {{ form_widget(form_factura.id_cliente) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0 mb-3">
+                    <div class="col-12 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.id_contrato) }}
+                        {{ form_widget(form_factura.id_contrato) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.cuenta_obligacion) }}
+                        {{ form_widget(form_factura.cuenta_obligacion) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.subcuenta_obligacion) }}
+                        {{ form_widget(form_factura.subcuenta_obligacion) }}
+                    </div>
+                </div>
+                {{ form_end(form_factura) }}
+
+                {# --------- Venta de Mercancias o Productos --------------#}
+
+                {{ form_start(form_venta, { 'attr':{ 'id': 'form_movimientoventa' }}) }}
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Productos</h3>
+                    <div class="px-2" style="background: dimgray; border-radius: .3rem;">
+                        <span class="pr-1">Importe Total : </span>
+                        <span id="importe-total">0</span>
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+                <div class="row mt-0">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.mercancia) }}
+                        {{ form_widget(form_venta.mercancia) }}
+                    </div>
+                    <div class="col-2 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.codigo) }}
+                        <div class="row m-0 p-0">
+                            <div class="col-9 p-0">
+                                {{ form_widget(form_venta.codigo) }}
+                            </div>
+                            <div class="col-1 mt-0 p-0">
+                                <button class="btn btn-secondary btn-sm" type="button"
+                                        id="btnSearchMercancia"
+                                        onclick="buscarProducto()"><i
+                                            class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.descripcion) }}
+                        {{ form_widget(form_venta.descripcion) }}
+                    </div>
+                    <div class="col-2 mt-0 pl-0 form-group input-group input-group-sm d-block ">
+                        {{ form_label(form_venta.um) }}
+                        {{ form_widget(form_venta.um) }}
+                    </div>
+                </div>
+                <div class="row mt-0">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.cantidad) }}
+                        {{ form_widget(form_venta.cantidad, {'type': 'number'}) }}
+                    </div>
+                    <div class="col-3 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.precio) }}
+                        {{ form_widget(form_venta.precio, {'type': 'number'}) }}
+                    </div>
+                    <div class="col-3 mt-0 pl-0 form-group input-group input-group-sm d-block ">
+                        {{ form_label(form_venta.descuento_recarga) }}
+                        {{ form_widget(form_venta.descuento_recarga, {'type': 'number'}) }}
+                    </div>
+                    <div class="col-2 mt-0 pl-0 form-group input-group input-group-sm d-block ">
+                        <label for="importe_id">Importe</label>
+                        <input type="number" id="importe_id" name="importe" class="w-100 form-control"
+                               readonly="readonly">
+                    </div>
+                    <div class="col-2 mt-0 pl-0 form-group input-group input-group-sm d-block ">
+                        {{ form_label(form_venta.existencia) }}
+                        {{ form_widget(form_venta.existencia) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.cuenta_acreedora) }}
+                        {{ form_widget(form_venta.cuenta_acreedora) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.subcuenta_acreedora) }}
+                        {{ form_widget(form_venta.subcuenta_acreedora) }}
+                    </div>
+                    <input type="hidden" id="id_almacen">
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.cuenta_deudora) }}
+                        {{ form_widget(form_venta.cuenta_deudora) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_venta.subcuenta_deudora) }}
+                        {{ form_widget(form_venta.subcuenta_deudora) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <button class="btn btn-secondary btn-sm ml-auto mr-3" type="button" id="btnAplicarMercancia">
+                        ADICIONAR
+                    </button>
+                </div>
+                {{ form_end(form_venta) }}
+                <div class="mt-3">
+                    <table class="table-small-rows table table-hover text-light">
+                        <thead class="thead-dark">
+                        <th style="width: 85px;">Tipo</th>
+                        <th style="width: 50px;">Codigo</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Desc./Rec.</th>
+                        <th>Importe</th>
+                        <th scope="col-1">Nueva Exist</th>
+                        <th style="width: 45px;"><i class="fa fa-minus-circle text-danger"></i></th>
+                        <th scope="col-1" hidden>UM</th>
+                        <th scope="col-1" hidden>Descripcion</th>
+                        </thead>
+                        <tbody id="rows_mercancias">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex mt-2">
+                    <div class="mr-auto">
+                        <a href="{{ url('venta') }}"
+                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                    </div>
+                    <div class="ml-2">
+                        <button type="button" class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Vale()">
+                            imprimir
+                        </button>
+                    </div>
+                    <div class="ml-2">
+                        <button type="button" class='my-0 btn btn-secondary' id="btnSubmitFactura">Facturar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        let mercancia = [];
+
+        /** Imprimir factura */
+        function Print_Vale() {
+            if (lista_mercancias.length > 0) {
+                const nro_factura = $("#factura_nro_factura").val()
+                const fecha_factura = $("#factura_fecha_factura").val()
+                const contrato = $('#factura_id_contrato option:selected').text()
+                const cliente = $("#factura_id_cliente option:selected").text()
+
+                const mercancia_json = JSON.stringify(lista_mercancias)
+                $('body').append(`
+                    <form action='/contabilidad/venta/factura/print-current'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='text' hidden name='datos[nro_factura]' value='${nro_factura}'/>
+                        <input type='text' hidden name='datos[fecha_factura]' value='${fecha_factura}'/>
+                        <input type='text' hidden name='datos[contrato]' value='${contrato}'/>
+                        <input type='text' hidden name='datos[cliente]' value='${cliente}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                    </form>`)
+
+                const fomrulario = $('#form_print_current')
+                fomrulario.submit()
+                fomrulario.remove()
+            } else
+                alertTemplate('No excisten mercancias para imprimir', 'danger')
+        }
+
+        /** variables  */
+        let lista_mercancias = []
+        let importe_total = 0
+
+        $(document).ready(function () {
+
+            /**
+             *  ------------------------- Init -----------------------------------------
+             */
+
+            $('select').prepend(`<option value = 0 selected=false disabled> --- seleccine --- </option>`)
+            $('select').val(0)
+
+            const form_factura = $('#form_factura')
+            const form_movimientoventa = $('#form_movimientoventa')
+            const tabla_mercancias = $('#rows_mercancias')
+
+            /** selects  */
+            const cbx_tipoCliente = $('#factura_tipo_cliente')
+            const cbx_cliente = $('#factura_id_cliente')
+            const cbx_cuentaObligacion = $('#factura_cuenta_obligacion')
+            const cbx_subcuentaObligacion = $('#factura_subcuenta_obligacion')
+            const cbx_cuentaDeudora = $('#movimiento_venta_cuenta_deudora')
+            const cbx_subcuentaDeudora = $('#movimiento_venta_subcuenta_deudora')
+            const cbx_cuentaAcreedora = $('#movimiento_venta_cuenta_acreedora')
+            const cbx_subcuentaAcreedora = $('#movimiento_venta_subcuenta_acreedora')
+            const cbx_tipo = $('#movimiento_venta_mercancia')
+
+            /**  inputs */
+            const txt_nroFactura = $('#factura_nro_factura')
+            const txt_codigoMercancia = $('#movimiento_venta_codigo')
+            const txt_descripMercancia = $('#movimiento_venta_descripcion')
+            const txt_umMercancia = $('#movimiento_venta_um')
+            const txt_cantidadMercancia = $('#movimiento_venta_cantidad')
+            const txt_precioMercancia = $('#movimiento_venta_precio')
+            const txt_descuento_recargaMercancia = $('#movimiento_venta_descuento_recarga')
+            const txt_existenciaMercancia = $('#movimiento_venta_existencia')
+            const txt_importeMercancia = $('#importe_id')
+            const label_importeTotal = $("#importe-total")
+
+            /** buttons */
+            const btn_adicionarMercancia = $('#btnAplicarMercancia')
+            const btn_submitFactura = $('#btnSubmitFactura')
+
+            /** validaciones de Formularios */
+            form_factura.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'factura[nro_factura]': "required",
+                    'factura[fecha_factura]': "required",
+                    'factura[tipo_cliente]': "required",
+                    'factura[id_cliente]': "required",
+                    'factura[cuenta_obligacion]': "required",
+                    'factura[subcuenta_obligacion]': "required",
+                },
+                messages: {
+                    'factura[nro_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[tipo_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[cuenta_obligacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[subcuenta_obligacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                }
+            })
+            form_movimientoventa.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'movimiento_venta[mercancia]': "required",
+                    'movimiento_venta[codigo]': "required",
+                    'movimiento_venta[descripcion]': "required",
+                    'movimiento_venta[um]': "required",
+                    'movimiento_venta[cantidad]': "required",
+                    'movimiento_venta[precio]': "required",
+                    // 'movimiento_venta[descuento_recarga]': "required",
+                    'movimiento_venta[importe]': "required",
+                    'movimiento_venta[existencia]': "required",
+                    'movimiento_venta[cuenta_deudora]': "required",
+                    'movimiento_venta[subcuenta_deudora]': "required",
+                    'movimiento_venta[cuenta_acreedora]': "required",
+                    'movimiento_venta[subcuenta_acreedora]': "required",
+                },
+                messages: {
+                    'movimiento_venta[mercancia]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[codigo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[um]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[cantidad]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[precio]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    // 'movimiento_venta[descuento_recarga]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[importe]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[existencia]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[subcuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[cuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_venta[subcuenta_acreedora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                }
+            })
+
+            /**
+             * --------------------------------- Loads & Functions ------------------------------------
+             */
+
+            /** cargar otras facturas */
+            txt_nroFactura.on('keyup', function (event) {
+                event.preventDefault()
+                if (event.which == 13) {
+                    loadingModal.show()
+                    window.location.replace('/contabilidad/venta/factura/' + $(this).val())
+                }
+            })
+
+            /** obtener los clientes por el tipo cliente seleccionado */
+            cbx_tipoCliente.on('change', function () {
+                cbx_cliente.find('option').remove()
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            result.clientes.forEach(
+                                el => cbx_cliente.append(`<option value = "${el.id}">${el.nombre} </option>`)
+                            )
+                            cbx_cliente
+                        } else {
+
+                        }
+                        loadingModal.close()
+                    },
+                    error: function () {
+                    }
+                })
+            })
+
+            /** cargar las subcuentas de la cuenta seleccionada */
+            const loadSubcuentas = function () {
+                const nro_cuenta = $(this).val()
+                const id_select = $(this).attr('id')
+                loadingModal.show()
+                $.ajax({
+                    url: `/contabilidad/venta/factura/get-subcuentas-bycuenta/${nro_cuenta}`,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            let subcuenta = null;
+                            switch (id_select) {
+                                case cbx_cuentaObligacion.attr('id'):
+                                    subcuenta = cbx_subcuentaObligacion
+                                    break;
+                                case cbx_cuentaAcreedora.attr('id'):
+                                    subcuenta = cbx_subcuentaAcreedora
+                                    break;
+                                case cbx_cuentaDeudora.attr('id'):
+                                    subcuenta = cbx_subcuentaDeudora
+                                    break;
+                            }
+                            subcuenta.find('option').remove()
+                            subcuenta.prepend(`<option value = 0 selected=false disabled> --- seleccine --- </option>`)
+                            result.data.forEach(el => subcuenta.append(`<option value="${el.nro_subcuenta}">${el.nombre}</option>`))
+
+                        } else {
+
+                        }
+                        loadingModal.close()
+                    }
+                })
+            }
+            cbx_cuentaObligacion.on('change', loadSubcuentas)
+            cbx_cuentaAcreedora.on('change', loadSubcuentas)
+            cbx_cuentaDeudora.on('change', loadSubcuentas)
+
+            txt_codigoMercancia.on('keyup', function (event) {
+                if (event.which == 13) {
+                    buscarProducto()
+                } else {
+                    txt_descripMercancia.val('')
+                    txt_umMercancia.val('')
+                    txt_cantidadMercancia.val('')
+                    txt_precioMercancia.val('')
+                    txt_descuento_recargaMercancia.val('')
+                    txt_importeMercancia.val('')
+                    txt_existenciaMercancia.val('')
+                    cbx_cuentaDeudora.val(0)
+                    cbx_subcuentaDeudora.val(0)
+                    cbx_cuentaAcreedora.val(0)
+                    cbx_subcuentaAcreedora.val(0)
+                }
+            })
+
+            /** Reset forms */
+            function resetFormMercancia() {
+                cbx_tipo.val(0)
+                txt_codigoMercancia.val('')
+                txt_descripMercancia.val('')
+                txt_umMercancia.val('')
+                txt_cantidadMercancia.val('')
+                txt_precioMercancia.val('')
+                txt_descuento_recargaMercancia.val('')
+                txt_importeMercancia.val('')
+                txt_existenciaMercancia.val('')
+                cbx_cuentaDeudora.val(0)
+                cbx_subcuentaDeudora.val(0)
+                cbx_cuentaAcreedora.val(0)
+                cbx_subcuentaAcreedora.val(0)
+            }
+
+            /**
+             * --------------------------------- Acctions ------------------------------------
+             */
+
+            /** calculos de Importe */
+            txt_cantidadMercancia.on('keyup', function (event) {
+
+                const cantidad = parseFloat($(this).val()) || 0
+                const precio = parseFloat(txt_precioMercancia.val()) || 0
+                const existencia = parseFloat(txt_existenciaMercancia.val()) || 0
+                txt_importeMercancia.val(parseFloat(cantidad * precio).toFixed(2))
+
+                if (existencia < cantidad) {
+                    $(this).val('')
+                    txt_importeMercancia.val('')
+                    alertTemplate('La cantidas supera la existencia', 'danger')
+                }
+            })
+            txt_precioMercancia.on('keyup', function (event) {
+                const precio = parseFloat($(this).val()) || 0
+                const cantidad = parseFloat(txt_cantidadMercancia.val()) || 0
+                txt_importeMercancia.val(parseFloat(cantidad * precio).toFixed(2))
+            })
+
+            /** Adicionar mercancias */
+            btn_adicionarMercancia.click(function (event) {
+                if (form_movimientoventa.valid()) {
+
+                    const tipo = cbx_tipo.val()
+                    const codigo = txt_codigoMercancia.val()
+                    const descripcion = txt_descripMercancia.val()
+                    const um = txt_umMercancia.val()
+                    const cantidad = txt_cantidadMercancia.val()
+                    const precio = txt_precioMercancia.val()
+                    const descuento_recatrga = txt_descuento_recargaMercancia.val()
+                    const importe = txt_importeMercancia.val()
+                    const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
+                    const cuenta_deudora = cbx_cuentaDeudora.val()
+                    const subcuenta_deudora = cbx_subcuentaDeudora.val()
+                    const cuenta_acreedora = cbx_cuentaAcreedora.val()
+                    const subcuenta_acreedora = cbx_subcuentaAcreedora.val()
+                    const id_almacen = $('#id_almacen').val()
+
+                    //validar que el codigo no se repita
+                    if (lista_mercancias.some(e => e.codigo === codigo)) {
+                        alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
+                    } else {
+
+                        lista_mercancias.push({
+                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,
+                            cuenta_deudora, cuenta_acreedora, subcuenta_deudora, subcuenta_acreedora, id_almacen
+                        })
+                        importe_total += (parseFloat(importe) + parseFloat(descuento_recatrga))
+                        label_importeTotal.text('$' + importe_total.toFixed(2))
+
+                        tabla_mercancias.append(`<tr>
+                        <td style="width: 85px; font-weight: 400"> ${tipo == 1 ? 'Mercancía' : 'Producto'}</td>
+                        <td style="width: 50px;"> ${codigo}</td>
+                        <td> ${cantidad}</td>
+                        <td> ${parseFloat(precio).toFixed(2)} </td>
+                        <td> ${parseFloat(descuento_recatrga).toFixed(2)} </td>
+                        <td> ${parseFloat(importe).toFixed(2)}</td>
+                        <td> ${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td style="width: 45px;"> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td></tr>`
+                        );
+                        resetFormMercancia()
+                    }
+
+                }
+            })
+
+            btn_submitFactura.click(function (event) {
+                event.preventDefault()
+                if (form_factura.valid()) {
+                    if (lista_mercancias.length) {
+                        // proceso de facturación
+                        const mercancias = JSON.stringify(lista_mercancias)
+                        form_factura.append(`<input type="text" hidden name="mercancias" value='${mercancias}' />`)
+                        form_factura.append(`<input type="text" hidden name="importe_total" value='${importe_total}' />`)
+                        // form_factura.append(txt_nroFactura)
+                        loadingModal.show()
+                        form_factura.submit()
+                    } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+                }
+            })
+
+            /** eliminar la mercancia de la lista */
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                const mercancia = lista_mercancias.find(e => e.codigo === $(this).attr('id-mercancia'))
+                importe_total -= Number.parseFloat(mercancia.importe)
+                label_importeTotal.text('$' + importe_total.toFixed(2))
+                lista_mercancias = lista_mercancias.filter(e => e.codigo !== $(this).attr('id-mercancia'))
+                $(this).closest('tr').remove()
+            })
+        })
+
+        function buscarProducto() {
+            loadingModal.show()
+            $.ajax({
+                method: 'POST',
+                url: '{{ path('cont_venta_get_mercancia_producto') }}',
+                data: {tipo: $('#movimiento_venta_mercancia').val(), codigo: $('#movimiento_venta_codigo').val()},
+                success: function (result) {
+                    if (result.success) {
+                        $('#rows_table').find('tr').remove();
+                        if (result.data.length > 1) {
+                            mercancia = result.data
+                            $(result.data).each(function (pos, valor) {
+                                $('#rows_table').append('<tr>' +
+                                    '<td style="font-weight:400;"> ' +
+                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
+                                    '</td>' +
+                                    '<td style="font-weight:400;" class="text-center"> ' + valor.cuenta + '/' + valor.subcuenta + '</td>' +
+                                    '<td style="font-weight:400;" class="text-center"> ' + valor.codigo + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                    '<td style="font-weight:400;" class="text-right"> ' + valor.existencia + '</td> </tr>'
+                                );
+                            })
+                            $('#listarMercanciasModal').modal('show')
+                        } else if (result.data.length == 1) {
+                            $('#listarMercanciasModal').modal('hide')
+                            const data = result.data[0]
+                            $('#movimiento_venta_descripcion').val(data.descripcion)
+                            $('#movimiento_venta_um').val(data.um)
+                            $('#movimiento_venta_existencia').val(data.existencia)
+                            $('#movimiento_venta_codigo').val(data.codigo)
+                            // $('#movimiento_venta_cuenta_acreedora').val(data.nro_cuenta_acreedora)
+                            // $('#movimiento_venta_subcuenta_acreedora').val(data.nro_subcuenta_acreedora)
+                            $('#id_almacen').val(data.id_almacen)
+                        } else {
+                            $('#listarMercanciasModal').modal('hide')
+                            let type = $('#movimiento_venta_mercancia').val() == 1 ? 'mercancías' : 'producto'
+                            alertTemplate('No existen ' + type + ' con el código especificado.', 'danger')
+                        }
+                    }
+                    loadingModal.close()
+                },
+                error: function (error) {
+                    loadingModal.close()
+                    alertTemplate('Error interno, verifique el código', 'danger')
+                }
+            })
+        }
+
+        function SeleccionarMercancia() {
+            for (var i = 0; i < mercancia.length; i++) {
+                let id = '#' + mercancia[i]['id']
+                if ($(id).prop('checked') == true) {
+                    $('#movimiento_venta_descripcion').val(mercancia[i]['descripcion'])
+                    $('#movimiento_venta_um').val(mercancia[i]['um'])
+                    $('#movimiento_venta_existencia').val(mercancia[i]['existencia'])
+                    $('#movimiento_venta_cuenta_acreedora').val(mercancia[i]['nro_cuenta_acreedora'])
+                    $('#movimiento_venta_subcuenta_acreedora').val(mercancia[i]['nro_subcuenta_acreedora'])
+                    $('#id_almacen').val(mercancia[i]['id_almacen'])
+                    $('#movimiento_venta_codigo').val(mercancia[i]['codigo'])
+                    break
+                }
+            }
+        }
+    </script>
+{% endblock %}

@@ -22,6 +22,21 @@ class UnidadRepository extends ParanoidEntityRepository
         parent::__construct();
     }
 
+    /**
+     * Retorna todas las unidades esepto la del $id
+     * @param $id
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function findAllNotMe($id)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.activo = true')
+            ->andWhere('u.id != :val')
+            ->setParameter('val', $id)
+            ->orderBy('u.nombre', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
     // /**
     //  * @return Unidad[] Returns an array of Unidad objects
     //  */

@@ -9,7 +9,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=SubcuentaRepository::class)
- * @UniqueEntity(fields={"nro_subcuenta"},message="contabilidad.config.subcuenta_nro_unique")
  */
 class Subcuenta
 {
@@ -24,6 +23,11 @@ class Subcuenta
      * @ORM\Column(type="string", length=255)
      */
     private $nro_subcuenta;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $elemento_gasto;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -111,4 +115,17 @@ class Subcuenta
 
         return $this;
     }
+
+    public function getElementoGasto(): ?bool
+    {
+        return $this->elemento_gasto;
+    }
+
+    public function setElementoGasto(bool $elemento_gasto): self
+    {
+        $this->elemento_gasto = $elemento_gasto;
+
+        return $this;
+    }
+
 }

@@ -3,19 +3,27 @@
 configuraciones:
   tipo_documento:
     - id: 1
-      name: "INFORME DE RECECIÓN"
+      name: "INFORME DE RECECIÓN MERCANCIA"
     - id: 2
-      name: "AJUSTE DE ENTRADA"
+      name: "INFORME DE RECECIÓN PRODUCTO"
     - id: 3
-      name: "AJUSTE DE SALIDA"
+      name: "AJUSTE DE ENTRADA"
     - id: 4
-      name: "TRANSFERENCIA DE ENTRADA"
+      name: "AJUSTE DE SALIDA"
     - id: 5
-      name: "TRANSFERENCIA DE SALIDA"
+      name: "TRANSFERENCIA DE ENTRADA"
     - id: 6
-      name: "VALE DE SALIDA"
+      name: "TRANSFERENCIA DE SALIDA"
     - id: 7
+      name: "VALE DE SALIDA MERCANCIA"
+    - id: 8
+      name: "VALE DE SALIDA PRODUCTO"
+    - id: 9
       name: "DEVOLUCION"
+    - id: 10
+      name: "VENTA"
+    - id: 11
+      name: "DEVOLUCION VENTA"
 
   modulo:
     - id: 1
@@ -30,3 +38,34 @@ configuraciones:
       name: "CAPITAL HUMANO"
     - id: 6
       name: "GENERAL"
+
+  tipo_comprobantes:
+    - id: 1
+      name: "COMPROBANTE DE APERTURA"
+      abreviatura: "AP"
+    - id: 2
+      name: "COMPROBANTE DE OPERACIONES"
+      abreviatura: "00"
+
+  tipo_movimiento:
+    - id: 1
+      name: "APERTURA"
+      abreviatura: "AP"
+    - id: 2
+      name: "COMPRA"
+      abreviatura: "A"
+    - id: 3
+      name: "TRASLADO INTERNO"
+      abreviatura: "TI"
+    - id: 4
+      name: "TRASLADOS ENVIADOS"
+      abreviatura: "TE"
+    - id: 5
+      name: "TRASLADOS RECIVIDOS"
+      abreviatura: "TR"
+    - id: 6
+      name: "BAJAS DE ACTIVOS"
+      abreviatura: "BA"
+    - id: 7
+      name: "VENTA DE ACTIVOS"
+      abreviatura: "VA"

@@ -5,8 +5,13 @@ namespace App\Entity\Contabilidad\Config;
 use App\Repository\Contabilidad\Config\CuentaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+// validadciones
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 /**
  * @ORM\Entity(repositoryClass=CuentaRepository::class)
+ * @UniqueEntity("nro_cuenta", message="contabilidad.config.nro_cuenta_unique")
  */
 class Cuenta
 {
@@ -18,7 +23,7 @@ class Cuenta
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer", length=255)
      */
     private $nro_cuenta;
 
@@ -33,15 +38,15 @@ class Cuenta
     private $deudora;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $mixta;
+
+    /**
      * @ORM\ManyToOne(targetEntity=TipoCuenta::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_tipo_cuenta;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $elemento_gasto;
 
     /**
      * @ORM\Column(type="boolean")
@@ -58,17 +63,22 @@ class Cuenta
      */
     private $activo;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $produccion;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNroCuenta(): ?string
+    public function getNroCuenta(): ?int
     {
         return $this->nro_cuenta;
     }
 
-    public function setNroCuenta(string $nro_cuenta): self
+    public function setNroCuenta(int $nro_cuenta): self
     {
         $this->nro_cuenta = $nro_cuenta;
 
@@ -99,6 +109,18 @@ class Cuenta
         return $this;
     }
 
+    public function getMixta(): ?bool
+    {
+        return $this->mixta;
+    }
+
+    public function setMixta(bool $mixta): self
+    {
+        $this->mixta = $mixta;
+
+        return $this;
+    }
+
     public function getIdTipoCuenta(): ?TipoCuenta
     {
         return $this->id_tipo_cuenta;
@@ -107,18 +129,6 @@ class Cuenta
     public function setIdTipoCuenta(?TipoCuenta $id_tipo_cuenta): self
     {
         $this->id_tipo_cuenta = $id_tipo_cuenta;
-
-        return $this;
-    }
-
-    public function getElementoGasto(): ?bool
-    {
-        return $this->elemento_gasto;
-    }
-
-    public function setElementoGasto(bool $elemento_gasto): self
-    {
-        $this->elemento_gasto = $elemento_gasto;
 
         return $this;
     }
@@ -155,6 +165,17 @@ class Cuenta
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+    public function getProduccion(): ?bool
+    {
+        return $this->produccion;
+    }
+
+    public function setProduccion(bool $produccion): self
+    {
+        $this->produccion = $produccion;
 
         return $this;
     }

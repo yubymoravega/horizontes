@@ -1,75 +1,62 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    {#Style#}
-    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
-    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Plan de Cuentas {% endblock %}
+{% block style %}
     <style>
-        @media print {
-            #footer {
-                position: fixed;
-                display: block;
-                bottom: 0;
-            }
+        @page
+        {
+            size: auto;
+            margin: 15mm 8mm 13.5mm 5mm;
         }
+        body
+        {
+            margin: 0;
+            padding: 0;
+        }
+
+      table { page-break-inside:auto } tr { page-break-inside:avoid; page-break-after:auto } thead { display:table-header-group } tfoot { display:table-footer-group }
     </style>
+{% endblock %}
 
-    <title>Imprimir Informe</title>
-</head>
-<body>
-<div class="container-fluid mt-3 d-flex flex-column align-items-center" style="height: 1000px;">
-    <h3>Plan de cuentas</h3>
-    <table border="1" width="1000px" class="mt-1 text-center">
-        <tbody>
-        <tr>
-            <td width="90" class="text-left"><strong>Cuenta</strong></td>
-            <td width="180" class="text-left"><strong>Nombre</strong></td>
-            <td width="40"><strong>Nat.</strong></td>
-            <td width="40"><strong>E. Gasto</strong></td>
-            <td width="100"><strong>Oblg. Deudora</strong></td>
-            <td width="100"><strong>Oblg. Acreedora</strong></td>
-            <td width="180" class="text-left"><strong>Tipo</strong></td>
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column align-items-center" style="height: 1000px;">
+        <h3>Plan de cuentas</h3>
+        <table border="0" width="1000px" class="mt-1 mx-5  text-center">
+            <thead>
+
+            <th width="90" class="text-left"><strong>Cuenta</strong></th>
+            <th width="180" class="text-left"><strong>Nombre</strong></th>
+            <th width="40"><strong>Nat.</strong></th>
             {% for i in range(1,maximo_criterios) %}
-                <td width="75"><strong>Análisis {{ i }}</strong></td>
+                <th width="75"><strong>Análisis {{ i }}</strong></th>
             {% endfor %}
-        </tr>
-        </tbody>
-    </table>
-    <table width="1000px" class="text-center">
-        {% for item in cuentas %}
-            <tr>
-                <td width="90" class="text-left">{{ item.nro_cuenta }}</td>
-                <td width="180" class="text-left">{{ item.nombre }}</td>
-                <td width="40">{{ item.naturaleza }}</td>
-                <td width="40">{{ item.elemento_gasto }}</td>
-                <td width="100">{{ item.obligacion_deudora }}</td>
-                <td width="100">{{ item.obligacion_aceedora }}</td>
-                <td width="180" class="text-left">{{ item.nombre_tipo_cuenta }}</td>
-                {% for criterio in item.abreviaturas %}
-                    <td width="75">{{ criterio.abreviatura }}</td>
-                {% endfor %}
-            </tr>
-            {% for subcuenta in item.subcuentas %}
+            <th width="50" class="text-center"><strong>Obligación</strong></th>
+
+            </thead>
+            <tbody>
+            {% for item in cuentas %}
                 <tr>
-                    <td width="90" class="text-left">{{ item.nro_cuenta }}/{{ subcuenta.nro_subcuenta }}</td>
-                    <td width="180" class="text-left">{{ subcuenta.nombre }}</td>
-                    <td width="40">{{ subcuenta.naturaleza }}</td>
+                    <td width="90" class="text-left">{{ item.nro_cuenta }}</td>
+                    <td width="180" class="text-left">{{ item.nombre }}</td>
+                    <td width="40">{{ item.naturaleza }}</td>
+                    {% for i in range(0,maximo_criterios-1) %}
+                        {% if item.abreviaturas|length > 0  and i < item.abreviaturas|length%}
+                            <td width="75">{{ item.abreviaturas[i]['abreviatura'] }}</td>
+                        {% else %}
+                            <td width="75"></td>
+                        {% endif %}
+                    {% endfor %}
+                    <td width="50" class="text-center">{{ item.obligacion }}</td>
                 </tr>
+                {% for subcuenta in item.subcuentas %}
+                    <tr>
+                        <td width="90" class="text-left">{{ item.nro_cuenta }}/{{ subcuenta.nro_subcuenta }}</td>
+                        <td width="180" class="text-left">{{ subcuenta.nombre }}</td>
+                        <td width="40">{{ subcuenta.naturaleza }}</td>
+                    </tr>
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
-    </table>
+            </tbody>
+        </table>
 
-</div>
-
-{#JavaScript#}
-<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
-<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
-
-</body>
-</html>
+    </div>
+{% endblock %}

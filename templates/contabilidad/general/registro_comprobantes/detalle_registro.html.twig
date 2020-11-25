@@ -1,0 +1,103 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Comprobante de Operaciones {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                {% if almacen!='' %}
+                    <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Comprobante de
+                        operaciones
+                    </td>
+                {% else %}
+                    <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Comprobante de
+                        operaciones de Venta
+                    </td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td style="width: 180px"><strong>Fecha: </strong> {{ fecha }}</td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Almacén:</strong> {{ almacen }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="1" width="960px" class="text-center">
+            <thead>
+            <th width="70px">Fecha</th>
+            <th width="175px">Cuenta</th>
+            <th width="120px">Subcuenta</th>
+            <th width="120px">Análisis 1</th>
+            <th width="120px">Análisis 2</th>
+            <th width="120px">Débitos</th>
+            <th width="120px">Créditos</th>
+            </thead>
+
+            <tbody>
+            {% for info in datos %}
+            <table border="0" width="960px" class="text-center">
+                <div style="background-color: #cecbcb; width: 960px; height: 30px">
+                    <p><strong>Documento: </strong>{{ info.nro_doc }}</p>
+                </div>
+                {% for item in info.datos %}
+                    {% if item.nro_cuenta == '' %}
+                        <tr>
+                            <td style="font-weight:400;width:136px">{{ item.fecha }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.nro_cuenta }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.nro_subcuenta }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.analisis_1 }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.analisis_2 }}</td>
+                            <td style="font-weight:400;width:136px"
+                                class="text-right border-top pb-3">{{ item.debito }}</td>
+                            <td style="font-weight:400;width:136px"
+                                class="text-right border-top pb-3">{{ item.credito }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td style="font-weight:400;width:136px">{{ item.fecha }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.nro_cuenta }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.nro_subcuenta }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.analisis_1 }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.analisis_2 }}</td>
+                            <td style="font-weight:400;width:136px" class="text-right">{{ item.debito }}</td>
+                            <td style="font-weight:400;width:136px" class="text-right">{{ item.credito }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </table>
+        {% endfor %}
+        <table width="960px" class="text-center">
+            <tr>
+                <td width="700px" class="font-weight-bold">TOTAL</td>
+                <td class="font-weight-bold text-right">{{ total_debito }}</td>
+                <td class="font-weight-bold text-right">{{ total_credito }}</td>
+            </tr>
+        </table>
+        <form action="{{ path('contabilidad_inventario_comprobante_operaciones_guardar') }}" method="post">
+            <div style="width: 960px" class="mt-2">
+                <label for="observacion" class="font-weight-bold">Observación:</label>
+                <textarea name="observacion" id="observacion" cols="120" rows="4" class="w-100"
+                          readonly>{{ observacion }}</textarea>
+                <input type="text" name="fecha" hidden value="{{ fecha }}">
+                <input type="text" name="debito" hidden value="{{ total_debito }}">
+                <input type="text" name="credito" hidden value="{{ total_credito }}">
+            </div>
+        </form>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary" onclick="imprimir()"> Imprimir</button>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
+{% endblock %}

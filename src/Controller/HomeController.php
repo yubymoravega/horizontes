@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use App\Entity\User;
 use App\Entity\Pais;
 use App\Entity\MonedaPais;
@@ -41,22 +42,33 @@ class HomeController extends AbstractController
      */
     public function home()
     {
+
         $user =  $this->getUser();
         $dataBase = $this->getDoctrine()->getManager();
         $carrito = $dataBase->getRepository(Carrito::class)->findBy(['empleado' => $user->getUsername()]);
-        
-        if(count($carrito) > 0){
 
+
+        //Código del módulo de CONTABILIDAD, NO BORRAR
+        $user = $this->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $almacen_ocupado_er = $em->getRepository(AlmacenOcupado::class);
+        $obj_almacen_ocupado = $almacen_ocupado_er->findOneBy(array(
+            'id_usuario'=>$user
+        ));
+        if($obj_almacen_ocupado){
+            $em->remove($obj_almacen_ocupado);
+            $em->flush();
+        }
+        //Fin del código
+
+        if(count($carrito) > 0){
             $this->addFlash(
                 'error',
                 'Tiene una factura en el Carrito. Debe finalizarla para continuar'
             );
-            
            $orden = json_decode($carrito[0]->getJson());
-
             return $this->redirectToRoute('categorias', ['tel' => $orden->idCliente]);
         }
-        
         return $this->render('home/index.html.twig');
     }
 

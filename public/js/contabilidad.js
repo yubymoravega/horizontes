@@ -1,4 +1,8 @@
 // conseloe.log() function
+/**
+ * Avreviatura de console.log()
+ * @type {(message?: any, ...optionalParams: any[]) => void}
+ */
 var cl = console.log
 
 $(document).ready(function () {
@@ -111,7 +115,7 @@ const CONTAB_MSG = {
     REQUIRED_CUENTA: 'seleccione una cuenta',
     REQUIRED_SUBCUENTA: 'seleccione una subcuenta',
     REQUIRED_NOT_BLANK: 'El campo no puede estar vacio!',
-    REQUIRED_OBLIGATORIO: 'El campo obligatorio!',
+    REQUIRED_OBLIGATORIO: 'campo obligatorio!',
     FORMAT_NO_CUENTA: 'el No. de la cuenta solo acepta letras y números',
 }
 
@@ -127,12 +131,13 @@ const CONTAB_MSG = {
  *
  */
 const onDeleteConfirm = function (config) {
-    const {title = '', message = '', url, _token} = config
+    const {title = '', message = '', url, _token, page = null} = config
     $('#confirm__modal').modal('show')
     if (title !== '') $('#confirm__modal__title').html(title)
     if (message !== '') $('#confirm__modal__body').text(message)
 
     $('#_token__confirm__modal').val(_token)
+    $('#page__confirm__modal').val(page)
 
     $('#confirm__modal__btn_ok').click(function () {
         const form = $('#form__confirm__modal')
@@ -176,7 +181,22 @@ loadingModal = {
             $('#loading-modal').modal('hide');
         }, 500)
     }
+}
 
+miniLoadin = {
+    show: (config) => {
+        const {msg = 'Cargando...', target} = config
+
+        $(target).append(
+            `<div mili-loading class="d-flex justify-content-center">
+                <span class="spinner-border text-primary" style="width: 1.3rem; height: 1.3rem;" role="status" aria-hidden="true"></span>
+                <span class="text-primary ml-2" id="loading-modal-msg"> ${msg}</span>
+            </div>`
+        )
+    },
+    close: () => {
+        $('[mili-loading]').remove()
+    }
 }
 
 
@@ -197,15 +217,21 @@ var contableAsyncLoads = {
     config: {
 
         /**
-         * Carga una el listado de subcuentas y lo asigna en un <select>, si `slect_index != 0` sera el valor seleccionado por defecto
+         * Carga una el listado de subcuentas y lo asigna en un <select>, si
+         `slect_index != 0`
+         sera el valor seleccionado por defecto
          * @param id_cuenta id de la cuenta por la que se va a buscar
-         * @param select_input `<select>` componente HTML que se va a cargar el listado de cuentas
-         * @param select_index `<options>` seleccionada por defecto
+         * @param select_input
+         `<select>`
+         componente HTML que se va a cargar el listado de cuentas
+         * @param select_index
+         `<options>`
+         seleccionada por defecto
          */
         loadSubcuentaByCuenta: function (id_cuenta, select_input, select_index = 0) {
             loadingModal.show('Cargando subcuentas...')
             $.ajax({
-                url: '/contabilidad/config/centro-costo/getsubcuenta/' + id_cuenta,
+                url: '/contabilidad/config/cuenta/get-subcuentas/' + id_cuenta,
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -226,4 +252,11 @@ var contableAsyncLoads = {
             })
         }
     }
+}
+
+const getNro = function (nro) {
+    $arr = nro.split(' - ');
+    if ($arr)
+        return $arr[0];
+    return '';
 }

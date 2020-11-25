@@ -1,0 +1,45 @@
+# ENUM - tipos de documentos
+# moverlos posteriormente al fichero de traslation/es
+unidad_medida:
+  - id: 1
+    nombre: "Centímetro"
+    abreviatura: "cm"
+  - id: 2
+    nombre: "Metro"
+    abreviatura: "m"
+  - id: 3
+    nombre: "Milímetro"
+    abreviatura: "mm"
+  - id: 4
+    nombre: "Kilómetro"
+    abreviatura: "km"
+  - id: 5
+    nombre: "Gramo"
+    abreviatura: "g"
+  - id: 6
+    nombre: "Miligramo"
+    abreviatura: "mg"
+  - id: 7
+    nombre: "Libra"
+    abreviatura: "lb"
+  - id: 8
+    nombre: "Kilogramo"
+    abreviatura: "kg"
+  - id: 9
+    nombre: "Mililitro"
+    abreviatura: "ml"
+  - id: 10
+    nombre: "Litro"
+    abreviatura: "l"
+  - id: 11
+    nombre: "Metro cuadrado"
+    abreviatura: "m²"
+  - id: 12
+    nombre: "Metro cúbico"
+    abreviatura: "m³"
+  - id: 13
+    nombre: "Unidad"
+    abreviatura: "u"
+  - id: 14
+    nombre: "Blister"
+    abreviatura: "Blister"

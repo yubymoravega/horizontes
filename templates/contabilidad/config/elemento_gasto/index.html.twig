@@ -31,15 +31,15 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
+            <th scope="col-1">Código</th>
             <th scope="col-2">Descripción</th>
-            <th scope="col-3">Código</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in elemento_gasto %}
                 <tr>
-                    <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
+                    <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"

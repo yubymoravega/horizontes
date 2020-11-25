@@ -68,12 +68,12 @@ class CriterioAnalisisController extends AbstractController
                 'abreviatura' => $item->getAbreviatura()
             );
         }
-        return new JsonResponse(['data'=>$row,'success'=>true]);
+        return new JsonResponse(['data' => $row, 'success' => true]);
     }
 
 
     /**
-     * @Route("/add", name="contabilidad_config_criterio_analisis_add",methods={"POST"})
+     * @Route("/add", name="contabilidad_config_criterio_analisis_add", methods={"POST"})
      */
     public function add(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -85,9 +85,12 @@ class CriterioAnalisisController extends AbstractController
         $errors = $validator->validate($criterio);
 
         if ($form->isValid() && $form->isSubmitted()) {
-            $criterio->setActivo(true);
+            $criterio_uper = new CriterioAnalisis();
+            $criterio_uper->setNombre(strtoupper($criterio->getNombre()));
+            $criterio_uper->setAbreviatura(strtoupper($criterio->getAbreviatura()));
+            $criterio_uper->setActivo(true);
             try {
-                $em->persist($criterio);
+                $em->persist($criterio_uper);
                 $em->flush();
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
@@ -108,6 +111,9 @@ class CriterioAnalisisController extends AbstractController
         $errors = $validator->validate($criterio);
         if ($form->isValid() && $form->isSubmitted()) {
             try {
+                $criterio_uper = new CriterioAnalisis();
+                $criterio_uper->setNombre(strtoupper($criterio->getNombre()));
+                $criterio_uper->setAbreviatura(strtoupper($criterio->getAbreviatura()));
                 $em->persist($criterio);
                 $em->flush();
                 $this->addFlash('success', 'Criterio de análisis actualizado satisfactoriamente');

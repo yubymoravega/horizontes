@@ -3,9 +3,12 @@
 namespace App\Controller\Contabilidad\Config;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\Config\CriterioAnalisis;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\SubcuentaCriterioAnalisis;
 use App\Form\Contabilidad\Config\SubcuentaType;
+use App\Repository\Contabilidad\Config\SubcuentaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use phpDocumentor\Reflection\Types\This;
@@ -26,7 +29,7 @@ class SubcuentaController extends AbstractController
     /**
      * @Route("/", name="contabilidad_config_subcuenta", methods={"GET"})
      */
-    public function index(EntityManagerInterface $em, $id_cuenta,Request $request, PaginatorInterface $pagination)
+    public function index(EntityManagerInterface $em, $id_cuenta, Request $request, PaginatorInterface $pagination)
     {
         $form = $this->createForm(SubcuentaType::class);
 
@@ -43,18 +46,34 @@ class SubcuentaController extends AbstractController
             $obj_cuenta = $em->getRepository(Cuenta::class)->find($id_cuenta);
             $descripcion = '(' . $obj_cuenta->getNroCuenta() . ') ' . $obj_cuenta->getNombre();
         }
+
+
+        $subcuenta_criterio_er = $em->getRepository(SubcuentaCriterioAnalisis::class);
         foreach ($subcuentas_arr as $item) {
             /**@var $item Subcuenta** */
+            //creo el str con las abreviaturas de los criterios de analisis asociados a la cuenta
+            $str_criterios = '';
+            $arr_criterios_asociados = $subcuenta_criterio_er->findBy(array(
+                'id_subcuenta' => $item
+            ));
+            if (!empty($arr_criterios_asociados)) {
+                foreach ($arr_criterios_asociados as $criterios_asociados) {
+                    $abreviatura = $criterios_asociados->getIdCriterioAnalisis()->getAbreviatura();
+                    $str_criterios = $str_criterios . $abreviatura . ' - ';
+                }
+            }
             $row [] = array(
                 'id' => $item->getId(),
                 'nro_subcuenta' => $item->getNroSubcuenta(),
                 'descripcion' => $item->getDescripcion(),
                 'deudora' => $item->getDeudora() == true ? 'Deudora' : 'Acreedora',
+                'elemento_gasto' => $item->getElementoGasto() == true ? 'SI' : '',
+                'criterios' => $str_criterios == '' ? '' : substr($str_criterios, 0, -2)
             );
         }
         $paginator = $pagination->paginate(
             $row,
-            $request->query->getInt('page', 1), /*page number*/
+            $request->query->getInt('page', $request->get("page") || 1), /*page number*/
             15, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
@@ -85,15 +104,54 @@ class SubcuentaController extends AbstractController
                 $subcuenta->setActivo(true);
                 $subcuenta->setIdCuenta($id_cuenta);
                 $em->persist($subcuenta);
-                $em->flush();
-                $this->addFlash('success', "Subcuenta adicionada satisfactoriamente");
+                $abreviaturas = $request->get('criterio_analisis')['abreviatura'];
+                if (!empty($abreviaturas)) {
+                    $arr_abreviaturas = explode(' - ', $abreviaturas);
+                    $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+                    foreach ($arr_abreviaturas as $abreviatura_) {
+                        $obj_criterio = $criterio_analisis_er->findOneBy(array(
+                            'abreviatura' => $abreviatura_,
+                            'activo' => true
+                        ));
+                        if ($obj_criterio) {
+                            $cuenta_criterio = new SubcuentaCriterioAnalisis();
+                            $cuenta_criterio
+                                ->setIdSubCuenta($subcuenta)
+                                ->setIdCriterioAnalisis($obj_criterio);
+                            $em->persist($cuenta_criterio);
+                        }
+                    }
+                }
+                //no permitir agregar duplicados
+                $obj_duplicado_nro_cuenta = $em->getRepository(Subcuenta::class)->findOneBy(array(
+                    'id_cuenta' => $subcuenta->getIdCuenta(),
+                    'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                    'activo' => true
+                ));
+                $obj_duplicado_descripcion = $em->getRepository(Subcuenta::class)->findOneBy(array(
+                    'id_cuenta' => $subcuenta->getIdCuenta(),
+                    'descripcion' => $subcuenta->getDescripcion(),
+                    'activo' => true
+                ));
+                if ($obj_duplicado_nro_cuenta) {
+                    $this->addFlash('error', "Existe una subcuenta con el mismo nro.");
+                } elseif ($obj_duplicado_descripcion) {
+                    $this->addFlash('error', "Existe una subcuenta con la misma descripción.");
+                } else {
+                    $em->flush();
+                    $this->addFlash('success', "Subcuenta adicionada satisfactoriamente");
+                }
 
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id_cuenta' => $id_cuenta->getId()]);
+        return $this->redirectToRoute('contabilidad_config_subcuenta',
+            [
+                'id_cuenta' => $id_cuenta->getId(),
+                'page' => $request->get("page")
+            ]);
     }
 
     /**
@@ -108,14 +166,67 @@ class SubcuentaController extends AbstractController
         if ($form->isValid() && $form->isSubmitted()) {
             try {
                 $em->persist($subcuenta);
-                $em->flush();
-                $this->addFlash('success', "Subcuenta actualizada satisfactoriamente");
+                $cuenta_criterio_analisis_er = $em->getRepository(SubcuentaCriterioAnalisis::class);
+                //elimino los registros de criterios y cuentas de la tabla SubcuentaCriterioAnalisis
+                $arr_criterios_cuenta = $cuenta_criterio_analisis_er->findBy(array(
+                    'id_subcuenta' => $subcuenta
+                ));
+                if (!empty($arr_criterios_cuenta)) {
+                    foreach ($arr_criterios_cuenta as $obj_cuenta_criterio) {
+                        $em->remove($obj_cuenta_criterio);
+                    }
+                }
+                //adiciono los nuevos criterios asociados a las cuentas
+
+                $abreviaturas = $request->get('criterio_analisis')['abreviatura'];
+                if (!empty($abreviaturas)) {
+                    $arr_abreviaturas = explode(' - ', $abreviaturas);
+                    $criterio_analisis_er = $em->getRepository(CriterioAnalisis::class);
+                    foreach ($arr_abreviaturas as $abreviatura_) {
+                        $obj_criterio = $criterio_analisis_er->findOneBy(array(
+                            'abreviatura' => $abreviatura_,
+                            'activo' => true
+                        ));
+                        if ($obj_criterio) {
+                            $cuenta_criterio = new SubcuentaCriterioAnalisis();
+                            $cuenta_criterio
+                                ->setIdSubCuenta($subcuenta)
+                                ->setIdCriterioAnalisis($obj_criterio);
+                            $em->persist($cuenta_criterio);
+                        }
+                    }
+                }
+
+                //no permitir agregar duplicados
+                $obj_duplicado_nro_cuenta = $em->getRepository(Subcuenta::class)->findOneBy(array(
+                    'id_cuenta' => $subcuenta->getIdCuenta(),
+                    'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
+                    'activo' => true
+                ));
+                $obj_duplicado_descripcion = $em->getRepository(Subcuenta::class)->findOneBy(array(
+                    'id_cuenta' => $subcuenta->getIdCuenta(),
+                    'descripcion' => $subcuenta->getDescripcion(),
+                    'activo' => true
+                ));
+                if ($obj_duplicado_nro_cuenta && $obj_duplicado_nro_cuenta->getId() != $subcuenta->getId()) {
+                    $this->addFlash('error', "Existe una subcuenta con el mismo nro.");
+                } elseif ($obj_duplicado_descripcion && $obj_duplicado_descripcion->getId() != $subcuenta->getId()) {
+                    $this->addFlash('error', "Existe una subcuenta con la misma descripción.");
+                } else {
+                    $em->flush();
+                    $this->addFlash('success', "Subcuenta actualizada satisfactoriamente");
+                }
+
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
         }
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
-        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id_cuenta' => $id_cuenta->getId()]);
+        return $this->redirectToRoute('contabilidad_config_subcuenta',
+            [
+                'id_cuenta' => $id_cuenta->getId(),
+                'page' => $request->get("page")
+            ]);
     }
 
     /**
@@ -145,6 +256,10 @@ class SubcuentaController extends AbstractController
             }
             $this->addFlash($success, $msg);
         }
-        return $this->redirectToRoute('contabilidad_config_subcuenta', ['id_cuenta' => $id_cuenta]);
+        return $this->redirectToRoute('contabilidad_config_subcuenta',
+            [
+                'id_cuenta' => $id_cuenta,
+                'page' => $request->get("page")
+            ]);
     }
 }

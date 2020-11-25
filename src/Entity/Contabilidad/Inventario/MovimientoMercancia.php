@@ -2,9 +2,11 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\User;
 use App\Repository\Contabilidad\Inventario\EntradaMercanciaRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -83,6 +85,38 @@ class MovimientoMercancia
      * @ORM\ManyToOne(targetEntity=ElementoGasto::class)
      */
     private $id_elemento_gasto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     */
+    private $id_almacen;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Expediente::class)
+     *  @ORM\JoinColumn(nullable=true)
+     */
+    private $id_expediente;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=OrdenTrabajo::class)
+     *  @ORM\JoinColumn(nullable=true)
+     */
+    private $id_orden_trabajo;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cuenta;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_subcuenta_deudora;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Factura::class)
+     */
+    private $id_factura;
 
     public function getId(): ?int
     {
@@ -229,6 +263,78 @@ class MovimientoMercancia
     public function setIdElementoGasto(?ElementoGasto $id_elemento_gasto): self
     {
         $this->id_elemento_gasto = $id_elemento_gasto;
+
+        return $this;
+    }
+
+    public function getIdAlmacen(): ?Almacen
+    {
+        return $this->id_almacen;
+    }
+
+    public function setIdAlmacen(?Almacen $id_almacen): self
+    {
+        $this->id_almacen = $id_almacen;
+
+        return $this;
+    }
+
+    public function getIdExpediente(): ?Expediente
+    {
+        return $this->id_expediente;
+    }
+
+    public function setIdExpediente(?Expediente $id_expediente): self
+    {
+        $this->id_expediente = $id_expediente;
+
+        return $this;
+    }
+
+    public function getIdOrdenTrabajo(): ?OrdenTrabajo
+    {
+        return $this->id_orden_trabajo;
+    }
+
+    public function setIdOrdenTrabajo(?OrdenTrabajo $id_orden_trabajo): self
+    {
+        $this->id_orden_trabajo = $id_orden_trabajo;
+
+        return $this;
+    }
+
+    public function getCuenta(): ?string
+    {
+        return $this->cuenta;
+    }
+
+    public function setCuenta(?string $cuenta): self
+    {
+        $this->cuenta = $cuenta;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaDeudora(): ?string
+    {
+        return $this->nro_subcuenta_deudora;
+    }
+
+    public function setNroSubcuentaDeudora(?string $nro_subcuenta_deudora): self
+    {
+        $this->nro_subcuenta_deudora = $nro_subcuenta_deudora;
+
+        return $this;
+    }
+
+    public function getIdFactura(): ?Factura
+    {
+        return $this->id_factura;
+    }
+
+    public function setIdFactura(?Factura $id_factura): self
+    {
+        $this->id_factura = $id_factura;
 
         return $this;
     }

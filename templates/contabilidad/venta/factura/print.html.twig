@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>factura</title>
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+    <style>
+        @media print {
+            #footer {
+                position: fixed;
+                display: block;
+                bottom: 0;
+            }
+        }
+
+        th {
+            padding: .6rem 0;
+            border: solid black 1px;
+            width: 80px;
+        }
+
+        td {
+            padding: 0 !important;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        .bg-gray {
+            background: darkgray;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid mt-3" style="width: 1000px;">
+    <div class="row">
+        <h5 class="col-9"><img style="margin-left: -10px;" width="90" height="80" src={{ asset('images/print_logo_factura.png') }} alt=""><br>{{ factura.nombre_unidad }}</h5>
+        <div class="col-3">
+            <p class="m-0"><h1 class="text-uppercase font-weight-bold text-primary" >factura</h1></p>
+        </div>
+    </div>
+    <div class="row">
+        <h3 class="col-9">
+        </h3>
+        <div class="col-3">
+            <p class="m-0"><span class="font-weight-bold text-uppercase">ncf: </span> {{ factura.ncf }}</p>
+            <p class="m-0"><span class="font-weight-bold text-uppercase">Fecha :</span> {{ factura.fecha_factura }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            <p class="m-0"> {{ factura.direccion_unidad }}</p>
+            <p class="m-0"><span class="text-capitalize font-weight-bold">télefono: </span> {{ factura.telefono_unidad }}</p>
+            <p class="m-0"><span class="text-capitalize font-weight-bold">correo electrónico: </span> {{ factura.correo_unidad }}</p>
+        </div>
+    </div>
+    <div class="mt-4 row">
+        <div class="col-12">
+            <p class="m-0"> <span class="text-uppercase font-weight-bold">para: </span>{{ factura.cliente }}</p>
+            <p class="m-0">{{ factura.direccion_cliente }}</p>
+            <p class="m-0">{{ factura.telefono_cliente }}</p>
+        </div>
+    </div>
+
+    <div style="min-height: 450px;" class="mt-5">
+        <table border="0" width="960px">
+            <thead>
+            <th width="230" class="text-center"><strong>Código - Descripción</strong></th>
+            <th colspan="2" class="text-center"><strong>Especificación</strong></th>
+            <th width="10" class="text-center"><strong>UM</strong></th>
+            <th width="90" class="text-center"><strong>Cantidad</strong></th>
+            <th width="90" class="text-center"><strong>Precio</strong></th>
+            <th width="90" class="text-center"><strong>Recargo</strong></th>
+            <th width="90" class="text-center"><strong>Importe</strong></th>
+            </thead>
+            <tbody>
+            {% for item in mercancias %}
+                <tr>
+                    <td class="px-2" width="230">{{ item.codigo }} - {{ item.descripcion }}</td>
+                    <td class="px-2" colspan="2">{{ item.descripcion_venta }}</td>
+                    <td class="text-center">{{ item.um }}</td>
+                    <td class="text-right px-2" width="90" class="text-right">{{ item.cantidad }}</td>
+                    <td class="text-right px-2" width="90" class="text-right">{{ item.precio }}</td>
+                    <td class="text-right px-2" width="90" class="text-right">{{ item.descuento_recarga }}</td>
+                    <td class="text-right px-2" width="90" class="text-right">{{ item.importe }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-5">
+            <table width="960px">
+                <tr style="height: 2px;">
+                    <td class="pl-5 pt-2  text-center font-weight-bold" colspan="7" width="80">TOTAL</td>
+                    <td class="pt-2 text-right font-weight-bold px-2" width="100"
+                        class="text-right">{{ importe_total|number_format(2) }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="text-center"><h3 class="text-uppercase">¡gracias por su confianza!</h3></div>
+    <div class="row">
+
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto" onclick="imprimir()"> Imprimir</button>
+    </div>
+</div>
+
+<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
+</body>
+</html>
+
+
+{% block javascripts %}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
+{% endblock %}

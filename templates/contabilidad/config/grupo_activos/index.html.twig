@@ -30,30 +30,25 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
+            <th width="115px">Código</th>
             <th scope="col-2">Descripción</th>
             <th scope="col-1">% deprecia(año)</th>
-            <th scope="col-3">Cuenta</th>
-            <th scope="col-3">Subcuenta</th>
             <th scope="col-1" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in grupo_activos %}
                 <tr>
+                    <td style="font-weight:400;">{{ item.codigo }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                     <td style="font-weight:400;">{{ item.por_ciento_deprecia_anno }}</td>
-                    <td style="font-weight:400;">{{ item.nro_cuenta }}</td>
-                    <td style="font-weight:400;">{{ item.nro_subcuenta }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
                                         id: '{{ item.id }}',
                                         descripcion: '{{ item.descripcion }}',
+                                        codigo: '{{ item.codigo }}',
                                         por_ciento_deprecia_anno: '{{ item.por_ciento_deprecia_anno }}',
-                                        id_cuenta: '{{ item.id_cuenta }}',
-                                        id_subcuenta: '{{ item.id_subcuenta }}',
-                                        nro_cuenta: '{{ item.nro_cuenta }}',
-                                        nro_subcuenta: '{{ item.nro_subcuenta }}',
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
@@ -79,7 +74,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const TEXT_SELECT = '... seleccione ...';
+        const TEXT_SELECT = '--seleccione--';
 
         function mostrarBtn() {
             $('#modal__btn__actualizar').hide()
@@ -90,95 +85,73 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {descripcion = '', id = '', por_ciento_deprecia_anno = '', id_cuenta = '', id_subcuenta = ''} = config
+            const {descripcion = '', id = '', por_ciento_deprecia_anno = '', codigo = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + descripcion)
 
             $('#grupo_activos_porciento_deprecia_anno').val(por_ciento_deprecia_anno)
             $('#grupo_activos_descripcion').val(descripcion)
+            $('#grupo_activos_codigo').val(codigo)
             $('#id_grupo_activos').val(id)
-
-
-            // cuenta   y sub cuenta
-            $('#grupo_activos_id_cuenta').val(id_cuenta)
-            contableAsyncLoads.config.loadSubcuentaByCuenta(id_cuenta, $('#grupo_activos_id_subcuenta'), id_subcuenta)
         }
+        // init
+        $('#modal__btn__actualizar').hide()
 
-        $(document).ready(function () {
-            // init
-            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
-            $('#modal__btn__actualizar').hide()
 
-            // cargar subcuenta por la cuenta seleccionada
-            let subcuenta = $('#grupo_activos_id_subcuenta');
-            $('#grupo_activos_id_cuenta').change(function (evernt) {
-                subcuenta.find('option').remove();
-                if (typeof ($(this).val()) != 'object') {
-                    contableAsyncLoads.config.loadSubcuentaByCuenta($(this).val(), subcuenta)
+        // validacion del formulario
+        var validateForm = $('#form_modal_target').validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                // colocar mensajes de error a la derecha de cada label para el componente
+                const error_label = element.closest("form").find(element.attr('id') + "-error")
+                if (error_label.length) {
+                    error_label.removeClass('hide')
                 } else {
-                    subcuenta.prop('disabled', true);
+                    error.addClass('ml-3')
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
                 }
-            })
+            },
+            rules: {
+                'grupo_activos[descripcion]': "required",
+                'grupo_activos[porciento_deprecia_anno]': "required",
+            },
+            messages: {
+                'grupo_activos[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                'grupo_activos[porciento_deprecia_anno]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+            }
+        })
 
-            // validacion del formulario
-            var validateForm = $('#form_modal_target').validate({
-                errorClass: 'invalid-label-orange',
-                errorPlacement: function (error, element) {
-                    // colocar mensajes de error a la derecha de cada label para el componente
-                    const error_label = element.closest("form").find(element.attr('id') + "-error")
-                    if (error_label.length) {
-                        error_label.removeClass('hide')
-                    } else {
-                        error.addClass('ml-3')
-                        $(element)
-                            .closest("form")
-                            .find("label[for='" + element.attr("id") + "']")
-                            .append(error);
-                    }
-                },
-                rules: {
-                    'grupo_activos[descripcion]': "required",
-                    'grupo_activos[porciento_deprecia_anno]': "required",
-                    'grupo_activos[id_cuenta]': "required",
-                    'grupo_activos[id_subcuenta]': "required",
-                },
-                messages: {
-                    'grupo_activos[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'grupo_activos[porciento_deprecia_anno]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'grupo_activos[id_cuenta]': CONTAB_MSG.REQUIRED_CUENTA,
-                    'grupo_activos[id_subcuenta]': CONTAB_MSG.REQUIRED_SUBCUENTA,
-                }
-            })
+        $('#modal__btn__aceptar').on('click', function () {
+            const formulario = $('#form_modal_target')
+            formulario.attr('method', `POST`)
+            formulario.attr('action', `/contabilidad/config/grupo-activos/add`)
+            formulario.submit()
+            if (validateForm.errorList.length === 0) loadingModal.show()
+        })
 
-            $('#modal__btn__aceptar').on('click', function () {
-                const formulario = $('#form_modal_target')
-                formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/grupo-activos/add`)
-                formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
-            })
-
-            $('#modal__btn__actualizar').on('click', function () {
-                const id_grupo_activos = $('#id_grupo_activos').val()
-                const formulario = $('#form_modal_target')
-                formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/config/grupo-activos/upd/${id_grupo_activos}`)
-                formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
-            })
+        $('#modal__btn__actualizar').on('click', function () {
+            const id_grupo_activos = $('#id_grupo_activos').val()
+            const formulario = $('#form_modal_target')
+            formulario.attr('method', `POST`)
+            formulario.attr('action', `/contabilidad/config/grupo-activos/upd/${id_grupo_activos}`)
+            formulario.submit()
+            if (validateForm.errorList.length === 0) loadingModal.show()
+        })
 
 
-            $('#gestionarGrupoActivosModal').on('show.bs.modal', function (event) {
-                var modal = $(this)
-                modal.find('.modal-title').text('Adicionar grupo de activos')
-            })
+        $('#gestionarGrupoActivosModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar grupo de activos')
+        })
 
-            $('#modal__form__id').on('show.bs.modal', function (event) {
-                validateForm.resetForm()
-                subcuenta.find('option').remove();
-                $('#modal__form__label__id').text('Adicionar Grupos de activos')
-            })
+        $('#modal__form__id').on('show.bs.modal', function (event) {
+            validateForm.resetForm()
+
+            $('#modal__form__label__id').text('Adicionar Grupos de activos')
         })
 
     </script>

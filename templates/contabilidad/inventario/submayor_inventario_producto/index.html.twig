@@ -1,0 +1,148 @@
+{% extends 'contabilidad/inventario/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="seleccionarProducto" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="seleccionarProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="seleccionarProductoLabel">Seleccione el producto</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app">
+                    <form method="post" autocomplete="off">
+                        <div class="form-group input-group input-group-sm">
+                            <div class="row mt-0">
+                                <div class="col-12">
+                                    <label for="codigo">Código</label>
+                                    <input type="text" name="codigo" id="codigo"
+                                           placeholder="Introduzca el código del producto y presione la tecla Enter para buscar"
+                                           class="w-100 form-control">
+                                </div>
+                                <div class="col-10 mt-0 pr-0">
+                                    <label for="descripcion" class="mt-3">Descripción</label>
+                                    <input type="text" name="descripcion" id="descripcion"
+                                           placeholder="Descripción del producto" class="w-100 form-control">
+                                </div>
+                                <div class="col-2 mt-5 pl-0 ml-0">
+                                    <button style="height: 32px !important;" class="my-0 btn btn-secondary w-100" onclick="llenarSelect()"
+                                             type="button" id="btnSearch"><i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                                <div class="col-12 mt-3" id="busqueda" >
+                                    <label for="select_productos">Productos del almacén</label>
+                                    <select name="codigos" id="select_productos"class="w-100 form-control" readonly="false"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <a class="btn btn-outline-secondary text-white" type="button"
+                               aria-label="Cerrar" data-dismiss="modal">
+                                <span aria-hidden="true">Salir</span>
+                            </a>
+                        </div>
+                        <div class="ml-2">
+                            <button class="my-0 btn btn-secondary" onclick="PrintSubmayor()"
+                                    id="btnAceptarPrintSubmayor">
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#busqueda').hide()
+        function PrintSubmayor() {
+            if ($('#codigo').val() != '' && $('#descripcion').val() != '') {
+                let url = '/contabilidad/inventario/submayor-inventario-producto/print/' + $('#codigo').val()
+                window.open(url, 'blank_')
+            } else
+                alertTemplate('Introducir el código del producto a buscar', 'danger')
+        }
+
+        function llenarSelect() {
+            $('#select_productos').find('option').remove()
+            $('#select_productos').prepend('<option selected = "false" value = "0" disabled>--Seleccione--</option>');
+            let desc = $('#descripcion').val()
+            if (desc == ''){
+                $('#busqueda').hide()
+                alertTemplate('Debe introducir la descripción del producto a buscar', 'danger')
+            }
+            else{
+                miniLoadin.show({msg: 'Cargando...', target: '#busqueda'})
+                $('#busqueda').show()
+                $.ajax({
+                    url: '/contabilidad/inventario/submayor-inventario-producto/getProductosByDesc/'+ desc,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        $('#select_productos').find('option').remove()
+                        $('#select_productos').prepend('<option selected = "false" value = "0" disabled>--Seleccione--</option>');
+
+                        $(result.data).each(function (pos, valor) {
+                            $('#select_productos').append('<option value = "' + valor + '">' + valor + '</option>');
+                        })
+                        miniLoadin.close()
+                    },
+                    error: function () {
+                        loadingModal.close()
+                    }
+                })
+            }
+        }
+
+        $('#select_productos').on('change', function () {
+            let arr_data = $('#select_productos').val().split(' - ')
+            $('#codigo').val(arr_data[0])
+            $('#descripcion').val(arr_data[1])
+        })
+
+        $(document).ready(function () {
+            $('#seleccionarProducto').modal('show')
+        })
+        $('#codigo').on('keyup', function (e) {
+            if (e.which == 13) {
+                let codigo = $('#codigo').val()
+                if (codigo != '') {
+                    $.ajax({
+                        url: '/contabilidad/inventario/submayor-inventario-producto/getProducto/' + codigo,
+                        method: 'POST',
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.descripcion != '') {
+                                $('#descripcion').val(result.descripcion)
+                            } else {
+                                alertTemplate('No existen mercancias o productos con ese código', 'danger')
+                            }
+                        },
+                        error: function () {
+                        }
+                    })
+                } else {
+                    alertTemplate('El campo código no debe estar vacio.', 'danger')
+                }
+            } else {
+                $('#descripcion').val('')
+            }
+        })
+
+    </script>
+{% endblock %}

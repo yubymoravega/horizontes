@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,10 +20,10 @@ class MercanciaType extends AbstractType
             ->add('codigo', TextType::class, [
                 'required' => false,
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Código',
+                'label' => 'Código',
             ])
             ->add('descripcion', TextType::class, [
-                'attr' => ['class' => 'w-100'],
+                'attr' => ['class' => 'w-100', 'readonly' => true],
                 'label' => 'Descripción',
                 'required' => false,
             ])
@@ -44,16 +45,27 @@ class MercanciaType extends AbstractType
                 'attr' => ['class' => 'w-100']
             ])
             ->add('id_unidad_medida', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label'=>'UM',
+                'attr' => ['class' => 'w-100 read-only-select'],
+                'label' => 'UM',
                 'class' => UnidadMedida::class,
-                'choice_label' => 'nombre',
+                'choice_label' => 'abreviatura',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
+//                        ->select(array('u.id','u.nombre','u.abreviatura'))
                         ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
+                        ->orderBy('u.abreviatura', 'ASC');
                 }
-            ]);
+            ])
+            ->add('nro_cuenta_inventario', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Cuenta de inventario',
+                'choice_label' => 'nro_cuenta',
+            ))
+            ->add('nro_subcuenta_inventario', ChoiceType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Subcuenta de inventario',
+                'choice_label' => 'nro_subcuenta',
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver)

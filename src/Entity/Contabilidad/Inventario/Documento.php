@@ -4,6 +4,7 @@ namespace App\Entity\Contabilidad\Inventario;
 
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Repository\Contabilidad\Inventario\DocumentoRepository;
@@ -53,6 +54,16 @@ class Documento
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_moneda;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=TipoDocumento::class)
+     */
+    private $id_tipo_documento;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $anno;
 
     public function getId(): ?int
     {
@@ -127,6 +138,30 @@ class Documento
     public function setIdMoneda(?Moneda $id_moneda): self
     {
         $this->id_moneda = $id_moneda;
+
+        return $this;
+    }
+
+    public function getIdTipoDocumento(): ?TipoDocumento
+    {
+        return $this->id_tipo_documento;
+    }
+
+    public function setIdTipoDocumento(?TipoDocumento $id_tipo_documento): self
+    {
+        $this->id_tipo_documento = $id_tipo_documento;
+
+        return $this;
+    }
+
+    public function getAnno(): ?int
+    {
+        return $this->anno;
+    }
+
+    public function setAnno(?int $anno): self
+    {
+        $this->anno = $anno;
 
         return $this;
     }

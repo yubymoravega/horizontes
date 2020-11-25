@@ -4,9 +4,13 @@ namespace App\Entity\Contabilidad\Config;
 
 use App\Repository\Contabilidad\Config\CriterioAnalisisRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CriterioAnalisisRepository::class)
+ * @UniqueEntity(fields={"nombre"}, message="contabilidad.config.descripcion_unique")
+ * @UniqueEntity(fields={"abreviatura"}, message="contabilidad.config.abreviatura_unique")
  */
 class CriterioAnalisis
 {
@@ -19,11 +23,13 @@ class CriterioAnalisis
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.descripcion_not_blank")
      */
     private $nombre;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="contabilidad.config.abreviatura_not_blank")
      */
     private $abreviatura;
 

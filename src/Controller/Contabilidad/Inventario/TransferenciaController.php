@@ -8,17 +8,20 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\ConfiguracionInicial;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Modulo;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
-use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
-use App\Entity\Contabilidad\Inventario\Proveedor;
+use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\TransferenciaType;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
+use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -35,6 +38,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class TransferenciaController extends AbstractController
 {
+    private static int $TIPO_DOC_RANSFERENCIA_ENTRADA = 5;
+
     /**
      * @Route("/", name="contabilidad_inventario_transferencia_entrada",methods={"GET"})
      */
@@ -82,14 +87,14 @@ class TransferenciaController extends AbstractController
             $list_mercancia = json_decode($request->get('transferencia_entrada')['list_mercancia'], true);
 //            if ($form->isValid()) {
             $transferencia_entrada = $request->get('transferencia');
+            $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+            $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
 
             /**  datos de TransferenciaEntradaType **/
-            $cuenta_acreedora = $transferencia_entrada['nro_cuenta_acreedora'];
-            $cuenta_inventario = $transferencia_entrada['nro_cuenta_inventario'];
-            $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
+            $cuenta_acreedora = AuxFunctions::getNro($transferencia_entrada['nro_cuenta_acreedora']);
+            $subcuenta_acreedora = AuxFunctions::getNro($transferencia_entrada['nro_subcuenta_acreedora']);
             $id_unidad_origen = isset($transferencia_entrada['id_unidad']) ? $transferencia_entrada['id_unidad'] : '';
             $id_almacen_origen = isset($transferencia_entrada['id_almacen']) ? $transferencia_entrada['id_almacen'] : '';
-            $subcuenta_inventario = $transferencia_entrada['nro_subcuenta_inventario'];
 
             ////0-obtengo el numero consecutivo de documento
             /// aqui va la fecha del cierre pero como aun no esta hecho cojo la del servidor, para ir trabajando
@@ -104,7 +109,6 @@ class TransferenciaController extends AbstractController
                 $id_unidad = $obj_empleado->getIdUnidad()->getId();
                 $transferencias_entrada_arr = $em->getRepository(Transferencia::class)->findBy(array(
                     'anno' => $year_,
-                    'activo' => true,
                     'entrada' => true
                 ));
                 $contador = 0;
@@ -115,23 +119,25 @@ class TransferenciaController extends AbstractController
                 }
                 $consecutivo = $contador + 1;
 
-
-                //1-adicionar en subcuenta los datos del proveedor como subcuenta de la cuenta acreedora
-                $sub_cuenta_er = $em->getRepository(Subcuenta::class);
-                $cuenta_er = $em->getRepository(Cuenta::class);
-                $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
-                    'nro_cuenta' => $cuenta_acreedora,
-                    'activo' => true
-                ));
-
                 //2-adicionar en documento
-                $today = Date('Y-m-d');
+                $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $id_almacen]);
+                if (empty($arr_documentos)) {
+                    $today = $request->getSession()->get('date_system');
+                    $obj_date = \DateTime::createFromFormat('d/m/Y', $today);
+                } else {
+                    $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                    $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
+                }
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
-                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setFecha($obj_date)
+                    ->setAnno($year_)
+                    ->setIdTipoDocumento($obj_tipo_documento)
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad));
+                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+                    ->setIdMoneda($em->getRepository(Moneda::class)->find($transferencia_entrada['documento']['id_moneda']));
+
                 $em->persist($documento);
 
                 //3.1-adicionar en transferencia de entrada
@@ -140,30 +146,15 @@ class TransferenciaController extends AbstractController
                     ->setAnno($year_)
                     ->setIdDocumento($documento)
                     ->setNroConcecutivo($consecutivo)
-                    ->setNroCuentaAcreedora($cuenta_acreedora)
-                    ->setNroCuentaInventario($cuenta_inventario)
-                    ->setNroSubcuentaInventario($subcuenta_inventario)
+                    ->setNroCuentaAcreedora(AuxFunctions::getNro($cuenta_acreedora))
+                    ->setNroCuentaInventario(AuxFunctions::getNro(''))
+                    ->setNroSubcuentaInventario(AuxFunctions::getNro(''))
+                    ->setNroSubcuentaAcreedora(AuxFunctions::getNro($subcuenta_acreedora))
                     ->setIdUnidad($id_unidad_origen != '' ? $em->getRepository(Unidad::class)->find($id_unidad_origen) : null)
                     ->setIdAlmacen($id_almacen_origen != '' ? $em->getRepository(Almacen::class)->find($id_almacen_origen) : null)
                     ->setActivo(true)
                     ->setEntrada(true);
                 $em->persist($transferencia_entrada);
-
-                //4-crear la obligacion de pago con el proveedor(crear la tabla)
-//                    $obligacion_pago = new ObligacionPago();
-//                    $obligacion_pago
-//                        ->setIdProveedor($proveedor_obj)
-//                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-//                        ->setIdDocumento($documento)
-//                        ->setActivo(true)
-//                        ->setNroSubcuenta($proveedor_obj->getCodigo())
-//                        ->setNroCuenta($cuenta_acreedora)
-//                        ->setLiquidado(false)
-//                        ->setResto(floatval($importe_total))
-//                        ->setValorPagado(0)
-//                        ->setCodigoFactura($codigo_factura)
-//                        ->setFechaFactura(\DateTime::createFromFormat('Y-m-d', $fecha_factura));
-//                    $em->persist($obligacion_pago);
 
                 /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                  * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
@@ -174,11 +165,6 @@ class TransferenciaController extends AbstractController
 
                 /**OBTENGO TODAS LAS MERCANCIAS CONTENIDAS EN EL LISTADO, ITERO POR CADA UNA DE ELLAS Y VOY ADICIONANDOLAS**/
                 $mercancia_er = $em->getRepository(Mercancia::class);
-                $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-                $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-                    'nombre' => 'TRANSFERENCIA DE ENTRADA',
-                    'activo' => true
-                ));
                 $importe_total = 0;
                 if ($obj_tipo_documento) {
                     foreach ($list_mercancia as $mercancia) {
@@ -187,6 +173,8 @@ class TransferenciaController extends AbstractController
                         $descripcion = $mercancia['descripcion'];
                         $importe_mercancia = $mercancia['importe'];
                         $unidad_medida = $mercancia['um'];
+                        $cuenta_inventario = AuxFunctions::getNro($mercancia['cuenta']);
+                        $subcuenta_inventario = AuxFunctions::getNro($mercancia['subcuenta']);
 
                         $importe_total += floatval($importe_mercancia);
 
@@ -196,6 +184,7 @@ class TransferenciaController extends AbstractController
                             ->setActivo(true)
                             ->setImporte(floatval($importe_mercancia))
                             ->setEntrada(true)
+                            ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                             ->setCantidad($cantidad_mercancia)
                             ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                             ->setIdDocumento($documento)
@@ -217,6 +206,9 @@ class TransferenciaController extends AbstractController
                                 ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
                                 ->setCodigo($codigo_mercancia)
                                 ->setCuenta($cuenta_inventario)
+                                ->setNroCuentaAcreedora($cuenta_acreedora)
+                                ->setNroSubcuentaInventario($subcuenta_inventario)
+                                ->setNroSubcuentaAcreedora($subcuenta_acreedora)
                                 ->setImporte(floatval($importe_mercancia));
                             $em->persist($new_mercancia);
                             $movimiento_mercancia
@@ -267,7 +259,7 @@ class TransferenciaController extends AbstractController
                 } catch (FileException $e) {
                     return $e->getMessage();
                 }
-                return new JsonResponse(['success' => true, 'msg' => 'Transferencia de entrada adicionado satisfactoriamente.']);
+                return new JsonResponse(['success' => true, 'msg' => 'Transferencia realizada satisfactoriamente.']);
             } else {
                 return new JsonResponse(['success' => false, 'msg' => 'Usted no es empleado de la empresa.']);
             }
@@ -280,144 +272,87 @@ class TransferenciaController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{params}", name="contabilidad_inventario_transferencia_entrada_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_transferencia_entrada_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request, $params)
+    public function getMercancia(EntityManagerInterface $em, Request $request, $codigo)
     {
-        $arr = explode(',', $params);
-        $codigo = $arr[0];
-        $cuenta = $arr[1];
-        $em = $this->getDoctrine()->getManager();
-        if ($codigo == -1 || $codigo == '-1')
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'activo' => true,
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'cuenta' => $cuenta
-            ));
-        else
-            $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
-                'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'activo' => true,
-                'codigo' => $codigo
-            ));
-
-        $row = array();
-        foreach ($mercancia_arr as $obj) {
-            /**@var $obj Mercancia* */
-            $row [] = array(
-                'id' => $obj->getId(),
-                'codigo' => $obj->getCodigo(),
-                'descripcion' => $obj->getDescripcion(),
-                'precio_compra' => round($obj->getImporte() / $obj->getExistencia(), 3),
-                'id_almacen' => $obj->getIdAmlacen(),
-                'existencia' => $obj->getExistencia()
-            );
-        }
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $row = AuxFunctions::getMercanciaByCod($em, $codigo, $id_almacen);
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
     }
 
     /**
-     * @Route("/getCuentas", name="contabilidad_inventario_transferencia_entrada_gestionar_getCuentas", methods={"POST"})
+     * @Route("/getChoices", name="contabilidad_inventario_transferencia_entrada_gestionar_getChoices", methods={"POST"})
      */
-    public function getCuentas()
+    public function getChoices(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
+        $row_inventario = AuxFunctions::getCuentasByCriterio($em, ['ALM', 'EG']);
+        $row_acreedoras = AuxFunctions::getCuentasByCriterio($em, ['ALM']);
 
-        //MODULO INVENTARIO
-        //TIPO DE DOCUMENTO "transferencia DE ENTRADA"
-        $conf_inicial_er = $em->getRepository(ConfiguracionInicial::class);
-        $modulo_er = $em->getRepository(Modulo::class);
-        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
-        $subcuenta_er = $em->getRepository(Subcuenta::class);
-        $cuenta_er = $em->getRepository(Cuenta::class);
-
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'TRANSFERENCIA DE ENTRADA',
-            'activo' => true
-        ));
-
-        $obj_modulo = $modulo_er->findOneBy(array(
-            'nombre' => strtoupper('inventario'),
-            'activo' => true
-        ));
-
-        $row_inventario = array();
-        $row_acreedoras = array();
-
-        if ($obj_modulo && $obj_tipo_documento) {
-            $obj_conf_inicial = $conf_inicial_er->findOneBy(array(
-                'id_modulo' => $obj_modulo->getId(),
-                'id_tipo_documento' => $obj_tipo_documento->getId(),
-                'activo' => true
-            ));
-            if ($obj_conf_inicial) {
-                /**@var $obj_conf_inicial ConfiguracionInicial* */
-                $str_cuentas = $obj_conf_inicial->getStrCuentas();
-                $str_cuentas_acreedoras = $obj_conf_inicial->getStrCuentasContrapartida();
-
-                $cuentas_inventario = explode('-', $str_cuentas);
-                $cuentas_acreedoras = explode('-', $str_cuentas_acreedoras);
-
-                foreach ($cuentas_inventario as $cuentas) {
-                    $row_inventario [] = array(
-                        'nro_cuenta' => trim($cuentas),
-                        'sub_cuenta' => $this->getSubcuentas($obj_conf_inicial->getStrSubcuentas(), trim($cuentas), $subcuenta_er, $cuenta_er)
-                    );
-                }
-                foreach ($cuentas_acreedoras as $cuentas) {
-                    $row_acreedoras [] = array(
-                        'nro_cuenta' => trim($cuentas)
-                    );
-                }
+        $monedas = $em->getRepository(Moneda::class)->findAll();
+        $rows = [];
+        if ($monedas) {
+            foreach ($monedas as $item) {
+                /**@var $item Moneda */
+                $rows [] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getNombre()
+                );
             }
         }
-        return new JsonResponse(['cuentas_inventario' => $row_inventario, 'cuentas_acrredoras' => $row_acreedoras, 'success' => true]);
-    }
 
-    public function getSubcuentas($str_subcuentas, $nro_cuenta, $subcuenta_er, $cuenta_er)
-    {
-        $obj_cuenta = $cuenta_er->findOneBy(array(
-            'activo' => true,
-            'nro_cuenta' => $nro_cuenta
-        ));
-        if ($obj_cuenta) {
-            /**@var $obj_cuenta Cuenta* */
-            $arr_obj_subcuentas = $subcuenta_er->findBy(array(
-                'activo' => true,
-                'id_cuenta' => $obj_cuenta->getId()
-            ));
-            if (!empty($arr_obj_subcuentas)) {
-                $rows = [];
-                $subcuentas_array = explode('-', $str_subcuentas);
-                foreach ($arr_obj_subcuentas as $subcuenta) {
-                    /**@var $subcuenta Subcuenta* */
-                    foreach ($subcuentas_array as $nro_subcuenta) {
-                        if ($subcuenta->getNroSubcuenta() == trim($nro_subcuenta))
-                            $rows [] = array(
-                                'nro_cuenta' => $nro_cuenta,
-                                'nro_subcuenta' => $subcuenta->getNroSubcuenta(),
-                                'id' => $subcuenta->getId()
-                            );
-                    }
-                }
-                return $rows;
-            } else {
-                return '';
+        $unidades = $em->getRepository(Unidad::class)->findAllNotMe(1);
+        $rows_unidades = [];
+        if ($unidades) {
+            foreach ($unidades as $item) {
+                /**@var $item Unidad */
+                $rows_unidades [] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getCodigo() . ' - ' . $item->getNombre()
+                );
             }
-        } else {
-            return '';
         }
+
+        $almacen_session = $request->getSession()->get('selected_almacen/id');
+        /** @var Almacen $obj_almacen */
+        $obj_almacen = $em->getRepository(Almacen::class)->find($almacen_session);
+        $almacen = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $obj_almacen->getIdUnidad()]);
+        $rows_almcen = [];
+        if (!empty($almacen)) {
+            foreach ($almacen as $item) {
+                /**@var $item Almacen */
+                if ($item->getId() != $obj_almacen->getId())
+                    $rows_almcen [] = array(
+                        'id' => $item->getId(),
+                        'nombre' => $item->getCodigo() . ' - ' . $item->getDescripcion()
+                    );
+            }
+        }
+
+        return new JsonResponse([
+            'cuentas_inventario' => $row_inventario,
+            'cuentas_acreedoras' => $row_acreedoras,
+            'monedas' => $rows,
+            'unidades' => $rows_unidades,
+            'almacenes' => $rows_almcen,
+            'success' => true
+        ]);
     }
 
     /**
-     * @Route("/delete/{id}", name="contabilidad_inventario_transferencia_entrada_delete", methods={"DELETE"})
+     * @Route("/delete/{nro}", name="contabilidad_inventario_transferencia_entrada_delete", methods={"DELETE"})
      */
-    public function deleteTransferencia(Request $request, $id)
+    public function deleteTransferencia(Request $request, $nro)
     {
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->find($id);
+        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy([
+            'nro_concecutivo' => $nro,
+            'entrada' => true,
+            'anno' => Date('Y')
+        ]);
         $msg = 'No se pudo eliminar el transferencia seleccionada';
         $success = 'error';
         if ($obj_transferencia_entrada) {
@@ -488,39 +423,50 @@ class TransferenciaController extends AbstractController
         }
         $this->addFlash($success, $msg);
         // }
-        return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada');
+        return $this->redirectToRoute('contabilidad_inventario_transferencia_entrada_gestionar');
     }
 
     /**
      * @Route("/get-nros-transferencias", name="contabilidad_inventario_transferencia_entrada_get_nros", methods={"POST"})
      */
-    public function getNros(EntityManagerInterface $em, Request $request){
+    public function getNros(EntityManagerInterface $em, Request $request)
+    {
         $transferencia_er = $em->getRepository(Transferencia::class);
         $id_usuario = $this->getUser()->getId();
         $year_ = Date('Y');
         $idalmacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getConsecutivos($em,$transferencia_er,$year_,$id_usuario,$idalmacen);
+        $row = AuxFunctions::getConsecutivos($em, $transferencia_er, $year_, $id_usuario, $idalmacen, ['entrada' => true], 'Transferencia');
         return new JsonResponse(['nros' => $row, 'success' => true]);
     }
 
     /**
-     * @Route("/print_report/{id}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
+     * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_entrada_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em, $id)
+    public function print(EntityManagerInterface $em,Request $request, $nro)
     {
         $transferencia_entrada_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
-        $transferencia_obj = $transferencia_entrada_er->findOneBy(array(
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $year_ = $today->format('Y');
+
+        $transferencia_arr = $transferencia_entrada_er->findBy(array(
             'activo' => true,
-            'id' => $id
+            'nro_concecutivo' => $nro,
+            'entrada' => true,
+            'anno'=>$year_
         ));
 
-        $obj_tipo_documento = $tipo_documento_er->findOneBy(array(
-            'nombre' => 'transferencia DE ENTRADA',
-            'activo' => true
-        ));
+        /** @var Transferencia $element */
+        foreach ($transferencia_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $transferencia_obj = $element;
+        }
+
+        $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
         $rows = [];
         $almacen = '';
         $unidad_origen = '';
@@ -531,10 +477,10 @@ class TransferenciaController extends AbstractController
         $fecha_transferencia = '';
         if ($transferencia_obj && $obj_tipo_documento) {
             /** @var  $transferencia_obj Transferencia */
-            $almacen = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $almacen = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $fecha_transferencia = $transferencia_obj->getIdDocumento()->getFecha()->format('d/m/Y');
-            $unidad_origen = $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getNombre() : '';
-            $almacen_origen = $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getDescripcion() : '';
+            $unidad_origen = $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo() . ' - ' . $transferencia_obj->getIdUnidad()->getNombre() : '';
+            $almacen_origen = $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdAlmacen()->getDescripcion() : '';
             $nro_solicitud = $transferencia_obj->getNroConcecutivo();
             $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
                 'id_tipo_documento' => $obj_tipo_documento->getId(),
@@ -543,45 +489,151 @@ class TransferenciaController extends AbstractController
             ));
 
             if (!empty($arr_movimiento_mercancia)) {
-                /** @var  $mov_mercancia MovimientoMercancia */
-                $mov_mercancia = $arr_movimiento_mercancia[0];
-                $id_usuario_movimiento = $mov_mercancia->getIdUsuario()->getId();
-                /** @var Empleado $obj_empleado */
-                $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
-                    'id_usuario' => $id_usuario_movimiento
-                ));
-                $unidad = $obj_empleado->getIdUnidad()->getNombre();
+                /** @var Unidad $obj_unidad */
+                $obj_unidad = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad();
+                $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
                     /**@var $obj MovimientoMercancia* */
                     $rows[] = array(
                         'id' => $obj->getIdMercancia()->getId(),
                         'codigo' => $obj->getIdMercancia()->getCodigo(),
+                        'um' => $obj->getIdMercancia()->getIdUnidadMedida()->getAbreviatura(),
                         'descripcion' => $obj->getIdMercancia()->getDescripcion(),
                         'existencia' => $obj->getExistencia(),
                         'cantidad' => $obj->getCantidad(),
-                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
-                        'importe' => number_format($obj->getImporte(), 2, '.', ''),
+                        'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3),
+                        'importe' => number_format($obj->getImporte(), 2),
                     );
                     $importe_total += $obj->getImporte();
                 }
             }
-
         }
         return $this->render('contabilidad/inventario/transferencia/print.html.twig', [
             'controller_name' => 'TransferenciaEntradaControllerPrint',
             'datos' => array(
-                'importe_total' => number_format($importe_total, 2, '.', ''),
+                'importe_total' => number_format($importe_total, 2),
                 'almacen' => $almacen,
-                'cod_proveedor' => '$cod_proveedor',
-                'proveedor' => '$proveedor',
                 'unidad' => $unidad,
-                'unidad_origen'=>$unidad_origen,
-                'almacen_origen'=>$almacen_origen,
+                'unidad_origen' => $unidad_origen,
+                'almacen_origen' => $almacen_origen,
                 'fecha_transferencia' => $fecha_transferencia,
                 'nro_solicitud' => $nro_solicitud
             ),
             'mercancias' => $rows,
-            'id' => $id
+            'nro' => $nro
         ]);
+    }
+
+    /**
+     * @Route("/print_report_current/", name="contabilidad_inventario_transferencia_entrada_print_report_current",methods={"GET","POST"})
+     */
+    public function printCurrent(EntityManagerInterface $em, Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha_contable = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha_contable = explode('-', $fecha_contable);
+        $datos = $request->get('datos');
+        $mercancias = json_decode($request->get('mercancias'));
+        $nro = $request->get('nro');
+        /** @var Unidad $obj_unidad */
+        $obj_unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad();
+        $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
+        $rows = [];
+        foreach ($mercancias as $obj) {
+            array_push($rows, [
+                "id" => 0,
+                "codigo" => $obj->codigo,
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
+                "descripcion" => $obj->descripcion,
+                "existencia" => $obj->nueva_existencia,
+                "cantidad" => $obj->cant,
+                "precio" => number_format($obj->precio, 3),
+                "importe" => number_format($obj->importe, 2)
+            ]);
+        }
+        return $this->render('contabilidad/inventario/transferencia/print.html.twig', [
+            'controller_name' => 'AjusteEntradaControllerPrint',
+            'datos' => array(
+                'importe_total' => number_format($datos['importe_total'], 2),
+                'almacen' => $request->getSession()->get('selected_almacen/name'),
+                'unidad' => $unidad,
+                'unidad_origen' => $datos["unidad_origen"] == ' -- seleccione -- ' ? '' : $datos["unidad_origen"],
+                'almacen_origen' => $datos["almacen_origen"] == '-- seleccione --' ? '' : $datos["almacen_origen"],
+                'fecha_transferencia' => $arr_fecha_contable[2] . '/' . $arr_fecha_contable[1] . '/' . $arr_fecha_contable[0],
+                'nro_solicitud' => $nro
+            ),
+            'mercancias' => $rows,
+            'nro' => $nro
+        ]);
+
+    }
+
+    /**
+     * @Route("/load-tranferencia/{nro}", name="contabilidad_inventario_load_transferencia",methods={"GET","POST"})
+     */
+    public function loadTranferencia(EntityManagerInterface $em, Request $request, $nro)
+    {
+        $transferencia_entrada_er = $em->getRepository(Transferencia::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+        $cuentas = $em->getRepository(Cuenta::class);
+        $subcuentas = $em->getRepository(Subcuenta::class);
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
+        $today = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $elements_arr = $transferencia_entrada_er->findBy(array(
+            'nro_concecutivo' => $nro,
+            'entrada' => true,
+            'anno' => $today->format('Y')
+        ));
+        /** @var Transferencia $element */
+        foreach ($elements_arr as $element) {
+            if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
+                $transferencia_obj = $element;
+        }
+
+        if (!$transferencia_obj) {
+            return new JsonResponse(['data' => [], 'success' => false, 'msg' => 'El nro de la Tranferencia no existe o fue Cancelada.']);
+        }
+
+        $importe_total = 0;
+        $rows_movimientos = [];
+
+        $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+            'id_tipo_documento' => $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA),
+            'id_documento' => $transferencia_obj->getIdDocumento()
+        ));
+
+        foreach ($arr_movimiento_mercancia as $obj) {
+            /**@var $obj MovimientoMercancia* */
+            $rows_movimientos[] = array(
+                'id' => $obj->getIdMercancia()->getId(),
+                'codigo' => $obj->getIdMercancia()->getCodigo(),
+                'descripcion' => $obj->getIdMercancia()->getDescripcion(),
+                'existencia' => $obj->getExistencia(),
+                'cuenta_subcuenta' => $obj->getIdMercancia()->getCuenta() . ' - ' . $obj->getIdMercancia()->getNroSubcuentaInventario(),
+                'cantidad' => $obj->getCantidad(),
+                'precio' => number_format(($obj->getImporte() / $obj->getCantidad()), 3, '.', ''),
+                'importe' => number_format($obj->getImporte(), 2, '.', ''),
+            );
+            $importe_total += $obj->getImporte();
+        }
+
+        $cuenta_acred = $cuentas->findOneBy(['nro_cuenta' => $transferencia_obj->getNroCuentaAcreedora()]);
+        $subcuenta_acred = $subcuentas->findOneBy(['id_cuenta' => $cuenta_acred->getId(), 'nro_subcuenta' => $transferencia_obj->getNroSubcuentaAcreedora()]);
+
+        $rows = array(
+            'id' => $transferencia_obj->getId(),
+            'nro_cuenta_acreedora' => $transferencia_obj->getNroCuentaAcreedora() . ' - ' . $cuenta_acred->getNombre(),
+            'nro_subcuenta_acreedora' => $transferencia_obj->getNroSubcuentaAcreedora() . ' - ' . $subcuenta_acred->getDescripcion(),
+            'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo() . ' - ' . $transferencia_obj->getIdUnidad()->getNombre() : '',
+            'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
+            'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),
+            'moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getNombre(),
+            'importe_total' => $importe_total,
+            'mercancias' => $rows_movimientos
+        );
+        return new JsonResponse(['data' => $rows, 'success' => true, 'msg' => 'ajuste de entrada cargado con éxito.']);
     }
 }

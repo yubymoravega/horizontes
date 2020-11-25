@@ -7,7 +7,9 @@ use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,6 +19,10 @@ class UnidadType extends AbstractType
     {
         $builder
             ->add('nombre')
+            ->add('codigo')
+            ->add('telefono')
+            ->add('correo', EmailType::class)
+            ->add('direccion',TextareaType::class)
             ->add('id_padre', EntityType::class, [
                 'class' => Unidad::class,
                 'choice_label' => 'nombre',

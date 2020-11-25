@@ -16,10 +16,59 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <ul class="navbar-nav mr-auto">
-            <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_registrar') }}">Registrar</a>
-            <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_movimiento') }}">Movimiento</a>
-            <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_depreciacion') }}">Depreciación</a>
+            <li class="nav-item dropdown ">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Operaciones de activos
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <h6 class="text-center">Movimientos de Activos Fijos</h6>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" style="font-weight: 300;font-family: inherit !important;" href="{{ url ('contabilidad_activo_fijo_apertura') }}">Apertura</a>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                       href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Compra</a>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                       href="{{ url ('contabilidad_inventario_vale_salida_producto_gestionar') }}">Traslados
+                        Internos</a>
+                    <a class="dropdown-item" style="font-weight: 300;font-family: inherit !important;"
+                       href="{{ url ('contabilidad_inventario_transferencia_salida_gestionar') }}">Traslados
+                        Recibidos</a>
+                    <a class="dropdown-item" style="font-weight: 300;font-family: inherit !important;" href="{{ url ('contabilidad_inventario_ajuste_salida_gestionar') }}">Traslados
+                        Enviados</a>
+                    <a class="dropdown-item" style="font-weight: 300;font-family: inherit !important;"
+                       href="{{ url ('contabilidad_inventario_ajuste_salida_gestionar') }}">Ventas</a>
+                    <a class="dropdown-item" style="font-weight: 300;font-family: inherit !important;"
+                       href="{{ url ('contabilidad_inventario_ajuste_salida_gestionar') }}">Bajas</a>
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Ajuste</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_criterio_analisis') }}">Depreciación</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_tipo_cuenta') }}">Cerrar Periodo
+                        Mensual</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_cuenta') }}">Cerrar año</a>
+                </div>
+            </li>
+
+            <li class="nav-item dropdown ">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Informes
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_registro_activo_fijo') }}">Registro de Activos
+                        Fijos</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_unidad') }}">Submayor de Activos
+                        Fijos</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Listado de
+                        Depreciación</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_registrar') }}">Activos Fijos por
+                        criterio</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Comprobante de
+                        Anotaciones</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Generar
+                        Comprobante de Operaciones</a>
+                </div>
+            </li>
         </ul>
-        {#        </div>#}
     </nav>
 {% endblock %}

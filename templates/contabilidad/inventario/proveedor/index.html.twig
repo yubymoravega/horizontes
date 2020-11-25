@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Proveedores
+                Listado de proveedores
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
@@ -36,7 +36,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{ form_start(form) }}
+                    {{ form_start(form, {'attr':{'autocomplete':"off"}}) }}
                     <div class="modal-body bg-dark-app">
                         <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
                             <label for="grupo_activos_porciento_deprecia_anno" class="font-weight-bold">Nombre</label>

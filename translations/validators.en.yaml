@@ -2,6 +2,8 @@
 #author.name.not_blank: Please enter an author name.
 contabilidad:
   config:
+    nro_cuenta_unique: El numero de cuenta ya esta registrado !
+    nro_contrato_unique: El numero del contrato ya esta registrado !
     descripcion_not_blank: El campo descripción está vacio !
     descripcion_unique: El nombre ya está en uso !
     modulo_not_blank: Debe seleccionar el módulo !
@@ -16,3 +18,11 @@ contabilidad:
     centro_costo_unique: Centro de Costo ya se encuentra registrado
     grupo_activo_unique: Ya se encuentra registrado un grupo con esa descripción
     taza_cambio_unique: La tasa de cambio ya se encuentra registrada
+    nombre_cliente: Ya existe un cliente registrado con ese nombre
+    codigo_cliente: Ya existe un cliente registrado con ese código
+    codigo_almacen: Ya existe un almacén registrado con ese código
+    abreviatura_not_blank: El campo descripción está vacio !
+    abreviatura_unique: La abreviatura ya está en uso !
+  venta:
+    nro_factura_unique: La factura ya está registrada
+

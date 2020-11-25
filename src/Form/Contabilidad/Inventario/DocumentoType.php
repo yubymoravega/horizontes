@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,35 +28,11 @@ class DocumentoType extends AbstractType
                 'label' => 'Importe',
                 'attr' => ['class' => 'w-100']
             ])
-            ->add('id_moneda', EntityType::class, [
-                'label' => 'Moneda',
-                'class' => Moneda::class,
-                'choice_label' => 'nombre',
+            ->add('id_moneda', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
-            ])
-//            ->add('importe_total', TextType::class, [
-//                'required' => true,
-////                'hidden' => true,
-////                'disabled'=>true,
-//                'label' => 'Importe Total',
-//                'attr' => ['class' => 'w-100']
-//            ])
-//            ->add('nro_concecutivo',TextType::class, [
-//                'required' => true,
-//                'attr' => ['class' => 'w-100'],
-//                'disabled' => true
-//            ])
-//            ->add('fecha', DateType::class, array(
-//                'input' => 'datetime',
-//                'attr' => ['class' => 'w-100'],
-//                'widget' => 'single_text',
-//                'placeholder' => 'Fecha'
-//            ))
+                'label'=>'Moneda',
+                'choice_label' => 'nombre'
+            ))
         ;
     }
 

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title> Listado de existencia en almacén</title>
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+    <style>
+        @media print {
+
+            table {
+                page-break-before: always;
+                page-break-after: always;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto
+            }
+
+            td {
+                page-break-inside: avoid;
+                page-break-after: auto
+            }
+
+            thead {
+                display: table-header-group
+            }
+
+            tfoot {
+                display: table-footer-group
+            }
+        }
+
+        th {
+            padding: .2rem 0;
+            border: solid black 1px;
+            width: 80px;
+        }
+
+        td {
+            padding: 0 .3rem;
+        }
+
+        .cuenta-print-listado {
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        .subcuenta-print-listado {
+            font-style: italic;
+        }
+
+        .total-print {
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+    <table border="1" width="960px" class="mt-1">
+        <tbody>
+        <tr>
+            <td colspan="7" height="70px" class="font-weight-bold text-center">Listado de existencia en almacén</td>
+        </tr>
+        </tbody>
+    </table>
+    <table border="0" width="960px" style="margin-bottom: 1rem;">
+        <thead>
+        <th class="text-center"><strong>Código</strong></th>
+        <th class="text-center"><strong>Descripción</strong></th>
+        <th width="10" class="text-center"><strong>UM</strong></th>
+        <th class="text-center"><strong>Existencia</strong></th>
+        <th class="text-center"><strong>Precio</strong></th>
+        <th class="text-center"><strong>Importe</strong></th>
+        </thead>
+        <tbody>
+        {% for cuenta in cuentas %}
+
+        <tr>
+            <td class="cuenta-print-listado pt-3 border-top border-bottom" style="background-color: #eae4e4" colspan="5">{{ cuenta.cuenta }}</td>
+            <td class="cuenta-print-listado text-right pt-3 border-top border-bottom" style="background-color: #eae4e4">{{ cuenta.total }}</td>
+        </tr>
+        {% for subcuenta in cuenta.data %}
+            <tr>
+                <td class="subcuenta-print-listado" colspan="5">{{ subcuenta.subcuenta }}</td>
+                <td class="subcuenta-print-listado text-right">{{ subcuenta.total }}</td>
+            </tr>
+            {% for item in subcuenta.existencia %}
+                {% if loop.last %}
+                    <tr class="total-print">
+                {% else %}
+                    <tr>
+                {% endif %}
+                <td>{{ item.codigo }}</td>
+                <td>{{ item.descripcion }}</td>
+                <td width="10" class="text-center">{{ item.unidad_medida }}</td>
+                <td class="text-right">{{ item.existencia }}</td>
+                <td class="text-right">{{ item.precio }}</td>
+                <td class="text-right">{{ item.importe }}</td>
+                </tr>
+
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+
+        {% endfor %}
+    </table>
+</div>
+<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
+</body>
+</html>

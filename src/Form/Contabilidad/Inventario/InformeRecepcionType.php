@@ -29,31 +29,25 @@ class InformeRecepcionType extends AbstractType
                 'mapped'=>false,
                 'auto_initialize'=>true
             ])
-            ->add('nro_cuenta_inventario', ChoiceType::class, array(
-                'attr' => ['class' => 'w-100'],
-                'label'=>'Cuenta de inventario',
-                'choice_label' => 'nro_cuenta',
-            ))
-            ->add('nro_subcuenta_inventario', ChoiceType::class, array(
-                'attr' => ['class' => 'w-100'],
-                'label'=>'Subcuenta de inventario',
-                'choice_label' => 'nro_subcuenta',
-            ))
             ->add('nro_cuenta_acreedora', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label'=>'Cuenta acreedora',
                 'choice_label' => 'nro_cuenta',
             ))
-            ->add('id_proveedor', EntityType::class, [
-                'class' => Proveedor::class,
-                'label'=>'Proveedor',
+            ->add('nro_subcuenta_acreedora', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'choice_label' => 'nombre',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
+                'label'=>'Subcuenta acreedora',
+                'choice_label' => 'nro_subcuenta',
+            ))
+            ->add('cod_proveedor', TextType::class, [
+                'required' => true,
+                'label'=>'Cod. Proveedor',
+                'attr' => ['class' => 'w-100'],
+            ])
+            ->add('nombre_proveedor', TextType::class, [
+                'required' => true,
+                'label'=>'Proveedor',
+                'attr' => ['class' => 'w-100','disabled'=>true],
             ])
             ->add('fecha_factura', DateType::class, array(
                 'input' => 'datetime',

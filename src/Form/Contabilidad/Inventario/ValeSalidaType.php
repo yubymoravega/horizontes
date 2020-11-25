@@ -32,7 +32,7 @@ class ValeSalidaType extends AbstractType
             ))
             ->add('nro_solicitud', TextType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'label'=> 'Nro. solicitud'
+                'label' => 'Nro. solicitud'
             ))
             ->add('nro_cuenta_deudora', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
@@ -54,8 +54,17 @@ class ValeSalidaType extends AbstractType
                 'label' => 'Elemento de gasto',
                 'choice_label' => 'codigo',
             ))
-            ->add('list_mercancia', HiddenType::class);
-        ;
+            ->add('codigo_ot', TextType::class, [
+                'required' => false,
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Código O.T.',
+            ])
+            ->add('descripcion_ot', TextType::class, [
+                'attr' => ['class' => 'w-100', 'readonly' => true],
+                'label' => 'Descripción O.T.',
+                'required' => false,
+            ])
+            ->add('list_mercancia', HiddenType::class);;
     }
 
 }

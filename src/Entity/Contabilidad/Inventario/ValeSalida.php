@@ -30,6 +30,11 @@ class ValeSalida
     private $activo;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $producto;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $nro_consecutivo;
@@ -56,6 +61,7 @@ class ValeSalida
 
     /**
      * @ORM\Column(type="string", length=255)
+	 * @ORM\JoinColumn(nullable=false)
      */
     private $nro_subcuenta_deudora;
 
@@ -84,6 +90,18 @@ class ValeSalida
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getProducto(): ?bool
+    {
+        return $this->producto;
+    }
+
+    public function setProducto(bool $producto): self
+    {
+        $this->producto = $producto;
 
         return $this;
     }

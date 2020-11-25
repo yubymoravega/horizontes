@@ -24,11 +24,18 @@ class TipoDocumentoController extends AbstractController
      */
     public function index(EntityManagerInterface $em)
     {
-        $tipo_documento_arr = $em->getRepository(TipoDocumento::class)->findAll();
-        if (empty($tipo_documento_arr)) {
-            $config = Yaml::parse(file_get_contents('../src/Data/contabilidad.yml'));
-            $tipos_documentos_yml = $config['configuraciones']['tipo_documento'];
-            foreach ($tipos_documentos_yml as $tipos) {
+        $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+        $config = Yaml::parse(file_get_contents('../src/Data/contabilidad.yml'));
+        $tipos_documentos_yml = $config['configuraciones']['tipo_documento'];
+        foreach ($tipos_documentos_yml as $tipos) {
+            $td = $tipo_documento_er->find($tipos['id']);
+            if ($td) {
+                /**@var $td TipoDocumento**/
+                $td
+                    ->setActivo(true)
+                    ->setNombre($tipos['name']);
+                $em->persist($td);
+            } else {
                 $new_tipo = new TipoDocumento();
                 $new_tipo
                     ->setNombre($tipos['name'])
@@ -42,6 +49,7 @@ class TipoDocumentoController extends AbstractController
                 return $exception->getMessage();
             }
         }
+
         $tipo_documento_arr = $em->getRepository(TipoDocumento::class)->findAll();
         $row = [];
         foreach ($tipo_documento_arr as $tipoDocumento) {

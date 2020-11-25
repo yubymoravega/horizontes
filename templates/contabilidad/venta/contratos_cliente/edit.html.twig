@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-5" style="width: 50rem;">
+            <div class="container">
+                <h1 class="text-reporte"> Editar Contrato ({{ contratos_cliente.nroContrato }})</h1>
+            </div>
+            <div class="card-body">
+                {{ include('contabilidad/venta/contratos_cliente/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+
+        $('#form_contrato_cliente').validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'contratos_cliente[nro_contrato]': "required",
+                'contratos_cliente[id_cliente]': "required",
+                'contratos_cliente[importe]': "required",
+                'contratos_cliente[id_moneda]': "required",
+                'contratos_cliente[fecha_aprobado]': "required",
+                'contratos_cliente[fecha_vencimiento]': "required",
+            },
+            messages: {
+                'contratos_cliente[nro_contrato]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[importe]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[fecha_aprobado]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'contratos_cliente[fecha_vencimiento]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+            }
+        })
+    </script>
+{% endblock %}

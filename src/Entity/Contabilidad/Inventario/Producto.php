@@ -2,6 +2,8 @@
 
 namespace App\Entity\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\UnidadMedida;
 use App\Repository\Contabilidad\Inventario\ProductoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,17 +27,54 @@ class Producto
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $cuenta;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $descripcion;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $precio_costo;
+    private $existencia;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="float")
+     */
+    private $importe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Almacen::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_amlacen;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=UnidadMedida::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad_medida;
+
+    /**
+     * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_subcuenta_inventario;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_cuenta_acreedora;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_subcuenta_acreedora;
 
     public function getId(): ?int
     {
@@ -54,6 +93,18 @@ class Producto
         return $this;
     }
 
+    public function getCuenta(): ?string
+    {
+        return $this->cuenta;
+    }
+
+    public function setCuenta(string $cuenta): self
+    {
+        $this->cuenta = $cuenta;
+
+        return $this;
+    }
+
     public function getDescripcion(): ?string
     {
         return $this->descripcion;
@@ -66,14 +117,50 @@ class Producto
         return $this;
     }
 
-    public function getPrecioCosto(): ?float
+    public function getExistencia(): ?float
     {
-        return $this->precio_costo;
+        return $this->existencia;
     }
 
-    public function setPrecioCosto(float $precio_costo): self
+    public function setExistencia(float $existencia): self
     {
-        $this->precio_costo = $precio_costo;
+        $this->existencia = $existencia;
+
+        return $this;
+    }
+
+    public function getImporte(): ?float
+    {
+        return $this->importe;
+    }
+
+    public function setImporte(float $importe): self
+    {
+        $this->importe = $importe;
+
+        return $this;
+    }
+
+    public function getIdAmlacen(): ?Almacen
+    {
+        return $this->id_amlacen;
+    }
+
+    public function setIdAmlacen(?Almacen $id_amlacen): self
+    {
+        $this->id_amlacen = $id_amlacen;
+
+        return $this;
+    }
+
+    public function getIdUnidadMedida(): ?UnidadMedida
+    {
+        return $this->id_unidad_medida;
+    }
+
+    public function setIdUnidadMedida(?UnidadMedida $id_unidad_medida): self
+    {
+        $this->id_unidad_medida = $id_unidad_medida;
 
         return $this;
     }
@@ -83,9 +170,45 @@ class Producto
         return $this->activo;
     }
 
-    public function setActivo(?bool $activo): self
+    public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaInventario(): ?string
+    {
+        return $this->nro_subcuenta_inventario;
+    }
+
+    public function setNroSubcuentaInventario(?string $nro_subcuenta_inventario): self
+    {
+        $this->nro_subcuenta_inventario = $nro_subcuenta_inventario;
+
+        return $this;
+    }
+
+    public function getNroCuentaAcreedora(): ?string
+    {
+        return $this->nro_cuenta_acreedora;
+    }
+
+    public function setNroCuentaAcreedora(?string $nro_cuenta_acreedora): self
+    {
+        $this->nro_cuenta_acreedora = $nro_cuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaAcreedora(): ?string
+    {
+        return $this->nro_subcuenta_acreedora;
+    }
+
+    public function setNroSubcuentaAcreedora(?string $nro_subcuenta_acreedora): self
+    {
+        $this->nro_subcuenta_acreedora = $nro_subcuenta_acreedora;
 
         return $this;
     }

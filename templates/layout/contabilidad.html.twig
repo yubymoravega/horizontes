@@ -1,42 +1,46 @@
 <li>
-    <a href="#"><span>Contabilidad</span>
-  
+    <a href="#"><span>Economía</span>
+
     </a>
     <ul class="rd-navbar-dropdown">
         <li>
             <a href="{{ url ('config') }}">
                 <span class="text-middle">► Configuración</span>
-                
+
             </a>
         </li>
         <li>
-            <a href="{{ url('sel_alamacen_inventario')}}">
+            <a href=" {% if app.session.get('selected_almacen/id') %}
+                          {{ url('inventario') }}
+                       {% else %}
+                          {{ url('sel_alamacen_inventario') }}
+                       {% endif %}">
                 <span class="text-middle">► Inventario</span>
-               
+
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ url('venta') }}">
                 <span class="text-middle">► Venta</span>
-                
+
             </a>
         </li>
         <li>
             <a href="{{ url('activo_fijo') }}">
                 <span class="text-middle">► Activo Fijo</span>
-                
+
             </a>
         </li>
         <li>
             <a href="{{ url ('capital_humano') }}">
                 <span class="text-middle">► Capital Humano</span>
-               
+
             </a>
         </li>
         <li>
             <a href="{{ url('general') }}">
-                <span class="text-middle">► General</span>
-                
+                <span class="text-middle">► Contabilidad</span>
+
             </a>
         </li>
     </ul>

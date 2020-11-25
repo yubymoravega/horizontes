@@ -21,8 +21,6 @@ class ProductoController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
-        $form = $this->createForm(ProductoType::class);
-
         $productos_arr = $em->getRepository(Producto::class)->findByActivo(true);
         $row = [];
         foreach ($productos_arr as $item) {
@@ -30,14 +28,17 @@ class ProductoController extends AbstractController
             $row [] = array(
                 'id' => $item->getId(),
                 'descripcion' => $item->getDescripcion(),
-                'precio_costo'=>$item->getPrecioCosto(),
-                'codigo' => $item->getCodigo()
+                'existencia'=>$item->getExistencia(),
+                'codigo'=>$item->getCodigo(),
+                'importe'=>$item->getImporte(),
+                'precio'=> number_format(($item->getImporte()/$item->getExistencia()),3,'.',''),
+                'um' => $item->getIdUnidadMedida()->getNombre(),
+                'cuenta'=>$item->getCuenta()
             );
         }
         return $this->render('contabilidad/inventario/producto/index.html.twig', [
             'controller_name' => 'ProductoController',
             'productos' => $row,
-            'form' => $form->createView()
         ]);
     }
 

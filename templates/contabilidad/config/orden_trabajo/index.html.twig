@@ -1,0 +1,42 @@
+{% extends 'contabilidad/general/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Ordenes de Trabajo
+            </h4>
+        </div>
+        {# end header #}
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-1">Código</th>
+            <th scope="col-1">Descripción</th>
+            </thead>
+            <tbody>
+            {% for almacen in list_ordenes %}
+                <tr>
+                    <td class="row-group-conta" colspan="2">{{ almacen.almacen }}</td>
+                </tr>
+                {% for item in almacen.ordenes %}
+                    <tr>
+                        <td style="font-weight:400;">{{ item.codigo }}</td>
+                        <td style="font-weight:400;">{{ item.descripcion }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}

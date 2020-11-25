@@ -61,6 +61,21 @@ class Mercancia
      */
     private $activo;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_subcuenta_inventario;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_cuenta_acreedora;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_subcuenta_acreedora;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -158,6 +173,42 @@ class Mercancia
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaInventario(): ?string
+    {
+        return $this->nro_subcuenta_inventario;
+    }
+
+    public function setNroSubcuentaInventario(string $nro_subcuenta_inventario): self
+    {
+        $this->nro_subcuenta_inventario = $nro_subcuenta_inventario;
+
+        return $this;
+    }
+
+    public function getNroCuentaAcreedora(): ?string
+    {
+        return $this->nro_cuenta_acreedora;
+    }
+
+    public function setNroCuentaAcreedora(?string $nro_cuenta_acreedora): self
+    {
+        $this->nro_cuenta_acreedora = $nro_cuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getNroSubcuentaAcreedora(): ?string
+    {
+        return $this->nro_subcuenta_acreedora;
+    }
+
+    public function setNroSubcuentaAcreedora(?string $nro_subcuenta_acreedora): self
+    {
+        $this->nro_subcuenta_acreedora = $nro_subcuenta_acreedora;
 
         return $this;
     }

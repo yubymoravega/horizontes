@@ -1,15 +1,15 @@
 {% extends 'utils/modal_form.html.twig' %}
 
 {% block modalbody %}
-    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
 
-    <div class="form-group input-group input-group-sm d-block">
-        <label for="elemento_gasto_descripcion" class="font-weight-bold">Descripción</label>
-        {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100','id':'nombre_field'}}) }}
-    </div>
     <div class="form-group input-group input-group-sm d-block">
         <label for="elemento_gasto_codigo" class="font-weight-bold">Código</label>
         {{ form_widget(form.codigo,{'attr': {'class': 'form-control w-100','id':'codigo_field'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        <label for="elemento_gasto_descripcion" class="font-weight-bold">Descripción</label>
+        {{ form_widget(form.descripcion,{'attr': {'class': 'form-control w-100','id':'nombre_field'}}) }}
     </div>
     <input type="text" id="id_elemento_gasto" hidden>
 

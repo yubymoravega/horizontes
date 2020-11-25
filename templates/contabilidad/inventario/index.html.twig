@@ -10,7 +10,8 @@
 
 {% block navBar %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
-        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal" data-target="#GetOutAlmacenModal">Inventario</a>
+        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal"
+           data-target="#GetOutAlmacenModal">Inventario</a>
         <button class="navbar-toggler order-md-2" type="button" data-toggle="collapse"
                 data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,27 +19,26 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Nomencladores
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_mercancia') }}">Mercancia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_producto') }}">Producto</a>
-                    </div>
-                </li>
+                <a class="dropdown-item" href="{{ url ('contabilidad_inventario_proveedor') }}">Proveedor</a>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Entrada
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <h6 class="text-center">Informe de Recepción</h6>
+                        <div class="dropdown-divider"></div>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Mercancía o
+                            Materiales</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_informe_recepcion_producto_gestionar') }}">Producto</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_transferencia_entrada_gestionar') }}">Transferencia</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_devolucion') }}">Devolución</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada_gestionar') }}">Ajuste</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada_gestionar') }}">Transferencia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_informe_recepcion_gestionar') }}">Informe
-                            de recepción</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -47,10 +47,16 @@
                         Salida
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">Ajuste</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Transferencia</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Vale de
-                            salida</a>
+{#                        <h6 class="text-center">Vale de Salida</h6>#}
+{#                        <div class="dropdown-divider"></div>#}
+                        <a class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Vale de Salida de Mercancía o Materiales</a>
+{#                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"#}
+{#                           href="{{ url ('contabilidad_inventario_vale_salida_producto_gestionar') }}">Producto</a>#}
+{#                        <div class="dropdown-divider"></div>#}
+                        <a class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_transferencia_salida_gestionar') }}">Transferencia</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_salida_gestionar') }}">Ajuste</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -59,61 +65,113 @@
                         Operaciones
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">Cerrar
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_cerrar_dia') }}">Cerrar
                             Día</a>
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Cerrar
-                            Mes</a>
+                        {#                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Cerrar#}
+                        {#                            Mes</a>#}
+                        <a class="dropdown-item" {#target="_blank"#}
+                           href="{{ url ('contabilidad_inventario_comprobante_operaciones') }}">Generar comprobante de
+                            operaciones</a>
                     </div>
                 </li>
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Reportes
+                        Informes
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_entrada') }}">INF</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_mercancia',{nro_cuenta:'one'}) }}">Existencia en
+                            Almacén</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('contabilidad_inventario_submayor_inventario_producto') }}">Submayor de
+                            inventario por producto</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Comprobante de anotaciones</h6>
+                        <div class="dropdown-divider"></div>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" target="_blank"
+                           href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print_entrada') }}">Entrada</a>
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" target="_blank"
+                           href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print_salida') }}">Salida</a>
                     </div>
                 </li>
             </ul>
         </div>
         <span class="text-light p-1 order-md-1"
-              style="cursor: pointer;border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal" data-target="#GetOutAlmacenModal">Almacén: {{ app.session.get('selected_almacen/name') }}</a></span>
+              style="cursor: pointer;border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal"
+                                                                                      data-target="#cambiarFecha">Fecha: {{ app.session.get('date_system') }}</a></span>
+        <span class="text-light p-1 order-md-1 ml-2"
+              style="cursor: pointer;border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal"
+                                                                                      data-target="#GetOutAlmacenModal">Salir del almacén: {{ app.session.get('selected_almacen/name') }}</a></span>
     </nav>
-{% endblock %}
-
-{% block content %}
     <!-- Modal -->
-    <div class="modal fade" id="GetOutAlmacenModal" tabindex="-1" aria-labelledby="GetOutAlmacenModalLabel" aria-hidden="true">
+    <div class="modal fade" id="GetOutAlmacenModal" tabindex="-1" aria-labelledby="GetOutAlmacenModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+            <div class="modal-content">
                 <div class="modal-header bg-dark">
-                    <h5 class="modal-title text-light" id="GetOutAlmacenModalLabel"><i class="fa fa-warning"></i> Atención</h5>
+                    <h5 class="modal-title text-light" id="GetOutAlmacenModalLabel"><i class="fa fa-warning"></i>
+                        Atención</h5>
                     <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Está seguro que desae salir del almacén?</p>
+                    <p>¿Está seguro que desea salir del almacén?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="btnAceptar" data-dismiss="modal">Salir</button>
+                    <button type="button" class="btn btn-secondary" id="btnAceptar__salir" data-dismiss="modal">Salir
+                    </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {#    Cambiar fecha de trebajo en el sistema#}
+    <div class="modal fade" id="cambiarFecha" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="cambiarFechaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="confirm_title">
+                        <i class="fa fa-warning text-warning"></i> Cambiar de fecha</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form_confirm_modal" method="post"
+                      action="{{ path('contabilidad_inventario_cambiar_fecha') }}">
+                    <div class="modal-body" id="confirm_body">
+                        Seleccione la fecha en la que desea trabajar
+                        <input type="date" name="fecha_cierre"
+                               min="{{ app.session.get('min_date') }}"
+                               max="{{ app.session.get('max_date') }}"
+                               value="{{ app.session.get('min_date') }}">
+                    </div>
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input id="_token_confirm_modal" type="hidden" name="_token" value="123...">
+                    <div class="modal-footer">
+                        <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">
+                            Salir
+                        </button>
+                        <button type="submit" class="my-0 btn btn-danger">Aceptar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 {% endblock %}
 
-
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $('#btnAceptar').on('click', function () {
+        $('#btnAceptar__salir').on('click', function () {
             $.ajax({
                 url: '/contabilidad/inventario/salirAlmacen',
                 method: "POST",
-                data: {
-                }
+                data: {}
             }).then(res => {
                 window.location.replace('/contabilidad/inventario/selAlmacen');
             })

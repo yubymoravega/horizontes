@@ -1,0 +1,94 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Sub-Mayor Inventarios {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="1" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="6" height="70px" class="font-weight-bold text-center text-uppercase">sub-mayor inventarios
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" class="text-uppercase"><strong>sub mayor:</strong> {{ datos.desc_grupo_activo }}</td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan="2" rowspan="2"><strong>Código del Sub Mayor: </strong> {{ datos.cod_grupo_activo }}</td>
+                <td class="text-center font-weight-bold" colspan="2">Alta</td>
+                <td class="text-center font-weight-bold" colspan="2">Baja</td>
+
+            </tr>
+            <tr>
+                <td class="text-center font-weight-bold">Nro. Documento</td>
+                <td class="text-center font-weight-bold">Fecha</td>
+                <td class="text-center font-weight-bold">Nro. Documento</td>
+                <td class="text-center font-weight-bold">Fecha</td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan="2"><strong>Nro. Inventario: </strong>{{ datos.nro_inv }}</td>
+                <td class="text-center">{{ datos.tipo_moviniemto }}-{{ datos.nro_doc_alta }}</td>
+                <td class="text-center">{{ datos.fecha_alta }}</td>
+                <td class="text-center">{{ datos.tipo_movimiento_baja }}-{{ datos.nro_doc_baja }}</td>
+                <td class="text-center">{{ datos.fecha_baja }}</td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan="6"><strong>Descripción:</strong> <p>{{ datos.descripcion }}</p></td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan="6"><strong>Area de Responsabilidad:</strong> {{ datos.area_responsabilidad }}</td>
+            </tr>
+            <tr>
+                <td class="text-left font-weight-bold" colspan="2">Cuenta/Subcuenta del Activo</td>
+                <td class="text-center font-weight-bold" colspan="2">Centdo de Costo</td>
+                <td class="text-center font-weight-bold" colspan="2">Area Responsable</td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan="2">{{ datos.cuenta_activo }}/{{ datos.subcuenta_activo }}</td>
+                <td class="text-left" colspan="2">{{ datos.centro_costo_activo }}</td>
+                <td class="text-left" colspan="2">{{ datos.area_responsabilidad_activo }}</td>
+            </tr>
+            <tr>
+                <td class="text-left font-weight-bold" colspan ="6">Cuenta/Subcuenta Depreciación</td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan ="6">{{ datos.cuenta_depreciacion }}/{{ datos.subcuenta_depreciacion }}</td>
+            </tr>
+            <tr>
+                <td class="text-left font-weight-bold" colspan="2">Cuenta/Subcuenta de Gasto</td>
+                <td class="text-center font-weight-bold" colspan="2">Centdo de Costo</td>
+                <td class="text-center font-weight-bold" colspan="2">Elemento de Gasto</td>
+            </tr>
+            <tr>
+                <td class="text-left" colspan="2">{{ datos.cuenta_gasto }}/{{ datos.subcuenta_gasto }}</td>
+                <td class="text-left" colspan="2">{{ datos.centro_costo_gasto }}</td>
+                <td class="text-left" colspan="2">{{ datos.elemento_gasto }}</td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2"><strong>Valor Inicial:</strong><p>{{ datos.valor_inicial }}</p></td>
+                <td class="text-center" colspan="2"><strong>Depreciación Acumulada:</strong><p>{{ datos.depreciacion_acumulada }}</p></td>
+                <td class="text-center" colspan="2"><strong>Valor Real:</strong><p>{{ datos.valor_real }}</p></td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2"><strong>Tasa de Depreciación:</strong><p>{{ datos.tasa_depreciacion }}</p></td>
+                <td class="text-center" colspan="2"><strong>Años de Vida Util:</strong><p>{{ datos.annos_vida_util }}</p></td>
+                <td class="text-center" colspan="2"><strong>Ultima Fecha de Depreciación:</strong><p>{{ datos.fecha_ultima_depreciacion }}</p></td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2"><strong>País:</strong><p>{{ datos.pais }}</p></td>
+                <td class="text-center" colspan="2"><strong>Modelo:</strong><p>{{ datos.modelo }}</p></td>
+                <td class="text-center" colspan="2"><strong>Tipo:</strong><p>{{ datos.tipo }}</p></td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2"><strong>Marca:</strong><p>{{ datos.marca }}</p></td>
+                <td class="text-center" colspan="2"><strong>Nro. Motor:</strong><p>{{ datos.nro_motor }}</p></td>
+                <td class="text-center" colspan="2"><strong>Nro. Serie:</strong><p>{{ datos.nro_serie }}</p></td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2"><strong>Nro. Chapa:</strong><p>{{ datos.nro_chapa }}</p></td>
+                <td class="text-center" colspan="2"><strong>Nro. Chasis:</strong><p>{{ datos.nro_chasis }}</p></td>
+                <td class="text-center" colspan="2"><strong>Combustible:</strong><p>{{ datos.combustible }}</p></td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

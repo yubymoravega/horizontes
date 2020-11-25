@@ -12,6 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=AlmacenRepository::class)
  * @UniqueEntity("descripcion", message="contabilidad.config.descripcion_unique")
+ * @UniqueEntity("codigo", message="contabilidad.config.codigo_almacen")
  */
 class Almacen
 {
@@ -38,6 +39,11 @@ class Almacen
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_unidad;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
+     */
+    private $codigo;
 
     public function getId(): ?int
     {
@@ -76,6 +82,18 @@ class Almacen
     public function setIdUnidad(?Unidad $id_unidad): self
     {
         $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
+    public function getCodigo(): ?string
+    {
+        return $this->codigo;
+    }
+
+    public function setCodigo(?string $codigo): self
+    {
+        $this->codigo = $codigo;
 
         return $this;
     }

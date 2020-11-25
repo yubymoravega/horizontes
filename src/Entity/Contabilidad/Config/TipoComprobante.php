@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Entity\Contabilidad\Config;
+
+use App\Repository\Contabilidad\Config\TipoComprobanteRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass=TipoComprobanteRepository::class)
+ */
+class TipoComprobante
+{
+    /**
+     * @ORM\Id()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $descripcion;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activo;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $abreviatura;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getDescripcion(): ?string
+    {
+        return $this->descripcion;
+    }
+
+    public function setDescripcion(string $descripcion): self
+    {
+        $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(bool $activo): self
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function getAbreviatura(): ?string
+    {
+        return $this->abreviatura;
+    }
+
+    public function setAbreviatura(string $abreviatura): self
+    {
+        $this->abreviatura = $abreviatura;
+
+        return $this;
+    }
+}

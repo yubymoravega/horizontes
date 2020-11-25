@@ -1,0 +1,797 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {# Modal de Cuentas#}
+    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 850px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Listado de mercancias</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app" style="height: 600px;">
+                    <div style="height: 500px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light">
+                            <thead class="thead-dark">
+                            <th style="width: 10px">Sel.</th>
+                            <th style="width: 160px">Código</th>
+                            <th scope="col-6">Descripción</th>
+                            <th style="width: 200px">Precio Compra</th>
+                            </thead>
+                            <tbody id="rows_table">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
+                                    onclick="SeleccionarMercancia()"
+                                    data-dismiss="modal">Seleccionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0">Ajuste de Salida </h1>
+                    </div>
+                    <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
+                        <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {{ form_start(formulario.nro_cuenta_deudora, {'attr':{'id':'ajuste_salida','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0">
+                    <div class="col-6 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_cuenta_deudora) }}
+                        {{ form_widget(formulario.nro_cuenta_deudora) }}
+                    </div>
+                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.nro_subcuenta_deudora) }}
+                        {{ form_widget(formulario.nro_subcuenta_deudora) }}
+                    </div>
+                    <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-8 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
+                        {{ form_label(formulario.observacion) }}
+                        {{ form_widget(formulario.observacion) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.documento.id_moneda) }}
+                        {{ form_widget(formulario.documento.id_moneda) }}
+                    </div>
+                </div>
+                <div id="eg_cc_row" class="row mt-0 p-0">
+                    <div class="col-6 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
+                        {{ form_label(formulario.id_elemento_gasto) }}
+                        {{ form_widget(formulario.id_elemento_gasto) }}
+                    </div>
+                    <div class="col-6 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.id_centro_costo) }}
+                        {{ form_widget(formulario.id_centro_costo) }}
+                    </div>
+                </div>
+                <div id="expediente_row" class="row mt-0 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
+                        {{ form_label(formulario.codigo_exp) }}
+                        {{ form_widget(formulario.codigo_exp) }}
+                    </div>
+                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.descripcion_exp) }}
+                        {{ form_widget(formulario.descripcion_exp) }}
+                    </div>
+                </div>
+                {#                <div id="dinamic_form_id" class="row mt-0 p-0"></div>#}
+                {{ form_end(formulario.nro_cuenta_deudora) }}
+
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Mercancias o Materiales</h3>
+                    <div class="px-2" style="background: dimgray; border-radius: .3rem;">
+                        <span class="pr-1">Importe Total : </span>
+                        <span id="importe-total">0</span>
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+
+                {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-1 d-block">
+                        {{ form_label(formulario.mercancia.codigo) }}
+                        <div class="row m-0 p-0">
+                            <div class="col-8 p-0">
+                                {{ form_widget(formulario.mercancia.codigo) }}
+                            </div>
+                            <div class="col-1 mt-0 p-0">
+                                <button class="btn btn-secondary btn-sm" data-toggle="modal" type="button"
+                                        data-target="#listarMercanciasModal" id="btnSearchMercancia"><i
+                                            class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-7 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.descripcion) }}
+                        {{ form_widget(formulario.mercancia.descripcion) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block pr-0">
+                        {{ form_label(formulario.mercancia.id_unidad_medida) }}
+                        {{ form_widget(formulario.mercancia.id_unidad_medida) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.documento.cantidad_mercancia) }}
+                        {{ form_widget(formulario.documento.cantidad_mercancia,{'type':'number'}) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.mercancia.precio) }}
+                        {{ form_widget(formulario.mercancia.precio) }}
+                    </div>
+                    <input type="hidden" id="true_precio_mercancia" name="">
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.documento.importe_mercancia) }}
+                        {{ form_widget(formulario.documento.importe_mercancia,{'type':'number', 'disabled': true}) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.mercancia.existencia) }}
+                        {{ form_widget(formulario.mercancia.existencia) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.mercancia.existencia_decremento) }}
+                        {{ form_widget(formulario.mercancia.existencia_decremento) }}
+                    </div>
+                    <div class="col-2 pl-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                        <label for="resto_importe">Resto Importe</label>
+                        <input type="text" name="resto" id="resto_importe" disabled="disabled"
+                               class="w-100 form-control">
+                    </div>
+                </div>
+                <div class="pt-0 pl-1 mt-0 text-right">
+                    <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">
+                        ADICIONAR
+                    </button>
+                </div>
+                {{ form_end(formulario.mercancia) }}
+            </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th class="px-2" width="100px">Código</th>
+                    <th class="px-2" width="100px">Cantidad</th>
+                    <th class="px-2" width="100px">Importe</th>
+                    <th class="px-2" width="100px">Precio</th>
+                    <th class="px-2" width="100px">Nueva Existencia</th>
+                    <th class="px-2" width="20px"><i class="fa fa-minus-circle text-danger"></i></th>
+                    <th hidden>UM</th>
+                    <th hidden>Descripcion</th>
+                    </thead>
+                    <tbody id="rows_mercancias">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a href="{{ url('inventario') }}"
+                       class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
+                    </button>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitAjuste">contabilizar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#eg_cc_row').hide()
+        $('#expediente_row').hide()
+
+        function Print_Ajuste() {
+            if ($('#select_nros').val() == consecutivo) {
+                if (list_mercancia.length > 0) {
+                    const obsercacion = $("#ajuste_salida_observacion").val()
+                    const mercancia_json = JSON.stringify(list_mercancia)
+                    $('body').append(`
+                    <form action='/contabilidad/inventario/ajuste-salida/print_report_current/'
+                         method="post" id='form_print_current' target='_blank'>
+                        <input type='text' hidden name='datos[importe_total]' value='${importe_total}'/>
+                        <input type='text' hidden name='datos[observacion]' value='${obsercacion}'/>
+                        <input type='hidden' name='mercancias' value='${mercancia_json}'/>
+                        <input type='text' hidden name='nro' value="${consecutivo}" />
+                    </form>`)
+
+                    const fomrulario = $('#form_print_current')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('No excisten mercancias para imprimir', 'danger')
+
+            } else {
+                const url = '/contabilidad/inventario/ajuste-salida/print_report/' + $('#select_nros').val()
+                window.open(url, 'blank_')
+            }
+        }
+
+        function cancelar() {
+            const url = '/contabilidad/inventario/ajuste-salida/delete/' + $('#select_nros').val()
+            onDeleteConfirm({
+                message: 'Está seguro que desea cancelar el Ajuste de entrada?',
+                url
+            })
+        }
+
+        let mercancias_seleccionada = [];
+        let mercancias = [];
+        let consecutivo = 0;
+        let cuentas_deudoras = [];
+        let cuentas_acreedoras = [];
+        let list_mercancia = []
+        let importe_total = 0;
+        let flag = false;
+        loadingModal.show()
+
+        $(document).ready(function () {
+            /** Ajax para obtener los nros consecutivos**/
+            $.ajax({
+                url: '/contabilidad/inventario/ajuste-salida/get-nros-ajustes',
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    consecutivo = result.nros
+                    $('#select_nros').val(consecutivo)
+                    $('#select_nros').prop('max', consecutivo)
+                    $('#select_nros').prop('min', 1)
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+
+            $('#ajuste_salida_id_elemento_gasto, #ajuste_salida_id_centro_costo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
+            $("#select_nros").blur(function(){
+                if(flag == false){
+                    //no dio enter
+                    $(this).val(consecutivo)
+                    $('#ajuste_salida').resetForm()
+                    $('#form_mercancia').resetForm()
+                    $('#btnSubbmitAjuste').show()
+                    $('#btnImprimir').show()
+                    $('#btnCancelar').hide()
+                    $('#ajuste_salida_observacion').val('')
+                    $('#rows_mercancias').find('tr').remove()
+                    list_mercancia = []
+                    loadingData()
+                }
+                else{
+                    flag = false;
+                }
+            });
+
+            /** Evento para activar/desactivar los btn de CONTABILIZAR o IMPRIMIR**/
+            $('#select_nros').on('change', function () {
+                if ($('#select_nros').val() == consecutivo) {
+                    $('#btnSubbmitAjuste').show()
+                } else {
+                    $('#btnSubbmitAjuste').hide()
+                }
+            })
+            $('#select_nros').on('keyup', function (event) {
+                if (event.which == 13) {
+                    flag = true;
+                    $('#ajuste_salida').resetForm()
+                    $('#ajuste_salida_observacion').text('')
+                    $('#form_mercancia').resetForm()
+                    $("#importe-total").text('$ 0.00')
+                    $('#rows_mercancias').find('tr').remove()
+
+                    $('#expediente_row').hide()
+                    $('#eg_cc_row').hide()
+
+                    if ($('#select_nros').val() == consecutivo) {// si es el consecutivo
+                        $('#btnSubbmitAjuste').show()
+                        $('#btnImprimir').show()
+                        $('#btnCancelar').hide()
+                        loadingData()
+                    } else if ($('#select_nros').val() > consecutivo) {// si es mayor
+                        $('#btnSubbmitAjuste').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        //$('#ajuste_salida select').find('option').remove()
+                        alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+                    } else if ($('#select_nros').val() == '') {// si no hay numero
+                        $('#btnSubbmitAjuste').hide()
+                        $('#btnImprimir').hide()
+                        $('#btnCancelar').hide()
+                        alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
+                    } else {// si es un Numero valido para cargar
+                        $('#btnImprimir').show()
+                        $('#btnSubbmitAjuste').hide()
+                        $('#btnCancelar').show()
+                        llenarFormulario($('#select_nros').val())
+                    }
+                }
+            })
+
+            function llenarFormulario(nro) {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/inventario/ajuste-salida/load-ajuste/' + nro,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            $('#rows_mercancias').find('tr').remove()
+                            $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora, #ajuste_salida_documento_id_moneda').find('option').remove()
+                            let data = result.data;
+                            const cuenta_acreedora = $('#ajuste_salida_nro_cuenta_deudora')
+                            const subcuenta_acreedora = $('#ajuste_salida_nro_subcuenta_deudora')
+                            const moneda = $('#ajuste_salida_documento_id_moneda')
+                            $('#ajuste_salida_observacion').text(data.observaciones)
+
+                            // datos del Formulario
+                            $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora', '#ajuste_salida_documento_id_moneda').find('option').remove()
+                            cuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_cuenta_deudora} </option>`);
+                            subcuenta_acreedora.prepend(`<option selected = "false" value = "0" disabled> ${data.nro_subcuenta_deudora} </option>`);
+                            moneda.prepend(`<option selected = "false" value = "0" disabled> ${data.moneda} </option>`);
+
+                            // CC EG EXP
+                            if (data.centro_costo && data.elemento_gasto) {
+                                $('#eg_cc_row').show()
+                                $('#ajuste_salida_id_elemento_gasto').val(data.elemento_gasto.id)
+                                $('#ajuste_salida_id_centro_costo').val(data.centro_costo.id)
+                            }
+                            if (data.expediente) {
+                                $('#expediente_row').show()
+                                $('#ajuste_salida_codigo_exp').val(data.expediente.codigo)
+                                $('#ajuste_salida_descripcion_exp').val(data.expediente.descripcion)
+                            }
+
+                            $('#form_mercancia').css('display', 'none')
+                            // datos de la mercancia
+                            let mercancias = data.mercancias
+                            $("#importe-total").text('$' + parseFloat(data.importe_total).toFixed(2))
+                            for (var i = 0; i < mercancias.length; i++) {
+
+                                $('#rows_mercancias').append(`<tr>
+                                    <td class="px-2" style="font-weight:400;"> ${mercancias[i]['codigo']} </td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${mercancias[i]['cantidad']}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(mercancias[i]['importe']).toFixed(2)}</td>
+                                    <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(mercancias[i]['precio']).toFixed(6)} </td>
+                                    <td class="px-2 text-right" style="font-weight:400;" >${parseFloat(mercancias[i]['existencia'])}</td>
+                                    <td></td>
+                                   </tr>`
+                                );
+                            }
+                            loadingModal.close()
+                        } else {
+                            loadingModal.close()
+                            alertTemplate(result.msg, 'danger')
+                        }
+                    },
+                    error: function () {
+                    }
+                })
+            }
+
+            $('#ajuste_salida_codigo_exp').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo = $('#ajuste_salida_codigo_exp').val()
+                    if (!!codigo) {
+                        loadingModal.show("cargando expediente...")
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-salida/get-expediente/' + codigo,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                if (result.success) {
+                                    const expediente = result.data
+                                    $('#ajuste_salida_descripcion_exp').val(expediente)
+                                    $('#ajuste_salida_descripcion_exp').attr('readonly', true)
+
+                                } else {
+                                    alertTemplate('No existen expediente con ese código')
+                                    $('#ajuste_salida_descripcion_exp').val('')
+                                    $('#ajuste_salida_descripcion_exp').attr('readonly', false)
+                                }
+                                loadingModal.close()
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El campo código no deben estar vacio.', 'danger')
+                    }
+                } else {
+                    $('#ajuste_salida_descripcion_exp').val('')
+                    $('#ajuste_salida_descripcion_exp').attr('readonly', true)
+                }
+            })
+
+            const loadingData = function () {
+                loadingModal.show()
+                $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora, #ajuste_salida_documento_id_moneda').find('option').remove()
+                $('#ajuste_salida_nro_cuenta_deudora, #ajuste_salida_nro_subcuenta_deudora, #ajuste_salida_documento_id_moneda').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
+                $('#form_mercancia').css('display', 'block')
+
+                $.ajax({
+                    url: '/contabilidad/inventario/ajuste-salida/getCuentas',
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        cuentas_deudoras = result.cuentas_deudoras
+                        $(result.cuentas_deudoras).each(function (pos, valor) {
+                            $('#ajuste_salida_nro_cuenta_deudora').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
+                        })
+                        $(result.monedas).each(function (pos, valor) {
+                            $('#ajuste_salida_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        loadingModal.close()
+                    },
+                    error: function () {
+                    }
+                })
+            }
+            loadingData()
+
+            $('#btnSearchMercancia').on('click', function () {
+                $('#rows_table').find('tr').remove();
+                let codigo = $('#ajuste_salida_mercancia_codigo').val()
+                let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val()
+                if (!!cuent) {
+                    let nro = cuenta.split(' - ')[0];
+                    loadingModal.show("cargando mercancia...")
+                    $.ajax({
+                        url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + nro,
+                        method: 'POST',
+                        dataType: 'json',
+                        success: function (result) {
+
+                            $(result.mercancias).each(function (pos, valor) {
+                                $('#rows_table').append('<tr>' +
+                                    '<td style="font-weight:400;"> ' +
+                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                    '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                    '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
+                                );
+                            })
+                        },
+                        error: function () {
+                            $('#ajuste_salida_mercancia_descripcion').val('')
+                            $('#ajuste_salida_mercancia_existencia').val('')
+                            $('#ajuste_salida_mercancia_precio').val('')
+                            $('#true_precio_mercancia').val('')
+                            $('#ajuste_salida_mercancia_id_unidad_medida').val('')
+                            $('#ajuste_salida_documento_importe_mercancia').val('')
+                            $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                            $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                            $('#resto_importe').val('')
+                            importe_real = 0
+                        }
+                    })
+                } else {
+                    alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                }
+            })
+            let importe_real = 0
+            $('#ajuste_salida_mercancia_codigo').on('keyup', function (e) {
+                if (e.which == 13) {
+                    let codigo = $('#ajuste_salida_mercancia_codigo').val()
+                    let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val()
+                    if (!!cuenta && !!codigo) {
+                        let nro = cuenta.split(' - ')[0];
+                        loadingModal.show("cargando mercancia...")
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + nro,
+                            method: 'POST',
+                            dataType: 'json',
+                            success: function (result) {
+                                mercancias = result.mercancias
+                                if (mercancias.length > 0) {
+                                    importe_real = mercancias[0]['importe_real']
+                                    $('#ajuste_salida_mercancia_descripcion').val(mercancias[0]['descripcion'])
+                                    $('#ajuste_salida_mercancia_existencia').val(mercancias[0]['existencia'])
+                                    $('#ajuste_salida_mercancia_precio').val(parseFloat(mercancias[0]['precio_compra']).toFixed(5))
+                                    $('#true_precio_mercancia').val(mercancias[0]['precio_compra'])
+                                    $('#ajuste_salida_mercancia_id_unidad_medida').find('option').remove()
+                                    $('#ajuste_salida_mercancia_id_unidad_medida').prepend('<option selected = "true" value = "1">' + mercancias[0]['um'] + ' </option>');
+
+                                } else {
+                                    alertTemplate('No existen mercancias con ese código')
+                                }
+                                loadingModal.close()
+                            },
+                            error: function () {
+                                resetMercancias()
+                            }
+                        })
+                    } else {
+                        resetMercancias()
+                        alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
+                    }
+                } else {
+                    resetMercancias()
+                }
+            })
+
+            function resetMercancias(){
+
+                $('#ajuste_salida_mercancia_descripcion').val('')
+                $('#ajuste_salida_mercancia_existencia').val('')
+                $('#ajuste_salida_mercancia_precio').val('')
+                $('#true_precio_mercancia').val('')
+                $('#ajuste_salida_mercancia_id_unidad_medida').find('option').remove()
+                $('#ajuste_salida_documento_importe_mercancia').val('')
+                $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                $('#resto_importe').val('')
+                importe_real = 0
+            }
+
+            $('#ajuste_salida_documento_cantidad_mercancia').on('keyup', function () {
+                let cantidad = parseFloat($('#ajuste_salida_documento_cantidad_mercancia').val())
+                let precio = parseFloat($('#true_precio_mercancia').val())
+                let existencia = parseFloat($('#ajuste_salida_mercancia_existencia').val())
+
+                if (cantidad <= existencia) {
+                    if (cantidad > 0) {
+                        let importe = parseFloat(precio * cantidad).toFixed(2)
+                        $('#ajuste_salida_documento_importe_mercancia').val(importe)
+                        let resto = importe_real - importe
+                        $('#resto_importe').val(resto.toFixed(2))
+                    } else {
+                        $('#ajuste_salida_documento_importe_mercancia').val(0)
+                    }
+                    if (cantidad == 0 || cantidad == '') {
+                        $('#ajuste_salida_mercancia_existencia_decremento').val(0)
+                    } else {
+                        let existencia_inicial = (parseFloat($('#ajuste_salida_mercancia_existencia').val()) > 0 || $('#ajuste_salida_mercancia_existencia').val() != '') ? parseFloat($('#ajuste_salida_mercancia_existencia').val()) : 0
+                        $('#ajuste_salida_mercancia_existencia_decremento').val(existencia_inicial - cantidad)
+                    }
+                } else {
+                    if (cantidad > 0)
+                        alertTemplate('La cantidas supera la existencia', 'danger')
+                    $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                }
+            })
+
+            $('#ajuste_mercancia_codigo').on('keyup', function () {
+                $('#ajuste_salida_mercancia_descripcion').val('')
+                $('#ajuste_salida_mercancia_precio').val('')
+                $('#true_precio_mercancia').val('')
+                $('#ajuste_salida_mercancia_existencia').val('')
+            })
+
+            $('#ajuste_salida_nro_cuenta_deudora').on('change', function () {
+                $('#ajuste_salida_nro_subcuenta_deudora').find('option').remove()
+                cuentas_deudoras.forEach(function (valor, pos) {
+                    if ($('#ajuste_salida_nro_cuenta_deudora').val() == valor.nro_cuenta) {
+                        $('#ajuste_salida_nro_subcuenta_deudora').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                        for (var i = 0; i < valor.sub_cuenta.length; i++) {
+                            $('#ajuste_salida_nro_subcuenta_deudora').append('<option value = "' + valor.sub_cuenta[i]['nro_subcuenta'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
+                        }
+                    }
+                })
+                miniLoadin.show({msg: 'cargando otros campos...', target: '#ajuste_salida'})
+                // cargar dinamicamente [cc, eg] o [exp]
+                $('#eg_cc_row').hide()
+                $('#expediente_row').hide()
+                $.ajax({
+                    url: '/contabilidad/inventario/ajuste-salida/dinamic-files/' + $(this).val(),
+                    method: 'POST',
+                    success: function (result) {
+                        if (result.success) {
+
+                            $('#ajuste_salida_id_elemento_gasto').val(0)
+                            $('#ajuste_salida_id_centro_costo').val(0)
+                            $('#ajuste_salida_codigo_exp').val(null)
+                            $('#ajuste_salida_descripcion_exp').val(null)
+                            result.data.forEach(data => {
+                                if (data == 'CCT' || data == 'EG') $('#eg_cc_row').show()
+                                if (data == 'EXP') $('#expediente_row').show()
+                            })
+                        } else {
+                            alertTemplate(result.msg)
+                        }
+                        miniLoadin.close()
+                    },
+                    error: function () {
+                    }
+                })
+            })
+
+            const form_ajuste_salida = $('#ajuste_salida')
+
+            form_ajuste_salida.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'ajuste_salida[observacion]': "required",
+                    'ajuste_salida[nro_cuenta_deudora]': "required",
+                    'ajuste_salida[nro_subcuenta_deudora]': "required",
+                    'ajuste_salida[documento][id_moneda]': "required",
+
+                    'ajuste_salida[id_elemento_gasto]': "required",
+                    'ajuste_salida[id_centro_costo]': "required",
+                    'ajuste_salida[codigo_exp]': "required",
+                    'ajuste_salida[descripcion_exp]': "required",
+                },
+                messages: {
+                    'ajuste_salida[observacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[nro_cuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[nro_subcuenta_deudora]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[documento][id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+
+                    'ajuste_salida[id_elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[id_centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[codigo_exp]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'ajuste_salida[descripcion_exp]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                }
+            })
+
+            const form_mercancia = $('#form_mercancia')
+            form_mercancia.validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'ajuste_salida[mercancia][codigo]': "required",
+                    'ajuste_salida[mercancia][descripcion]': "required",
+                    'ajuste_salida[mercancia][id_unidad_medida]': "required",
+                    'ajuste_salida[documento][cantidad_mercancia]': "required",
+                    'ajuste_salida[documento][importe_mercancia]': "required",
+                },
+                messages: {
+                    'ajuste_salida[mercancia][codigo]': 'Obligatorio!',
+                    'ajuste_salida[mercancia][descripcion]': 'Obligatorio!',
+                    'ajuste_salida[mercancia][id_unidad_medida]': 'Obligatorio!',
+                    'ajuste_salida[documento][cantidad_mercancia]': 'Obligatorio!',
+                    'ajuste_salida[documento][importe_mercancia]': 'Obligatorio!',
+                }
+            })
+
+            $("#btnSubbmitAjuste").click(function (e) {
+                if (form_ajuste_salida.valid()) {
+                    if (list_mercancia.length) {
+                        let data = form_ajuste_salida.serializeArray()
+                        loadingModal.show()
+                        data.push({name: 'ajuste_salida[list_mercancia]', value: JSON.stringify(list_mercancia)})
+                        $.ajax({
+                            url: '/contabilidad/inventario/ajuste-salida/form-add',
+                            method: 'POST',
+                            data: data,
+                            dataType: 'json',
+                            success: function (result) {
+                                if (result.success) {
+                                    window.location.replace('{{ path('contabilidad_inventario_ajuste_salida_gestionar') }}')
+                                } else {
+                                    loadingModal.close()
+                                    alertTemplate(result.msg)
+                                }
+                            },
+                            error: function () {
+                            }
+                        })
+                    } else {
+                        alertTemplate('El Ajuste de Entrada debe contener algunas mercancias', 'danger')
+                    }
+                }
+            });
+
+            $('#btnAplicarMercancia').on('click', function () {
+                if (form_mercancia.valid()) {
+                    let codigo = $('#ajuste_salida_mercancia_codigo').val()
+                    let cant = $('#ajuste_salida_documento_cantidad_mercancia').val()
+                    let importe = $('#ajuste_salida_documento_importe_mercancia').val()
+                    let precio = $('#ajuste_salida_mercancia_precio').val()
+                    let nueva_existencia = $('#ajuste_salida_mercancia_existencia_decremento').val()
+                    let um = $('#ajuste_salida_mercancia_id_unidad_medida').val()
+                    let descripcion = $('#ajuste_salida_mercancia_descripcion').val()
+
+                    //validar que el codigo no se repita
+                    if (list_mercancia.some(e => e.codigo === codigo)) {
+                        alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
+                    } else {
+                        list_mercancia.push({
+                            codigo,
+                            cant,
+                            importe,
+                            precio,
+                            nueva_existencia,
+                            um,
+                            descripcion
+                        })
+
+                        importe_total += Number.parseFloat(importe)
+
+                        $("#importe-total").text('$' + importe_total.toFixed(2))
+                        $('#rows_mercancias').append(`<tr>
+                        <td class="px-2" style="font-weight:400;"> ${codigo}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${cant}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(importe).toFixed(2)}</td>
+                        <td class="px-2 text-right" style="font-weight:400;" > ${parseFloat(precio).toFixed(6)} </td>
+                        <td class="px-2 text-right" style="font-weight:400;" >${parseFloat(nueva_existencia)}</td>
+                        <td class="px-2" style="font-weight:400;" hidden> ${descripcion}</td>
+                        <td class="px-2"> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td>
+                        <td style="font-weight:400;" hidden> ${um} </td> </tr>`
+                        );
+                        $('#ajuste_salida_mercancia_codigo').val('')
+                        $('#ajuste_salida_mercancia_descripcion').val('')
+                        $('#ajuste_salida_mercancia_existencia').val('')
+                        $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                        $('#ajuste_salida_documento_importe_mercancia').val('')
+                        $('#ajuste_salida_mercancia_precio').val('')
+                        $('#true_precio_mercancia').val('')
+                        $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                    }
+
+                }
+            })
+
+            // eliminar la mercancia de la lista
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                const mercancia = list_mercancia.find(e => e.codigo === $(this).attr('id-mercancia'))
+                importe_total -= Number.parseFloat(mercancia.importe)
+                $("#importe-total").text('$' + importe_total.toFixed(2))
+                list_mercancia = list_mercancia.filter(e => e.codigo !== $(this).attr('id-mercancia'))
+                $(this).closest('tr').remove()
+            })
+        })
+
+        function SeleccionarMercancia() {
+            for (var i = 0; i < mercancias.length; i++) {
+                let id = '#' + mercancias[i]['codigo']
+                if ($(id).prop('checked') == true) {
+                    $('#ajuste_salida_mercancia_codigo').val(mercancias[i]['codigo'])
+                    $('#ajuste_salida_salida_mercancia_descripcion').val(mercancias[i]['descripcion'])
+                    $('#ajuste_salida_salida_mercancia_precio').val(mercancias[i]['precio_compra'])
+                    $('#ajuste_salida_salida_mercancia_existencia').val(parseFloat(mercancias[i]['existencia']).toFixed(2))
+                    break
+                }
+            }
+        }
+
+
+    </script>
+{% endblock %}
+

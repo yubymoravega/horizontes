@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{% block title %} Contabilidad | Ventas {% endblock %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block navBar %}
+    <nav class="navbar navbar-expand-lg  nabvar-navegation">
+        <a class="navbar-brand text-white" href="{{ url ('venta') }}">Venta</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown ">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Nomencladores
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_cliente_contabilidad') }}">Cliente</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_contratos_cliente_index') }}">Contratos</a>
+                    </div>
+                </li>
+                <a class="dropdown-item" href="{{ url ('contabilidad_venta_factura') }}">Factura</a>
+                <li class="nav-item dropdown ">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Informes
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_principales_clientes') }}">Principales clientes</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_mas_vendido') }}">Productos más Vendidos</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_venta_mayor_utilidad') }}">Productos con Mayor Utilidad</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+{% endblock %}
