@@ -615,3 +615,26 @@ svg.iconCarritoDelete{
     float: right;
     margin-right: 10%;
 }
+.currency{
+
+    color: white;
+    border-color: black;
+    background-color: black;
+    margin-right: 385px;
+    margin-top: 20px;
+}
+
+.hr-pago{
+   background-color: #5E5A5A;
+   height: 30%;
+}
+
+.cursor{
+  
+    cursor: pointer;
+}
+
+.texto-blanco{
+    color: white;
+    font-weight: 100;
+}

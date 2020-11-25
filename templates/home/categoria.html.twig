@@ -7,61 +7,44 @@
 
 		<div class="card 1">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/TELECOMUNICACIONES.jpg') }}"/>
+				<img src="{{ asset('images/servicios/telecomunicaciones.png') }}"/>
 			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio">Telecomunicaciones</p>
-			</div>
+			
 		</div>
 
 		<div class="card 2">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/multiservicios.jpg') }}"/>
+				<img src="{{ asset('images/servicios/multiservicio-blanco.png') }}"/>
 			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio">Multi Servicios</p> 
-			</div>
+			
 		</div>
 
-		<div class="card 3">
+		<div id="turismo" class="card 3">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/TURISMO.jpg') }}"/>
+				<img src="{{ asset('images/servicios/turismo.png') }}"/>
 			</div>
-			<div class="card_title">
-				<p class="texto-servicio">Turismo</p>
-			</div>
+			
 		</div>
 
 	</div>
 
 	<div class="cards-list">
 	
-		<div class="card 1">
+		<div id="remesa" class="card 1">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/REMESAS.jpg') }}"/>
+				<img src="{{ asset('images/servicios/remesas.png') }}"/>
 			</div>
-			<div class="card_title title-white">
-				<a href="{{ path('remesas.beneficiarios', {'tel': tel}) }}"><p class="texto-servicio">Remesas</p></a>
-			</div>
+			
 		</div>
 
 		<div class="card 2">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/paquetera.jpg') }}"/>
+				<img src="{{ asset('images/servicios/paqueteria-blanco.png') }}"/>
 			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio" style="color:black;" >Envios de Paquetes</p>
-			</div>
+			
 		</div>
 
-		<div class="card 3">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title">
-				<p class="texto-servicio"></p>
-			</div>
-		</div>
+	
 
 	</div>
 
@@ -159,6 +142,17 @@ minlength: "Minimo 8 Caracteres"
 $('#tel').on('input', function () {
 this.value = this.value.replace(/[^0-9]/g, '');
 });
+
+$( "#remesa" ).click(function() {
+  
+  window.location.href = "/remesas/pais/"+{{tel}};
+});
+
+$( "#turismo" ).click(function() {
+  
+  window.location.href = "/turismo/solicitud/"+{{tel}};
+});
+
 	</script>
 
 {% endblock %}

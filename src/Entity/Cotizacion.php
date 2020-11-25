@@ -52,6 +52,11 @@ class Cotizacion
      */
     private $nombreCliente;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $idMoneda;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class Cotizacion
     public function setEdit(string $edit): self
     {
         $this->edit = $edit;
+
+        return $this;
+    }
+
+    public function getIdMoneda(): ?string
+    {
+        return $this->idMoneda;
+    }
+
+    public function setIdMoneda(string $idMoneda): self
+    {
+        $this->idMoneda = $idMoneda;
 
         return $this;
     }

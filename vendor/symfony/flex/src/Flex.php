@@ -120,13 +120,14 @@ class Flex implements PluginInterface, EventSubscriberInterface
         $this->config = $composer->getConfig();
         $this->options = $this->initOptions();
 
+        $symfonyRequire = preg_replace('/\.x$/', '.x-dev', getenv('SYMFONY_REQUIRE') ?: ($composer->getPackage()->getExtra()['symfony']['require'] ?? null));
+
         if ($composer2 = version_compare('2.0.0', PluginInterface::PLUGIN_API_VERSION, '<=')) {
             $rfs = Factory::createHttpDownloader($this->io, $this->config);
 
             $this->downloader = $downloader = new Downloader($composer, $io, $rfs);
             $this->downloader->setFlexId($this->getFlexId());
 
-            $symfonyRequire = getenv('SYMFONY_REQUIRE') ?: ($composer->getPackage()->getExtra()['symfony']['require'] ?? null);
             if ($symfonyRequire) {
                 $this->filter = new PackageFilter($io, $symfonyRequire, $this->downloader);
             }
@@ -136,7 +137,6 @@ class Flex implements PluginInterface, EventSubscriberInterface
             $rfs = Factory::createRemoteFilesystem($this->io, $this->config);
             $this->rfs = $rfs = new ParallelDownloader($this->io, $this->config, $rfs->getOptions(), $rfs->isTlsDisabled());
 
-            $symfonyRequire = getenv('SYMFONY_REQUIRE') ?: ($composer->getPackage()->getExtra()['symfony']['require'] ?? null);
             $this->downloader = $downloader = new Downloader($composer, $io, $this->rfs);
             $this->downloader->setFlexId($this->getFlexId());
 
@@ -324,12 +324,19 @@ class Flex implements PluginInterface, EventSubscriberInterface
             return;
         }
 
+        // Remove LICENSE (which do not apply to the user project)
+        @unlink('LICENSE');
+
+        // Update composer.json (project is proprietary by default)
         $json = new JsonFile(Factory::getComposerFile());
         $contents = file_get_contents($json->getPath());
         $manipulator = new JsonManipulator($contents);
 
         // new projects are most of the time proprietary
         $manipulator->addMainKey('license', 'proprietary');
+
+        // extra.branch-alias doesn't apply to the project
+        $manipulator->removeSubNode('extra', 'branch-alias');
 
         // replace unbounded constraints for symfony/* packages by extra.symfony.require
         $config = json_decode($contents, true);
@@ -469,11 +476,17 @@ class Flex implements PluginInterface, EventSubscriberInterface
             $this->io->writeError('');
             $this->io->writeError('What about running <comment>composer global require symfony/thanks && composer thanks</> now?');
             $this->io->writeError(sprintf('This will spread some %s by sending a %s to the GitHub repositories of your fellow package maintainers.', $love, $star));
-            $this->io->writeError('');
         }
+
+        $this->io->writeError('');
 
         if (!$recipes) {
             $this->lock->write();
+
+            if ($this->downloader->isEnabled()) {
+                $this->io->writeError('Run <comment>composer recipes</> at any time to see the status of your Symfony recipes.');
+                $this->io->writeError('');
+            }
 
             return;
         }
@@ -879,7 +892,7 @@ EOPHP
 
     private function formatOrigin(string $origin): string
     {
-        // symfony/translation:3.3@github.com/symfony/recipes:master
+        // symfony/translation:3.3@github.com/symfony/recipes:branch
         if (!preg_match('/^([^:]++):([^@]++)@(.+)$/', $origin, $matches)) {
             return $origin;
         }

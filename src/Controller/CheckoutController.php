@@ -5,6 +5,10 @@ namespace App\Controller;
 use App\Entity\Provincias;
 use App\Entity\Municipios;
 use App\Entity\Carrito;
+use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\TasaDeCambio;
+use App\Entity\Trasacciones;
+use App\Entity\ReporteEfectivo;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,8 +51,9 @@ class CheckoutController extends AbstractController
                 'id' => $data[$contador]->getId(),
                 'json' => \json_decode($data[$contador]->getJson()),
 
-            );
+            ); 
 
+ 
         $dataBase = $this->getDoctrine()->getManager();
         $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]['json']->provincia]);
         $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]['json']->municipio]); 
@@ -56,15 +61,26 @@ class CheckoutController extends AbstractController
         $json[$contador]['json']->provincia = $provincia[0]->getNombre();
         $json[$contador]['json']->municipio = $municipio[0]->getNombre();
 
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]['json']->montoMoneda]);
+
+        $dolares = $json[$contador]['json']->monto / $tasa[0]->getTasa();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+        $json[$contador]['json']->monto = $dolares * $tasa[0]->getTasa();
+        $json[$contador]['recibirMoneda'] = $dataBase->getRepository(Moneda::class)->find($json[$contador]['json']->recibirMoneda)->getNombre();
+
             $total = $total + $json[$contador]['json']->monto;
 
             $contador++;
         }
 
+        $user =  $this->getUser();
+
+        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
+
         //return new Response(var_dump($json ));
 
         return $this->render('checkout/index.html.twig', [
-            'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
+            'moneda' => $moneda,'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
         ]);
     }
 
@@ -78,21 +94,46 @@ class CheckoutController extends AbstractController
         $data = $dataBase->getRepository(Cotizacion::class)->findBY(['id' => $id, 'edit' => '1']);
 
         if(!$data){
-
+           
             $this->addFlash(
-                'error',
-                'Esta cotizacion no se puede editar'
+                'success',
+                'Cotizacion con pagos'
             );
 
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('checkout/pago/cotizacion/',['id'=>$id]);
         }
 
+        
+
+        $monedaTasa = $dataBase->getRepository(Moneda::class)->findBy(['nombre'=> $data[0]->getIdMoneda()]);
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $monedaTasa[0]->getId()]);
+
+        $dolares = $data[0]->getTotal() / $tasa[0]->getTasa();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+        $total = $dolares * $tasa[0]->getTasa();
+        
         $json = json_decode($data[0]->getJson()); 
 
-        //return new Response(var_dump(json_decode( $json[1])));
+        $con = count( $json);
+
+        $contador = 0;
+        
+        while($contador < $con){
+ 
+            $json[$contador]->recibirMoneda = $dataBase->getRepository(Moneda::class)->find($json[$contador]->recibirMoneda)->getNombre();
+            $dolaresInten = $json[$contador]->monto / $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $json[$contador]->montoMoneda])[0]->getTasa();
+            $json[$contador]->monto =  $json[$contador]->monto =  number_format($dolaresInten * $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()])[0]->getTasa(), 2, '.', '');
+            $json[$contador]->provincia =  $dataBase->getRepository(Provincias::class)->findBy(['code'=>  $json[$contador]->provincia])[0]->getNombre();
+            $json[$contador]->municipio =  $dataBase->getRepository(Municipios::class)->findBy(['code'=>  $json[$contador]->municipio])[0]->getNombre();
+
+            $contador++;
+        }
+ 
+
+        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
 
         return $this->render('checkout/cotizacion.html.twig', [
-            'data' =>$data[0],  'itens' => $json, 'total' =>number_format($data[0]->getTotal(), 2, '.', '')
+           'moneda'=> $moneda ,'id' =>$id,  'data' =>$data[0],  'itens' => $json, 'total' =>number_format($total, 2, '.', '')
         ]);
     }
 
@@ -158,5 +199,121 @@ class CheckoutController extends AbstractController
         );
 
         return new response(200);
+    }
+
+    /**
+     * @Route("/checkout/cotizacion/carrito/{id}", name="checkout/cotizacion/carrito")
+     */
+    public function cotizacionCarrito($id, Request $request)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Cotizacion::class)->find($id);
+        $user =  $this->getUser();
+
+       $json = json_decode($data->getJson());
+
+       $con = count( $json);
+
+       $contador = 0;
+       
+       while($contador < $con){
+
+           $carrito = new Carrito();
+           $carrito->setJson(json_encode($json[$contador]));
+           $carrito->setEmpleado($user->getUsername());
+           
+           $dataBase->persist($carrito);
+           $dataBase->flush();
+
+           $contador++;
+       }
+
+       $dataBase->remove(  $data );
+            $dataBase->flush();
+
+        $this->addFlash(
+            'success',
+            'Carrito'
+        );
+
+        return $this->redirectToRoute('home');
+    }
+
+    /**
+     * @Route("/checkout/pago/cotizacion/{id}", name="checkout/pago/cotizacion/")
+     */
+    public function cotizacionPagos($id)
+    {
+        $user =  $this->getUser();
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Cotizacion::class)->findBY(['id' => $id, 'edit' => '0']);
+
+        $monedaTasa = $dataBase->getRepository(Moneda::class)->findBy(['nombre'=> $data[0]->getIdMoneda()]);
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $monedaTasa[0]->getId()]);
+
+        $dolares = $data[0]->getTotal() / $tasa[0]->getTasa();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+        $total = $dolares * $tasa[0]->getTasa();
+        
+        $json = json_decode($data[0]->getJson()); 
+
+        $con = count( $json);
+
+        $contador = 0;
+        
+        while($contador < $con){
+ 
+            $json[$contador]->recibirMoneda = $dataBase->getRepository(Moneda::class)->find($json[$contador]->recibirMoneda)->getNombre();
+            $dolaresInten = $json[$contador]->monto / $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $json[$contador]->montoMoneda])[0]->getTasa();
+            $json[$contador]->monto =  $json[$contador]->monto =  number_format($dolaresInten * $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()])[0]->getTasa(), 2, '.', '');
+            $json[$contador]->provincia =  $dataBase->getRepository(Provincias::class)->findBy(['code'=>  $json[$contador]->provincia])[0]->getNombre();
+            $json[$contador]->municipio =  $dataBase->getRepository(Municipios::class)->findBy(['code'=>  $json[$contador]->municipio])[0]->getNombre();
+
+            $contador++;
+        }
+ 
+        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
+
+        $tarjeta = null;
+
+        $banco =  $dataBase->getRepository(Trasacciones::class)->findBy(['idCotizacion' => $id]);
+
+        $con = count($banco);
+
+        $contador = 0;
+        
+        while($contador < $con){
+
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $dataBase->getRepository(Moneda::class)->findBy(['nombre'=>$banco[$contador]->getMoneda()])[0]->getId()]);
+            $dolaresBanco = $banco[$contador]->getMonto() / $tasa[0]->getTasa();
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+            $banco[$contador]->setMonto($dolaresBanco * $tasa[0]->getTasa());
+            $contador++;
+        }
+
+        $efectivo = $dataBase->getRepository(ReporteEfectivo::class)->findBy(['idCotizacion' => $id]);
+
+        $con = count($efectivo);
+
+        $contador = 0;
+        
+        while($contador < $con){
+
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $dataBase->getRepository(Moneda::class)->findBy(['nombre'=>$efectivo[$contador]->getMoneda()])[0]->getId()]);
+            $dolaresEfectivo = $efectivo[$contador]->getMonto() / $tasa[0]->getTasa();
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+            $efectivo[$contador]->setMonto(number_format($dolaresEfectivo * $tasa[0]->getTasa(), 2, '.', '')); 
+            /**** Cambio */
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $dataBase->getRepository(Moneda::class)->findBy(['nombre'=>$efectivo[$contador]->getMoneda()])[0]->getId()]);
+            $dolaresEfectivo = $efectivo[$contador]->getCambio() / $tasa[0]->getTasa();
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+            $efectivo[$contador]->setCambio(number_format($dolaresEfectivo * $tasa[0]->getTasa(), 2, '.', ''));
+            $contador++;
+        }
+
+
+        return $this->render('checkout/pagos.html.twig', [
+            'banco'=> $banco ,'efectivo'=> $efectivo, 'moneda'=> $moneda ,'id' =>$id,  'data' =>$data[0],  'itens' => $json, 'total' =>number_format($total, 2, '.', '')
+         ]);
     }
 }

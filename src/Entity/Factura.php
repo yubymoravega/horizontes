@@ -25,7 +25,7 @@ class Factura
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $estado;
+    private $idMoneda;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -52,16 +52,6 @@ class Factura
      */
     private $nombreCliente;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $idCotizacion;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $idPreFactura;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -79,14 +69,14 @@ class Factura
         return $this;
     }
 
-    public function getEstado(): ?string
+    public function getIdMoneda(): ?string
     {
-        return $this->estado;
+        return $this->idMoneda;
     }
 
-    public function setEstado(string $estado): self
+    public function setIdMoneda(string $idMoneda): self
     {
-        $this->estado = $estado;
+        $this->idMoneda = $idMoneda;
 
         return $this;
     }
@@ -151,27 +141,7 @@ class Factura
         return $this;
     }
 
-    public function getIdCotizacion(): ?string
-    {
-        return $this->idCotizacion;
-    }
+  
 
-    public function setIdCotizacion(string $idCotizacion): self
-    {
-        $this->idCotizacion = $idCotizacion;
-
-        return $this;
-    }
-
-    public function getIdPreFactura(): ?string
-    {
-        return $this->idPreFactura;
-    }
-
-    public function setIdPreFactura(string $idPreFactura): self
-    {
-        $this->idPreFactura = $idPreFactura;
-
-        return $this;
-    }
+    
 }

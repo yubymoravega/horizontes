@@ -20,54 +20,16 @@ security:
             logout:
                 path: app_logout
     access_control:
-        -
-            path: ^/home
-            roles:
-                - ROLE_USER
-        -
-            path: ^/cliente
-            roles:
-                - ROLE_USER
-        -
-            path: ^/registrar
-            roles:
-                - ROLE_USER
-        -
-            path: ^/edit
-            roles:
-                - ROLE_USER
-        -
-            path: ^/api
-            roles:
-                - ROLE_USER
-        -
-            path: ^/select
-            roles:
-                - ROLE_USER
-        -
-            path: ^/confirm
-            roles:
-                - ROLE_USER
-        -
-            path: ^/contabilidad/config/almacen
-            roles:
-                - ROLE_USER
-                - ROLE_ADMIN
-                - ROLE_CONTADOR
-        -
-            path: ^/contabilidad/config/cuenta
-            roles:
-                - ROLE_ADMIN
-        -
-            path: ^/contabilidad/config/unidad
-            roles:
-                - ROLE_USER
-        -
-            path: ^/config
-            roles:
-                - ROLE_ADMIN
-        -
-            path: ^/contavilidad/activo-fijo/test
-            roles:
-                - ROLE_ADMIN
-                - ROLE_USER
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+          - { path: '^/home', roles: [ROLE_USER] } 
+          - { path: '^/cliente', roles: [ ROLE_USER] } 
+          - { path: '^/registrar', roles: [ ROLE_USER] }
+          - { path: '^/edit', roles: [ ROLE_USER] } 
+          - { path: '^/api', roles: [ ROLE_USER] } 
+          - { path: '^/select', roles: [ ROLE_USER] } 
+          - { path: '^/confirm', roles: [ ROLE_USER] }
+          - { path: '^/contabilidad', roles: [ ROLE_ADMIN] }
+          - { path: '^/contabilidad/config', roles: [ ROLE_ADMIN] }
+          - { path: '^/config', roles: [ ROLE_ADMIN] }
+          - { path: '^/turismo', roles: [ ROLE_USER] }

@@ -11,6 +11,7 @@ use App\Entity\Municipios;
 use App\Entity\Pais;
 use App\Entity\ReglasRemesas;
 use App\Entity\MonedaPais; 
+use App\Entity\TasaDeCambio;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\ClienteBeneficiario;
 use App\Form\ClienteBeneficiarioType;
@@ -20,20 +21,23 @@ use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 
 class RemesasController extends AbstractController
 {
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, HttpClientInterface $client)
     {
         // 3. Update the value of the private entityManager variable through injection
         $this->entityManager = $entityManager;
+        $this->client = $client;
     }
 
     /**
-     * @Route("/remesas.add/{tel}", name="remesas.add")
+     * @Route("/remesas.add/{tel}/{pais}", name="remesas.add")
      */
-    public function add($tel, Request $request)
+    public function add($tel,$pais, Request $request)
     {
         $ClienteBeneficiario = new ClienteBeneficiario();
 
@@ -47,7 +51,7 @@ class RemesasController extends AbstractController
         $formulario = $this->createForm(
             ClienteBeneficiarioType::class,
             $ClienteBeneficiario,
-            array('action' => $this->generateUrl('remesas.add', array('tel' => $tel)), 'method' => 'POST')
+            array('action' => $this->generateUrl('remesas.add', array('tel' => $tel,'pais' => $pais)), 'method' => 'POST')
         );
 
         $formulario->handleRequest($request);
@@ -66,7 +70,7 @@ class RemesasController extends AbstractController
                 'Agregado'
             );
 
-            return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $tel]);
+            return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $tel,'pais' => $pais]);
         } else {
 
             return $this->render('remesas/add-beneficiario.html.twig', [
@@ -123,9 +127,9 @@ class RemesasController extends AbstractController
     }
 
     /**
-     * @Route("/remesas.beneficiarios/{tel}", name="remesas.beneficiarios")
+     * @Route("/remesas.beneficiarios/{tel}/{pais}", name="remesas.beneficiarios")
      */
-    public function beneficiarios($tel, EntityManagerInterface $em, PaginatorInterface $paginator, Request $request)
+    public function beneficiarios($tel, $pais, EntityManagerInterface $em, PaginatorInterface $paginator, Request $request)
     {
         $dql = "SELECT a FROM App:ClienteBeneficiario a JOIN App:Cliente b WHERE  a.idCliente =$tel";
 
@@ -144,9 +148,26 @@ class RemesasController extends AbstractController
         $user =  $this->getUser();
         $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
 
+        $monedaPais = $dataBase->getRepository(MonedaPais::class)->findBy(['idPais' => $pais, 'status' => '1']);
+       
+        $con = count($monedaPais);
+        $contador = 0;
+        $array = null;
+
+        while ($contador < $con) {
+
+            $nombreMoneda = $dataBase->getRepository(Moneda::class)->find($monedaPais[$contador]->getIdMoneda());
+
+            $array[$contador] = array(
+                'code' => $nombreMoneda->getId(),
+                'nombre' => $nombreMoneda->getNombre()          
+            );
+            $contador++;
+        }
+
         return $this->render(
             'remesas/beneficiarios.html.twig',
-            ['moneda' => $moneda, 'pagination' => $pagination, 'id' =>  $data[0]->getTelefono(), 'nombre' =>  $data[0]->getNombre(), 'apellido' => $data[0]->getApellidos()]
+            ['pais' => $pais, 'monedaPais'=>$array, 'moneda' => $moneda, 'pagination' => $pagination, 'id' =>  $data[0]->getTelefono(), 'nombre' =>  $data[0]->getNombre(), 'apellido' => $data[0]->getApellidos()]
         );
     }
 
@@ -214,9 +235,9 @@ class RemesasController extends AbstractController
     }
 
     /**
-     * @Route("/remesas.carrito/{id}/{monto}/{recibir}/{idCliente}/{nombre}/{apellido}", name="remesas.carrito")
+     * @Route("/remesas.carrito/{id}/{monto}/{recibir}/{idCliente}/{nombre}/{apellido}/{moneda}/{pais}", name="remesas.carrito")
      */
-    public function carrito($id, $monto, $recibir, $idCliente,$nombre,$apellido)
+    public function carrito($id, $monto, $recibir, $idCliente,$nombre,$apellido,$moneda,$pais)
     {
         $dataBase = $this->getDoctrine()->getManager();
        // $carritoDataBase = $dataBase->getRepository(Carrito::class)->findBy([''=>'']);
@@ -255,7 +276,10 @@ class RemesasController extends AbstractController
             'fecha' => $date->format('Y-m-d H:i:s'),
             'empleado' => $user->getUsername(),
             'monto' => $monto,
+            'montoMoneda' =>  $user->getIdMoneda(),
             'recibir' => $recibir,
+            'recibirMoneda' => $moneda,
+            'pais' => $pais,
             'servicio' => 'Remesa',
             'orden' => uniqid()
         );
@@ -270,7 +294,7 @@ class RemesasController extends AbstractController
             'Remesa Agregada Al Carrito'
         );
 
-        return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $idCliente]);
+        return $this->redirectToRoute('remesas.beneficiarios', ['tel' => $idCliente,'pais' => $pais]);
     }
 
     /**
@@ -278,14 +302,39 @@ class RemesasController extends AbstractController
      */
     public function jsonEditar($id)
     {
+        $user =  $this->getUser();
         $dataBase = $this->getDoctrine()->getManager();
         $data = $dataBase->getRepository(Carrito::class)->find($id);
+        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
 
         $beneficiario = json_decode($data->getJson());
 
+        $monedaPais = $dataBase->getRepository(MonedaPais::class)->findBy(['idPais' =>$beneficiario->pais, 'status' => '1']);
+       
+        $con = count($monedaPais);
+        $contador = 0;
+        $array = null;
+
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$beneficiario->montoMoneda]);
+
+        $dolares = $beneficiario->monto / $tasa[0]->getTasa();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+        $beneficiario->monto = $dolares * $tasa[0]->getTasa();
+
+        while ($contador < $con) {
+
+            $nombreMoneda = $dataBase->getRepository(Moneda::class)->find($monedaPais[$contador]->getIdMoneda());
+
+            $array[$contador] = array(
+                'code' => $nombreMoneda->getId(),
+                'nombre' => $nombreMoneda->getNombre()          
+            );
+            $contador++;
+        }
+
         return $this->render(
             'remesas/carrito-beneficiario.html.twig',
-            ['beneficiario' => $beneficiario, 'id' => $id]
+            ['monedaPais'=>$array,'moneda' => $moneda,'beneficiario' => $beneficiario, 'id' => $id]
         );
     }
 
@@ -322,16 +371,12 @@ class RemesasController extends AbstractController
     }
 
     /**
-     * @Route("/remesas/pais", name="remesas/pais")
+     * @Route("/remesas/pais/{tel}", name="remesas/pais/")
      */
-    public function pais()
+    public function pais($tel)
     {
-        //$dataBase = $this->getDoctrine()->getManager();
-        //$data = $dataBase->getRepository(Pais::class)->findAll();
-
-      
         return $this->render(
-            'remesas/pais.html.twig'
+            'remesas/pais.html.twig',['tel' => $tel]
         );
     }
 
@@ -386,13 +431,41 @@ class RemesasController extends AbstractController
 
             $reglasRemesas->setIdMonedaPais($id); 
 
-            $dataBase->persist($reglasRemesas);
-            $dataBase->flush();
-          
-            $this->addFlash(
-                'success',
-                'Regla Agregada'
-            );
+            $reglasAll = $dataBase->getRepository(ReglasRemesas::class)->findBy(['idMonedaPais'=>$reglasRemesas->getIdMonedaPais()]);
+
+            $con = count($reglasAll);
+            $validacion = 0;
+            $contador = 0;
+
+            while ($contador < $con) {
+
+                if($reglasRemesas->getDesde() > $reglasAll[$contador]->getDesde() & $reglasRemesas->getDesde() > $reglasAll[$contador]->getHasta()){
+
+                    $validacion++;
+
+                }else{
+
+                    $this->addFlash(
+                        'error',
+                        'Una regla no puede chocar con la otra'
+                    );
+                    return $this->redirectToRoute('remesas/reglas', ['id' => $id]);
+
+                }
+            $contador++;}
+
+            if($con == $validacion){
+
+                $dataBase->persist($reglasRemesas);
+                $dataBase->flush();
+              
+                $this->addFlash(
+                    'success',
+                    'Regla Agregada'
+                );
+            }
+
+            
 
             return $this->redirectToRoute('remesas/reglas', ['id' => $id]);
         }
@@ -440,5 +513,231 @@ class RemesasController extends AbstractController
 
         return $this->render('remesas/reglasAdd.html.twig',['pais'=> $pais->getNombre(), 
         'moneda' => $moneda->getNombre(),'idReglas' => $id,  'formulario' => $formulario->createView()]);
+    }
+
+    /**
+     * @Route("/remesas/tasaMoneda/{moneda}/{cantidad}/{pais}", name="/remesas/tasaMoneda/")
+     */
+    public function tasaMoneda($moneda,$cantidad,$pais)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $user =  $this->getUser();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
+        $total = null ;
+
+        if($user->getIdMoneda() == 1){
+
+            if($tasa[0]->getTasa() > 0){
+                $total = $cantidad * $tasa[0]->getTasa();
+            
+            }else{
+                $total = $cantidad * $tasa[0]->getTasaSugerida();
+            }
+            
+            
+        }else{
+
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+
+            if($tasa[0]->getTasa() > 0){
+
+                $total = $cantidad / $tasa[0]->getTasa();
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
+
+                if($tasa[0]->getTasa() > 0){
+                    $total = $total * $tasa[0]->getTasa();
+               
+                }else{
+                    $total = $total * $tasa[0]->getTasaSugerida();
+                }
+            
+            }else{
+               
+                $total = $cantidad / $tasa[0]->getTasaSugerida();
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
+
+                if($tasa[0]->getTasa() > 0){
+                    $total = $total * $tasa[0]->getTasa();
+               
+                }else{
+                    $total = $total * $tasa[0]->getTasaSugerida();
+                }
+            }
+
+        }
+
+        $monedaPais = $dataBase->getRepository(MonedaPais::class)->findBy(['idMoneda'=>$moneda,'idPais'=>$pais,'status'=>'1']);
+        $reglasRemesas = $dataBase->getRepository(ReglasRemesas::class)->findBy(['idMonedaPais' => $monedaPais]);
+
+        $con = count($reglasRemesas);
+        $contador = 0;
+
+        while ($contador < $con) {
+
+            if($total >=  $reglasRemesas[$contador]->getDesde() & $total <=  $reglasRemesas[$contador]->getHasta()){
+
+                if($reglasRemesas[$contador]->getTarifa() == "porciento"){
+
+                    $porciento = $total /100; $total = $total - ($porciento * $reglasRemesas[$contador]->getValor());
+                
+                }else{
+
+                    $total = $total - $reglasRemesas[$contador]->getValor();
+                }
+            }
+            $contador++;
+        }
+
+        return new Response(round($total, 2));
+
+       
+    }
+
+
+     /**
+     * @Route("/remesas/tasaMoneda/recibir/{moneda}/{cantidad}/{pais}", name="/remesas/tasaMoneda/recibir/")
+     */
+    public function tasaMonedaReves($moneda,$cantidad,$pais)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $user =  $this->getUser();
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
+        $total = null ;
+
+
+        $monedaPais = $dataBase->getRepository(MonedaPais::class)->findBy(['idMoneda'=>$moneda,'idPais'=>$pais,'status'=>'1']);
+        $reglasRemesas = $dataBase->getRepository(ReglasRemesas::class)->findBy(['idMonedaPais' => $monedaPais]);
+
+        $con = count($reglasRemesas);
+        $contador = 0;
+
+        while ($contador < $con) {
+
+            if($cantidad >=  $reglasRemesas[$contador]->getDesde() & $cantidad <=  $reglasRemesas[$contador]->getHasta()){
+
+                if($reglasRemesas[$contador]->getTarifa() == "porciento"){
+
+                    $porciento = $cantidad /100; $total = $cantidad + ($porciento * $reglasRemesas[$contador]->getValor());
+                
+                }else{
+
+                    $total = $cantidad + $reglasRemesas[$contador]->getValor();
+                }
+            }
+            $contador++;
+        }
+
+
+        if($user->getIdMoneda() == 1){
+
+            if($tasa[0]->getTasa() > 0){
+                $total = $total / $tasa[0]->getTasa();
+
+                
+            
+            }else{
+                $total = $total / $tasa[0]->getTasaSugerida();
+            }
+            
+            
+        }else{
+
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+
+            if($tasa[0]->getTasa() > 0){
+
+                $total = $total / $tasa[0]->getTasa();
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
+
+                if($tasa[0]->getTasa() > 0){
+                    $total = $total * $tasa[0]->getTasa();
+               
+                }else{
+                    $total = $total * $tasa[0]->getTasaSugerida();
+                }
+            
+            }else{
+               
+                $total = $total / $tasa[0]->getTasaSugerida();
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
+
+                if($tasa[0]->getTasa() > 0){
+                    $total = $total * $tasa[0]->getTasa();
+               
+                }else{
+                    $total = $total * $tasa[0]->getTasaSugerida();
+                }
+            }
+
+        }
+        return new Response(round($total, 2));
+
+       
+    }
+
+     /**
+     * @Route("/remesas/prueba/", name="remesas/prueba")
+     */
+    public function prueba()
+    {
+       /* $response = $this->client->request('POST', 'http://www.virtualrg.com/wsfamily/service1.asmx', [
+            'json' => [
+               'mCustomerID' => '4327861528',
+                'mAPIKey' => 'rnl370fwi6',
+              'mKeyValue' => 'abce123456',
+              'mDenomination' => 'CUC',
+              'mAmount' => '10.00',
+              'mNote' => 'Remesa de prueba',
+              'mSourceName' => 'Jose Miguel De Jesus',
+              'mSourcePhoneNo' => '8095648845',
+              'mTargetFirstName' => 'Adrian',
+              'mTargetLastName' => 'Gonzales',
+              'mTargetFirstName2' => '',
+              'mTargetLastName2' => '',
+              'mTargetAddress' => 'Calle esquina municipio',
+              'mProvinceID' => '32',
+              'mMunicipalityID' => '3204',
+              'mTargetPhoneNo' => '53914814',
+              'mTargetPhoneNo2' => '',
+          
+            ]
+          ]);*/
+
+
+         /* $response = $this->client->request('POST', 'http://www.virtualrg.com/wsfamily/service1.asmx', [
+            'gh' => [    
+              'mCustomerID' => '4327861528',
+              'mAPIKey' => 'rnl370fwi6',
+              'mOrderNo' => 'CF0000119984',           
+            ]
+          ]);
+
+    $respuesta = $response->getStatusCode(); */
+
+    $client = new \Soapclient('http://www.virtualrg.com/wsfamily/service1.asmx?WSDL',);
+
+   $respuesta = $client->Family_Transaction([
+  'mCustomerID' => '4327861528',
+  'mAPIKey' => 'rnl370fwi6',
+  'mKeyValue' => 'abce123458',
+  'mDenomination' => 'CUC',
+  'mAmount' => '10.00',
+  'mNote' => 'Remesa de prueba',
+  'mSourceName' => 'Jose Miguel De Jesus',
+  'mSourcePhoneNo' => '8095648845',
+  'mTargetFirstName' => 'Adrian',
+  'mTargetLastName' => 'Gonzales',
+  'mTargetFirstName2' => '',
+  'mTargetLastName2' => '',
+  'mTargetAddress' => 'Calle esquina municipio',
+  'mProvinceID' => '32',
+  'mMunicipalityID' => '3204',
+  'mTargetPhoneNo' => '53914814',
+  'mTargetPhoneNo2' => '',
+        ]);
+   
+
+    return new Response($respuesta->mOrderNo);
+   // return new Response("200"); CF0000120321
     }
 }

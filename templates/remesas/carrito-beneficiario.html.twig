@@ -208,11 +208,27 @@
                 <div class="form-group">
 					<div class="input-group input-group-sm">
 
-					<div class="row">
-  			<div class="col-3"></div>
- 		    <div class="col-3">A Pagar<input value="{{beneficiario.monto}}" type="text" id="total" name="pagar" required="required" maxlength="255" class="fomulario form-control" placeholder="A Pagar"></div>
-			<div class="col-3">Recibir<input type="text" id="monto" name="recibir" maxlength="255" class="fomulario form-control" placeholder="Recibir"></div>
-			<div class="col-3"></div>
+					<div class="row" >
+ 		    <div class="col-4" style="margin-top: 28px;">{{moneda.nombre}} A Pagar<input value="{{beneficiario.monto}}" type="text" id="total" name="pagar" required="required" maxlength="255" class="fomulario form-control" placeholder="A Pagar"></div>
+			<div class="col-4">Recibir<input type="text" id="monto" name="recibir" maxlength="255" class="fomulario form-control" placeholder="Recibir"></div>
+			<div class="col-4">
+			 Moneda
+    <select style="height: 42px;" class="form-control" id="monedasRecibir">
+      <option Selected value="0">Moneda</option>
+     {% for data in monedaPais %}
+
+		{% if data.code == beneficiario.recibirMoneda  %}
+    <option Selected value="{{data.code}}">{{data.nombre}}</option>
+	{% else %}
+	<option value="{{data.code}}">{{data.nombre}}</option>
+   {% endif %}
+
+         
+    {% endfor %}
+    </select>
+  </div>
+			
+			</div>
 					</div>				
 					</div>
 				</div>
@@ -257,13 +273,8 @@ let codeMunicipio = {{beneficiario.municipio}};
 
 $( document ).ready(function() {
 
-	total();
-
 	let provinciaNombre = $( "#cliente_beneficiario_provincias  option:selected" ).text();
-
-	if(provinciaNombre == "LA HABANA"){
-
-	}
+	$('#monto').val("{{beneficiario.recibir}}");
 
    $('#cliente_beneficiario_provincias option[value="'+codeProvincia+'"]').attr("selected",true);
    let code = $('#cliente_beneficiario_provincias').find('option:selected').val() 
@@ -389,83 +400,13 @@ $.validator.addMethod("valueNotEquals", function(value, element, arg){
 });  
 
 
-$( "#cliente_beneficiario_provincias" ).change(function() {
-				
-			monto();
-
-            });
-
-			$( "#monto" ).change(function() {
-				
-			monto();
-
-            });
-
-
-			$( "#total" ).change(function() {
-
-				total();
-
-            });
-
-			function monto(){
-
-					if($( "#monto" ).val() <= 100){
-								
-				if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
-
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(5));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(8));
-				
-				}}else{ 
-				
-					if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
-
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.08 ));
-
-				}}
-
-			}
-
-			function total(){
-
-					if($( "#total" ).val() <= 100){
-								
-				if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
-
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(5));
-				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(8));
-				
-				}}else{ 
-				
-					if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
-
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.08 ));
-
-				}}
-
-			}
 $( "#editBeneficiario" ).click(function() {
  
 let respuestaForm =  validator.form();
 
 if(respuestaForm){
 
-	let idCarrito = {{id}};
+	let idCarrito = {{id}}; 
 
 	let array = {};
 
@@ -499,6 +440,9 @@ if(respuestaForm){
 	array['remitenteNombre'] = ($( "#remitenteNombre" ).val() == "") ? null : $( "#remitenteNombre").val() ;
 	array['remitenteApellido'] = ($( "#remitenteApellido" ).val() == "") ? null : $( "#remitenteNombre").val() ;
 	array['comentario'] = ($( "#comentario" ).val() == "") ? null : $( "#comentario" ).val() ;
+	array['pais'] = "{{beneficiario.pais}}";
+	array['montoMoneda'] ="{{moneda.id}}";
+	array['recibirMoneda'] =$('#monedasRecibir').val();
 
   let jsonString = JSON.stringify(array);
 
@@ -509,16 +453,67 @@ if(respuestaForm){
             dataType: 'html',
             success: function (data) {
 				
-				 window.location.href = "/remesas.beneficiarios/"+"{{beneficiario.idCliente}}";
+				 window.location.href = "/remesas.beneficiarios/"+"{{beneficiario.idCliente}}"+"/"+"{{beneficiario.pais}}";
             }
         });
-
-
 }
 
 });
 
-			
+
+	$( "#monedasRecibir" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{beneficiario.pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
+            });
+
+					$( "#monto" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/recibir/"
+			+$('#monedasRecibir').val()+"/"+$('#monto').val()+"/"+{{beneficiario.pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#total').val(data);
+            }
+        });
+	}
+            });
+
+				$( "#total" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{beneficiario.pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
+            });
 
 
  </script>

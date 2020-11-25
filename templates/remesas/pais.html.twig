@@ -6,21 +6,20 @@
 
 <section class="section novi-background section-66 setion-md-top-100">
         <div class="container">
-         <h1 class="text-reporte">Remesas Paises</h1>
+         <h1 class="text-reporte">Seleccione país</h1>
           <hr class="divider bg-mantis">
           <div class="row justify-content-sm-center offset-top-66">
             <div class="col-md-8 col-xl-12">
               <div class="row">
-                <div class="col-md-6 col-xl-3"><img class="rounded-circle img-fluid d-block mx-auto" src="images/users/user-john-doe-140x140.jpg" width="140" height="140" alt="">
-                  <div class="offset-top-24">
-                    <h5 class="font-weight-bold text-center"><a href="#">Cuba</a></h5>
+                <div  class="col-md-6 col-xl-3"><img  id="cuba" class="cursor img-fluid d-block mx-auto" src="{{ asset('images/Flag_of_Cuba.svg') }}" width="140" height="140" alt="">
+                  <div  class="offset-top-24">
+                    <h5 class="font-weight-bold text-center"><a class="texto-blanco"   href="{{ path('remesas.beneficiarios', {'tel': tel, 'pais': '3'}) }}">Cuba</a></h5>
                   </div>
-                
                 </div>
-                <div class="col-md-6 col-xl-3 offset-top-66 offset-md-top-0"><img class="rounded-circle img-fluid d-block mx-auto" src="images/users/user-july-mao-140x140.jpg" width="140" height="140" alt="">
-                  <div class="offset-top-24">
-                    <h5 class="font-weight-bold text-center"><a href="#">Republica Dominicana</a></h5>
-                  </div>
+                <div class="col-md-6 col-xl-3 offset-top-66 offset-md-top-0"><img class=" img-fluid d-block mx-auto" src="{{ asset('images/Flag_of_the_Dominican_Republic.svg') }}" width="140" height="140" alt="">
+                  <div  class="offset-top-24">
+                    <h5 class="font-weight-bold text-center"><a class="texto-blanco"  href="{{ path('remesas.beneficiarios', {'tel': tel, 'pais': '2'}) }}">República Dominicana</a></h5>
+                  </div> 
                 
                 </div>
               </div>
@@ -30,3 +29,19 @@
       </section>
 
       {% endblock %}
+
+
+{% block javascripts %}
+	{{parent()}}
+
+	<script>
+
+
+$( "#cuba" ).click(function() {
+  document.getElementById("cuba").style.cursor = "pointer";
+  window.location.href = "/remesas.beneficiarios/"+{{tel}}+"/3";
+});
+
+	</script>
+
+{% endblock %}
