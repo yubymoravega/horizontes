@@ -22,6 +22,7 @@ use Doctrine\ORM\QueryBuild;
 use Doctrine\ORM\Query;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Entity\SolicitudTurismo; 
 
 
 class HomeController extends AbstractController
@@ -405,6 +406,20 @@ class HomeController extends AbstractController
 
     }
 
+     /**
+     * @Route("/home/atender/", name="home/atender/")
+     */
+    public function atenderNotificaciones()
+    {  
+        $dataBase = $this->getDoctrine()->getManager();
+        $user =  $this->getUser();
+        $data = $dataBase->getRepository(SolicitudTurismo::class)->findBy(["empleado" => $user->getUsername(),"stado" => "Pendiente"]); 
+        
+       $contador = count( $data);
+
+       return new response ($contador);
+
+    }
   
  
 }
