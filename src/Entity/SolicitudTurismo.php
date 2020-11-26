@@ -229,6 +229,23 @@ class SolicitudTurismo
      */
     private $rentCantidadPersonas;
 
+      /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $empleadoStatus;
+
+    public function getEmpleadoStatus(): ?string
+    {
+        return $this->empleadoStatus;
+    }
+
+    public function setEmpleadoStatus(string $empleadoStatus): self
+    {
+        $this->empleadoStatus = $empleadoStatus;
+
+        return $this;
+    }
+
     public function getTramferIdaVuelta(): ?string
     {
         return $this->tramferIdaVuelta;

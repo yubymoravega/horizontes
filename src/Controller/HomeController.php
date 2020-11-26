@@ -412,8 +412,8 @@ class HomeController extends AbstractController
     public function atenderNotificaciones()
     {  
         $dataBase = $this->getDoctrine()->getManager();
-        $user =  $this->getUser();
-        $data = $dataBase->getRepository(SolicitudTurismo::class)->findBy(["empleado" => $user->getUsername(),"stado" => "Pendiente"]); 
+       // $user =  $this->getUser();
+        $data = $dataBase->getRepository(SolicitudTurismo::class)->findBy(["stado" => "Pendiente"]); 
         
        $contador = count( $data);
 

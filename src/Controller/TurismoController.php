@@ -184,6 +184,62 @@ class TurismoController extends AbstractController
                 'Solicitud Agregada'
             );
 
+                // Instantiation and passing `true` enables exceptions
+         $mail = new PHPMailer(true);
+
+         try {
+            //Server settings
+            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+            $mail->isSMTP();                                            // Send using SMTP
+            $mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+            $mail->Username   = 'info@solyag.com';                     // SMTP username
+            $mail->Password   = 'solyag*info';                               // SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+            $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+        
+            //Recipients
+            $mail->setFrom("info@solyag.com", 'Solyag');
+            $mail->addAddress("reservas@solyag.com", 'Solyag');     // Add a recipient
+            $mail->addAddress("operaciones@solyag.com", 'Solyag'); 
+
+            // Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = 'Solyag Turismo ';
+            $mail->Body    = "<table cellspacing='0' cellpadding='0' border='0' style='color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <tbody><tr width='100%'> <td valign='top' align='left' style='background:#eef0f1;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <table style='border:none;padding:0 18px;margin:50px auto;width:500px'> <tbody> <tr width='100%' height='60'> <td valign='top' align='left' style='border-top-left-radius:4px;border-top-right-radius:4px;background:black; bottom left repeat-x;padding:10px 18px;text-align:center'> <img height='40' width='125' src='https://solyag.com/wp-content/uploads/2020/11/22-scaled.jpg' title='Trello' style='font-weight:bold;font-size:18px;color:#fff;vertical-align:top' class='CToWUd'> </td> </tr> <tr width='100%'> <td valign='top' align='left' style='background:#fff;padding:18px'>
+
+            <h1 style='text-align:center !important; font-size:20px;margin:16px 0;color:#333;'> Solicitud De Turismo <br> </h1>
+           
+            <p style='text-align:center !important;'> Click para ver la solicitud de turismo</p>
+           
+            <div style='background:#f6f7f8;border-radius:3px'> <br>
+           
+            <p style='text-align:center !important; font:15px/1.25em 'Helvetica Neue',Arial,Helvetica;margin-bottom:0;text-align:center'> <a href='https://solyag.online/' style='border-radius:3px;background:#3aa54c;color:#fff;display:block;font-weight:700;font-size:16px;line-height:1.25em;margin:24px auto 6px;padding:10px 18px;text-decoration:none;width:180px' target='_blank'>Ver solicitud de turismo</a> </p>
+           
+            <br><br> </div>
+           
+            <p style='text-align:center; font:14px/1.25em 'Helvetica Neue',Arial,Helvetica;color:#333'> 
+              <strong style='text-align:center;' >SOLYAG S.R.L RNC: 1-32-13041-3 </strong><br>
+                     Calle. Juan S Ramirez esq Wenceslao Alvarez<br>
+                    Zona Universitaria, Santo Domingo, Rep Dom <br>
+                    Tel: +1-305-400-4243 & +1-809-770-2266
+             
+             </p>
+           
+            </td>
+           
+            </tr>
+           
+            </tbody> </table> </td> </tr></tbody> </table>";
+          
+        
+            $mail->send();
+           
+        } catch (Exception $e) {
+            
+           
+        }
+
             return $this->redirectToRoute('turismo/reporte/solicitud/');
         } else {
 
@@ -1278,7 +1334,10 @@ class TurismoController extends AbstractController
        
         $data = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
 
+        $user =  $this->getUser();
+
         $data->setStado("Atendida");
+        $data->setEmpleadoStatus($user->getUsername());
 
         $dataBase->flush($data);
 
@@ -1287,61 +1346,7 @@ class TurismoController extends AbstractController
             'Solicitud Atendida'
         );
 
-         // Instantiation and passing `true` enables exceptions
-         $mail = new PHPMailer(true);
-
-         try {
-            //Server settings
-            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
-            $mail->isSMTP();                                            // Send using SMTP
-            $mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = 'info@solyag.com';                     // SMTP username
-            $mail->Password   = 'solyag*info';                               // SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-            $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
-        
-            //Recipients
-            $mail->setFrom("info@solyag.com", 'Solyag');
-            $mail->addAddress("reservas@solyag.com", 'Solyag');     // Add a recipient
-            $mail->addAddress("operaciones@solyag.com", 'Solyag'); 
-
-            // Content
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Solyag Turismo ';
-            $mail->Body    = "<table cellspacing='0' cellpadding='0' border='0' style='color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <tbody><tr width='100%'> <td valign='top' align='left' style='background:#eef0f1;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <table style='border:none;padding:0 18px;margin:50px auto;width:500px'> <tbody> <tr width='100%' height='60'> <td valign='top' align='left' style='border-top-left-radius:4px;border-top-right-radius:4px;background:black; bottom left repeat-x;padding:10px 18px;text-align:center'> <img height='40' width='125' src='https://solyag.com/wp-content/uploads/2020/11/22-scaled.jpg' title='Trello' style='font-weight:bold;font-size:18px;color:#fff;vertical-align:top' class='CToWUd'> </td> </tr> <tr width='100%'> <td valign='top' align='left' style='background:#fff;padding:18px'>
-
-            <h1 style='text-align:center !important; font-size:20px;margin:16px 0;color:#333;'> Solicitud De Turismo <br> </h1>
-           
-            <p style='text-align:center !important;'> Click para ver la solicitud de turismo</p>
-           
-            <div style='background:#f6f7f8;border-radius:3px'> <br>
-           
-            <p style='text-align:center !important; font:15px/1.25em 'Helvetica Neue',Arial,Helvetica;margin-bottom:0;text-align:center'> <a href='https://solyag.online/' style='border-radius:3px;background:#3aa54c;color:#fff;display:block;font-weight:700;font-size:16px;line-height:1.25em;margin:24px auto 6px;padding:10px 18px;text-decoration:none;width:180px' target='_blank'>Ver solicitud de turismo</a> </p>
-           
-            <br><br> </div>
-           
-            <p style='text-align:center; font:14px/1.25em 'Helvetica Neue',Arial,Helvetica;color:#333'> 
-              <strong style='text-align:center;' >SOLYAG S.R.L RNC: 1-32-13041-3 </strong><br>
-                     Calle. Juan S Ramirez esq Wenceslao Alvarez<br>
-                    Zona Universitaria, Santo Domingo, Rep Dom <br>
-                    Tel: +1-305-400-4243 & +1-809-770-2266
-             
-             </p>
-           
-            </td>
-           
-            </tr>
-           
-            </tbody> </table> </td> </tr></tbody> </table>";
-          
-        
-            $mail->send();
-           
-        } catch (Exception $e) {
-            
-           
-        }
+     
       
         return $this->redirectToRoute('turismo/reporte/solicitud/');
     }

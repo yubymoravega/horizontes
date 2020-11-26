@@ -53,7 +53,16 @@
         <tr {% if loop.index is odd %}class="color"{% endif %}>
             <td>{{ data.fechaSolicitud | date('d-M-y H:i:s A') }} </td>
               <td>{{ data.idCliente  }} <br> {{ data.nombreCliente  }}</td>
-                <td>{{ data.stado  }} </td>
+                <td>
+				
+				{% if  data.stado == "Atendida"  %}
+              {{ data.stado  }}  <br> {{ data.empleadoStatus  }} 
+
+            {% else %}
+            {{ data.stado  }}
+              {% endif %}
+				
+				</td>
                  <td>{{ data.empleado  }} </td> 
 				  <td>
 				  
