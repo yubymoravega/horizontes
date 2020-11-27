@@ -304,15 +304,14 @@ class FacturaController extends AbstractController
             'id_cuenta' => $cuenta])) : '';
         $factura = [
             'nro_factura' => $factura_obj->getNroFactura(),
-            'fecha_factura' => $factura_obj->getFechaFactura()->format('d/m/Y'),
+            'ncf'=>$factura_obj->getNcf(),
+            'fecha_factura' => $factura_obj->getFechaFactura()->format('d-m-Y'),
             'tipo_cliente' => $cliente->getTipo(),
             'cliente' => $cliente->find($factura_obj->getIdCliente())['nombre'],
             'contrato' => $contrato ? ($contrato->getNroContrato() . ' - '
                 . $contrato->getIdCliente()->getNombre() . ' | $'
                 . $contrato->getImporte() . ' ( '
                 . $contrato->getFechaAprobado()->format('d/m/Y') . ' )') : '',
-            'cuenta_obligacion' => $cuenta != '' ? ($cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()) : '',
-            'subcuenta_obligacion' => $subcuenta != '' ? ($subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion()) : '',
         ];
 
         $importe_total = 0;
@@ -320,7 +319,7 @@ class FacturaController extends AbstractController
             $importe_total += $mercancia->getPrecio() * $mercancia->getCantidad();
         }
         return $this->render('contabilidad/venta/factura/load.html.twig', [
-            'factura' => $factura,
+            'form_factura' => $factura,
             'mercancias' => $mercancias,
             'importe_total' => floatval($importe_total)
         ]);
@@ -419,13 +418,16 @@ class FacturaController extends AbstractController
             'cuenta_obligacion' => $cuenta != '' ? ($cuenta->getNroCuenta() . ' - ' . $cuenta->getNombre()) : '',
             'subcuenta_obligacion' => $subcuenta != '' ? ($subcuenta->getNroSubcuenta() . ' - ' . $subcuenta->getDescripcion()) : '',
             'ncf' => $factura_obj->getNcf(),
-            'nombre_unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
+            'nombre_unidad' => $unidad->getNombre(),
+            'codigo_unidad' => $unidad->getCodigo(),
             'direccion_unidad' => $unidad->getDireccion(),
             'telefono_unidad' => $unidad->getTelefono(),
             'correo_unidad' => $unidad->getCorreo(),
         ];
 
         $importe_total = 0;
+        $impuesto_total = 0;
+        $subtotal = 0;
         $mercancia_arr = [];
         foreach ($mercancias as $mercancia) {
             if ($mercancia->getMercancia())
@@ -450,9 +452,12 @@ class FacturaController extends AbstractController
                     'cantidad' => $mercancia->getCantidad(),
                     'precio' => number_format($mercancia->getPrecio(), 2, '.', ''),
                     'descuento_recarga' => number_format($mercancia->getDescuentoRecarga(), 2, '.', ''),
-                    'importe' => number_format($mercancia->getPrecio() * $mercancia->getCantidad() + $mercancia->getDescuentoRecarga(), 2, '.', ''),
+                    'total' => number_format($mercancia->getPrecio() * $mercancia->getCantidad() + $mercancia->getDescuentoRecarga(), 2, '.', ''),
+                    'subtotal' => number_format($mercancia->getPrecio() * $mercancia->getCantidad(), 2, '.', ''),
                 ]);
+            $subtotal += $mercancia->getPrecio() * $mercancia->getCantidad();
             $importe_total += $mercancia->getPrecio() * $mercancia->getCantidad() + $mercancia->getDescuentoRecarga();
+            $impuesto_total += $mercancia->getDescuentoRecarga();
         }
         /** @var Empleado $empleado */
         $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_unidad' => $unidad, 'id_usuario' => $factura_obj->getIdUsuario()]);
@@ -460,6 +465,8 @@ class FacturaController extends AbstractController
             'factura' => $factura,
             'mercancias' => $mercancia_arr,
             'importe_total' => floatval($importe_total),
+            'subtotal' => floatval($subtotal),
+            'impuesto_total' => floatval($impuesto_total),
             'suministrador' => $unidad->getNombre(),
             'cod_suministrador' => $unidad->getCodigo(),
             'usuario' => $empleado->getNombre(),
@@ -488,7 +495,8 @@ class FacturaController extends AbstractController
         $factura['direccion_cliente'] = $cliente_arr['direccion'];
         $factura['ncf'] = $factura_data['ncf'];
         $factura['fecha_factura'] = $factura_data['fecha_factura'];
-        $factura['nombre_unidad'] = $unidad->getCodigo() . ' - ' . $unidad->getNombre();
+        $factura['codigo_unidad'] = $unidad->getCodigo();
+        $factura['nombre_unidad'] = $unidad->getNombre();
         $factura['direccion_unidad'] = $unidad->getDireccion();
         $factura['telefono_unidad'] = $unidad->getTelefono();
         $factura['correo_unidad'] = $unidad->getCorreo();
@@ -507,6 +515,8 @@ class FacturaController extends AbstractController
             return $this->redirectToRoute('contabilidad_venta_factura');
         }
         $importe_total = $factura_data['importe_total'];
+        $impuesto_total=0;
+        $subtotal=0;
         $mercancia_arr = [];
 
         foreach ($mercancias as $mercancia) {
@@ -532,9 +542,12 @@ class FacturaController extends AbstractController
                     'descripcion_venta' => $mercancia->descripcion_venta,
                     'precio' => number_format($mercancia->precio, 2, '.', ''),
                     'descuento_recarga' => number_format($mercancia->descuento_recatrga, 2, '.', ''),
-                    'importe' => number_format(floatval($mercancia->precio) * floatval($mercancia->cantidad) + floatval($mercancia->descuento_recatrga), 2, '.', ''),
+                    'total' => number_format(floatval($mercancia->precio) * floatval($mercancia->cantidad) + floatval($mercancia->descuento_recatrga), 2, '.', ''),
+                    'subtotal' => number_format(floatval($mercancia->precio) * floatval($mercancia->cantidad), 2, '.', ''),
 
                 ]);
+            $subtotal += (floatval($mercancia->precio) * floatval($mercancia->cantidad));
+            $impuesto_total += floatval($mercancia->descuento_recatrga);
         }
         /** @var Empleado $empleado */
         $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_unidad' => $unidad,
@@ -544,6 +557,8 @@ class FacturaController extends AbstractController
             'factura' => $factura,
             'mercancias' => $mercancia_arr,
             'importe_total' => floatval($importe_total),
+            'impuesto_total' => floatval($impuesto_total),
+            'subtotal' => floatval($subtotal),
             'suministrador' => $unidad->getNombre(),
             'cod_suministrador' => $unidad->getCodigo(),
             'usuario' => $empleado->getNombre(),

@@ -21,42 +21,27 @@
 					<div class="col col-lg-2"></div>
 				</div>
 
+
+
 				{{ form_start(formulario,{'attr': { 'id': 'form_add_beneficiario'}}) }}
 				
-				<h4 style="color:white;">Beneficiario</h4>
+				<h5 style="color:white;">Beneficiario</h5>
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 						
-					<div class="col">
-					Nombre{{ form_widget(formulario.primerNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': ' Nombre'}}) }}
-					</div>	
-						
-						<div class="col">
-						Primer Apellido{{ form_widget(formulario.primerApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Apellido'}}) }}
-						</div>
-						
-						<div class="col">
-						Segundo Apellido
+						{{ form_widget(formulario.primerNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': ' Nombre'}}) }}
+						{{ form_widget(formulario.primerApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Apellido'}}) }}
 						{{ form_widget(formulario.segundoApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Segundo Apellido'}}) }}
-						</div>
 						<span class="input-group-append"></div>
 					</div>
 					
-                    <h4 style="color:white;"> Alternativo</h4>
+                    <h5 style="color:white;"> Alternativo</h5>
 					<div class="form-group">
 						<div class="input-group input-group-sm">
 						
-						<div class="col">
-							Nombre{{ form_widget(formulario.alternativoNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Nombre'}}) }}
-							</div>
-
-						<div class="col">	
-							Primer Apellido{{ form_widget(formulario.alternativoApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Primer Apellido'}}) }}
-						</div>
-							
-							<div class="col">	
-							Segundo Apellido{{ form_widget(formulario.alternativoSegundoApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Segundo Apellido'}}) }}
-							</div>
+							{{ form_widget(formulario.alternativoNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Alternativo Nombre Alternativo'}}) }}
+							{{ form_widget(formulario.alternativoApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': ' Alternativo Primer Apellido '}}) }}
+							{{ form_widget(formulario.alternativoSegundoApellido, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': ' Alternativo Segundo Apellido '}}) }}
 							<span class="input-group-append"></div>
 						</div>
 
@@ -64,69 +49,41 @@
 						<div class="form-group">
 							<div class="input-group input-group-sm">
 								
-							<div class="col">		
-							Celular	{{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Celular'}}) }}
-							</div>	
+								{{ form_widget(formulario.telefono, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Celular'}}) }}
+								{{ form_widget(formulario.telefonoCasa, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Telefono Adicional'}}) }}
+								{{ form_widget(formulario.identificacion, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Identificacion'}}) }}
 								
-							<div class="col">		
-							Telefono Adicional	{{ form_widget(formulario.telefonoCasa, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Telefono Adicional'}}) }}
-							</div>		
-							
-							<div class="col">	
-							Identificacion	{{ form_widget(formulario.identificacion, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Identificacion'}}) }}
-							</div>	
-
 								<span class="input-group-append"></div>
 							</div>
 
-						<h4 style="color:white;">Dirección</h4>
+						<h5 style="color:white;">Dirección</h5>
 							<div class="form-group">
 								<div class="input-group input-group-sm">
 									
-								<div class="col">		
-								Calle	{{ form_widget(formulario.calle, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Calle'}}) }}
-								</div>
-								
-								<div class="col">	
-								Entre	{{ form_widget(formulario.entre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Entre'}}) }}
-								</div>
-								
-								<div class="col">	
-									Y{{ form_widget(formulario.y, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Y'}}) }}
-								</div>
+									{{ form_widget(formulario.calle, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Calle'}}) }}
+									{{ form_widget(formulario.entre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Entre'}}) }}
+									{{ form_widget(formulario.y, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Y'}}) }}
 
 									<span class="input-group-append"></div>
 								</div>
 
+						
 							<div class="form-group">
 						<div class="input-group input-group-sm">
 						
-						<div class="col">	
-							No{{ form_widget(formulario.no, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'No'}}) }}
-							
-						</div>
-						
-						<div class="col">	
-						Edificio{{ form_widget(formulario.edificio, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Edificio'}}) }}
-							
-						</div>
-						
-						<div class="col">
-						Apartamento	{{ form_widget(formulario.apto, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Apartamento'}}) }}
-						
-						</div>
+							{{ form_widget(formulario.no, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'No'}}) }}
+							{{ form_widget(formulario.edificio, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Edificio'}}) }}
+							{{ form_widget(formulario.apto, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Apartamento'}}) }}
 							<span class="input-group-append"></div>
 						</div>
-	
+
+						
 							<div class="form-group">
 						<div class="input-group input-group-sm">
 						
-						<div class="col">
-							Reparto{{ form_widget(formulario.reparto, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Reparto'}}) }}
-						</div>	
-
-						<div class="col"> Provincias
-							<select id="cliente_beneficiario_provincias" name="provincias" class="fomulario form-control" style="height: 40px; font-size: 15px;" >
+							{{ form_widget(formulario.reparto, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Reparto'}}) }}
+							
+							<select id="cliente_beneficiario_provincias" name="provincias" class="fomulario form-control" >
   							
 							   {% if provinciaSelect == false %}
                                <option value="0">Provincias</option>							
@@ -142,22 +99,21 @@
                            {% endfor %}			
 							</select>
 
-							</div>	
-
-							<div class="col"> Municipios
-							<select id="cliente_beneficiario_municipios" name="municipios" class="fomulario form-control" style="height: 40px; font-size: 15px;" >
+							<select id="cliente_beneficiario_municipios" name="municipios" class="fomulario form-control" >
 							   {% if municipioSelect == false %}
                                <option value="0">Municipios</option>					
                                  {% else %}
 								<option selected value="{{municipioSelect}}">Municipios</option>
 							    {% endif %}
+							
+							  
 							 		
 							</select>
-							</div>	
 							<span class="input-group-append"></div>
 						</div>
+
 			</div>
-                              <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
+                              <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Agregar Beneficiario</button> </div>
 							{{ form_end(formulario) }}
 							<div></section>
 <style>
@@ -202,7 +158,7 @@ $.ajax({
     .val('0');
 
 				data = JSON.parse(data);
-					
+				console.log(data);			
 			for(let i = 0; i < data.length; i++) {
 
 				if(municipio != data[i].code){
@@ -248,6 +204,7 @@ $.ajax({
         });
 
 });
+
 
 $.validator.addMethod("valueNotEquals", function(value, element, arg){
   return arg !== value;
