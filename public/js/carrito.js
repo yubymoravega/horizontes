@@ -18,6 +18,19 @@ $.ajax({
         }
     }}); 
 
+    $.ajax({
+        type: 'POST',
+        data: {'code' : '200'},
+        url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/home/atender/",
+        dataType: 'json',
+        success: function (data) { 
+          
+            let  atender = document.getElementById('icon-notification');
+            atender.setAttribute('data-count',data);
+
+
+        }}); 
+
     $( "#currency" ).change(function() {
        
         $.ajax({

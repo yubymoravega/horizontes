@@ -45,6 +45,7 @@
 						<th>Estado</th>
 						<th>Empleado</th>
                         <th>Acciones</th>
+						 <th>Cambiar Estado</th>
                        
 					</tr>
 					{# table body #}
@@ -52,7 +53,16 @@
         <tr {% if loop.index is odd %}class="color"{% endif %}>
             <td>{{ data.fechaSolicitud | date('d-M-y H:i:s A') }} </td>
               <td>{{ data.idCliente  }} <br> {{ data.nombreCliente  }}</td>
-                <td>{{ data.stado  }} </td>
+                <td>
+				
+				{% if  data.stado == "Atendida"  %}
+              {{ data.stado  }}  <br> {{ data.empleadoStatus  }} 
+
+            {% else %}
+            {{ data.stado  }}
+              {% endif %}
+				
+				</td>
                  <td>{{ data.empleado  }} </td> 
 				  <td>
 				  
@@ -69,7 +79,15 @@
 <svg onclick="borrar({{data.id}})"  width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
 </svg>
-       </td>	      
+       </td>
+	   	 <td>
+	   
+	   <svg style="width: 20px;height: 30px;" onclick="status({{data.id}})" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z"/>
+  <path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+</svg>
+	   
+	    </td>       
         </tr>
     {% endfor %}    
 				</tbody>
@@ -163,6 +181,10 @@ function edit(id) {
   window.location.href ="/turismo/solicitud/edit/"+id;
 }
 
+function status(id) {
+  window.location.href ="/turismo/status/"+id;
+}
+
  function borrar(id) {
     $('#confirm__modal').modal('show')
 
@@ -177,11 +199,7 @@ function edit(id) {
 
                 window.location.href = "/turismo/reporte/solicitud/";
             
-                
             }}); 
-
-            
-        
       });
                      }
 
