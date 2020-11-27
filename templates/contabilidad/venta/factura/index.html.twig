@@ -179,9 +179,10 @@
                         <th style="width: 50px;">Codigo</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
-                        <th>Descuento</th>
-                        <th>Importe</th>
-                        <th scope="col-1">Nueva Exist</th>
+                        <th>Sub-Total</th>
+                        <th>Impuesto</th>
+                        <th>Total</th>
+                        <th scope="col-1" hidden>Nueva Exist</th>
                         <th style="width: 45px;"><i class="fa fa-minus-circle text-danger"></i></th>
                         <th scope="col-1" hidden>UM</th>
                         <th scope="col-1" hidden>Descripcion</th>
@@ -455,7 +456,8 @@
                     const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
                     const id_almacen = $('#id_almacen').val()
                     const descripcion_venta = $('#movimiento_venta_descripcion_venta').val()
-
+                    const subtotal = parseFloat(precio)* parseFloat(cantidad)
+                    const total = subtotal+ parseFloat(descuento_recatrga)
                     //validar que el codigo no se repita
                     if (lista_mercancias.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
@@ -470,11 +472,11 @@
                         tabla_mercancias.append(`<tr>
                         <td style="width: 85px; font-weight: 400"> ${tipo == 1 ? 'Mercancía' : 'Producto'}</td>
                         <td style="width: 50px;"> ${codigo}</td>
-                        <td> ${cantidad}</td>
-                        <td> ${parseFloat(precio).toFixed(2)} </td>
-                        <td> ${parseFloat(descuento_recatrga).toFixed(2)} </td>
-                        <td> ${parseFloat(importe_movimiento).toFixed(2)}</td>
-                        <td> ${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td class="text-center"> ${cantidad}</td>
+                        <td class="text-right"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td class="text-right"> ${parseFloat(subtotal).toFixed(2)} </td>
+                        <td class="text-right"> ${parseFloat(descuento_recatrga).toFixed(2)} </td>
+                        <td class="text-right"> ${parseFloat(total).toFixed(2)}</td>
                         <td style="width: 45px;"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
                             <i class="fa fa-minus-circle"></i>

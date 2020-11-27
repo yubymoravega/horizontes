@@ -44,9 +44,9 @@
                         <button class="rd-navbar-toggle" style="display: block !important;" data-rd-navbar-toggle=".rd-navbar, .rd-navbar-nav-wrap">
                             <span></span></button>
                         <!--Navbar Brand-->
-                        <div class="rd-navbar-brand" style="left: 30%;"><a href="/"><img style='margin-left: -15px; margin-top: -10px;'
-                                                                                         width='165' height='70'
-                                                                                         src="{{ asset('images/solyag-logo-nuevo.png') }}"
+                        <div class="rd-navbar-brand" style="left: 30%;"><a href="/"><img style='margin-left: -15px;'
+                                                                                         width='150' height='57'
+                                                                                         src="{{ asset('images/logo-viajes-horizontes.png') }}"
                                                                                          alt=''/></a></div>
                     </div>
                     <div class="rd-navbar-menu-wrap">
@@ -55,7 +55,7 @@
                                 <!--Navbar Brand Mobile-->
                                 <div class="rd-navbar-mobile-brand"><a href="/"><img
                                                 style='margin-top: -5px;margin-left: -15px;' width='138' height='40'
-                                                src="{{ asset('images/solyag-logo-nuevo.png') }}"
+                                                src="{{ asset('images/logo-viajes-horizontes.png') }}"
                                                 alt=''/></a>
                                 </div>
                                 <div class="form-search-wrap">
@@ -74,7 +74,6 @@
                                 </div>
                                 <!-- RD Navbar Nav-->
                                 <ul class="rd-navbar-nav">
-                            
                                    {# ------------ reporteCliente ------------------- #}
                                     {% include 'layout/reportecliente.html.twig' %}
 
@@ -116,11 +115,6 @@
                                data-rd-navbar-toggle=".rd-navbar-cart-dropdown"
                                href="#"><span></span><br>
                                 <p class="p-text">Factura</p></a>
-                                
-                                <select id='currency' class="currency rd-navbar-cart"  >
-                               
-                                </select>
-                                
                             <a class="rd-navbar-cart mdi icon-texto" href="#"><span class="span-text"
                                                                                     style="width: 115px;"></span><br>
                                 <p style="margin-top: -3px;" class="p-text">Valor Total</p></a>
@@ -136,8 +130,8 @@
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="{{ url ('checkout') }}"><span class="icon novi-icon mdi mdi-lock"></span>Ir
-                                        a
+                                            href="shop-cart.html"><span class="icon novi-icon mdi mdi-lock"></span>Go
+                                        to
                                         checkout</a></div>
                             </div>
 
@@ -149,7 +143,6 @@
                                     </div>
                                     <div class="col-10">
                                         <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
-                                        <h5 class="rd-navbar-cart-total-title" id="monedaSys"></h5>
                                     </div>
                                 </div>
                                 <div class="text-center"><a

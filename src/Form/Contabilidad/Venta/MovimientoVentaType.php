@@ -55,7 +55,7 @@ class MovimientoVentaType extends AbstractType
             ])
             ->add('descuento_recarga', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
-                'label' => 'Recarga (Impuesto)',
+                'label' => 'Impuesto',
                 'required'=>false
             ])
             ->add('existencia', NumberType::class, [

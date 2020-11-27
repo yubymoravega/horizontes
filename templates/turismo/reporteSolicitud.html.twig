@@ -2,205 +2,230 @@
 
 {% block content %}
 
-	{% include 'breadcrumbs.html.twig' %}
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<section class="section novi-background section-66 section-sm-bottom-110">
-		<div class="container">
-			<h1 class="text-reporte">Turismo Solicitud De Servicio
-			</h1>
-			<hr class="divider bg-mantis">
-			<form id="payment-form" name='payment-form' action="{{ path('turismo/reporte/solicitud/') }}" method="GET">
-				<div class="input-group input-group-sm mb-3">
+    {% include 'breadcrumbs.html.twig' %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <section class="section novi-background section-66 section-sm-bottom-110">
+        <div class="container">
+            <h1 class="text-reporte">Turismo Solicitud De Servicio
+            </h1>
+            <hr class="divider bg-mantis">
+            <form id="payment-form" name='payment-form' action="{{ path('turismo/reporte/solicitud/') }}" method="GET">
+                <div class="input-group input-group-sm mb-3">
 
-					<div class="input-group-prepend"></div>
-					<input autocomplete="off" name="from" id='from' type="text" placeholder="Desde" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-sm">
-					<input autocomplete="off" name="to" id='to' type="text" placeholder="Hasta" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                    <div class="input-group-prepend"></div>
+                    <input autocomplete="off" name="from" id='from' type="text" placeholder="Desde" class="form-control"
+                           aria-label="Default" aria-describedby="inputGroup-sizing-sm">
+                    <input autocomplete="off" name="to" id='to' type="text" placeholder="Hasta" class="form-control"
+                           aria-label="Small" aria-describedby="inputGroup-sizing-sm">
 
-					<div class="input-group-prepend"></div>
-					<select name="estado" class="custom-select" id="estado">
-						<option value="0" selected>Estado</option>
-						<option value="Pendiente">Pendiente</option>
-						<option value="Realizada">Realizada</option>
-					</select>
-					<div class="input-group-prepend"></div>
-					<select class="custom-select" name='empleado' id="empleado">
-						<option value="0" selected>Empleado</option>
-						{% for data in user %}
-							<option value="{{data.username}}">{{data.username}}</option>
-						{% endfor %}
-					</select>
-					<div class="input-group-prepend"></div>
-					<input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text" class="form-control">
-					<button class="btn btn-sm btn-outline-dark" type="submit">Filtrar</button>
-				</span>
-			</div>
-		</form>
-		<!-- Bootstrap Table-->
-		<div class="table-responsive clearfix">
-			<table class="table table-striped tabla-reporte">
-				<tbody>
-					<tr>
-						<th>Fecha</th>
-						<th>Cliente</th>
-						<th>Estado</th>
-						<th>Empleado</th>
+                    <div class="input-group-prepend"></div>
+                    <select name="estado" class="custom-select" id="estado">
+                        <option value="0" selected>Estado</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Realizada">Realizada</option>
+                    </select>
+                    <div class="input-group-prepend"></div>
+                    <select class="custom-select" name='empleado' id="empleado">
+                        <option value="0" selected>Empleado</option>
+                        {% for data in user %}
+                            <option value="{{ data.username }}">{{ data.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="input-group-prepend"></div>
+                    <input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text"
+                           class="form-control">
+                    <button class="btn btn-sm btn-outline-dark" type="submit">Filtrar</button>
+                    </span>
+                </div>
+            </form>
+            <!-- Bootstrap Table-->
+            <div class="table-responsive clearfix">
+                <table class="table table-striped tabla-reporte">
+                    <tbody>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Estado</th>
+                        <th>Empleado</th>
                         <th>Acciones</th>
-						 <th>Cambiar Estado</th>
-                       
-					</tr>
-					{# table body #}
-        {% for data in pagination %}
-        <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ data.fechaSolicitud | date('d-M-y H:i:s A') }} </td>
-              <td>{{ data.idCliente  }} <br> {{ data.nombreCliente  }}</td>
-                <td>
-				
-				{% if  data.stado == "Atendida"  %}
-              {{ data.stado  }}  <br> {{ data.empleadoStatus  }} 
+                        <th>Cambiar Estado</th>
 
-            {% else %}
-            {{ data.stado  }}
-              {% endif %}
-				
-				</td>
-                 <td>{{ data.empleado  }} </td> 
-				  <td>
-				  
-<svg onclick="mostrar({{data.id}})" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
-  <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-</svg>
+                    </tr>
+                    {# table body #}
+                    {% for data in pagination %}
+                        <tr {% if loop.index is odd %}class="color"{% endif %}>
+                            <td>{{ data.fechaSolicitud | date('d-M-y H:i:s A') }} </td>
+                            <td>{{ data.idCliente }} <br> {{ data.nombreCliente }}</td>
+                            <td>
 
-<svg onclick="edit({{data.id}})" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-</svg>
-			  
-<svg onclick="borrar({{data.id}})"  width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
-</svg>
-       </td>
-	   	 <td>
-	   
-	   <svg style="width: 20px;height: 30px;" onclick="status({{data.id}})" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z"/>
-  <path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
-</svg>
-	   
-	    </td>       
-        </tr>
-    {% endfor %}    
-				</tbody>
-			</table>
-			<hr style="background-color: white; margin-top: 0px;">
-			{# display navigation #}
-			<div class="navigation">{{ knp_pagination_render(pagination) }}</div>
-      <div class="count contador">Transacciones: {{ pagination.getTotalItemCount }} </div>
-	</div>
-</div></div></div></section>
+                                {% if  data.stado == "Atendida" %}
+                                    {{ data.stado }}  <br> {{ data.empleadoStatus }}
 
+                                {% else %}
+                                    {{ data.stado }}
+                                {% endif %}
 
+                            </td>
+                            <td>{{ data.empleado }} </td>
+                            <td>
 
-<style>.input-group.input-group-sm .form-control {
-	height: 31px !important;
-}
+                                <svg onclick="mostrar({{ data.id }})" width="1em" height="1em" viewBox="0 0 16 16"
+                                     class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
 
-input#from {
-	margin-right: 10px;
-}
+                                <svg onclick="edit({{ data.id }})" width="1em" height="1em" viewBox="0 0 16 16"
+                                     class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                </svg>
 
-input#to {
+                                <svg onclick="borrar({{ data.id }})" width="1em" height="1em" viewBox="0 0 16 16"
+                                     class="bi bi-trash-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
+                                </svg>
+                            </td>
+                            <td>
 
-	margin-right: 10px;
-}
-select#estado {
-	margin-right: 10px;
-}
+                                <svg style="width: 20px;height: 30px;" onclick="status({{ data.id }})" width="1em"
+                                     height="1em" viewBox="0 0 16 16" class="bi bi-bell" fill="currentColor"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                                </svg>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <hr style="background-color: white; margin-top: 0px;">
+                {# display navigation #}
+                <div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+                <div class="count contador">Transacciones: {{ pagination.getTotalItemCount }} </div>
+            </div>
+        </div>
+        </div></div></section>
 
 
-select#empleado {
-	margin-right: 10px;
-}
 
-input#telefono {
-	margin-right: 10px;
-}
+    <style>.input-group.input-group-sm .form-control {
+            height: 31px !important;
+        }
 
-.input-group .form-control {
-	height: auto;
-	color: #ffffff;
-	background: #2f2f2f !important;
-	border: 1px solid #ffffff80 !important;
-}
+        input#from {
+            margin-right: 10px;
+        }
 
-.custom-select {
-	color: #ffffff;
-	background: #2f2f2f !important;
-	border: 1px solid #ffffff80 !important;
-}
-.input-group .form-control {
-	height: auto;
-	color: #ffffff !important;
-	background: #ffffff;
-}</style>
+        input#to {
+
+            margin-right: 10px;
+        }
+
+        select#estado {
+            margin-right: 10px;
+        }
+
+
+        select#empleado {
+            margin-right: 10px;
+        }
+
+        input#telefono {
+            margin-right: 10px;
+        }
+
+        .input-group .form-control {
+            height: auto;
+            color: #ffffff;
+            background: #2f2f2f !important;
+            border: 1px solid #ffffff80 !important;
+        }
+
+        .custom-select {
+            color: #ffffff;
+            background: #2f2f2f !important;
+            border: 1px solid #ffffff80 !important;
+        }
+
+        .input-group .form-control {
+            height: auto;
+            color: #ffffff !important;
+            background: #ffffff;
+        }</style>
 
 {% endblock %}
 {% block javascripts %}
-{{parent()}}
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    {{ parent() }}
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-<script>
+    <script>
 
-$(function () {
-var dateFormat = "mm/dd/yy",
-from = $("#from").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
-to.datepicker("option", "minDate", getDate(this));
-}),
-to = $("#to").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
-from.datepicker("option", "maxDate", getDate(this));
-});
+        $(function () {
+            var dateFormat = "mm/dd/yy",
+                from = $("#from").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 1
+                }).on("change", function () {
+                    to.datepicker("option", "minDate", getDate(this));
+                }),
+                to = $("#to").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 1
+                }).on("change", function () {
+                    from.datepicker("option", "maxDate", getDate(this));
+                });
 
-function getDate(element) {
-var date;
-try {
-date = $.datepicker.parseDate(dateFormat, element.value);
-} catch (error) {
-date = null;
-}
+            function getDate(element) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate(dateFormat, element.value);
+                } catch (error) {
+                    date = null;
+                }
 
-return date;
-}
-});
+                return date;
+            }
+        });
 
 
-function mostrar(id) {
-  window.location.href ="/turismo/detalle/"+id;
-}
+        function mostrar(id) {
+            window.location.href = "/turismo/detalle/" + id;
+        }
 
-function edit(id) {
-  window.location.href ="/turismo/solicitud/edit/"+id;
-}
+        function edit(id) {
+            window.location.href = "/turismo/solicitud/edit/" + id;
+        }
 
-function status(id) {
-  window.location.href ="/turismo/status/"+id;
-}
+        function status(id) {
+            window.location.href = "/turismo/status/" + id;
+        }
 
- function borrar(id) {
-    $('#confirm__modal').modal('show')
+        function borrar(id) {
+            $('#confirm__modal').modal('show')
 
-    $( "#confirm__modal__btn_ok" ).click(function() {
+            $("#confirm__modal__btn_ok").click(function () {
 
-        $.ajax({
-            type: 'POST',
-            data: {'code' : '200'},
-            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/turismo/borrar/"+id,
-            dataType: 'html',
-            success: function (data) {
+                $.ajax({
+                    type: 'POST',
+                    data: {'code': '200'},
+                    url: window.location.protocol + "//" + location.hostname + ":" + window.location.port + "/turismo/borrar/" + id,
+                    dataType: 'html',
+                    success: function (data) {
 
-                window.location.href = "/turismo/reporte/solicitud/";
-            
-            }}); 
-      });
-                     }
+                        window.location.href = "/turismo/reporte/solicitud/";
 
-</script>{% endblock %}
+                    }
+                });
+            });
+        }
+
+    </script>{% endblock %}

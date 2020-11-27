@@ -7,46 +7,33 @@
 
 		<div class="card 1">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/telecomunicaciones.png') }}"/>
+				<img src=""/>
 			</div>
-			
+			<div class="card_title title-white">
+				<p class="texto-servicio">Telecomunicaciones</p>
+			</div>
 		</div>
 
 		<div class="card 2">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/multiservicio-blanco.png') }}"/>
+				<img src=""/>
 			</div>
-			
+			<div class="card_title title-white">
+				<p class="texto-servicio">Multi Servicios</p>
+			</div>
 		</div>
 
-		<div id="turismo" class="card 3">
+		<div class="card 3">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/turismo.png') }}"/>
+				<img src=""/>
 			</div>
-			
+			<div class="card_title">
+				<p class="texto-servicio">Turismo</p>
+			</div>
 		</div>
 
 	</div>
 
-	<div class="cards-list">
-	
-		<div id="remesa" class="card 1">
-			<div class="card_image">
-				<img src="{{ asset('images/servicios/remesas.png') }}"/>
-			</div>
-			
-		</div>
-
-		<div class="card 2">
-			<div class="card_image">
-				<img src="{{ asset('images/servicios/paqueteria-blanco.png') }}"/>
-			</div>
-			
-		</div>
-
-	
-
-	</div>
 
 	<style>
 
@@ -142,17 +129,6 @@ minlength: "Minimo 8 Caracteres"
 $('#tel').on('input', function () {
 this.value = this.value.replace(/[^0-9]/g, '');
 });
-
-$( "#remesa" ).click(function() {
-  
-  window.location.href = "/remesas/pais/"+{{tel}};
-});
-
-$( "#turismo" ).click(function() {
-  
-  window.location.href = "/turismo/solicitud/"+{{tel}};
-});
-
 	</script>
 
 {% endblock %}
