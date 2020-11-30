@@ -159,6 +159,7 @@
                         {{ form_widget(form_venta.existencia) }}
                     </div>
                     <input type="hidden" id="id_almacen">
+                    <input type="hidden" id="id_mercancia">
                 </div>
                 <div class="row mt-0">
                     <div class="col-12 mt-0 form-group input-group input-group-sm d-block">
@@ -455,6 +456,7 @@
                     const importe = txt_importeMercancia.val()
                     const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
                     const id_almacen = $('#id_almacen').val()
+                    const id_mercancia = $('#id_mercancia').val()
                     const descripcion_venta = $('#movimiento_venta_descripcion_venta').val()
                     const subtotal = parseFloat(precio)* parseFloat(cantidad)
                     const total = subtotal+ parseFloat(descuento_recatrga)
@@ -463,7 +465,7 @@
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
                         lista_mercancias.push({
-                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia, id_almacen,descripcion_venta
+                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,id_mercancia ,id_almacen,descripcion_venta
                         })
                         let importe_movimiento = (parseFloat(importe) + parseFloat(descuento_recatrga))
                         importe_total += importe_movimiento
@@ -549,6 +551,7 @@
                                 $('#movimiento_venta_existencia').val(data.existencia)
                                 $('#movimiento_venta_codigo').val(data.codigo)
                                 $('#id_almacen').val(data.id_almacen)
+                                $('#id_mercancia').val(data.id)
                             } else {
                                 $('#listarMercanciasModal').modal('hide')
                                 let type = $('#movimiento_venta_mercancia').val() == 1 ? 'mercancías' : 'producto'
@@ -574,6 +577,7 @@
                     $('#movimiento_venta_existencia').val(mercancia[i]['existencia'])
                     $('#id_almacen').val(mercancia[i]['id_almacen'])
                     $('#movimiento_venta_codigo').val(mercancia[i]['codigo'])
+                    $('#id_mercancia').val(mercancia[i]['id'])
                     break
                 }
             }

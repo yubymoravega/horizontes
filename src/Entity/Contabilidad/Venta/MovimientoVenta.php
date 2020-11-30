@@ -125,6 +125,11 @@ class MovimientoVenta
      */
     private $descripcion;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_mercancia;
+
 
     public function getId(): ?int
     {
@@ -366,6 +371,18 @@ class MovimientoVenta
     public function setDescripcion(?string $descripcion): self
     {
         $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+    public function getIdMercancia(): ?int
+    {
+        return $this->id_mercancia;
+    }
+
+    public function setIdMercancia(?int $id_mercancia): self
+    {
+        $this->id_mercancia = $id_mercancia;
 
         return $this;
     }
