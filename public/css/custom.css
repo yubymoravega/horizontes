@@ -197,6 +197,12 @@ h1.text-reporte {
     text-align: center;
     font-weight: 100;
 }
+
+h3.text-reporte {
+    color: #fff;
+    text-align: center;
+    font-weight: 100;
+}
 table.table.table-striped a {
     color: #fff;
 }
@@ -601,6 +607,10 @@ a.rd-navbar-cart.mdi.icon-carrito.fas.toggle-original {
     font-size: 33px;
 }
 
+a.rd-navbar-cart.mdi.icon-notification.fas {
+    font-size: 33px;
+}
+
 svg.iconCarritoDelete{
     width: 20px;
     
@@ -608,4 +618,27 @@ svg.iconCarritoDelete{
 .svgCarrito{
     float: right;
     margin-right: 10%;
+}
+.currency{
+
+    color: white;
+    border-color: black;
+    background-color: black;
+    margin-right: 385px;
+    margin-top: 20px;
+}
+
+.hr-pago{
+   background-color: #5E5A5A;
+   height: 30%;
+}
+
+.cursor{
+  
+    cursor: pointer;
+}
+
+.texto-blanco{
+    color: white;
+    font-weight: 100;
 }
