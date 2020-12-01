@@ -4,7 +4,6 @@ namespace Doctrine\DBAL\Schema;
 
 use Doctrine\DBAL\Platforms\SQLAnywherePlatform;
 use Doctrine\DBAL\Types\Type;
-
 use function assert;
 use function is_string;
 use function preg_replace;
@@ -113,7 +112,6 @@ class SQLAnywhereSchemaManager extends AbstractSchemaManager
             case 'char':
             case 'nchar':
                 $fixed = true;
-                break;
         }
 
         switch ($type) {
@@ -121,7 +119,6 @@ class SQLAnywhereSchemaManager extends AbstractSchemaManager
             case 'float':
                 $precision = $tableColumn['length'];
                 $scale     = $tableColumn['scale'];
-                break;
         }
 
         return new Column(
@@ -201,9 +198,9 @@ class SQLAnywhereSchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableIndexesList($tableIndexes, $tableName = null)
+    protected function _getPortableTableIndexesList($tableIndexRows, $tableName = null)
     {
-        foreach ($tableIndexes as &$tableIndex) {
+        foreach ($tableIndexRows as &$tableIndex) {
             $tableIndex['primary'] = (bool) $tableIndex['primary'];
             $tableIndex['flags']   = [];
 
@@ -222,7 +219,7 @@ class SQLAnywhereSchemaManager extends AbstractSchemaManager
             $tableIndex['flags'][] = 'for_olap_workload';
         }
 
-        return parent::_getPortableTableIndexesList($tableIndexes, $tableName);
+        return parent::_getPortableTableIndexesList($tableIndexRows, $tableName);
     }
 
     /**

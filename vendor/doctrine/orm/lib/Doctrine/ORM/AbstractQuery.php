@@ -72,7 +72,6 @@ abstract class AbstractQuery
      * The parameter map of this query.
      *
      * @var ArrayCollection|Parameter[]
-     * @psalm-var ArrayCollection<int, Parameter>
      */
     protected $parameters;
 
@@ -241,7 +240,7 @@ abstract class AbstractQuery
      *
      * @param integer $lifetime
      *
-     * @return static This query instance.
+     * @return \Doctrine\ORM\AbstractQuery This query instance.
      */
     public function setLifetime($lifetime)
     {
@@ -261,7 +260,7 @@ abstract class AbstractQuery
     /**
      * @param integer $cacheMode
      *
-     * @return static This query instance.
+     * @return \Doctrine\ORM\AbstractQuery This query instance.
      */
     public function setCacheMode($cacheMode)
     {
@@ -322,13 +321,11 @@ abstract class AbstractQuery
      */
     public function getParameter($key)
     {
-        $key = Query\Parameter::normalizeName($key);
-
         $filteredParameters = $this->parameters->filter(
             function (Query\Parameter $parameter) use ($key) : bool {
                 $parameterName = $parameter->getName();
 
-                return $key === $parameterName;
+                return $key === $parameterName || (string) $key === (string) $parameterName;
             }
         );
 
@@ -341,14 +338,11 @@ abstract class AbstractQuery
      * @param ArrayCollection|mixed[] $parameters
      *
      * @return static This query instance.
-     *
-     * @psalm-param ArrayCollection<int, Parameter>|mixed[] $parameters
      */
     public function setParameters($parameters)
     {
         // BC compatibility with 2.3-
         if (is_array($parameters)) {
-            /** @psalm-var ArrayCollection<int, Parameter> $parameterCollection */
             $parameterCollection = new ArrayCollection();
 
             foreach ($parameters as $key => $value) {
@@ -394,11 +388,9 @@ abstract class AbstractQuery
      *
      * @param mixed $value
      *
-     * @return mixed[]|string|int|float|bool
+     * @return array|string
      *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     *
-     * @psalm-return array|scalar
      */
     public function processParameterValue($value)
     {
@@ -476,7 +468,7 @@ abstract class AbstractQuery
      */
     private function translateNamespaces(Query\ResultSetMapping $rsm)
     {
-        $translate = function ($alias) : string {
+        $translate = function ($alias) {
             return $this->_em->getClassMetadata($alias)->getName();
         };
 
@@ -637,7 +629,7 @@ abstract class AbstractQuery
     /**
      * Defines how long the result cache will be active before expire.
      *
-     * @param int|null $lifetime How long the cache entry is valid.
+     * @param integer $lifetime How long the cache entry is valid.
      *
      * @return static This query instance.
      */
@@ -972,11 +964,10 @@ abstract class AbstractQuery
             $this->setParameters($parameters);
         }
 
-        $setCacheEntry = static function () : void {
-        };
+        $setCacheEntry = function() {};
 
         if ($this->_hydrationCacheProfile !== null) {
-            [$cacheKey, $realCacheKey] = $this->getHydrationCacheId();
+            list($cacheKey, $realCacheKey) = $this->getHydrationCacheId();
 
             $queryCacheProfile = $this->getHydrationCacheProfile();
             $cache             = $queryCacheProfile->getResultCacheDriver();
@@ -990,7 +981,7 @@ abstract class AbstractQuery
                 $result = [];
             }
 
-            $setCacheEntry = static function ($data) use ($cache, $result, $cacheKey, $realCacheKey, $queryCacheProfile) : void {
+            $setCacheEntry = function($data) use ($cache, $result, $cacheKey, $realCacheKey, $queryCacheProfile) {
                 $result[$realCacheKey] = $data;
 
                 $cache->save($cacheKey, $result, $queryCacheProfile->getLifetime());
@@ -1077,7 +1068,7 @@ abstract class AbstractQuery
      * Will return the configured id if it exists otherwise a hash will be
      * automatically generated for you.
      *
-     * @return array<string, string> ($key, $hash)
+     * @return array ($key, $hash)
      */
     protected function getHydrationCacheId()
     {

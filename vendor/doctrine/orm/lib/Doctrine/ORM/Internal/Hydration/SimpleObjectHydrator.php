@@ -22,7 +22,6 @@ namespace Doctrine\ORM\Internal\Hydration;
 use PDO;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use function array_keys;
 use function in_array;
 
 class SimpleObjectHydrator extends AbstractHydrator
@@ -78,7 +77,7 @@ class SimpleObjectHydrator extends AbstractHydrator
     /**
      * {@inheritdoc}
      */
-    protected function hydrateRowData(array $row, array &$result)
+    protected function hydrateRowData(array $sqlResult, array &$result)
     {
         $entityName       = $this->class->name;
         $data             = [];
@@ -93,27 +92,27 @@ class SimpleObjectHydrator extends AbstractHydrator
                 $discrColumnName = $metaMappingDiscrColumnName;
             }
 
-            if (! isset($row[$discrColumnName])) {
+            if ( ! isset($sqlResult[$discrColumnName])) {
                 throw HydrationException::missingDiscriminatorColumn($entityName, $discrColumnName, key($this->_rsm->aliasMap));
             }
 
-            if ($row[$discrColumnName] === '') {
+            if ($sqlResult[$discrColumnName] === '') {
                 throw HydrationException::emptyDiscriminatorValue(key($this->_rsm->aliasMap));
             }
 
             $discrMap = $this->class->discriminatorMap;
 
-            if (! isset($discrMap[$row[$discrColumnName]])) {
-                throw HydrationException::invalidDiscriminatorValue($row[$discrColumnName], array_keys($discrMap));
+            if ( ! isset($discrMap[$sqlResult[$discrColumnName]])) {
+                throw HydrationException::invalidDiscriminatorValue($sqlResult[$discrColumnName], array_keys($discrMap));
             }
 
-            $entityName       = $discrMap[$row[$discrColumnName]];
-            $discrColumnValue = $row[$discrColumnName];
+            $entityName       = $discrMap[$sqlResult[$discrColumnName]];
+            $discrColumnValue = $sqlResult[$discrColumnName];
 
-            unset($row[$discrColumnName]);
+            unset($sqlResult[$discrColumnName]);
         }
 
-        foreach ($row as $column => $value) {
+        foreach ($sqlResult as $column => $value) {
             // An ObjectHydrator should be used instead of SimpleObjectHydrator
             if (isset($this->_rsm->relationMap[$column])) {
                 throw new \Exception(sprintf('Unable to retrieve association information for column "%s"', $column));

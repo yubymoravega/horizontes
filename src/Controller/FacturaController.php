@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Carrito; 
 use App\Entity\ReporteEfectivo; 
-use App\Entity\Factura; 
+use App\Entity\FacturaNoContable; 
 use App\Entity\Cotizacion; 
 use App\Entity\Provincias; 
 use App\Entity\Municipios; 
@@ -58,7 +58,7 @@ class FacturaController extends AbstractController
     public function reporte(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request) 
     {
 
-        $dql = "SELECT a FROM App:Factura a ";
+        $dql = "SELECT a FROM App:FacturaNoContable a ";
 
         if ($request->get('to') && $request->get('from')) {
 
@@ -366,7 +366,7 @@ class FacturaController extends AbstractController
         date_default_timezone_set('America/Santo_Domingo');
         $date = new DateTime('NOW');
         
-        $factura = new Factura();
+        $factura = new FacturaNoContable();
         
         $factura->setEmpleado($cotizacion->getEmpleado());
         $factura->setdatetime($date);
@@ -476,7 +476,7 @@ class FacturaController extends AbstractController
         $idFactura = $factura->getId();
 
           // Instantiation and passing `true` enables exceptions
-          $mail = new PHPMailer(true);
+          $mail = new PHPMailer(true); 
 
           try {
               //Server settings
@@ -617,7 +617,7 @@ class FacturaController extends AbstractController
     public function servicioPdf($id, $cf, Pdf $pdf){
 
         $dataBase = $this->getDoctrine()->getManager();
-        $factura = $dataBase->getRepository(Factura::class)->find($id);
+        $factura = $dataBase->getRepository(FacturaNoContable::class)->find($id);
 
         $json = json_decode($factura->getJson());
 

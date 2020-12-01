@@ -122,8 +122,6 @@ class ProxyFactory extends AbstractProxyFactory
      * @return \Closure
      *
      * @throws \Doctrine\ORM\EntityNotFoundException
-     *
-     * @psalm-return \Closure(BaseProxy):void
      */
     private function createInitializer(ClassMetadata $classMetadata, EntityPersister $entityPersister)
     {
@@ -175,8 +173,6 @@ class ProxyFactory extends AbstractProxyFactory
      * @return \Closure
      *
      * @throws \Doctrine\ORM\EntityNotFoundException
-     *
-     * @psalm-return \Closure(BaseProxy):void
      */
     private function createCloner(ClassMetadata $classMetadata, EntityPersister $entityPersister)
     {

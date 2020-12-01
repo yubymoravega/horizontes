@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+<section class="section-lg-50 novi-background " id='seccion-principal'>
+
+	<div class="card-header text-center">
+		<img class="imagen-efectivo" src="{{ asset('images/iconos/money.svg') }}">
+		<h2>Pagos Bancarios</h2>
+	</div>
+	<hr class="divider bg-mantis">
+    <div class="container d-flex justify-content-center" style="margin-bottom: 30px;">
+     <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger " role="alert"></div>
+     </div>
+	<div class="container d-flex justify-content-center">
+              
+		<form id="banco" action="{{ path('efectivo/banco/save/',[id]) }}" method="POST">
+			<div class="form-row">
+				<div class="form-group col-md-6">
+					<label style="color:white;" for="inputState">Transaccion</label>
+					<select name="select" style="height: 38px;" id="inputState" class="form-control">
+						<option value="Deposito">Deposito</option>
+                        <option value="zeller">zeller</option>
+                        <option value="Tranferencia" selected>Tranferencia</option>
+						
+					</select>
+				</div>
+				<div class="form-group col-md-6">
+					<label style="color:white;">Monto</label>
+					<input name='monto' class="form-control" placeholder="Monto">
+				</div>
+			</div>
+
+			<div class="form-row">
+				<div class="form-group col-md-6">
+					<label style="color:white;" for="inputCity">Banco</label>
+					<input name='banco' type="text" class="form-control" id="inputCity">
+				</div>
+			
+				<div class="form-group col-md-6">
+					<label style="color:white;" for="inputZip">Cuenta</label>
+					<input name='cuenta' type="text" class="form-control" id="inputZip">
+				</div>
+			</div>
+
+            <div class="form-row">
+				<div class="form-group col-md-12">
+					<label style="color:white;" for="inputCity">No. Transaccion</label>
+					<input name='id' type="text" class="form-control" id="inputCity">
+				</div>
+			</div>
+
+            <div class="form-row" style="margin-top: 11px;">
+				<div class="form-group col-md-12">
+					<label style="color:white;" for="inputCity">Nota</label>
+					<input name='nota' type="text" class="form-control" id="inputCity">
+				</div>
+			</div>
+        <div class="col d-flex justify-content-center container" style='margin-top: 25px;'>
+							<button id="procesar" type="submit" class="btn btn-dark">Procesar</button>
+						</div>
+		</form>
+	</div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+
+<script>
+
+$("#banco").validate({
+   errorLabelContainer: "#messageBox",
+    wrapper: "li",
+    rules: {
+      'monto': {required: true},
+      'banco': {required: true},
+      'id': {required: true},
+      
+      
+    },
+
+    messages: {
+      'monto': {required: "Monto Requerido" },
+      'banco': {required: "Banco Requerido" },
+      'id': {required: "No. Transaccion Requerido" },
+      
+}});
+     
+ </script>
+
+{% endblock %}
+

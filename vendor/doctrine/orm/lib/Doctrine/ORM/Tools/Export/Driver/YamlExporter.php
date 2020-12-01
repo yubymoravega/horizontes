@@ -120,7 +120,10 @@ class YamlExporter extends AbstractExporter
         $array['id'] = $ids;
 
         if ($fieldMappings) {
-            $array['fields'] = $fieldMappings;
+            if ( ! isset($array['fields'])) {
+                $array['fields'] = [];
+            }
+            $array['fields'] = array_merge($array['fields'], $fieldMappings);
         }
 
         foreach ($metadata->associationMappings as $name => $associationMapping) {

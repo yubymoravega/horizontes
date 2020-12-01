@@ -337,8 +337,6 @@ final class PersistentCollection extends AbstractLazyCollection implements Selec
 
     /**
      * {@inheritdoc}
-     *
-     * @return object
      */
     public function remove($key)
     {
@@ -512,8 +510,6 @@ final class PersistentCollection extends AbstractLazyCollection implements Selec
 
     /**
      * {@inheritdoc}
-     *
-     * @return object
      */
     public function offsetUnset($offset)
     {
@@ -573,11 +569,9 @@ final class PersistentCollection extends AbstractLazyCollection implements Selec
      * Internal note: Tried to implement Serializable first but that did not work well
      *                with circular references. This solution seems simpler and works well.
      *
-     * @return string[]
-     *
-     * @psalm-return array{0: string, 1: string}
+     * @return array
      */
-    public function __sleep() : array
+    public function __sleep()
     {
         return ['collection', 'initialized'];
     }

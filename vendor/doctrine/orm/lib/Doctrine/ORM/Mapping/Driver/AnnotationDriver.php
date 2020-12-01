@@ -40,8 +40,7 @@ use function interface_exists;
 class AnnotationDriver extends AbstractAnnotationDriver
 {
     /**
-     * @var int[]
-     * @psalm-var array<class-string, int>
+     * {@inheritDoc}
      */
     protected $entityAnnotationClasses = [
         Mapping\Entity::class => 1,
@@ -275,6 +274,7 @@ class AnnotationDriver extends AbstractAnnotationDriver
         }
 
         // Evaluate annotations on properties/fields
+        /* @var $property \ReflectionProperty */
         foreach ($class->getProperties() as $property) {
             if ($metadata->isMappedSuperclass && ! $property->isPrivate()
                 ||
@@ -505,6 +505,7 @@ class AnnotationDriver extends AbstractAnnotationDriver
                 $hasMapping     = false;
                 $listenerClass  = new \ReflectionClass($listenerClassName);
 
+                /* @var $method \ReflectionMethod */
                 foreach ($listenerClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
                     // find method callbacks.
                     $callbacks  = $this->getMethodCallbacks($method);
@@ -524,6 +525,7 @@ class AnnotationDriver extends AbstractAnnotationDriver
 
         // Evaluate @HasLifecycleCallbacks annotation
         if (isset($classAnnotations[Mapping\HasLifecycleCallbacks::class])) {
+            /* @var $method \ReflectionMethod */
             foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
                 foreach ($this->getMethodCallbacks($method) as $value) {
                     $metadata->addLifecycleCallback($value[0], $value[1]);
@@ -556,7 +558,7 @@ class AnnotationDriver extends AbstractAnnotationDriver
      *
      * @param \ReflectionMethod $method
      *
-     * @return callable[]
+     * @return array
      */
     private function getMethodCallbacks(\ReflectionMethod $method)
     {
@@ -604,17 +606,7 @@ class AnnotationDriver extends AbstractAnnotationDriver
      * Parse the given JoinColumn as array
      *
      * @param Mapping\JoinColumn $joinColumn
-     *
-     * @return mixed[]
-     *
-     * @psalm-return array{
-     *                   name: string,
-     *                   unique: bool,
-     *                   nullable: bool,
-     *                   onDelete: mixed,
-     *                   columnDefinition: string,
-     *                   referencedColumnName: string
-     *               }
+     * @return array
      */
     private function joinColumnToArray(Mapping\JoinColumn $joinColumn)
     {
@@ -634,20 +626,7 @@ class AnnotationDriver extends AbstractAnnotationDriver
      * @param string $fieldName
      * @param Mapping\Column $column
      *
-     * @return mixed[]
-     *
-     * @psalm-return array{
-     *                   fieldName: string,
-     *                   type: mixed,
-     *                   scale: int,
-     *                   length: int,
-     *                   unique: bool,
-     *                   nullable: bool,
-     *                   precision: int,
-     *                   options?: mixed[],
-     *                   columnName?: string,
-     *                   columnDefinition?: string
-     *               }
+     * @return array
      */
     private function columnToArray($fieldName, Mapping\Column $column)
     {

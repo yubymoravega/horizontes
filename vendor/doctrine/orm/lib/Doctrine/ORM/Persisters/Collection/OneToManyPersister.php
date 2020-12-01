@@ -36,8 +36,6 @@ class OneToManyPersister extends AbstractCollectionPersister
 {
     /**
      * {@inheritdoc}
-     *
-     * @return int|null
      */
     public function delete(PersistentCollection $collection)
     {

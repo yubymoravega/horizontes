@@ -22,7 +22,6 @@ namespace Doctrine\ORM\Tools\Console\Command;
 use Doctrine\ORM\Tools\ConvertDoctrine1Schema;
 use Doctrine\ORM\Tools\EntityGenerator;
 use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
-use Doctrine\ORM\Tools\Export\Driver\AnnotationExporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -131,7 +130,7 @@ class ConvertDoctrine1SchemaCommand extends Command
 
         $toType = $input->getArgument('to-type');
         $extend = $input->getOption('extend');
-        $numSpaces = (int) $input->getOption('num-spaces');
+        $numSpaces = $input->getOption('num-spaces');
 
         $this->convertDoctrine1Schema($fromPaths, $destPath, $toType, $numSpaces, $extend, $output);
 
@@ -181,7 +180,7 @@ class ConvertDoctrine1SchemaCommand extends Command
         $cme = $this->getMetadataExporter();
         $exporter = $cme->getExporter($toType, $destPath);
 
-        if ($exporter instanceof AnnotationExporter) {
+        if (strtolower($toType) === 'annotation') {
             $entityGenerator = $this->getEntityGenerator();
             $exporter->setEntityGenerator($entityGenerator);
 

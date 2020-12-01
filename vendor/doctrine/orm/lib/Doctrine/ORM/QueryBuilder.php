@@ -440,9 +440,7 @@ class QueryBuilder
      *     $qb->getRootAliases(); // array('u')
      * </code>
      *
-     * @return mixed[]
-     *
-     * @psalm-return list<mixed>
+     * @return array
      */
     public function getRootAliases()
     {
@@ -475,10 +473,7 @@ class QueryBuilder
      *
      *     $qb->getAllAliases(); // array('u','a')
      * </code>
-     *
-     * @return mixed[]
-     *
-     * @psalm-return list<mixed>
+     * @return array
      */
     public function getAllAliases()
     {
@@ -497,9 +492,7 @@ class QueryBuilder
      *     $qb->getRootEntities(); // array('User')
      * </code>
      *
-     * @return mixed[]
-     *
-     * @psalm-return list<mixed>
+     * @return array
      */
     public function getRootEntities()
     {
@@ -574,7 +567,6 @@ class QueryBuilder
     {
         // BC compatibility with 2.3-
         if (is_array($parameters)) {
-            /** @psalm-var ArrayCollection<int, Query\Parameter> $parameterCollection */
             $parameterCollection = new ArrayCollection();
 
             foreach ($parameters as $key => $value) {
@@ -610,13 +602,11 @@ class QueryBuilder
      */
     public function getParameter($key)
     {
-        $key = Query\Parameter::normalizeName($key);
-
         $filteredParameters = $this->parameters->filter(
             function (Query\Parameter $parameter) use ($key) : bool {
                 $parameterName = $parameter->getName();
 
-                return $key === $parameterName;
+                return $key === $parameterName || (string) $key === (string) $parameterName;
             }
         );
 

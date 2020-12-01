@@ -135,7 +135,7 @@ EOT
      *
      * @return string[]
      */
-    private function getMappedEntities(EntityManagerInterface $entityManager) : array
+    private function getMappedEntities(EntityManagerInterface $entityManager)
     {
         $entityClassNames = $entityManager->getConfiguration()
                                           ->getMetadataDriverImpl()
@@ -225,7 +225,7 @@ EOT
         }
 
         if (is_scalar($value)) {
-            return (string) $value;
+            return $value;
         }
 
         throw new \InvalidArgumentException(sprintf('Do not know how to format value "%s"', print_r($value, true)));
@@ -237,11 +237,9 @@ EOT
      * @param string $label Label for the value
      * @param mixed  $value A Value to show
      *
-     * @return string[]
-     *
-     * @psalm-return array{0: string, 1: string}
+     * @return array
      */
-    private function formatField($label, $value) : array
+    private function formatField($label, $value)
     {
         if (null === $value) {
             $value = '<comment>None</comment>';
@@ -255,11 +253,9 @@ EOT
      *
      * @param array $propertyMappings
      *
-     * @return string[][]
-     *
-     * @psalm-return list<array{0: string, 1: string}>
+     * @return array
      */
-    private function formatMappings(array $propertyMappings) : array
+    private function formatMappings(array $propertyMappings)
     {
         $output = [];
 
@@ -279,11 +275,9 @@ EOT
      *
      * @param array $entityListeners
      *
-     * @return string[]
-     *
-     * @psalm-return array{0: string, 1: string}
+     * @return array
      */
-    private function formatEntityListeners(array $entityListeners) : array
+    private function formatEntityListeners(array $entityListeners)
     {
         return $this->formatField('Entity listeners', array_map('get_class', $entityListeners));
     }

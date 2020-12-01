@@ -37,7 +37,6 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Utility\IdentifierFlattener;
 use Doctrine\ORM\Utility\PersisterHelper;
-use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function assert;
@@ -361,11 +360,6 @@ class BasicEntityPersister implements EntityPersister
         return Type::getType($fieldMapping['type'])->convertToPHPValue($value, $this->platform);
     }
 
-    /**
-     * @return int[]|null[]|string[]
-     *
-     * @psalm-return list<int|null|string>
-     */
     private function extractIdentifierTypes(array $id, ClassMetadata $versionedClass) : array
     {
         $types = [];
@@ -448,26 +442,14 @@ class BasicEntityPersister implements EntityPersister
             $types[]    = $this->columnTypes[$columnName];
         }
 
-        $where                = [];
-        $identifier           = $this->em->getUnitOfWork()->getEntityIdentifier($entity);
-        $quotedClassTableName = $this->quoteStrategy->getTableName($this->class, $this->platform);
+        $where      = [];
+        $identifier = $this->em->getUnitOfWork()->getEntityIdentifier($entity);
 
         foreach ($this->class->identifier as $idField) {
             if ( ! isset($this->class->associationMappings[$idField])) {
-                $params[] = $identifier[$idField];
-                $types[]  = $this->class->fieldMappings[$idField]['type'];
-
-                // Fix for bug GH-8229 (id column from parent class renamed in child class):
-                // This method is called with the updated entity, but with different table names
-                // (the entity table name or a table name of an inherited entity). In dependence
-                // of the used table, the identifier name must be adjusted.
-                $class = $this->class;
-                if (isset($class->fieldMappings[$idField]['inherited']) && $quotedTableName !== $quotedClassTableName) {
-                    $className = $this->class->fieldMappings[$idField]['inherited'];
-                    $class     = $this->em->getClassMetadata($className);
-                }
-
-                $where[] = $this->quoteStrategy->getColumnName($idField, $class, $this->platform);
+                $params[]   = $identifier[$idField];
+                $types[]    = $this->class->fieldMappings[$idField]['type'];
+                $where[]    = $this->quoteStrategy->getColumnName($idField, $this->class, $this->platform);
 
                 continue;
             }
@@ -619,9 +601,7 @@ class BasicEntityPersister implements EntityPersister
      *
      * @param object $entity The entity for which to prepare the data.
      *
-     * @return mixed[][] The prepared data.
-     *
-     * @psalm-return array<string, array<array-key, mixed|null>>
+     * @return array The prepared data.
      */
     protected function prepareUpdateData($entity)
     {
@@ -645,18 +625,7 @@ class BasicEntityPersister implements EntityPersister
             $newVal = $change[1];
 
             if ( ! isset($this->class->associationMappings[$field])) {
-                $class = $this->class;
-
-                // Fix for bug GH-8229 (id column from parent class renamed in child class):
-                // Get the correct class metadata
-                foreach ($class->parentClasses as $parentClassName) {
-                    $parentClass = $this->em->getClassMetadata($parentClassName);
-                    if (array_key_exists($field, $parentClass->fieldMappings)) {
-                        $class = $parentClass;
-                    }
-                }
-
-                $fieldMapping = $class->fieldMappings[$field];
+                $fieldMapping = $this->class->fieldMappings[$field];
                 $columnName   = $fieldMapping['columnName'];
 
                 $this->columnTypes[$columnName] = $fieldMapping['type'];
@@ -719,11 +688,9 @@ class BasicEntityPersister implements EntityPersister
      *
      * @param object $entity The entity for which to prepare the data.
      *
-     * @return mixed[][] The prepared data for the tables to update.
+     * @return array The prepared data for the tables to update.
      *
      * @see prepareUpdateData
-     *
-     * @psalm-return array<string, mixed[]>
      */
     protected function prepareInsertData($entity)
     {
@@ -746,7 +713,7 @@ class BasicEntityPersister implements EntityPersister
         $this->switchPersisterContext(null, $limit);
 
         $sql = $this->getSelectSQL($criteria, $assoc, $lockMode, $limit, null, $orderBy);
-        [$params, $types] = $this->expandParameters($criteria);
+        list($params, $types) = $this->expandParameters($criteria);
         $stmt = $this->conn->executeQuery($sql, $params, $types);
 
         if ($entity !== null) {
@@ -838,7 +805,7 @@ class BasicEntityPersister implements EntityPersister
     public function refresh(array $id, $entity, $lockMode = null)
     {
         $sql = $this->getSelectSQL($id, null, $lockMode);
-        [$params, $types] = $this->expandParameters($id);
+        list($params, $types) = $this->expandParameters($id);
         $stmt = $this->conn->executeQuery($sql, $params, $types);
 
         $hydrator = $this->em->newHydrator(Query::HYDRATE_OBJECT);
@@ -852,7 +819,7 @@ class BasicEntityPersister implements EntityPersister
     {
         $sql = $this->getCountSQL($criteria);
 
-        [$params, $types] = $criteria instanceof Criteria
+        list($params, $types) = ($criteria instanceof Criteria)
             ? $this->expandCriteriaParameters($criteria)
             : $this->expandParameters($criteria);
 
@@ -869,7 +836,7 @@ class BasicEntityPersister implements EntityPersister
         $offset  = $criteria->getFirstResult();
         $query   = $this->getSelectSQL($criteria, null, null, $limit, $offset, $orderBy);
 
-        [$params, $types] = $this->expandCriteriaParameters($criteria);
+        list($params, $types) = $this->expandCriteriaParameters($criteria);
 
         $stmt       = $this->conn->executeQuery($query, $params, $types);
         $hydrator   = $this->em->newHydrator(($this->currentPersisterContext->selectJoinSql) ? Query::HYDRATE_OBJECT : Query::HYDRATE_SIMPLEOBJECT);
@@ -895,14 +862,14 @@ class BasicEntityPersister implements EntityPersister
 
         $valueVisitor->dispatch($expression);
 
-        [$params, $types] = $valueVisitor->getParamsAndTypes();
+        list($params, $types) = $valueVisitor->getParamsAndTypes();
 
         foreach ($params as $param) {
             $sqlParams = array_merge($sqlParams, $this->getValues($param));
         }
 
         foreach ($types as $type) {
-            [$field, $value] = $type;
+            list ($field, $value) = $type;
             $sqlTypes = array_merge($sqlTypes, $this->getTypes($field, $value, $this->class));
         }
 
@@ -917,7 +884,7 @@ class BasicEntityPersister implements EntityPersister
         $this->switchPersisterContext($offset, $limit);
 
         $sql = $this->getSelectSQL($criteria, null, null, $limit, $offset, $orderBy);
-        [$params, $types] = $this->expandParameters($criteria);
+        list($params, $types) = $this->expandParameters($criteria);
         $stmt = $this->conn->executeQuery($sql, $params, $types);
 
         $hydrator = $this->em->newHydrator(($this->currentPersisterContext->selectJoinSql) ? Query::HYDRATE_OBJECT : Query::HYDRATE_SIMPLEOBJECT);
@@ -987,11 +954,11 @@ class BasicEntityPersister implements EntityPersister
     /**
      * {@inheritdoc}
      */
-    public function loadManyToManyCollection(array $assoc, $sourceEntity, PersistentCollection $collection)
+    public function loadManyToManyCollection(array $assoc, $sourceEntity, PersistentCollection $coll)
     {
         $stmt = $this->getManyToManyStatement($assoc, $sourceEntity);
 
-        return $this->loadCollectionFromStatement($assoc, $stmt, $collection);
+        return $this->loadCollectionFromStatement($assoc, $stmt, $coll);
     }
 
     /**
@@ -1062,7 +1029,7 @@ class BasicEntityPersister implements EntityPersister
         }
 
         $sql = $this->getSelectSQL($criteria, $assoc, null, $limit, $offset);
-        [$params, $types] = $this->expandToManyParameters($parameters);
+        list($params, $types) = $this->expandToManyParameters($parameters);
 
         return $this->conn->executeQuery($sql, $params, $types);
     }
@@ -1166,7 +1133,7 @@ class BasicEntityPersister implements EntityPersister
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    final protected function getOrderBySQL(array $orderBy, $baseTableAlias) : string
+    protected final function getOrderBySQL(array $orderBy, $baseTableAlias)
     {
         $orderByList = [];
 
@@ -1451,9 +1418,7 @@ class BasicEntityPersister implements EntityPersister
      * Subclasses should override this method to alter or change the list of
      * columns placed in the INSERT statements used by the persister.
      *
-     * @return string[] The list of columns.
-     *
-     * @psalm-return list<string>
+     * @return array The list of columns.
      */
     protected function getInsertColumnList()
     {
@@ -1570,7 +1535,7 @@ class BasicEntityPersister implements EntityPersister
              . $where
              . $lockSql;
 
-        [$params, $types] = $this->expandParameters($criteria);
+        list($params, $types) = $this->expandParameters($criteria);
 
         $this->conn->executeQuery($sql, $params, $types);
     }
@@ -1578,7 +1543,7 @@ class BasicEntityPersister implements EntityPersister
     /**
      * Gets the FROM and optionally JOIN conditions to lock the entity managed by this persister.
      *
-     * @param int|null $lockMode One of the Doctrine\DBAL\LockMode::* constants.
+     * @param integer $lockMode One of the Doctrine\DBAL\LockMode::* constants.
      *
      * @return string
      */
@@ -1690,23 +1655,15 @@ class BasicEntityPersister implements EntityPersister
      * @return string[]
      *
      * @throws \Doctrine\ORM\ORMException
-     *
-     * @psalm-return list<string>
      */
     private function getSelectConditionStatementColumnSQL($field, $assoc = null)
     {
         if (isset($this->class->fieldMappings[$field])) {
-            // Fix for bug GH-8229 (id column from parent class renamed in child class):
-            // Use the correct metadata and name for the id column
-            if (isset($this->class->fieldMappings[$field]['inherited'])) {
-                $className = $this->class->fieldMappings[$field]['inherited'];
-                $class     = $this->em->getClassMetadata($className);
-            } else {
-                $className = $this->class->name;
-                $class     = $this->class;
-            }
+            $className = (isset($this->class->fieldMappings[$field]['inherited']))
+                ? $this->class->fieldMappings[$field]['inherited']
+                : $this->class->name;
 
-            return [$this->getSQLTableAlias($className) . '.' . $this->quoteStrategy->getColumnName($field, $class, $this->platform)];
+            return [$this->getSQLTableAlias($className) . '.' . $this->quoteStrategy->getColumnName($field, $this->class, $this->platform)];
         }
 
         if (isset($this->class->associationMappings[$field])) {
@@ -1795,11 +1752,11 @@ class BasicEntityPersister implements EntityPersister
     /**
      * {@inheritdoc}
      */
-    public function loadOneToManyCollection(array $assoc, $sourceEntity, PersistentCollection $collection)
+    public function loadOneToManyCollection(array $assoc, $sourceEntity, PersistentCollection $coll)
     {
         $stmt = $this->getOneToManyStatement($assoc, $sourceEntity);
 
-        return $this->loadCollectionFromStatement($assoc, $stmt, $collection);
+        return $this->loadCollectionFromStatement($assoc, $stmt, $coll);
     }
 
     /**
@@ -1855,7 +1812,7 @@ class BasicEntityPersister implements EntityPersister
         }
 
         $sql                  = $this->getSelectSQL($criteria, $assoc, null, $limit, $offset);
-        [$params, $types] = $this->expandToManyParameters($parameters);
+        list($params, $types) = $this->expandToManyParameters($parameters);
 
         return $this->conn->executeQuery($sql, $params, $types);
     }
@@ -1889,9 +1846,8 @@ class BasicEntityPersister implements EntityPersister
      *                             - value to be bound
      *                             - class to which the field belongs to
      *
-     * @return mixed[][]
      *
-     * @psalm-return array{0: array, 1: list<mixed>}
+     * @return array
      */
     private function expandToManyParameters($criteria)
     {
@@ -1917,11 +1873,9 @@ class BasicEntityPersister implements EntityPersister
      * @param mixed         $value
      * @param ClassMetadata $class
      *
-     * @return int[]|null[]|string[]
+     * @return array
      *
      * @throws \Doctrine\ORM\Query\QueryException
-     *
-     * @psalm-return list<int|null|string>
      */
     private function getTypes($field, $value, ClassMetadata $class)
     {
@@ -2034,11 +1988,11 @@ class BasicEntityPersister implements EntityPersister
              . $this->getLockTablesSql(null)
              . ' WHERE ' . $this->getSelectConditionSQL($criteria);
 
-        [$params, $types] = $this->expandParameters($criteria);
+        list($params, $types) = $this->expandParameters($criteria);
 
         if (null !== $extraConditions) {
             $sql                                 .= ' AND ' . $this->getSelectConditionCriteriaSQL($extraConditions);
-            [$criteriaParams, $criteriaTypes] = $this->expandCriteriaParameters($extraConditions);
+            list($criteriaParams, $criteriaTypes) = $this->expandCriteriaParameters($extraConditions);
 
             $params = array_merge($params, $criteriaParams);
             $types  = array_merge($types, $criteriaTypes);
@@ -2071,9 +2025,7 @@ class BasicEntityPersister implements EntityPersister
     }
 
     /**
-     * @param string $columnName
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSQLColumnAlias($columnName)
     {
