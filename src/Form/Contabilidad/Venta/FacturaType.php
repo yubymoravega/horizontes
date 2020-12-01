@@ -3,8 +3,6 @@
 namespace App\Form\Contabilidad\Venta;
 
 use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
-use App\Controller\Contabilidad\VentaController;
-use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Venta\ContratosCliente;
 use App\Entity\Contabilidad\Venta\Factura;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,13 +10,9 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FacturaType extends AbstractType
@@ -33,10 +27,6 @@ class FacturaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-//            ->add('fecha_factura', TextType::class, [
-//                'label' => 'Fecha de la factura',
-//                'attr' => ['class' => 'w-100', 'readonly' => true]
-//            ])
             ->add('tipo_cliente', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Tipo cliente',

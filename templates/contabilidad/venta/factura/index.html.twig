@@ -67,12 +67,9 @@
             {# --------- Datos de la venta --------------#}
             <div class="card-body">
                 {{ form_start(form_factura,{'attr': {'class': 'text-left','id':'form_factura','method':'POST'}}) }}
-                {#                {{ form_widget(form_factura.nro_factura, {'arrt':{'type':'hidden'}}) }}#}
                 <div class="row mt-0 p-0">
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                     <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
-{#                        {{ form_label(form_factura.fecha_factura) }}#}
-{#                        {{ form_widget(form_factura.fecha_factura) }}#}
                         <label for="factura_fecha_factura"> Fecha de la factura</label>
                         <input type="text" value="{{ fecha }}" id="factura_fecha_factura" name="factura[fecha_factura]" class="w-100 form-control" readonly="readonly">
                     </div>
@@ -159,6 +156,7 @@
                         {{ form_widget(form_venta.existencia) }}
                     </div>
                     <input type="hidden" id="id_almacen">
+                    <input type="hidden" id="id_mercancia">
                 </div>
                 <div class="row mt-0">
                     <div class="col-12 mt-0 form-group input-group input-group-sm d-block">
@@ -179,9 +177,10 @@
                         <th style="width: 50px;">Codigo</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
-                        <th>Descuento</th>
-                        <th>Importe</th>
-                        <th scope="col-1">Nueva Exist</th>
+                        <th>Sub-Total</th>
+                        <th>Impuesto</th>
+                        <th>Total</th>
+                        <th scope="col-1" hidden>Nueva Exist</th>
                         <th style="width: 45px;"><i class="fa fa-minus-circle text-danger"></i></th>
                         <th scope="col-1" hidden>UM</th>
                         <th scope="col-1" hidden>Descripcion</th>
@@ -443,7 +442,6 @@
             /** Adicionar mercancias */
             btn_adicionarMercancia.click(function (event) {
                 if (form_movimientoventa.valid()) {
-
                     const tipo = cbx_tipo.val()
                     const codigo = txt_codigoMercancia.val()
                     const descripcion = txt_descripMercancia.val()
@@ -454,14 +452,16 @@
                     const importe = txt_importeMercancia.val()
                     const nueva_existencia = parseFloat(txt_existenciaMercancia.val()) - parseFloat(cantidad)
                     const id_almacen = $('#id_almacen').val()
+                    const id_mercancia = $('#id_mercancia').val()
                     const descripcion_venta = $('#movimiento_venta_descripcion_venta').val()
-
+                    const subtotal = parseFloat(precio)* parseFloat(cantidad)
+                    const total = subtotal+ parseFloat(descuento_recatrga)
                     //validar que el codigo no se repita
                     if (lista_mercancias.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
                         lista_mercancias.push({
-                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia, id_almacen,descripcion_venta
+                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,id_mercancia ,id_almacen,descripcion_venta
                         })
                         let importe_movimiento = (parseFloat(importe) + parseFloat(descuento_recatrga))
                         importe_total += importe_movimiento
@@ -470,11 +470,11 @@
                         tabla_mercancias.append(`<tr>
                         <td style="width: 85px; font-weight: 400"> ${tipo == 1 ? 'Mercancía' : 'Producto'}</td>
                         <td style="width: 50px;"> ${codigo}</td>
-                        <td> ${cantidad}</td>
-                        <td> ${parseFloat(precio).toFixed(2)} </td>
-                        <td> ${parseFloat(descuento_recatrga).toFixed(2)} </td>
-                        <td> ${parseFloat(importe_movimiento).toFixed(2)}</td>
-                        <td> ${parseFloat(nueva_existencia).toFixed(2)}</td>
+                        <td class="text-center"> ${cantidad}</td>
+                        <td class="text-right"> ${parseFloat(precio).toFixed(2)} </td>
+                        <td class="text-right"> ${parseFloat(subtotal).toFixed(2)} </td>
+                        <td class="text-right"> ${parseFloat(descuento_recatrga).toFixed(2)} </td>
+                        <td class="text-right"> ${parseFloat(total).toFixed(2)}</td>
                         <td style="width: 45px;"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-mercancia="${codigo}">
                             <i class="fa fa-minus-circle"></i>
@@ -547,6 +547,7 @@
                                 $('#movimiento_venta_existencia').val(data.existencia)
                                 $('#movimiento_venta_codigo').val(data.codigo)
                                 $('#id_almacen').val(data.id_almacen)
+                                $('#id_mercancia').val(data.id)
                             } else {
                                 $('#listarMercanciasModal').modal('hide')
                                 let type = $('#movimiento_venta_mercancia').val() == 1 ? 'mercancías' : 'producto'
@@ -572,6 +573,7 @@
                     $('#movimiento_venta_existencia').val(mercancia[i]['existencia'])
                     $('#id_almacen').val(mercancia[i]['id_almacen'])
                     $('#movimiento_venta_codigo').val(mercancia[i]['codigo'])
+                    $('#id_mercancia').val(mercancia[i]['id'])
                     break
                 }
             }

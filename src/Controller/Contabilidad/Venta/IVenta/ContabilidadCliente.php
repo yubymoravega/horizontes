@@ -41,7 +41,7 @@ class ContabilidadCliente extends ClientesAdapter implements ICliente
             'nombre' => $personas_obj->getCodigo() . ' - ' . $personas_obj->getNombre(),
             'codigo' => $personas_obj->getCodigo(),
             'name' => $personas_obj->getNombre(),
-            'telefono' => $personas_obj->getTelefono(),
+            'telefono' => $personas_obj->getTelefonos(),
             'direccion' => $personas_obj->getDireccion(),
         ];
     }

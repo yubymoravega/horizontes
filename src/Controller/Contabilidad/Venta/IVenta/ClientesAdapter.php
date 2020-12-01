@@ -12,14 +12,19 @@ class ClientesAdapter
     public static $UNIDAD_SISTEMA = 2;
     public static $CLIENTE_CONTABILIDAD = 3;
     protected EntityManagerInterface $em;
-    protected String $tipo;
+    protected string $tipo;
 
     /**
      * @return String
      */
     public function getTipo(): string
     {
-        return $this->tipo;
+        if ($this->tipo == 'persona')
+            return 'Persona Natural';
+        if ($this->tipo == 'unidad del sistema')
+            return 'Cliente Interno';
+        else
+            return 'Cliente Externo';
     }
 
     /**
