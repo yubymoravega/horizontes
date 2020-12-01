@@ -33,6 +33,11 @@ class User implements UserInterface
      */
     private $status;
 
+      /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $idMoneda;
+
 
     /**
      * @var string The hashed password
@@ -121,6 +126,18 @@ class User implements UserInterface
     public function setStatus(bool $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getIdMoneda(): string
+    {
+        return (string) $this->idMoneda;
+    }
+
+    public function setIdMoneda(string $idMoneda): self
+    {
+        $this->idMoneda = $idMoneda;
 
         return $this;
     }

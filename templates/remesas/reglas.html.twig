@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+	<!-- Classic Breadcrumbs-->
+
+	<section class="section novi-background section-66 section-sm-bottom-110">
+		
+        <div class="container">
+			<h1 class="text-reporte">Reglas {{moneda}} {{pais}}</h1>
+			<hr class="divider bg-mantis">
+
+       <button class="btn btn-sm btn-outline-dark" id="agregar-reglas"  >Agregar Reglas</button>
+ <div class="table-responsive clearfix">
+                <table class="table table-striped tabla-reporte">
+                  <tbody><tr>
+                  <th>Desde</th> 
+                   <th>Hasta</th> 
+                   <th>Tarifa</th> 
+                   <th>Valor</th> 
+                   <th>Estado</th> 
+                   <th>Acciones</th> 
+                  </tr>
+                 {# table body #}
+        <tr>
+         {% for data in pagination %}
+         <tr {% if loop.index is odd %}class="color"{% endif %}>
+          <td>{{data.desde}}</td>
+           <td>{{data.hasta}}</td>
+           <td>{{data.tarifa}}</td>
+            <td>{{data.valor}}</td>
+            {% if data.estado == 1 %}
+  <td>Activado</td>
+{% else %}
+   <td>Desactivado</td>
+{% endif %}
+          
+           <td>
+           
+        <a  onClick="editar('{{ data.id }}');" > 		     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg></a>
+           
+           </td>
+     </tr>
+ {% endfor %}  
+        </tr>
+                </tbody></table> <hr style="background-color: white; margin-top: 0px;">
+                {# display navigation #}
+                 <div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+                <div class="count contador">Reglas: {{ pagination.getTotalItemCount }}</div>
+             
+              </div>
+	</div>
+    </section>
+
+
+
+{% endblock %}
+
+ {% block javascripts %} 
+{{parent()}}
+
+  <script>
+
+ $( "#agregar-reglas" ).click(function(id) {
+
+           window.location.href = "/remesas/reglas/add/"+{{idReglas}}; 
+      });
+
+function editar(id) {
+   window.location.href = "/remesas/reglas/edit/"+{{idReglas}}+"/"+id; 
+
+ }
+
+  </script>
+ 
+
+{% endblock %}

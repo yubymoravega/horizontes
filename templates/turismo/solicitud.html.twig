@@ -1,0 +1,409 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<!-- Section Input Groups-->
+	<section class="section novi-background section-20" id='seccion-principal'>
+		<div class="container">
+
+			<div class="container card">
+				<img class="imagen-cliente" src="{{ asset('images/iconos/user.svg') }}">
+				<div class="card-header text-center">
+					<h1>Solicitud Turismo</h1>
+                    <hr class="divider-white bg-mantis-white">
+				</div>
+				
+				<div class="row justify-content-md-center no-margin">
+					<div class="col col-lg-2"></div>
+					<div class="col-md-auto">
+						<div id="messageBox" style="margin: 25px; display: none;" class="alert alert-danger" role="alert"></div>
+					</div>
+					<div class="col col-lg-2"></div>
+				</div>
+
+				{{ form_start(formulario,{'attr': { 'id': 'form_add_Solicitud'}}) }}
+				
+				<h3 style="padding-top: 25px; text-align: center; color:white;">Vuelo</h3>
+                 
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+					<div class="col">
+					Adultos{{ form_widget(formulario.vueloCantidadAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
+					</div>	
+						
+						<div class="col">
+						Niños{{ form_widget(formulario.vueloCantidadNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+						</div>
+						
+						<div class="col">
+						Origen
+						{{ form_widget(formulario.vueloOrigen, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Origen'}}) }}
+						</div>
+						<span class="input-group-append"></div>
+					</div>
+					
+  
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">
+								Destino{{ form_widget(formulario.VueloDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
+                           
+							</div>
+
+						<div class="col">	
+							Fecha{{ form_widget(formulario.vueloIda, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Origen'}}) }}
+						</div>
+
+                        <div class="col">	
+								Retorno{{ form_widget(formulario.vueloVuelta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Retorno'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+
+                        	<div class="col">	
+								Comentario{{ form_widget(formulario.vueloComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+							</div>
+							
+			
+
+            <h3 style="padding-top: 25px; text-align: center; color:white;">Hotel</h3>
+             <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+
+					<div class="col">
+					Cantidad Adultos{{ form_widget(formulario.hotelAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Cantidad Adultos'}}) }}
+					</div>	
+
+					<div class="col">
+					Cantidad Niños{{ form_widget(formulario.hotelNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+					</div>	
+
+					<div class="col">
+					Destino{{ form_widget(formulario.hotelDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
+					</div>	
+						
+						<div class="col">
+						Nombre Hotel{{ form_widget(formulario.hotelNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Nombre Hotel'}}) }}
+						</div>
+						
+					
+						<span class="input-group-append"></div>
+					</div>
+					
+  
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+							<div class="col">
+						Categoria
+						{{ form_widget(formulario.hotelCategoria, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'hotelCategoria'}}) }}
+						</div>
+
+						<div class="col">
+								Plan Hotel{{ form_widget(formulario.hotelPlan, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Hotel Plan'}}) }}
+                           
+							</div>
+
+						<div class="col">	
+							Fecha Desde{{ form_widget(formulario.hotelDesde, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Desde'}}) }}
+						</div>
+
+                        <div class="col">	
+								Fecha Hasta{{ form_widget(formulario.hotelHasta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Hasta'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+
+                        	<div class="col">	
+								Comentario{{ form_widget(formulario.hotelComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+						</div>
+
+                        <h3 style="padding-top: 25px; text-align: center; color:white;">Tranfer</h3>
+                         <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+					<div class="col">
+					Adultos {{ form_widget(formulario.tramferAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
+					</div>	
+
+						<div class="col">
+					Niños {{ form_widget(formulario.tramferNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+					</div>	
+
+					<div class="col">
+					Fecha {{ form_widget(formulario.tranferLlegada, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha'}}) }}
+					</div>	
+						
+						<div class="col">
+						Fecha Salida{{ form_widget(formulario.tramferSalida, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
+						</div>
+						
+					
+						<span class="input-group-append"></div>
+					</div>
+					
+  
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+							<div class="col">
+						Ida & Vuelta
+						{{ form_widget(formulario.tramferIdaVuelta, {'attr': {'class': 'form-control','class': 'fomulario'}}) }}
+						</div>
+
+							<div class="col">
+						Lugar
+						{{ form_widget(formulario.tramferLugar, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar'}}) }}
+						</div>
+
+						<div class="col">
+								Destino{{ form_widget(formulario.tramferDestino, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Destino'}}) }}
+                           
+							</div>
+
+						<div class="col">	
+							Tipo Vehiculo{{ form_widget(formulario.tramferVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
+						</div>
+
+							<span class="input-group-append"></div>
+
+                        	
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+					
+
+                        <div class="col">	
+								Comentario{{ form_widget(formulario.tramferComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+
+                        	
+						</div>
+
+                             <h3 style="padding-top: 25px; text-align: center; color:white;">Tour</h3>
+                              <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+					<div class="col">
+					Adultos {{ form_widget(formulario.tourAdultos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Adultos'}}) }}
+					</div>	
+
+					<div class="col">
+					Niños {{ form_widget(formulario.tourNinos, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Niños'}}) }}
+					</div>	
+
+					<div class="col">
+					Tour {{ form_widget(formulario.tourNombre, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tour'}}) }}
+					</div>	
+						
+						<div class="col">
+						Fecha Salida{{ form_widget(formulario.tourFecha, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
+						</div>
+						
+						<span class="input-group-append"></div>
+					</div>
+					
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">	
+							Comentario{{ form_widget(formulario.tourComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+						</div>
+
+                        	
+						</div>
+
+                         <h3 style="padding-top: 25px; text-align: center; color:white;">Rent Car</h3>
+                          <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+						<div class="col">
+					Cantidad De Personas {{ form_widget(formulario.rentCantidadPersonas, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Cantidad De Personas'}}) }}
+					</div>	
+
+					<div class="col">
+					Tipo Vehiculo {{ form_widget(formulario.RentTipoVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
+					</div>	
+						
+						<div class="col">
+						Lugar Recogida{{ form_widget(formulario.rentLugarRecogida, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar Recogida'}}) }}
+						</div>
+						
+						<div class="col">
+						Lugar Entrega
+						{{ form_widget(formulario.rentLugarEntrega, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Lugar Entrega'}}) }}
+						</div>
+						<span class="input-group-append"></div>
+					</div>
+					
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">
+							Fecha Desde	{{ form_widget(formulario.rentFechaDesde, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Desde'}}) }}
+                           
+							</div>
+
+						<div class="col">	
+							Fecha Hasta{{ form_widget(formulario.rentFechaHasta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Hasta'}}) }}
+						</div>
+
+                        	
+						</div>
+
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						
+                        	<div class="col">	
+							Comentario{{ form_widget(formulario.rentComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+						</div>
+	
+						</div>
+							
+	
+						</div>
+
+						</div>
+
+			</div>
+
+	                <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
+							{{ form_end(formulario) }}
+							<div></section>
+<style>
+
+.fomulario{
+
+margin-right: 25px;
+
+}
+
+select.form-control{height: 50px !important;}
+.no-margin{margin: 0px;}
+
+form#form_add_beneficiario {
+    padding-right: 15%;
+    padding-left: 15%;
+}
+
+</style>
+						{% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> 
+<script>
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_vueloIda = $("#solicitud_turismo_vueloIda").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_vueloVuelta.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_vueloVuelta = $("#solicitud_turismo_vueloVuelta").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_vueloIda.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_hotelDesde = $("#solicitud_turismo_hotelDesde").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_hotelHasta.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_hotelHasta = $("#solicitud_turismo_hotelHasta").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_hotelDesde.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_tranferLlegada = $("#solicitud_turismo_tranferLlegada").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_tramferSalida.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_tramferSalida = $("#solicitud_turismo_tramferSalida").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_tranferLlegada.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_rentFechaDesde = $("#solicitud_turismo_rentFechaDesde").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_rentFechaHasta.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_rentFechaHasta = $("#solicitud_turismo_rentFechaHasta").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_rentFechaDesde.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+ $( function() {
+    $( "#solicitud_turismo_tourFecha" ).datepicker();
+  } );
+
+
+ </script>
+
+{% endblock %}
+

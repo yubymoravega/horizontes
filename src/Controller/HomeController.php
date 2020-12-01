@@ -7,6 +7,11 @@ use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use App\Entity\User;
 use App\Entity\Carrito;
+use App\Entity\Pais;
+use App\Entity\MonedaPais;
+use App\Entity\TasaDeCambio;
+use App\Form\Contabilidad\Config\MonedaType;
+use App\Entity\Contabilidad\Config\Moneda;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +27,18 @@ use App\Entity\SolicitudTurismo;
 
 class HomeController extends AbstractController
 {
+
+      // 2. Expose the EntityManager in the class level
+      private $entityManager;
+
+      public function __construct(EntityManagerInterface $entityManager,HttpClientInterface $client)
+     {
+         // 3. Update the value of the private entityManager variable through injection
+         $this->entityManager = $entityManager;
+         $this->client = $client;
+     }
+ 
+
     /**
      * @Route("/home", name="home")
      */
@@ -42,13 +59,13 @@ class HomeController extends AbstractController
         return $this->render('home/index.html.twig');
     }
 
-    /**
-     * @Route("/categorias", name="categorias")
+     /**
+     * @Route("/categorias/{tel}", name="categorias")
      */
-    public function categorias()
+    public function categorias($tel)
     {
-        return $this->render('home/categoria.html.twig');
-    }
+        return $this->render('home/categoria.html.twig',['tel' => $tel]);
+    } 
 
     /**
      * @Route("/servicios", name="servicios")
@@ -64,24 +81,37 @@ class HomeController extends AbstractController
     public function carrito()
     {
         $dataBase = $this->getDoctrine()->getManager();
-        $user = $this->getUser();
-
+        $user =  $this->getUser();
+        
         $data = $dataBase->getRepository(Carrito::class)->findBY(['empleado' => $user->getUsername()]);
         $json = null;
-        $con = count($data);
+        $con = count( $data);
         $contador = 0;
+        $decode = null;
+       
+        while($contador < $con){
 
-        while ($contador < $con) {
+            $decode = json_decode($data[$contador]->getJson());
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$decode->montoMoneda]);
+
+            $dolares = $decode->monto / $tasa[0]->getTasa();
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+            $total = $dolares * $tasa[0]->getTasa();
+
+            $dataBase = $this->getDoctrine()->getManager();
+            $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
 
             $json[$contador] = array(
                 'id' => $data[$contador]->getId(),
                 'json' => $data[$contador]->getJson(),
+                'moneda' => $moneda->getNombre(),
+                'total' => $total,
             );
             $contador++;
         }
-
+ 
         return new Response(json_encode($json));
-    }
+    } 
 
     /**
      * @Route("/home/moneda", name="home/moneda")
@@ -302,7 +332,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/home/moneda/tasa/sugerida/", name="home/moneda/tasa/sugerida")
      */
-    public function tasaSugerida(Request $request)
+    public function tasaSugerida(Request $request) 
     {
         $dataBase = $this->getDoctrine()->getManager();
         $moneda = $dataBase->getRepository(Moneda::class)->findall();

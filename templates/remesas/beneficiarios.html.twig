@@ -54,12 +54,12 @@
 	'{{ data.primerApellido }}','{{ data.segundoApellido }}','{{ data.telefono }}','{{ data.telefonoCasa }}'
 	,'{{ data.identificacion }}' ,'{{ data.alternativoNombre }}','{{ data.alternativoApellido }}','{{ data.alternativoSegundoApellido }}'
 	,'{{ data.calle }}','{{ data.no }}','{{ data.entre }}','{{ data.y }}','{{ data.apto }}','{{ data.edificio }}','{{ data.reparto }}'
-	,'{{ data.provincia }}','{{ data.municipio }}','{{ data.idCliente }}');" >  
+	,'{{ data.provincia }}','{{ data.municipio }}','{{ data.idCliente }}','{{ nombre }}','{{ apellido }}');" >  
 	 <svg width="1em" height="1em" viewBox="0 0 16 16" class="box bi bi-plus-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
   <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
 </svg>	 </a>
-			<a  onClick="editarBeneficiario('{{ data.id }}');" > 
+			<a  onClick="editarBeneficiario('{{ data.id }}','{{ pais}}');" > 
 <svg width="1em" height="1em" viewbox="0 0 16 16" class=" box bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 	<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
 	<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
@@ -78,7 +78,7 @@
 			<hr style="background-color: white; margin-top: 0px;">
 			{# display navigation #}
 			<div class="navigation">{{ knp_pagination_render(pagination) }}</div>
-      <div class="count contador">Transacciones: {{ pagination.getTotalItemCount }} </div>
+      <div class="count contador">Registros: {{ pagination.getTotalItemCount }} </div>
 	</div>
 </div></div></div></section>
 
@@ -100,23 +100,31 @@
 	<b>Municipio:</b> <span id="municipio">  </span> </br>
 	<b>Provincia:</b> <span id="provincia">  </span> </br>
 	
-	
+		<div class="row" >
 
-  <div class="form-row text-center">
-  <div class="col-md-4 mb-3">
-     
-	  <input type="text" class="form-control" id="total" placeholder="A pagar">
-      <input type="text" class="form-control" id="monto" placeholder="Recibir">
+ 		    <div style="margin: 0px;" class="col-4">A Pagar {{moneda.nombre}}<input type="text" class="form-control" id="total" placeholder="A pagar"></div>
+			<div style="margin: 0px;" class="col-4">Recibir <input type="text" class="form-control" id="monto" placeholder="Recibir"></div>
+			<div style="margin: 0px;" class="col-4"> 
+ Moneda
+    <select style="height: 42px;" class="form-control" id="monedasRecibir">
+      <option Selected value="0">Moneda</option>
+     {% for data in monedaPais %}
+         <option value="{{data.code}}">{{data.nombre}}</option>
+    {% endfor %}
+    </select>
+  </div>
+					</div>
+        <div class="row" style="margin-top: -15px;">
+	        <div class="col-4"></div>
+ 		    <div class="col-4"><button id='boton-enviar' type="button" class="btn btn-dark">Procesar</button></div>
+			<div class="col-4"></div>			
+		</div>
 
-      <div id='mensaje-monto'>
-       
-      </div>
-	  
-    </div>
-	 <div class="col-md-4 mb-3">
-    <button id='boton-enviar' type="button" class="btn btn-dark">Agregar Al Carrito</button>
-    </div>
-	</div>
+		<div class="row" style="margin-top: -15px;">
+	        <div class="col-3"></div>
+ 		    <div id='mensaje-monto' class="col-6"></div>
+			<div class="col-3"></div>			
+		</div>
 </div>
 
 <style>
@@ -140,16 +148,16 @@
 $( "#add" ).click(function() {
 	 var split = window.location.pathname.split("/");
 
-  window.location.href = "/remesas.add/"+split[2];
+  window.location.href = "/remesas.add/"+split[2]+"/"+split[3];
 });
 
-	function editarBeneficiario(id) {
-		window.location.href = "/remesas.edit/"+id;
+	function editarBeneficiario(id,pais) {
+		window.location.href = "/remesas.edit/"+id+"/"+pais;
       };
 
 	  function remesa(id,primerNombre,primerApellido,segundoApellido,telefono,
 	  telefonoCasa,identificacion,alternativoNombre,alternativoApellido,alternativoSegundoApellido,
-	  calle,no,entre,y,apto,edificio,reparto,provincia,municipio,idCliente) {
+	  calle,no,entre,y,apto,edificio,reparto,provincia,municipio,idCliente,nombre,apellido) {
 
 		    $("#primerNombre").text(primerNombre+' '+primerApellido+' '+primerApellido);
 		    $("#telefono").text(telefono);
@@ -175,58 +183,64 @@ $( "#add" ).click(function() {
             }
         });
 
+			$( "#total" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
+            });
+
+
 			$( "#monto" ).change(function() {
 				
-				if($( "#monto" ).val() <= 100){
-								
-				if($("#provincia").text() == 'LA HABANA'){
+				if($('#monedasRecibir').val() == "0")
+				{}else{
 
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(5));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(8));
-				
-				}}else{ 
-				
-					if($("#provincia").text() == 'LA HABANA'){
-
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.08 ));
-
-				}}
-
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/recibir/"
+			+$('#monedasRecibir').val()+"/"+$('#monto').val()+"/"+{{pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#total').val(data);
+            }
+        });
+	}
             });
 
 
-			$( "#total" ).change(function() {
-
-				if($( "#total" ).val() <= 100){
-								
-				if($("#provincia").text() == 'LA HABANA'){
-
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(5));
+			$( "#monedasRecibir" ).change(function() {
 				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(8));
-				
-				}}else{ 
-				
-					if($("#provincia").text() == 'LA HABANA'){
+				if($('#monedasRecibir').val() == "0")
+				{}else{
 
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.08 ));
-
-				}}
-
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
             });
+
+
+			
 
 
 		    $( "#dialog-monto" ).dialog({width: 500});
@@ -234,14 +248,16 @@ $( "#add" ).click(function() {
 
 			$( "#boton-enviar" ).click(function() {
 
-				if($( "#total" ).val() > 0){
+				if($( "#total" ).val() > 17){
 
 					let monto =	$( "#total" ).val();
-					window.location.href = "/remesas.carrito/"+id+"/"+monto+"/"+idCliente;
+					let recibir =	$( "#monto" ).val();
+					window.location.href = "/remesas.carrito/"+id+"/"+monto+"/"+recibir+"/"
+					+idCliente+"/"+nombre+'/'+apellido+'/'+$('#monedasRecibir').val()+'/'+{{pais}};
 				}else {
 
-					 $("#mensaje-monto").text("Ingrese un Monto");
-					  $("#mensaje-monto").css({"color": "red"});
+					 $("#mensaje-monto").text("Monto Minimo A Pagar $18");
+					  $("#mensaje-monto").css({"color": "red"}); 
 				}
        });
            
