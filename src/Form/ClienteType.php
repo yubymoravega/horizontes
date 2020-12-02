@@ -17,7 +17,7 @@ class ClienteType extends AbstractType
         $builder
             ->add('nombre')
             ->add('apellidos')
-            ->add('correo')
+            ->add('correo ',null, ['required'=> false])
             ->add('direccion')
            // ->add('token')
             //->add('fecha')
