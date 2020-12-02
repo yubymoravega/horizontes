@@ -132,27 +132,27 @@ $("#form_cliente").validate({
 
 $("#edit-nombre").click(function(){ 
   $('#cliente_nombre').prop("disabled", false);
-  $('#cliente_nombre').css('background-color', 'white');
+  $('#cliente_nombre').css('background-color', 'white !important');
   });
 
 $("#edit-apellidos").click(function(){ 
   $('#cliente_apellidos').prop("disabled", false);
-  $('#cliente_apellidos').css('background-color', 'white'); 
+  $('#cliente_apellidos').css('background-color', 'white !important'); 
   });
 
 $("#edit-correo").click(function(){ 
-  $('#cliente_correo').prop("disabled", false);
-  $('#cliente_correo').css('background-color', 'white');
+  $('#cliente_correo').prop("disabled", false); 
+  $('#cliente_correo').css('background-color', 'white !important !important');
   });
 
   $("#edit-direccion").click(function(){ 
   $('#cliente_direccion').prop("disabled", false);
-  $('#cliente_direccion').css('background-color', 'white');
+  $('#cliente_direccion').css('background-color', 'white !important');
   });
 
   $("#edit-comentario").click(function(){ 
   $('#cliente_comentario').prop("disabled", false);
-  $('#cliente_comentario').css('background-color', 'white');
+  $('#cliente_comentario').css('background-color', 'white !important');
   });
 
 
@@ -162,32 +162,32 @@ $( document ).ready(function() {
 
   if($('#cliente_telefono').is(':disabled')){
 
-    $('#cliente_telefono').css('background-color', '#b3b3b3');
+    $('#cliente_telefono').css('background-color', '#b3b3b3 !important');
   }
 
    if($('#cliente_nombre').is(':disabled')){
 
-    $('#cliente_nombre').css('background-color', '#b3b3b3');
+    $('#cliente_nombre').css('background-color', '#b3b3b3 !important');
   }
 
  if($('#cliente_apellidos').is(':disabled')){
 
-    $('#cliente_apellidos').css('background-color', '#b3b3b3' );
+    $('#cliente_apellidos').css('background-color', '#b3b3b3 !important' );
   }
 
  if($('#cliente_correo').is(':disabled')){
 
-    $('#cliente_correo').css('background-color', '#b3b3b3');
+    $('#cliente_correo').css('background-color', '#b3b3b3 !important');
   }
 
  if($('#cliente_direccion').is(':disabled')){
 
-    $('#cliente_direccion').css('background-color', '#b3b3b3 ');
+    $('#cliente_direccion').css('background-color', '#b3b3b3 !important');
   }
 
  if($('#cliente_comentario').is(':disabled')){
 
-    $('#cliente_comentario').css('background-color', '#b3b3b3');
+    $('#cliente_comentario').css('background-color', '#b3b3b3 !important');
   }
 
 });

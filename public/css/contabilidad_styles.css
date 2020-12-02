@@ -118,9 +118,10 @@ input[type=number] {
     background-color: rgba(0, 0, 0, .075);
 }
 
+/* Comentado por jose miguel Cambia el tamano de todos los imput de la aplicacion
 .input-group.input-group-sm .form-control {
     height: 31px !important;
-}
+}*/
 
 input#from {
     margin-right: 10px;
