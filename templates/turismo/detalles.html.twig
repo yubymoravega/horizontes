@@ -6,37 +6,102 @@
 
     <h1 class="text-reporte">Solicitud {{cliente.nombre }} {{cliente.apellidos}}</h1>
 
-   <!-- Classic Vertical Tabs-->
-      <section class="section novi-background section-66">
+<section class="section novi-background section-66 ">
         <div class="container">
-          <h1>Classic Vertical Tabs</h1>
-          <hr class="divider bg-mantis">
-          <div class="offset-md-top-66 text-left">
-            <!-- Responsive-tabs-->
-            <div class="responsive-tabs responsive-tabs-classic responsive-tabs-classic-vertical" data-type="vertical">
-              <ul class="resp-tabs-list tabs-group-default" data-group="tabs-group-default">
-                <li>Toolkit Core</li>
-                <li>UI Kit</li>
-                <li>Plugins</li>
-                <li>Documentation</li>
+          <div>
+          
+            <hr class="divider divider bg-mantis">
+          </div>
+          <div class="row justify-content-center text-left offset-top-30 offset-lg-top-20">
+            <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0">
+              <!--Default List-->
+              <h4 style="color: white; text-align: left;">Vuelo</h4>
+              <ul style="color: white; " class="list  list-marked">
+                <li><strong>Adutos:</strong>  {{solicitud.vueloCantidadAdultos}}</li>
+                <li><strong>Niños:</strong>  {{solicitud.vueloCantidadNinos}}</li>
+                <li><strong>Origen:</strong>  {{solicitud.vueloOrigen}}</li>
+                <li><strong>Destino:</strong>  {{solicitud.vueloDestino}}</li>
+                <li><strong>Fecha:</strong>  {{solicitud.vueloIda}}</li>
+                <li><strong>Retorno:</strong>  {{solicitud.vueloVuelta}}</li>
+                <li><strong>Comentario:</strong>  {{solicitud.vueloComentario}}</li>
               </ul>
-              <div class="resp-tabs-container tabs-group-default" data-group="tabs-group-default">
-                <div>
-                  <p class="big font-weight-bold">Our professional services are the keys to your success</p>
-                  <p>Nowadays, almost everyone has a website. Basically, this is a business card that you present every visitor or partner with. So, the better it is designed the more likely you can expect your further cooperation. The content on your website is important as well.</p>
-                  <p>The information should be not only well-organized and easy to read, but it should be also presented in a visually pleasing manner, thus making the process of reading an enjoyable journey. Adorn posts with bold imagery, and users will get more interested and involved.</p>
-                </div>
-                <div>
-                  <p>The information should be not only well-organized and easy to read, but it should be also presented in a visually pleasing manner, thus making the process of reading an enjoyable journey. Adorn posts with bold imagery, and users will get more interested and involved.</p>
-                </div>
-                <div>
-                  <p>Nowadays, almost everyone has a website. Basically, this is a business card that you present every visitor or partner with. So, the better it is designed the more likely you can expect your further cooperation. The content on your website is important as well.</p>
-                </div>
-                <div>
-                  <p>Nowadays, almost everyone has a website. Basically, this is a business card that you present every visitor or partner with. So, the better it is designed the more likely you can expect your further cooperation. The content on your website is important as well.</p>
-                  <p></p>The information should be not only well-organized and easy to read, but it should be also presented in a visually pleasing manner, thus making the process of reading an enjoyable journey. Adorn posts with bold imagery, and users will get more interested and involved.
-                </div>
-              </div>
+            </div>
+            <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0 offset-top-30 offset-lg-top-0">
+               <h4 style="color: white; text-align: left;">Hotel</h4>
+             <ul style="color: white; " class="list  list-marked">
+                <li><strong>Desde:</strong>  {{solicitud.hotelDesde}}</li> 
+				 <li><strong>Hasta:</strong>  {{solicitud.hotelHasta}}</li>
+				 <li><strong>Adultos:</strong>  {{solicitud.hotelAdultos}}</li>
+				 <li><strong>Niños:</strong>  {{solicitud.hotelNinos}}</li>
+				<li><strong>Destino:</strong>  {{solicitud.hotelDestino}}</li>
+                <li><strong>Nombre Hotel:</strong>  {{solicitud.hotelNombre}}</li>
+                <li><strong>Categoria:</strong>  {{solicitud.hotelCategoria}}</li>
+                <li><strong>Hotel Plan:</strong>  {{solicitud.hotelPlan}}</li>
+                <li><strong>Comentario:</strong>  {{solicitud.HotelComentario}}</li>
+              
+              </ul>
+            </div>
+            <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0 offset-top-30 offset-lg-top-0">
+             <h4 style="color: white; text-align: left;">Transfer</h4>
+             <ul style="color: white; " class="list  list-marked">
+              <li><strong>Adultos:</strong>  {{solicitud.tramferAdultos}}</li>
+			  <li><strong>Niños:</strong>  {{solicitud.tramferNinos}}</li>
+			    <li><strong>Ida & Vuelta:</strong>  {{solicitud.tramferIdaVuelta}}</li>
+			  <li><strong>LLegada:</strong>  {{solicitud.tranferLlegada}}</li>
+              <li><strong>Salida:</strong>  {{solicitud.tramferSalida}}</li>
+              <li><strong>Lugar:</strong>  {{solicitud.tramferLugar}}</li>
+              <li><strong>Destino:</strong>  {{solicitud.tramferDestino}}</li>
+              <li><strong>Vehiculo:</strong>  {{solicitud.tramferVehiculo}}</li>
+              <li><strong>Comentario:</strong>  {{solicitud.tramferComentario	}}</li>
+               
+              </ul>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <section class="section novi-background section-66 ">
+        <div class="container">
+          <div>
+          </div>
+          <div class="row justify-content-center text-left offset-top-30 offset-lg-top-20">
+            <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0">
+              <!--Default List-->
+              <h4 style="color: white; text-align: left;">Tours</h4>
+              <ul style="color: white; " class="list  list-marked">
+                <li><strong>Nombre:</strong>  {{solicitud.tourNombre}}</li>
+                <li><strong>Fecha:</strong>  {{solicitud.tourFecha}}</li>
+                <li><strong>Adultos:</strong> </li>
+                <li><strong>Niños:</strong>  </li>
+                 <li><strong>Comentario:</strong>  {{solicitud.tourComentario}}</li>
+               
+              </ul>
+            </div>
+            <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0 offset-top-30 offset-lg-top-0">
+              <h4 style="color: white; text-align: left;">Rent Car</h4>
+             <ul style="color: white; " class="list  list-marked">
+              <li><strong>Vehiculo:</strong>  {{solicitud.rentTipoVehiculo}}</li>
+              <li><strong>Recogida:</strong>  {{solicitud.rentLugarRecogida}}</li>
+              <li><strong>Entrega:</strong>  {{solicitud.rentLugarEntrega}}</li>
+              <li><strong>Desde:</strong>  {{solicitud.rentFechaDesde}}</li>
+              <li><strong>Hasta:</strong>  {{solicitud.rentFechaHasta}}</li>
+			   <li><strong>Cantidad Personas:</strong>  {{solicitud.rentCantidadPersonas}}</li>
+              <li><strong>Comentario:</strong>  {{solicitud.rentComentario	}}</li>
+               
+              </ul>
+            </div>
+            <div class="col-md-8 col-md-offset-2 col-lg-4 col-lg-offset-0 offset-top-30 offset-lg-top-0">
+             <h4 style="color: white; text-align: left;">Datos</h4>
+             <ul style="color: white; " class="list  list-marked">
+              <li><strong>Feha Solicitud:</strong>  {{solicitud.fechaSolicitud |date("m/d/Y H:i:s A")}}</li>
+              <li><strong>Nombre:</strong> {{cliente.nombre }} {{cliente.apellidos}}</li>
+              <li><strong>Correo:</strong> {{cliente.correo }} </li>
+              <li><strong>Telefono:</strong>  {{solicitud.idCliente}}</li>
+              <li><strong>Estado:</strong>  {{solicitud.stado}}</li>
+              <li><strong>Usuario:</strong>  {{solicitud.empleado}}</li>
+
+              </ul>
             </div>
           </div>
         </div>
