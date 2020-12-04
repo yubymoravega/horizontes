@@ -139,10 +139,9 @@ class TurismoController extends AbstractController
 
         $solicitud = new SolicitudTurismo();
         $user =  $this->getUser();
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
         
-
         $dataBase = $this->getDoctrine()->getManager();
 
         $formulario = $this->createForm(
@@ -272,8 +271,8 @@ class TurismoController extends AbstractController
         $renteLugarRecogida = $dataBase->getRepository(RentRecogida::class)->findAll();
 
         $user =  $this->getUser();
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
         
         $formulario = $this->createForm(
             SolicitudTurismoType::class,
@@ -455,9 +454,7 @@ class TurismoController extends AbstractController
         $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id]);
         $cliente = $dataBase->getRepository(Cliente::class)->findBy(["telefono"=>$solicitud->getIdCliente()]);
         
-
         return $this->render('turismo/detalles.html.twig',['comentarios' => $comentario,'solicitud' => $solicitud,'cliente' => $cliente[0]]);
-        
     }
 
     /**
@@ -469,9 +466,9 @@ class TurismoController extends AbstractController
         $newComenatario = new SolicitudTurismoComentario();
        
         $user =  $this->getUser();
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
-
+        $date = new DateTime('NOW');
+        
         $newComenatario->setIdSolicitudTurismo($id);
         $newComenatario->setFecha($date); 
         $newComenatario->setEmpleado($user->getUsername()); 
