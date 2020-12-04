@@ -594,7 +594,7 @@ class FacturaController extends AbstractController
     public function facturaPdf($id, Pdf $pdf){
 
         $dataBase = $this->getDoctrine()->getManager();
-        $factura = $dataBase->getRepository(Factura::class)->find($id);
+        $factura = $dataBase->getRepository(FacturaNoContable::class)->find($id);
 
         $json = json_decode($factura->getJson());
 
