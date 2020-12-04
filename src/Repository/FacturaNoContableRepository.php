@@ -16,7 +16,7 @@ class FacturaNoContableRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Factura::class);
+        parent::__construct($registry, FacturaNoContable::class);
     }
 
     // /**
