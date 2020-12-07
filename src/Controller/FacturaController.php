@@ -312,8 +312,9 @@ class FacturaController extends AbstractController
             $contador++;
         }
 
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
+        
 
         $Cotizacion = new Cotizacion();
 
@@ -440,6 +441,17 @@ class FacturaController extends AbstractController
                       ]);
 
                       $json[$contador]->mOrderNo = ($respuesta->mOrderNo) ? ($respuesta->mOrderNo) : "Tienda sin balance";
+
+                      if(  $json[$contador]->mOrderNo == "Tienda sin balance"){
+
+                        $this->addFlash(
+                            'error',
+                            'TIENDA SIN BALANCE'
+                        );
+            
+                        return $this->redirectToRoute('factura/nobalance');
+                      }
+
                       $json[$contador]->direcion = $direcion;
                       $json[$contador]->respueta = $respuesta; 
                       $json[$contador]->fecha = $date; 
@@ -566,10 +578,27 @@ class FacturaController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
+        $json = json_decode($cotizacion->getJson());
+
+        $con = count($json);
+        $contador = 0;
+
+        while($contador < $con){
+
+            if(!isset($json[$contador]->mOrderNo) ){
+
+                return $this->render('factura/paginacerrada.html.twig');
+               
+                }
+
+                $contador++;
+        }
+
+
         date_default_timezone_set('America/Santo_Domingo');
         $date = new DateTime('NOW');
         
-        $html = $this->renderView("factura//cash.html.twig",['json' => \json_decode($cotizacion->getJson())]);
+        $html = $this->renderView("factura/cash.html.twig",['json' => \json_decode($cotizacion->getJson())]);
        
         $filename = 'factura.pdf';
 
@@ -628,7 +657,6 @@ class FacturaController extends AbstractController
         $contador = 0;
         $data = null;
 
-
         while($contador < $con){
 
             if( $json[$contador]->respueta->mOrderNo == $cf){
@@ -637,7 +665,7 @@ class FacturaController extends AbstractController
             }
 
             $contador++;
-        }
+        } 
 
         $html = $this->renderView("factura/servicios.html.twig",
         ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $data,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
@@ -658,13 +686,13 @@ class FacturaController extends AbstractController
 
 
     /**
-     * @Route("factura/email/", name="factura/email")
+     * @Route("factura/nobalance/", name="factura/nobalance")
      */
-    public function email(){
+    public function nobalance(){
 
       
        
-        return new Response('enviado');
+        return $this->render('factura/nobalance.html.twig');
        
     }
 
