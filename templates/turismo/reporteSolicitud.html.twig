@@ -55,7 +55,7 @@
               <td>{{ data.idCliente  }} <br> {{ data.nombreCliente  }}</td>
                 <td>
 				
-				{% if  data.stado == "Atendida"  %}
+				{% if  data.stado %}
               {{ data.stado  }}  <br> {{ data.empleadoStatus  }} 
 
             {% else %}
@@ -98,6 +98,32 @@
       <div class="count contador">Transacciones: {{ pagination.getTotalItemCount }} </div>
 	</div>
 </div></div></div></section>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Cambiar Estado</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <select id="selectEstatus" name="selectEstatus" class="form-control">
+  <option value="Pendiente">Pendiente</option>
+  <option value="En Proceso">En Proceso</option>
+  <option value="Finalizada">Finalizada</option>
+</select>
+      </div>
+      <div class="modal-footer">
+        
+        <button type="button" id="guardarEstado" data-dismiss="modal" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -182,8 +208,19 @@ function edit(id) {
 }
 
 function status(id) {
-  window.location.href ="/turismo/status/"+id;
+  
+
+  $('#exampleModalCenter').modal('show'); // abrir
+
+  $("#guardarEstado").click(function(){
+  
+  //alert("asdasd");
+	window.location.href ="/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text();
+
+});
 }
+
+
 
  function borrar(id) {
     $('#confirm__modal').modal('show')

@@ -1323,9 +1323,9 @@ class TurismoController extends AbstractController
     }
 
     /**
-     * @Route("turismo/status/{id}", name="turismo/status/")
+     * @Route("turismo/status/{id}/{status}", name="turismo/status/")
      */
-    public function status($id)
+    public function status($id,$status)
     {
         $dataBase = $this->getDoctrine()->getManager();
        
@@ -1333,14 +1333,14 @@ class TurismoController extends AbstractController
 
         $user =  $this->getUser();
 
-        $data->setStado("Atendida");
+        $data->setStado($status);
         $data->setEmpleadoStatus($user->getUsername());
 
         $dataBase->flush($data);
 
         $this->addFlash(
             'success',
-            'Solicitud Atendida'
+            'Cambio de estatus'
         );
 
      
