@@ -56,6 +56,23 @@ class Unidad
      */
     private $correo;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=CategoriaCliente::class)
+     */
+    private $id_categoria_cliente;
+
+    public function getIdCategoriaCliente(): ?CategoriaCliente
+    {
+        return $this->id_categoria_cliente;
+    }
+
+    public function setIdCategoriaCliente(?CategoriaCliente $id_categoria_cliente): self
+    {
+        $this->id_categoria_cliente = $id_categoria_cliente;
+
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

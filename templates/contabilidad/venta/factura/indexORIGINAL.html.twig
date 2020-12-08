@@ -270,7 +270,7 @@
              *  ------------------------- Init -----------------------------------------
              */
 
-            $('select').prepend(`<option value = 0 selected=false disabled> --- seleccine --- </option>`)
+            $('select').prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
             $('select').val(0)
 
             const form_factura = $('#form_factura')
@@ -427,7 +427,7 @@
                                     break;
                             }
                             subcuenta.find('option').remove()
-                            subcuenta.prepend(`<option value = 0 selected=false disabled> --- seleccine --- </option>`)
+                            subcuenta.prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
                             result.data.forEach(el => subcuenta.append(`<option value="${el.nro_subcuenta}">${el.nombre}</option>`))
 
                         } else {

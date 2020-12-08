@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\General;
 
+use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
@@ -116,7 +117,6 @@ class CuentasComprobanteOperacionesType extends AbstractType
                         ->andWhere('u.id_unidad = :val')
                         ->setParameter('val', $this->id_unidad);
                 }
-
             ])
             ->add('orden_trabajo', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
@@ -147,12 +147,16 @@ class CuentasComprobanteOperacionesType extends AbstractType
                         ->andWhere('u.id = :val')
                         ->setParameter('val', $this->id_unidad);
                 }
-            ))
-            ->add('cliente', ChoiceType::class, array(
+            ))->add('tipo_cliente', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
+                'label' => 'Tipo cliente',
+                'choices' => ClientesAdapter::getTypeClientes()
+            ])
+            ->add('cliente', ChoiceType::class, [
+                'attr' => ['class' => 'w-100'],
+                'choice_value' => 'id',
                 'label' => 'Cliente',
-                'choice_label' => 'cliente',
-            ))
+            ])
             ->add('proveedor', EntityType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Proveedor',

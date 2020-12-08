@@ -1,4 +1,4 @@
-{% extends 'contabilidad/contabilidad/general/index.html.twig' %}
+{% extends 'contabilidad/inventario/index.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -8,9 +8,9 @@
 {% endblock %}
 
 {% block content %}
-    <div class="modal fade" id="cerrarDia" tabindex="-1" role="dialog" data-backdrop="static"
+    <div class="modal fade" id="notify" tabindex="-1" role="dialog" data-backdrop="static"
          data-keyboard="false"
-         aria-labelledby="cerrarDiaLabel" aria-hidden="true">
+         aria-labelledby="notifyLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-dark">
@@ -23,7 +23,7 @@
                     {{ message }}
                 </div>
                 <div class="modal-footer">
-                    <a type="button" name="btn_generar" href="{{ url('general') }}"
+                    <a type="button" name="btn_generar" href="{{ url('contabilidad_general_comprobante_operaciones') }}"
                        class="btn btn-outline-secondary text-uppercase mt-2 font-weight-bold">
                         Aceptar
                     </a>
@@ -37,9 +37,7 @@
     {{ parent() }}
     <script>
         $(document).ready(function () {
-            $('#cerrarDia').modal('show')
+            $('#notify').modal('show')
         })
-
-
     </script>
 {% endblock %}

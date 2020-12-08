@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Venta;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\CuentasCliente;
@@ -40,7 +41,10 @@ class ClienteContabilidadController extends AbstractController
                 'fax' => $item->getFax(),
                 'telefonos' => $item->getTelefonos(),
                 'correos' => $item->getCorreos(),
-                'direccion' => $item->getDireccion()
+                'direccion' => $item->getDireccion(),
+                'categoria' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getNombre():'',
+                'id_categoria' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getId():'',
+                'prefijo' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getPrefijo():'',
             );
         }
         $paginator = $pagination->paginate(

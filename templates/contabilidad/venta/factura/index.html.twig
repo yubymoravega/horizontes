@@ -67,12 +67,9 @@
             {# --------- Datos de la venta --------------#}
             <div class="card-body">
                 {{ form_start(form_factura,{'attr': {'class': 'text-left','id':'form_factura','method':'POST'}}) }}
-                {#                {{ form_widget(form_factura.nro_factura, {'arrt':{'type':'hidden'}}) }}#}
                 <div class="row mt-0 p-0">
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                     <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
-{#                        {{ form_label(form_factura.fecha_factura) }}#}
-{#                        {{ form_widget(form_factura.fecha_factura) }}#}
                         <label for="factura_fecha_factura"> Fecha de la factura</label>
                         <input type="text" value="{{ fecha }}" id="factura_fecha_factura" name="factura[fecha_factura]" class="w-100 form-control" readonly="readonly">
                     </div>
@@ -93,6 +90,16 @@
                     <div class="col-4 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.ncf) }}
                         {{ form_widget(form_factura.ncf) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0 mb-3">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.id_moneda) }}
+                        {{ form_widget(form_factura.id_moneda) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.id_termino_pago) }}
+                        {{ form_widget(form_factura.id_termino_pago) }}
                     </div>
                 </div>
                 {{ form_end(form_factura) }}
@@ -260,7 +267,7 @@
              *  ------------------------- Init -----------------------------------------
              */
 
-            $('select').prepend(`<option value = 0 selected=false disabled> --- seleccine --- </option>`)
+            $('select').prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
             $('select').val(0)
 
             const form_factura = $('#form_factura')
@@ -302,7 +309,8 @@
                     'factura[tipo_cliente]': "required",
                     'factura[id_cliente]': "required",
                     'factura[ncf]': "required",
-
+                    'factura[id_moneda]': "required",
+                    'factura[id_termino_pago]': "required"
                 },
                 messages: {
                     'factura[nro_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -310,7 +318,8 @@
                     'factura[tipo_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[ncf]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-
+                    'factura[id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[id_termino_pago]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
             form_movimientoventa.validate({
@@ -364,6 +373,8 @@
             /** obtener los clientes por el tipo cliente seleccionado */
             cbx_tipoCliente.on('change', function () {
                 cbx_cliente.find('option').remove()
+                cbx_cliente.prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
+
                 loadingModal.show()
                 $.ajax({
                     url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
@@ -377,6 +388,30 @@
                             cbx_cliente
                         } else {
 
+                        }
+                        loadingModal.close()
+                    },
+                    error: function () {
+                    }
+                })
+            })
+            cbx_cliente.on('change', function () {
+                $('#factura_ncf').val('')
+                loadingModal.show()
+                let params = {
+                    tipo_cliente: $('#factura_tipo_cliente').val(),
+                    cliente: $(this).val()
+                }
+                $.ajax({
+                    url: '/contabilidad/venta/factura/getNcf',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: params,
+                    success: function (result) {
+                        if (result.success) {
+                            $('#factura_ncf').val(result.prefijo+result.consecutivo)
+                        } else {
+                            $('#factura_ncf').val('-sin resultado-')
                         }
                         loadingModal.close()
                     },
@@ -445,7 +480,6 @@
             /** Adicionar mercancias */
             btn_adicionarMercancia.click(function (event) {
                 if (form_movimientoventa.valid()) {
-
                     const tipo = cbx_tipo.val()
                     const codigo = txt_codigoMercancia.val()
                     const descripcion = txt_descripMercancia.val()

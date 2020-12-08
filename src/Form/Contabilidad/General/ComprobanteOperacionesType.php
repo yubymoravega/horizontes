@@ -17,7 +17,6 @@ class ComprobanteOperacionesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('cuentas_comprobantes', CuentasComprobanteOperacionesType::class)
             ->add('tipo_comprobante', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Tipo de comprobante',
@@ -31,9 +30,9 @@ class ComprobanteOperacionesType extends AbstractType
                         ->where('u.activo = true');
                 }
             ])
-            ->add('nro_comprobante', NumberType::class, [
-                'attr' => ['class' => 'w-100'],
-            ])
+//            ->add('nro_comprobante', NumberType::class, [
+//                'attr' => ['class' => 'w-100'],
+//            ])
             ->add('documento', TextType::class,[
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Documento',

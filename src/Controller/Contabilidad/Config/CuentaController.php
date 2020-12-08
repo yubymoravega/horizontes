@@ -202,7 +202,8 @@ class CuentaController extends AbstractController
         /** @var Cuenta $cuenta */
         $cuenta = $form->getData();
         $errors = $validator->validate($cuenta);
-        if ($form->isValid() && $form->isSubmitted()) {
+//        if ($form->isValid() && $form->isSubmitted()) {
+        if ($form->isSubmitted()) {
             try {
                 $naturaleza = $request->get('cuenta')['deudora'];
                 $field_deudora = true;

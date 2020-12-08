@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\CategoriaCliente;
 use App\Repository\Contabilidad\Venta\ClienteContabilidadRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
@@ -58,6 +59,11 @@ class ClienteContabilidad
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CategoriaCliente::class)
+     */
+    private $id_categoria_cliente;
 
     public function getId(): ?int
     {
@@ -144,6 +150,18 @@ class ClienteContabilidad
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getIdCategoriaCliente(): ?CategoriaCliente
+    {
+        return $this->id_categoria_cliente;
+    }
+
+    public function setIdCategoriaCliente(?CategoriaCliente $id_categoria_cliente): self
+    {
+        $this->id_categoria_cliente = $id_categoria_cliente;
 
         return $this;
     }

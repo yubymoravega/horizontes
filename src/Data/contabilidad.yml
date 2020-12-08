@@ -47,6 +47,37 @@ configuraciones:
       name: "COMPROBANTE DE OPERACIONES"
       abreviatura: "00"
 
+  categorias:
+    - id: 1
+      name: "Personas Naturales"
+      prefijo: "B01"
+    - id: 2
+      name: "Instituciones"
+      prefijo: "B02"
+
+  termino_pago:
+    - id: 1
+      name: "Contra servicio"
+    - id: 2
+      name: "A 7 días"
+    - id: 3
+      name: "A 15 días"
+    - id: 4
+      name: "A 30 días"
+    - id: 5
+      name: "A 45 días"
+
+  servicios:
+    - id: 1
+      name: "Boletos Avión"
+      codigo: "0010"
+    - id: 2
+      name: "Remesa"
+      codigo: "0020"
+    - id: 3
+      name: "Paqueteria"
+      codigo: "0030"
+
   tipo_movimiento:
     - id: 1
       name: "APERTURA"
