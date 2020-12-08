@@ -1,5 +1,39 @@
 {% extends 'base.html.twig' %}
 {% block content %}
+    {#    ----------- Modal de la cancelacion -----------#}
+    <div class="modal fade" id="cancel_modal" data-backdrop="static" data-keyboard="false"
+         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark-app">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-white" id="cancel_modal__title"><i
+                                class="fa fa-warning text-warning"></i>
+                        Cancelar factura</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form__cancel_modal"
+                      class="p-2">
+                    <div class="modal-body text-white" id="cancel_modal__body">
+                        ¿Está seguro que desea cancelar la factura seleccionada? Explique el motivo de la cancelación.
+                    </div>
+                    <input type="hidden" name="nro" value="{{ form_factura.nro_factura }}">
+                    <textarea name="explicacion" id="explicacion" cols="30" rows="5"
+                              class="form form-control bg-dark text-white"></textarea>
+                    <div class="modal-footer">
+                        <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">
+                            Salir
+                        </button>
+                        <button type="button" class="my-0 btn btn-danger" id="btn_cancelar_factura">
+                            <i class="fa fa-trash text-white"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
 
@@ -46,36 +80,72 @@
                                class="w-100 form-control" readonly="readonly">
                     </div>
                 </div>
+                <div class="row mt-0 p-0 mb-3">
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        <label for="contrato">Moneda</label>
+                        <input type="text" value="{{ form_factura.moneda }}" id="contrato" name=""
+                               class="w-100 form-control" readonly="readonly">
+                    </div>
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        <label for="ncf">Término de pago</label>
+                        <input type="text" value="{{ form_factura.termino_pago }}" id="ncf" name=""
+                               class="w-100 form-control" readonly="readonly">
+                    </div>
+                </div>
 
 
                 {# --------- Venta de Mercancias o Productos --------------#}
                 <div class="mt-3">
                     <table class="table-small-rows table table-hover text-light">
-                        <thead class="thead-dark">
-                        <th style="width: 85px;">Tipo</th>
-                        <th style="width: 50px;">Codigo</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Sub-Total</th>
-                        <th>Impuesto</th>
-                        <th>Total</th>
-                        </thead>
+                        {% if servicio %}
+                            <thead class="thead-dark">
+                            <th style="width: 85px;">Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Sub-Total</th>
+                            <th>Impuesto</th>
+                            <th>Total</th>
+                            </thead>
+                        {% else %}
+                            <thead class="thead-dark">
+                            <th style="width: 85px;">Tipo</th>
+                            <th style="width: 50px;">Codigo</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Sub-Total</th>
+                            <th>Impuesto</th>
+                            <th>Total</th>
+                            </thead>
+                        {% endif %}
                         <tbody id="rows_mercancias">
-                        {% for mercancia in mercancias %}
-                            <tr>
-                                {% if mercancia.mercancia %}
-                                    <td style="width: 85px; font-weight: 400"> Mercancía</td>
-                                {% else %}
-                                    <td style="width: 85px; font-weight: 400"> Producto</td>
-                                {% endif %}
-                                <td style="width: 50px; text-align: center;"> {{ mercancia.codigo }}</td>
-                                <td style="text-align: center;"> {{ mercancia.cantidad }}</td>
-                                <td style="text-align: right;"> {{ mercancia.precio|number_format(2) }}</td>
-                                <td style="text-align: right;"> {{ (mercancia.cantidad * mercancia.precio)|number_format(2) }}</td>
-                                <td style="text-align: right;"> {{ mercancia.descuentoRecarga|number_format(2) }}</td>
-                                <td style="text-align: right;"> {{ (mercancia.cantidad * mercancia.precio+mercancia.descuentoRecarga)|number_format(2) }}</td>
-                            </tr>
-                        {% endfor %}
+                        {% if servicio %}
+                            {% for mercancia in mercancias %}
+                                <tr>
+                                    <td style="width: 85px; font-weight: 400"> Servicio</td>
+                                    <td style="text-align: center;"> {{ mercancia.cantidad }}</td>
+                                    <td style="text-align: right;"> {{ mercancia.precio|number_format(2) }}</td>
+                                    <td style="text-align: right;"> {{ (mercancia.cantidad * mercancia.precio)|number_format(2) }}</td>
+                                    <td style="text-align: right;"> {{ mercancia.impuesto|number_format(2) }}</td>
+                                    <td style="text-align: right;"> {{ (mercancia.cantidad * mercancia.precio+mercancia.impuesto)|number_format(2) }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            {% for mercancia in mercancias %}
+                                <tr>
+                                    {% if mercancia.mercancia %}
+                                        <td style="width: 85px; font-weight: 400"> Mercancía</td>
+                                    {% else %}
+                                        <td style="width: 85px; font-weight: 400"> Producto</td>
+                                    {% endif %}
+                                    <td style="width: 50px; text-align: center;"> {{ mercancia.codigo }}</td>
+                                    <td style="text-align: center;"> {{ mercancia.cantidad }}</td>
+                                    <td style="text-align: right;"> {{ mercancia.precio|number_format(2) }}</td>
+                                    <td style="text-align: right;"> {{ (mercancia.cantidad * mercancia.precio)|number_format(2) }}</td>
+                                    <td style="text-align: right;"> {{ mercancia.descuentoRecarga|number_format(2) }}</td>
+                                    <td style="text-align: right;"> {{ (mercancia.cantidad * mercancia.precio+mercancia.descuentoRecarga)|number_format(2) }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -86,17 +156,17 @@
                            class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="myOnDeleteConfirm()">cancelar</button>
+                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="myOnDeleteConfirm()">cancelar
+                        </button>
                     </div>
                     <div class="ml-2">
-                        <a href="{{ url('print_factura',{nro: form_factura.nro_factura}) }}" target="_blank" class="btn btn-secondary" id="btn_salir">imprimir</a>
+                        <a href="{{ url('print_factura',{nro: form_factura.nro_factura}) }}" target="_blank"
+                           class="btn btn-secondary" id="btn_salir">imprimir</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
@@ -105,31 +175,42 @@
         /** cancelar la factura */
         const myOnDeleteConfirm = function () {
             const txt_nroFactura = $('#nro_factura')
+            let explicacion = $('#explicacion').val();
+            $('#cancel_modal').modal('show')
+            $('#cancel_modal__body').text('¿Está seguro que desea cancelar la factura Nro.' + txt_nroFactura.val() + '? Explique el motivo de la cancelación.')
 
-            $('#confirm__modal').modal('show')
-            $('#confirm__modal__title').html('Cancelar')
-            $('#confirm__modal__body').text('Está seguro que desea cancelar la factura Nro.' + txt_nroFactura.val() + '?')
+            $('#_token__cancel_modal').val($('#__token').val())
 
-            $('#_token__confirm__modal').val($('#__token').val())
-
-            $('#confirm__modal__btn_ok').click(function () {
-                const form = $('#form__confirm__modal')
-                $('#confirm__modal').modal('hide')
-                loadingModal.show('Cancelando...')
-                let url = '/contabilidad/venta/factura/delete/' + txt_nroFactura.val()
-                form.attr('action', url)
-                form.submit()
+            $('#btn_cancelar_factura').click(function () {
+                if ($('#explicacion').val() == '')
+                    alertTemplate('Tiene que explicar el motivo de la cancelación', 'danger');
+                else {
+                    const form = $('#form__cancel_modal')
+                    $('#confirm__modal').modal('hide')
+                    loadingModal.show('Cancelando...')
+                    let url = '/contabilidad/venta/factura/delete/' + $('#nro_factura').val()
+                    form.attr('action', url)
+                    form.submit()
+                }
             })
         }
-
+        //
+        // $('#btn_cancelar_factura').on('click', function () {
+        //     if ($('#explicacion').val() == '')
+        //         alertTemplate('Tiene que explicar el motivo de la cancelación', 'danger');
+        //     else {
+        //         loadingModal.show('Cancelando...')
+        //         const form = $('#form__cancel_modal')
+        //         $('#cancel_modal').modal('hide')
+        //         form.attr('action','/contabilidad/venta/factura/delete')
+        //         form.submit()
+        //     }
+        // })
         $(document).ready(function () {
-
             /**
              *  ------------------------- Init -----------------------------------------
              */
-
             const txt_nroFactura = $('#nro_factura')
-
             /** cargar otras facturas */
             txt_nroFactura.on('keyup', function (event) {
                 if (event.which == 13) {
@@ -144,6 +225,5 @@
             }
 
         })
-
     </script>
 {% endblock %}

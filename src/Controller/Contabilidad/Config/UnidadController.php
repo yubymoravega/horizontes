@@ -37,7 +37,10 @@ class UnidadController extends AbstractController
                 'telefono' => $item->getTelefono(),
                 'direccion' => $item->getDireccion(),
                 'id_padre' => $item->getIdPadre() ? $item->getIdPadre()->getId() : '',
-                'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : ''
+                'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : '',
+                'categoria' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getNombre():'',
+                'id_categoria' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getId():'',
+                'prefijo' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getPrefijo():'',
             );
         }
         return $this->render('contabilidad/config/unidad/index.html.twig', [

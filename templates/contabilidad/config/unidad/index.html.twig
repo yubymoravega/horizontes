@@ -32,6 +32,7 @@
             <th width="80">Código</th>
             <th scope="col-3" >Nombre</th>
             <th scope="col-3">Subordinada a</th>
+            <th scope="col-2">Categoría</th>
             <th scope="col-1">Teléfono</th>
             <th scope="col-1">Correo</th>
             <th scope="col-2">Direccion</th>
@@ -43,6 +44,7 @@
                     <td style="font-weight:400;" >{{ item.codigo }}</td>
                     <td style="font-weight:400;" >{{ item.nombre }}</td>
                     <td style="font-weight:400;" >{{ item.padre_nombre }}</td>
+                    <td style="font-weight:400;">{{ item.categoria }}</td>
                     <td style="font-weight:400;" >{{ item.telefono }}</td>
                     <td style="font-weight:400;" >{{ item.correo }}</td>
                     <td style="font-weight:400;">{{ item.direccion }}</td>
@@ -55,6 +57,7 @@
                                         nombre:'{{ item.nombre }}' ,
                                         codigo:'{{ item.codigo }}' ,
                                         correo:'{{ item.correo }}' ,
+                                        categoria: '{{ item.id_categoria }}',
                                         telefono:'{{ item.telefono }}' ,
                                         direccion:'{{ item.direccion }}' ,
                                         id: '{{ item.id }}'
@@ -95,7 +98,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {nombre = '',codigo='', id = '', telefono = '', correo = '', direccion = '', id_padre = ''} = config
+            const {nombre = '',codigo='', id = '', telefono = '', correo = '',categoria='', direccion = '', id_padre = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
@@ -107,6 +110,7 @@
             $('#unidad_telefono').val(telefono)
             $('#unidad_correo').val(correo)
             $('#unidad_direccion').val(direccion)
+            $('#unidad_id_categoria_cliente').val(categoria)
             $('#id_unidad').val(id)
         }
 
@@ -137,6 +141,7 @@
                     'unidad[telefono]': "required",
                     'unidad[correo]': "required",
                     'unidad[direccion]': "required",
+                    'unidad[id_categoria_cliente]': "required",
                 },
                 messages: {
                     'unidad[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
@@ -144,6 +149,7 @@
                     'unidad[telefono]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'unidad[correo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'unidad[direccion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'unidad[id_categoria_cliente]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {

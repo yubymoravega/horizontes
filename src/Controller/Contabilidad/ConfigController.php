@@ -51,7 +51,7 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/init",name="register-dev-rootuser")
+     * @Route("/0",name="register-dev-rootuser")
      */
     public function UserRoot(EntityManagerInterface $em, UserPasswordEncoderInterface $passEncoder)
     {

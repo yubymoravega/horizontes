@@ -120,6 +120,7 @@ class CerrarDiaController extends AbstractController
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
+//        dd($movimientos_productos_arr,$today);
         /** @var MovimientoProducto $obj_producto */
         foreach ($movimientos_productos_arr as $obj_producto) {
             if ($obj_producto->getEntrada())

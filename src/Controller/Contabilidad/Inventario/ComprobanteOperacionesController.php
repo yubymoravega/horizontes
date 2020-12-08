@@ -193,6 +193,8 @@ class ComprobanteOperacionesController extends AbstractController
             elseif ($id_tipo_documento == 10) {
                 $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_venta);
+                $datos_venta_cancelada = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_venta_cancelada);
             }
             $retur_rows [] = array(
                 'nro_doc' => $rows[0]['nro_doc'],

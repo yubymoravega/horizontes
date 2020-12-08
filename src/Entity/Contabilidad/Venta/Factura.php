@@ -2,8 +2,11 @@
 
 namespace App\Entity\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\CategoriaCliente;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\ElementoGasto;
+use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\TerminoPago;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
@@ -118,6 +121,41 @@ class Factura
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $ncf;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CategoriaCliente::class)
+     */
+    private $id_categoria_cliente;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=TerminoPago::class)
+     */
+    private $id_termino_pago;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Moneda::class)
+     */
+    private $id_moneda;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $cancelada;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $motivo_cancelacion;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Factura::class)
+     */
+    private $id_factura_cancela;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $servicio;
 
 
     public function getId(): ?int
@@ -337,6 +375,90 @@ class Factura
     public function setNcf(?string $ncf): self
     {
         $this->ncf = $ncf;
+
+        return $this;
+    }
+
+    public function getIdCategoriaCliente(): ?CategoriaCliente
+    {
+        return $this->id_categoria_cliente;
+    }
+
+    public function setIdCategoriaCliente(?CategoriaCliente $id_categoria_cliente): self
+    {
+        $this->id_categoria_cliente = $id_categoria_cliente;
+
+        return $this;
+    }
+
+    public function getIdTerminoPago(): ?TerminoPago
+    {
+        return $this->id_termino_pago;
+    }
+
+    public function setIdTerminoPago(?TerminoPago $id_termino_pago): self
+    {
+        $this->id_termino_pago = $id_termino_pago;
+
+        return $this;
+    }
+
+    public function getIdMoneda(): ?Moneda
+    {
+        return $this->id_moneda;
+    }
+
+    public function setIdMoneda(?Moneda $id_moneda): self
+    {
+        $this->id_moneda = $id_moneda;
+
+        return $this;
+    }
+
+    public function getCancelada(): ?bool
+    {
+        return $this->cancelada;
+    }
+
+    public function setCancelada(?bool $cancelada): self
+    {
+        $this->cancelada = $cancelada;
+
+        return $this;
+    }
+
+    public function getMotivoCancelacion(): ?string
+    {
+        return $this->motivo_cancelacion;
+    }
+
+    public function setMotivoCancelacion(?string $motivo_cancelacion): self
+    {
+        $this->motivo_cancelacion = $motivo_cancelacion;
+
+        return $this;
+    }
+
+    public function getIdFacturaCancela(): ?self
+    {
+        return $this->id_factura_cancela;
+    }
+
+    public function setIdFacturaCancela(?self $id_factura_cancela): self
+    {
+        $this->id_factura_cancela = $id_factura_cancela;
+
+        return $this;
+    }
+
+    public function getServicio(): ?bool
+    {
+        return $this->servicio;
+    }
+
+    public function setServicio(?bool $servicio): self
+    {
+        $this->servicio = $servicio;
 
         return $this;
     }

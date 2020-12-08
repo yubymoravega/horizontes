@@ -80,6 +80,11 @@ class RegistroComprobantes
      */
     private $tipo;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $documento;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -213,6 +218,18 @@ class RegistroComprobantes
     public function setTipo(?int $tipo): self
     {
         $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    public function getDocumento(): ?string
+    {
+        return $this->documento;
+    }
+
+    public function setDocumento(string $documento): self
+    {
+        $this->documento = $documento;
 
         return $this;
     }

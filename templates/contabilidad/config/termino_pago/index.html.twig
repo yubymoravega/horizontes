@@ -1,0 +1,38 @@
+{% extends 'contabilidad/config/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Términos de pago
+            </h4>
+        </div>
+        {# end header #}
+
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="80px">#</th>
+            <th scope="col-1" class="text-left">Nombre</th>
+            </thead>
+            <tbody>
+            {% for item in terminos %}
+                <tr>
+                    <td style="font-weight:400;" class="text-center">{{ item.numero }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}

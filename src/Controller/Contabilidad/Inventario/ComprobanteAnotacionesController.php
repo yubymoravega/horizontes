@@ -109,6 +109,7 @@ class ComprobanteAnotacionesController extends AbstractController
             'id_almacen' => $id_almacen,
             'activo' => true
         ));
+
         foreach ($arr_obj_documentos as $obj_documento) {
             $cod_almacen = $obj_documento->getIdAlmacen()->getCodigo();
             /**@var $obj_documento Documento* */
@@ -133,6 +134,10 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 9) {
                 $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_devolucion);
+            }//Factura
+            elseif ($id_tipo_documento == 10) {
+                $datos_venta = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_venta);
             }
         }
         return $rows;
@@ -247,7 +252,7 @@ class ComprobanteAnotacionesController extends AbstractController
         $paginator = $pagination->paginate(
             $rows,
             $request->query->getInt('page', $request->get("page") || 1), /*page number*/
-            15, /*limit per page*/
+            30, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
         //dd($total);
