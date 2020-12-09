@@ -52,7 +52,7 @@
 					{# table body #}
         {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ data.fechaSolicitud | date('d-M-y h:i:s A') }} </td>
+			  <td>{{ data.fechaSolicitud | date('d-M-y') }} </br> {{data.fechaSolicitud | date('h:i a') }}</td>
               <td>{{ data.idCliente  }} <br> {{ data.nombreCliente  }}</td>
               
 				{% if  data.empleadoStatus %}
