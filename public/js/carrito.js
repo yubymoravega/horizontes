@@ -1,4 +1,41 @@
 
+
+$( "#reportes" ).click(function() {
+    if($("#reportes").hasClass("opened")){
+        $( "#reportes" ).removeClass( "opened" );      
+    }else{
+        $("#reportes").addClass("opened");
+    }
+  });
+
+  $( "#servicios" ).click(function() {
+    if($("#servicios").hasClass("opened")){
+        $( "#servicios" ).removeClass( "opened" );      
+    }else{
+        $("#servicios").addClass("opened");
+    }
+  });
+
+  $( "#Configuracion" ).click(function() {
+    if($("#Configuracion").hasClass("opened")){
+        $( "#Configuracion" ).removeClass( "opened" );      
+    }else{
+        $("#Configuracion").addClass("opened");
+    }
+  });
+
+  $( "#Economia" ).click(function() {
+    if($("#Economia").hasClass("opened")){
+        $( "#Economia" ).removeClass( "opened" );      
+    }else{
+        $("#Economia").addClass("opened");
+    }
+  });
+
+$( "#icon-notification" ).click(function() {
+    window.location.href ="/turismo/reporte/solicitud/";
+  });
+
 $.ajax({
     type: 'POST',
     data: {'code' : '200'},

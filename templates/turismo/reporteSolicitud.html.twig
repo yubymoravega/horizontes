@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<section class="section novi-background section-66 section-sm-bottom-110">
 		<div class="container">
-			<h1 class="text-reporte">Turismo Solicitud De Servicio
+			<h1 class="text-reporte">Solicitud de servicio de turismo
 			</h1>
 			<hr class="divider bg-mantis">
 			<form id="payment-form" name='payment-form' action="{{ path('turismo/reporte/solicitud/') }}" method="GET">
@@ -20,7 +20,8 @@
 					<select name="estado" class="custom-select" id="estado">
 						<option value="0" selected>Estado</option>
 						<option value="Pendiente">Pendiente</option>
-						<option value="Realizada">Realizada</option>
+						<option value="En Proceso">En Proceso</option> 
+						<option value="Finalizada">Finalizada</option>
 					</select>
 					<div class="input-group-prepend"></div>
 					<select class="custom-select" name='empleado' id="empleado">
@@ -53,16 +54,13 @@
         <tr {% if loop.index is odd %}class="color"{% endif %}>
             <td>{{ data.fechaSolicitud | date('d-M-y H:i:s A') }} </td>
               <td>{{ data.idCliente  }} <br> {{ data.nombreCliente  }}</td>
-                <td>
-				
-				{% if  data.stado %}
-              {{ data.stado  }}  <br> {{ data.empleadoStatus  }} 
-
-            {% else %}
-            {{ data.stado  }}
+              
+				{% if  data.empleadoStatus %}
+				<td>{{ data.stado  }}  <br> {{ data.empleadoStatus  }}  </td>
+            {% else %}  
+			<td style="color: red !important;">{{ data.stado  }}</td>
               {% endif %}
-				
-				</td>
+
                  <td>{{ data.empleado  }} </td> 
 				  <td>
 				  
@@ -101,12 +99,12 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade " id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Cambiar Estado</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <div class="modal-header bg-dark">
+        <h5 class="modal-title text-light" id="exampleModalLongTitle">Cambiar Estado</h5>
+        <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -119,7 +117,7 @@
       </div>
       <div class="modal-footer">
         
-        <button type="button" id="guardarEstado" data-dismiss="modal" class="btn btn-primary">Guardar</button>
+        <button type="button" id="guardarEstado" data-dismiss="modal" class="my-0 btn btn-danger">Guardar</button>
       </div>
     </div>
   </div>
