@@ -14,6 +14,7 @@ use App\Entity\Municipios;
 use App\Entity\Cliente; 
 use App\Entity\User; 
 use App\Entity\TasaDeCambio;
+use App\Entity\Trasacciones;
 use Symfony\Component\HttpFoundation\Response;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -420,7 +421,7 @@ class FacturaController extends AbstractController
                 $direcion .=" Reparto: ".$json[$contador]->reparto;
             }
 
-            $respuesta = $client->Family_Transaction([
+          $respuesta = $client->Family_Transaction([
                 'mCustomerID' => '4327861528',
                 'mAPIKey' => 'rnl370fwi6',
                 'mKeyValue' => uniqid(),
@@ -440,8 +441,8 @@ class FacturaController extends AbstractController
                 'mTargetPhoneNo2' => ($json[$contador]->telefonoCasa) ? $json[$contador]->telefonoCasa : '' ,
                       ]);
 
-                      $json[$contador]->mOrderNo = ($respuesta->mOrderNo) ? ($respuesta->mOrderNo) : "Tienda sin balance";
-
+                     $json[$contador]->mOrderNo = ($respuesta->mOrderNo) ? ($respuesta->mOrderNo) : "Tienda sin balance";
+                    
                       if(  $json[$contador]->mOrderNo == "Tienda sin balance"){
 
                         $this->addFlash(
@@ -541,10 +542,30 @@ class FacturaController extends AbstractController
               
              
           }
+
+        $trasacciones = $dataBase->getRepository(Trasacciones::class)->findBy(['idCotizacion'=>$cotizacion->getId()]);
         
-        $html = $this->renderView("factura/pdf.html.twig",
-        ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
-        $filename = 'factura.pdf';
+        if(isset($efectivo[0])){
+
+            if(isset($trasacciones)){
+                $html = $this->renderView("factura/pdfMixta.html.twig",
+            ['deposito' => $trasacciones, 'cambio' => $efectivo[0], 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+            $filename = 'factura.pdf'; 
+           
+        }else{
+
+            $html = $this->renderView("factura/pdf.html.twig",
+            ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+            $filename = 'factura.pdf'; 
+        }
+
+        }else{
+
+        $html = $this->renderView("factura/pdfDeposito.html.twig",
+        ['deposito' => $trasacciones, 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+        $filename = 'factura.pdf'; 
+
+        }
 
      //return $this->render('factura/pdf.html.twig',
     // ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
@@ -630,9 +651,31 @@ class FacturaController extends AbstractController
         $efectivo = $dataBase->getRepository(ReporteEfectivo::class)->findBy(['idCotizacion'=>$json[0]->idCotizacion]);
         $clienteOrigen = $dataBase->getRepository(Cliente::class)->findby(['telefono' => $factura->getIdCliente()]);
 
-        $html = $this->renderView("factura/pdf.html.twig",
-        ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
-        $filename = 'factura.pdf';
+        $trasacciones = $dataBase->getRepository(Trasacciones::class)->findBy(['idCotizacion'=>$json[0]->idCotizacion]);
+        
+        if(isset($efectivo[0])){
+
+            if(isset($trasacciones)){
+                $html = $this->renderView("factura/pdfMixta.html.twig",
+            ['cambio' => $efectivo[0],'deposito' => $trasacciones , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+            $filename = 'factura.pdf'; 
+           
+        }else{
+
+            $html = $this->renderView("factura/pdf.html.twig",
+            ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+            $filename = 'factura.pdf'; 
+        }
+
+        }else{
+
+            $html = $this->renderView("factura/pdfDeposito.html.twig",
+        ['deposito' => $trasacciones , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+        $filename = 'factura.pdf'; 
+
+        }
+
+        
 
        
                 
