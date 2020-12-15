@@ -57,6 +57,8 @@ class DevolucionController extends AbstractController
             $devolucion = $request->get('devolucion');
             $tipo_documento_er = $em->getRepository(TipoDocumento::class);
             $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOCUMENTO_DEVOLUCION);
+            $cuenta_er = $em->getRepository(Cuenta::class);
+            $subcuenta_er = $em->getRepository(Subcuenta::class);
 
             $cuenta = AuxFunctions::getNro($devolucion['nro_cuenta_acreedora']);
             $subcuenta = AuxFunctions::getNro($devolucion['nro_subcuenta_acreedora']);
@@ -81,22 +83,33 @@ class DevolucionController extends AbstractController
                 $contador = 0;
                 foreach ($devolucion_arr as $obj) {
                     /**@var $obj Devolucion* */
-                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id') && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id') &&
+                        $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
                         $contador++;
                 }
+                $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
+                $obj_unidad = $em->getRepository(Unidad::class)->find($id_unidad);
+                $obj_Moneda = $em->getRepository(Moneda::class)->find($devolucion['documento']['id_moneda']);
                 $consecutivo = $contador + 1;
 
                 //2-adicionar en documento
-                $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $id_almacen]);
+                if (empty($arr_documentos)) {
+                    $today = $request->getSession()->get('date_system');
+                    $obj_date = \DateTime::createFromFormat('d/m/Y', $today);
+                } else {
+                    $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                    $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
+                }
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
-                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setFecha($obj_date)
                     ->setAnno($year_)
                     ->setIdTipoDocumento($obj_tipo_documento)
-                    ->setIdAlmacen($almacen)
-                    ->setIdUnidad($unidad)
-                    ->setIdMoneda($em->getRepository(Moneda::class)->find($devolucion['documento']['id_moneda']));
+                    ->setIdAlmacen($obj_almacen)
+                    ->setIdUnidad($obj_unidad)
+                    ->setIdMoneda($obj_Moneda);
 
                 $em->persist($documento);
 
@@ -132,6 +145,16 @@ class DevolucionController extends AbstractController
                         ->setIdOrdenTabajo($ot);
                 }
                 $em->persist($devolucion_obj);
+                /*** Asentando la Operacion**/
+                $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy([
+                    'nro_cuenta' => $cuenta,
+                    'activo' => true
+                ]);
+                $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                    'id_cuenta' => $obj_cuenta,
+                    'nro_subcuenta' => $subcuenta,
+                    'activo' => true
+                ]);
 
                 /**
                  * 5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
@@ -165,7 +188,7 @@ class DevolucionController extends AbstractController
                             ->setEntrada(true)
                             ->setIdAlmacen($almacen)
                             ->setCantidad($cantidad_mercancia)
-                            ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                            ->setFecha($obj_date)
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
                             ->setIdUsuario($this->getUser());
@@ -224,6 +247,23 @@ class DevolucionController extends AbstractController
                                 ->setIdMercancia($obj_mercancia)
                                 ->setExistencia($obj_mercancia->getExistencia());
                         }
+
+                        ///////----ADICIONANDO ASIENTO DE LA CUENTA DE INVENTARIO
+                        $cuenta_inv = $movimiento_mercancia->getIdMercancia()->getCuenta();
+                        $subcuenta_inv = $movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                        $obj_cuenta_inv = $cuenta_er->findOneBy([
+                            'nro_cuenta'=>$cuenta_inv,
+                            'activo'=>true
+                        ]);
+                        $obj_subcuenta_inv = $subcuenta_er->findOneBy([
+                            'nro_subcuenta'=>$subcuenta_inv,
+                            'activo'=>true,
+                            'id_cuenta'=>$obj_cuenta_inv
+                        ]);
+                        $asiento_inv = AuxFunctions::createAsiento($em,$obj_cuenta_inv, $obj_subcuenta_inv,$documento,
+                            $obj_unidad,$obj_almacen,null,null,null,null,
+                            null,0,0,$obj_date,$obj_date->format('Y'),0,
+                            $importe_mercancia,'D-'.$consecutivo);
                         $em->persist($movimiento_mercancia);
                     }
                 }
@@ -232,6 +272,11 @@ class DevolucionController extends AbstractController
                 $documento
                     ->setImporteTotal($importe_total);
                 $em->persist($documento);
+
+                $asiento = AuxFunctions::createAsiento($em,$obj_cuenta,$obj_subcuenta,$documento,$obj_unidad,$obj_almacen,
+                    $centro_costo?$centro_costo:null,$elemento_gasto?$elemento_gasto:null,
+                    $ot?$ot:null,null,null
+                    ,0,0,$obj_date,$obj_date->format('Y'),$importe_total,0,'D-'.$consecutivo);
 
                 try {
                     $em->flush();
@@ -302,7 +347,9 @@ class DevolucionController extends AbstractController
         $empleado = $em->getRepository(Empleado::class)->findOneBy(['id_usuario'=>$user]);
         $rows_centro_costo = [];
         if($empleado){
-            $centro_costo_arr = $em->getRepository(CentroCosto::class)->findBy(['id_unidad'=>$empleado->getIdUnidad()]);
+            $centro_costo_arr = $em->getRepository(CentroCosto::class)->findBy(
+                ['id_unidad'=>$empleado->getIdUnidad(),'activo'=>true]
+            );
             if(!empty($centro_costo_arr)){
                 /** @var CentroCosto $cc */
                 foreach ($centro_costo_arr as $cc){
@@ -342,13 +389,20 @@ class DevolucionController extends AbstractController
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_devolucion = $em->getRepository(Devolucion::class)->findOneBy([
+        $arr_devolucion = $em->getRepository(Devolucion::class)->findBy([
             'nro_concecutivo' => $nro,
             'anno' => Date('Y')
         ]);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
         $msg = 'No se pudo eliminar la devolución seleccionada';
         $success = 'error';
-        if ($obj_devolucion) {
+        if (!empty($arr_devolucion)) {
+            /** @var Devolucion $inf */
+            foreach ($arr_devolucion as $inf) {
+                if ($inf->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen) {
+                    $obj_devolucion = $inf;
+                }
+            }
             /**@var $obj_devolucion Devolucion** */
             $importe_devolucion = $obj_devolucion->getIdDocumento()->getImporteTotal();
 

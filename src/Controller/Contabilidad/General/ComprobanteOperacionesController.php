@@ -12,14 +12,18 @@ use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Contabilidad\OperacionesComprobanteOperaciones;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
+use App\Entity\Contabilidad\General\CobrosPagos;
 use App\Entity\Contabilidad\Inventario\Expediente;
+use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Proveedor;
+use App\Entity\Contabilidad\Venta\Factura;
 use App\Form\Contabilidad\General\ComprobanteOperacionesType;
 use App\Form\Contabilidad\General\CuentasComprobanteOperacionesType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -55,6 +59,8 @@ class ComprobanteOperacionesController extends AbstractController
             $total_credito = floatval($request->get('credito_total'));
             $comprobante = $request->get('comprobante_operaciones');
             $operaciones = json_decode($request->get('operaciones'));
+            $pagos_cobros = json_decode($request->get('pagos_cobros'));
+//            dd($comprobante,$operaciones,$pagos_cobros);
             if ($total_credito == $total_debito) {
                 $new_registro = new RegistroComprobantes();
 
@@ -91,12 +97,56 @@ class ComprobanteOperacionesController extends AbstractController
                 $proveedor_er = $em->getRepository(Proveedor::class);
                 $almacen_er = $em->getRepository(Almacen::class);
                 $unidad_er = $em->getRepository(Unidad::class);
+                $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
+                $factura_er = $em->getRepository(Factura::class);
+
                 foreach ($operaciones as $item) {
                     $subcuenta = $subcuenta_er->findOneBy([
                         'id_cuenta' => $cuenta_er->find(intval($item->cuenta)),
                         'nro_subcuenta' => $item->subcuenta,
                         'activo' => true
                     ]);
+
+                    if ($item->id_informe_recepcion != '') {
+                        $arr_informes = explode(',', $item->id_informe_recepcion);
+                        foreach ($arr_informes as $informe) {
+                            if ($informe != '') {
+                                foreach ($pagos_cobros as $pagos) {
+                                    if ($pagos->type == 'IR' && $pagos->id_factura == $informe) {
+                                        $informe_recepcion_obj = $informe_recepcion_er->find(intval($informe));
+                                        $new_cobro_pago = new CobrosPagos();
+                                        $new_cobro_pago
+                                            ->setIdInforme($informe_recepcion_obj)
+                                            ->setIdProveedor($proveedor_er->find(intval($item->proveedor)))
+                                            ->setCredito(floatval($pagos->importe))
+                                            ->setDebito(0);
+                                        $em->persist($new_cobro_pago);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ($item->id_factura != '') {
+                        $arr_facturas = explode(',', $item->id_factura);
+                        foreach ($arr_facturas as $fact) {
+                            if ($fact != '') {
+                                foreach ($pagos_cobros as $pagos) {
+                                    if ($pagos->type == 'FACT' && $pagos->id_factura == $fact) {
+                                        $factura = $factura_er->find(intval($fact));
+                                        $new_cobro_pago = new CobrosPagos();
+                                        $new_cobro_pago
+                                            ->setIdFactura($factura)
+                                            ->setIdTipoCliente($factura->getTipoCliente())
+                                            ->setIdClienteVenta($factura->getIdCliente())
+                                            ->setDebito(floatval($pagos->importe))
+                                            ->setCredito(0);
+                                        $em->persist($new_cobro_pago);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
                     $new_operaciones_comprobante = new OperacionesComprobanteOperaciones();
                     $new_operaciones_comprobante
                         ->setIdCliente(isset($item->cliente) ? intval($item->cliente) : null)
@@ -139,5 +189,88 @@ class ComprobanteOperacionesController extends AbstractController
             'form_cuentas_comprobantes' => $form_cuentas_comprobantes->createView(),
             'nro_consecutivo' => $nro_consecutivo
         ]);
+    }
+
+    /** @Route("/getFacturas", name="contabilidad_general_get_facturas", methods={"POST"}) */
+    public function getFacturas(EntityManagerInterface $em, Request $request)
+    {
+        $tipo_cliente = $request->request->get('tipo_cliente');
+        $cliente = $request->request->get('cliente');
+        $facturas = $em->getRepository(Factura::class)->findBy([
+            'tipo_cliente' => intval($tipo_cliente),
+            'id_cliente' => intval($cliente),
+            'cancelada' => false,
+            'activo' => true,
+            'id_factura_cancela' => null
+        ]);
+        $row = [];
+        $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
+        $cobros_er = $em->getRepository(CobrosPagos::class);
+        /** @var Factura $item */
+        foreach ($facturas as $item) {
+            $cobro_factura = $cobros_er->findBy([
+                'id_factura' => $item
+            ]);
+            $resto = floatval($item->getImporte());
+            if (!empty($cobro_factura))
+                /** @var CobrosPagos $cobro */
+                foreach ($cobro_factura as $cobro)
+                    $resto = $resto - floatval($cobro->getDebito());
+            if ($resto > 0)
+                $row[] = array(
+                    'id' => $item->getId(),
+                    'documento' => 'FACT-' . $item->getNroFactura(),
+                    'importe_mostrar' => number_format($item->getImporte(), 2),
+                    'importe' => number_format($resto, 2),
+                    'resto' => floatval($resto),
+                    'fecha' => $item->getFechaFactura()->format('d-m-Y'),
+                    'antiguedad'=>$today->diff($item->getFechaFactura())->days
+                );
+        }
+        return new JsonResponse(['success' => true, 'data' => $row]);
+    }
+
+    /** @Route("/getDeudas", name="contabilidad_general_get_deudas", methods={"POST"}) */
+    public function getDeudas(EntityManagerInterface $em, Request $request)
+    {
+        $proveedor = $request->request->get('proveedor');
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $almacenes = $em->getRepository(Almacen::class)->findBy([
+            'id_unidad' => $unidad
+        ]);
+
+        $informes = $em->getRepository(InformeRecepcion::class)->findBy([
+            'id_proveedor' => $em->getRepository(Proveedor::class)->find(intval($proveedor)),
+            'activo' => true,
+            'producto' => false
+        ]);
+        $row = [];
+        $cobros_er = $em->getRepository(CobrosPagos::class);
+        $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
+        /** @var InformeRecepcion $item */
+        foreach ($informes as $item) {
+            if (in_array($item->getIdDocumento()->getIdAlmacen(), $almacenes)) {
+
+                $pago_informe = $cobros_er->findBy([
+                    'id_informe' => $item
+                ]);
+                $resto = floatval($item->getIdDocumento()->getImporteTotal());
+                if (!empty($pago_informe))
+                    /** @var CobrosPagos $cobro */
+                    foreach ($pago_informe as $cobro)
+                        $resto = $resto - floatval($cobro->getCredito());
+                if ($resto > 0)
+                    $row[] = array(
+                        'id' => $item->getId(),
+                        'documento' => $item->getCodigoFactura(),
+                        'importe_mostrar' => number_format($item->getIdDocumento()->getImporteTotal(), 2),
+                        'importe' => number_format($resto, 2),
+                        'resto' => floatval($resto),
+                        'fecha' => $item->getFechaFactura()->format('d-m-Y'),
+                        'antiguedad'=>$today->diff($item->getFechaFactura())->days
+                    );
+            }
+        }
+        return new JsonResponse(['success' => true, 'data' => $row]);
     }
 }

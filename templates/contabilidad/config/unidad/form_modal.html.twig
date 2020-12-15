@@ -26,10 +26,6 @@
         <label for="unidad_id_padre" class="font-weight-bold">Subordinada a</label>
         {{ form_widget(form.id_padre,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
-    <div class="form-group input-group input-group-sm d-block">
-        {{ form_label(form.id_categoria_cliente) }}
-        {{ form_widget(form.id_categoria_cliente, {'attr': {'class': 'form- control w-100'}}) }}
-    </div>
     <input type="text" id="id_unidad" hidden>
     {{ form_end(form) }}
 

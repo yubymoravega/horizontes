@@ -49,11 +49,38 @@ configuraciones:
 
   categorias:
     - id: 1
-      name: "Personas Naturales"
+      name: "Facturas de Crédito Fiscal"
       prefijo: "B01"
     - id: 2
-      name: "Instituciones"
+      name: "Facturas de Consumo"
       prefijo: "B02"
+    - id: 3
+      name: "Notas de Débito"
+      prefijo: "B03"
+    - id: 4
+      name: "Notas de Crédito"
+      prefijo: "B04"
+    - id: 5
+      name: "Comprobantes de Compras"
+      prefijo: "B11"
+    - id: 6
+      name: "Registro Único de Ingresos"
+      prefijo: "B12"
+    - id: 7
+      name: "Comprobante para Gastos Menores"
+      prefijo: "B13"
+    - id: 8
+      name: "Comprobante para Regímenes Especiales"
+      prefijo: "B14"
+    - id: 9
+      name: "Comprobantes Gubernamentales"
+      prefijo: "B15"
+    - id: 10
+      name: "Comprobantes para Exportaciones"
+      prefijo: "B16"
+    - id: 11
+      name: "Comprobantes de Pagos al Exterior"
+      prefijo: "B17"
 
   termino_pago:
     - id: 1
@@ -69,14 +96,47 @@ configuraciones:
 
   servicios:
     - id: 1
-      name: "Boletos Avión"
+      name: "Recarga Cubacell"
       codigo: "0010"
     - id: 2
-      name: "Remesa"
+      name: "Recarga Nauta"
       codigo: "0020"
     - id: 3
-      name: "Paqueteria"
+      name: "Larga Distancia"
       codigo: "0030"
+    - id: 4
+      name: "Envio de Remesas"
+      codigo: "0040"
+    - id: 5
+      name: "Boletos Aéreos"
+      codigo: "0050"
+    - id: 6
+      name: "Renta de Hoteles"
+      codigo: "0060"
+    - id: 7
+      name: "Renta de Autos"
+      codigo: "0070"
+    - id: 8
+      name: "Excursiones"
+      codigo: "0080"
+    - id: 9
+      name: "Envio de paquetes"
+      codigo: "0090"
+    - id: 10
+      name: "Paquetes Turísticos"
+      codigo: "0100"
+    - id: 11
+      name: "Trámites Migratorios"
+      codigo: "0110"
+    - id: 12
+      name: "Desarrollo de Software"
+      codigo: "0120"
+    - id: 13
+      name: "Diseño"
+      codigo: "0130"
+    - id: 14
+      name: "Marketing y redes Sociales"
+      codigo: "0140"
 
   tipo_movimiento:
     - id: 1

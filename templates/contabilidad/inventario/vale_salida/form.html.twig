@@ -50,7 +50,9 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h3 class="text-reporte text-right mr-0 text-white mt-2">Vale de salida de Mercancias</h3>
+                        <h3 class="text-reporte text-right mr-0 text-white mt-2" id="normal_div">
+                            Vale de salida de Mercancias
+                        </h3>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -210,6 +212,8 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        $('#normal_div').text('Vale de salida de Mercancias')
+        $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
         $('#btnCancelar').hide()
         $('#orden_trabajo_row').hide()
         function Print_Vale() {
@@ -657,6 +661,12 @@
                             for (let i = 0; i < ids.length; i++) {
                                 $("#vale_salida" + ids[i]).find('option').remove()
                             }
+                            if(vale.cancelado == true || vale.cancelado == 'true'){
+                                ActiveDesactive(false)
+                            }
+                            else{
+                                ActiveDesactive(true)
+                            }
                             $('#rows_mercancias').find('tr').remove();
                             $('#vale_salida_nro_cuenta_deudora').prepend('<option selected value = ' + vale.nro_cuenta_deudora + '>' + vale.nro_cuenta_deudora + '</option>');
                             $('#vale_salida_nro_subcuenta_deudora').prepend('<option selected value = ' + vale.nro_subcuenta_deudora + '>' + vale.nro_subcuenta_deudora + '</option>');
@@ -713,6 +723,8 @@
                     $('#select_nros').val(consecutivo)
                     $('#select_nros').prop('max', consecutivo)
                     $('#select_nros').prop('min', 1)
+                    $('#normal_div').text('Vale de salida de Mercancias')
+                    $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
                     loadingModal.close()
                 },
                 error: function () {
@@ -790,6 +802,17 @@
                 }
             })
         }
-
+        function ActiveDesactive(active) {
+            if(active){
+                $('#normal_div').text('Vale de salida de Mercancias')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
+                $('#btnCancelar').show()
+            }
+            else{
+                $('#normal_div').text('Vale de Salida Cancelado')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 mt-2 text-danger text-uppercase')
+                $('#btnCancelar').hide()
+            }
+        }
     </script>
 {% endblock %}

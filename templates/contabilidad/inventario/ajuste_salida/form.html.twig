@@ -191,9 +191,9 @@
                     <a href="{{ url('inventario') }}"
                        class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                 </div>
-                <div class="ml-2">
-                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
-                </div>
+{#                <div class="ml-2">#}
+{#                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>#}
+{#                </div>#}
                 <div class="ml-2">
                     <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
                     </button>
@@ -284,7 +284,7 @@
                     $('#form_mercancia').resetForm()
                     $('#btnSubbmitAjuste').show()
                     $('#btnImprimir').show()
-                    $('#btnCancelar').hide()
+                    // $('#btnCancelar').hide()
                     $('#ajuste_salida_observacion').val('')
                     $('#rows_mercancias').find('tr').remove()
                     list_mercancia = []
@@ -318,23 +318,23 @@
                     if ($('#select_nros').val() == consecutivo) {// si es el consecutivo
                         $('#btnSubbmitAjuste').show()
                         $('#btnImprimir').show()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         loadingData()
                     } else if ($('#select_nros').val() > consecutivo) {// si es mayor
                         $('#btnSubbmitAjuste').hide()
                         $('#btnImprimir').hide()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         //$('#ajuste_salida select').find('option').remove()
                         alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
                     } else if ($('#select_nros').val() == '') {// si no hay numero
                         $('#btnSubbmitAjuste').hide()
                         $('#btnImprimir').hide()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
                     } else {// si es un Numero valido para cargar
                         $('#btnImprimir').show()
                         $('#btnSubbmitAjuste').hide()
-                        $('#btnCancelar').show()
+                        // $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
                 }

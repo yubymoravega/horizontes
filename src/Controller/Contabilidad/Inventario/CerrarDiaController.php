@@ -103,8 +103,6 @@ class CerrarDiaController extends AbstractController
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
-
-
         $debitos = 0;
         $creditos = 0;
         /** @var MovimientoMercancia $obj_mercancia */

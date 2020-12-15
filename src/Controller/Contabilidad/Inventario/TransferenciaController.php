@@ -88,6 +88,8 @@ class TransferenciaController extends AbstractController
 //            if ($form->isValid()) {
             $transferencia_entrada = $request->get('transferencia');
             $tipo_documento_er = $em->getRepository(TipoDocumento::class);
+            $cuenta_er = $em->getRepository(Cuenta::class);
+            $subcuenta_er = $em->getRepository(Subcuenta::class);
             $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_RANSFERENCIA_ENTRADA);
 
             /**  datos de TransferenciaEntradaType **/
@@ -114,9 +116,13 @@ class TransferenciaController extends AbstractController
                 $contador = 0;
                 foreach ($transferencias_entrada_arr as $obj) {
                     /**@var $obj Transferencia* */
-                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id') && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
+                    if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $request->getSession()->get('selected_almacen/id') &&
+                        $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad)
                         $contador++;
                 }
+                $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
+                $obj_unidad = $em->getRepository(Unidad::class)->find($id_unidad);
+                $obj_Moneda = $em->getRepository(Moneda::class)->find($transferencia_entrada['documento']['id_moneda']);
                 $consecutivo = $contador + 1;
 
                 //2-adicionar en documento
@@ -128,15 +134,16 @@ class TransferenciaController extends AbstractController
                     $today = AuxFunctions::getDateToClose($em, $id_almacen);
                     $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
                 }
+
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
                     ->setFecha($obj_date)
                     ->setAnno($year_)
                     ->setIdTipoDocumento($obj_tipo_documento)
-                    ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                    ->setIdMoneda($em->getRepository(Moneda::class)->find($transferencia_entrada['documento']['id_moneda']));
+                    ->setIdAlmacen($obj_almacen)
+                    ->setIdUnidad($obj_unidad)
+                    ->setIdMoneda($obj_Moneda);
 
                 $em->persist($documento);
 
@@ -155,6 +162,17 @@ class TransferenciaController extends AbstractController
                     ->setActivo(true)
                     ->setEntrada(true);
                 $em->persist($transferencia_entrada);
+
+                /*** Asentando la Operacion**/
+                $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy([
+                    'nro_cuenta' => $cuenta_acreedora,
+                    'activo' => true
+                ]);
+                $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                    'id_cuenta' => $obj_cuenta,
+                    'nro_subcuenta' => $subcuenta_acreedora,
+                    'activo' => true
+                ]);
 
                 /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                  * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
@@ -184,9 +202,9 @@ class TransferenciaController extends AbstractController
                             ->setActivo(true)
                             ->setImporte(floatval($importe_mercancia))
                             ->setEntrada(true)
-                            ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
+                            ->setIdAlmacen($obj_almacen)
                             ->setCantidad($cantidad_mercancia)
-                            ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                            ->setFecha($obj_date)
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
                             ->setIdUsuario($this->getUser());
@@ -245,6 +263,24 @@ class TransferenciaController extends AbstractController
                                 ->setIdMercancia($obj_mercancia)
                                 ->setExistencia($obj_mercancia->getExistencia());
                         }
+
+                        ///////----ADICIONANDO ASIENTO DE LA CUENTA DE INVENTARIO
+                        $cuenta_inv = $movimiento_mercancia->getIdMercancia()->getCuenta();
+                        $subcuenta_inv = $movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                        $obj_cuenta_inv = $cuenta_er->findOneBy([
+                            'nro_cuenta'=>$cuenta_inv,
+                            'activo'=>true
+                        ]);
+                        $obj_subcuenta_inv = $subcuenta_er->findOneBy([
+                            'nro_subcuenta'=>$subcuenta_inv,
+                            'activo'=>true,
+                            'id_cuenta'=>$obj_cuenta_inv
+                        ]);
+                        $asiento_inv = AuxFunctions::createAsiento($em,$obj_cuenta_inv, $obj_subcuenta_inv,$documento,
+                            $obj_unidad,$obj_almacen,null,null,null,null,
+                            null,0,0,$obj_date,$obj_date->format('Y'),0,
+                            $importe_mercancia,'TE-'.$consecutivo);
+
                         $em->persist($movimiento_mercancia);
                     }
                 }
@@ -253,6 +289,10 @@ class TransferenciaController extends AbstractController
                 $documento
                     ->setImporteTotal($importe_total);
                 $em->persist($documento);
+
+                $asiento = AuxFunctions::createAsiento($em,$obj_cuenta,$obj_subcuenta,$documento,$obj_unidad,$obj_almacen,
+                    null,null,null,null,null
+                    ,0,0,$obj_date,$obj_date->format('Y'),$importe_total,0,'TE-'.$consecutivo);
 
                 try {
                     $em->flush();
@@ -348,14 +388,22 @@ class TransferenciaController extends AbstractController
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_transferencia_entrada = $em->getRepository(Transferencia::class)->findOneBy([
+        $arr_transferencia_entrada = $em->getRepository(Transferencia::class)->findBy([
             'nro_concecutivo' => $nro,
             'entrada' => true,
             'anno' => Date('Y')
         ]);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+
         $msg = 'No se pudo eliminar el transferencia seleccionada';
         $success = 'error';
-        if ($obj_transferencia_entrada) {
+        if (!empty($arr_transferencia_entrada)) {
+            /** @var Transferencia $inf */
+            foreach ($arr_transferencia_entrada as $inf) {
+                if ($inf->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen) {
+                    $obj_transferencia_entrada = $inf;
+                }
+            }
             /**@var $obj_transferencia_entrada Transferencia** */
 //            $obligacion_er = $em->getRepository(ObligacionPago::class);
 

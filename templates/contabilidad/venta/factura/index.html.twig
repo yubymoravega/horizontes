@@ -71,7 +71,8 @@
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
                     <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         <label for="factura_fecha_factura"> Fecha de la factura</label>
-                        <input type="text" value="{{ fecha }}" id="factura_fecha_factura" name="factura[fecha_factura]" class="w-100 form-control" readonly="readonly">
+                        <input type="text" value="{{ fecha }}" id="factura_fecha_factura" name="factura[fecha_factura]"
+                               class="w-100 form-control" readonly="readonly">
                     </div>
                     <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.tipo_cliente) }}
@@ -83,16 +84,19 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0 mb-3">
-                    <div class="col-8 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                    <div class="col-12 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.id_contrato) }}
                         {{ form_widget(form_factura.id_contrato) }}
                     </div>
-                    <div class="col-4 mt-0 pl-3 form-group input-group input-group-sm d-block">
+
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_factura.id_categoria_cliente) }}
+                        {{ form_widget(form_factura.id_categoria_cliente, {'attr': {'class': 'form- control w-100'}}) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.ncf) }}
                         {{ form_widget(form_factura.ncf) }}
                     </div>
-                </div>
-                <div class="row mt-0 p-0 mb-3">
                     <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.id_moneda) }}
                         {{ form_widget(form_factura.id_moneda) }}
@@ -277,6 +281,7 @@
             /** selects  */
             const cbx_tipoCliente = $('#factura_tipo_cliente')
             const cbx_cliente = $('#factura_id_cliente')
+            const cbx_categoria = $('#factura_id_categoria_cliente')
             const cbx_tipo = $('#movimiento_venta_mercancia')
 
             /**  inputs */
@@ -310,7 +315,8 @@
                     'factura[id_cliente]': "required",
                     'factura[ncf]': "required",
                     'factura[id_moneda]': "required",
-                    'factura[id_termino_pago]': "required"
+                    'factura[id_categoria_cliente]': "required",
+                    'factura[id_termino_pago]': "required",
                 },
                 messages: {
                     'factura[nro_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -319,6 +325,7 @@
                     'factura[id_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[ncf]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[id_moneda]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'factura[id_categoria_cliente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'factura[id_termino_pago]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
@@ -395,13 +402,10 @@
                     }
                 })
             })
-            cbx_cliente.on('change', function () {
+            cbx_categoria.on('change', function () {
                 $('#factura_ncf').val('')
                 loadingModal.show()
-                let params = {
-                    tipo_cliente: $('#factura_tipo_cliente').val(),
-                    cliente: $(this).val()
-                }
+                let params = {categoria: $(this).val()}
                 $.ajax({
                     url: '/contabilidad/venta/factura/getNcf',
                     method: 'POST',
@@ -409,7 +413,7 @@
                     data: params,
                     success: function (result) {
                         if (result.success) {
-                            $('#factura_ncf').val(result.prefijo+result.consecutivo)
+                            $('#factura_ncf').val(result.prefijo + result.consecutivo)
                         } else {
                             $('#factura_ncf').val('-sin resultado-')
                         }
@@ -459,7 +463,6 @@
 
             /** calculos de Importe */
             txt_cantidadMercancia.on('keyup', function (event) {
-
                 const cantidad = parseFloat($(this).val()) || 0
                 const precio = parseFloat(txt_precioMercancia.val()) || 0
                 const existencia = parseFloat(txt_existenciaMercancia.val()) || 0
@@ -492,14 +495,23 @@
                     const id_almacen = $('#id_almacen').val()
                     const id_mercancia = $('#id_mercancia').val()
                     const descripcion_venta = $('#movimiento_venta_descripcion_venta').val()
-                    const subtotal = parseFloat(precio)* parseFloat(cantidad)
-                    const total = subtotal+ parseFloat(descuento_recatrga)
+                    const subtotal = parseFloat(precio) * parseFloat(cantidad)
+                    const total = subtotal + parseFloat(descuento_recatrga)
                     //validar que el codigo no se repita
                     if (lista_mercancias.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
                     } else {
                         lista_mercancias.push({
-                            tipo, codigo, cantidad, precio, descuento_recatrga, importe, nueva_existencia,id_mercancia ,id_almacen,descripcion_venta
+                            tipo,
+                            codigo,
+                            cantidad,
+                            precio,
+                            descuento_recatrga,
+                            importe,
+                            nueva_existencia,
+                            id_mercancia,
+                            id_almacen,
+                            descripcion_venta
                         })
                         let importe_movimiento = (parseFloat(importe) + parseFloat(descuento_recatrga))
                         importe_total += importe_movimiento
@@ -544,7 +556,7 @@
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
                 const mercancia = lista_mercancias.find(e => e.codigo === $(this).attr('id-mercancia'))
-                importe_total -= Number.parseFloat(mercancia.importe)
+                importe_total -= (Number.parseFloat(mercancia.importe)+Number.parseFloat(mercancia.descuento_recatrga))
                 label_importeTotal.text('$' + importe_total.toFixed(2))
                 lista_mercancias = lista_mercancias.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
@@ -554,12 +566,16 @@
         function buscarProducto() {
             if (fecha == '')
                 alertTemplate('Debe seleccionar la fecha para buscar las mercancías o productos', 'danger')
-            else{
+            else {
                 loadingModal.show()
                 $.ajax({
                     method: 'POST',
                     url: '{{ path('cont_venta_get_mercancia_producto') }}',
-                    data: {tipo: $('#movimiento_venta_mercancia').val(), codigo: $('#movimiento_venta_codigo').val(),fecha :fecha},
+                    data: {
+                        tipo: $('#movimiento_venta_mercancia').val(),
+                        codigo: $('#movimiento_venta_codigo').val(),
+                        fecha: fecha
+                    },
                     success: function (result) {
                         if (result.success) {
                             $('#rows_table').find('tr').remove();

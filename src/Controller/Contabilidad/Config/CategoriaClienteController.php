@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Class CategoriaClienteController
  * @package App\Controller\Contabilidad\Config
- * @Route("/contabilidad/config/categoria-cliente")
+ * @Route("/contabilidad/config/tipos-comprobantes-fiscales")
  */
 class CategoriaClienteController extends AbstractController
 {

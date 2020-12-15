@@ -186,7 +186,7 @@ class MovimientoServicio
         return $this;
     }
 
-    public function getCuentaNominalAcreedora(): ?string
+    public function getCuentaAcreedora(): ?string
     {
         return $this->cuenta_nominal_acreedora;
     }
@@ -198,7 +198,7 @@ class MovimientoServicio
         return $this;
     }
 
-    public function getSubcuentaNominalAcreedora(): ?string
+    public function getSubcuentaAcreedora(): ?string
     {
         return $this->subcuenta_nominal_acreedora;
     }

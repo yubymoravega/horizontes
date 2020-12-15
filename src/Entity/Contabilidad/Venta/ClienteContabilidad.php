@@ -60,11 +60,6 @@ class ClienteContabilidad
      */
     private $activo;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=CategoriaCliente::class)
-     */
-    private $id_categoria_cliente;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -150,18 +145,6 @@ class ClienteContabilidad
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
-
-        return $this;
-    }
-
-    public function getIdCategoriaCliente(): ?CategoriaCliente
-    {
-        return $this->id_categoria_cliente;
-    }
-
-    public function setIdCategoriaCliente(?CategoriaCliente $id_categoria_cliente): self
-    {
-        $this->id_categoria_cliente = $id_categoria_cliente;
 
         return $this;
     }

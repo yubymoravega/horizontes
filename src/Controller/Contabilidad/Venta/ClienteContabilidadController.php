@@ -42,9 +42,6 @@ class ClienteContabilidadController extends AbstractController
                 'telefonos' => $item->getTelefonos(),
                 'correos' => $item->getCorreos(),
                 'direccion' => $item->getDireccion(),
-                'categoria' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getNombre():'',
-                'id_categoria' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getId():'',
-                'prefijo' => $item->getIdCategoriaCliente()?$item->getIdCategoriaCliente()->getPrefijo():'',
             );
         }
         $paginator = $pagination->paginate(

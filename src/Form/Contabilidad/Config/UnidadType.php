@@ -24,15 +24,6 @@ class UnidadType extends AbstractType
             ->add('telefono')
             ->add('correo', EmailType::class)
             ->add('direccion',TextareaType::class)
-            ->add('id_categoria_cliente', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Categoría',
-                'class' => CategoriaCliente::class,
-                'choice_value' => 'id',
-                'choice_label' => function (CategoriaCliente $eg) {
-                    return $eg->getPrefijo() . ' - ' . $eg->getNombre();
-                }]
-            )
             ->add('id_padre', EntityType::class, [
                 'class' => Unidad::class,
                 'choice_label' => 'nombre',

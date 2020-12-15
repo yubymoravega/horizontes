@@ -18,6 +18,7 @@ use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\Factura;
+use App\Entity\Contabilidad\Venta\MovimientoServicio;
 use App\Entity\Contabilidad\Venta\MovimientoVenta;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -285,6 +286,7 @@ class RegistroComprobantesController extends AbstractController
         $persona_natural = $em->getRepository(Cliente::class);
         /** @var FacturasComprobante $datafacturas */
         foreach ($data as $datafacturas) {
+            $total_impuesto = 0;
             /** @var Factura $obj_factura */
             $factura = $datafacturas->getIdFactura();
             $row = [];
@@ -317,13 +319,14 @@ class RegistroComprobantesController extends AbstractController
                 'debito' => number_format($factura->getImporte(), 2),
                 'credito' => ''
             );
-            $arr_movimientos = $movimiento_venta_er->findBy(['id_factura' => $factura]);
+            if (!$factura->getServicio())
+                $arr_movimientos = $movimiento_venta_er->findBy(['id_factura' => $factura]);
+            else
+                $arr_movimientos = $em->getRepository(MovimientoServicio::class)->findBy(['id_factura' => $factura]);
             $str_criterio = [];
             /** @var MovimientoVenta $movimiento_venta */
             foreach ($arr_movimientos as $movimiento_venta) {
-                $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora() . '-' .
-                    $movimiento_venta->getIdCentroCostoAcreedor() . '-' . $movimiento_venta->getIdOrdenTrabajoAcreedor() . '' .
-                    $movimiento_venta->getIdElementoGastoAcreedor() . '-' . $movimiento_venta->getIdExpedienteAcreedor();
+                $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora();
                 if (!in_array($srt_movimiento, $str_criterio))
                     $str_criterio[count($str_criterio)] = $srt_movimiento;
             }
@@ -331,10 +334,9 @@ class RegistroComprobantesController extends AbstractController
             foreach ($str_criterio as $criterio) {
                 $credito = 0;
                 foreach ($arr_movimientos as $movimiento_venta) {
-                    $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora() . '-' .
-                        $movimiento_venta->getIdCentroCostoAcreedor() . '-' . $movimiento_venta->getIdOrdenTrabajoAcreedor() . '' .
-                        $movimiento_venta->getIdElementoGastoAcreedor() . '-' . $movimiento_venta->getIdExpedienteAcreedor();
+                    $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora();
                     if ($criterio == $srt_movimiento) {
+                        $total_impuesto += ($factura->getServicio() ? $movimiento_venta->getImpuesto() : $movimiento_venta->getDescuentoRecarga());
                         $credito += ($movimiento_venta->getCantidad() * $movimiento_venta->getPrecio());
                     }
                 }
@@ -358,6 +360,23 @@ class RegistroComprobantesController extends AbstractController
                     'credito' => number_format($credito, 2)
                 );
             }
+            if ($total_impuesto > 0)
+                $row[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => '440',
+                    'nro_subcuenta' => '0001',
+                    'analisis_1' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes' => $mes,
+                    'anno' => $anno,
+                    'debito' => '',
+                    'credito' => number_format($total_impuesto, 2)
+                );
             $row[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -371,15 +390,60 @@ class RegistroComprobantesController extends AbstractController
                 'analisis_3' => '',
                 'mes' => '',
                 'anno' => '',
-                'debito' => number_format($total, 2),
-                'credito' => number_format($total, 2)
+                'debito' => number_format(($total + $total_impuesto), 2),
+                'credito' => number_format(($total + $total_impuesto), 2)
             );
-            $data_return [] = array(
-                'nro_doc' => $nro_doc,
-                'datos' => $row
-            );
-
+            if ($factura->getIdFacturaCancela() == null) {
+                $data_return [] = array(
+                    'nro_doc' => $nro_doc,
+                    'datos' => $row
+                );
+            } else {
+                $fecha = $row[0]['fecha'];
+                $reverse = array_reverse($row);
+                $new_row = [];
+                foreach ($reverse as $key => $item) {
+                    if ($key > 0)
+                        $new_row[] = [
+                            'nro_doc' => $nro_doc,
+                            'fecha' => $fecha,
+                            'nro_cuenta' => $item['nro_cuenta'],
+                            'nro_subcuenta' => $item['nro_subcuenta'],
+                            'analisis_1' => $item['analisis_1'],
+                            'value_1' => $item['value_1'],
+                            'value_2' => $item['value_2'],
+                            'value_3' => $item['value_3'],
+                            'analisis_2' => $item['analisis_2'],
+                            'analisis_3' => $item['analisis_3'],
+                            'mes' => $item['mes'],
+                            'anno' => $item['anno'],
+                            'debito' => $item['credito'],
+                            'credito' => $item['debito']
+                        ];
+                }
+                $new_row[] = [
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => '',
+                    'nro_subcuenta' => '',
+                    'analisis_1' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes' => '',
+                    'anno' => '',
+                    'debito' => $row[0]['debito'],
+                    'credito' => $row[0]['debito'],
+                ];
+                $data_return [] = array(
+                    'nro_doc' => $nro_doc,
+                    'datos' => $new_row
+                );
+            }
         }
+//        dd($data_return);
         return $data_return;
     }
 }

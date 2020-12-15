@@ -5,7 +5,9 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h3 class="text-reporte text-right mr-0 text-white">Informe de Recepción de Productos</h3>
+                        <h3 class="text-reporte text-right mr-0 text-white" id="normal_div" >
+                            Informe de Recepción de Productos
+                        </h3>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm  mt-2 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -625,6 +627,12 @@
                             for (let i = 0; i < ids.length; i++) {
                                 $("#informe_recepcion_producto" + ids[i]).find('option').remove()
                             }
+                           if(informe.cancelado == true || informe.cancelado == 'true'){
+                                ActiveDesactive(false)
+                            }
+                            else{
+                                ActiveDesactive(true)
+                            }
                             $('#rows_mercancias').find('tr').remove();
                             $('#informe_recepcion_producto_nro_cuenta_acreedora').prepend('<option selected value = ' + informe.nro_cuenta_acreedora + '>' + informe.nro_cuenta_acreedora + '</option>');
                             $('#informe_recepcion_producto_documento_id_moneda').prepend('<option selected value = ' + informe.moneda + '>' + informe.moneda + '</option>');
@@ -700,6 +708,8 @@
                     $('#select_nros').val(consecutivo)
                     $('#select_nros').prop('max', consecutivo)
                     $('#select_nros').prop('min', 1)
+                    $('#normal_div').text('Informe de Recepción de Productos')
+                    $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
                     loadingModal.close()
                 },
                 error: function () {
@@ -821,6 +831,18 @@
             $('#informe_recepcion_producto_id_centro_costo').val('')
             $('#informe_recepcion_producto_codigo_ot').val('')
             $('#informe_recepcion_producto_descripcion_ot').val('')
+        }
+        function ActiveDesactive(active) {
+            if(active){
+                $('#normal_div').text('Informe de Recepción de Productos')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
+                $('#btnCancelar').show()
+            }
+            else{
+                $('#normal_div').text('Informe de Recepción Cancelado')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 mt-2 text-danger text-uppercase')
+                $('#btnCancelar').hide()
+            }
         }
     </script>
 {% endblock %}

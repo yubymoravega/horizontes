@@ -122,18 +122,29 @@ class AjusteSalidaController extends AbstractController
                 }
                 $consecutivo = $contador + 1;
 
+                $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
+                $obj_unidad = $em->getRepository(Unidad::class)->find($id_unidad);
+                $obj_moneda = $em->getRepository(Moneda::class)->find($ajuste_salida['documento']['id_moneda']);
 
                 //2-adicionar en documento
-                $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $id_almacen]);
+                if (empty($arr_documentos)) {
+                    $today = $request->getSession()->get('date_system');
+                    $obj_date = \DateTime::createFromFormat('d/m/Y', $today);
+                } else {
+                    $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                    $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
+                }
+                //2-adicionar en documento
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                     ->setAnno($year_)
                     ->setIdTipoDocumento($obj_tipo_documento)
-                    ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                    ->setIdMoneda($em->getRepository(Moneda::class)->find($ajuste_salida['documento']['id_moneda']));
+                    ->setIdAlmacen($obj_almacen)
+                    ->setIdUnidad($obj_unidad)
+                    ->setIdMoneda($obj_moneda);
                 $em->persist($documento);
 
                 //3.1-adicionar en ajuste de salida
@@ -150,6 +161,17 @@ class AjusteSalidaController extends AbstractController
                     ->setActivo(true)
                     ->setEntrada(false);
                 $em->persist($ajuste_salida);
+
+                /*** Asentando la Operacion**/
+                $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy([
+                    'nro_cuenta' => $cuenta_inventario,
+                    'activo' => true
+                ]);
+                $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                    'id_cuenta' => $obj_cuenta,
+                    'nro_subcuenta' => $subcuenta_inventario,
+                    'activo' => true
+                ]);
 
                 /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                  * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
@@ -224,6 +246,17 @@ class AjusteSalidaController extends AbstractController
                             ->setIdMercancia($obj_mercancia)
                             ->setExistencia($obj_mercancia->getExistencia());
 
+                        /*** Asiento la operacion**/
+                        $cuenta_mercancia = $em->getRepository(Cuenta::class)->findOneBy(
+                            ['nro_cuenta' => $obj_mercancia->getCuenta(), 'activo' => true]
+                        );
+                        $subcuenta_mercancia = $em->getRepository(Subcuenta::class)->findOneBy(
+                            ['nro_subcuenta' => $obj_mercancia->getNroSubcuentaInventario(), 'activo' => true, 'id_cuenta' => $cuenta_mercancia]
+                        );
+                        $asiento_ = AuxFunctions::createAsiento($em, $cuenta_mercancia, $subcuenta_mercancia, $documento, $obj_unidad, $obj_almacen,
+                            null, null, null, null, null
+                            , 0, 0, $obj_date, $obj_date->format('Y'), $importe_mercancia, 0, 'AS-' . $consecutivo);
+
                         $em->persist($movimiento_mercancia);
                     }
                 }
@@ -232,6 +265,11 @@ class AjusteSalidaController extends AbstractController
                 $documento
                     ->setImporteTotal($importe_total);
                 $em->persist($documento);
+
+                ///-----asiento la operacion
+                $asiento = AuxFunctions::createAsiento($em, $obj_cuenta, $obj_subcuenta, $documento, $obj_unidad, $obj_almacen,
+                    null, null, null, null, null
+                    , 0, 0, $obj_date, $obj_date->format('Y'), 0, $importe_total, 'AS-' . $consecutivo);
 
                 try {
                     $em->flush();
@@ -349,14 +387,22 @@ class AjusteSalidaController extends AbstractController
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_ajuste_salida = $em->getRepository(Ajuste::class)->findOneBy([
+        $arr_ajuste_salida = $em->getRepository(Ajuste::class)->findBy([
             'nro_concecutivo' => $nro,
             'entrada' => false,
             'anno' => Date('Y')
         ]);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+
         $msg = 'No se pudo eliminar el ajuste seleccionado';
         $success = 'error';
-        if ($obj_ajuste_salida) {
+        if (!empty($arr_ajuste_salida)) {
+            /** @var Ajuste $inf */
+            foreach ($arr_ajuste_salida as $inf) {
+                if ($inf->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen) {
+                    $obj_ajuste_salida = $inf;
+                }
+            }
             /**@var $obj_ajuste_salida Ajuste** */
             $obligacion_er = $em->getRepository(ObligacionPago::class);
 
@@ -415,14 +461,14 @@ class AjusteSalidaController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_ajuste_salida_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em,Request $request, $nro)
+    public function print(EntityManagerInterface $em, Request $request, $nro)
     {
         $ajuste_entrada_er = $em->getRepository(Ajuste::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
         $today = \DateTime::createFromFormat('Y-m-d', $fecha);
         $year_ = $today->format('Y');
 
@@ -430,7 +476,7 @@ class AjusteSalidaController extends AbstractController
             'activo' => true,
             'nro_concecutivo' => $nro,
             'entrada' => false,
-            'anno'=>$year_
+            'anno' => $year_
         ));
 
         /** @var Ajuste $element */

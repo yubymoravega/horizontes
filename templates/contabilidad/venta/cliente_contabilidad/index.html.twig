@@ -32,7 +32,6 @@
         <table class="table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2">NRF</th>
-            <th scope="col-2">Categoría</th>
             <th scope="col-1">Nombre</th>
             <th scope="col-1">Fax</th>
             <th scope="col-1">Teléfonos</th>
@@ -44,7 +43,6 @@
             {% for item in clientes %}
                 <tr>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
-                    <td style="font-weight:400;">{{ item.categoria }}</td>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.fax }}</td>
                     <td style="font-weight:400;">{{ item.telefonos }}</td>
@@ -65,7 +63,6 @@
                                         codigo: '{{ item.codigo }}',
                                         nombre: '{{ item.nombre }}',
                                         fax: '{{ item.fax }}',
-                                        categoria: '{{ item.id_categoria }}',
                                         telefonos: '{{ item.telefonos }}',
                                         correos: '{{ item.correos }}',
                                         direccion: '{{ item.direccion }}',
@@ -107,7 +104,7 @@
         const onUpdate = function (config) {
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
-            const {id = '', codigo = '', nombre = '', fax = '', telefonos = '',categoria='', correos = '', direccion = ''} = config
+            const {id = '', codigo = '', nombre = '', fax = '', telefonos = '', correos = '', direccion = ''} = config
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
             // nombre, codigo, id
@@ -117,7 +114,6 @@
             $('#cliente_contabilidad_telefonos').val(telefonos)
             $('#cliente_contabilidad_correos').val(correos)
             $('#cliente_contabilidad_direccion').val(direccion)
-            $('#cliente_contabilidad_id_categoria_cliente').val(categoria)
             $('#id_cliente_contabilidad').val(id)
         }
 
@@ -254,7 +250,6 @@
                     'cliente_contabilidad[telefonos]': "required",
                     'cliente_contabilidad[correos]': "required",
                     'cliente_contabilidad[direccion]': "required",
-                    'cliente_contabilidad[id_categoria_cliente]': "required",
                 },
                 messages: {
                     'cliente_contabilidad[nombre]': 'Obligratorio',
@@ -262,7 +257,6 @@
                     'cliente_contabilidad[telefonos]': 'Obligratorio',
                     'cliente_contabilidad[correos]': 'Obligratorio',
                     'cliente_contabilidad[direccion]': 'Obligratorio',
-                    'cliente_contabilidad[id_categoria_cliente]': 'Obligratorio',
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {

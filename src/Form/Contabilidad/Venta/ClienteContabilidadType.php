@@ -20,7 +20,7 @@ class ClienteContabilidadType extends AbstractType
         $builder
             ->add('codigo', TextType::class, array(
                 'required' => true,
-                'label' => 'RNC',
+                'label' => 'NRF',
                 'attr' => ['class' => 'w-100 '],
             ))
             ->add('nombre', TextType::class, array(
@@ -43,15 +43,6 @@ class ClienteContabilidadType extends AbstractType
                 'label' => 'Correos',
                 'attr' => ['class' => 'w-100', 'placeholder' => 'usuario@dominio.com - usuario@dominio.com'],
             ))
-            ->add('id_categoria_cliente', EntityType::class, [
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Categoría',
-                'class' => CategoriaCliente::class,
-                'choice_value' => 'id',
-                'choice_label' => function (CategoriaCliente $eg) {
-                    return $eg->getPrefijo() . ' - ' . $eg->getNombre();
-                }]
-            )
             ->add('direccion', TextareaType::class, array(
                 'required' => true,
                 'label' => 'Dirección',

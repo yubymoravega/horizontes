@@ -10,7 +10,9 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Contabilidad\OperacionesComprobanteOperaciones;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
+use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Contabilidad\General\FacturasComprobante;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
@@ -40,6 +42,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
+use function Sodium\add;
 
 /**
  * Class MovimientoCuentaController
@@ -86,6 +89,102 @@ class MovimientoCuentaController extends AbstractController
         $arr_subcuenta = (isset($nro_subcuenta) && $nro_subcuenta != '') ? explode(' - ', $nro_subcuenta) : '';
 
         /** @var Cuenta $obj_cuenta */
+        $obj_cuenta = $cuenta_er->findOneBy(['nro_cuenta' => $arr_cuenta[0], 'activo' => true]);
+        if ($arr_subcuenta != '' || !empty($arr_subcuenta))
+            $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy(
+                ['nro_subcuenta' => $arr_subcuenta[0], 'activo' => true, 'id_cuenta' => $obj_cuenta]);
+        else
+            $obj_subcuenta = null;
+
+        $asiento_er = $em->getRepository(Asiento::class);
+        $centro_costo_er = $em->getRepository(CentroCosto::class);
+        $orden_trabajo_er = $em->getRepository(OrdenTrabajo::class);
+        $elemento_gasto_er = $em->getRepository(ElementoGasto::class);
+        $expediente_er = $em->getRepository(Expediente::class);
+        $proveedor_er = $em->getRepository(Proveedor::class);
+        $almacen_er = $em->getRepository(Almacen::class);
+
+        $params = [];
+        if (isset($almacen) && $almacen > 0) {
+            $params[0]['id_almacen'] = $almacen_er->find($almacen)->getId();
+
+        }
+        if (isset($centro_costo) && $centro_costo > 0) {
+            $params[0]['id_centro_costo'] = $centro_costo_er->find($centro_costo)->getId();
+
+        }
+        if (isset($orden_trabajo) && $orden_trabajo > 0) {
+            $params[0]['id_orden_trabajo'] = $orden_trabajo_er->find($orden_trabajo)->getId();
+
+        }
+        if (isset($elemento_gasto) && $elemento_gasto > 0) {
+            $params[0]['id_elemento_gasto'] = $elemento_gasto_er->find($elemento_gasto)->getId();
+
+        }
+        if (isset($expediente) && $expediente > 0) {
+            $params[0]['id_expediente'] = $expediente_er->find($expediente)->getId();
+
+        }
+        if (isset($proveedor) && $proveedor > 0) {
+            $params[0]['id_proveedor'] = $proveedor_er->find($proveedor)->getId();
+
+        }
+        if ($obj_subcuenta) {
+            $params[0]['id_subcuenta'] = $obj_subcuenta->getId();
+
+        }
+        if ($obj_cuenta) {
+            $params[0]['id_cuenta'] = $obj_cuenta->getId();
+
+        }
+
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        if ($unidad) {
+            $params[0]['id_unidad'] = $unidad->getId();
+        }
+
+        $arr_asientos = $asiento_er->findBy($params[0]);
+        $row = [];
+        $saldo_partida = 0;
+        /** @var Asiento $asiento */
+        foreach ($arr_asientos as $asiento) {
+            if ($asiento->getIdComprobante() != null)
+                $row[] = array(
+                    'tipo_comprobante' => $asiento->getIdTipoComprobante()->getAbreviatura(),
+                    'nro_comprobante' => $asiento->getIdComprobante()->getNroConsecutivo(),
+                    'nro_consecutivo' => $asiento->getNroDocumento(),
+                    'debito' => $asiento->getDebito() == 0 ? '' : $asiento->getDebito(),
+                    'credito' => $asiento->getCredito() == 0 ? '' : $asiento->getCredito(),
+                    'total' => number_format(0, 2)
+                );
+        }
+
+        return new JsonResponse(['success' => true, 'datos' => $row, 'saldo_inicial' => number_format($saldo_partida, 2)]);
+    }
+
+    public function getSumbayorOriginal(EntityManagerInterface $em, Request $request)
+    {
+        //params to view
+        $centro_costo = $request->request->get('centro_costo');
+        $orden_trabajo = $request->request->get('orden_trabajo');
+        $elemento_gasto = $request->request->get('elemento_gasto');
+        $expediente = $request->request->get('expediente');
+        $periodo = $request->request->get('periodo');
+        $nro_cuenta = $request->request->get('nro_cuenta');
+        $anno = $request->request->get('anno');
+        $nro_subcuenta = $request->request->get('nro_subcuenta');
+        $almacen = $request->request->get('almacen');
+        $cliente = $request->request->get('cliente');
+        $proveedor = $request->request->get('proveedor');
+
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+
+        $arr_cuenta = explode(' - ', $nro_cuenta);
+        $arr_subcuenta = (isset($nro_subcuenta) && $nro_subcuenta != '') ? explode(' - ', $nro_subcuenta) : '';
+
+        /** @var Cuenta $obj_cuenta */
+//        dd($arr_cuenta,$nro_cuenta);
         $obj_cuenta = $cuenta_er->findOneBy(['nro_cuenta' => $arr_cuenta[0], 'activo' => true]);
         $arr_criterio = AuxFunctions::getCriterioByCuenta($obj_cuenta->getNroCuenta(), $em);
         $rows_data_criterios = [];
@@ -331,6 +430,13 @@ class MovimientoCuentaController extends AbstractController
             ]);
             if (!empty($facturas_comprobantes)) {
                 //dd($facturas_comprobantes[0]->getIdFactura()->getCuentaObligacion());
+            } else {
+                $comprobante_operaciones = $em->getRepository(OperacionesComprobanteOperaciones::class)->findBy([
+                    'id_registro_comprobantes' => $comp->getId()
+                ]);
+                if (!empty($comprobante_operaciones)) {
+
+                }
             }
         }
         return ['datos' => $row, 'saldo' => $saldo_inicial_calculo];
@@ -620,7 +726,8 @@ class MovimientoCuentaController extends AbstractController
             elseif ($id_tipo_documento == 10) {
                 $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_venta);
-                // dd($datos_venta);
+                $datos_venta_cancelada = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_venta_cancelada);
             }
             $retur_rows [] = array(
                 'nro_doc' => $rows[0]['nro_doc'],
