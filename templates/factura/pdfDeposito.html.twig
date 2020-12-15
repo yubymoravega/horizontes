@@ -1,0 +1,184 @@
+{% block content %}
+<html lang="en" class=""><head>
+
+  <meta charset="UTF-8">
+  <title>Factura</title>
+
+  <meta name="robots" content="noindex">
+
+  <link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
+  <link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111">
+
+  
+  
+  
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+
+  <style class="INLINE_PEN_STYLESHEET_ID">
+    body {
+  /*background: #ccc;*/
+  padding: 30px;
+}
+
+.container {
+  width: 30cm;
+  min-height: 29.7cm;
+}
+
+.invoice {
+  background: #fff;
+  width: 100%;
+  padding: 50px;
+}
+
+.logo {
+  width: 2.5cm;
+}
+
+.document-type {
+  text-align: right;
+  color: #444;
+}
+
+.conditions {
+  font-size: 0.7em;
+  color: #666;
+}
+
+.bottom-page {
+  font-size: 0.7em;
+}
+.mayuscula{
+    text-transform: uppercase;
+}
+
+  </style>
+
+ 
+</head>
+
+<body>
+  <div class="container">
+  <div class="invoice">
+    <div class="row">
+      <div class="col-7">
+        <img src="https://solyag.com/wp-content/uploads/2020/10/Recurso-2.png" class="logo">
+      </div>
+      <div class="col-5">
+        <h1 class="document-type display-4">FACTURA</h1>
+        <p class="text-right"><strong>{{ "now"|date("d/M/Y ") }} <br> No: 000{{id}} </strong></p>
+         
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-7">
+        <p>
+          <strong>SOLYAG S.R.L  <br> RNC: 1-32-13041-3 </strong>
+         
+        <br><strong>Empleado:</strong> {{empleado}} 
+         </p>
+      </div>
+      <div style="text-align: right;" class="col-5">
+       
+        <p>
+          <strong>{{nombre}}</strong><br>
+          {{telefono}}<br>
+           {{cliente.direccion}}<br>
+         {{cliente.correo}}
+        </p>
+      </div>
+    </div>
+    <br>
+    <br>
+    
+    <br>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="text-right">Código</th>
+          <th class="text-left">Servicio</th>
+          <th class="text-right">No.Orden</th>
+          <th class="text-right">Producto</th>
+          <th class="text-right">Comisión</th>
+          <th class="text-right">SubTotal</th>
+        </tr>
+      </thead>
+      <tbody>
+          
+{% for data in json %}
+<tr>  <td>  <img style="width: 90px;"  src = "https://solyag.online/qr-code/https://solyag.online/factura/pdf/servicio/{{id}}/{{data.mOrderNo}}.png" /> </td>
+        <td> <p  class="mayuscula"> {{data.servicio}} <br> <br> {{data.primerNombre}} {{data.primerApellido}} {{data.segundoApellido}}</P> 
+        </td>
+         <td class="text-right"> {{data.mOrderNo}} </td>
+          <td class="text-right">$ {{data.recibir}} {{data.recibirMoneda}}</td>
+           <td class="text-right">$ {{data.comision}}  {{data.montoMoneda}}</td>
+          <td class="text-right">$  {{data.monto }}  </td>
+    </tr>  
+    {% endfor %}
+
+        
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col-8">
+      </div>
+      <div class="col-4">
+        <table class="table table-sm text-right">
+          <tbody><tr>
+            <td><strong>SubTotal</strong></td>
+            <td class="text-right">$ {{total}} </td>
+          </tr>
+          <tr>
+            <td>Impuesto</td>
+            <td class="text-right">$ 0.00 </td>
+          </tr>
+          <tr>
+            <td><strong>Total {{moneda}}</strong></td>
+            <td class="text-right">$ {{total}}</td>
+          
+          </tr>
+
+          {% for data in deposito %}
+        <tr>
+            <td><strong>Deposito {{data.banco}}</strong></td>
+            <td class="text-right">$ {{(data.monto)|number_format(2, '.', ',')}}</td>
+          
+          </tr> 
+    {% endfor %}
+
+        </tbody></table>
+      </div>
+    </div>
+    <br> <br> 
+     ________________________
+     <br>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Firma 
+     <br><br>  <br>
+     
+     <h6>Gracias por su compra.</h6>
+    <p class="conditions">
+     Consulte los términos y condiciones de los servicios en <strong>www.solyag.com </strong> 
+    </p>
+    
+    <br>
+    
+
+    <hr>
+    <p class="bottom-page text-center">
+      <strong>SOLYAG S.R.L RNC: 1-32-13041-3 </strong><br>
+          Calle. Juan S Ramirez esq Wenceslao Alvarez<br>
+         Zona Universitaria, Santo Domingo, Rep Dom <br>
+         Tel: +1-305-400-4243 & +1-809-770-2266
+    </p>
+    <img style="width: 90px; margin-left: 45%;"  src = "https://solyag.online/qr-code/{{id}}.png" />
+  </div>
+</div>
+  
+
+</body></html>
+
+
+
+{% endblock %}
+
+
+

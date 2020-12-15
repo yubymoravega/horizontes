@@ -1,11 +1,11 @@
-<li>
+<li id="reportes">
 
-	<a href="#">
+	<a href="#" >
 		<span>Reportes</span>
 	</a>
 	<ul class="rd-navbar-dropdown">
 
-		<li>
+		<li id="id-reportes">
 			<a >
 				<a href="{{ url ('paymentreport') }}">
 					<span>Tarjetas</span>
@@ -63,9 +63,9 @@
 </li>
 
 
-<li>
+<li id="servicios">
 	<a href="#">
-		<span>Servicios</span>
+		<span>Configuración servicios</span>
 	</a>
 	<ul class="rd-navbar-dropdown">
 
@@ -77,6 +77,15 @@
 
 			</a>
 		</li>
+
+		<li>
+			<a >
+				<a href="{{ url ('turismo/configuracion/') }}">
+					<span>Turismo</span>
+				</a>
+
+			</a>
+		</li>
 		
 
 	</ul>
@@ -84,7 +93,7 @@
 </li>
 
 
-<li>
+<li id="Configuracion">
 		<a href="#">
 		<span>Configuracion</span>
 	</a>
@@ -108,14 +117,7 @@
 			</a>
 		</li>
 
-		<li>
-			<a >
-				<a href="{{ url ('turismo/configuracion/') }}">
-					<span>Turismo</span>
-				</a>
-
-			</a>
-		</li>
+		
 
 
 	</ul>
