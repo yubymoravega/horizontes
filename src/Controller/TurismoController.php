@@ -1362,7 +1362,7 @@ class TurismoController extends AbstractController
         );
 
      
-      
-        return $this->redirectToRoute('turismo/reporte/solicitud/');
+      return new Response(200);
+        //return $this->redirectToRoute('turismo/reporte/solicitud/');
     }
 }

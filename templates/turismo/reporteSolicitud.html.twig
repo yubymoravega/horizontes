@@ -212,8 +212,17 @@ function status(id) {
 
   $("#guardarEstado").click(function(){
   
-  //alert("asdasd");
-	window.location.href ="/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text();
+  $.ajax({
+            type: 'POST',
+            data: {'code' : '200'},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text(),
+            dataType: 'html',
+            success: function (data) {
+
+                location.reload();
+            
+            }}); 
+	//window.location.href ="/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text();
 
 });
 }
@@ -232,7 +241,7 @@ function status(id) {
             dataType: 'html',
             success: function (data) {
 
-                window.location.href = window.location;
+                window.location.href = "/turismo/reporte/solicitud/";
             
             }}); 
       });
