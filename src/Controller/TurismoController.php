@@ -121,6 +121,8 @@ class TurismoController extends AbstractController
             $dql .= " WHERE a.stado = 'Pendiente'";
         }
 
+        $dql .= " ORDER BY a.fecha DESC";
+
         $query = $em->createQuery($dql);
 
         $pagination = $paginator->paginate(
