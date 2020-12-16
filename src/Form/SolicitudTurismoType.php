@@ -29,7 +29,7 @@ class SolicitudTurismoType extends AbstractType
         $builder
             ->add('vueloCantidadAdultos', ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -43,7 +43,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('vueloCantidadNinos'  ,  ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -101,7 +101,7 @@ class SolicitudTurismoType extends AbstractType
             ])
             ->add('hotelCategoria',  ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => "1 Estrella",
                     '2' => "2 Estrellas",
                     '3' => "3 Estrellas",
@@ -111,7 +111,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('hotelPlan', ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     'all inclusive' => "all inclusive",
                     'desayuno incluido' => "desayuno incluido",
                     'desayuno y almuerzo incluido' => "desayuno y almuerzo incluido",
@@ -160,7 +160,7 @@ class SolicitudTurismoType extends AbstractType
             //->add('tourCantidadNinos',  null, ['required'=> false])
             ->add('RentTipoVehiculo' , ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     'Económico/Intermedio' => "Económico/Intermedio",
                     'Estándar/Full-size' => "Estándar/Full-size",
                     'Premium' => "Premium",
@@ -193,7 +193,7 @@ class SolicitudTurismoType extends AbstractType
             ->add('rentComentario' ,TextareaType::class , ['required'=> false])
             ->add('hotelAdultos',   ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -207,7 +207,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('hotelNinos',   ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -221,7 +221,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('tramferAdultos',   ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -235,7 +235,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('tramferNinos',   ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -249,7 +249,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('tourNinos',   ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -263,7 +263,7 @@ class SolicitudTurismoType extends AbstractType
                 ]], ['required'=> false])
             ->add('tourAdultos',    ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
+                    '-' => '-',
                     '1' => 1,
                     '2' => 2,
                     '3' => 3,
@@ -278,7 +278,6 @@ class SolicitudTurismoType extends AbstractType
             ->add('rentCantidadPersonas',  null, ['required'=> false])
             ->add('tramferIdaVuelta'  ,  ChoiceType::class, [
                 'choices'  => [
-                    '-' => null,
                     '-' => "-",
                     'Solo Ida' => "Solo Ida",
                     'Ida & Vuelta' => "Ida & Vuelta",

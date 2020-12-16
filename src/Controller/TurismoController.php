@@ -65,8 +65,10 @@ class TurismoController extends AbstractController
 
                 if ($request->get('estado') == 'Pendiente') {
                     $dql .= " AND  a.stado = 'Pendiente'";
-                } else {
-                    $dql .= " AND  a.stado != 'Pendiente'";
+                } elseif($request->get('estado') == 'En Proceso') {
+                    $dql .= " AND  a.stado = 'En Proceso'";
+                }elseif($request->get('estado') == 'Finalizada') {
+                    $dql .= " AND  a.stado = 'Finalizada'";
                 }
             }
 
@@ -83,18 +85,20 @@ class TurismoController extends AbstractController
 
             if ($request->get('estado') == 'Pendiente') {
                 $dql .= " WHERE  a.stado = 'Pendiente'";
-            } else {
-                $dql .= " WHERE  a.stado != 'Pendiente'";
+            } elseif($request->get('estado') == 'En Proceso') {
+                $dql .= " WHERE  a.stado = 'En Proceso'";
+            }elseif($request->get('estado') == 'Finalizada') {
+                $dql .= " WHERE  a.stado = 'Finalizada'";
             }
 
             if ($request->get('empleado')) {
 
-                $dql .= " WHERE  a.empleado  ='" . $request->get('empleado') . "'";
+                $dql .= " AND  a.empleado  ='" . $request->get('empleado') . "'";
             }
 
             if ($request->get('telefono')) {
 
-                $dql .= " WHERE  a.idCliente  ='" . $request->get('telefono') . "'";
+                $dql .= " AND  a.idCliente  ='" . $request->get('telefono') . "'";
             }
         } elseif ($request->get('empleado')) {
 
@@ -112,7 +116,11 @@ class TurismoController extends AbstractController
             }
         }
 
-        $dql .= " ORDER BY a.fechaSolicitud DESC";
+        if (!$request->get('estado')) {
+
+            $dql .= " WHERE a.stado = 'Pendiente'";
+        }
+
         $query = $em->createQuery($dql);
 
         $pagination = $paginator->paginate(
@@ -257,7 +265,7 @@ class TurismoController extends AbstractController
     {
         $dataBase = $this->getDoctrine()->getManager();
 
-        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id]);
+        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id],[ 'fecha' =>'ASC']);
         $solicitud = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
 
         $vueloOrigen = $dataBase->getRepository(VueloOrigen::class)->findAll();
@@ -326,6 +334,7 @@ class TurismoController extends AbstractController
         } else {
 
             $vueloAdultos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -339,6 +348,7 @@ class TurismoController extends AbstractController
             );
 
             $vueloNinos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -352,6 +362,7 @@ class TurismoController extends AbstractController
             );
 
             $hotelAdultos = array(
+              '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -365,6 +376,7 @@ class TurismoController extends AbstractController
             );
 
             $hotelNinos = array(
+              '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -378,6 +390,7 @@ class TurismoController extends AbstractController
             );
 
             $transferAdultos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -391,6 +404,7 @@ class TurismoController extends AbstractController
             );
 
             $transferNinos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -404,6 +418,7 @@ class TurismoController extends AbstractController
             );
 
             $tourNinos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -417,6 +432,7 @@ class TurismoController extends AbstractController
             );
 
             $tourAdultos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -451,7 +467,7 @@ class TurismoController extends AbstractController
     {
         $dataBase = $this->getDoctrine()->getManager();
         $solicitud = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
-        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id]);
+        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id] ,[ 'fecha' =>'DESC']);
         $cliente = $dataBase->getRepository(Cliente::class)->findBy(["telefono"=>$solicitud->getIdCliente()]);
         
         return $this->render('turismo/detalles.html.twig',['comentarios' => $comentario,'solicitud' => $solicitud,'cliente' => $cliente[0]]);

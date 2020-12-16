@@ -431,9 +431,9 @@ class FacturaController extends AbstractController
                 'mSourceName' => ($json[$contador]->nombreCliente) ? $json[$contador]->nombreCliente : "",
                 'mSourcePhoneNo' => ($json[$contador]->idCliente) ? $json[$contador]->idCliente : "",
                 'mTargetFirstName' => ($json[$contador]->primerNombre) ? $json[$contador]->primerNombre : "",
-                'mTargetLastName' => '',
-                'mTargetFirstName2' => ($json[$contador]->primerApellido) ? $json[$contador]->primerApellido : "",
-                'mTargetLastName2' => ($json[$contador]->segundoApellido) ? $json[$contador]->segundoApellido:"" ,
+                'mTargetLastName' => ($json[$contador]->primerApellido) ? $json[$contador]->primerApellido : "", ($json[$contador]->segundoApellido) ? $json[$contador]->segundoApellido:"" ,
+                'mTargetFirstName2' => "",
+                'mTargetLastName2' => "",
                 'mTargetAddress' => $direcion,
                 'mProvinceID' => $json[$contador]->provincia,
                 'mMunicipalityID' => ($json[$contador]->municipio) ? $json[$contador]->municipio: "" ,
@@ -710,11 +710,11 @@ class FacturaController extends AbstractController
             $contador++;
         } 
 
-        $html = $this->renderView("factura/servicios.html.twig",
-        ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $data,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+        $html = $this->renderView("factura/servicios.html.twig", 
+        [ 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $data,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
         $filename = 'factura.pdf';
 
-         return $this->render("factura/servicios.html.twig", ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $data,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+         return $this->render("factura/servicios.html.twig", [ 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $data,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
         //return new Response(var_dump( $data));
         return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
     }
