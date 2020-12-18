@@ -30,11 +30,9 @@
                 <td rowspan="2" width="100px">Subcuenta</td>
                 <td rowspan="2" class="text-center">Descripción de la cuenta</td>
                 <td colspan="2" width="260px" class="text-center">Movimientos del Mes</td>
-                <td colspan="2" width="260px" class="text-center">Saldo Acumulado</td>
+                <td rowspan="2" width="160px" class="text-center">Saldo Acumulado</td>
             </tr>
             <tr class="bg-dark font-weight-bold">
-                <td width="130px" class="text-center">Débito</td>
-                <td width="130px" class="text-center">Crédito</td>
                 <td width="130px" class="text-center">Débito</td>
                 <td width="130px" class="text-center">Crédito</td>
             </tr>
@@ -48,7 +46,6 @@
                         <td style="font-weight:400;" class="text-center">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
                     </tr>
                 {% elseif item.cuenta == '' and item.subcuenta != '' %}
                     <tr class="row-group-subconta">
@@ -58,7 +55,6 @@
                         <td style="font-weight:400;" class="text-center">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -76,7 +72,6 @@
                         <td style="font-weight:400;" class="text-center">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
                     </tr>
                 {% endif %}
             {% endfor %}

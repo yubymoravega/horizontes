@@ -59,7 +59,7 @@ class ClientesAdapter
     {
         return [
             'Persona Natural' => self::$PERSONA,
-            'Cliente Inerno' => self::$UNIDAD_SISTEMA,
+            'Cliente Interno' => self::$UNIDAD_SISTEMA,
             'Cliente Externo' => self::$CLIENTE_CONTABILIDAD
         ];
     }

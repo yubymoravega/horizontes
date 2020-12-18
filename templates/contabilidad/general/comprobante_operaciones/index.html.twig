@@ -239,6 +239,7 @@
         let pagos_cobros = [];
         let lista_cuentas_comprobante = []
         let debito_total = 0;
+        let total_entrada = 0;
         let credito_total = 0;
         let cbx_cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta')
         let cbx_centro_costo = $('#cuentas_comprobante_operaciones_centro_costo')
@@ -258,14 +259,19 @@
 
         cbx_cliente.on('change', function () {
             cbx_proveedor.val(0)
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
         })
         cbx_proveedor.on('change', function () {
             cbx_cliente.val(0)
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
             cbx_tipo_cliente.val(0)
             cbx_cliente.find('option').remove()
         })
-
         cbx_cuenta.on('change', function () {
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
             $('#cuentas_comprobante_operaciones_debito').prop('disabled', false)
             $('#cuentas_comprobante_operaciones_credito').prop('disabled', false)
             $('#cuentas_comprobante_operaciones_debito').val('')
@@ -322,6 +328,32 @@
                 }
             })
         })
+        cbx_tipo_cliente.on('change', function () {
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
+            cbx_cliente.find('option').remove()
+            cbx_cliente.prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            cbx_proveedor.val(0)
+            loadingModal.show()
+            $.ajax({
+                url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        result.clientes.forEach(
+                            el => cbx_cliente.append(`<option value = "${el.id}">${el.nombre} </option>`)
+                        )
+                        cbx_cliente
+                    } else {
+
+                    }
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+        })
 
         function hiddenParents() {
             cbx_centro_costo.parent().hide()
@@ -338,8 +370,8 @@
             $('#cliente_id_label').parent().hide()
             $('#proveedor_id_label').parent().hide()
             $('#cuentas_comprobante_operaciones_id_factura').hide()
-            $('#cuentas_comprobante_operaciones_id_informe_recepcion').hide()
 
+            $('#cuentas_comprobante_operaciones_id_informe_recepcion').hide()
             $('#cuentas_comprobante_operaciones_centro_costo').val(0)
             $('#cuentas_comprobante_operaciones_orden_trabajo').val(0)
             $('#cuentas_comprobante_operaciones_elemento_gasto').val(0)
@@ -352,6 +384,22 @@
         }
 
         hiddenParents()
+
+        $('#listarMercanciasModal').on('show.bs.modal', function () {
+            $("#rows_table input[type='number']").on('keyup', function () {
+                total_entrada = 0;
+                for (var i = 0; i < obligaciones.length; i++) {
+                    let id = '#' + obligaciones[i]['id']
+                    if ($(id + '_input').val() != '') {
+                        total_entrada = Number.parseFloat(total_entrada) + Number.parseFloat($(id + '_input').val())
+                        $(id).attr('checked', true);
+                    } else {
+                        $(id).attr('checked', false);
+                    }
+                }
+                $('#total_input').val(total_entrada)
+            })
+        })
 
         form_comprobante.validate({
             errorClass: 'invalid-label-orange',
@@ -397,30 +445,7 @@
                 'cuentas_comprobante_operaciones[expediente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
             }
         })
-        cbx_tipo_cliente.on('change', function () {
-            cbx_cliente.find('option').remove()
-            cbx_cliente.prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-            cbx_proveedor.val(0)
-            loadingModal.show()
-            $.ajax({
-                url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
-                method: 'POST',
-                dataType: 'json',
-                success: function (result) {
-                    if (result.success) {
-                        result.clientes.forEach(
-                            el => cbx_cliente.append(`<option value = "${el.id}">${el.nombre} </option>`)
-                        )
-                        cbx_cliente
-                    } else {
 
-                    }
-                    loadingModal.close()
-                },
-                error: function () {
-                }
-            })
-        })
         $('#btnAplicarMercancia').on('click', function () {
             let debito = $('#cuentas_comprobante_operaciones_debito').val()
             let credito = $('#cuentas_comprobante_operaciones_credito').val()
@@ -679,7 +704,7 @@
             let str = '';
             for (var i = 0; i < obligaciones.length; i++) {
                 let id = '#' + obligaciones[i]['id']
-                str += ($(id + '_id').val()+',')
+                str += ($(id + '_id').val() + ',')
                 if ($(id).prop('checked') == true) {
                     type = $(id + '_type').val()
                     pagos_cobros.push({
@@ -691,20 +716,16 @@
                 }
             }
             if (type == 'FACT') {
-                $('#cuentas_comprobante_operaciones_debito').val(Number.parseFloat(total).toFixed(2))
-                $('#cuentas_comprobante_operaciones_credito').val(0)
-                $('#cuentas_comprobante_operaciones_id_factura').val(str)
-                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val('')
-            } else {
                 $('#cuentas_comprobante_operaciones_id_factura').val('')
                 $('#cuentas_comprobante_operaciones_id_informe_recepcion').val(str)
                 $('#cuentas_comprobante_operaciones_debito').val(0)
                 $('#cuentas_comprobante_operaciones_credito').val(Number.parseFloat(total).toFixed(2))
+            } else {
+                $('#cuentas_comprobante_operaciones_debito').val(Number.parseFloat(total).toFixed(2))
+                $('#cuentas_comprobante_operaciones_credito').val(0)
+                $('#cuentas_comprobante_operaciones_id_factura').val(str)
+                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val('')
             }
         }
-
-        $('#rows_table tr td').on('change',function () {
-                alert('as');
-        })
     </script>
 {% endblock %}

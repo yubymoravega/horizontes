@@ -17,12 +17,16 @@ use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TerminoPago;
+use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\TipoCuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Contabilidad\OperacionesComprobanteOperaciones;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\General\Asiento;
+use App\Entity\Contabilidad\General\CobrosPagos;
 use App\Entity\Contabilidad\Inventario\Ajuste;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Devolucion;
@@ -48,6 +52,7 @@ use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Date;
@@ -1231,9 +1236,9 @@ class AuxFunctions
                 /**@var $obj_movimiento_mercancia MovimientoMercancia */
                 $cc = $obj_movimiento_mercancia->getIdCentroCosto()->getId() . '-' . $obj_movimiento_mercancia->getIdElementoGasto()->getId() . '-' . $obj_movimiento_mercancia->getIdElementoGasto()->getId();
                 if ($cc == $item) {
-                    $cento_costo = $obj_movimiento_mercancia->getIdCentroCosto()?$obj_movimiento_mercancia->getIdCentroCosto()->getCodigo():'';
-                    $orden_trabajo = $obj_movimiento_mercancia->getIdOrdenTrabajo()?$obj_movimiento_mercancia->getIdOrdenTrabajo()->getCodigo():'';
-                    $elemento_gasto = $obj_movimiento_mercancia->getIdElementoGasto()?$obj_movimiento_mercancia->getIdElementoGasto()->getCodigo():'';
+                    $cento_costo = $obj_movimiento_mercancia->getIdCentroCosto() ? $obj_movimiento_mercancia->getIdCentroCosto()->getCodigo() : '';
+                    $orden_trabajo = $obj_movimiento_mercancia->getIdOrdenTrabajo() ? $obj_movimiento_mercancia->getIdOrdenTrabajo()->getCodigo() : '';
+                    $elemento_gasto = $obj_movimiento_mercancia->getIdElementoGasto() ? $obj_movimiento_mercancia->getIdElementoGasto()->getCodigo() : '';
 
                     $total += floatval($obj_movimiento_mercancia->getImporte());
                 }
@@ -2680,7 +2685,7 @@ class AuxFunctions
         foreach ($list_servicios as $servicios) {
             $importe = (floatval($servicios['cantidad']) * floatval($servicios['precio']));
             $costo = (floatval($servicios['cantidad']) * floatval($servicios['costo']));
-            $importe_total += ($importe+floatval($servicios['impuesto']));
+            $importe_total += ($importe + floatval($servicios['impuesto']));
             $impuesto_total += floatval($servicios['impuesto']);
             $new_movimiento_servicio = new MovimientoServicio();
             $new_movimiento_servicio
@@ -2707,15 +2712,15 @@ class AuxFunctions
                 $unidad, null, null, null, null, null,
                 null, 0, 0, $factura->getFechaFactura(),
                 $factura->getFechaFactura()->format('Y'), $importe, 0,
-                'FACT-' . $factura->getNroFactura(),$factura);
-            if(floatval($servicios['costo'])>0){
+                'FACT-' . $factura->getNroFactura(), $factura);
+            if (floatval($servicios['costo']) > 0) {
                 $obj_subcuenta_costo_venta_servicio = $em->getRepository(Subcuenta::class)->findOneBy(
                     ['nro_subcuenta' => $servicios['codigo_servicio'], 'id_cuenta' => $cuenta_costo_venta_servicio, 'activo' => true]
                 );
                 $asiento_movimiento_servicio = self::createAsiento($em, $cuenta_costo_venta_servicio, $obj_subcuenta_costo_venta_servicio, null,
                     $unidad, null, null, null, null, null,
                     null, 0, 0, $factura->getFechaFactura(), $factura->getFechaFactura()->format('Y'),
-                    0, $costo, 'FACT-' . $factura->getNroFactura(),$factura);
+                    0, $costo, 'FACT-' . $factura->getNroFactura(), $factura);
 
             }
         }
@@ -2723,25 +2728,24 @@ class AuxFunctions
             ->setImporte($importe_total);
 
         //asentando impuesto
-        $obj_cuenta_impuesto = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>'440','activo'=>true]);
-        $obj_subcuenta_impuesto = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta'=>'0001','id_cuenta'=>$obj_cuenta_impuesto,'activo'=>true]);
+        $obj_cuenta_impuesto = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => '440', 'activo' => true]);
+        $obj_subcuenta_impuesto = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta' => '0001', 'id_cuenta' => $obj_cuenta_impuesto, 'activo' => true]);
         $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_impuesto, $obj_subcuenta_impuesto, null,
             $unidad, null, null, null, null, null,
             null, 0, 0, $factura->getFechaFactura(), $factura->getFechaFactura()->format('Y'),
-            0, $impuesto_total, 'FACT-' . $factura->getNroFactura(),$factura);
+            0, $impuesto_total, 'FACT-' . $factura->getNroFactura(), $factura);
 
 
         //asentando factura
-        $obj_cuenta_factura = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>'135','activo'=>true]);
+        $obj_cuenta_factura = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
         $obj_subcuenta_factura = $em->getRepository(Subcuenta::class)->findOneBy(
-            ['nro_subcuenta'=>$nro_subcuenta_obligracion_factura,'activo'=>true]
+            ['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true]
         );
         $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_factura, $obj_subcuenta_factura, null,
             $unidad, null, null, null, null, null,
             null, $factura->getTipoCliente(), $factura->getIdCliente(), $factura->getFechaFactura(),
             $factura->getFechaFactura()->format('Y'), 0, $importe_total,
-            'FACT-' . $factura->getNroFactura(),$factura);
-
+            'FACT-' . $factura->getNroFactura(), $factura);
 
 
         $em->persist($factura);
@@ -2772,10 +2776,10 @@ class AuxFunctions
      * @return Asiento
      */
     public static function createAsiento(EntityManagerInterface $em, Cuenta $obj_cuenta, Subcuenta $obj_subcuenta,
-                                  Documento $obj_documento = null, Unidad $obj_unidad, Almacen $obj_almacen = null,
-                                  CentroCosto $obj_centro_costo = null, ElementoGasto $obj_elemento_gasto = null,
-                                  OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
-                                  int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,Factura $id_factura = null)
+                                         Documento $obj_documento = null, Unidad $obj_unidad, Almacen $obj_almacen = null,
+                                         CentroCosto $obj_centro_costo = null, ElementoGasto $obj_elemento_gasto = null,
+                                         OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
+                                         int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento, Factura $id_factura = null)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -2799,5 +2803,181 @@ class AuxFunctions
             ->setTipoCliente($tipo_cliente);
         $em->persist($new_asiento);
         return $new_asiento;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param int $tipo_cliente tipo de cliente que adquiere el servicio
+     * @param int $id_cliente identificador del cliente que adquiere el servicio
+     * @param int $nro_factura nro de la factura que se esta pagando
+     * @param int $clasificafor_documento IMPORTANTE PORQUE DE AQUI SALE LA CUENTA BANCARIA QUE AFECTA (1->(efectivo y cheque); 2->(transferecnai o cualquier otra operacion bancaria))
+     * @param string $documento documento de pago Ej. cheque, efectivo, transferencia
+     * @param float $importe importe que paga de la factura
+     * @param object $id_user Usuario que realiza la accion
+     * @return string
+     *
+     */
+    public static function addComprobanteCobro(EntityManagerInterface $em, int $tipo_cliente, int $id_cliente, int $nro_factura, int $clasificafor_documento, string $documento, float $importe, object $id_user)
+    {
+        $new_registro = new RegistroComprobantes();
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $tipo_comprobante = $em->getRepository(TipoComprobante::class)->find(2);
+        $cta_efectivo_banco = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '109']);
+        $cta_efectivo_caja = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '103']);
+        $cta_x_cobrar = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '135']);
+        $subcuenta_efectivo_banco = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cta_efectivo_banco]);
+        $subcuenta_efectivo_caja = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cta_efectivo_caja]);
+
+        $nro_subcuenta_obligracion_factura = '0010';
+        if ($tipo_cliente == 2) {
+            $nro_subcuenta_obligracion_factura = '0020';
+        } elseif ($tipo_cliente == 3) {
+            $nro_subcuenta_obligracion_factura = '0030';
+        }
+
+        $subcuenta_x_cobrar = $subcuenta_er->findOneBy(
+            ['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true, 'id_cuenta' => $cta_x_cobrar]
+        );
+        $fecha = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+        $year_ = Date('Y');
+        $usuario = $em->getRepository(User::class)->find($id_user);
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy([
+            'id_usuario' => $usuario,
+            'activo' => true
+        ]);
+        $unidad = $empleado->getIdUnidad();
+
+        /** @var Factura $obj_factura */
+        $obj_factura = $em->getRepository(Factura::class)->findOneBy(
+            ['id_unidad' => $unidad, 'activo' => true, 'nro_factura' => $nro_factura]
+        );
+
+        if ($obj_factura) {
+            $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+                'id_unidad' => $unidad,
+                'anno' => $year_
+            ));
+            $nro_consecutivo_real = count($arr_registros) + 1;
+
+            $new_registro
+                ->setDescripcion('Pagando factura de servicio, número FACT-' . $obj_factura->getNroFactura())
+                ->setIdUsuario($usuario)
+                ->setFecha($fecha)
+                ->setAnno($year_)
+                ->setTipo(3)
+                ->setCredito($importe)
+                ->setDebito($importe)
+                ->setIdTipoComprobante($tipo_comprobante)
+                ->setIdUnidad($unidad)
+                ->setDocumento($documento)
+                ->setNroConsecutivo($nro_consecutivo_real);
+            $em->persist($new_registro);
+
+            $new_cobro_pago = new CobrosPagos();
+            $new_cobro_pago
+                ->setIdFactura($obj_factura)
+                ->setIdTipoCliente($tipo_cliente)
+                ->setIdClienteVenta($id_cliente)
+                ->setDebito(0)
+                ->setCredito($importe);
+            $em->persist($new_cobro_pago);
+
+            $new_operaciones_comprobante_debito = new OperacionesComprobanteOperaciones();
+            $new_operaciones_comprobante_debito
+                ->setIdCliente($id_cliente)
+                ->setIdProveedor(null)
+                ->setIdCentroCosto(null)
+                ->setIdOrdenTrabajo(null)
+                ->setIdElementoGasto(null)
+                ->setIdExpediente(null)
+                ->setIdAlmacen(null)
+                ->setIdUnidad($unidad)
+                ->setIdCuenta($clasificafor_documento == 1 ? $cta_efectivo_caja : $cta_efectivo_banco)
+                ->setIdSubcuenta($clasificafor_documento == 1 ? $subcuenta_efectivo_caja : $subcuenta_efectivo_banco)
+                ->setCredito(0)
+                ->setDebito($importe)
+                ->setIdTipoCliente($tipo_cliente)
+                ->setIdRegistroComprobantes($new_registro);
+            $em->persist($new_operaciones_comprobante_debito);
+
+            //asentando las operacones
+            $new_asiento = new Asiento();
+            $new_asiento
+                ->setIdCuenta($clasificafor_documento == 1 ? $cta_efectivo_caja : $cta_efectivo_banco)
+                ->setIdSubcuenta($clasificafor_documento == 1 ? $subcuenta_efectivo_caja : $subcuenta_efectivo_banco)
+                ->setFecha($fecha)
+                ->setAnno($year_)
+                ->setCredito(0)
+                ->setDebito($importe)
+                ->setNroDocumento('FACT-'.$obj_factura->getNroFactura())
+                ->setIdDocumento(null)
+                ->setIdUnidad($unidad)
+                ->setIdAlmacen(null)
+                ->setIdFactura($obj_factura)
+                ->setIdCentroCosto(null)
+                ->setIdOrdenTrabajo(null)
+                ->setIdElementoGasto(null)
+                ->setIdExpediente(null)
+                ->setIdProveedor(null)
+                ->setIdCliente($id_cliente)
+                ->setIdComprobante($new_registro)
+                ->setIdTipoComprobante($tipo_comprobante)
+                ->setTipoCliente($tipo_cliente);
+            $em->persist($new_asiento);
+
+
+            $new_operaciones_comprobante_credito = new OperacionesComprobanteOperaciones();
+            $new_operaciones_comprobante_credito
+                ->setIdCliente($id_cliente)
+                ->setIdProveedor(null)
+                ->setIdCentroCosto(null)
+                ->setIdOrdenTrabajo(null)
+                ->setIdElementoGasto(null)
+                ->setIdExpediente(null)
+                ->setIdAlmacen(null)
+                ->setIdUnidad($unidad)
+                ->setIdCuenta($cta_x_cobrar)
+                ->setIdSubcuenta($subcuenta_x_cobrar)
+                ->setCredito($importe)
+                ->setDebito(0)
+                ->setIdTipoCliente($tipo_cliente)
+                ->setIdRegistroComprobantes($new_registro);
+            $em->persist($new_operaciones_comprobante_credito);
+
+            //asentando las operacones
+            $new_asiento = new Asiento();
+            $new_asiento
+                ->setIdCuenta($cta_x_cobrar)
+                ->setIdSubcuenta($subcuenta_x_cobrar)
+                ->setFecha($fecha)
+                ->setAnno($year_)
+                ->setCredito($importe)
+                ->setDebito(0)
+                ->setNroDocumento('FACT-'.$obj_factura->getNroFactura())
+                ->setIdDocumento(null)
+                ->setIdUnidad($unidad)
+                ->setIdAlmacen(null)
+                ->setIdFactura($obj_factura)
+                ->setIdCentroCosto(null)
+                ->setIdOrdenTrabajo(null)
+                ->setIdElementoGasto(null)
+                ->setIdExpediente(null)
+                ->setIdProveedor(null)
+                ->setIdCliente($id_cliente)
+                ->setIdComprobante($new_registro)
+                ->setIdTipoComprobante($tipo_comprobante)
+                ->setTipoCliente($tipo_cliente);
+            $em->persist($new_asiento);
+
+            try {
+                $em->flush();
+            } catch (FileException $exception) {
+                return $exception->getMessage();
+            }
+            return $nro_consecutivo_real;
+        } else
+            return '';
     }
 }

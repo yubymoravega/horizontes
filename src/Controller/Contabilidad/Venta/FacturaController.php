@@ -71,7 +71,7 @@ class FacturaController extends AbstractController
                           AlmacenRepository $almacenRepository, ValidatorInterface $validator)
     {
 //        $id_user = $this->getUser();
-//        $insert = AuxFunctions::addFactServicio($em, 2,$id_user, 3, 4, 1,
+//        $insert = AuxFunctions::addFactServicio($em, 2, $id_user, 3, 4, 1,
 //            [
 //                [
 //                    'codigo_servicio' => '0010',
@@ -80,24 +80,37 @@ class FacturaController extends AbstractController
 //                    'costo' => 50,
 //                    'precio' => 90,
 //                    'impuesto' => 5,
-//                ],[
-//                    'codigo_servicio' => '0020',
-//                    'cantidad' => 1,
-//                    'descripcion' => 'Remesa para Ana',
-//                    'costo' => 97,
-//                    'precio' => 103,
-//                    'impuesto' => 2,
-//                ],[
-//                    'codigo_servicio' => '0030',
-//                    'cantidad' => 1,
-//                    'descripcion' => 'Paquete de cosas para la beba',
-//                    'costo' => 50,
-//                    'precio' => 90,
-//                    'impuesto' => 10,
-//                ],
+//                ], [
+//                'codigo_servicio' => '0020',
+//                'cantidad' => 1,
+//                'descripcion' => 'Remesa para Ana',
+//                'costo' => 97,
+//                'precio' => 103,
+//                'impuesto' => 2,
+//            ], [
+//                'codigo_servicio' => '0030',
+//                'cantidad' => 1,
+//                'descripcion' => 'Paquete de cosas para la anita',
+//                'costo' => 50,
+//                'precio' => 90,
+//                'impuesto' => 10,
+//            ],
 //            ]
 //        );
-
+//
+//        $facturas = $em->getRepository(Factura::class)->findAll();
+//        /** @var Factura $x */
+//        $x = $facturas[count($facturas) - 1];
+//
+//        $facturaRepository = $em->getRepository(Factura::class);
+//        $movimientoVentaRepository = $em->getRepository(MovimientoVenta::class);
+//        $cuentaRepository = $em->getRepository(Cuenta::class);
+//        $subcuentaRepository = $em->getRepository(Subcuenta::class);
+//        $productoRepository = $em->getRepository(Producto::class);
+//        $mercanciaRepository = $em->getRepository(Mercancia::class);
+//        return $this->print($em, $x->getNroFactura(), $facturaRepository,
+//            $movimientoVentaRepository, $cuentaRepository, $subcuentaRepository,
+//            $productoRepository, $mercanciaRepository);
 
         $factura_er = $em->getRepository(Factura::class);
         $cuenta_er = $em->getRepository(Cuenta::class);

@@ -86,6 +86,16 @@ class SaldoCuentas
      */
     private $saldo;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $tipo_cliente;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_cliente;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -231,6 +241,30 @@ class SaldoCuentas
     public function setSaldo(float $saldo): self
     {
         $this->saldo = $saldo;
+
+        return $this;
+    }
+
+    public function getIdTipoCliente(): ?int
+    {
+        return $this->tipo_cliente;
+    }
+
+    public function setIdTipoCliente(?int $tipo_cliente): self
+    {
+        $this->tipo_cliente = $tipo_cliente;
+
+        return $this;
+    }
+
+    public function getIdCliente(): ?int
+    {
+        return $this->id_cliente;
+    }
+
+    public function setIdCliente(?int $id_cliente): self
+    {
+        $this->id_cliente = $id_cliente;
 
         return $this;
     }

@@ -1,0 +1,46 @@
+{% extends 'contabilidad/general/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Cuentas por Cobrar
+            </h4>
+        </div>
+        {# end header #}
+
+        {# list#}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-1">Cliente</th>
+            <th width="110px">Factura</th>
+            <th width="170px">Fecha </th>
+            <th width="180px">Hasta 30 días</th>
+            <th width="185px">De 31 a 45 días</th>
+            <th width="180px">De 45a 60 días</th>
+            <th width="180px">Más de 60 días</th>
+            </thead>
+            <tbody>
+            {% for item in obligaciones_cobro %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.cliente }}</td>
+                    <td style="font-weight:400;">{{ item.factura }}</td>
+                    <td style="font-weight:400;">{{ item.fecha }}</td>
+                    <td style="font-weight:400;">{{ item.case_1 }}</td>
+                    <td style="font-weight:400;">{{ item.case_2 }}</td>
+                    <td style="font-weight:400;">{{ item.case_3 }}</td>
+                    <td style="font-weight:400;">{{ item.case_4 }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
