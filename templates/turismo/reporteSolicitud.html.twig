@@ -18,8 +18,8 @@
 
 					<div class="input-group-prepend"></div>
 					<select name="estado" class="custom-select" id="estado">
-						<option value="0" selected>Estado</option>
-						<option value="Pendiente">Pendiente</option>
+						<option value="Todos" >Todos</option>
+						<option selected value="Pendiente">Pendiente</option>
 						<option value="En Proceso">En Proceso</option> 
 						<option value="Finalizada">Finalizada</option>
 					</select>
@@ -212,8 +212,17 @@ function status(id) {
 
   $("#guardarEstado").click(function(){
   
-  //alert("asdasd");
-	window.location.href ="/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text();
+  $.ajax({
+            type: 'POST',
+            data: {'code' : '200'},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text(),
+            dataType: 'html',
+            success: function (data) {
+
+                location.reload();
+            
+            }}); 
+	//window.location.href ="/turismo/status/"+id+"/"+$( "#selectEstatus option:selected" ).text();
 
 });
 }
