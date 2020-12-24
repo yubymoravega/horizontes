@@ -28,7 +28,8 @@
             <tr class="bg-dark font-weight-bold">
                 <td rowspan="2" width="100px">Cuenta</td>
                 <td rowspan="2" width="100px">Subcuenta</td>
-                <td rowspan="2" class="text-center">Descripción de la cuenta</td>
+                <td rowspan="2" width="100px">Criterio</td>
+                <td rowspan="2" class="text-center">Descripción</td>
                 <td colspan="2" width="260px" class="text-center">Movimientos del Mes</td>
                 <td colspan="2" width="260px" class="text-center">Saldo Acumulado</td>
             </tr>
@@ -44,8 +45,9 @@
                     <tr style="background-color: black;">
                         <td style="font-weight:400;">{{ item.cuenta }}</td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
+                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.criterio }}</td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
-                        <td style="font-weight:400;" class="text-center">{{ item.debito_mes }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
@@ -54,8 +56,9 @@
                     <tr class="row-group-subconta">
                         <td style="font-weight:400;">{{ item.cuenta }}</td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
+                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.criterio }}</td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
-                        <td style="font-weight:400;" class="text-center">{{ item.debito_mes }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
@@ -64,6 +67,7 @@
                     <tr>
                         <td style="font-weight:400;">{{ item.cuenta }}</td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
+                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.criterio }}</td>
                         {% if item.index == 2 or item.index == '2' %}
                             <td style="font-weight:400;" class="pl-0 pr-0"><a
                                         >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>{{ item.descripcion }}</td>
@@ -73,7 +77,7 @@
                         {% else %}
                             <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
                         {% endif %}
-                        <td style="font-weight:400;" class="text-center">{{ item.debito_mes }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>

@@ -109,6 +109,33 @@ class ComprobanteOperacionesController extends AbstractController
                 $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
                 $factura_er = $em->getRepository(Factura::class);
 
+                if (!empty($pagos_cobros)){
+                    foreach ($pagos_cobros as $pagos) {
+                        if ($pagos->type == 'IR') {
+                            $informe_recepcion_obj = $informe_recepcion_er->find(intval($pagos->id_factura));
+                            $new_cobro_pago = new CobrosPagos();
+                            $new_cobro_pago
+                                ->setIdInforme($informe_recepcion_obj)
+                                ->setIdProveedor($informe_recepcion_obj->getIdProveedor())
+                                ->setCredito(floatval($pagos->importe))
+                                ->setDebito(0);
+                            $em->persist($new_cobro_pago);
+                        }
+                        if ($pagos->type == 'FACT') {
+                            /** @var Factura $factura */
+                            $factura = $factura_er->find(intval($pagos->id_factura));
+                            $new_cobro_pago = new CobrosPagos();
+                            $new_cobro_pago
+                                ->setIdFactura($factura)
+                                ->setIdTipoCliente($factura->getTipoCliente())
+                                ->setIdClienteVenta($factura->getIdCliente())
+                                ->setDebito(floatval($pagos->importe))
+                                ->setCredito(0);
+                            $em->persist($new_cobro_pago);
+                        }
+                    }
+                }
+
                 foreach ($operaciones as $item) {
                     $cuenta = $cuenta_er->find(intval($item->cuenta));
                     $subcuenta = $subcuenta_er->findOneBy([
@@ -116,113 +143,6 @@ class ComprobanteOperacionesController extends AbstractController
                         'nro_subcuenta' => $item->subcuenta,
                         'activo' => true
                     ]);
-
-                    //adiciono en la tabla cobros_pagos el pago de las facturas de los informes de recepcion
-                    if ($item->id_informe_recepcion != '') {
-                        $arr_informes = explode(',', $item->id_informe_recepcion);
-                        foreach ($arr_informes as $informe) {
-                            if ($informe != '') {
-                                foreach ($pagos_cobros as $pagos) {
-                                    if ($pagos->type == 'IR' && $pagos->id_factura == $informe) {
-                                        $informe_recepcion_obj = $informe_recepcion_er->find(intval($informe));
-                                        $new_cobro_pago = new CobrosPagos();
-                                        $new_cobro_pago
-                                            ->setIdInforme($informe_recepcion_obj)
-                                            ->setIdProveedor($proveedor_er->find(intval($item->proveedor)))
-                                            ->setCredito(floatval($pagos->importe))
-                                            ->setDebito(0);
-                                        $em->persist($new_cobro_pago);
-
-                                        //asentando las operacones
-                                        $new_asiento = new Asiento();
-                                        $new_asiento
-                                            ->setIdCuenta($cta_x_cobrar)
-                                            ->setIdSubcuenta($subcuenta_x_cobrar)
-                                            ->setFecha($fecha)
-                                            ->setAnno($year_)
-                                            ->setCredito(floatval($pagos->importe))
-                                            ->setDebito(0)
-                                            ->setNroDocumento('FACT-'.$factura->getNroFactura())
-                                            ->setIdDocumento(null)
-                                            ->setIdUnidad($factura->getIdUnidad())
-                                            ->setIdAlmacen(null)
-                                            ->setIdFactura($factura)
-                                            ->setIdCentroCosto(null)
-                                            ->setIdOrdenTrabajo(null)
-                                            ->setIdElementoGasto(null)
-                                            ->setIdExpediente(null)
-                                            ->setIdProveedor(null)
-                                            ->setIdCliente($factura->getIdCliente())
-                                            ->setIdComprobante($new_registro)
-                                            ->setIdTipoComprobante($obj_tipo_comprobante)
-                                            ->setTipoCliente($tipo_cliente);
-                                        $em->persist($new_asiento);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //adiciono en la tabla cobros_pagos el cobro de las facturas de venta
-                    if ($item->id_factura != '') {
-                        $arr_facturas = explode(',', $item->id_factura);
-                        $cta_x_cobrar = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '135']);
-                        foreach ($arr_facturas as $fact) {
-                            if ($fact != '') {
-                                foreach ($pagos_cobros as $pagos) {
-                                    if ($pagos->type == 'FACT' && $pagos->id_factura == $fact) {
-                                        /** @var Factura $factura */
-                                        $factura = $factura_er->find(intval($fact));
-                                        $tipo_cliente = $factura->getTipoCliente();
-
-                                        //asiento la factura
-                                        $nro_subcuenta_obligracion_factura = '0010';
-                                        if ($tipo_cliente == 2) {
-                                            $nro_subcuenta_obligracion_factura = '0020';
-                                        } elseif ($tipo_cliente == 3) {
-                                            $nro_subcuenta_obligracion_factura = '0030';
-                                        }
-                                        $subcuenta_x_cobrar = $subcuenta_er->findOneBy(
-                                            ['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true, 'id_cuenta' => $cta_x_cobrar]
-                                        );
-
-                                        $new_cobro_pago = new CobrosPagos();
-                                        $new_cobro_pago
-                                            ->setIdFactura($factura)
-                                            ->setIdTipoCliente($factura->getTipoCliente())
-                                            ->setIdClienteVenta($factura->getIdCliente())
-                                            ->setDebito(floatval($pagos->importe))
-                                            ->setCredito(0);
-                                        $em->persist($new_cobro_pago);
-
-                                        //asentando las operacones
-                                        $new_asiento = new Asiento();
-                                        $new_asiento
-                                            ->setIdCuenta($cta_x_cobrar)
-                                            ->setIdSubcuenta($subcuenta_x_cobrar)
-                                            ->setFecha($fecha)
-                                            ->setAnno($year_)
-                                            ->setCredito(floatval($pagos->importe))
-                                            ->setDebito(0)
-                                            ->setNroDocumento('FACT-'.$factura->getNroFactura())
-                                            ->setIdDocumento(null)
-                                            ->setIdUnidad($factura->getIdUnidad())
-                                            ->setIdAlmacen(null)
-                                            ->setIdFactura($factura)
-                                            ->setIdCentroCosto(null)
-                                            ->setIdOrdenTrabajo(null)
-                                            ->setIdElementoGasto(null)
-                                            ->setIdExpediente(null)
-                                            ->setIdProveedor(null)
-                                            ->setIdCliente($factura->getIdCliente())
-                                            ->setIdComprobante($new_registro)
-                                            ->setIdTipoComprobante($obj_tipo_comprobante)
-                                            ->setTipoCliente($tipo_cliente);
-                                        $em->persist($new_asiento);
-                                    }
-                                }
-                            }
-                        }
-                    }
 
                     $new_operaciones_comprobante = new OperacionesComprobanteOperaciones();
                     $new_operaciones_comprobante
@@ -233,7 +153,7 @@ class ComprobanteOperacionesController extends AbstractController
                         ->setIdElementoGasto(isset($item->elemento_gasto) ? $elemento_gasto_er->find(intval($item->elemento_gasto)) : null)
                         ->setIdExpediente(isset($item->expediente) ? $expediente_er->find(intval($item->expediente)) : null)
                         ->setIdAlmacen(isset($item->almacen) ? $almacen_er->find(intval($item->almacen)) : null)
-                        ->setIdUnidad(isset($item->unidad) ? $unidad_er->find(intval($item->unidad)) : null)
+                        ->setIdUnidad(isset($item->unidad) ? $unidad_er->find(intval($item->unidad)) : $obj_unidad)
                         ->setIdCuenta($cuenta_er->find(intval($item->cuenta)))
                         ->setIdSubcuenta($subcuenta)
                         ->setCredito(floatval($item->credito))
@@ -242,14 +162,35 @@ class ComprobanteOperacionesController extends AbstractController
                         ->setIdRegistroComprobantes($new_registro);
                     $em->persist($new_operaciones_comprobante);
 
-                    //asiento la cuenta
-
+                    //asentando las operacones
+                    $new_asiento = new Asiento();
+                    $new_asiento
+                        ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+                        ->setAnno($year_)
+                        ->setNroDocumento('-')
+                        ->setIdDocumento(null)
+                        ->setIdFactura(null)
+                        ->setIdComprobante($new_registro)
+                        ->setIdTipoComprobante($obj_tipo_comprobante)
+                        ->setIdCliente(isset($item->cliente) ? intval($item->cliente) : null)
+                        ->setIdProveedor(isset($item->proveedor) ? $proveedor_er->find(intval($item->proveedor)) : null)
+                        ->setIdCentroCosto(isset($item->centro_costo) ? $centro_costo_er->find(intval($item->centro_costo)) : null)
+                        ->setIdOrdenTrabajo(isset($item->orden_tabajo) ? $orden_trabajo_er->find(intval($item->orden_tabajo)) : null)
+                        ->setIdElementoGasto(isset($item->elemento_gasto) ? $elemento_gasto_er->find(intval($item->elemento_gasto)) : null)
+                        ->setIdExpediente(isset($item->expediente) ? $expediente_er->find(intval($item->expediente)) : null)
+                        ->setIdAlmacen(isset($item->almacen) ? $almacen_er->find(intval($item->almacen)) : null)
+                        ->setIdUnidad(isset($item->unidad) ? $unidad_er->find(intval($item->unidad)) : $obj_unidad)
+                        ->setIdCuenta($cuenta_er->find(intval($item->cuenta)))
+                        ->setIdSubcuenta($subcuenta)
+                        ->setCredito(floatval($item->credito))
+                        ->setDebito(floatval($item->debito))
+                        ->setTipoCliente(intval($item->tipo_cliente) != 0 ? intval($item->tipo_cliente) : null);
+                    $em->persist($new_asiento);
                 }
 
                 try {
                     $em->flush();
-                }
-                catch (FileException $exception) {
+                } catch (FileException $exception) {
                     return $exception->getMessage();
                 }
                 if ($nro_consecutivo == $nro_consecutivo_real)
@@ -290,6 +231,7 @@ class ComprobanteOperacionesController extends AbstractController
         $cobros_er = $em->getRepository(CobrosPagos::class);
         /** @var Factura $item */
         foreach ($facturas as $item) {
+//            dd($item);
             $cobro_factura = $cobros_er->findBy([
                 'id_factura' => $item
             ]);
@@ -304,7 +246,7 @@ class ComprobanteOperacionesController extends AbstractController
                     'documento' => 'FACT-' . $item->getNroFactura(),
                     'importe_mostrar' => number_format($item->getImporte(), 2),
                     'importe' => number_format($resto, 2),
-                    'resto' => floatval($resto),
+                    'resto' => number_format($resto,2),
                     'fecha' => $item->getFechaFactura()->format('d-m-Y'),
                     'antiguedad' => $today->diff($item->getFechaFactura())->days
                 );
@@ -347,7 +289,7 @@ class ComprobanteOperacionesController extends AbstractController
                         'documento' => $item->getCodigoFactura(),
                         'importe_mostrar' => number_format($item->getIdDocumento()->getImporteTotal(), 2),
                         'importe' => number_format($resto, 2),
-                        'resto' => floatval($resto),
+                        'resto' => number_format($resto,2),
                         'fecha' => $item->getFechaFactura()->format('d-m-Y'),
                         'antiguedad' => $today->diff($item->getFechaFactura())->days
                     );

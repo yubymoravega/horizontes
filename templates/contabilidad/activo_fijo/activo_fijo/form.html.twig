@@ -22,14 +22,14 @@
                     </div>
                 </div>
                 <div class="row mt-0 p-0">
-                    <div class="col-9 mt-0 p-0 form-group input-group input-group-sm d-block w-100">
+                    <div class="col-12 mt-0 p-0 form-group input-group input-group-sm d-block w-100">
                         {{ form_label(formulario.descripcion) }}
                         {{ form_widget(formulario.descripcion, {'attr':{'class':'w-100'}}) }}
                     </div>
-                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block w-100">
-                        {{ form_label(formulario.id_area_responsabilidad) }}
-                        {{ form_widget(formulario.id_area_responsabilidad, {'attr':{'class':'w-100'}}) }}
-                    </div>
+                    {#                    <div class="col-3 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block w-100">#}
+                    {#                        {{ form_label(formulario.id_area_responsabilidad) }}#}
+                    {#                        {{ form_widget(formulario.id_area_responsabilidad, {'attr':{'class':'w-100'}}) }}#}
+                    {#                    </div>#}
                 </div>
 
                 <div class="row mt-0 p-0">
@@ -167,7 +167,7 @@
         const loadingData = function () {
             loadingModal.show()
             let ids = ['activo_fijo_id_grupo_activo', 'activo_fijo_activo_fijo_cuentas_id_cuenta_activo', 'activo_fijo_activo_fijo_cuentas_id_cuenta_depreciacion',
-                'activo_fijo_activo_fijo_cuentas_id_cuenta_gasto', 'activo_fijo_id_area_responsabilidad', 'activo_fijo_activo_fijo_cuentas_id_subcuenta_activo',
+                'activo_fijo_activo_fijo_cuentas_id_cuenta_gasto', 'activo_fijo_activo_fijo_cuentas_id_subcuenta_activo',
                 'activo_fijo_activo_fijo_cuentas_id_centro_costo_activo', 'activo_fijo_activo_fijo_cuentas_id_area_responsabilidad_activo', 'activo_fijo_activo_fijo_cuentas_id_subcuenta_depreciacion',
                 'activo_fijo_activo_fijo_cuentas_id_subcuenta_gasto', 'activo_fijo_activo_fijo_cuentas_id_centro_costo_gasto',
                 'activo_fijo_activo_fijo_cuentas_id_elemento_gasto_gasto', 'activo_fijo_pais']
@@ -201,9 +201,9 @@
                     $(result.centro_costo).each(function (pos, valor) {
                         $('#activo_fijo_activo_fijo_cuentas_id_centro_costo_gasto').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
-                    $(result.area_responsabilidad).each(function (pos, valor) {
-                        $('#activo_fijo_id_area_responsabilidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                    })
+                    // $(result.area_responsabilidad).each(function (pos, valor) {
+                    //     $('#activo_fijo_id_area_responsabilidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    // })
                     $(result.area_responsabilidad).each(function (pos, valor) {
                         $('#activo_fijo_activo_fijo_cuentas_id_area_responsabilidad_activo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
@@ -345,13 +345,36 @@
             $("#btnSubbmit").click(function (e) {
                 if (form_activo_fijo.valid()) {
                     form_activo_fijo.attr('method', `POST`)
-                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar`)
+                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val())
                     form_activo_fijo.submit()
                     if (validateForm.errorList.length === 0) loadingModal.show()
                 }
             });
 
         })
+
+        $("#activo_fijo_valor_inicial").on('keyup', function () {
+            let valor_real = 0;
+            if ($("#activo_fijo_valor_inicial").val() == '')
+                valor_real = parseFloat($("#activo_fijo_depreciacion_acumulada").val())
+            else if (parseFloat($("#activo_fijo_depreciacion_acumulada").val()) > 0 || $("#activo_fijo_depreciacion_acumulada").val() != '') {
+                valor_real = parseFloat($("#activo_fijo_valor_inicial").val()) - parseFloat($("#activo_fijo_depreciacion_acumulada").val())
+            } else {
+                valor_real = parseFloat($("#activo_fijo_valor_inicial").val())
+            }
+            $("#activo_fijo_valor_real").val(valor_real)
+        });
+        $("#activo_fijo_depreciacion_acumulada").on('keyup', function () {
+            let valor_real = 0;
+            if ($("#activo_fijo_depreciacion_acumulada").val() == '')
+                valor_real = parseFloat($("#activo_fijo_valor_inicial").val())
+            else if (parseFloat($("#activo_fijo_valor_inicial").val()) > 0 || $("#activo_fijo_valor_inicial").val() != '') {
+                valor_real = parseFloat($("#activo_fijo_valor_inicial").val()) - parseFloat($("#activo_fijo_depreciacion_acumulada").val())
+            } else {
+                valor_real = parseFloat($("#activo_fijo_valor_inicial").val())
+            }
+            $("#activo_fijo_valor_real").val(valor_real)
+        });
     </script>
 {% endblock %}
 

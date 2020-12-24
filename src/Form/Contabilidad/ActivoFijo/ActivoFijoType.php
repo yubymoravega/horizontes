@@ -16,7 +16,8 @@ class ActivoFijoType extends AbstractType
     {
         $builder
             ->add('nro_inventario', TextType::class,[
-                'label'=>'Nro. Inventario'
+                'label'=>'Nro. Inventario',
+                'disabled'=>true
             ])
             ->add('fecha_alta',DateType::class, array(
                 'input'=>'datetime',
@@ -42,7 +43,8 @@ class ActivoFijoType extends AbstractType
                 'required'=>false
             ])
             ->add('valor_real',TextType::class,[
-                'label'=>'Valor Real'
+                'label'=>'Valor Real',
+                'disabled'=>true
             ])
             ->add('annos_vida_util',TextType::class,[
                 'label'=>'Años de Vida Util'
@@ -79,9 +81,9 @@ class ActivoFijoType extends AbstractType
                 'label'=>'Tipo de Combustible',
                 'required'=>false
             ])
-            ->add('id_area_responsabilidad', ChoiceType::class,[
-                'label'=>'Area de Responsabilidad'
-            ])
+//            ->add('id_area_responsabilidad', ChoiceType::class,[
+//                'label'=>'Area de Responsabilidad'
+//            ])
             ->add('id_grupo_activo', ChoiceType::class,[
                 'label'=>'Grupo de Activo'
             ])

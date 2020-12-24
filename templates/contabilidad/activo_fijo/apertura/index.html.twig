@@ -45,6 +45,14 @@
                         {{ form_label(formulario.fecha) }}
                         {{ form_widget(formulario.fecha,{'attr':{'class':'w-100'}}) }}
                     </div>
+                    <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.centro_costo) }}
+                        {{ form_widget(formulario.centro_costo) }}
+                    </div>
+                    <div class="col-6 mt-0 pl-3 pr-2 form-group input-group input-group-sm d-block">
+                        {{ form_label(formulario.area_responsabilidad) }}
+                        {{ form_widget(formulario.area_responsabilidad,{'attr':{'class':'w-100'}}) }}
+                    </div>
                 </div>
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
                     {{ form_label(formulario.fundamentacion) }}
@@ -79,15 +87,13 @@
         $('#btnCancelar').hide()
         let cuentas = [];
         let consecutivo = '';
+        let id_activo = '';
 
         const loadingData = function () {
+            id_activo = ''
             loadingModal.show()
-            $('#movimiento_activo_fijo_id_cuenta').find('option').remove()
-            $('#movimiento_activo_fijo_id_cuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-
-            $('#movimiento_activo_fijo_id_subcuenta').find('option').remove()
-            $('#movimiento_activo_fijo_id_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-
+            $('#movimiento_activo_fijo_id_cuenta').val('')
+            $('#movimiento_activo_fijo_id_subcuenta').val('')
             $.ajax({
                 url: '/contabilidad/activo-fijo/apertura/getCuentas',
                 method: 'POST',
@@ -98,9 +104,6 @@
                     $('#select_nros').prop('max', consecutivo)
                     $('#select_nros').prop('min', 1)
                     cuentas = result.cuentas;
-                    $(result.cuentas).each(function (pos, valor) {
-                        $('#movimiento_activo_fijo_id_cuenta').append('<option value = "' + valor.id + '">' + valor.nro_cuenta + '</option>');
-                    })
                     loadingModal.close()
                 },
                 error: function () {
@@ -109,17 +112,6 @@
         }
         loadingData()
 
-        $('#movimiento_activo_fijo_id_cuenta').on('change', function () {
-            $('#movimiento_activo_fijo_id_subcuenta').find('option').remove()
-            $('#movimiento_activo_fijo_id_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-            cuentas.forEach(function (valor, pos) {
-                if ($('#movimiento_activo_fijo_id_cuenta').val() == valor.id) {
-                    for (var i = 0; i < valor.sub_cuenta.length; i++) {
-                        $('#movimiento_activo_fijo_id_subcuenta').append('<option value = "' + valor.sub_cuenta[i]['id'] + '">' + valor.sub_cuenta[i]['nro_subcuenta'] + '</option>');
-                    }
-                }
-            })
-        })
 
         $('#movimiento_activo_fijo_nro_inventatio').on('keyup', function (e) {
             if (e.which == 13) {
@@ -145,7 +137,7 @@
                         $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
                         loadingModal.close()
                     } else {
-                        window.open('/contabilidad/activo-fijo/gestionar', '_self');
+                        window.open('/contabilidad/activo-fijo/gestionar/' + codigo, '_self');
                         alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }
                 },
@@ -241,14 +233,12 @@
                     success: function (result) {
                         if (result.success == true) {
                             let apertura = result.apertura;
-                            $('#movimiento_activo_fijo_id_subcuenta').find('option').remove()
-                            $('#movimiento_activo_fijo_id_cuenta').find('option').remove()
-
-                            $('#movimiento_activo_fijo_nro_inventatio').val(apertura.nro_inv);
+                             $('#movimiento_activo_fijo_nro_inventatio').val(apertura.nro_inv);
                             $('#movimiento_activo_fijo_descripcion').val(apertura.desc);
-
-                            $('#movimiento_activo_fijo_id_cuenta').prepend('<option selected value = ' + apertura.nro_cuenta + '>' + apertura.nro_cuenta + '</option>');
-                            $('#movimiento_activo_fijo_id_subcuenta').prepend('<option selected value = ' + apertura.nro_subcuenta + '>' + apertura.nro_subcuenta + '</option>');
+                            $('#movimiento_activo_fijo_id_cuenta').val(apertura.nro_cuenta);
+                            $('#movimiento_activo_fijo_id_subcuenta').val(apertura.nro_subcuenta);
+                            $('#movimiento_activo_fijo_centro_costo').val(apertura.centro_costo);
+                            $('#movimiento_activo_fijo_area_responsabilidad').val(apertura.area_responsabilidad);
                             $('#movimiento_activo_fijo_fecha').attr('type', 'text')
                             $('#movimiento_activo_fijo_fecha').val(apertura.fecha);
 
