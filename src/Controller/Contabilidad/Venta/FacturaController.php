@@ -47,6 +47,7 @@ use App\Repository\Contabilidad\Venta\FacturaRepository;
 use App\Repository\Contabilidad\Venta\MovimientoVentaRepository;
 use App\Repository\Contabilidad\Venta\ObligacionCobroRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Element;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -269,7 +270,7 @@ class FacturaController extends AbstractController
             $obj_subcuenta_impuesto = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'id_cuenta' => $obj_cuenta_impuesto, 'activo' => true]);
             $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_impuesto, $obj_subcuenta_impuesto, null,
                 $unidad, null, null, null, null, null,
-                null, 0, 0, $fecha_factura, $fecha_factura->format('Y'), 0, $impuesto_total,
+                null, 0, 0, $fecha_factura, $fecha_factura->format('Y'), $impuesto_total, 0,
                 'FACT-' . $factura->getNroFactura(), $factura);
 
 
@@ -319,6 +320,19 @@ class FacturaController extends AbstractController
                             $elemento->setActivo(false);
                         }
                         $em->persist($elemento);
+
+                        $cuenta_inventario = $cuenta_er->findOneBy(['nro_cuenta'=>$elemento->getCuenta(),'activo'=>true]);
+                        $subcuenta_inventatio_mercancia = $subcuenta_er->findOneBy(
+                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
+                        );
+
+                        /** Asiento la operacion reduciento la cuenta de la mercancia */
+                        $asiento_costo_venta_almacen = AuxFunctions::createAsiento($em, $cuenta_inventario, $subcuenta_inventatio_mercancia,
+                            $document, $unidad, $elemento->getIdAmlacen(), null, null,
+                            null, null, null, 0, 0, $fecha_factura,
+                            $fecha_factura->format('Y'), round(($precio*floatval($mercancia_obj->cantidad)),2),0,
+                            'FACT-' . $factura->getNroFactura(), $factura);
+
 
                         /** Calcular el importe total del codumento**/
                         $importe_documento += floatval($precio * floatval($mercancia_obj->cantidad));
@@ -394,7 +408,7 @@ class FacturaController extends AbstractController
                         $asiento_costo_venta = AuxFunctions::createAsiento($em, $obj_cuenta_movimiento_venta, $obj_subcuenta_venta_deudora,
                             $document, $unidad, $almacenRepository->find($mercancia_obj->id_almacen), null, null,
                             null, null, null, 0, 0, $fecha_factura,
-                            $fecha_factura->format('Y'), ($new_movimiento_inventario->getImporte() / $new_movimiento_inventario->getCantidad()), 0,
+                            $fecha_factura->format('Y'), 0, ($new_movimiento_inventario->getImporte() / $new_movimiento_inventario->getCantidad()),
                             'FACT-' . $factura->getNroFactura(), $factura);
 
 

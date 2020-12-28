@@ -6,9 +6,6 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
-use App\Entity\Contabilidad\Config\Cuenta;
-use App\Entity\Contabilidad\Config\Subcuenta;
-use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
 use App\Form\Contabilidad\ActivoFijo\MovimientoActivoFijoType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,17 +14,17 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class AperturaController
+ * Class CompraController
  * @package App\Controller\Contabilidad\ActivoFijo
- * @Route("/contabilidad/activo-fijo/apertura")
+ * @Route("/contabilidad/activo-fijo/compra")
  */
-class AperturaController extends AbstractController
+class CompraController extends AbstractController
 {
+    protected $tipo_movimiento = 2;
     /**
-     * @Route("/", name="contabilidad_activo_fijo_apertura", methods={"GET","POST"})
+     * @Route("/", name="contabilidad_activo_fijo_compra", methods={"GET","POST"})
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
@@ -68,11 +65,11 @@ class AperturaController extends AbstractController
                 'id_activo' => $obj_activo
             ]);
 
-            $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find(1);
+            $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento);
             $nro = AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $obj_unidad, $obj_activo->getFechaAlta()->format('Y'));
             $new_movimiento = new MovimientoActivoFijo();
             $new_movimiento
-                ->setIdTipoMovimiento($em->getRepository(TipoMovimiento::class)->find(1))
+                ->setIdTipoMovimiento($em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento))
                 ->setIdUnidad($obj_unidad)
                 ->setIdUsuario($user)
                 ->setIdActivoFijo($obj_activo)
@@ -119,7 +116,7 @@ class AperturaController extends AbstractController
                         'id_subcuenta' => '',
                         'fundamentacion' => ''
                     ]);
-                return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
+                return $this->render('contabilidad/activo_fijo/compra/index.html.twig', [
                     'controller_name' => 'AperturaController',
                     'formulario' => $formulario->createView(),
                 ]);
@@ -127,19 +124,19 @@ class AperturaController extends AbstractController
                 return $em->getMessage();
             }
         }
-        return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
-            'controller_name' => 'AperturaController',
+        return $this->render('contabilidad/activo_fijo/compra/index.html.twig', [
+            'controller_name' => 'CompraController',
             'formulario' => $form->createView(),
         ]);
     }
 
     /**
-     * @Route("/getCuentas", name="contabilidad_activo_fijo_apertura_get_cuentas", methods={"POST"})
+     * @Route("/getCuentas", name="contabilidad_activo_fijo_compra_get_cuentas", methods={"POST"})
      */
     public function getCuentas(Request $request, EntityManagerInterface $em)
     {
         $row = AuxFunctions::getCuentasMovimientosEntradaActivoFijo($em);
-        $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find(1);
+        $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento);
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         return new JsonResponse([
             'cuentas' => $row,
@@ -149,7 +146,7 @@ class AperturaController extends AbstractController
     }
 
     /**
-     * @Route("/getNroInv/{nro_inv}", name="contabilidad_activo_fijo_apertura_get_nro_inv", methods={"POST"})
+     * @Route("/getNroInv/{nro_inv}", name="contabilidad_activo_fijo_compra_get_nro_inv", methods={"POST"})
      */
     public function getNroInv(Request $request, EntityManagerInterface $em, $nro_inv)
     {
@@ -169,15 +166,15 @@ class AperturaController extends AbstractController
     }
 
     /**
-     * @Route("/getApertura/{nro}", name="contabilidad_activo_fijo_apertura_get_apertura", methods={"POST"})
+     * @Route("/getCompra/{nro}", name="contabilidad_activo_fijo_compra_get_compra", methods={"POST"})
      */
-    public function getApertura(Request $request, EntityManagerInterface $em, $nro)
+    public function getCompra(Request $request, EntityManagerInterface $em, $nro)
     {
         $user = $this->getUser();
         $id_unidad = AuxFunctions::getUnidad($em, $user);
         /** @var MovimientoActivoFijo $obj_movimiento_activo_fijo */
         $obj_movimiento_activo_fijo = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
-            'id_tipo_movimiento' => $em->getRepository(TipoMovimiento::class)->find(1),
+            'id_tipo_movimiento' => $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento),
             'anno' => Date('Y'),
             'id_unidad' => $id_unidad,
             'nro_consecutivo' => $nro
@@ -196,7 +193,7 @@ class AperturaController extends AbstractController
             'id' => $obj_movimiento_activo_fijo->getId()
         );
         return new JsonResponse([
-            'apertura' => $row,
+            'compra' => $row,
             'success' => true
         ]);
     }

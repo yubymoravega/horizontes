@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Movimiento de Activo Fijo</title>
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+    <style>
+        @media print {
+            #footer {
+                position: fixed;
+                display: block;
+                bottom: 0;
+            }
+        }
+
+        th {
+            padding: .6rem 0;
+            border: solid black 1px;
+            width: 80px;
+        }
+
+        td {
+            padding: 0 !important;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        .bg-gray {
+            background: darkgray;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid mt-3" style="width: 1000px;">
+    <h4 class="text-uppercase font-weight-bold text-center">movimientos de activo fijo</h4>
+    <table border="1" width="900px">
+        <tbody>
+        {% for item in data %}
+            <tr>
+                <td class="px-2" colspan="2">
+                    <strong>Unidad:</strong><br>{{ item.unidad }}</td>
+                <td class="px-2" width="230"><strong>Fecha:</strong><br>{{ item.fecha }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" colspan="3"><strong>Tipo de Movimiento:</strong><br>{{ item.tipo_movimiento }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" width="230"><strong>Nro. de Inventario:</strong><br>{{ item.nro_inventario }}</td>
+                <td class="px-2" colspan="2"><strong>Descripción:</strong><br>{{ item.descripcion }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" width="230"><strong>Cuenta Nro:</strong><br>{{ item.cuenta_activo }}</td>
+                <td class="px-2" width="230" rowspan="2">
+                    <strong>Fecha de Adquisición:</strong> {{ item.fecha }}</td>
+                <td class="px-2" width="230" rowspan="2">
+                    <strong>Valor Inicial:</strong> {{ item.valor_inicial }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" width="230"><strong>Subcuenta Nro:</strong><br>{{ item.subcuenta_activo }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" width="230"><strong>Cuenta de Depreciación
+                        Nro:</strong><br>{{ item.cuenta_depreciacion }}</td>
+                <td class="px-2" width="230" rowspan="2"><strong>Depreciación
+                        Acumulada:</strong> {{ item.depreciacion_acumulada }}</td>
+                <td class="px-2" width="230" rowspan="2"><strong>Depreciación
+                        Mensual:</strong> {{ item.valor_depreciacion_mensal }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" width="230"><strong>Subcuenta de Depreciación
+                        Nro:</strong><br>{{ item.subcuenta_depreciacion }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" colspan="3" height="100px" valign="top"><strong>Fundamentación de la
+                        Operación:</strong><br>{{ item.fundamentacion }}</td>
+            </tr>
+            <tr>
+                <td class="px-2" valign="top"><strong>Anotado en submayor por:</strong><br>{{ item.usuario }}</td>
+                <td class="px-2" valign="top"><strong>Autorizado por</strong><br></td>
+                <td class="px-2 text-center" valign="top"><strong>{{ item.nro_consecutivo }}</strong></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto mt-5"
+            onclick="imprimir()"> Imprimir
+    </button>
+</div>
+<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
+</body>
+</html>
+
+
+{% block javascripts %}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
+{% endblock %}
+
