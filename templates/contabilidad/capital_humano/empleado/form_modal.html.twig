@@ -1,0 +1,55 @@
+{% extends 'utils/modal_form.html.twig' %}
+{% block modalbody %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
+    <div class="row mt-0 p-0">
+        <div class="col-12 form-group input-group input-group-sm pa-2 d-block">
+            {{ form_label(form.nombre) }}
+            {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}
+        </div>
+    </div>
+    <div class="row mt-0 p-0">
+        <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+            {{ form_label(form.correo) }}
+            {{ form_widget(form.correo,{'attr': {'class': 'form-control w-100','placeholder':'usuario@dominio.com'}}) }}
+        </div>
+        <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">
+            {{ form_label(form.telefono) }}
+            {{ form_widget(form.telefono,{'attr': {'class': 'form-control w-100','placeholder':'+## ########'}}) }}
+        </div>
+    </div>
+    <div class="row mt-0 p-0">
+        <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+            {{ form_label(form.fecha_alta) }}
+            {{ form_widget(form.fecha_alta, {'attr': {'class': 'w-100'}}) }}
+        </div>
+        <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">
+            {{ form_label(form.salario_x_hora) }}
+            {{ form_widget(form.salario_x_hora,{'attr': {'class': 'form-control w-100'}}) }}
+        </div>
+    </div>
+    <div class="row mt-0 p-0">
+        <div class="col-12 form-group input-group input-group-sm d-block">
+            {{ form_label(form.id_unidad) }}
+            {{ form_widget(form.id_unidad,{'attr': {'class': 'form-control w-100'}}) }}
+        </div>
+    </div>
+    <div class="form-group input-group mt-2 input-group-sm d-block">
+        {{ form_label(form.id_cargo) }}
+        {{ form_widget(form.id_cargo, {'attr': {'class': 'w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        {{ form_label(form.direccion_particular) }}
+        {{ form_widget(form.direccion_particular, {'attr': {'class': 'w-100'}}) }}
+    </div>
+    <label for="is-user" class="form-check-label ">Es usuario del
+        sistema</label>
+    <input type="checkbox" class="form-check-input ml-2" id="is-user" name="is_usuario">
+    <div class="container-fluid ml-0 p-0 form-group input-group input-group-sm d-none" id="div_rol">
+        {{ form_label(form.rol) }}
+        {{ form_widget(form.rol, {'attr': {'class': 'w-100'}}) }}
+    </div>
+
+
+    <input type="text" id="id_empleado" hidden>
+    {{ form_end(form) }}
+{% endblock %}

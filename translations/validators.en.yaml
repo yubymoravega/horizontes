@@ -25,4 +25,7 @@ contabilidad:
     abreviatura_unique: La abreviatura ya está en uso !
   venta:
     nro_factura_unique: La factura ya está registrada
+  RRHH:
+    nombre_unico: el nombre ya se encuentra registrado en el sistema
+    correo_unico: El correo ya se encuentra registrado en el sistema
 

@@ -37,7 +37,7 @@ class EmpleadoController extends AbstractController
                 'nombre' => $item->getNombre(),
                 'correo' => $item->getCorreo(),
                 'cargo_nombre' => $item->getIdCargo() ? $item->getIdCargo()->getNombre() : '',
-                'rol_nombre' => $item->getRol() ? $item->getRol() : '',
+                'rol' => $item->getRol() ? $item->getRol() : '',
                 'salario_x_hora' => $item->getSalarioXHora(),
                 'telefono' => $item->getTelefono(),
                 'id_cargo' => $item->getIdCargo() ? $item->getIdCargo()->getId() : '',
@@ -45,12 +45,12 @@ class EmpleadoController extends AbstractController
                 'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                 'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',
                 'direccion' => $item->getDireccionParticular(),
-                'fecha_alta' => $item->getFechaAlta()->format('d-m-Y')
+                'fecha_alta' => $item->getFechaAlta()->format('Y-m-d')
             );
         }
         $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
-//
-        $roles = $this->getRoles();
+//        dd($row);
+        $roles = self::getRoles();
         return $this->render($callback, [
             'controller_name' => 'EmpleadoController',
             'empleados' => $row,
@@ -62,49 +62,42 @@ class EmpleadoController extends AbstractController
     /**
      * @Route("/contabilidad/capital-humano/empleado-add", name="contabilidad_capital_humano_empleado_add")
      */
-    public function addEmplpeado(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
+    public function addEmplpeado(EntityManagerInterface $em, Request $request,
+                                 ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
     {
-        $entity_repository = $em->getRepository(Empleado::class);
-        $params = array(
-            'correo' => $request->get('correo'),
-            'activo' => true
-        );
-        if (!AuxFunctions::isDuplicate($entity_repository, $params, 'add')) {
-            $obj_empleado = new Empleado();
+        $form = $this->createForm(EmpleadoType::class);
+        $form->handleRequest($request);
+
+        /** @var Empleado $empleado */
+        $obj_empleado = $form->getData();
+        $errors = $validator->validate($obj_empleado);
+        if ($form->isSubmitted() && $form->isValid()) {
             //---ADICIONO EL EMPLEADO
+//            dd($request->get('is_usuario'));
             $obj_empleado
-                ->setNombre($request->get('nombre'))
-                ->setCorreo($request->get('correo'))
-                ->setTelefono($request->get('telefono'))
-                ->setFechaAlta(\DateTime::createFromFormat('Y-m-d', $request->get('fecha_alta')))
-                ->setSalarioXHora(floatval($request->get('salario_x_hora')))
-                ->setIdUnidad($em->getRepository(Unidad::class)->find($request->get('id_unidad')))
-                ->setIdCargo($em->getRepository(Cargo::class)->find($request->get('id_cargo')))
-                ->setDireccionParticular($request->get('direccion'))
                 ->setBaja(false)
                 ->setAcumuladoTiempoVacaciones(0)
                 ->setAcumuladoDineroVacaciones(0)
-                ->setRol($request->get('rol'))
                 ->setActivo(true);
 
-            if ($request->get('is_usuario') && $request->get('is_usuario') == 1) {
+            if ($request->get('is_usuario') == "on") {
                 //-------ADICIONO EL USUARIO
                 $obj_usuario = new User();
-                $arr_role [0] = $request->get('rol');
+                $arr_role[0] = $obj_empleado->getRol();
                 $obj_usuario
-                    ->setUsername($request->get('correo'))
+                    ->setUsername($obj_empleado->getCorreo())
                     ->setRoles($arr_role)
                     ->setStatus(true);
             }
             try {
-                if ($request->get('is_usuario') && $request->get('is_usuario') == 1) {
+                if ($request->get('is_usuario') == "on") {
                     $em->persist($obj_usuario);
                     $password = AuxFunctions::generateRandomPassword();
                     $obj_usuario->setPassword($passEncoder->encodePassword($obj_usuario, $password));
                     $obj_empleado->setIdUsuario($obj_usuario);
 
                     $msg = "Felicitaciones es usted miembro de nuestro equipo de trabajo, use la siguiente dirección para acceder al sistema www.google.com, su usuario es: " . $request->get('correo') . " y su contraseña: " . $password;
-                    AuxFunctions::sendEmail('Credenciales del sistema', $request->get('correo'), $request->get('nombre'), $msg);
+//                    AuxFunctions::sendEmail('Credenciales del sistema', $request->get('correo'), $request->get('nombre'), $msg);
                 }
                 $em->persist($obj_empleado);
                 $em->flush();
@@ -112,82 +105,63 @@ class EmpleadoController extends AbstractController
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
             $this->addFlash('success', "Empleado adicionado satisfactoriamente");
-            return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "El correo ya se encuentra registrado en el sistema");
-        return new JsonResponse(['success' => false]);
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_capital_humano_empleado');
     }
 
     /**
-     * @Route("/contabilidad/capital-humano/empleado-upd", name="contabilidad_capital_humano_empleado_upd")
+     * @Route("/contabilidad/capital-humano/empleado-upd/{id}", name="contabilidad_capital_humano_empleado_upd")
      */
-    public function updEmpleado(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
+    public function updEmpleado(EntityManagerInterface $em, Request $request, Empleado $empleado,
+                                ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
     {
-        $entity_repository = $em->getRepository(Empleado::class);
-        $params = array(
-            'correo' => $request->get('correo'),
-            'activo' => true
-        );
-        if (!AuxFunctions::isDuplicate($entity_repository, $params, 'upd', $request->get('id_empleado'))) {
-            /**@var $obj_empleado Empleado** */
-            $obj_empleado = $em->getRepository(Empleado::class)->find($request->get('id_empleado'));
-            if (!$obj_empleado) {
-                $this->addFlash('error', "El empleado no se encuentra en la base de datos");
-                return new JsonResponse(['success' => true]);
-            }
-            $old_email = $obj_empleado->getCorreo();
-            $obj_empleado
-                ->setNombre($request->get('nombre'))
-                ->setCorreo($request->get('correo'))
-                ->setTelefono($request->get('telefono'))
-                ->setFechaAlta(\DateTime::createFromFormat('Y-m-d', $request->get('fecha_alta')))
-                ->setSalarioXHora(floatval($request->get('salario_x_hora')))
-                ->setIdUnidad($em->getRepository(Unidad::class)->find($request->get('id_unidad')))
-                ->setIdCargo($em->getRepository(Cargo::class)->find($request->get('id_cargo')))
-                ->setDireccionParticular($request->get('direccion'))
+        $old_email = $em->getRepository(Empleado::class)->find($empleado->getId())->getCorreo();
+        $form = $this->createForm(EmpleadoType::class, $empleado);
+        $form->handleRequest($request);
+        $errors = $validator->validate($empleado);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $empleado
                 ->setBaja(false)
-                ->setAcumuladoTiempoVacaciones(0)
-                ->setAcumuladoDineroVacaciones(0)
-                ->setRol($request->get('rol'))
                 ->setActivo(true);
 
             //obtengo el usuario en caso de que exista
             $obj_usuario = $em->getRepository(User::class)->findOneByUsername($old_email);
 
-            if ($request->get('is_usuario') && $request->get('is_usuario') == 1) {
-                $arr_role [0] = $request->get('rol');
+            if ($request->get('is_usuario') == "on") {
+                $arr_role[0] = $empleado->getRol();
                 if (!$obj_usuario) {
                     $obj_usuario = new User();
-                    $obj_usuario->setPassword($passEncoder->encodePassword($obj_usuario, 'prueba'));
+                    $password = AuxFunctions::generateRandomPassword();
+                    $obj_usuario->setPassword($passEncoder->encodePassword($obj_usuario, $password));
+                    $empleado->setIdUsuario($obj_usuario);
+                    $msg = "Felicitaciones es usted miembro de nuestro equipo de trabajo, use la siguiente dirección para acceder al sistema www.google.com, su usuario es: " . $request->get('correo') . " y su contraseña: " . $password;
+//                    AuxFunctions::sendEmail('Credenciales del sistema', $request->get('correo'), $request->get('nombre'), $msg);
                 }
                 /**@var $obj_usuario User* */
                 $obj_usuario
-                    ->setUsername($request->get('correo'))
+                    ->setUsername($empleado->getCorreo())
                     ->setRoles($arr_role)
                     ->setStatus(true);
 
             } else {
                 if ($obj_usuario)
-                    $obj_usuario
-                        ->setStatus(false);
-                $obj_empleado->setRol(null);
+                    $obj_usuario->setStatus(false);
+                $empleado->setIdUsuario(null);
+                $empleado->setRol(null);
             }
             try {
-
-                if ($request->get('is_usuario') && $request->get('is_usuario') == 1) {
-                    $em->persist($obj_usuario);
-                    $obj_empleado->setIdUsuario($obj_usuario);
-                }
-                $em->persist($obj_empleado);
+                if ($obj_usuario) $em->persist($obj_usuario);
+                $em->persist($empleado);
                 $em->flush();
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedro de software.');
             }
             $this->addFlash('success', "Empleado actualizado satisfactoriamente");
-            return new JsonResponse(['success' => true]);
         }
-        $this->addFlash('error', "El correo ya se encuentra registrado en el sistema");
-        return new JsonResponse(['success' => false]);
+        if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
+        return $this->redirectToRoute('contabilidad_capital_humano_empleado');
     }
 
 
@@ -223,26 +197,17 @@ class EmpleadoController extends AbstractController
         return $this->redirectToRoute('contabilidad_capital_humano_empleado');
     }
 
-    public function getRoles()
+    public static function getRoles()
     {
-        $str = "";
+        $roles_list = [];
         $config = Yaml::parse(file_get_contents('../config/packages/security.yaml'));
         $access_control = $config['security']['access_control'];
         foreach ($access_control as $ac) {
             foreach ($ac['roles'] as $item) {
-                $str = $str . $item . ",";
+                if (in_array($item, $roles_list) == false)
+                    $roles_list[$item] = $item;
             }
         }
-        $str = substr($str, 0, -1);
-        $array = explode(",", $str);
-        $array = array_unique($array);
-
-        $roles = [];
-        foreach ($array as $item){
-            $roles[] = array(
-                'rol'=>$item
-            );
-        }
-        return $roles;
+        return $roles_list;
     }
 }

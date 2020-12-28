@@ -6,9 +6,13 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
 use App\Repository\Contabilidad\CapitalHumano\EmpleadoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=EmpleadoRepository::class)
+ * @UniqueEntity("correo", message="contabilidad.RRHH.correo_unico")
+ * @UniqueEntity("nombre", message="contabilidad.RRHH.correo_unico")
  */
 class Empleado
 {
