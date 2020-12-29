@@ -12,7 +12,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Traslado  Recibido</h1>
+                        <h1 class="text-reporte text-right mr-0" id="normal_div">Traslado Recibido</h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -243,6 +243,13 @@
                     success: function (result) {
                         if (result.success == true) {
                             let traslado = result.traslado;
+
+                            if(traslado.cancelado == true || traslado.cancelado == 'true'){
+                                ActiveDesactive(false)
+                            }
+                            else{
+                                ActiveDesactive(true)
+                            }
                             $('#movimiento_activo_fijo_nro_inventatio').val(traslado.nro_inv);
                             $('#movimiento_activo_fijo_descripcion').val(traslado.desc);
                             $('#movimiento_activo_fijo_id_cuenta').val(traslado.nro_cuenta);
@@ -254,6 +261,8 @@
                             $('#movimiento_activo_fijo_id_movimiento').val(traslado.id);
                             $('#movimiento_activo_fijo_id_activo').val(traslado.id_activo);
                             $('#movimiento_activo_fijo_fundamentacion').val(traslado.fundamentacion);
+                            $('#id_unidad').val(traslado.id_unidad);
+
                             loadingModal.close()
                         }
                         if (result.success == false) {
@@ -266,6 +275,20 @@
                 })
             }
         }
+
+        $("#btnCancelar").click(function (e) {
+            let nro = $('#select_nros').val()
+            if (nro != '') {
+                $('body').append(`
+                    <form action='/contabilidad/activo-fijo/traslados-recibidos/cancelTraslado'
+                         method="post" id='form_cancel'>
+                            <input type='text' hidden name='nro' value='${nro}'/>
+                    </form>`)
+                const fomrulario = $('#form_cancel')
+                fomrulario.submit()
+                fomrulario.remove()
+            }
+        });
 
         function printTraslado() {
             if ($('#movimiento_activo_fijo_id_movimiento').val() != '') {
@@ -286,6 +309,19 @@
                 const fomrulario = $('#form_print_current')
                 fomrulario.submit()
                 fomrulario.remove()
+            }
+        }
+
+        function ActiveDesactive(active) {
+            if(active){
+                $('#normal_div').text('Traslado Recibido')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
+                $('#btnCancelar').show()
+            }
+            else{
+                $('#normal_div').text('Traslado Cancelado')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 mt-2 text-danger text-uppercase')
+                $('#btnCancelar').hide()
             }
         }
     </script>

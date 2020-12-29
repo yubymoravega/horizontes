@@ -213,6 +213,8 @@ class TrasladosRecividosController extends AbstractController
         /** @var ActivoFijoCuentas $cuenta_activo */
         $cuenta_activo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy(['id_activo' => $obj_movimiento_activo_fijo->getIdActivoFijo()]);
         $row = array(
+            'id_unidad'=>$obj_movimiento_activo_fijo->getIdUnidadDestinoOrigen()->getId(),
+            'cancelado'=>$obj_movimiento_activo_fijo->getCancelado(),
             'nro_inv' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getNroInventario(),
             'desc' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getDescripcion(),
             'fecha' => $obj_movimiento_activo_fijo->getFecha()->format('d/m/Y'),
@@ -227,5 +229,27 @@ class TrasladosRecividosController extends AbstractController
             'traslado' => $row,
             'success' => true
         ]);
+    }
+
+    /**
+     * @Route("/cancelTraslado", name="contabilidad_activo_fijo_traslado_cancel_traslado", methods={"POST","GET"})
+     */
+    public function cancelTraslado(Request $request, EntityManagerInterface $em)
+    {
+        $nro = $request->request->get('nro');
+        $anno = Date('Y');
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+
+        $cancelado = AuxFunctions::CancelarActivoFijo($em, $this->tipo_movimiento, intval($nro), $anno, $unidad, $this->getUser());
+        if (!$cancelado)
+            $this->addFlash('error', 'El traslado no se ha podido cancelar, consulte el problema con su administrador de software');
+        else
+            $this->addFlash('success', 'Traslado cancelado satisfactoriamente');
+        $formulario = $this->createForm(MovimientoActivoFijoType::class);
+        return $this->render('contabilidad/activo_fijo/traslados_recividos/index.html.twig', [
+            'controller_name' => 'AperturaController',
+            'formulario' => $formulario->createView(),
+        ]);
+
     }
 }

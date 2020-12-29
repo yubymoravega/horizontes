@@ -109,6 +109,16 @@ class MovimientoActivoFijo
      */
     private $id_proveedor;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $cancelado;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=MovimientoActivoFijo::class)
+     */
+    private $id_movimiento_cancelado;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -302,6 +312,30 @@ class MovimientoActivoFijo
     public function setIdProveedor(?Proveedor $id_proveedor): self
     {
         $this->id_proveedor = $id_proveedor;
+
+        return $this;
+    }
+
+    public function getCancelado(): ?bool
+    {
+        return $this->cancelado;
+    }
+
+    public function setCancelado(?bool $cancelado): self
+    {
+        $this->cancelado = $cancelado;
+
+        return $this;
+    }
+
+    public function getIdMovimientoCancelado(): ?self
+    {
+        return $this->id_movimiento_cancelado;
+    }
+
+    public function setIdMovimientoCancelado(?self $id_movimiento_cancelado): self
+    {
+        $this->id_movimiento_cancelado = $id_movimiento_cancelado;
 
         return $this;
     }

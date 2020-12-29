@@ -12,7 +12,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Compra de Activo Fijo</h1>
+                        <h1 class="text-reporte text-right mr-0" id="normal_div">Compra de Activo Fijo</h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -56,7 +56,8 @@
                 </div>
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
                     <label for="id_proveedor">Proveedor</label>
-                    <select name="movimiento_activo_fijo[id_proveedor]" class="w-100 form-control" id="id_proveedor"> </select>
+                    <select name="movimiento_activo_fijo[id_proveedor]" class="w-100 form-control"
+                            id="id_proveedor"> </select>
                 </div>
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
                     {{ form_label(formulario.fundamentacion) }}
@@ -145,7 +146,7 @@
                         $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
                         loadingModal.close()
                     } else {
-                        window.open('/contabilidad/activo-fijo/gestionar/' + codigo+'&type=2', '_self');
+                        window.open('/contabilidad/activo-fijo/gestionar/' + codigo + '&type=2', '_self');
                         alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }
                 },
@@ -243,6 +244,12 @@
                     success: function (result) {
                         if (result.success == true) {
                             let compra = result.compra;
+
+                            if (compra.cancelado == true || compra.cancelado == 'true') {
+                                ActiveDesactive(false)
+                            } else {
+                                ActiveDesactive(true)
+                            }
                             $('#movimiento_activo_fijo_nro_inventatio').val(compra.nro_inv);
                             $('#movimiento_activo_fijo_descripcion').val(compra.desc);
                             $('#movimiento_activo_fijo_id_cuenta').val(compra.nro_cuenta);
@@ -254,18 +261,34 @@
                             $('#movimiento_activo_fijo_id_movimiento').val(compra.id);
                             $('#movimiento_activo_fijo_id_activo').val(compra.id_activo);
                             $('#movimiento_activo_fijo_fundamentacion').val(compra.fundamentacion);
+                            $('#id_proveedor').val(compra.id_proveedor);
                             loadingModal.close()
                         }
                         if (result.success == false) {
                             loadingModal.close()
                             alertTemplate(result.message, 'danger')
                         }
-                    },
+                    }
+                    ,
                     error: function (result) {
                     }
                 })
             }
         }
+
+        $("#btnCancelar").click(function (e) {
+            let nro = $('#select_nros').val()
+            if (nro != '') {
+                $('body').append(`
+                    <form action='/contabilidad/activo-fijo/compra/cancelCompra'
+                         method="post" id='form_cancel'>
+                            <input type='text' hidden name='nro' value='${nro}'/>
+                    </form>`)
+                const fomrulario = $('#form_cancel')
+                fomrulario.submit()
+                fomrulario.remove()
+            }
+        });
 
         function printCompra() {
             if ($('#movimiento_activo_fijo_id_movimiento').val() != '') {
@@ -286,6 +309,18 @@
                 const fomrulario = $('#form_print_current')
                 fomrulario.submit()
                 fomrulario.remove()
+            }
+        }
+
+        function ActiveDesactive(active) {
+            if (active) {
+                $('#normal_div').text('Compra de Activo Fijo')
+                $('#normal_div').attr('class', 'text-reporte text-right mr-0 text-white mt-2')
+                $('#btnCancelar').show()
+            } else {
+                $('#normal_div').text('Compra Cancelada')
+                $('#normal_div').attr('class', 'text-reporte text-right mr-0 mt-2 text-danger text-uppercase')
+                $('#btnCancelar').hide()
             }
         }
     </script>

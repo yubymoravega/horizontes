@@ -12,7 +12,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0">Apertura de Activo Fijo </h1>
+                        <h1 class="text-reporte text-right mr-0" id="normal_div">Apertura de Activo Fijo</h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -137,7 +137,7 @@
                         $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
                         loadingModal.close()
                     } else {
-                        window.open('/contabilidad/activo-fijo/gestionar/' + codigo+'&type=1', '_self');
+                        window.open('/contabilidad/activo-fijo/gestionar/' + codigo + '&type=1', '_self');
                         alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }
                 },
@@ -179,6 +179,20 @@
                 $('#movimiento_activo_fijo').attr('action', `/contabilidad/activo-fijo/apertura/`)
                 $('#movimiento_activo_fijo').submit()
                 if (validateForm.errorList.length === 0) loadingModal.show()
+            }
+        });
+
+        $("#btnCancelar").click(function (e) {
+            let nro = $('#select_nros').val()
+            if (nro != '') {
+                $('body').append(`
+                    <form action='/contabilidad/activo-fijo/apertura/cancelApertura'
+                         method="post" id='form_cancel'>
+                            <input type='text' hidden name='nro' value='${nro}'/>
+                    </form>`)
+                const fomrulario = $('#form_cancel')
+                fomrulario.submit()
+                fomrulario.remove()
             }
         });
 
@@ -233,7 +247,14 @@
                     success: function (result) {
                         if (result.success == true) {
                             let apertura = result.apertura;
-                            console.info(apertura)
+
+                            if(apertura.cancelado == true || apertura.cancelado == 'true'){
+                                ActiveDesactive(false)
+                            }
+                            else{
+                                ActiveDesactive(true)
+                            }
+
                             $('#movimiento_activo_fijo_nro_inventatio').val(apertura.nro_inv);
                             $('#movimiento_activo_fijo_descripcion').val(apertura.desc);
                             $('#movimiento_activo_fijo_id_cuenta').val(apertura.nro_cuenta);
@@ -277,6 +298,19 @@
                 const fomrulario = $('#form_print_current')
                 fomrulario.submit()
                 fomrulario.remove()
+            }
+        }
+
+        function ActiveDesactive(active) {
+            if(active){
+                $('#normal_div').text('Apertura de Activo Fijo')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
+                $('#btnCancelar').show()
+            }
+            else{
+                $('#normal_div').text('Apertura Cancelada')
+                $('#normal_div').attr('class','text-reporte text-right mr-0 mt-2 text-danger text-uppercase')
+                $('#btnCancelar').hide()
             }
         }
     </script>

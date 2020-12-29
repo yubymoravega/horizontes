@@ -225,6 +225,8 @@ class CompraController extends AbstractController
         /** @var ActivoFijoCuentas $cuenta_activo */
         $cuenta_activo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy(['id_activo' => $obj_movimiento_activo_fijo->getIdActivoFijo()]);
         $row = array(
+            'id_proveedor'=>$obj_movimiento_activo_fijo->getIdProveedor()?$obj_movimiento_activo_fijo->getIdProveedor()->getId():'',
+            'cancelado'=>$obj_movimiento_activo_fijo->getCancelado(),
             'nro_inv' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getNroInventario(),
             'desc' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getDescripcion(),
             'fecha' => $obj_movimiento_activo_fijo->getFecha()->format('d/m/Y'),
@@ -239,5 +241,27 @@ class CompraController extends AbstractController
             'compra' => $row,
             'success' => true
         ]);
+    }
+
+    /**
+     * @Route("/cancelCompra", name="contabilidad_activo_fijo_compra_cancel_compra", methods={"POST","GET"})
+     */
+    public function cancelCompra(Request $request, EntityManagerInterface $em)
+    {
+        $nro = $request->request->get('nro');
+        $anno = Date('Y');
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+
+        $cancelado = AuxFunctions::CancelarActivoFijo($em, $this->tipo_movimiento, intval($nro), $anno, $unidad, $this->getUser());
+        if (!$cancelado)
+            $this->addFlash('error', 'La Compra no se ha podido cancelar, consulte el problema con su administrador de software');
+        else
+            $this->addFlash('success', 'Compra cancelada satisfactoriamente');
+        $formulario = $this->createForm(MovimientoActivoFijoType::class);
+        return $this->render('contabilidad/activo_fijo/compra/index.html.twig', [
+            'controller_name' => 'CompraController',
+            'formulario' => $formulario->createView(),
+        ]);
+
     }
 }
