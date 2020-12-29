@@ -292,7 +292,7 @@ class ActivoFijoController extends AbstractController
     {
         $cuenta_activo = AuxFunctions::getCuentasByTipo($em, [3]);
         $cuenta_depreciacion = AuxFunctions::getCuentasByTipo($em, [6]);
-        $cuenta_gasto = AuxFunctions::getCuentasByTipo($em, [14]);
+        $cuenta_gasto = AuxFunctions::getCuentasByTipo($em, [13]);
         $paises = AuxFunctions::getPaises();
 
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());

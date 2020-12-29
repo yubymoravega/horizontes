@@ -88,6 +88,16 @@ class ActivoFijoCuentas
      */
     private $id_elemento_gasto_gasto;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Cuenta::class)
+     */
+    private $id_cuenta_acreedora;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Subcuenta::class)
+     */
+    private $id_subcuenta_acreedora;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -221,6 +231,30 @@ class ActivoFijoCuentas
     public function setIdElementoGastoGasto(?ElementoGasto $id_elemento_gasto_gasto): self
     {
         $this->id_elemento_gasto_gasto = $id_elemento_gasto_gasto;
+
+        return $this;
+    }
+
+    public function getIdCuentaAcreedora(): ?Cuenta
+    {
+        return $this->id_cuenta_acreedora;
+    }
+
+    public function setIdCuentaAcreedora(?Cuenta $id_cuenta_acreedora): self
+    {
+        $this->id_cuenta_acreedora = $id_cuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getIdSubcuentaAcreedora(): ?Subcuenta
+    {
+        return $this->id_subcuenta_acreedora;
+    }
+
+    public function setIdSubcuentaAcreedora(?Subcuenta $id_subcuenta_acreedora): self
+    {
+        $this->id_subcuenta_acreedora = $id_subcuenta_acreedora;
 
         return $this;
     }

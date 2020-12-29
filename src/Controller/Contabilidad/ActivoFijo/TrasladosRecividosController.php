@@ -6,7 +6,10 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
+use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Form\Contabilidad\ActivoFijo\MovimientoActivoFijoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +17,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use const http\Client\Curl\Features\UNIX_SOCKETS;
 
 /**
  * Class TrasladosRecividosController
@@ -23,6 +27,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TrasladosRecividosController extends AbstractController
 {
     protected $tipo_movimiento = 5;
+
     /**
      * @Route("/", name="contabilidad_activo_fijo_traslados_recividos")
      */
@@ -35,6 +40,8 @@ class TrasladosRecividosController extends AbstractController
             $movimiento_apertura = $request->get('movimiento_activo_fijo');
             $nro_inventatio = $movimiento_apertura['nro_inventatio'];
             $fundamentacion = $movimiento_apertura['fundamentacion'];
+            $id_unidad_origen = $movimiento_apertura['id_unidad'];
+            $obj_unidad_origen = $em->getRepository(Unidad::class)->find($id_unidad_origen);
 
             $user = $this->getUser();
             $obj_unidad = AuxFunctions::getUnidad($em, $user);
@@ -80,7 +87,9 @@ class TrasladosRecividosController extends AbstractController
                 ->setAnno($obj_activo->getFechaAlta()->format('Y'))
                 ->setFecha($obj_activo->getFechaAlta())
                 ->setEntrada(true)
-                ->setFundamentacion($fundamentacion);
+                ->setFundamentacion($fundamentacion)
+                ->setIdUnidadDestinoOrigen($obj_unidad_origen)
+            ;
             $em->persist($new_movimiento);
 
             $obj_activo->setActivo(true);
@@ -98,11 +107,21 @@ class TrasladosRecividosController extends AbstractController
                         $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getDepreciacionAcumulada(), 0,
                         $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
                 }
-                //asentando la cuenta de gasto del activo
-                $asiento_depresiacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaGasto(), $cuentas_activo_fijo->getIdSubcuentaGasto(), null,
+
+                //asentando la cuenta de acreedora del activo(600)
+                $cuenta_acreedora = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>'600','activo'=>true]);
+                $subcuenta_acreedora = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta'=>$cuenta_acreedora,'nro_subcuenta'=>'0010','activo'=>true]);
+                $asiento_acreedora = AuxFunctions::createAsiento($em, $cuenta_acreedora, $subcuenta_acreedora, null,
                     $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
                     $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorReal(), 0,
                     $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+
+                //actualizando la cuenta acreedora del activo fijo
+                $cuentas_activo_fijo
+                    ->setIdCuentaAcreedora($cuenta_acreedora)
+                    ->setIdSubcuentaAcreedora($subcuenta_acreedora);
+                $em->persist($cuentas_activo_fijo);
+
 
                 $em->flush();
                 $formulario = $this->createForm(MovimientoActivoFijoType::class,
@@ -137,10 +156,22 @@ class TrasladosRecividosController extends AbstractController
     {
         $row = AuxFunctions::getCuentasMovimientosEntradaActivoFijo($em);
         $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento);
+        /** @var Unidad $unidad */
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $unidades_arr = $em->getRepository(Unidad::class)->findBy(['activo' => true]);
+        $unidades = [];
+        /** @var Unidad $item */
+        foreach ($unidades_arr as $item) {
+            if ($item->getId() != $unidad->getId())
+                $unidades[] = [
+                    'id' => $item->getId(),
+                    'nombre' => $item->getCodigo() . ' - ' . $item->getNombre()
+                ];
+        }
         return new JsonResponse([
             'cuentas' => $row,
             'success' => true,
+            'unidades'=>$unidades,
             'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, Date('Y'))
         ]);
     }

@@ -61,8 +61,8 @@ class ComprobanteAnotacionesController extends AbstractController
                 $row[] = array(
                     'nro'=>'',
                     'fecha' => '',
-                    'cuenta' => $cuentas_activo_fijo->getIdCuentaGasto()->getNroCuenta(),
-                    'subcuenta' => $cuentas_activo_fijo->getIdSubcuentaGasto()->getNroSubcuenta(),
+                    'cuenta' => $cuentas_activo_fijo->getIdCuentaAcreedora()?$cuentas_activo_fijo->getIdCuentaAcreedora()->getNroCuenta():'',
+                    'subcuenta' => $cuentas_activo_fijo->getIdSubcuentaAcreedora()?$cuentas_activo_fijo->getIdSubcuentaAcreedora()->getNroSubcuenta():'',
                     'debito' => '',
                     'credito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
                     'criterio_1' => $cuentas_activo_fijo->getIdCentroCostoGasto()->getCodigo(),

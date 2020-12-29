@@ -101,11 +101,20 @@ class AperturaController extends AbstractController
                         $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getDepreciacionAcumulada(), 0,
                         $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
                 }
-                //asentando la cuenta de gasto del activo
-                $asiento_depresiacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaGasto(), $cuentas_activo_fijo->getIdSubcuentaGasto(), null,
+
+                //asentando la cuenta de acreedora del activo
+                $cuenta_acreedora = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>'600','activo'=>true]);
+                $subcuenta_acreedora = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta'=>$cuenta_acreedora,'nro_subcuenta'=>'0010','activo'=>true]);
+                $asiento_acreedora = AuxFunctions::createAsiento($em, $cuenta_acreedora, $subcuenta_acreedora, null,
                     $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
                     $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorReal(), 0,
                     $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+
+                //actualizando la cuenta acreedora del activo fijo
+                $cuentas_activo_fijo
+                    ->setIdCuentaAcreedora($cuenta_acreedora)
+                    ->setIdSubcuentaAcreedora($subcuenta_acreedora);
+                $em->persist($cuentas_activo_fijo);
 
                 $em->flush();
                 $formulario = $this->createForm(MovimientoActivoFijoType::class,
