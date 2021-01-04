@@ -160,6 +160,7 @@ class MovimientoCuentaController extends AbstractController
             $saldo_inicial_calculo += $obj_saldo_cuenta->getSaldo();
         }
         $arr_asientos = $asiento_er->findBy($params[0]);
+//        dd($params[0],$arr_asientos);
         $row = [];
         $saldo_partida = 0;
         /** @var Asiento $asiento */

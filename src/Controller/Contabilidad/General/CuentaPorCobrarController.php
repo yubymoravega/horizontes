@@ -82,9 +82,32 @@ class CuentaPorCobrarController extends AbstractController
 
             }
         }
+        $rows_return = [];
+        $proveedor_repeat = [];
+        foreach ($row as $data){
+            if(!in_array($data['cliente'],$proveedor_repeat))
+                $proveedor_repeat[count($proveedor_repeat)]= $data['cliente'];
+        }
+        foreach ($proveedor_repeat as $proveedor){
+            $puntero = 0;
+            foreach ($row as $key => $data){
+                if($data['cliente']== $proveedor){
+                    $rows_return[] = [
+                        'cliente' => $puntero==0?$proveedor:'',
+                        'factura' => $data['factura'],
+                        'fecha' => $data['fecha'],
+                        'case_4' => $data['case_4'],
+                        'case_2' => $data['case_2'],
+                        'case_3' => $data['case_3'],
+                        'case_1' => $data['case_1'],
+                    ];
+                    $puntero++;
+                }
+            }
+        }
         return $this->render('contabilidad/general/cuenta_por_cobrar/index.html.twig', [
             'controller_name' => 'CuentaPorCobrarController',
-            'obligaciones_cobro' => $row
+            'obligaciones_cobro' => $rows_return
         ]);
     }
 

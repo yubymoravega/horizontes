@@ -2733,7 +2733,7 @@ class AuxFunctions
         $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_impuesto, $obj_subcuenta_impuesto, null,
             $unidad, null, null, null, null, null,
             null, 0, 0, $factura->getFechaFactura(), $factura->getFechaFactura()->format('Y'),
-            0, $impuesto_total, 'FACT-' . $factura->getNroFactura(), $factura);
+            $impuesto_total,0, 'FACT-' . $factura->getNroFactura(), $factura);
 
 
         //asentando factura

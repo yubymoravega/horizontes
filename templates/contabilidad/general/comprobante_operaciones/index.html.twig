@@ -716,16 +716,18 @@
                 }
             }
             if (type == 'FACT') {
-                $('#cuentas_comprobante_operaciones_id_factura').val('')
-                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val(str)
+                $('#cuentas_comprobante_operaciones_id_factura').val(str)
+                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val('')
                 $('#cuentas_comprobante_operaciones_debito').val(0)
                 $('#cuentas_comprobante_operaciones_credito').val(Number.parseFloat(total).toFixed(2))
             } else {
                 $('#cuentas_comprobante_operaciones_debito').val(Number.parseFloat(total).toFixed(2))
                 $('#cuentas_comprobante_operaciones_credito').val(0)
-                $('#cuentas_comprobante_operaciones_id_factura').val(str)
-                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val('')
+                $('#cuentas_comprobante_operaciones_id_factura').val('')
+                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val(str)
             }
+            console.log( $('#cuentas_comprobante_operaciones_id_factura').val())
+            console.log( str)
         }
     </script>
 {% endblock %}

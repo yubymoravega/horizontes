@@ -2,10 +2,8 @@
 
 namespace App\Form\Contabilidad\ActivoFijo;
 
-use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,35 +14,51 @@ class MovimientoActivoFijoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('fecha',DateType::class, array(
-                'input'=>'datetime',
-                'widget'=>'single_text',
-                'placeholder'=>'Fecha',
-
+            ->add('fecha', TextType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Fecha',
+                'required' => false,
+                'disabled' => true
             ))
-            ->add('fundamentacion',TextareaType::class, [
+            ->add('fundamentacion', TextareaType::class, [
                 'label' => 'Fundamentación de la Operación',
                 'attr' => ['class' => 'w-100']
             ])
-            ->add('nro_inventatio',TextType::class, [
+            ->add('nro_inventatio', TextType::class, [
                 'label' => 'Nro. Inventario',
                 'attr' => ['class' => 'w-100']
             ])
-            ->add('descripcion',TextType::class, [
+            ->add('descripcion', TextType::class, [
                 'label' => 'Descripción',
                 'attr' => ['class' => 'w-100']
             ])
-            ->add('id_cuenta',ChoiceType::class, array(
+            ->add('id_cuenta', TextType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Cuenta',
-                'choice_label' => 'nro_cuenta',
+                'label' => 'Cuenta',
+                'required' => false,
+                'disabled' => true
             ))
-            ->add('id_subcuenta',ChoiceType::class, array(
+            ->add('centro_costo', TextType::class, array(
                 'attr' => ['class' => 'w-100'],
-                'label'=>'Subcuenta',
-                'choice_label' => 'nro_subcuenta',
+                'label' => 'Centro de Costo',
+                'required' => false,
+                'disabled' => true
             ))
-        ;
+            ->add('area_responsabilidad', TextType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Area de Responsabilidad',
+                'required' => false,
+                'disabled' => true
+            ))
+            ->add('id_movimiento', HiddenType::class)
+            ->add('id_activo', HiddenType::class)
+            ->add('id_subcuenta', TextType::class, array(
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Subcuenta',
+                'required' => false,
+                'disabled' => true
+            ));
+
     }
 
     public function configureOptions(OptionsResolver $resolver)
