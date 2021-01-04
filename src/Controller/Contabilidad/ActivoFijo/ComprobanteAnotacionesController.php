@@ -79,6 +79,9 @@ class ComprobanteAnotacionesController extends AbstractController
                     'criterio_2' => ''
                 );
             }
+            else{
+
+            }
         }
         $row[] = array(
             'nro'=>'',

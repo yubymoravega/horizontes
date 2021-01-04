@@ -2773,13 +2773,15 @@ class AuxFunctions
      * @param float $debito
      * @param string $nro_documento
      * @param Factura|null $id_factura
+     * @param ActivoFijo|null $id_activo
      * @return Asiento
      */
     public static function createAsiento(EntityManagerInterface $em, Cuenta $obj_cuenta, Subcuenta $obj_subcuenta,
                                          Documento $obj_documento = null, Unidad $obj_unidad, Almacen $obj_almacen = null,
                                          CentroCosto $obj_centro_costo = null, ElementoGasto $obj_elemento_gasto = null,
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
-                                         int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento, Factura $id_factura = null)
+                                         int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
+                                         Factura $id_factura = null, ActivoFijo $id_activo = null)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -2800,7 +2802,9 @@ class AuxFunctions
             ->setIdExpediente($obj_expediente)
             ->setIdProveedor($obj_proveedor)
             ->setIdCliente($id_cliente)
-            ->setTipoCliente($tipo_cliente);
+            ->setTipoCliente($tipo_cliente)
+            ->setIdActivoFijo($id_activo)
+        ;
         $em->persist($new_asiento);
         return $new_asiento;
     }

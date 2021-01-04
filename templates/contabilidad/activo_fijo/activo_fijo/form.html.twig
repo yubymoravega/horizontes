@@ -145,8 +145,8 @@
                 {{ form_end(formulario) }}
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('contabilidad_activo_fijo_apertura') }}"
-                           class="btn btn-outline-secondary" id="btn_cancelar">Salir</a>
+                        <button class="btn btn-outline-secondary" id="btn_cancelar">Salir</button>
+
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmit">Guardar</button>
@@ -345,7 +345,7 @@
             $("#btnSubbmit").click(function (e) {
                 if (form_activo_fijo.valid()) {
                     form_activo_fijo.attr('method', `POST`)
-                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val()+'&type='+$('#activo_fijo_type').val())
+                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val() + '&type=' + $('#activo_fijo_type').val())
                     form_activo_fijo.submit()
                     if (validateForm.errorList.length === 0) loadingModal.show()
                 }
@@ -375,6 +375,11 @@
             }
             $("#activo_fijo_valor_real").val(valor_real)
         });
+
+        $('#btn_cancelar').on("click", function () {
+            window.history.back();
+        });
+
     </script>
 {% endblock %}
 

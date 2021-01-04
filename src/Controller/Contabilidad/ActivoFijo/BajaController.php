@@ -82,26 +82,48 @@ class BajaController extends AbstractController
             ;
             $em->persist($obj_activo);
             try {
-//                //asentar la cuenta del activo
-//                $asiento_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
-//                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
-//                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
-//                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-//                //asentando la cuenta de depresicion del activo
-//                if ($obj_activo->getDepreciacionAcumulada() > 0) {
-//                    $asiento_depresiacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
-//                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
-//                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getDepreciacionAcumulada(), 0,
-//                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-//                }
-//
-//                //asentando la cuenta de acreedora del activo
-//                $cuenta_acreedora = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => '600', 'activo' => true]);
-//                $subcuenta_acreedora = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta' => $cuenta_acreedora, 'nro_subcuenta' => '0010', 'activo' => true]);
-//                $asiento_acreedora = AuxFunctions::createAsiento($em, $cuenta_acreedora, $subcuenta_acreedora, null,
-//                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
-//                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorReal(), 0,
-//                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+
+                //Caso 1. El activo deprecio completamente
+                if($obj_activo->getValorReal() == 0){
+                    $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em,$cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
+                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,$obj_activo);
+
+                    $asiento_cuenta_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+                        $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorInicial(), 0,
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,$obj_activo);
+                }
+                //Caso 2. El activo solo ha depreciado un porciento del valor inicial
+                elseif( $obj_activo->getValorInicial() - $obj_activo->getValorReal() > 0){
+                    $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em,$cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
+                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getDepreciacionAcumulada(),
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,$obj_activo);
+
+                    $asiento_cuenta_gasto = AuxFunctions::createAsiento($em,$cuentas_activo_fijo->getIdCuentaGasto(), $cuentas_activo_fijo->getIdSubcuentaGasto(), null,
+                        $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorReal(),
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+
+                    $asiento_cuenta_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+                        $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorInicial(), 0,
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,$obj_activo);
+                }
+                //Caso 3. El activo no ha depreciado absolutamente nada(este caso no debe pasar)
+                elseif($obj_activo->getValorReal() == $obj_activo->getValorInicial()){
+                    $asiento_cuenta_gasto = AuxFunctions::createAsiento($em,$cuentas_activo_fijo->getIdCuentaGasto(), $cuentas_activo_fijo->getIdSubcuentaGasto(), null,
+                        $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+
+                    $asiento_cuenta_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+                        $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorInicial(), 0,
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,$obj_activo);
+                }
 
                 $em->flush();
                 $formulario = $this->createForm(MovimientoActivoFijoType::class,

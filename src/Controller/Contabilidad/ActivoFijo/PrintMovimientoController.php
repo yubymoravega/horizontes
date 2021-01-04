@@ -83,7 +83,7 @@ class PrintMovimientoController extends AbstractController
         /** @var ActivoFijo $activo_fijo */
         $activo_fijo = $em->getRepository(ActivoFijo::class)->find($id_activo);
         if(!$activo_fijo)
-            return new JsonResponse(['success' => false, 'msg' => 'El Activo Fijo no existe']);
+            return new JsonResponse(['success' => false, 'msg' => 'El Activo Fijo con identificador '.$id_activo.' no existe']);
         $cuentas_activo_fijo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy(['id_activo'=>$id_activo]);
         if(!$cuentas_activo_fijo)
             return new JsonResponse(['success' => false, 'msg' => 'El Activo Fijo no tiene cuentas asociadas']);
