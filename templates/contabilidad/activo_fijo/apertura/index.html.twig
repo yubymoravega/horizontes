@@ -114,6 +114,7 @@
 
 
         $('#movimiento_activo_fijo_nro_inventatio').on('keyup', function (e) {
+            $('#btnSubbmitApertura').hide();
             if (e.which == 13) {
                 let codigo = $('#movimiento_activo_fijo_nro_inventatio').val()
                 if (codigo !== '') {
@@ -123,6 +124,11 @@
                 }
             } else {
                 $('#movimiento_activo_fijo_descripcion').val('')
+                $('#movimiento_activo_fijo_id_cuenta').val('')
+                $('#movimiento_activo_fijo_id_subcuenta').val('')
+                $('#movimiento_activo_fijo_fecha').val('')
+                $('#movimiento_activo_fijo_centro_costo').val('')
+                $('#movimiento_activo_fijo_area_responsabilidad').val('')
             }
         })
 
@@ -135,8 +141,15 @@
                 success: function (result) {
                     if (result.descripcion != '') {
                         $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
+                        $('#movimiento_activo_fijo_id_cuenta').val(result.cuenta)
+                        $('#movimiento_activo_fijo_id_subcuenta').val(result.subcuenta)
+                        $('#movimiento_activo_fijo_fecha').val(result.fecha)
+                        $('#movimiento_activo_fijo_centro_costo').val(result.centro_costo)
+                        $('#movimiento_activo_fijo_area_responsabilidad').val(result.area_responsabilidad)
+                        $('#btnSubbmitApertura').hide();
                         loadingModal.close()
                     } else {
+                        $('#btnSubbmitApertura').show();
                         window.open('/contabilidad/activo-fijo/gestionar/' + codigo + '&type=1', '_self');
                         alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }

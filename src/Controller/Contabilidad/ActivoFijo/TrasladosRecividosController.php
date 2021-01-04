@@ -61,7 +61,7 @@ class TrasladosRecividosController extends AbstractController
             ]);
             if ($duplicate) {
                 $this->addFlash('error', 'El Activo Fijo ya existe, en esta unidad');
-                return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
+                return $this->render('contabilidad/activo_fijo/traslados_recividos/index.html.twig', [
                     'controller_name' => 'AperturaController',
                     'formulario' => $form->createView()
                 ]);
@@ -189,8 +189,17 @@ class TrasladosRecividosController extends AbstractController
             'activo' => true,
             'nro_inventario' => $nro_inv
         ]);
+        /** @var ActivoFijoCuentas $obj_cuenta_activo */
+        $obj_cuenta_activo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy(
+            ['id_activo' => $obj_activo_fijo]
+        );
         return new JsonResponse([
             'descripcion' => $obj_activo_fijo ? $obj_activo_fijo->getDescripcion() : '',
+            'cuenta' => $obj_cuenta_activo ? $obj_cuenta_activo->getIdCuentaActivo()->getNroCuenta() . ' - ' . $obj_cuenta_activo->getIdCuentaActivo()->getNombre() : '',
+            'subcuenta' => $obj_cuenta_activo ? $obj_cuenta_activo->getIdSubcuentaActivo()->getNroSubcuenta() . ' - ' . $obj_cuenta_activo->getIdSubcuentaActivo()->getDescripcion() : '',
+            'fecha' => $obj_activo_fijo ? $obj_activo_fijo->getFechaAlta()->format('d/m/Y') : '',
+            'centro_costo' => $obj_cuenta_activo ? $obj_cuenta_activo->getIdCentroCostoActivo()->getCodigo() . ' - ' . $obj_cuenta_activo->getIdCentroCostoActivo()->getNombre() : '',
+            'area_responsabilidad' => $obj_activo_fijo ? $obj_activo_fijo->getIdAreaResponsabilidad()->getCodigo() . ' - ' . $obj_activo_fijo->getIdAreaResponsabilidad()->getNombre() : '',
             'id' => $obj_activo_fijo ? $obj_activo_fijo->getId() : '',
             'success' => true
         ]);

@@ -8,29 +8,26 @@ use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
-use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
 use App\Form\Contabilidad\ActivoFijo\MovimientoActivoFijoType;
-use ContainerOrhabYj\getUserRepositoryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class AperturaController
+ * Class BajaController
  * @package App\Controller\Contabilidad\ActivoFijo
- * @Route("/contabilidad/activo-fijo/apertura")
+ * @Route("/contabilidad/activo-fijo/baja")
  */
-class AperturaController extends AbstractController
+class BajaController extends AbstractController
 {
-    protected $tipo_movimiento = 1;
+    protected $tipo_movimiento = 6;
 
     /**
-     * @Route("/", name="contabilidad_activo_fijo_apertura", methods={"GET","POST"})
+     * @Route("/", name="contabilidad_activo_fijo_baja")
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
@@ -38,6 +35,7 @@ class AperturaController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
+            $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
             $movimiento_apertura = $request->get('movimiento_activo_fijo');
             $nro_inventatio = $movimiento_apertura['nro_inventatio'];
             $fundamentacion = $movimiento_apertura['fundamentacion'];
@@ -46,25 +44,12 @@ class AperturaController extends AbstractController
             $obj_unidad = AuxFunctions::getUnidad($em, $user);
             $obj_activo = $em->getRepository(ActivoFijo::class)->findOneBy([
                 'nro_inventario' => $nro_inventatio,
-                'activo' => false,
+                'activo' => true,
                 'id_unidad' => $obj_unidad
             ]);
 
             if (!$obj_activo)
                 return new JsonResponse(['success' => false, 'msg' => 'El Activo Fijo no existe, en esta unidad']);
-
-            $duplicate = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
-                'activo' => true,
-                'id_activo_fijo' => $obj_activo,
-                'id_unidad' => $obj_unidad
-            ]);
-            if ($duplicate) {
-                $this->addFlash('error', 'El Activo Fijo ya existe, en esta unidad');
-                return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
-                    'controller_name' => 'AperturaController',
-                    'formulario' => $form->createView()
-                ]);
-            }
 
             /** @var ActivoFijoCuentas $cuentas_activo_fijo */
             $cuentas_activo_fijo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy([
@@ -83,41 +68,40 @@ class AperturaController extends AbstractController
                 ->setIdSubcuenta($cuentas_activo_fijo->getIdSubcuentaActivo())
                 ->setNroConsecutivo($nro)
                 ->setActivo(true)
-                ->setAnno($obj_activo->getFechaAlta()->format('Y'))
-                ->setFecha($obj_activo->getFechaAlta())
-                ->setEntrada(true)
+                ->setAnno(Date('Y'))
+                ->setFecha($today)
+                ->setEntrada(false)
                 ->setFundamentacion($fundamentacion);
             $em->persist($new_movimiento);
 
-            $obj_activo->setActivo(true);
+            $obj_activo
+                ->setActivo(false)
+                ->setFechaBaja($today)
+                ->setNroDocumentoBaja($new_movimiento->getNroConsecutivo())
+                ->setIdTipoMovimientoBaja($em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento))
+            ;
             $em->persist($obj_activo);
             try {
-                //asentar la cuenta del activo
-                $asiento_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
-                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
-                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
-                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-                //asentando la cuenta de depresicion del activo
-                if ($obj_activo->getDepreciacionAcumulada() > 0) {
-                    $asiento_depresiacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
-                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
-                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getDepreciacionAcumulada(), 0,
-                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-                }
-
-                //asentando la cuenta de acreedora del activo
-                $cuenta_acreedora = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => '600', 'activo' => true]);
-                $subcuenta_acreedora = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta' => $cuenta_acreedora, 'nro_subcuenta' => '0010', 'activo' => true]);
-                $asiento_acreedora = AuxFunctions::createAsiento($em, $cuenta_acreedora, $subcuenta_acreedora, null,
-                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
-                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorReal(), 0,
-                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-
-                //actualizando la cuenta acreedora del activo fijo
-                $cuentas_activo_fijo
-                    ->setIdCuentaAcreedora($cuenta_acreedora)
-                    ->setIdSubcuentaAcreedora($subcuenta_acreedora);
-                $em->persist($cuentas_activo_fijo);
+//                //asentar la cuenta del activo
+//                $asiento_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+//                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
+//                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
+//                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+//                //asentando la cuenta de depresicion del activo
+//                if ($obj_activo->getDepreciacionAcumulada() > 0) {
+//                    $asiento_depresiacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
+//                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
+//                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getDepreciacionAcumulada(), 0,
+//                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
+//                }
+//
+//                //asentando la cuenta de acreedora del activo
+//                $cuenta_acreedora = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => '600', 'activo' => true]);
+//                $subcuenta_acreedora = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta' => $cuenta_acreedora, 'nro_subcuenta' => '0010', 'activo' => true]);
+//                $asiento_acreedora = AuxFunctions::createAsiento($em, $cuenta_acreedora, $subcuenta_acreedora, null,
+//                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
+//                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorReal(), 0,
+//                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
 
                 $em->flush();
                 $formulario = $this->createForm(MovimientoActivoFijoType::class,
@@ -131,7 +115,7 @@ class AperturaController extends AbstractController
                         'id_subcuenta' => '',
                         'fundamentacion' => ''
                     ]);
-                return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
+                return $this->render('contabilidad/activo_fijo/baja/index.html.twig', [
                     'controller_name' => 'AperturaController',
                     'formulario' => $formulario->createView(),
                 ]);
@@ -139,14 +123,14 @@ class AperturaController extends AbstractController
                 return $em->getMessage();
             }
         }
-        return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
+        return $this->render('contabilidad/activo_fijo/baja/index.html.twig', [
             'controller_name' => 'AperturaController',
             'formulario' => $form->createView(),
         ]);
     }
 
     /**
-     * @Route("/getCuentas", name="contabilidad_activo_fijo_apertura_get_cuentas", methods={"POST"})
+     * @Route("/getCuentas", name="contabilidad_activo_fijo_baja_get_cuentas", methods={"POST"})
      */
     public function getCuentas(Request $request, EntityManagerInterface $em)
     {
@@ -161,7 +145,7 @@ class AperturaController extends AbstractController
     }
 
     /**
-     * @Route("/getNroInv/{nro_inv}", name="contabilidad_activo_fijo_apertura_get_nro_inv", methods={"POST"})
+     * @Route("/getNroInv/{nro_inv}", name="contabilidad_activo_fijo_baja_get_nro_inv", methods={"POST"})
      */
     public function getNroInv(Request $request, EntityManagerInterface $em, $nro_inv)
     {
@@ -190,9 +174,9 @@ class AperturaController extends AbstractController
     }
 
     /**
-     * @Route("/getApertura/{nro}", name="contabilidad_activo_fijo_apertura_get_apertura", methods={"POST"})
+     * @Route("/getBaja/{nro}", name="contabilidad_activo_fijo_baja_get_baja", methods={"POST"})
      */
-    public function getApertura(Request $request, EntityManagerInterface $em, $nro)
+    public function getBaja(Request $request, EntityManagerInterface $em, $nro)
     {
         $user = $this->getUser();
         $id_unidad = AuxFunctions::getUnidad($em, $user);
@@ -226,24 +210,23 @@ class AperturaController extends AbstractController
     }
 
     /**
-     * @Route("/cancelApertura", name="contabilidad_activo_fijo_apertura_cancel_apertura", methods={"POST","GET"})
+     * @Route("/cancelApertura", name="contabilidad_activo_fijo_baja_cancel_apertura", methods={"POST","GET"})
      */
     public function cancelApertura(Request $request, EntityManagerInterface $em)
     {
-        $nro = $request->request->get('nro');
-        $anno = Date('Y');
-        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
-
-        $cancelado = AuxFunctions::CancelarActivoFijo($em, $this->tipo_movimiento, intval($nro), $anno, $unidad, $this->getUser());
-        if (!$cancelado)
-            $this->addFlash('error', 'La Apertura no se ha podido cancelar, consulte el problema con su administrador de software');
-        else
-            $this->addFlash('success', 'Apertura cancelada satisfactoriamente');
-        $formulario = $this->createForm(MovimientoActivoFijoType::class);
-        return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
-            'controller_name' => 'AperturaController',
-            'formulario' => $formulario->createView(),
-        ]);
-
+//        $nro = $request->request->get('nro');
+//        $anno = Date('Y');
+//        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+//
+//        $cancelado = AuxFunctions::CancelarActivoFijo($em, $this->tipo_movimiento, intval($nro), $anno, $unidad, $this->getUser());
+//        if (!$cancelado)
+//            $this->addFlash('error', 'La Apertura no se ha podido cancelar, consulte el problema con su administrador de software');
+//        else
+//            $this->addFlash('success', 'Apertura cancelada satisfactoriamente');
+//        $formulario = $this->createForm(MovimientoActivoFijoType::class);
+//        return $this->render('contabilidad/activo_fijo/baja/index.html.twig', [
+//            'controller_name' => 'AperturaController',
+//            'formulario' => $formulario->createView(),
+//        ]);
     }
 }

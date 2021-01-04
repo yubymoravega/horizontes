@@ -12,11 +12,8 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Depresiar Activos Fijos
+                Listado de Depreciación de Activos Fijos
             </h4>
-            <button type="button" class="btn btn-danger font-weight-bold text-uppercase" data-placement="bottom" title="Depreciar"
-                    onclick="Depreciar()">Depreciar
-            </button>
         </div>
         {# end header #}
 
@@ -46,7 +43,7 @@
                         <td style="font-weight:400;" class="text-right">{{ new_item.depreciacion_acumulada }}</td>
                         <td style="font-weight:400;" class="text-right">{{ new_item.valor_real }}</td>
                         <td style="font-weight:400;" class="text-right">{{ new_item.tasa_depreciacion }}</td>
-                        </tr>
+                    </tr>
                 {% endfor %}
             {% endfor %}
             </tbody>
@@ -64,4 +61,5 @@
         }
     </script>
 {% endblock %}
+
 

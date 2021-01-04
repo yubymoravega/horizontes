@@ -53,7 +53,7 @@ class ActivoFijoCuentas
     private $id_area_responsabilidad_activo;
 
     /**
-     * @ORM\ManyToOne(targetEntity=\App\Entity\COntabilidad\Config\Cuenta::class)
+     * @ORM\ManyToOne(targetEntity=\App\Entity\Contabilidad\Config\Cuenta::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_cuenta_depreciacion;
@@ -163,12 +163,12 @@ class ActivoFijoCuentas
         return $this;
     }
 
-    public function getIdCuentaDepreciacion(): ?\App\Entity\COntabilidad\Config\Cuenta
+    public function getIdCuentaDepreciacion(): ?\App\Entity\Contabilidad\Config\Cuenta
     {
         return $this->id_cuenta_depreciacion;
     }
 
-    public function setIdCuentaDepreciacion(?\App\Entity\COntabilidad\Config\Cuenta $id_cuenta_depreciacion): self
+    public function setIdCuentaDepreciacion(?\App\Entity\Contabilidad\Config\Cuenta $id_cuenta_depreciacion): self
     {
         $this->id_cuenta_depreciacion = $id_cuenta_depreciacion;
 

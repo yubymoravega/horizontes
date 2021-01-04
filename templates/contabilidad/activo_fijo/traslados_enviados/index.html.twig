@@ -12,7 +12,7 @@
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0" id="normal_div">Traslado Recibido</h1>
+                        <h1 class="text-reporte text-right mr-0" id="normal_div">Traslado Enviado</h1>
                     </div>
                     <div class="col-4 form-group input-group input-group-sm mt-3 ml-0 p-0 d-block">
                         <span class="h5 text-light mr-2">Nro.</span><input type="number" id="select_nros" class="w-25">
@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
-                    <label for="id_proveedor">Unidad de Origen</label>
+                    <label for="id_proveedor">Unidad Destino</label>
                     <select name="movimiento_activo_fijo[id_unidad]" class="w-100 form-control" id="id_unidad"> </select>
                 </div>
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
@@ -101,7 +101,7 @@
             $('#movimiento_activo_fijo_id_cuenta').val('')
             $('#movimiento_activo_fijo_id_subcuenta').val('')
             $.ajax({
-                url: '/contabilidad/activo-fijo/traslados-recibidos/getCuentas',
+                url: '/contabilidad/activo-fijo/traslados-enviados/getCuentas',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -143,7 +143,7 @@
         function getData(codigo) {
             loadingModal.show("Cargando activo fijo...")
             $.ajax({
-                url: '/contabilidad/activo-fijo/traslados-recibidos/getNroInv/' + codigo,
+                url: '/contabilidad/activo-fijo/traslados-enviados/getNroInv/' + codigo,
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -154,13 +154,12 @@
                         $('#movimiento_activo_fijo_fecha').val(result.fecha)
                         $('#movimiento_activo_fijo_centro_costo').val(result.centro_costo)
                         $('#movimiento_activo_fijo_area_responsabilidad').val(result.area_responsabilidad)
-                        $('#btnSubbmitTraslado').hide();
-                        loadingModal.close()
-                    } else {
                         $('#btnSubbmitTraslado').show();
-                        window.open('/contabilidad/activo-fijo/gestionar/' + codigo+'&type=5', '_self');
+                    } else {
+                        $('#btnSubbmitTraslado').hide();
                         alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
                     }
+                    loadingModal.close()
                 },
                 error: function () {
                 }
@@ -199,7 +198,7 @@
         $("#btnSubbmitTraslado").click(function (e) {
             if ($('#movimiento_activo_fijo').valid()) {
                 $('#movimiento_activo_fijo').attr('method', `POST`)
-                $('#movimiento_activo_fijo').attr('action', `/contabilidad/activo-fijo/traslados-recibidos/`)
+                $('#movimiento_activo_fijo').attr('action', `/contabilidad/activo-fijo/traslados-enviados/`)
                 $('#movimiento_activo_fijo').submit()
                 if (validateForm.errorList.length === 0) loadingModal.show()
             }
@@ -222,7 +221,7 @@
                     } else {
                         $('#btnImprimir').show()
                         $('#btnSubbmitTraslado').hide()
-                        $('#btnCancelar').show()
+                        // $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
                 } else {
@@ -250,19 +249,19 @@
             } else {
                 loadingModal.show()
                 $.ajax({
-                    url: '/contabilidad/activo-fijo/traslados-recibidos/getTraslado/' + nro,
+                    url: '/contabilidad/activo-fijo/traslados-enviados/getTraslado/' + nro,
                     method: 'POST',
                     dataType: 'json',
                     success: function (result) {
                         if (result.success == true) {
                             let traslado = result.traslado;
 
-                            if(traslado.cancelado == true || traslado.cancelado == 'true'){
-                                ActiveDesactive(false)
-                            }
-                            else{
-                                ActiveDesactive(true)
-                            }
+                            // if(traslado.cancelado == true || traslado.cancelado == 'true'){
+                            //     ActiveDesactive(false)
+                            // }
+                            // else{
+                            //     ActiveDesactive(true)
+                            // }
                             $('#movimiento_activo_fijo_nro_inventatio').val(traslado.nro_inv);
                             $('#movimiento_activo_fijo_descripcion').val(traslado.desc);
                             $('#movimiento_activo_fijo_id_cuenta').val(traslado.nro_cuenta);
@@ -293,7 +292,7 @@
             let nro = $('#select_nros').val()
             if (nro != '') {
                 $('body').append(`
-                    <form action='/contabilidad/activo-fijo/traslados-recibidos/cancelTraslado'
+                    <form action='/contabilidad/activo-fijo/traslados-enviados/cancelTraslado'
                          method="post" id='form_cancel'>
                             <input type='text' hidden name='nro' value='${nro}'/>
                     </form>`)
@@ -329,7 +328,7 @@
             if(active){
                 $('#normal_div').text('Traslado Recibido')
                 $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
-                $('#btnCancelar').show()
+                // $('#btnCancelar').show()
             }
             else{
                 $('#normal_div').text('Traslado Cancelado')
@@ -339,3 +338,4 @@
         }
     </script>
 {% endblock %}
+

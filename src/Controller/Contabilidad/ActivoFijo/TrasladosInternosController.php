@@ -38,7 +38,7 @@ class TrasladosInternosController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-            $traslados_internos = $request->get('traslados_internos');
+            $traslados_internos = $request->get('movimiento_activo_fijo_salida');
             $nro_inventatio = $traslados_internos['nro_inventatio'];
             $centro_costo = $traslados_internos['centro_costo'];
             $area_responsabilidad = $traslados_internos['area_responsabilidad'];
@@ -48,26 +48,20 @@ class TrasladosInternosController extends AbstractController
             $obj_unidad = AuxFunctions::getUnidad($em, $user);
             $obj_activo = $em->getRepository(ActivoFijo::class)->findOneBy([
                 'nro_inventario' => $nro_inventatio,
-                'activo' => false,
-                'id_unidad' => $obj_unidad
+                'activo' => true,
+                'id_unidad' => $obj_unidad->getId()
             ]);
-
             if (!$obj_activo)
                 return new JsonResponse(['success' => false, 'msg' => 'El Activo Fijo no existe, en esta unidad']);
 
-            $cuantas_activo_fijo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy([
+            $cuentas_activo_fijo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy([
                 'id_activo' => $obj_activo->getId()
             ]);
             // 1. actualizar el CCT y AR del activo fijo
-            $cuantas_activo_fijo->setIdCentroCostoActivo($em->getRepository(CentroCosto::class)->find($centro_costo));
-            $cuantas_activo_fijo->setIdAreaResponsabilidadActivo($em->getRepository(AreaResponsabilidad::class)->find($area_responsabilidad));
+            $cuentas_activo_fijo->setIdCentroCostoActivo($em->getRepository(CentroCosto::class)->find($centro_costo));
+            $cuentas_activo_fijo->setIdAreaResponsabilidadActivo($em->getRepository(AreaResponsabilidad::class)->find($area_responsabilidad));
 
             //2. crear el nuevo movimiento de activo fijo
-            /** @var ActivoFijoCuentas $cuentas_activo_fijo */
-            $cuentas_activo_fijo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy([
-                'id_activo' => $obj_activo
-            ]);
-
             $tipo_movimiento = $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento);
             $nro = AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $obj_unidad, $obj_activo->getFechaAlta()->format('Y'));
             $new_movimiento = new MovimientoActivoFijo();
@@ -90,6 +84,7 @@ class TrasladosInternosController extends AbstractController
             $em->persist($obj_activo);
 
             //3. Invertir los asientos contables y crear uno nuevo con el CCt y AR
+
 
 
             $em->flush();
@@ -165,8 +160,7 @@ class TrasladosInternosController extends AbstractController
     /**
      * @Route("/getCCtandAR")
      */
-    public function getCCtandAR(Request $request, EntityManagerInterface $em,
-                                CentroCostoRepository $cct, AreaResponsabilidadRepository $ar)
+    public function getCCtandAR(EntityManagerInterface $em,AreaResponsabilidadRepository $ar)
     {
         $user = $this->getUser();
         $id_unidad = AuxFunctions::getUnidad($em, $user);
@@ -185,7 +179,6 @@ class TrasladosInternosController extends AbstractController
                 'descripcion' => $cct->getCodigo() . ' - ' . $cct->getNombre()
             ];
         }
-
         foreach ($arr_ar as $ar) {
             /** AreaResponsabilidad $ar */
             $row_ar[] = [
@@ -197,6 +190,42 @@ class TrasladosInternosController extends AbstractController
             'centro_costos' => $row_cct,
             'area_responsbilidad' => $row_ar
         ]);
-
     }
+
+    /**
+     * @Route("/getTraslado/{nro}", name="contabilidad_activo_fijo_traslado_interno_get_traslado", methods={"POST"})
+     */
+    public function getApertura(Request $request, EntityManagerInterface $em, $nro)
+    {
+        $user = $this->getUser();
+        $id_unidad = AuxFunctions::getUnidad($em, $user);
+        /** @var MovimientoActivoFijo $obj_movimiento_activo_fijo */
+        $obj_movimiento_activo_fijo = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
+            'id_tipo_movimiento' => $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento),
+            'anno' => Date('Y'),
+            'id_unidad' => $id_unidad,
+            'nro_consecutivo' => $nro
+        ]);
+        /** @var ActivoFijoCuentas $cuenta_activo */
+        $cuenta_activo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy(
+            ['id_activo' => $obj_movimiento_activo_fijo->getIdActivoFijo()]
+        );
+        $row = array(
+            'cancelado' => $obj_movimiento_activo_fijo->getCancelado(),
+            'nro_inv' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getNroInventario(),
+            'desc' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getDescripcion(),
+            'fecha' => $obj_movimiento_activo_fijo->getFecha()->format('d/m/Y'),
+            'fundamentacion' => $obj_movimiento_activo_fijo->getFundamentacion(),
+            'nro_cuenta' => $obj_movimiento_activo_fijo->getIdCuenta()->getNroCuenta() . ' - ' . $obj_movimiento_activo_fijo->getIdCuenta()->getNombre(),
+            'nro_subcuenta' => $obj_movimiento_activo_fijo->getIdSubcuenta()->getNroSubcuenta() . ' - ' . $obj_movimiento_activo_fijo->getIdSubcuenta()->getDescripcion(),
+            'centro_costo' => $cuenta_activo->getIdCentroCostoActivo()->getId(),
+            'area_responsabilidad' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getIdAreaResponsabilidad()->getId(),
+            'id' => $obj_movimiento_activo_fijo->getId()
+        );
+        return new JsonResponse([
+            'traslado' => $row,
+            'success' => true
+        ]);
+    }
+
 }

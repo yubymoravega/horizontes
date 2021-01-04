@@ -49,7 +49,7 @@
                     <div class="col-6 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         <label class="" for="movimiento_activo_fijo_salida_salida_centro_costo">Centro de Costo</label>
                         <select id="movimiento_activo_fijo_salida_salida_centro_costo"
-                                name="movimiento_activo_fijo_salida_salida[centro_costo]"
+                                name="movimiento_activo_fijo_salida[centro_costo]"
                                 class="w-100 form-control">
                             <option value=""></option>
                         </select>
@@ -59,7 +59,7 @@
                         <label class="" for="movimiento_activo_fijo_salida_salida_area_responsabilidad">Area de
                             Responsabilidad</label>
                         <select id="movimiento_activo_fijo_salida_salida_area_responsabilidad"
-                                name="movimiento_activo_fijo_salida_salida[area_responsabilidad]"
+                                name="movimiento_activo_fijo_salida[area_responsabilidad]"
                                 class="w-100 form-control">
                             <option value=""></option>
                         </select>
@@ -98,6 +98,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        blockForm()
         $('#btnCancelar').hide()
         let cuentas = [];
         let consecutivo = '';
@@ -139,6 +140,7 @@
         loadingData()
 
         $('#movimiento_activo_fijo_salida_nro_inventatio').on('keyup', function (e) {
+            $('#btnSubbmitTraslado').hide();
             if (e.which == 13) {
                 let codigo = $('#movimiento_activo_fijo_salida_nro_inventatio').val()
                 if (codigo !== '') {
@@ -147,7 +149,14 @@
                     alertTemplate('El campo código es obligatorio.', 'danger')
                 }
             } else {
+                $('#movimiento_activo_fijo_salida_salida_area_responsabilidad').val(0)
+                $('#movimiento_activo_fijo_salida_salida_centro_costo').val(0)
                 $('#movimiento_activo_fijo_salida_descripcion').val('')
+                $('#movimiento_activo_fijo_salida_id_cuenta').val('')
+                $('#movimiento_activo_fijo_salida_id_subcuenta').val('')
+                $('#movimiento_activo_fijo_salida_fecha').val('')
+                $('#movimiento_activo_fijo_salida_centro_costo').val('')
+                $('#movimiento_activo_fijo_salida_area_responsabilidad').val('')
             }
         })
 
@@ -158,17 +167,19 @@
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
+                    unblockFields()
                     $('#movimiento_activo_fijo_salida_descripcion').val(result.descripcion)
                     $('#movimiento_activo_fijo_salida_id_cuenta').val(result.cuenta)
                     $('#movimiento_activo_fijo_salida_id_subcuenta').val(result.subcuenta)
                     $('#movimiento_activo_fijo_salida_fecha').val(result.fecha)
-
                     $('#movimiento_activo_fijo_salida_salida_centro_costo').val(result.centor_costo)
                     $('#movimiento_activo_fijo_salida_salida_area_responsabilidad').val(result.area_responsabilidad)
                     loadingModal.close()
+                    $('#btnSubbmitTraslado').show()
                 },
                 error: function (response) {
                     loadingModal.close()
+                    blockForm()
                     alertTemplate(response.responseJSON.detail, 'danger')
                     $('#movimiento_activo_fijo_salida_descripcion').val('')
                     $('#movimiento_activo_fijo_salida_id_cuenta').val('')
@@ -177,6 +188,7 @@
 
                     $('#movimiento_activo_fijo_salida_centro_costo').val('')
                     $('#movimiento_activo_fijo_salida_area_responsabilidad').val('')
+                    $('#btnSubbmitTraslado').hide()
                 }
             })
         }
@@ -235,7 +247,7 @@
                     } else {
                         $('#btnImprimir').show()
                         $('#btnSubbmitTraslado').hide()
-                        $('#btnCancelar').show()
+                        // $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
                 } else {
@@ -273,8 +285,8 @@
                             $('#movimiento_activo_fijo_salida_descripcion').val(traslado.desc);
                             $('#movimiento_activo_fijo_salida_id_cuenta').val(traslado.nro_cuenta);
                             $('#movimiento_activo_fijo_salida_id_subcuenta').val(traslado.nro_subcuenta);
-                            $('#movimiento_activo_fijo_salida_centro_costo').val(traslado.centro_costo);
-                            $('#movimiento_activo_fijo_salida_area_responsabilidad').val(traslado.area_responsabilidad);
+                            $('#movimiento_activo_fijo_salida_salida_centro_costo').val(traslado.centro_costo);
+                            $('#movimiento_activo_fijo_salida_salida_area_responsabilidad').val(traslado.area_responsabilidad);
                             $('#movimiento_activo_fijo_salida_fecha').attr('type', 'text');
                             $('#movimiento_activo_fijo_salida_fecha').val(traslado.fecha);
                             $('#movimiento_activo_fijo_salida_id_movimiento').val(traslado.id);
@@ -313,6 +325,19 @@
                 fomrulario.submit()
                 fomrulario.remove()
             }
+        }
+
+        function blockForm(){
+            $('#movimiento_activo_fijo_descripcion').prop('disabled', true);
+            $('#movimiento_activo_fijo_id_cuenta').prop('disabled', true);
+            $('#movimiento_activo_fijo_id_subcuenta').prop('disabled', true);
+            $('#movimiento_activo_fijo_fecha').prop('disabled', true);
+            $('#movimiento_activo_fijo_centro_costo').prop('disabled', true);
+            $('#movimiento_activo_fijo_area_responsabilidad').prop('disabled', true);
+        }
+        function unblockFields() {
+            $('#movimiento_activo_fijo_centro_costo').prop('disabled', false);
+            $('#movimiento_activo_fijo_area_responsabilidad').prop('disabled', false);
         }
     </script>
 {% endblock %}
