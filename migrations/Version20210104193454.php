@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20201216141446 extends AbstractMigration
+final class Version20210104193454 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -20,10 +20,35 @@ final class Version20201216141446 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE activo_fijo ADD CONSTRAINT FK_75EBC93EDB763453 FOREIGN KEY (id_tipo_movimiento_id) REFERENCES tipo_movimiento (id)');
+        $this->addSql('ALTER TABLE activo_fijo ADD CONSTRAINT FK_75EBC93E6FBA0327 FOREIGN KEY (id_tipo_movimiento_baja_id) REFERENCES tipo_movimiento (id)');
+        $this->addSql('ALTER TABLE activo_fijo ADD CONSTRAINT FK_75EBC93ED410562 FOREIGN KEY (id_area_responsabilidad_id) REFERENCES area_responsabilidad (id)');
+        $this->addSql('ALTER TABLE activo_fijo ADD CONSTRAINT FK_75EBC93E4A667A2B FOREIGN KEY (id_grupo_activo_id) REFERENCES grupo_activos (id)');
+        $this->addSql('ALTER TABLE activo_fijo ADD CONSTRAINT FK_75EBC93E1D34FA6B FOREIGN KEY (id_unidad_id) REFERENCES unidad (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD id_cuenta_acreedora_id INT DEFAULT NULL, ADD id_subcuenta_acreedora_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF2901C84BDE84 FOREIGN KEY (id_activo_id) REFERENCES activo_fijo (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF290186762CC7 FOREIGN KEY (id_cuenta_activo_id) REFERENCES cuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF29014476721E FOREIGN KEY (id_subcuenta_activo_id) REFERENCES subcuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF29012955A16D FOREIGN KEY (id_centro_costo_activo_id) REFERENCES centro_costo (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF29014C675596 FOREIGN KEY (id_area_responsabilidad_activo_id) REFERENCES area_responsabilidad (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF290174A5FFBA FOREIGN KEY (id_cuenta_depreciacion_id) REFERENCES cuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF2901549C81D9 FOREIGN KEY (id_subcuenta_depreciacion_id) REFERENCES subcuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF290180C608FA FOREIGN KEY (id_cuenta_gasto_id) REFERENCES cuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF290157677646 FOREIGN KEY (id_subcuenta_gasto_id) REFERENCES subcuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF2901A950EE53 FOREIGN KEY (id_centro_costo_gasto_id) REFERENCES centro_costo (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF2901A752F04B FOREIGN KEY (id_elemento_gasto_gasto_id) REFERENCES elemento_gasto (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF29014D7B4AB9 FOREIGN KEY (id_cuenta_acreedora_id) REFERENCES cuenta (id)');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas ADD CONSTRAINT FK_E0DF2901EB1B341E FOREIGN KEY (id_subcuenta_acreedora_id) REFERENCES subcuenta (id)');
+        $this->addSql('CREATE INDEX IDX_E0DF29014D7B4AB9 ON activo_fijo_cuentas (id_cuenta_acreedora_id)');
+        $this->addSql('CREATE INDEX IDX_E0DF2901EB1B341E ON activo_fijo_cuentas (id_subcuenta_acreedora_id)');
+        $this->addSql('ALTER TABLE activo_fijo_movimiento_activo_fijo ADD CONSTRAINT FK_2FA61FF25832E72E FOREIGN KEY (id_activo_fijo_id) REFERENCES activo_fijo (id)');
+        $this->addSql('ALTER TABLE activo_fijo_movimiento_activo_fijo ADD CONSTRAINT FK_2FA61FF27786CA71 FOREIGN KEY (id_movimiento_activo_fijo_id) REFERENCES movimiento (id)');
+        $this->addSql('ALTER TABLE ajuste ADD CONSTRAINT FK_DD35BD326601BA07 FOREIGN KEY (id_documento_id) REFERENCES documento (id)');
+        $this->addSql('ALTER TABLE almacen ADD CONSTRAINT FK_D5B2D2501D34FA6B FOREIGN KEY (id_unidad_id) REFERENCES unidad (id)');
         $this->addSql('ALTER TABLE almacen_ocupado ADD CONSTRAINT FK_AA53605839161EBF FOREIGN KEY (id_almacen_id) REFERENCES almacen (id)');
         $this->addSql('ALTER TABLE almacen_ocupado ADD CONSTRAINT FK_AA5360587EB2C349 FOREIGN KEY (id_usuario_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE area_responsabilidad ADD CONSTRAINT FK_F469C2BA1D34FA6B FOREIGN KEY (id_unidad_id) REFERENCES unidad (id)');
-        $this->addSql('ALTER TABLE asiento ADD id_tipo_comprobante_id INT DEFAULT NULL, ADD id_comprobante_id INT DEFAULT NULL, ADD id_factura_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE asiento ADD id_activo_fijo_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35C1ADA4D3F FOREIGN KEY (id_cuenta_id) REFERENCES cuenta (id)');
         $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35C2D412F53 FOREIGN KEY (id_subcuenta_id) REFERENCES subcuenta (id)');
         $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35C6601BA07 FOREIGN KEY (id_documento_id) REFERENCES documento (id)');
@@ -37,9 +62,8 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35CEF5F7851 FOREIGN KEY (id_tipo_comprobante_id) REFERENCES tipo_comprobante (id)');
         $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35C1800963C FOREIGN KEY (id_comprobante_id) REFERENCES registro_comprobantes (id)');
         $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35C55C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
-        $this->addSql('CREATE INDEX IDX_71D6D35CEF5F7851 ON asiento (id_tipo_comprobante_id)');
-        $this->addSql('CREATE INDEX IDX_71D6D35C1800963C ON asiento (id_comprobante_id)');
-        $this->addSql('CREATE INDEX IDX_71D6D35C55C5F988 ON asiento (id_factura_id)');
+        $this->addSql('ALTER TABLE asiento ADD CONSTRAINT FK_71D6D35C5832E72E FOREIGN KEY (id_activo_fijo_id) REFERENCES activo_fijo (id)');
+        $this->addSql('CREATE INDEX IDX_71D6D35C5832E72E ON asiento (id_activo_fijo_id)');
         $this->addSql('ALTER TABLE centro_costo ADD CONSTRAINT FK_749608CE1D34FA6B FOREIGN KEY (id_unidad_id) REFERENCES unidad (id)');
         $this->addSql('ALTER TABLE cierre ADD CONSTRAINT FK_D0DCFCC739161EBF FOREIGN KEY (id_almacen_id) REFERENCES almacen (id)');
         $this->addSql('ALTER TABLE cierre ADD CONSTRAINT FK_D0DCFCC77EB2C349 FOREIGN KEY (id_usuario_id) REFERENCES user (id)');
@@ -107,12 +131,19 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE movimiento ADD CONSTRAINT FK_C8FF107ADB763453 FOREIGN KEY (id_tipo_movimiento_id) REFERENCES tipo_movimiento (id)');
         $this->addSql('ALTER TABLE movimiento ADD CONSTRAINT FK_C8FF107A873C7FC7 FOREIGN KEY (id_unidad_origen_id) REFERENCES unidad (id)');
         $this->addSql('ALTER TABLE movimiento ADD CONSTRAINT FK_C8FF107A4F781EA FOREIGN KEY (id_unidad_destino_id) REFERENCES unidad (id)');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo ADD id_unidad_destino_origen_id INT DEFAULT NULL, ADD id_proveedor_id INT DEFAULT NULL, ADD id_movimiento_cancelado_id INT DEFAULT NULL, ADD id_tipo_cliente INT DEFAULT NULL, ADD id_cliente INT DEFAULT NULL, ADD cancelado TINYINT(1) DEFAULT NULL');
         $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA1D34FA6B FOREIGN KEY (id_unidad_id) REFERENCES unidad (id)');
         $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA5832E72E FOREIGN KEY (id_activo_fijo_id) REFERENCES activo_fijo (id)');
         $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DADB763453 FOREIGN KEY (id_tipo_movimiento_id) REFERENCES tipo_movimiento (id)');
         $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA1ADA4D3F FOREIGN KEY (id_cuenta_id) REFERENCES cuenta (id)');
         $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA2D412F53 FOREIGN KEY (id_subcuenta_id) REFERENCES subcuenta (id)');
         $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA7EB2C349 FOREIGN KEY (id_usuario_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA4B1CE99D FOREIGN KEY (id_unidad_destino_origen_id) REFERENCES unidad (id)');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DAE8F12801 FOREIGN KEY (id_proveedor_id) REFERENCES proveedor (id)');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo ADD CONSTRAINT FK_A985A0DA571159DE FOREIGN KEY (id_movimiento_cancelado_id) REFERENCES movimiento_activo_fijo (id)');
+        $this->addSql('CREATE INDEX IDX_A985A0DA4B1CE99D ON movimiento_activo_fijo (id_unidad_destino_origen_id)');
+        $this->addSql('CREATE INDEX IDX_A985A0DAE8F12801 ON movimiento_activo_fijo (id_proveedor_id)');
+        $this->addSql('CREATE INDEX IDX_A985A0DA571159DE ON movimiento_activo_fijo (id_movimiento_cancelado_id)');
         $this->addSql('ALTER TABLE movimiento_mercancia ADD CONSTRAINT FK_44876BD79F287F54 FOREIGN KEY (id_mercancia_id) REFERENCES mercancia (id)');
         $this->addSql('ALTER TABLE movimiento_mercancia ADD CONSTRAINT FK_44876BD76601BA07 FOREIGN KEY (id_documento_id) REFERENCES documento (id)');
         $this->addSql('ALTER TABLE movimiento_mercancia ADD CONSTRAINT FK_44876BD77A4F962 FOREIGN KEY (id_tipo_documento_id) REFERENCES tipo_documento (id)');
@@ -124,7 +155,6 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE movimiento_mercancia ADD CONSTRAINT FK_44876BD771381BB3 FOREIGN KEY (id_orden_trabajo_id) REFERENCES orden_trabajo (id)');
         $this->addSql('ALTER TABLE movimiento_mercancia ADD CONSTRAINT FK_44876BD755C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
         $this->addSql('ALTER TABLE movimiento_mercancia ADD CONSTRAINT FK_44876BD7571159DE FOREIGN KEY (id_movimiento_cancelado_id) REFERENCES movimiento_mercancia (id)');
-        $this->addSql('ALTER TABLE movimiento_producto ADD id_movimiento_cancelado_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE movimiento_producto ADD CONSTRAINT FK_FFC0EDFC6E57A479 FOREIGN KEY (id_producto_id) REFERENCES producto (id)');
         $this->addSql('ALTER TABLE movimiento_producto ADD CONSTRAINT FK_FFC0EDFC6601BA07 FOREIGN KEY (id_documento_id) REFERENCES documento (id)');
         $this->addSql('ALTER TABLE movimiento_producto ADD CONSTRAINT FK_FFC0EDFC7A4F962 FOREIGN KEY (id_tipo_documento_id) REFERENCES tipo_documento (id)');
@@ -136,7 +166,6 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE movimiento_producto ADD CONSTRAINT FK_FFC0EDFCF5DBAF2B FOREIGN KEY (id_expediente_id) REFERENCES expediente (id)');
         $this->addSql('ALTER TABLE movimiento_producto ADD CONSTRAINT FK_FFC0EDFC55C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
         $this->addSql('ALTER TABLE movimiento_producto ADD CONSTRAINT FK_FFC0EDFC571159DE FOREIGN KEY (id_movimiento_cancelado_id) REFERENCES movimiento_producto (id)');
-        $this->addSql('CREATE INDEX IDX_FFC0EDFC571159DE ON movimiento_producto (id_movimiento_cancelado_id)');
         $this->addSql('ALTER TABLE movimiento_servicio ADD CONSTRAINT FK_93FD19C355C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
         $this->addSql('ALTER TABLE movimiento_servicio ADD CONSTRAINT FK_93FD19C371CAA3E7 FOREIGN KEY (servicio_id) REFERENCES servicios (id)');
         $this->addSql('ALTER TABLE movimiento_venta ADD CONSTRAINT FK_8E3F7AE555C5F988 FOREIGN KEY (id_factura_id) REFERENCES factura (id)');
@@ -167,7 +196,6 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE registro_comprobantes ADD CONSTRAINT FK_B2D1B2B2EF5F7851 FOREIGN KEY (id_tipo_comprobante_id) REFERENCES tipo_comprobante (id)');
         $this->addSql('ALTER TABLE registro_comprobantes ADD CONSTRAINT FK_B2D1B2B27EB2C349 FOREIGN KEY (id_usuario_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE registro_comprobantes ADD CONSTRAINT FK_B2D1B2B239161EBF FOREIGN KEY (id_almacen_id) REFERENCES almacen (id)');
-        $this->addSql('ALTER TABLE saldo_cuentas ADD id_tipo_cliente INT DEFAULT NULL, ADD id_cliente INT DEFAULT NULL');
         $this->addSql('ALTER TABLE saldo_cuentas ADD CONSTRAINT FK_BB2B71AE1ADA4D3F FOREIGN KEY (id_cuenta_id) REFERENCES cuenta (id)');
         $this->addSql('ALTER TABLE saldo_cuentas ADD CONSTRAINT FK_BB2B71AE2D412F53 FOREIGN KEY (id_subcuenta_id) REFERENCES subcuenta (id)');
         $this->addSql('ALTER TABLE saldo_cuentas ADD CONSTRAINT FK_BB2B71AEC59B01FF FOREIGN KEY (id_centro_costo_id) REFERENCES centro_costo (id)');
@@ -188,12 +216,41 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE transferencia ADD CONSTRAINT FK_EDC227301D34FA6B FOREIGN KEY (id_unidad_id) REFERENCES unidad (id)');
         $this->addSql('ALTER TABLE transferencia ADD CONSTRAINT FK_EDC2273039161EBF FOREIGN KEY (id_almacen_id) REFERENCES almacen (id)');
         $this->addSql('ALTER TABLE unidad ADD CONSTRAINT FK_F3E6D02F31E700CD FOREIGN KEY (id_padre_id) REFERENCES unidad (id)');
+        $this->addSql('ALTER TABLE user CHANGE id id INT AUTO_INCREMENT NOT NULL');
+        $this->addSql('ALTER TABLE vale_salida CHANGE id id INT AUTO_INCREMENT NOT NULL');
         $this->addSql('ALTER TABLE vale_salida ADD CONSTRAINT FK_90C265C86601BA07 FOREIGN KEY (id_documento_id) REFERENCES documento (id)');
+        $this->addSql('ALTER TABLE vuelo_destino CHANGE id id INT AUTO_INCREMENT NOT NULL');
+        $this->addSql('ALTER TABLE vuelo_origen CHANGE id id INT AUTO_INCREMENT NOT NULL');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE activo_fijo DROP FOREIGN KEY FK_75EBC93EDB763453');
+        $this->addSql('ALTER TABLE activo_fijo DROP FOREIGN KEY FK_75EBC93E6FBA0327');
+        $this->addSql('ALTER TABLE activo_fijo DROP FOREIGN KEY FK_75EBC93ED410562');
+        $this->addSql('ALTER TABLE activo_fijo DROP FOREIGN KEY FK_75EBC93E4A667A2B');
+        $this->addSql('ALTER TABLE activo_fijo DROP FOREIGN KEY FK_75EBC93E1D34FA6B');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF2901C84BDE84');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF290186762CC7');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF29014476721E');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF29012955A16D');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF29014C675596');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF290174A5FFBA');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF2901549C81D9');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF290180C608FA');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF290157677646');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF2901A950EE53');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF2901A752F04B');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF29014D7B4AB9');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP FOREIGN KEY FK_E0DF2901EB1B341E');
+        $this->addSql('DROP INDEX IDX_E0DF29014D7B4AB9 ON activo_fijo_cuentas');
+        $this->addSql('DROP INDEX IDX_E0DF2901EB1B341E ON activo_fijo_cuentas');
+        $this->addSql('ALTER TABLE activo_fijo_cuentas DROP id_cuenta_acreedora_id, DROP id_subcuenta_acreedora_id');
+        $this->addSql('ALTER TABLE activo_fijo_movimiento_activo_fijo DROP FOREIGN KEY FK_2FA61FF25832E72E');
+        $this->addSql('ALTER TABLE activo_fijo_movimiento_activo_fijo DROP FOREIGN KEY FK_2FA61FF27786CA71');
+        $this->addSql('ALTER TABLE ajuste DROP FOREIGN KEY FK_DD35BD326601BA07');
+        $this->addSql('ALTER TABLE almacen DROP FOREIGN KEY FK_D5B2D2501D34FA6B');
         $this->addSql('ALTER TABLE almacen_ocupado DROP FOREIGN KEY FK_AA53605839161EBF');
         $this->addSql('ALTER TABLE almacen_ocupado DROP FOREIGN KEY FK_AA5360587EB2C349');
         $this->addSql('ALTER TABLE area_responsabilidad DROP FOREIGN KEY FK_F469C2BA1D34FA6B');
@@ -210,10 +267,9 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE asiento DROP FOREIGN KEY FK_71D6D35CEF5F7851');
         $this->addSql('ALTER TABLE asiento DROP FOREIGN KEY FK_71D6D35C1800963C');
         $this->addSql('ALTER TABLE asiento DROP FOREIGN KEY FK_71D6D35C55C5F988');
-        $this->addSql('DROP INDEX IDX_71D6D35CEF5F7851 ON asiento');
-        $this->addSql('DROP INDEX IDX_71D6D35C1800963C ON asiento');
-        $this->addSql('DROP INDEX IDX_71D6D35C55C5F988 ON asiento');
-        $this->addSql('ALTER TABLE asiento DROP id_tipo_comprobante_id, DROP id_comprobante_id, DROP id_factura_id');
+        $this->addSql('ALTER TABLE asiento DROP FOREIGN KEY FK_71D6D35C5832E72E');
+        $this->addSql('DROP INDEX IDX_71D6D35C5832E72E ON asiento');
+        $this->addSql('ALTER TABLE asiento DROP id_activo_fijo_id');
         $this->addSql('ALTER TABLE centro_costo DROP FOREIGN KEY FK_749608CE1D34FA6B');
         $this->addSql('ALTER TABLE cierre DROP FOREIGN KEY FK_D0DCFCC739161EBF');
         $this->addSql('ALTER TABLE cierre DROP FOREIGN KEY FK_D0DCFCC77EB2C349');
@@ -287,6 +343,13 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE movimiento_activo_fijo DROP FOREIGN KEY FK_A985A0DA1ADA4D3F');
         $this->addSql('ALTER TABLE movimiento_activo_fijo DROP FOREIGN KEY FK_A985A0DA2D412F53');
         $this->addSql('ALTER TABLE movimiento_activo_fijo DROP FOREIGN KEY FK_A985A0DA7EB2C349');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo DROP FOREIGN KEY FK_A985A0DA4B1CE99D');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo DROP FOREIGN KEY FK_A985A0DAE8F12801');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo DROP FOREIGN KEY FK_A985A0DA571159DE');
+        $this->addSql('DROP INDEX IDX_A985A0DA4B1CE99D ON movimiento_activo_fijo');
+        $this->addSql('DROP INDEX IDX_A985A0DAE8F12801 ON movimiento_activo_fijo');
+        $this->addSql('DROP INDEX IDX_A985A0DA571159DE ON movimiento_activo_fijo');
+        $this->addSql('ALTER TABLE movimiento_activo_fijo DROP id_unidad_destino_origen_id, DROP id_proveedor_id, DROP id_movimiento_cancelado_id, DROP id_tipo_cliente, DROP id_cliente, DROP cancelado');
         $this->addSql('ALTER TABLE movimiento_mercancia DROP FOREIGN KEY FK_44876BD79F287F54');
         $this->addSql('ALTER TABLE movimiento_mercancia DROP FOREIGN KEY FK_44876BD76601BA07');
         $this->addSql('ALTER TABLE movimiento_mercancia DROP FOREIGN KEY FK_44876BD77A4F962');
@@ -309,8 +372,6 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE movimiento_producto DROP FOREIGN KEY FK_FFC0EDFCF5DBAF2B');
         $this->addSql('ALTER TABLE movimiento_producto DROP FOREIGN KEY FK_FFC0EDFC55C5F988');
         $this->addSql('ALTER TABLE movimiento_producto DROP FOREIGN KEY FK_FFC0EDFC571159DE');
-        $this->addSql('DROP INDEX IDX_FFC0EDFC571159DE ON movimiento_producto');
-        $this->addSql('ALTER TABLE movimiento_producto DROP id_movimiento_cancelado_id');
         $this->addSql('ALTER TABLE movimiento_servicio DROP FOREIGN KEY FK_93FD19C355C5F988');
         $this->addSql('ALTER TABLE movimiento_servicio DROP FOREIGN KEY FK_93FD19C371CAA3E7');
         $this->addSql('ALTER TABLE movimiento_venta DROP FOREIGN KEY FK_8E3F7AE555C5F988');
@@ -350,7 +411,6 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE saldo_cuentas DROP FOREIGN KEY FK_BB2B71AEE8F12801');
         $this->addSql('ALTER TABLE saldo_cuentas DROP FOREIGN KEY FK_BB2B71AEF5DBAF2B');
         $this->addSql('ALTER TABLE saldo_cuentas DROP FOREIGN KEY FK_BB2B71AE71381BB3');
-        $this->addSql('ALTER TABLE saldo_cuentas DROP id_tipo_cliente, DROP id_cliente');
         $this->addSql('ALTER TABLE subcuenta DROP FOREIGN KEY FK_57BB37EA1ADA4D3F');
         $this->addSql('ALTER TABLE subcuenta_criterio_analisis DROP FOREIGN KEY FK_52A4A7682D412F53');
         $this->addSql('ALTER TABLE subcuenta_criterio_analisis DROP FOREIGN KEY FK_52A4A7685ABBE5F6');
@@ -362,6 +422,10 @@ final class Version20201216141446 extends AbstractMigration
         $this->addSql('ALTER TABLE transferencia DROP FOREIGN KEY FK_EDC227301D34FA6B');
         $this->addSql('ALTER TABLE transferencia DROP FOREIGN KEY FK_EDC2273039161EBF');
         $this->addSql('ALTER TABLE unidad DROP FOREIGN KEY FK_F3E6D02F31E700CD');
+        $this->addSql('ALTER TABLE user CHANGE id id INT NOT NULL');
         $this->addSql('ALTER TABLE vale_salida DROP FOREIGN KEY FK_90C265C86601BA07');
+        $this->addSql('ALTER TABLE vale_salida CHANGE id id INT NOT NULL');
+        $this->addSql('ALTER TABLE vuelo_destino CHANGE id id INT NOT NULL');
+        $this->addSql('ALTER TABLE vuelo_origen CHANGE id id INT NOT NULL');
     }
 }
