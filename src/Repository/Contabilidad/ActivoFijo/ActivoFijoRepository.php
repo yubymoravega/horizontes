@@ -19,6 +19,20 @@ class ActivoFijoRepository extends ServiceEntityRepository
         parent::__construct($registry, ActivoFijo::class);
     }
 
+    public function findByUnidadGroupByCuentaSubCuenta($unidad)
+    {
+        return $this->createQueryBuilder()
+//            ->where('a.id_unidad = :unidad')
+//            ->join('a.id_unidad','id_unidad')
+            ->select('a', 'u')
+            ->from('App:Contabilidad\ActivoFijo\ActivoFijo','a')
+            ->innerJoin('a.id_unidad', 'u')
+            ->andWhere('a.activo = true')
+            ->setParameter('unidad', $unidad)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return ActivoFijo[] Returns an array of ActivoFijo objects
     //  */
