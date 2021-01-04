@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -131,11 +132,15 @@ class ActivoFijoController extends AbstractController
     }
 
     /**
-     * @Route("/gestionar/{codigo}", name="contabilidad_activo_fijo_gestionar", methods={"GET","POST"})
+     * @Route("/gestionar/{params}", name="contabilidad_activo_fijo_gestionar", methods={"GET","POST"})
      */
-    public function gestionar(EntityManagerInterface $em, Request $request, $codigo)
+    public function gestionar(EntityManagerInterface $em, Request $request, $params)
     {
-        $form = $this->createForm(ActivoFijoType::class, ['nro_inventario' => $codigo]);
+        $data_request = explode('&type=', $params);
+        $codigo = $data_request[0];
+        $type = $data_request[1];
+
+        $form = $this->createForm(ActivoFijoType::class, ['nro_inventario' => $codigo,'type'=>$type]);
 
         $error = null;
         $form->handleRequest($request);
@@ -178,9 +183,9 @@ class ActivoFijoController extends AbstractController
                 'id_unidad' => AuxFunctions::getUnidad($em, $this->getUser())
             ]);
             if ($duplicate)
-            return new JsonResponse(['success' => false, 'msg' => 'Ya existe un activo fijo en la empresa con el nro de invetario especificado']);
-            if ($valor_real<0)
-            return new JsonResponse(['success' => false, 'msg' => 'El activo fijo tiene mayor valor depreciado que inicial.']);
+                return new JsonResponse(['success' => false, 'msg' => 'Ya existe un activo fijo en la empresa con el nro de invetario especificado']);
+            if ($valor_real < 0)
+                return new JsonResponse(['success' => false, 'msg' => 'El activo fijo tiene mayor valor depreciado que inicial.']);
 
             $nro_cuenta_activo = explode(' - ', $id_cuenta_activo)[0];
             $nro_subcuenta_activo = explode(' - ', $id_subcuenta_activo)[0];
@@ -196,9 +201,6 @@ class ActivoFijoController extends AbstractController
             $obj_subcuenta_activo = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta' => $nro_subcuenta_activo, 'activo' => true, 'id_cuenta' => $obj_cuenta_activo]);
             $obj_subcuenta_depreciacion = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta' => $nro_subcuenta_depreciacion, 'activo' => true, 'id_cuenta' => $obj_cuenta_depreciacion]);
             $obj_subcuenta_gasto = $em->getRepository(Subcuenta::class)->findOneBy(['nro_subcuenta' => $nro_subcuenta_gasto, 'activo' => true, 'id_cuenta' => $obj_cuenta_gasto]);
-
-
-
 
             $new_activo_fijo = new ActivoFijo();
             $new_activo_fijo
@@ -249,7 +251,7 @@ class ActivoFijoController extends AbstractController
                 $em->flush();
                 $form_apertura = $this->createForm(MovimientoActivoFijoType::class,
                     [
-                        'id_activo'=>$new_activo_fijo->getId(),
+                        'id_activo' => $new_activo_fijo->getId(),
                         'nro_inventatio' => $new_activo_fijo->getNroInventario(),
                         'descripcion' => $new_activo_fijo->getDescripcion(),
                         'fecha' => $new_activo_fijo->getFechaAlta()->format('d/m/Y'),
@@ -259,7 +261,16 @@ class ActivoFijoController extends AbstractController
                         'id_subcuenta' => $new_activo_fijo_cuentas->getIdSubcuentaActivo()->getNroSubcuenta() . ' - ' . $new_activo_fijo_cuentas->getIdSubcuentaActivo()->getDescripcion()
                     ]
                 );
-                return $this->render('contabilidad/activo_fijo/apertura/index.html.twig', [
+                if ($type == '1' || $type == 1) {
+                    $route = 'contabilidad/activo_fijo/apertura/index.html.twig';
+                }
+                if ($type == '2' || $type == 2) {
+                    $route = 'contabilidad/activo_fijo/compra/index.html.twig';
+                }
+                if ($type == '5' || $type == 5) {
+                    $route = 'contabilidad/activo_fijo/traslados_recividos/index.html.twig';
+                }
+                return $this->render($route, [
                     'controller_name' => 'CRUDActivoFijo',
                     'formulario' => $form_apertura->createView(),
                 ]);
@@ -281,7 +292,7 @@ class ActivoFijoController extends AbstractController
     {
         $cuenta_activo = AuxFunctions::getCuentasByTipo($em, [3]);
         $cuenta_depreciacion = AuxFunctions::getCuentasByTipo($em, [6]);
-        $cuenta_gasto = AuxFunctions::getCuentasByTipo($em, [14]);
+        $cuenta_gasto = AuxFunctions::getCuentasByTipo($em, [13]);
         $paises = AuxFunctions::getPaises();
 
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());

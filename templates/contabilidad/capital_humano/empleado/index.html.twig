@@ -16,7 +16,7 @@
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
-                        data-target="#gestionarCargosModal" data-placement="bottom" title="Adicionar"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
@@ -25,84 +25,7 @@
         {# end header #}
 
         {# Modal de adicionar#}
-        <div class="modal fade" id="gestionarCargosModal" tabindex="-1" role="dialog" data-backdrop="static"
-             data-keyboard="false"
-             aria-labelledby="gestionarCargosModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarCargosModalLabel">Adicionar empleado</h4>
-                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body bg-dark-app">
-                        {{ form_start(form,{'attr': {'class': 'p-2 rd-mailform w-100'}}) }}
-                        <div class="form-group input-group input-group-sm d-block">
-                            <label class="">Nombre</label>
-                            {{ form_widget(form.nombre, {'attr': {'class': 'w-100 from-control'}}) }}
-                        </div>
-                        <div class="row pt-0 mt-0">
-                            <div class="col-6 form-group input-group input-group-sm d-block">
-                                <label class="">Correo</label>
-                                {{ form_widget(form.correo, {'attr': {'class': 'w-100','placeholder':'usuario@dominio.com'}}) }}
-                            </div>
-                            <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
-                                <label class="">Teléfono</label>
-                                {{ form_widget(form.telefono, {'attr': {'class': 'w-100','placeholder':'+## ########'}}) }}
-                            </div>
-                        </div>
-                        <div class="row pt-0 mt-0">
-                            <div class="col-6 form-group input-group input-group-sm d-block">
-                                <label class="">Fecha de alta</label>
-                                {{ form_widget(form.fecha_alta, {'attr': {'class': 'w-100','placeholder':'aasa'}}) }}
-                            </div>
-                            <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
-                                <label class="">Salario x hora</label>
-                                {{ form_widget(form.salario_x_hora, {'attr': {'class': 'w-100'}}) }}
-                            </div>
-                        </div>
-                        <div class="form-group input-group input-group-sm d-block">
-                            <label class="">Empresa a la que perteneze</label>
-                            {{ form_widget(form.id_unidad, {'attr': {'class': 'form-control w-100 w-100'}}) }}
-                        </div>
-                        <div class="form-group input-group input-group-sm d-block">
-                            <label class="">Cargo en la empresa</label>
-                            {{ form_widget(form.id_cargo, {'attr': {'class': 'w-100'}}) }}
-                        </div>
-                        <div class="form-group input-group input-group-sm d-block">
-                            <label class="">Dirección particular</label>
-                            {{ form_widget(form.direccion_particular, {'attr': {'class': 'w-100'}}) }}
-                        </div>
-                        <label for="is-user" class="form-check-label ">Es usuario del
-                            sistema</label>
-                        <input type="checkbox" class="form-check-input ml-2" id="is-user">
-
-                        <div class="container-fluid ml-0 p-0 form-group input-group input-group-sm d-block" id="div_rol">
-                            <label class="">Rol que ejecuta:</label>
-                            {{ form_widget(form.rol, {'attr': {'class': 'w-100'}}) }}
-                        </div>
-                        <input type="text" id="id_empleado" hidden>
-                        {{ form_end(form) }}
-                        <div class="d-flex mt-4">
-                            <div class="mr-auto">
-                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                        aria-label="Cerrar">
-                                    <span aria-hidden="true">Cancelar</span>
-                                </button>
-                            </div>
-                            <div class="ml-2">
-                                <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                            </div>
-                            <div class="ml-2">
-                                <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ include('contabilidad/capital_humano/empleado/form_modal.html.twig', {title:'Crear Empleado'}) }}
 
         {# list #}
         <table class="table table-hover text-light">
@@ -121,7 +44,7 @@
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.correo }}</td>
                     <td style="font-weight:400;">{{ item.cargo_nombre }}</td>
-                    <td style="font-weight:400;">{{ item.rol_nombre }}</td>
+                    <td style="font-weight:400;">{{ item.rol }}</td>
                     <td style="font-weight:400;">{{ item.salario_x_hora }}</td>
                     <td style="font-weight:400;">{{ item.telefono }}</td>
                     <td>
@@ -133,7 +56,7 @@
                                         correo: '{{ item.correo }}',
                                         cargo_nombre: '{{ item.cargo_nombre }}',
                                         id_cargo: '{{ item.id_cargo }}',
-                                        rol_nombre: '{{ item.rol_nombre }}',
+                                        rol: '{{ item.rol }}',
                                         salario_x_hora: '{{ item.salario_x_hora }}',
                                         telefono: '{{ item.telefono }}',
                                         is_usuario: '{{ item.is_usuario }}',
@@ -166,112 +89,123 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-            $('#btnActualizar').hide()
-            $('#div_rol').css("display", "none")
-            // $('#empleado_rol').
-        })
-
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
         const onUpdate = function (config) {
-            $('#btnActualizar').show()
-            $('#btnAceptar').hide()
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
 
-            const {id_unidad = '', direccion = '', fecha_alta = '', unidad_nombre = '', is_usuario = '', telefono = '', correo = '', cargo_nombre = '', id_cargo = '', rol_nombre = '', salario_x_hora = '', nombre = '', id = '', i} = config
-            $('#gestionarCargosModal').modal('show')
+            const {
+                id = '', nombre = '',
+                correo = '', telefono = '', fecha_alta = '', salario_x_hora = '',
+                id_unidad = '', direccion = '', id_cargo = '',
+                is_usuario = '', rol= ''
+            } = config
 
-            $('#empleado_nombre').val(nombre)
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar " + nombre)
+
             $('#id_empleado').val(id)
+            $('#empleado_nombre').val(nombre)
             $('#empleado_correo').val(correo)
             $('#empleado_telefono').val(telefono)
             $('#empleado_fecha_alta').val(fecha_alta)
             $('#empleado_salario_x_hora').val(salario_x_hora)
-            $('#empleado_id_unidad').val()
-            $('#empleado_id_cargo').val()
+            $('#empleado_id_unidad').val(id_unidad)
+            $('#empleado_id_cargo').val(id_cargo)
             $('#empleado_direccion_particular').val(direccion)
+            $('#empleado_rol').val(rol)
 
             if (is_usuario == 'true' || is_usuario == true) {
                 $('#is-user').prop('checked', true)
                 $('#div_rol').css("display", "block")
-                $('#select2-empleado_rol-container')[0].textContent = rol_nombre
-                $('#empleado_rol').val(rol_nombre)
+                $('#empleado_rol').val(rol)
 
             } else {
                 $('#is-user').prop('checked', false)
                 $('#div_rol').css("display", "none")
             }
 
-
-            $('#gestionarCargosModalLabel').html("Modificar " + nombre)
         }
 
-        $('#btnAceptar').on('click', function () {
-            let params = {
-                nombre: $('#empleado_nombre').val(),
-                correo: $('#empleado_correo').val(),
-                telefono: $('#empleado_telefono').val(),
-                fecha_alta: $('#empleado_fecha_alta').val(),
-                salario_x_hora: $('#empleado_salario_x_hora').val(),
-                id_unidad: $('#empleado_id_unidad').val(),
-                id_cargo: $('#empleado_id_cargo').val(),
-                direccion: $('#empleado_direccion_particular').val(),
-                is_usuario: $('#is-user').prop('checked') == true ? 1 : 0,
-                rol: $('#empleado_rol').val()
-            }
-            $.ajax({
-                url: '/contabilidad/capital-humano/empleado-add',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/contabilidad/capital-humano/empleado');
+        $(document).ready(function () {
+            // init
+            $('select').prepend('<option selected = "false" value = "0" disabled>... seleccione ...</option>');
+            $('#modal__btn__actualizar').hide()
+
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'empleado[id_empleado]': "required",
+                    'empleado[nombre]': "required",
+                    'empleado[correo]': "required",
+                    'empleado[telefono]': "required",
+                    'empleado[fecha_alta]': "required",
+                    'empleado[salario_x_hora]': "required",
+                    'empleado[id_unidad]': "required",
+                    'empleado[id_cargo]': "required",
+                    'empleado[direccion_particular]': "required",
+                    'empleado[rol]': "required",
+                },
+                messages: {
+                    'empleado[id_empleado]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[correo]': 'obligatorio',
+                    'empleado[telefono]': 'obligatorio',
+                    'empleado[fecha_alta]': 'obligatorio',
+                    'empleado[salario_x_hora]': 'obligatorio',
+                    'empleado[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[id_cargo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[direccion_particular]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[rol]': CONTAB_MSG.REQUIRED_NOT_BLANK
+                }
+            })
+
+
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/capital-humano/empleado-add`)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+            $('#modal__btn__actualizar').on('click', function () {
+                const id = $('#id_empleado').val()
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', 'POST')
+                formulario.attr('action', '/contabilidad/capital-humano/empleado-upd/' + id)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+            $('#modal__form__id').on('show.bs.modal', function (event) {
+                validateForm.resetForm()
+                $('#modal__form__label__id').text('Adicionar empleado')
+            })
+
+            $('#is-user').on('change', function () {
+                if ($( this ).is(':checked'))
+                    $('#div_rol').css("display", "block")
+                else
+                    $('#div_rol').css("display", "none")
             })
         })
 
-        $('#btnActualizar').on('click', function () {
-            let params = {
-                nombre: $('#empleado_nombre').val(),
-                correo: $('#empleado_correo').val(),
-                telefono: $('#empleado_telefono').val(),
-                fecha_alta: $('#empleado_fecha_alta').val(),
-                salario_x_hora: $('#empleado_salario_x_hora').val(),
-                id_unidad: $('#empleado_id_unidad').val(),
-                id_cargo: $('#empleado_id_cargo').val(),
-                direccion: $('#empleado_direccion_particular').val(),
-                is_usuario: $('#is-user').prop('checked') == true ? 1 : 0,
-                rol: $('#empleado_rol').val(),
-                id_empleado: $('#id_empleado').val()
-            }
-            $.ajax({
-                url: '/contabilidad/capital-humano/empleado-upd',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/contabilidad/capital-humano/empleado');
-            })
-        })
-
-        $('#gestionarCargosModal').on('show.bs.modal', function (event) {
-            var modal = $(this)
-            modal.find('.modal-title').text('Adicionar empleado')
-        })
-
-        function mostrarBtn() {
-            $('#btnActualizar').hide()
-            $('#div_rol').css("display", "none")
-            $('#btnAceptar').show()
-            $('#empleado_nombre').val('')
-            $('#empleado_correo').val('')
-            $('#empleado_telefono').val('')
-            $('#empleado_fecha_alta').val('')
-            $('#empleado_salario_x_hora').val('')
-            $('#empleado_direccion_particular').val('')
-            $('#is-user').prop('checked', false)
-        }
-
-        $('#is-user').on('change', function () {
-            if ($('#is-user').is(':checked'))
-                $('#div_rol').css("display", "block")
-            else
-                $('#div_rol').css("display", "none")
-        })
     </script>
 {% endblock %}

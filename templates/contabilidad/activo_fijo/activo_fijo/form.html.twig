@@ -345,7 +345,7 @@
             $("#btnSubbmit").click(function (e) {
                 if (form_activo_fijo.valid()) {
                     form_activo_fijo.attr('method', `POST`)
-                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val())
+                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val()+'&type='+$('#activo_fijo_type').val())
                     form_activo_fijo.submit()
                     if (validateForm.errorList.length === 0) loadingModal.show()
                 }

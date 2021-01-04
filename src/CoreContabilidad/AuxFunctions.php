@@ -4,6 +4,7 @@ namespace App\CoreContabilidad;
 
 
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
@@ -2529,11 +2530,10 @@ class AuxFunctions
         $arr_movimientos = $em->getRepository(MovimientoActivoFijo::class)->findBy([
             'id_unidad' => $unidad_obj,
             'id_tipo_movimiento' => $tipo_movimiento_obj,
-            'anno' => $anno
+            'anno' => $anno,
+            'id_movimiento_cancelado'=>null
         ]);
-
         return count($arr_movimientos) + 1;
-
     }
 
     public
@@ -2733,7 +2733,7 @@ class AuxFunctions
         $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_impuesto, $obj_subcuenta_impuesto, null,
             $unidad, null, null, null, null, null,
             null, 0, 0, $factura->getFechaFactura(), $factura->getFechaFactura()->format('Y'),
-            $impuesto_total,0, 'FACT-' . $factura->getNroFactura(), $factura);
+            $impuesto_total, 0, 'FACT-' . $factura->getNroFactura(), $factura);
 
 
         //asentando factura
@@ -2911,7 +2911,7 @@ class AuxFunctions
                 ->setAnno($year_)
                 ->setCredito(0)
                 ->setDebito($importe)
-                ->setNroDocumento('FACT-'.$obj_factura->getNroFactura())
+                ->setNroDocumento('FACT-' . $obj_factura->getNroFactura())
                 ->setIdDocumento(null)
                 ->setIdUnidad($unidad)
                 ->setIdAlmacen(null)
@@ -2955,7 +2955,7 @@ class AuxFunctions
                 ->setAnno($year_)
                 ->setCredito($importe)
                 ->setDebito(0)
-                ->setNroDocumento('FACT-'.$obj_factura->getNroFactura())
+                ->setNroDocumento('FACT-' . $obj_factura->getNroFactura())
                 ->setIdDocumento(null)
                 ->setIdUnidad($unidad)
                 ->setIdAlmacen(null)
@@ -2979,5 +2979,88 @@ class AuxFunctions
             return $nro_consecutivo_real;
         } else
             return '';
+    }
+
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param int $id_tipo_movimiento tipo de movimiento a cancelar(Ej: 1,2,3 en correspondencia con la tabla de tipo_movimiento)
+     * @param int $nro_consecutivo numero consecutivo del movimiento, encontrado en la tabla de movimiento_activo_fijo la columna nro_concesutivo
+     * @param int $anno el anno actual, que nos servira para ubicar el activo
+     * @param Unidad $obj_unidad unidad en la que se encuentra el activo
+     * @param User $obj_user usuario que realiza la accion
+     * @return bool|string
+     */
+    public static function CancelarActivoFijo(EntityManagerInterface $em, int $id_tipo_movimiento, int $nro_consecutivo, int $anno, Unidad $obj_unidad, User $obj_user)
+    {
+        $tipo_movimiento_er = $em->getRepository(TipoMovimiento::class);
+        $movimiento_er = $em->getRepository(MovimientoActivoFijo::class);
+        $activo_fijo_er = $em->getRepository(ActivoFijo::class);
+        $obj_tipo_movimiento = $tipo_movimiento_er->find($id_tipo_movimiento);
+
+        /** @var MovimientoActivoFijo $obj_movimiento */
+        $obj_movimiento = $movimiento_er->findOneBy([
+//            'anno' => $anno,
+            'id_tipo_movimiento' => $obj_tipo_movimiento,
+            'nro_consecutivo' => $nro_consecutivo,
+            'id_unidad' => $obj_unidad
+        ]);
+
+        if (!$obj_movimiento)
+            return false;
+
+        $obj_activoFijo = $obj_movimiento->getIdActivoFijo();
+
+        if (!$obj_activoFijo)
+            return false;
+
+        $obj_activoFijo->setActivo(false);
+        $em->persist($obj_activoFijo);
+
+        $obj_movimiento
+            ->setCancelado(true);
+
+        $today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+
+        $new_movimiento = new MovimientoActivoFijo();
+        $new_movimiento
+            ->setCancelado(false)
+            ->setActivo(true)
+            ->setAnno($anno)
+            ->setFundamentacion($obj_movimiento->getFundamentacion())
+            ->setEntrada($obj_movimiento->getEntrada())
+            ->setFecha($today)
+            ->setNroConsecutivo($obj_movimiento->getNroConsecutivo())
+            ->setIdCuenta($obj_movimiento->getIdCuenta())
+            ->setIdSubcuenta($obj_movimiento->getIdSubcuenta())
+            ->setIdActivoFijo($obj_movimiento->getIdActivoFijo())
+            ->setIdUsuario($obj_user)
+            ->setIdUnidad($obj_movimiento->getIdUnidad())
+            ->setIdTipoMovimiento($obj_movimiento->getIdTipoMovimiento())
+            ->setIdMovimientoCancelado($obj_movimiento)
+            ->setIdProveedor($obj_movimiento->getIdProveedor())
+            ->setIdUnidadDestinoOrigen($obj_movimiento->getIdUnidadDestinoOrigen());
+        $em->persist($new_movimiento);
+
+        $nro_documento = $obj_tipo_movimiento->getCodigo() . '-' . $obj_movimiento->getNroConsecutivo();
+        $asientos = $em->getRepository(Asiento::class)->findBy([
+            'nro_documento' => $nro_documento,
+//            'anno' => $anno,
+            'id_unidad' => $obj_unidad,
+            'anno' => $obj_movimiento->getAnno()
+        ]);
+
+        /** @var Asiento $asiento */
+        foreach ($asientos as $asiento) {
+            $new_asiento_invertido = self::createAsiento($em, $asiento->getIdCuenta(), $asiento->getIdSubcuenta(), $asiento->getIdDocumento(), $obj_unidad, $asiento->getIdAlmacen(),
+                $asiento->getIdCentroCosto(), $asiento->getIdElementoGasto(), $asiento->getIdOrdenTrabajo(), $asiento->getIdExpediente(), $asiento->getIdProveedor()
+                , $asiento->getTipoCliente(), $asiento->getIdCliente(), $today, $anno, $asiento->getDebito(), $asiento->getCredito(), $asiento->getNroDocumento(), $asiento->getIdFactura());
+        }
+        try {
+            $em->flush();
+        } catch (FileException $exception) {
+            return $exception->getMessage();
+        }
+        return true;
     }
 }

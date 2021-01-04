@@ -3,13 +3,14 @@
 namespace App\Form\Contabilidad\ActivoFijo;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MovimientoActivoFijoType extends AbstractType
+class MovimientoActivoFijoSalidaType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -38,18 +39,19 @@ class MovimientoActivoFijoType extends AbstractType
                 'required' => false,
                 'disabled' => true
             ))
-            ->add('centro_costo', TextType::class, array(
+            /*->add('centro_costo', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Centro de Costo',
                 'required' => false,
-                'disabled' => true
+                'disabled' => true,
+
             ))
-            ->add('area_responsabilidad', TextType::class, array(
+            ->add('area_responsabilidad', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Area de Responsabilidad',
                 'required' => false,
                 'disabled' => true
-            ))
+            ))*/
             ->add('id_subcuenta', TextType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Subcuenta',

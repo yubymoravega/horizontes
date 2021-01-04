@@ -36,5 +36,19 @@
             {% endfor %}
             </tbody>
         </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
 {% endblock %}

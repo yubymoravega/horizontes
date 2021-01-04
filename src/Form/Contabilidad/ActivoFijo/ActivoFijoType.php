@@ -5,6 +5,7 @@ namespace App\Form\Contabilidad\ActivoFijo;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,6 +20,7 @@ class ActivoFijoType extends AbstractType
                 'label'=>'Nro. Inventario',
                 'disabled'=>true
             ])
+            ->add('type', HiddenType::class)
             ->add('fecha_alta',DateType::class, array(
                 'input'=>'datetime',
                 'widget'=>'single_text',
