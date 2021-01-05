@@ -9,9 +9,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
   <link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111">
 
-  
-  
-  
+
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
 
   <style class="INLINE_PEN_STYLESHEET_ID">
@@ -66,7 +64,7 @@
       </div>
       <div class="col-5">
         <h1 class="document-type display-4">FACTURA</h1>
-        <p class="text-right"><strong>{{ json[0].fecha.date|date("d/M/Y ")  }} <br> No: 000{{id}} </strong></p>
+        <p class="text-right"><strong>{{json[0].fecha.date|date("d/M/Y ")}} <br> No: 000{{id}} </strong></p>
          
       </div>
     </div>

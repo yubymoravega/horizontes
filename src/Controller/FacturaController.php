@@ -462,18 +462,23 @@ class FacturaController extends AbstractController
                       $json[$contador]->recibirMoneda = $dataBase->getRepository(Moneda::class)->find( $json[$contador]->recibirMoneda)->getNombre();
 
             $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $json[$contador]->montoMoneda]);
-            $dolares = $json[$contador]->monto / $tasa[0]->getTasa();
-            $dolares = $dolares - $json[$contador]->recibir;
-            $dolares =  $dolares * $tasa[0]->getTasa();
+            $dolaresMonto = $json[$contador]->monto / $tasa[0]->getTasa();
+            $tasaRecibir = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $json[$contador]->recibirMoneda]);
+            $dolaresRecibir = $json[$contador]->monto / $tasaRecibir[0]->getTasa();
+            $comisionDolares = $dolaresMonto -$dolaresRecibir;
+            $comisionMonedaRecibir =  $comisionDolares / $tasaRecibir[0]->getTasa();
+          
+            /* $dolares = $dolares - $json[$contador]->recibir;
+            $dolares =  $dolares * $tasa[0]->getTasa();*/
                       
                       $json[$contador]->idCotizacion =  $cotizacion->getId();
-                      $json[$contador]->comision = number_format ( $dolares,2,",", " " );
+                      $json[$contador]->comision = number_format ($comisionMonedaRecibir,2,",", " " );
                       $json[$contador]->monto = number_format ( $json[$contador]->monto,2,",", " " );
                       $json[$contador]->recibir = number_format ( $json[$contador]->recibir,2,",", " " );
                       $json[$contador]->montoMoneda = $dataBase->getRepository(Moneda::class)->find( $json[$contador]->montoMoneda)->getNombre();
  
             $contador++;
-        }
+        } 
 
         $factura->setJson(json_encode($json));
         $dataBase->persist($factura);
