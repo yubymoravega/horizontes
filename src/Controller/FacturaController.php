@@ -421,12 +421,15 @@ class FacturaController extends AbstractController
                 $direcion .=" Reparto: ".$json[$contador]->reparto;
             }
 
+            $CUP = $dataBase->getRepository(Moneda::class)->findBy(["nombre" => "CUP"]);
+            $tasaCUP = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda' => $CUP[0]->getId()]);
+
           $respuesta = $client->Family_Transaction([
                 'mCustomerID' => '4327861528',
                 'mAPIKey' => 'rnl370fwi6',
                 'mKeyValue' => uniqid(),
                 'mDenomination' => 'CUC',
-                'mAmount' => $json[$contador]->recibir,
+                'mAmount' =>   round($json[$contador]->recibir / $tasaCUP[0]->getTasa()),
                 'mNote' =>  ($json[$contador]->comentario) ? $json[$contador]->comentario : "No comentario",
                 'mSourceName' => ($json[$contador]->nombreCliente) ? $json[$contador]->nombreCliente : "",
                 'mSourcePhoneNo' => ($json[$contador]->idCliente) ? $json[$contador]->idCliente : "",
@@ -461,19 +464,31 @@ class FacturaController extends AbstractController
                       
                       $json[$contador]->recibirMoneda = $dataBase->getRepository(Moneda::class)->find( $json[$contador]->recibirMoneda)->getNombre();
 
-            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $json[$contador]->montoMoneda]);
-            $dolares = $json[$contador]->monto / $tasa[0]->getTasa();
-            $dolares = $dolares - $json[$contador]->recibir;
-            $dolares =  $dolares * $tasa[0]->getTasa();
+            $recibirMoneda = $dataBase->getRepository(Moneda::class)->findBy(["nombre" => $json[$contador]->recibirMoneda]);
+            //$montoMoneda = $dataBase->getRepository(Moneda::class)->findBy(["nombre" => $json[$contador]->montoMoneda]);
+
+            
+           
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]->montoMoneda]);
+            $dolaresMonto = $json[$contador]->monto / $tasa[0]->getTasa();
+            $tasaRecibir = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda' => $recibirMoneda[0]->getId()]);
+            $dolaresRecibir = $json[$contador]->recibir / $tasaRecibir[0]->getTasa();
+            $comisionDolares = $dolaresMonto -$dolaresRecibir;
+
+            $comisionMonedaRecibir =  $comisionDolares * $tasa[0]->getTasa();
+            //return new Response(var_dump( $comisionMonedaRecibir));
+          
+            /* $dolares = $dolares - $json[$contador]->recibir;
+            $dolares =  $dolares * $tasa[0]->getTasa();*/
                       
                       $json[$contador]->idCotizacion =  $cotizacion->getId();
-                      $json[$contador]->comision = number_format ( $dolares,2,",", " " );
-                      $json[$contador]->monto = number_format ( $json[$contador]->monto,2,",", " " );
-                      $json[$contador]->recibir = number_format ( $json[$contador]->recibir,2,",", " " );
+                      $json[$contador]->comision = round($comisionMonedaRecibir);
+                      $json[$contador]->monto =  round($json[$contador]->monto);
+                      $json[$contador]->recibir = round($json[$contador]->recibir);
                       $json[$contador]->montoMoneda = $dataBase->getRepository(Moneda::class)->find( $json[$contador]->montoMoneda)->getNombre();
  
             $contador++;
-        }
+        } 
 
         $factura->setJson(json_encode($json));
         $dataBase->persist($factura);
@@ -544,25 +559,27 @@ class FacturaController extends AbstractController
           }
 
         $trasacciones = $dataBase->getRepository(Trasacciones::class)->findBy(['idCotizacion'=>$cotizacion->getId()]);
+
+      
         
         if(isset($efectivo[0])){
 
             if(isset($trasacciones)){
                 $html = $this->renderView("factura/pdfMixta.html.twig",
-            ['deposito' => $trasacciones, 'cambio' => $efectivo[0], 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+            ['deposito' => $trasacciones, 'cambio' => $efectivo[0], 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" =>   json_decode($factura->getJson()),"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
             $filename = 'factura.pdf'; 
            
         }else{
 
             $html = $this->renderView("factura/pdf.html.twig",
-            ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+            ['cambio' => $efectivo[0] , 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" =>   json_decode($factura->getJson()),"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
             $filename = 'factura.pdf'; 
         }
 
         }else{
 
         $html = $this->renderView("factura/pdfDeposito.html.twig",
-        ['deposito' => $trasacciones, 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" => $json,"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
+        ['deposito' => $trasacciones, 'moneda' =>  $factura->getIdMoneda(),"total" => number_format ( $factura->getTotal(),2,",", " " ), "empleado" => $factura->getEmpleado(),"cliente" => $clienteOrigen[0],"json" =>  json_decode($factura->getJson()),"id" => $factura->getId(),"nombre" => $factura->getNombreCliente(),"telefono" => $factura->getIdCliente()]);
         $filename = 'factura.pdf'; 
 
         }
