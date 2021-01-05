@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ClienteController extends AbstractController
 {
 
-    public $apiKey = 'sk_test_szvCvPRPHBF2sWZFxRWCp5hT';
+    public $apiKey = 'sk_test_szvCvPRPHBF2sWZFxRWCp5hT'; 
 
     /**
      * @Route("/cliente-index", name="cliente-index")
@@ -44,7 +44,7 @@ class ClienteController extends AbstractController
      */
     public function registrarCliente(Request $request, $tel)
     {
-
+        
         $cliente = new Cliente();
 
         $cliente->setTelefono($tel);

@@ -1,5 +1,13 @@
 
 
+$( "#admin" ).click(function() {
+    if($("#admin").hasClass("opened")){
+        $( "#admin" ).removeClass( "opened" );      
+    }else{
+        $("#admin").addClass("opened");
+    }
+  });
+
 $( "#reportes" ).click(function() {
     if($("#reportes").hasClass("opened")){
         $( "#reportes" ).removeClass( "opened" );      
