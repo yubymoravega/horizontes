@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Listado de Depreciación de Activos Fijos
+                Listado de Activos Fijos por Centro de Costo y Area de Responsabilidad
             </h4>
         </div>
         {# end header #}
@@ -23,11 +23,13 @@
             <thead class="thead-dark">
             <th width="150px">Nro. Inv</th>
             <th scope="col-1">Descripción</th>
+            <th width="180px">Fecha de Alata</th>
             <th width="180px">Valor Inicial</th>
-            <th width="180px">Depreciación del Mes</th>
+{#            <th width="180px">Depreciación del Mes</th>#}
             <th width="200px">Depreciación Acumulada</th>
             <th width="150px">Valor Real</th>
-            <th width="200px">Tasa deDepreciación</th>
+            <th width="200px">Grupo de Activo</th>
+{#            <th width="200px">Tasa deDepreciación</th>#}
             </thead>
             <tbody>
             {% for item in datos %}
@@ -38,11 +40,13 @@
                     <tr>
                         <td style="font-weight:400;" class="text-left">{{ new_item.nro_inventario }}</td>
                         <td style="font-weight:400;">{{ new_item.descripcion }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.fecha_alta }}</td>
                         <td style="font-weight:400;" class="text-right">{{ new_item.valor_inicial }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ new_item.depreciacion_mes }}</td>
+{#                        <td style="font-weight:400;" class="text-right">{{ new_item.depreciacion_mes }}</td>#}
                         <td style="font-weight:400;" class="text-right">{{ new_item.depreciacion_acumulada }}</td>
                         <td style="font-weight:400;" class="text-right">{{ new_item.valor_real }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ new_item.tasa_depreciacion }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
+{#                        <td style="font-weight:400;" class="text-right">{{ new_item.tasa_depreciacion }}</td>#}
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -50,14 +54,4 @@
         </table>
         {# end list #}
     </div>
-{% endblock %}
-
-
-{% block javascripts %}
-    {{ parent() }}
-    <script>
-        function Depreciar() {
-            // window.open(url, 'blank_')
-        }
-    </script>
 {% endblock %}
