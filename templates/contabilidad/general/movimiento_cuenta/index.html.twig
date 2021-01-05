@@ -56,7 +56,10 @@
                 {{ form_widget(form.unidad,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
-                {{ form_widget(form.cliente,{'attr': {'class': 'form-control w-100'}}) }}
+                {{ form_widget(form.tipo_cliente,{'attr': {'class': 'form-control w-100'}}) }}
+            </div>
+            <div class="form-group mt-0 input-group input-group-sm col-2">
+                {{ form_widget(form.id_cliente,{'attr': {'class': 'form-control w-100'}}) }}
             </div>
             <div class="form-group mt-0 input-group input-group-sm col-2">
                 {{ form_widget(form.proveedor,{'attr': {'class': 'form-control w-100'}}) }}
@@ -92,7 +95,8 @@
         let cbx_almacen = $('#movimiento_cuenta_almacen')
         let cbx_orden_trabajo = $('#movimiento_cuenta_orden_trabajo')
         let cbx_unidad = $('#movimiento_cuenta_unidad')
-        let cbx_cliente = $('#movimiento_cuenta_cliente')
+        let cbx_tipo_cliente = $('#movimiento_cuenta_tipo_cliente')
+        let cbx_cliente = $('#movimiento_cuenta_id_cliente')
         let cbx_proveedor = $('#movimiento_cuenta_proveedor')
         let anno = new Date().getFullYear();
         let mes = new Date().getMonth();
@@ -187,6 +191,7 @@
                                         cbx_unidad.parent().show()
                                         break
                                     case "CLIPRO":
+                                        cbx_tipo_cliente.parent().show()
                                         cbx_cliente.parent().show()
                                         cbx_proveedor.parent().show()
                                         break
@@ -196,6 +201,42 @@
                         }
 
 
+                    }
+                })
+            })
+
+            $('select').on('change',function(){
+                $('#saldo_inicial').hide()
+                $('#rows_datos').find('tr').remove()
+            })
+
+            cbx_proveedor.on('change', function () {
+                cbx_tipo_cliente.val(0)
+                cbx_cliente.find('option').remove()
+                cbx_cliente.prepend(`<option value = 0 selected=false disabled> --- Cliente --- </option>`)
+            })
+                cbx_tipo_cliente.on('change', function () {
+                cbx_cliente.find('option').remove()
+                cbx_cliente.prepend(`<option value = 0 selected=false disabled> --- Cliente --- </option>`)
+                cbx_proveedor.val(0)
+
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            result.clientes.forEach(
+                                el => cbx_cliente.append(`<option value = "${el.id}">${el.nombre} </option>`)
+                            )
+                            cbx_cliente
+                        } else {
+
+                        }
+                        loadingModal.close()
+                    },
+                    error: function () {
                     }
                 })
             })
@@ -209,6 +250,7 @@
             cbx_unidad.parent().hide()
             cbx_proveedor.parent().hide()
             cbx_cliente.parent().hide()
+            cbx_tipo_cliente.parent().hide()
             cbx_orden_trabajo.parent().hide()
 
             $('#movimiento_cuenta_centro_costo').val(0)
@@ -217,7 +259,8 @@
             $('#movimiento_cuenta_almacen').val(0)
             $('#movimiento_cuenta_orden_trabajo').val(0)
             $('#movimiento_cuenta_unidad').val(0)
-            $('#movimiento_cuenta_cliente').val(0)
+            $('#movimiento_cuenta_id_cliente').val(0)
+            $('#movimiento_cuenta_tipo_cliente').val(0)
             $('#movimiento_cuenta_proveedor').val(0)
         }
 
@@ -242,6 +285,7 @@
             cbx_unidad.prepend('<option selected = "false" value = "0"> -- Unidad -- </option>');
             cbx_orden_trabajo.prepend('<option selected = "false" value = "0"> -- Orden de trabajo -- </option>');
             cbx_cliente.prepend('<option selected = "false" value = "0"> -- Cliente -- </option>');
+            cbx_tipo_cliente.prepend('<option selected = "false" value = "0"> -- Tipo  de Cliente -- </option>');
             cbx_proveedor.prepend('<option selected = "false" value = "0"> -- Proveedor -- </option>');
 
             hiddenParents()
@@ -268,9 +312,9 @@
                     $(result.unidad).each(function (pos, valor) {
                         $('#movimiento_cuenta_unidad').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
-                    $(result.cliente).each(function (pos, valor) {
-                        $('#movimiento_cuenta_cliente').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
-                    })
+                    // $(result.cliente).each(function (pos, valor) {
+                    //     $('#movimiento_cuenta_id_cliente').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                    // })
                     $(result.proveedor).each(function (pos, valor) {
                         $('#movimiento_cuenta_proveedor').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                     })
@@ -297,7 +341,8 @@
                     'nro_subcuenta': $('#movimiento_cuenta_nro_subcuenta').val(),
                     'periodo': $('#movimiento_cuenta_periodo').val(),
                     'unidad': $('#movimiento_cuenta_unidad').val(),
-                    'cliente': $('#movimiento_cuenta_cliente').val(),
+                    'tipo_cliente': $('#movimiento_cuenta_tipo_cliente').val(),
+                    'cliente': $('#movimiento_cuenta_id_cliente').val(),
                     'proveedor': $('#movimiento_cuenta_proveedor').val(),
                     'orden_trabajo': $('#movimiento_cuenta_orden_trabajo').val(),
                     'centro_costo': $('#movimiento_cuenta_centro_costo').val(),

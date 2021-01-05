@@ -2,7 +2,9 @@
 
 namespace App\Entity\Contabilidad\General;
 
+use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\AreaResponsabilidad;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
@@ -139,6 +141,16 @@ class Asiento
      * @ORM\ManyToOne(targetEntity=Factura::class)
      */
     private $id_factura;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ActivoFijo::class)
+     */
+    private $id_activo_fijo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=AreaResponsabilidad::class)
+     */
+    private $id_area_responsabilidad;
 
     public function getId(): ?int
     {
@@ -381,6 +393,30 @@ class Asiento
     public function setIdFactura(?Factura $id_factura): self
     {
         $this->id_factura = $id_factura;
+
+        return $this;
+    }
+
+    public function getIdActivoFijo(): ?ActivoFijo
+    {
+        return $this->id_activo_fijo;
+    }
+
+    public function setIdActivoFijo(?ActivoFijo $id_activo_fijo): self
+    {
+        $this->id_activo_fijo = $id_activo_fijo;
+
+        return $this;
+    }
+
+    public function getIdAreaResponsabilidad(): ?AreaResponsabilidad
+    {
+        return $this->id_area_responsabilidad;
+    }
+
+    public function setIdAreaResponsabilidad(?AreaResponsabilidad $id_area_responsabilidad): self
+    {
+        $this->id_area_responsabilidad = $id_area_responsabilidad;
 
         return $this;
     }

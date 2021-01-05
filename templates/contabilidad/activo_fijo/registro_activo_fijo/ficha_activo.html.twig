@@ -1,5 +1,6 @@
 {% extends('contabilidad/inventario/print_base.html.twig') %}
 {% block title %} Imprimir Sub-Mayor Inventarios {% endblock %}
+
 {% block body %}
     <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
         <table border="1" width="960px" class="mt-1 mb-2">
@@ -90,5 +91,19 @@
 
             </tbody>
         </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
 {% endblock %}

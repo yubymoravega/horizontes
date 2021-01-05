@@ -30,11 +30,25 @@
                         <td style="font-weight:400;" class="text-left">{{ new_item.nro_inventario }}</td>
                         <td style="font-weight:400;" class="text-left">{{ new_item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
-                        <td style="font-weight:400;" class="text-center">{{ new_item.cuenta_subcuenta }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.area }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}
             </tbody>
         </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
 {% endblock %}

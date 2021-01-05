@@ -152,7 +152,7 @@ configuraciones:
       name: "TRASLADOS ENVIADOS"
       abreviatura: "TE"
     - id: 5
-      name: "TRASLADOS RECIVIDOS"
+      name: "TRASLADOS RECIBIDOS"
       abreviatura: "TR"
     - id: 6
       name: "BAJAS DE ACTIVOS"

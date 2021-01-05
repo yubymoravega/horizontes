@@ -47,6 +47,7 @@ use App\Repository\Contabilidad\Venta\FacturaRepository;
 use App\Repository\Contabilidad\Venta\MovimientoVentaRepository;
 use App\Repository\Contabilidad\Venta\ObligacionCobroRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Element;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -71,7 +72,7 @@ class FacturaController extends AbstractController
                           AlmacenRepository $almacenRepository, ValidatorInterface $validator)
     {
 //        $id_user = $this->getUser();
-//        $insert = AuxFunctions::addFactServicio($em, 2,$id_user, 3, 4, 1,
+//        $insert = AuxFunctions::addFactServicio($em, 2, $id_user, 3, 4, 1,
 //            [
 //                [
 //                    'codigo_servicio' => '0010',
@@ -80,24 +81,37 @@ class FacturaController extends AbstractController
 //                    'costo' => 50,
 //                    'precio' => 90,
 //                    'impuesto' => 5,
-//                ],[
-//                    'codigo_servicio' => '0020',
-//                    'cantidad' => 1,
-//                    'descripcion' => 'Remesa para Ana',
-//                    'costo' => 97,
-//                    'precio' => 103,
-//                    'impuesto' => 2,
-//                ],[
-//                    'codigo_servicio' => '0030',
-//                    'cantidad' => 1,
-//                    'descripcion' => 'Paquete de cosas para la beba',
-//                    'costo' => 50,
-//                    'precio' => 90,
-//                    'impuesto' => 10,
-//                ],
+//                ], [
+//                'codigo_servicio' => '0020',
+//                'cantidad' => 1,
+//                'descripcion' => 'Remesa para Ana',
+//                'costo' => 97,
+//                'precio' => 103,
+//                'impuesto' => 2,
+//            ], [
+//                'codigo_servicio' => '0030',
+//                'cantidad' => 1,
+//                'descripcion' => 'Paquete de cosas para la anita',
+//                'costo' => 50,
+//                'precio' => 90,
+//                'impuesto' => 10,
+//            ],
 //            ]
 //        );
-
+//
+//        $facturas = $em->getRepository(Factura::class)->findAll();
+//        /** @var Factura $x */
+//        $x = $facturas[count($facturas) - 1];
+//
+//        $facturaRepository = $em->getRepository(Factura::class);
+//        $movimientoVentaRepository = $em->getRepository(MovimientoVenta::class);
+//        $cuentaRepository = $em->getRepository(Cuenta::class);
+//        $subcuentaRepository = $em->getRepository(Subcuenta::class);
+//        $productoRepository = $em->getRepository(Producto::class);
+//        $mercanciaRepository = $em->getRepository(Mercancia::class);
+//        return $this->print($em, $x->getNroFactura(), $facturaRepository,
+//            $movimientoVentaRepository, $cuentaRepository, $subcuentaRepository,
+//            $productoRepository, $mercanciaRepository);
 
         $factura_er = $em->getRepository(Factura::class);
         $cuenta_er = $em->getRepository(Cuenta::class);
@@ -256,7 +270,7 @@ class FacturaController extends AbstractController
             $obj_subcuenta_impuesto = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'id_cuenta' => $obj_cuenta_impuesto, 'activo' => true]);
             $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_impuesto, $obj_subcuenta_impuesto, null,
                 $unidad, null, null, null, null, null,
-                null, 0, 0, $fecha_factura, $fecha_factura->format('Y'), 0, $impuesto_total,
+                null, 0, 0, $fecha_factura, $fecha_factura->format('Y'), $impuesto_total, 0,
                 'FACT-' . $factura->getNroFactura(), $factura);
 
 
@@ -306,6 +320,19 @@ class FacturaController extends AbstractController
                             $elemento->setActivo(false);
                         }
                         $em->persist($elemento);
+
+                        $cuenta_inventario = $cuenta_er->findOneBy(['nro_cuenta'=>$elemento->getCuenta(),'activo'=>true]);
+                        $subcuenta_inventatio_mercancia = $subcuenta_er->findOneBy(
+                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
+                        );
+
+                        /** Asiento la operacion reduciento la cuenta de la mercancia */
+                        $asiento_costo_venta_almacen = AuxFunctions::createAsiento($em, $cuenta_inventario, $subcuenta_inventatio_mercancia,
+                            $document, $unidad, $elemento->getIdAmlacen(), null, null,
+                            null, null, null, 0, 0, $fecha_factura,
+                            $fecha_factura->format('Y'), round(($precio*floatval($mercancia_obj->cantidad)),2),0,
+                            'FACT-' . $factura->getNroFactura(), $factura);
+
 
                         /** Calcular el importe total del codumento**/
                         $importe_documento += floatval($precio * floatval($mercancia_obj->cantidad));
@@ -381,7 +408,7 @@ class FacturaController extends AbstractController
                         $asiento_costo_venta = AuxFunctions::createAsiento($em, $obj_cuenta_movimiento_venta, $obj_subcuenta_venta_deudora,
                             $document, $unidad, $almacenRepository->find($mercancia_obj->id_almacen), null, null,
                             null, null, null, 0, 0, $fecha_factura,
-                            $fecha_factura->format('Y'), ($new_movimiento_inventario->getImporte() / $new_movimiento_inventario->getCantidad()), 0,
+                            $fecha_factura->format('Y'), 0, ($new_movimiento_inventario->getImporte() / $new_movimiento_inventario->getCantidad()),
                             'FACT-' . $factura->getNroFactura(), $factura);
 
 

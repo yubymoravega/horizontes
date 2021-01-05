@@ -6,6 +6,7 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
@@ -27,89 +28,213 @@ class BalanceComprobacionSaldoController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
-        $arr_cuentas = $em->getRepository(Cuenta::class)->findAll();
-        $data_almacenes = $this->getDataEntrada($em);
-        $row = [];
-        $index_cuenta = 0;
-        /** @var Cuenta $cuenta */
-        foreach ($arr_cuentas as $cuenta) {
-            $arr_subcuentas = $em->getRepository(Subcuenta::class)->findBy([
-                'activo' => true,
-                'id_cuenta' => $cuenta
-            ]);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $asiento_er = $em->getRepository(Asiento::class);
+        $year = Date('Y');
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
 
-            if (!empty($arr_subcuentas)) {
-                $row[] = array(
-                    'cuenta' => $cuenta->getNroCuenta(),
-                    'descripcion' => $cuenta->getNombre(),
-                    'id_cuenta' => $cuenta->getId(),
-                    'subcuenta' => '',
-                    'id_subcuenta' => '',
-                    'credito_mes' => '',
-                    'debito_mes' => '',
-                    'credito_acumulado' => '',
-                    'debito_acumulado' => '',
-                    'index' => 1
-                );
-                $index_cuenta = count($row);
-                $total_credito_cuenta_acumulado = 0;
-                $total_debito_cuenta_acumulado = 0;
-                $total_credito_cuenta_mes = 0;
-                $total_debito_cuenta_mes = 0;
-                /** @var Subcuenta $subcuenta */
-                foreach ($arr_subcuentas as $subcuenta) {
-                    $row[] = array(
-                        'cuenta' => '',
-                        'descripcion' => $subcuenta->getDescripcion(),
-                        'id_cuenta' => $cuenta->getId(),
-                        'subcuenta' => $subcuenta->getNroSubcuenta(),
-                        'id_subcuenta' => $subcuenta->getId(),
-                        'credito_acumulado' => '',
-                        'debito_acumulado' => '',
-                        'credito_mes' => '',
-                        'debito_mes' => '',
-                        'index' => 1
-                    );
-                    $data_analisis = $this->getDataByParams($data_almacenes, $cuenta->getNroCuenta(), $subcuenta->getNroSubcuenta(), Date('m') - 1, Date('Y'));
-                    $total_debito_subcuenta_acumulado = 0;
-                    $total_credito_subcuenta_acumulado = 0;
-                    $total_debito_subcuenta_mes = 0;
-                    $total_credito_subcuenta_mes = 0;
-                    foreach ($data_analisis as $data) {
-                        $total_debito_subcuenta_acumulado += $data['debito_acumulado'];
-                        $total_credito_subcuenta_acumulado += $data['credito_acumulado'];
-                        $total_debito_subcuenta_mes += $data['debito_mes'];
-                        $total_credito_subcuenta_mes += $data['credito_mes'];//
-                        $row[] = array(
-                            'cuenta' => '',
-                            'subcuenta' => '',
-                            'descripcion' => $data['descripcion'],
-                            'id_cuenta' => $cuenta->getId(),
-                            'id_subcuenta' => $subcuenta->getId(),
-                            'credito_mes' => $data['credito_mes'] > 0 ? number_format($data['credito_mes'], 2) : '',
-                            'debito_mes' => $data['debito_mes'] > 0 ? number_format($data['debito_mes'], 2) : '',
-                            'credito_acumulado' => $data['credito_acumulado'] > 0 ? number_format($data['credito_acumulado'], 2) : '',
-                            'debito_acumulado' => $data['debito_acumulado'] > 0 ? number_format($data['debito_acumulado'], 2) : '',
-                            'index' => $data['index']
-                        );
-                    }
-                    $row[count($row) - count($data_analisis) - 1]['credito_acumulado'] = $total_credito_subcuenta_acumulado > 0 ? number_format($total_credito_subcuenta_acumulado, 2) : '';
-                    $row[count($row) - count($data_analisis) - 1]['debito_acumulado'] = $total_debito_subcuenta_acumulado > 0 ? number_format($total_debito_subcuenta_acumulado, 2) : '';
-                    $row[count($row) - count($data_analisis) - 1]['credito_mes'] = $total_credito_subcuenta_mes > 0 ? number_format($total_credito_subcuenta_mes, 2) : '';
-                    $row[count($row) - count($data_analisis) - 1]['debito_mes'] = $total_debito_subcuenta_mes > 0 ? number_format($total_debito_subcuenta_mes, 2) : '';
+        $data_asiento = $asiento_er->findBy([
+            'anno' => $year,
+            'id_unidad' => $unidad
+        ]);
 
-                    $total_credito_cuenta_acumulado += $total_credito_subcuenta_acumulado;
-                    $total_debito_cuenta_acumulado += $total_debito_subcuenta_acumulado;
-                    $total_credito_cuenta_mes += $total_credito_subcuenta_mes;
-                    $total_debito_cuenta_mes += $total_debito_subcuenta_mes;
-                }
-                $row[$index_cuenta - 1]['debito_acumulado'] = $total_debito_cuenta_acumulado > 0 ? number_format($total_debito_cuenta_acumulado, 2) : '';
-                $row[$index_cuenta - 1]['credito_acumulado'] = $total_credito_cuenta_acumulado > 0 ? number_format($total_credito_cuenta_acumulado, 2) : '';
-                $row[$index_cuenta - 1]['debito_mes'] = $total_debito_cuenta_mes > 0 ? number_format($total_debito_cuenta_mes, 2) : '';
-                $row[$index_cuenta - 1]['credito_mes'] = $total_credito_cuenta_mes > 0 ? number_format($total_credito_cuenta_mes, 2) : '';
-            }
+        $arr_repeat_cuenta = [];
+        /** @var Asiento $asiento */
+        foreach ($data_asiento as $asiento) {
+            $id_cuenta = $asiento->getIdCuenta()->getId();
+            if (!in_array($id_cuenta, $arr_repeat_cuenta) && $asiento->getIdComprobante() != null)
+                $arr_repeat_cuenta[count($arr_repeat_cuenta)] = $id_cuenta;
         }
+        array_multisort($arr_repeat_cuenta, SORT_ASC, SORT_NUMERIC);
 
+        $row = [];
+        foreach ($arr_repeat_cuenta as $id_cuenta) {
+            $credito_mes = 0;
+            $debito_mes = 0;
+            $arr_subcuenta = [];
+            $descripcion_cuenta = $cuenta_er->find($id_cuenta)->getNombre();
+            $nro_cuenta = $cuenta_er->find($id_cuenta)->getNroCuenta();
+            /** @var Asiento $asiento */
+            foreach ($data_asiento as $asiento) {
+                if ($asiento->getIdCuenta()->getId() == $id_cuenta) {
+                    $id_subcuenta = $asiento->getIdSubcuenta()->getId();
+                    if (!in_array($id_subcuenta, $arr_subcuenta)) {
+                        $arr_subcuenta[count($arr_subcuenta)] = $id_subcuenta;
+                    }
+                }
+            }
+            $rows_data_subcuenta = [];
+            foreach ($arr_subcuenta as $id_subcuenta) {
+                $credito_subcuenta = 0;
+                $debito_subcuenta = 0;
+                $nro_subcuenta = '';
+                $descripcion_subcuenta = '';
+                $obj_cuenta = null;
+                $obj_subcuenta = null;
+                foreach ($data_asiento as $asiento) {
+                    $id_cuenta_ = $asiento->getIdCuenta()->getId();
+                    $id_subcuenta_ = $asiento->getIdSubcuenta()->getId();
+                    if ($id_cuenta == $id_cuenta_ && $id_subcuenta_ == $id_subcuenta && $asiento->getIdComprobante() != null) {
+                        $descripcion_subcuenta = $asiento->getIdSubcuenta()->getDescripcion();
+                        $nro_subcuenta = $asiento->getIdSubcuenta()->getNroSubcuenta();
+                        $credito_mes += $asiento->getCredito();
+                        $debito_mes += $asiento->getDebito();
+                        $credito_subcuenta += $asiento->getCredito();
+                        $debito_subcuenta += $asiento->getDebito();
+                        $obj_cuenta = $asiento->getIdCuenta();
+                        $obj_subcuenta = $asiento->getIdSubcuenta();
+                    }
+                }
+                $saldo = $this->getSumbayor($em, $obj_cuenta, $obj_subcuenta, $asiento_er, $year, $unidad, 0);
+                //data subcuenta
+                $rows_data_subcuenta[] = array(
+                    'cuenta' => '',
+                    'criterio' => '',
+                    'descripcion' => $descripcion_subcuenta,
+                    'id_cuenta' => $id_cuenta,
+                    'subcuenta' => $nro_subcuenta,
+                    'id_subcuenta' => $id_subcuenta,
+                    'credito_acumulado' => '',
+                    'debito_acumulado' => number_format($saldo, 2),
+                    'credito_mes' => number_format($credito_subcuenta, 2),
+                    'debito_mes' => number_format($debito_subcuenta, 2),
+                    'index' => 2
+                );
+
+                //data criterios
+                $data_asiento_subcuenta = $asiento_er->findBy([
+                    'anno' => $year,
+                    'id_unidad' => $unidad,
+                    'id_subcuenta' => $subcuenta_er->find($id_subcuenta)
+                ]);
+
+                $criterios = AuxFunctions::getCriterioByCuenta($nro_cuenta, $em);
+//                $data_criterio = [];
+//                foreach ($data_asiento_subcuenta as $item) {
+//                        $cod_cct = $item->getIdCentroCosto()?$item->getIdCentroCosto()->getCodigo():'';
+//                        $cod_ot = $item->getIdOrdenTrabajo()?$item->getIdOrdenTrabajo()->getCodigo():'';
+//                        $cod_eg = $item->getIdElementoGasto()?$item->getIdElementoGasto()->getCodigo():'';
+//                        $cod_expediente = $item->getIdExpediente()?$item->getIdExpediente()->getCodigo():'';
+//                        $cod_almacen = $item->getIdAlmacen()?$item->getIdAlmacen()->getCodigo():'';
+//                        $str_repeat = $cod_cct.'-'.$cod_ot.'-'.$cod_eg.'-'.$cod_expediente.'-'.$cod_almacen.'-'.$cod_expediente;
+//                        if (!in_array($str_repeat, $data_criterio)) {
+//                            $data_criterio[count($data_criterio)] = $str_repeat;
+//                        }
+//                    }
+//                }
+//
+//
+//                foreach ($data_criterio as $criterio) {
+//                    $debito_criterio =0;
+//                    $credito_criterio =0;
+//                    foreach ($data_asiento_subcuenta as $data){
+//                        $cod_cct = $item->getIdCentroCosto()?$item->getIdCentroCosto()->getCodigo():'';
+//                        $cod_ot = $item->getIdOrdenTrabajo()?$item->getIdOrdenTrabajo()->getCodigo():'';
+//                        $cod_eg = $item->getIdElementoGasto()?$item->getIdElementoGasto()->getCodigo():'';
+//                        $cod_expediente = $item->getIdExpediente()?$item->getIdExpediente()->getCodigo():'';
+//                        $cod_almacen = $item->getIdAlmacen()?$item->getIdAlmacen()->getCodigo():'';
+//                        $str_repeat = $cod_cct.'-'.$cod_ot.'-'.$cod_eg.'-'.$cod_expediente.'-'.$cod_almacen.'-'.$cod_expediente;
+//                        if($str_repeat == $criterio){
+//                            $codigo_criterio = $str_repeat;
+//                            //$descripcion_criterio = $data->getIdCentroCosto()->getNombre();
+//                            $debito_criterio += $data->getDebito();
+//                            $credito_criterio += $data->getCredito();
+//                        }
+//                    }
+//                    $rows_data_subcuenta[] = array(
+//                        'cuenta' => '',
+//                        'criterio' => $codigo_criterio,
+//                        'descripcion' => $descripcion_criterio,
+//                        'id_cuenta' => $id_cuenta,
+//                        'subcuenta' => '',
+//                        'id_subcuenta' => $id_subcuenta,
+//                        'credito_acumulado' => '',
+//                        'debito_acumulado' => number_format($saldo, 2),
+//                        'credito_mes' => number_format($credito_criterio, 2),
+//                        'debito_mes' => number_format($debito_criterio, 2),
+//                        'index' => 3
+//                    );
+//                }
+
+            foreach ($criterios as $criterio) {
+                    $codigo_criterio = '';
+                    $descripcion_criterio = '';
+                    $debito_criterio = 0;
+                    $credito_criterio = 0;
+                    $data_criterio = [];
+                    if ($criterio == 'CCT') {
+                        /** @var Asiento $item */
+                        foreach ($data_asiento_subcuenta as $item) {
+                            if ($item->getIdCentroCosto()){
+                                if (!in_array($item->getIdCentroCosto()->getCodigo(), $data_criterio)) {
+                                    $data_criterio[count($data_criterio)] = $item->getIdCentroCosto()->getCodigo();
+                                }
+                            }
+                        }
+                        foreach ($data_criterio as $criteria){
+                            $debito_criterio =0;
+                            $credito_criterio =0;
+                            foreach ($data_asiento_subcuenta as $data){
+                                if($data->getIdCentroCosto() && $data->getIdCentroCosto()->getCodigo() == $criteria){
+                                    $codigo_criterio = $criteria;
+                                    $descripcion_criterio = $data->getIdCentroCosto()->getNombre();
+                                    $debito_criterio += $data->getDebito();
+                                    $credito_criterio += $data->getCredito();
+                                }
+                            }
+                            $rows_data_subcuenta[] = array(
+                                'cuenta' => '',
+                                'criterio' => $codigo_criterio,
+                                'descripcion' => $descripcion_criterio,
+                                'id_cuenta' => $id_cuenta,
+                                'subcuenta' => '',
+                                'id_subcuenta' => $id_subcuenta,
+                                'credito_acumulado' => '',
+                                'debito_acumulado' => number_format($saldo, 2),
+                                'credito_mes' => number_format($credito_criterio, 2),
+                                'debito_mes' => number_format($debito_criterio, 2),
+                                'index' => 3
+                            );
+                        }
+                    }
+////                    if ($criterio == 'OT') {
+////                        $codigo_criterio = $item->getIdOrdenTrabajo() ? $item->getIdOrdenTrabajo()->getCodigo() : '';
+////                        $descripcion_criterio = $item->getIdOrdenTrabajo() ? $item->getIdOrdenTrabajo()->getDescripcion() : '';
+////                        $debito_criterio = $item->getDebito();
+////                        $credito_criterio = $item->getCredito();
+////                    }
+////                    if ($criterio == 'EG') {
+////                        $codigo_criterio = $item->getIdElementoGasto() ? $item->getIdElementoGasto()->getCodigo() : '';
+////                        $descripcion_criterio = $item->getIdElementoGasto() ? $item->getIdElementoGasto()->getDescripcion() : '';
+////                        $debito_criterio = $item->getDebito();
+////                        $credito_criterio = $item->getCredito();
+////                    }
+////                    if ($criterio == 'ALM') {
+////                        $codigo_criterio = $item->getIdAlmacen() ? $item->getIdAlmacen()->getCodigo() : '';
+////                        $descripcion_criterio = $item->getIdAlmacen() ? $item->getIdAlmacen()->getDescripcion() : '';
+////                        $debito_criterio = $item->getDebito();
+////                        $credito_criterio = $item->getCredito();
+////                    }
+                }
+            }
+            //data cuenta
+            $saldo_cuenta = $this->getSumbayor($em, $obj_cuenta, null, $asiento_er, $year, $unidad, 0);
+            $row[] = array(
+                'cuenta' => $nro_cuenta,
+                'criterio' => '',
+                'descripcion' => $descripcion_cuenta,
+                'id_cuenta' => $id_cuenta,
+                'subcuenta' => '',
+                'id_subcuenta' => '',
+                'credito_acumulado' => '',
+                'debito_acumulado' => number_format($saldo_cuenta, 2),
+                'credito_mes' => number_format($credito_mes, 2),
+                'debito_mes' => number_format($debito_mes, 2),
+                'index' => 1
+            );
+            $row = array_merge($row, $rows_data_subcuenta);
+        }
         foreach ($row as $k => $d) {
             if ($d['debito_acumulado'] == '' && $d['credito_acumulado'] == '' && $d['debito_mes'] == '' && $d['credito_mes'] == '')
                 unset($row[$k]);
@@ -127,160 +252,48 @@ class BalanceComprobacionSaldoController extends AbstractController
         ]);
     }
 
-    public function getDataByParams($rows_data, $cuenta, $subcuenta, $mes, $anno)
+    public function getSumbayor(EntityManagerInterface $em, $obj_cuenta, $obj_subcuenta, $asiento_er, $anno, $unidad, $periodo)
     {
-        $row = [];
-        /***Criterio de analisis 1*/
-        $repet_criteria = [];
-        $repet_desc = [];
-        foreach ($rows_data as $data) {
-            if (!in_array($data['analisis_1'], $repet_criteria) && $data['nro_cuenta'] == $cuenta && $data['nro_subcuenta'] == $subcuenta) {
-                $repet_criteria[count($repet_criteria)] = $data['analisis_1'];
-                $repet_desc[count($repet_desc)] = $data['value_1'];
-            }
+        $params = [];
+        if ($obj_subcuenta) {
+            $params[0]['id_subcuenta'] = $obj_subcuenta->getId();
+        }
+        if ($obj_cuenta) {
+            $params[0]['id_cuenta'] = $obj_cuenta->getId();
+        }
+        if ($anno) {
+            $params[0]['anno'] = intval($anno);
+        }
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        if ($unidad) {
+            $params[0]['id_unidad'] = $unidad->getId();
+        }
+        if ($periodo > 0) {
+            $params[0]['mes'] = $periodo;
+        }
 
-        }
-        foreach ($repet_criteria as $key => $criteria) {
-            $total_debito = 0;
-            $total_credito = 0;
-            $total_debito_mes = 0;
-            $total_credito_mes = 0;
-            $row_analisis_2 = [];
-            $row_analisis_3 = [];
-            foreach ($rows_data as $data) {
-                if ($data['analisis_1'] == $criteria && $data['nro_cuenta'] == $cuenta && $data['nro_subcuenta'] == $subcuenta) {
-                    $total_debito += AuxFunctions::getNumberByString($data['debito']);
-                    $total_credito += AuxFunctions::getNumberByString($data['credito']);
-                    if ($data['mes'] == $mes && $data['anno'] == $anno) {
-                        $total_debito_mes += AuxFunctions::getNumberByString($data['debito']);
-                        $total_credito_mes += AuxFunctions::getNumberByString($data['credito']);
-                    }
-                    if ($data['analisis_2'] != '') {
-                        $row_analisis_2[] = array(
-                            'debito_acumulado' => AuxFunctions::getNumberByString($data['debito']),
-                            'credito_acumulado' => AuxFunctions::getNumberByString($data['credito']),
-                            'debito_mes' => AuxFunctions::getNumberByString($data['debito']),
-                            'credito_mes' => AuxFunctions::getNumberByString($data['credito']),
-                            'descripcion' => $data['analisis_2'] . ' - ' . $data['value_2'],
-                            'index' => 2,
-                            'analisis_2' => $data['analisis_2'],
-                            'analisis_3' => '',
-                        );
-                        if ($data['analisis_3'] != '') {
-                            $row_analisis_3[] = array(
-                                'debito_acumulado' => AuxFunctions::getNumberByString($data['debito']),
-                                'credito_acumulado' => AuxFunctions::getNumberByString($data['credito']),
-                                'debito_mes' => AuxFunctions::getNumberByString($data['debito']),
-                                'credito_mes' => AuxFunctions::getNumberByString($data['credito']),
-                                'descripcion' => $data['analisis_3'] . ' - ' . $data['value_3'],
-                                'index' => 3,
-                                'analisis_3' => $data['analisis_3'],
-                                'analisis_2' => $data['analisis_2'],
-                            );
-                            $row_analisis_2 = array_merge($row_analisis_2, $row_analisis_3);
-                            $row_analisis_3 = [];
-                        }
-                    }
-                }
+        /*** (1)-para buscar el saldo inicial de la cuenta solamente, busco los saldos iniciales
+         * para el espacio de tiempo especificado de
+         * todas sus subcuentas, entonces los suma y pan ya
+         ***/
+        $arr_asientos = $asiento_er->findBy($params[0]);
+        /** @var Asiento $asiento */
+        $sado_ = 0;
+        foreach ($arr_asientos as $asiento) {
+//            if ($asiento->getIdComprobante() != null) {
+            if (!$obj_subcuenta) {
+                if ($obj_cuenta->getDeudora())
+                    $sado_ += ($asiento->getDebito() - $asiento->getCredito());
+                else
+                    $sado_ += ($asiento->getCredito() - $asiento->getDebito());
+            } else {
+                if ($obj_subcuenta->getDeudora())
+                    $sado_ += ($asiento->getDebito() - $asiento->getCredito());
+                else
+                    $sado_ += ($asiento->getCredito() - $asiento->getDebito());
             }
-            $union = [];
-            if (!empty($row_analisis_2)) {
-                $repet_criteria_2 = [];
-                $repet_criteria_3 = [];
-                foreach ($row_analisis_2 as $a2) {
-                    if (!in_array($a2['analisis_2'], $repet_criteria_2))
-                        $repet_criteria_2[count($repet_criteria_2)] = $a2['analisis_2'];
-                }
-//                dd($repet_criteria_2);
-                foreach ($repet_criteria_2 as $c2) {
-                    foreach ($row_analisis_2 as $a2) {
-                        if ($a2['analisis_2'] == $c2) {
-                            $union[] = array(
-                                'descripcion' => $a2['descripcion'],
-                                'index' => $a2['index'],
-                                'debito_acumulado' => $a2['debito_acumulado'],
-                                'credito_acumulado' => $a2['credito_acumulado'],
-                                'debito_mes' => $a2['debito_mes'],
-                                'credito_mes' => $a2['credito_mes'],
-                            );
-                        }
-                    }
-                }
-//                dd($union,$row_analisis_2);
-            }
-            $row[] = array(
-                'debito_acumulado' => $total_debito,
-                'credito_acumulado' => $total_credito,
-                'debito_mes' => $total_debito_mes,
-                'credito_mes' => $total_credito_mes,
-                'descripcion' => $criteria . ' - ' . $repet_desc[$key],
-                'index' => 1
-            );
-            $row = array_merge($row, $union);
+//                }
         }
-        return $row;
-    }
-
-    public function getDataEntrada(EntityManagerInterface $em)
-    {
-        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
-        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
-        $documento_er = $em->getRepository(Documento::class);
-        $unidad_obj = AuxFunctions::getUnidad($em, $this->getUser());
-        $rows = [];
-        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $unidad_obj, 'activo' => true]);
-        foreach ($almacenes as $obj_almacen) {
-            //1. Recorro todos los documentos del almacen
-            $arr_obj_documentos = $documento_er->findBy(array(
-                'id_almacen' => $obj_almacen,
-                'activo' => true
-            ));
-            foreach ($arr_obj_documentos as $obj_documento) {
-                $cod_almacen = $obj_documento->getIdAlmacen()->getCodigo();
-                /**@var $obj_documento Documento* */
-                $id_tipo_documento = $obj_documento->getIdTipoDocumento()->getId();
-                //informe recepcion mercancia
-                if ($id_tipo_documento == 1) {
-                    $datos_informe = AuxFunctions::getDataInformeRecepcion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_informe);
-                } //informe recepcion producto
-                elseif ($id_tipo_documento == 2) {
-                    $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_informe);
-                } //Ajuste de entrada
-                elseif ($id_tipo_documento == 3) {
-                    $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_ajuste_entreada);
-                }//Ajuste de salida
-                if ($id_tipo_documento == 4) {
-                    $datos_ajuste_salida = AuxFunctions::getDataAjusteSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_ajuste_salida);
-                }//transferencia de entrada
-                elseif ($id_tipo_documento == 5) {
-                    $datos_transferencia_entrada = AuxFunctions::getDataTransferenciaEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_transferencia_entrada);
-                } //transferencia de salida
-                elseif ($id_tipo_documento == 6) {
-                    $datos_transferencia = AuxFunctions::getDataTransferenciaSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_transferencia);
-                }//vale salida de mercancia
-                elseif ($id_tipo_documento == 7) {
-                    $datos_vale = AuxFunctions::getDataValeSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_vale);
-                } //vale salida de producto
-                elseif ($id_tipo_documento == 8) {
-                    $rows = array_merge($rows, []);
-                }//devolucion
-                elseif ($id_tipo_documento == 9) {
-                    $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_devolucion);
-                }//Venta
-                elseif ($id_tipo_documento == 10) {
-                    $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
-                    $rows = array_merge($rows, $datos_venta);
-                }
-            }
-        }
-        return $rows;
+        return $sado_;
     }
 }
