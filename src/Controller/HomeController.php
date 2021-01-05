@@ -44,6 +44,8 @@ class HomeController extends AbstractController
      */
     public function home()
     {
+      
+
         //Código del módulo de CONTABILIDAD, NO BORRAR
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
@@ -56,6 +58,9 @@ class HomeController extends AbstractController
             $em->flush();
         }
         //Fin del código
+
+        $user->getRoles();
+
         return $this->render('home/index.html.twig');
     }
 
@@ -64,6 +69,13 @@ class HomeController extends AbstractController
      */
     public function categorias($tel)
     {
+        $user =  $this->getUser();
+
+        if($user->getRoles()['rol'] == "ROLE_5918"){
+
+            return $this->redirectToRoute('turismo/solicitud',['cliente' => $tel]); 
+        }
+
         return $this->render('home/categoria.html.twig',['tel' => $tel]);
     } 
 

@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% set total = null %}
+	{% include 'breadcrumbs.html.twig' %}
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<section class="section novi-background section-66 section-sm-bottom-110">
+		<div class="container">
+			<h1 class="text-reporte">Reporte de Agencias
+			</h1>
+			<hr class="divider bg-mantis">
+			 <button  type="button" data-toggle="modal" data-target="#agregarAgencia" class="btn btn-sm btn-outline-dark"   >Agregar agencia</button>
+		<!-- Bootstrap Table-->
+		<div class="table-responsive clearfix">
+			<table class="table table-striped tabla-reporte">
+				<tbody>
+					<tr>
+                       <th>No</th>
+						<th>Agencia</th>
+                        <th>Acciones</th>
+					</tr>
+					{# table body #}
+        {% for data in pagination %}
+        <tr {% if loop.index is odd %}class="color"{% endif %}>
+            <td> {{ data.id }}</td>     
+            <td>{{ data.nombre}}</td>
+          
+            <td><svg onclick="edit({{data.id }}, '{{data.nombre}}')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg" onclick="borrar({{data.id }})" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+  <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg" onclick="detalle('{{data.id }}')" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
+  <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+</svg>
+
+</td>   
+        </tr>
+    {% endfor %}    
+				</tbody>
+			</table>
+			<hr style="background-color: white; margin-top: 0px;">
+			{# display navigation #}
+			<div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+      <div class="count contador">Agencias: {{ pagination.getTotalItemCount }} </div>
+	</div>
+</div></div></div></section>
+    <!-- Modal -->
+<div class="modal fade" id="agregarAgencia" tabindex="-1" role="dialog" aria-labelledby="agregarAgencia" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editar-origen-titulo">Agregar Agencia</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+    <label for="exampleInputEmail1">Nombre de la agencia</label>
+    <input  class="form-control" id="nombreAgencia" aria-describedby="emailHelp" placeholder="Agencia">
+    <small id="emailHelp" class="form-text text-muted">Introdusca un nombre de agencia.</small>
+  </div>
+      </div>
+      <div class="modal-footer">
+       
+        <button id="botonAgregarAgencia" type="button"class="btn btn-dark">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Modal -->
+<div class="modal fade" id="editarAgencia" tabindex="-1" role="dialog" aria-labelledby="agregarAgencia" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editar-origen-titulo">Editar Agencia</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+    <label for="exampleInputEmail1">Nombre de la agencia</label>
+    <input  class="form-control" id="editAgencia" aria-describedby="emailHelp" placeholder="Agencia">
+    <small id="editlHelp" class="form-text text-muted">Introdusca un nombre de agencia.</small>
+  </div>
+      </div>
+      <div class="modal-footer">
+       
+        <button id="botonEditarAgencia" type="button"class="btn btn-dark">Editar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+
+{% block javascripts %} 
+{{parent()}}
+<script>
+
+// A $( document ).ready() block.
+$( document ).ready(function() {
+
+  $( "#botonAgregarAgencia" ).click(function() {
+  if($("#nombreAgencia").val() == ""){
+
+      $("#emailHelp").text('Nombre de agencia no valido');
+  
+      $("#emailHelp").attr('style', 'color:red !important');
+      
+    }else{
+
+     window.location.href = "/agencias/add/"+$("#nombreAgencia").val();
+    }
+});
+
+});
+
+function edit(id,nombre) {
+
+  $('#editarAgencia').modal('show'); // abrir
+  $("#editAgencia").val(nombre);
+
+  $( "#botonEditarAgencia" ).click(function() {
+ 
+    if($("#editAgencia").val() == ""){
+
+      $("#editlHelp").text('Nombre de agencia no valido');
+  
+      $("#editlHelp").attr('style', 'color:red !important');
+      
+    }else{
+       $('#editarAgencia').modal('hide'); // cerrar
+      window.location.href = "/agencias/edit/"+id+"/"+$("#editAgencia").val();
+     
+    }
+
+}); }
+
+
+function borrar(id) {
+
+ $('#confirm__modal').modal('show'); // abrir
+
+  $( "#confirm__modal__btn_ok" ).click(function() {
+
+  window.location.href = "/agencias/borrar/"+id;
+
+});
+}
+
+function detalle(id) {
+
+  window.location.href = "/agencias/detalle/"+id;
+}
+
+</script>
+
+
+{% endblock %} 

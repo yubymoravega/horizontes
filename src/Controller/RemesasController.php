@@ -582,7 +582,7 @@ class RemesasController extends AbstractController
                 
                 }else{
 
-                    $total = $total - $reglasRemesas[$contador]->getValor();
+                    $total = $total - ( $tasa[0]->getTasa() * $reglasRemesas[$contador]->getValor());
                 }
             }
             $contador++;
@@ -621,7 +621,7 @@ class RemesasController extends AbstractController
                 
                 }else{
 
-                    $total = $cantidad + $reglasRemesas[$contador]->getValor();
+                    $total = $cantidad + ( $tasa[0]->getTasa() * $reglasRemesas[$contador]->getValor());
                 }
             }
             $contador++;
