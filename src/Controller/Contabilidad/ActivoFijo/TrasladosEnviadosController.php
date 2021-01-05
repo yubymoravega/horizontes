@@ -47,7 +47,7 @@ class TrasladosEnviadosController extends AbstractController
             $obj_activo = $em->getRepository(ActivoFijo::class)->findOneBy([
                 'nro_inventario' => $nro_inventatio,
                 'id_unidad' => $obj_unidad,
-                'activo'=>true
+                'activo' => true
             ]);
 
             if (!$obj_activo)
@@ -85,41 +85,32 @@ class TrasladosEnviadosController extends AbstractController
                 ->setActivo(true)
                 ->setAnno($obj_activo->getFechaAlta()->format('Y'))
                 ->setFecha($obj_activo->getFechaAlta())
-                ->setEntrada(true)
+                ->setEntrada(false)
                 ->setFundamentacion($fundamentacion)
-                ->setIdUnidadDestinoOrigen($obj_unidad_origen)
-            ;
+                ->setIdUnidadDestinoOrigen($obj_unidad_origen);
             $em->persist($new_movimiento);
 
             $obj_activo->setActivo(false);
             $em->persist($obj_activo);
             try {
-//                //asentar la cuenta del activo
-//                $asiento_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
-//                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
-//                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
-//                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-//                //asentando la cuenta de depresicion del activo
-//                if ($obj_activo->getDepreciacionAcumulada() > 0) {
-//                    $asiento_depresiacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
-//                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
-//                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getDepreciacionAcumulada(), 0,
-//                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-//                }
-//
-//                //asentando la cuenta de acreedora del activo(600)
-//                $cuenta_acreedora = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta'=>'600','activo'=>true]);
-//                $subcuenta_acreedora = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta'=>$cuenta_acreedora,'nro_subcuenta'=>'0010','activo'=>true]);
-//                $asiento_acreedora = AuxFunctions::createAsiento($em, $cuenta_acreedora, $subcuenta_acreedora, null,
-//                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
-//                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorReal(), 0,
-//                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null);
-//
-//                //actualizando la cuenta acreedora del activo fijo
-//                $cuentas_activo_fijo
-//                    ->setIdCuentaAcreedora($cuenta_acreedora)
-//                    ->setIdSubcuentaAcreedora($subcuenta_acreedora);
-//                $em->persist($cuentas_activo_fijo);
+
+                // Asentanto las operaciones
+                if ($obj_activo->getDepreciacionAcumulada() > 0)
+                    $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaDepreciacion(), $cuentas_activo_fijo->getIdSubcuentaDepreciacion(), null,
+                        $obj_activo->getIdUnidad(), null, null, null, null, null, null, 0, 0,
+                        $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getDepreciacionAcumulada(),
+                        $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null, $obj_activo);
+
+                $asiento_cuenta_gasto = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaAcreedora(), $cuentas_activo_fijo->getIdSubcuentaAcreedora(), null,
+                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
+                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorReal(),
+                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,$obj_activo);
+
+                $asiento_cuenta_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+                    $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
+                    $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorInicial(), 0,
+                    $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,
+                    $obj_activo, $cuentas_activo_fijo->getIdAreaResponsabilidadActivo());
 
 
                 $em->flush();
@@ -170,7 +161,7 @@ class TrasladosEnviadosController extends AbstractController
         return new JsonResponse([
             'cuentas' => $row,
             'success' => true,
-            'unidades'=>$unidades,
+            'unidades' => $unidades,
             'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, Date('Y'))
         ]);
     }
@@ -221,8 +212,8 @@ class TrasladosEnviadosController extends AbstractController
         /** @var ActivoFijoCuentas $cuenta_activo */
         $cuenta_activo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy(['id_activo' => $obj_movimiento_activo_fijo->getIdActivoFijo()]);
         $row = array(
-            'id_unidad'=>$obj_movimiento_activo_fijo->getIdUnidadDestinoOrigen()->getId(),
-            'cancelado'=>$obj_movimiento_activo_fijo->getCancelado(),
+            'id_unidad' => $obj_movimiento_activo_fijo->getIdUnidadDestinoOrigen()->getId(),
+            'cancelado' => $obj_movimiento_activo_fijo->getCancelado(),
             'nro_inv' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getNroInventario(),
             'desc' => $obj_movimiento_activo_fijo->getIdActivoFijo()->getDescripcion(),
             'fecha' => $obj_movimiento_activo_fijo->getFecha()->format('d/m/Y'),

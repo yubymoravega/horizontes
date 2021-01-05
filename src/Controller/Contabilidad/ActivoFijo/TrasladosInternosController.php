@@ -57,6 +57,9 @@ class TrasladosInternosController extends AbstractController
             $cuentas_activo_fijo = $em->getRepository(ActivoFijoCuentas::class)->findOneBy([
                 'id_activo' => $obj_activo->getId()
             ]);
+            $centro_costo_origen = $cuentas_activo_fijo->getIdCentroCostoActivo();
+            $area_responsabilidad_origen = $cuentas_activo_fijo->getIdAreaResponsabilidadActivo();
+
             // 1. actualizar el CCT y AR del activo fijo
             $cuentas_activo_fijo->setIdCentroCostoActivo($em->getRepository(CentroCosto::class)->find($centro_costo));
             $cuentas_activo_fijo->setIdAreaResponsabilidadActivo($em->getRepository(AreaResponsabilidad::class)->find($area_responsabilidad));
@@ -76,14 +79,26 @@ class TrasladosInternosController extends AbstractController
                 ->setActivo(true)
                 ->setAnno($obj_activo->getFechaAlta()->format('Y'))
                 ->setFecha($obj_activo->getFechaAlta())
-                ->setEntrada(true)
+                ->setEntrada(false)
                 ->setFundamentacion($fundamentacion);
             $em->persist($new_movimiento);
 
             $obj_activo->setActivo(true);
             $em->persist($obj_activo);
 
-            //3. Invertir los asientos contables y crear uno nuevo con el CCt y AR
+            //3. Asentar las operaciones
+            $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em,$cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+                $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoActivo(), null, null, null, null, 0, 0,
+                $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorInicial(),
+                $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,
+                $obj_activo,$cuentas_activo_fijo->getIdAreaResponsabilidadActivo());
+
+            $asiento_cuenta_activo = AuxFunctions::createAsiento($em, $cuentas_activo_fijo->getIdCuentaActivo(), $cuentas_activo_fijo->getIdSubcuentaActivo(), null,
+                $obj_activo->getIdUnidad(), null, $centro_costo_origen, null, null, null, null, 0, 0,
+                $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), $obj_activo->getValorInicial(), 0,
+                $new_movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $new_movimiento->getNroConsecutivo(), null,
+                $obj_activo,$area_responsabilidad_origen);
+
 
 
 

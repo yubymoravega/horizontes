@@ -8,6 +8,7 @@ use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\AreaResponsabilidad;
 use App\Entity\Contabilidad\Config\CategoriaCliente;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\CriterioAnalisis;
@@ -2774,6 +2775,7 @@ class AuxFunctions
      * @param string $nro_documento
      * @param Factura|null $id_factura
      * @param ActivoFijo|null $id_activo
+     * @param AreaResponsabilidad|null $id_area_responsabilidad
      * @return Asiento
      */
     public static function createAsiento(EntityManagerInterface $em, Cuenta $obj_cuenta, Subcuenta $obj_subcuenta,
@@ -2781,7 +2783,7 @@ class AuxFunctions
                                          CentroCosto $obj_centro_costo = null, ElementoGasto $obj_elemento_gasto = null,
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
                                          int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
-                                         Factura $id_factura = null, ActivoFijo $id_activo = null)
+                                         Factura $id_factura = null, ActivoFijo $id_activo = null,AreaResponsabilidad $id_area_responsabilidad = null)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -2804,6 +2806,7 @@ class AuxFunctions
             ->setIdCliente($id_cliente)
             ->setTipoCliente($tipo_cliente)
             ->setIdActivoFijo($id_activo)
+            ->setIdAreaResponsabilidad($id_area_responsabilidad)
         ;
         $em->persist($new_asiento);
         return $new_asiento;

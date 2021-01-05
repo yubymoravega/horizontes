@@ -172,6 +172,7 @@
                     $('#movimiento_activo_fijo_salida_id_cuenta').val(result.cuenta)
                     $('#movimiento_activo_fijo_salida_id_subcuenta').val(result.subcuenta)
                     $('#movimiento_activo_fijo_salida_fecha').val(result.fecha)
+                    $('#movimiento_activo_fijo_salida_id_activo').val(result.id);
                     $('#movimiento_activo_fijo_salida_salida_centro_costo').val(result.centor_costo)
                     $('#movimiento_activo_fijo_salida_salida_area_responsabilidad').val(result.area_responsabilidad)
                     loadingModal.close()
@@ -311,7 +312,7 @@
             } else {
                 const fundamentacion = $("#movimiento_activo_fijo_salida_fundamentacion").val()
                 const id_activo = $("#movimiento_activo_fijo_salida_id_activo").val()
-                const tipo_movimiento = 2
+                const tipo_movimiento = 3
                 const consecutivo = $("#select_nros").val()
                 $('body').append(`
                     <form action='/contabilidad/activo-fijo/print-movimiento/print_current/'
