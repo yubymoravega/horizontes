@@ -35,6 +35,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ActivoFijoController extends AbstractController
 {
+
+    public static $APERTURA = 1;
+    public static $COMPRA = 2;
+
     /**
      * @Route("/registrar", name="contabilidad_activo_fijo_registrar", methods={"GET"})
      */
