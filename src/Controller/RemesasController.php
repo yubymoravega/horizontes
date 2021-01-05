@@ -574,7 +574,7 @@ class RemesasController extends AbstractController
 
         while ($contador < $con) {
 
-            if($total >=  $reglasRemesas[$contador]->getDesde() & $total <=  $reglasRemesas[$contador]->getHasta()){
+            if($cantidad >=  $reglasRemesas[$contador]->getDesde() & $cantidad <=  $reglasRemesas[$contador]->getHasta()){
 
                 if($reglasRemesas[$contador]->getTarifa() == "porciento"){
 
@@ -611,9 +611,11 @@ class RemesasController extends AbstractController
         $con = count($reglasRemesas);
         $contador = 0;
 
+        $dolarRegla = $cantidad / $tasa[0]->getTasa();
+
         while ($contador < $con) {
 
-            if($cantidad >=  $reglasRemesas[$contador]->getDesde() & $cantidad <=  $reglasRemesas[$contador]->getHasta()){
+            if($dolarRegla >=  $reglasRemesas[$contador]->getDesde() & $dolarRegla <=  $reglasRemesas[$contador]->getHasta()){
 
                 if($reglasRemesas[$contador]->getTarifa() == "porciento"){
 
