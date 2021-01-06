@@ -830,31 +830,51 @@ class AuxFunctions
         }
     }
 
-    public static function getCurrentYear(EntityManagerInterface $em,Unidad $id_unidad){
-        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad'=>$id_unidad]);
+    public static function getCurrentYear(EntityManagerInterface $em, Unidad $id_unidad)
+    {
+        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $id_unidad]);
         $year = 3000;
         /** @var Almacen $item */
-        foreach ($almacenes as $item){
-            $fecha = self::getDateToCloseDate($em,$item);
-            if($fecha->format('Y')<$year)
+        foreach ($almacenes as $item) {
+            $fecha = self::getDateToCloseDate($em, $item);
+            if ($fecha->format('Y') < $year)
                 $year = $fecha->format('Y');
         }
         return $year;
     }
 
-    public static function getCurrentDate(EntityManagerInterface $em,Unidad $id_unidad){
-        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad'=>$id_unidad]);
-        $date = \DateTime::createFromFormat('d-m-Y','01-01-2020');
+    public static function getCurrentDate(EntityManagerInterface $em, Unidad $id_unidad)
+    {
+        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $id_unidad]);
+        $date = \DateTime::createFromFormat('d-m-Y', '01-01-2020');
         /** @var Almacen $item */
-        foreach ($almacenes as $item){
-            $fecha = self::getDateToCloseDate($em,$item);
-            if($fecha>$date)
+        foreach ($almacenes as $item) {
+            $fecha = self::getDateToCloseDate($em, $item);
+            if ($fecha > $date)
                 $date = $fecha;
         }
         return $date;
     }
 
-    public static function getUnidades(EntityManagerInterface $em, Unidad $unidad){
+    public static function getUnidades(EntityManagerInterface $em, $user)
+    {
+        $allUnidades = function ($unidad) use ($em, &$allUnidades) {
+
+            $selec_unidades = $em->getRepository(Unidad::class)->findBy([
+                'id_padre' => $unidad->getId()
+            ]);
+            $unidades_hijas = [];
+            if ($selec_unidades) {
+                foreach ($selec_unidades as $unidad_select) {
+                    array_push($unidades_hijas, ...$allUnidades($unidad_select));
+                }
+            }
+            return array_merge($selec_unidades, $unidades_hijas);
+        };
+
+        $root_unidad = self::getUnidad($em, $user);
+        $unidades = $allUnidades($root_unidad);
+        return [$root_unidad, ...$unidades];
 
     }
 
@@ -2560,7 +2580,7 @@ class AuxFunctions
             'id_unidad' => $unidad_obj,
             'id_tipo_movimiento' => $tipo_movimiento_obj,
             'anno' => $anno,
-            'id_movimiento_cancelado'=>null
+            'id_movimiento_cancelado' => null
         ]);
         return count($arr_movimientos) + 1;
     }
@@ -2811,7 +2831,7 @@ class AuxFunctions
                                          CentroCosto $obj_centro_costo = null, ElementoGasto $obj_elemento_gasto = null,
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
                                          int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
-                                         Factura $id_factura = null, ActivoFijo $id_activo = null,AreaResponsabilidad $id_area_responsabilidad = null)
+                                         Factura $id_factura = null, ActivoFijo $id_activo = null, AreaResponsabilidad $id_area_responsabilidad = null)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -2834,8 +2854,7 @@ class AuxFunctions
             ->setIdCliente($id_cliente)
             ->setTipoCliente($tipo_cliente)
             ->setIdActivoFijo($id_activo)
-            ->setIdAreaResponsabilidad($id_area_responsabilidad)
-        ;
+            ->setIdAreaResponsabilidad($id_area_responsabilidad);
         $em->persist($new_asiento);
         return $new_asiento;
     }
