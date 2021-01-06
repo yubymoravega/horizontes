@@ -165,7 +165,7 @@ class ComprobanteOperacionesController extends AbstractController
         return $this->render('contabilidad/activo_fijo/comprobante_operaciones/index.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',
             'unidad' => $unidad->getNombre(),
-            'fecha' => Date('d-m-Y'),
+            'fecha' => AuxFunctions::getCurrentDate($em,$unidad)->format('d-m-Y'),
             'datos' => $retur_rows,
             'total_debito' => number_format($total, 2),
             'total_credito' => number_format($total, 2),
@@ -211,8 +211,7 @@ class ComprobanteOperacionesController extends AbstractController
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em,$this->getUser());
         $fecha = $request->request->get('fecha');
-        $arr_fecha = explode('-', $fecha);
-        $year_ = intval($arr_fecha[2]);
+        $year_ = AuxFunctions::getCurrentYear($em,$obj_unidad);
 
         $registro_comprobantes = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_tipo_comprobante' => $tipo_comprobante_obj,

@@ -830,6 +830,34 @@ class AuxFunctions
         }
     }
 
+    public static function getCurrentYear(EntityManagerInterface $em,Unidad $id_unidad){
+        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad'=>$id_unidad]);
+        $year = 3000;
+        /** @var Almacen $item */
+        foreach ($almacenes as $item){
+            $fecha = self::getDateToCloseDate($em,$item);
+            if($fecha->format('Y')<$year)
+                $year = $fecha->format('Y');
+        }
+        return $year;
+    }
+
+    public static function getCurrentDate(EntityManagerInterface $em,Unidad $id_unidad){
+        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad'=>$id_unidad]);
+        $date = \DateTime::createFromFormat('d-m-Y','01-01-2020');
+        /** @var Almacen $item */
+        foreach ($almacenes as $item){
+            $fecha = self::getDateToCloseDate($em,$item);
+            if($fecha>$date)
+                $date = $fecha;
+        }
+        return $date;
+    }
+
+    public static function getUnidades(EntityManagerInterface $em, Unidad $unidad){
+
+    }
+
     /**
      * Leo -
      */
