@@ -8,6 +8,8 @@ use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\Depreciacion;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Config\AreaResponsabilidad;
+use App\Entity\Contabilidad\Config\TipoComprobante;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Repository\Contabilidad\ActivoFijo\MovimientoActivoFijoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -60,6 +62,9 @@ class DepreciacionController extends AbstractController
                 $cuenta = $cuentas_activo->findOneBy(['id_activo' => $activo->getId()]);
                 $str = $cuenta->getIdCuentaActivo()->getNroCuenta() . '/' . $cuenta->getIdSubcuentaActivo()->getNroSubcuenta();
 
+                // si en el mes ya se deprecio o es el mes de alta, no depreciar
+                if (!$this->canDepreciarEnMes($em, $activo, $unidad)) continue;
+
                 if ($str == $ar) {
                     $depreciacion_x_grupo = $activo->getIdGrupoActivo()->getPorcientoDepreciaAnno();
                     $valor_a_depreciar = floatval($depreciacion_x_grupo) * floatval($activo->getValorInicial()) / 100;
@@ -87,12 +92,15 @@ class DepreciacionController extends AbstractController
     /**
      * @Route("/depreciar", name="contabilidad_activo_fijo_depreciar", methods={"POST"})
      */
-    public function depreciar(EntityManagerInterface $em, MovimientoActivoFijoRepository $movimientoActivoFijoRepository, Request $request)
+    public function depreciar(EntityManagerInterface $em, Request $request)
     {
+        $cuentaActivoFijoRepro = $em->getRepository(ActivoFijoCuentas::class);
         $fundamentacion = $request->get('fundamentacion');
         $id_usuario = $this->getUser()->getId();
         $depreciacion_er = $em->getRepository(Depreciacion::class);
         $unidad = AuxFunctions::getUnidad($em, $id_usuario);
+        $grupos_activos_debito = [];
+        $grupos_total = [];
 
         $arr_activos_fijos = $em->getRepository(ActivoFijo::class)->findBy(array(
             'id_unidad' => $unidad->getId(),
@@ -112,22 +120,114 @@ class DepreciacionController extends AbstractController
 
                 // 1. depreciar los activos fijos
                 $depreciacion_x_grupo = $activo_fijo->getIdGrupoActivo()->getPorcientoDepreciaAnno();
-                $valor_a_depreciar = round((parse(floatval($depreciacion_x_grupo) * floatval($activo_fijo->getValorInicial()) / 100) / 12), 2);
+                $valor_a_depreciar = round((floatval($depreciacion_x_grupo) * floatval($activo_fijo->getValorInicial()) / 100 / 12), 2);
 
                 $activo_fijo->setValorReal($activo_fijo->getValorReal() - $valor_a_depreciar);
                 $activo_fijo->setDepreciacionAcumulada($activo_fijo->getDepreciacionAcumulada() + $valor_a_depreciar);
                 $activo_fijo->setFechaUltimaDepreciacion(\DateTime::createFromFormat('Y-m-d', $today));
                 $em->persist($activo_fijo);
                 $total += $valor_a_depreciar;
+
+                // 1.1 agrupando activos por cuentas y elemntos de gastos
+                /** @var ActivoFijoCuentas $activo_fijo_cuenta */
+                $activo_fijo_cuenta = $cuentaActivoFijoRepro->findOneBy(['id_activo' => $activo_fijo->getId()]);
+                if (count($grupos_activos_debito) == 0) {
+                    array_push($grupos_activos_debito, [$activo_fijo_cuenta]);
+                    array_push($grupos_total, $valor_a_depreciar);
+                    continue;
+                }
+                $no_esta = true;
+                foreach ($grupos_activos_debito as $key => &$grupo) {
+                    /** @var ActivoFijoCuentas $first_activo */
+                    $first_activo = $grupo[0];
+                    if (
+                        $first_activo->getIdCuentaGasto()->getId() == $activo_fijo_cuenta->getIdCuentaGasto()->getId() &&
+                        $first_activo->getIdSubcuentaGasto()->getId() == $activo_fijo_cuenta->getIdSubcuentaGasto()->getId() &&
+                        $first_activo->getIdCentroCostoGasto()->getId() == $activo_fijo_cuenta->getIdCentroCostoGasto()->getId() &&
+                        $first_activo->getIdElementoGastoGasto()->getId() == $activo_fijo_cuenta->getIdElementoGastoGasto()->getId() &&
+                        $first_activo->getIdCuentaDepreciacion()->getId() == $activo_fijo_cuenta->getIdCuentaDepreciacion()->getId() &&
+                        $first_activo->getIdSubcuentaDepreciacion()->getId() == $activo_fijo_cuenta->getIdSubcuentaDepreciacion()->getId()
+                    ) {
+                        array_push($grupo, $activo_fijo_cuenta);
+                        $grupos_total[$key] += $valor_a_depreciar;
+                        $no_esta = false;
+                        continue;
+                    }
+                }
+                if ($no_esta) {
+                    array_push($grupos_activos_debito, [$activo_fijo_cuenta]);
+                    array_push($grupos_total, $valor_a_depreciar);
+                }
+
             }
-            //2. guardar la depreciacion total
-            $depreciacion = new Depreciacion();
-            $depreciacion->setAnno($year_);
-            $depreciacion->setFecha(\DateTime::createFromFormat('Y-m-d', $today));
-            $depreciacion->setFundamentacion($fundamentacion);
-            $depreciacion->setUnidad($unidad);
-            $depreciacion->setTotal($total);
-            $em->persist($depreciacion);
+            if ($total > 0) {
+                //2. guardar la depreciacion total
+                $depreciacion = new Depreciacion();
+                $depreciacion->setAnno($year_);
+                $depreciacion->setFecha(\DateTime::createFromFormat('Y-m-d', $today));
+                $depreciacion->setFundamentacion($fundamentacion);
+                $depreciacion->setUnidad($unidad);
+                $depreciacion->setTotal($total);
+                $em->persist($depreciacion);
+
+                //3. Crear comprobante
+
+                $registro_comprobantes = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+                    'id_tipo_comprobante' => ComprobanteOperacionesController::$COMPROBANTE_OPERACIONES,
+                    'id_unidad' => $unidad,
+                    'anno' => $year_
+                ));
+                $tipo_comprobante_obj = $em->getRepository(TipoComprobante::class)->find(ComprobanteOperacionesController::$COMPROBANTE_OPERACIONES);
+                $consecutivo = count($registro_comprobantes) + 1;
+
+                $new_comprobante = new RegistroComprobantes();
+                $new_comprobante
+                    ->setDescripcion('Depreciación de activo fijo')
+                    ->setIdUsuario($this->getUser())
+                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setAnno($year_)
+                    ->setTipo(4)
+                    ->setCredito(floatval($total))
+                    ->setDebito(floatval($total))
+                    ->setIdAlmacen(null)
+                    ->setIdTipoComprobante($tipo_comprobante_obj)
+                    ->setIdUnidad($unidad)
+                    ->setNroConsecutivo($consecutivo);
+                $em->persist($new_comprobante);
+
+                //4. crear los asientos utilizando el $new_comprobante, por los $grupos_activos
+                //dd($grupos_activos_debito, $grupos_total);
+                /** @var ActivoFijoCuentas $cuentas_activo_fijo */
+                foreach ($grupos_activos_debito as $key => $group) {
+                    $cuentas_activo_fijo = $group[0];
+                    $asiento_cuenta_gasto = AuxFunctions::createAsiento($em,
+                        $cuentas_activo_fijo->getIdCuentaGasto(),
+                        $cuentas_activo_fijo->getIdSubcuentaGasto(),
+                        null,
+                        $cuentas_activo_fijo->getIdActivo()->getIdUnidad(),
+                        null, $cuentas_activo_fijo->getIdCentroCostoGasto(),
+                        $cuentas_activo_fijo->getIdElementoGastoGasto(),
+                        null, null, null,
+                        0, 0,
+                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta(),
+                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta()->format('Y'),
+                        0, $grupos_total[$key],
+                        0, null, null, null, $new_comprobante);
+
+                    $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em,
+                        $cuentas_activo_fijo->getIdCuentaDepreciacion(),
+                        $cuentas_activo_fijo->getIdSubcuentaDepreciacion(),
+                        null,
+                        $cuentas_activo_fijo->getIdActivo()->getIdUnidad(),
+                        null, null, null, null, null, null, 0, 0,
+                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta(),
+                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta()->format('Y'),
+                        $grupos_total[$key], 0,
+                        0, null, null, null, $new_comprobante);
+
+                }
+
+            }
 
             try {
                 $em->flush();
@@ -171,5 +271,4 @@ class DepreciacionController extends AbstractController
         return true;
 
     }
-
 }

@@ -2532,7 +2532,7 @@ class AuxFunctions
             'id_unidad' => $unidad_obj,
             'id_tipo_movimiento' => $tipo_movimiento_obj,
             'anno' => $anno,
-            'id_movimiento_cancelado'=>null
+            'id_movimiento_cancelado' => null
         ]);
         return count($arr_movimientos) + 1;
     }
@@ -2783,7 +2783,8 @@ class AuxFunctions
                                          CentroCosto $obj_centro_costo = null, ElementoGasto $obj_elemento_gasto = null,
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
                                          int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
-                                         Factura $id_factura = null, ActivoFijo $id_activo = null,AreaResponsabilidad $id_area_responsabilidad = null)
+                                         Factura $id_factura = null, ActivoFijo $id_activo = null, AreaResponsabilidad $id_area_responsabilidad = null,
+                                         RegistroComprobantes $comprobante = null)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -2807,7 +2808,7 @@ class AuxFunctions
             ->setTipoCliente($tipo_cliente)
             ->setIdActivoFijo($id_activo)
             ->setIdAreaResponsabilidad($id_area_responsabilidad)
-        ;
+            ->setIdComprobante($comprobante);
         $em->persist($new_asiento);
         return $new_asiento;
     }
