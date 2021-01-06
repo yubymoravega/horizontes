@@ -106,8 +106,8 @@ class DepreciacionController extends AbstractController
             'id_unidad' => $unidad->getId(),
             'activo' => true
         ));
-        $today = Date('Y-m-d');
-        $year_ = date('Y');
+        $today = AuxFunctions::getCurrentDate($em, $unidad);
+        $year_ = AuxFunctions::getCurrentYear($em, $unidad);
         $total = 0;
 
         if (!empty($arr_activos_fijos)) {
@@ -124,7 +124,7 @@ class DepreciacionController extends AbstractController
 
                 $activo_fijo->setValorReal($activo_fijo->getValorReal() - $valor_a_depreciar);
                 $activo_fijo->setDepreciacionAcumulada($activo_fijo->getDepreciacionAcumulada() + $valor_a_depreciar);
-                $activo_fijo->setFechaUltimaDepreciacion(\DateTime::createFromFormat('Y-m-d', $today));
+                $activo_fijo->setFechaUltimaDepreciacion($today);
                 $em->persist($activo_fijo);
                 $total += $valor_a_depreciar;
 
@@ -164,7 +164,7 @@ class DepreciacionController extends AbstractController
                 //2. guardar la depreciacion total
                 $depreciacion = new Depreciacion();
                 $depreciacion->setAnno($year_);
-                $depreciacion->setFecha(\DateTime::createFromFormat('Y-m-d', $today));
+                $depreciacion->setFecha($today);
                 $depreciacion->setFundamentacion($fundamentacion);
                 $depreciacion->setUnidad($unidad);
                 $depreciacion->setTotal($total);
@@ -184,7 +184,7 @@ class DepreciacionController extends AbstractController
                 $new_comprobante
                     ->setDescripcion('Depreciación de activo fijo')
                     ->setIdUsuario($this->getUser())
-                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setFecha($today)
                     ->setAnno($year_)
                     ->setTipo(4)
                     ->setCredito(floatval($total))
@@ -209,8 +209,8 @@ class DepreciacionController extends AbstractController
                         $cuentas_activo_fijo->getIdElementoGastoGasto(),
                         null, null, null,
                         0, 0,
-                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta(),
-                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta()->format('Y'),
+                        AuxFunctions::getCurrentDate($em, $unidad),
+                        AuxFunctions::getCurrentYear($em, $unidad),
                         0, $grupos_total[$key],
                         0, null, null, null, $new_comprobante);
 
@@ -220,8 +220,8 @@ class DepreciacionController extends AbstractController
                         null,
                         $cuentas_activo_fijo->getIdActivo()->getIdUnidad(),
                         null, null, null, null, null, null, 0, 0,
-                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta(),
-                        $cuentas_activo_fijo->getIdActivo()->getFechaAlta()->format('Y'),
+                        AuxFunctions::getCurrentDate($em, $unidad),
+                        AuxFunctions::getCurrentYear($em, $unidad),
                         $grupos_total[$key], 0,
                         0, null, null, null, $new_comprobante);
 
@@ -246,7 +246,7 @@ class DepreciacionController extends AbstractController
         $mes_depreciado = $activo_fijo->getFechaUltimaDepreciacion()
             ? $activo_fijo->getFechaUltimaDepreciacion()->format('m')
             : null;
-        $mes = date('m');
+        $mes = AuxFunctions::getCurrentDate($em, $unidad)->format('m');
 
         // si en el mes ya se deprecio, no depreciar
         if ($mes == $mes_depreciado) return false;
