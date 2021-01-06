@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ComprobanteOperacionesController extends AbstractController
 {
     protected $tipo_coprobante = 2;
+    public static $COMPROBANTE_OPERACIONES = 2;
 
     /**
      * @Route("/", name="contabilidad_activo_fijo_comprobante_operaciones")
@@ -219,6 +220,7 @@ class ComprobanteOperacionesController extends AbstractController
             'id_unidad' => $obj_unidad,
             'anno' => $year_
         ));
+
         $observacion = $request->request->get('observacion');
         $debito = $request->request->get('debito');
         $credito = $request->request->get('credito');

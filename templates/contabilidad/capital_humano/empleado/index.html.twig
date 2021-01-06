@@ -129,11 +129,18 @@
             }
 
         }
-
+        $('#div_rol').css("display", "none")
         $(document).ready(function () {
             // init
             $('select').prepend('<option selected = "false" value = "0" disabled>... seleccione ...</option>');
             $('#modal__btn__actualizar').hide()
+
+            $('#is-user').on('change', function () {
+                if ($( this ).is(':checked'))
+                    $('#div_rol').css("display", "block")
+                else
+                    $('#div_rol').css("display", "none")
+            })
 
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
