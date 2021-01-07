@@ -109,9 +109,10 @@ $(document).ready(function () {
         method: 'POST',
         dataType: 'json',
         success: function (result) {
-            CHOICES_UNIDADES = result
-            $(result).each(function (pos, valor) {
-                $('#selected_unidad_id').append('<option value = "' + valor.id_unidad + '">' + valor.descripcion + '</option>');
+            // CHOICES_UNIDADES = result
+            cl(result, $('#__selected__unidad__id'))
+            $(result.data).each(function (pos, valor) {
+                $('#__selected__unidad__id').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
             })
         }
     })

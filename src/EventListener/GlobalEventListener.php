@@ -34,6 +34,13 @@ class GlobalEventListener
      */
     public function onCloseAlmacen(RequestEvent $event)
     {
+
+        // Filtro de Unidad Seleccionada ...
+        $is__selected__unidad = $event->getRequest()->get('__selected__unidad');
+        if (!is_null($is__selected__unidad)) $GLOBALS['selected__unidad'] = $is__selected__unidad;
+        else $GLOBALS['selected__unidad'] = null;
+
+
         // para peticiones que no sean AJAX
         if (!$event->getRequest()->isXmlHttpRequest()) {
 
@@ -81,18 +88,6 @@ class GlobalEventListener
                     return $red->send();
                 }
             }
-        }
-    }
-
-
-    public function onSelectedUnidad(RequestEvent $event)
-    {
-        // para peticiones que no sean AJAX
-        if (!$event->getRequest()->isXmlHttpRequest()) {
-            $is__selected__unidad = $event->getRequest()->get('__selected__unidad');
-            if (!is_null($is__selected__unidad)) $GLOBALS['selected__unidad'] = $is__selected__unidad;
-            else $GLOBALS['selected__unidad'] = null;
-//            dd($GLOBALS);
         }
     }
 }

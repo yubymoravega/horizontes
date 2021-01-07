@@ -8,6 +8,7 @@ use App\Form\Contabilidad\Config\UnidadType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -39,7 +40,7 @@ class UnidadController extends AbstractController
                 'direccion' => $item->getDireccion(),
                 'id_padre' => $item->getIdPadre() ? $item->getIdPadre()->getId() : '',
                 'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : '',
-                );
+            );
         }
         return $this->render('contabilidad/config/unidad/index.html.twig', [
             'controller_name' => 'UnidadController',
@@ -137,9 +138,18 @@ class UnidadController extends AbstractController
     /**
      * @Route("/load-unidades", name="contabilidad_config_load_unidades")
      */
-    public function loadUnidades(EntityManagerInterface $em, Request $request){
+    public function loadUnidades(EntityManagerInterface $em, Request $request)
+    {
         // load unidades por el usuario en AuxFuncions::getUnidades()
-        AuxFunctions::getUnidades($em, );
+        $unidades = AuxFunctions::getUnidades($em, $this->getUser());
+        $row = [];
+        foreach ($unidades as $unidad) {
+            array_push($row, [
+                'id'=>$unidad->getId(),
+                'nombre'=>$unidad->getNombre(),
+            ]);
+        }
+        return new JsonResponse(['data' => $row]);
     }
 
     /****************--METODOS AUXILIARES*************************/
