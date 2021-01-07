@@ -17,20 +17,36 @@
         </button>
         {#        <div class="collapse navbar-collapse" id="navbarSupportedContent">#}
         <ul class="navbar-nav mr-auto">
+
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Nomencladores
+                    Entrada de datos
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Cargo</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Tipo de
-                        pago</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_empleado') }}">Empleado</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Nomina</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Vacaciones</a>
+
                 </div>
             </li>
-            <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_empleado') }}">Empleado</a>
-            <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Nomina</a>
-            <a class="dropdown-item" href="{{ url ('contabilidad_config_centro_costo') }}">Vacaciones</a>
+
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Informes
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_plantilla_agencia') }}">Plantilla de la
+                        Agencia</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Nomina</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Reporte de
+                        Vacaciones</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_submayor_vacaciones') }}">Submayor de Vacaciones</a>
+                </div>
+            </li>
         </ul>
         {#        </div>#}
     </nav>
