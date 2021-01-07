@@ -4,6 +4,7 @@
  * @type {(message?: any, ...optionalParams: any[]) => void}
  */
 var cl = console.log
+var CHOICES_UNIDADES = []
 
 $(document).ready(function () {
 
@@ -101,6 +102,18 @@ $(document).ready(function () {
             modal.modal('hide')
         })
 
+    })
+
+    $.ajax({
+        url: '/contabilidad/config/unidad/load-unidades',
+        method: 'POST',
+        dataType: 'json',
+        success: function (result) {
+            CHOICES_UNIDADES = result
+            $(result).each(function (pos, valor) {
+                $('#selected_unidad_id').append('<option value = "' + valor.id_unidad + '">' + valor.descripcion + '</option>');
+            })
+        }
     })
 })
 ;

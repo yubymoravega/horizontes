@@ -266,6 +266,9 @@ class AuxFunctions
 
     public static function getUnidad($em, $user)
     {
+        if ($GLOBALS['selected__unidad'])
+            return $em->getRepository(Unidad::class)->find($GLOBALS['selected__unidad']);
+
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,
             'id_usuario' => $user

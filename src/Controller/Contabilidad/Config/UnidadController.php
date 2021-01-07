@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Form\Contabilidad\Config\UnidadType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -131,6 +132,14 @@ class UnidadController extends AbstractController
             $this->addFlash($success, $msg);
         }
         return $this->redirectToRoute('contabilidad_config_unidad');
+    }
+
+    /**
+     * @Route("/load-unidades", name="contabilidad_config_load_unidades")
+     */
+    public function loadUnidades(EntityManagerInterface $em, Request $request){
+        // load unidades por el usuario en AuxFuncions::getUnidades()
+        AuxFunctions::getUnidades($em, );
     }
 
     /****************--METODOS AUXILIARES*************************/
