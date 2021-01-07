@@ -30,6 +30,7 @@ class ComprobanteOperacionesController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
+        dd(AuxFunctions::getUnidades($em, $this->getUser()));
         $data_movimientos = $this->getData($em,$request);
         $row = [];
         $retur_rows = [];

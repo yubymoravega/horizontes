@@ -833,31 +833,51 @@ class AuxFunctions
         }
     }
 
-    public static function getCurrentYear(EntityManagerInterface $em,Unidad $id_unidad){
-        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad'=>$id_unidad]);
+    public static function getCurrentYear(EntityManagerInterface $em, Unidad $id_unidad)
+    {
+        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $id_unidad]);
         $year = 3000;
         /** @var Almacen $item */
-        foreach ($almacenes as $item){
-            $fecha = self::getDateToCloseDate($em,$item);
-            if($fecha->format('Y')<$year)
+        foreach ($almacenes as $item) {
+            $fecha = self::getDateToCloseDate($em, $item);
+            if ($fecha->format('Y') < $year)
                 $year = $fecha->format('Y');
         }
         return $year;
     }
 
-    public static function getCurrentDate(EntityManagerInterface $em,Unidad $id_unidad){
-        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad'=>$id_unidad]);
-        $date = \DateTime::createFromFormat('d-m-Y','01-01-2020');
+    public static function getCurrentDate(EntityManagerInterface $em, Unidad $id_unidad)
+    {
+        $almacenes = $em->getRepository(Almacen::class)->findBy(['id_unidad' => $id_unidad]);
+        $date = \DateTime::createFromFormat('d-m-Y', '01-01-2020');
         /** @var Almacen $item */
-        foreach ($almacenes as $item){
-            $fecha = self::getDateToCloseDate($em,$item);
-            if($fecha>$date)
+        foreach ($almacenes as $item) {
+            $fecha = self::getDateToCloseDate($em, $item);
+            if ($fecha > $date)
                 $date = $fecha;
         }
         return $date;
     }
 
-    public static function getUnidades(EntityManagerInterface $em, Unidad $unidad){
+    public static function getUnidades(EntityManagerInterface $em, $user)
+    {
+        $allUnidades = function ($unidad) use ($em, &$allUnidades) {
+
+            $selec_unidades = $em->getRepository(Unidad::class)->findBy([
+                'id_padre' => $unidad->getId()
+            ]);
+            $unidades_hijas = [];
+            if ($selec_unidades) {
+                foreach ($selec_unidades as $unidad_select) {
+                    array_push($unidades_hijas, ...$allUnidades($unidad_select));
+                }
+            }
+            return array_merge($selec_unidades, $unidades_hijas);
+        };
+
+        $root_unidad = self::getUnidad($em, $user);
+        $unidades = $allUnidades($root_unidad);
+        return [$root_unidad, ...$unidades];
 
     }
 
