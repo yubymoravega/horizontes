@@ -23,7 +23,148 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class BalanceComprobacionSaldoController extends AbstractController
 {
+    private $TIPO_CUENTA = 1;
+    private $TIPO_SUBCUENTA = 2;
+    private $TIPO_CRITERIO = 3;
+
     /**
+     * @Route("/", name="contabilidad_general_balance_comprobacion_saldo")
+     */
+    public function index_real(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
+    {
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $asiento_er = $em->getRepository(Asiento::class);
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $year = AuxFunctions::getCurrentYear($em, $unidad);
+
+        $data_asiento = $asiento_er->GroupForBalanceComprobacion($year, $unidad);
+
+        $list_balance_comprobacion = [];
+
+        foreach ($data_asiento as $asiento) {
+            /** @var Asiento $asiento */
+            $no_cuenta = true;
+            $no_subcuenta = true;
+            $no_criterio = true;
+
+            $temp_cuenta = null;
+            $temp_subcuenta = null;
+            $balance_comprobacion = [];
+//                dd($balance_comprobacion['index'] == $TIPO_CUENTA, $group_cuenta);
+            if ($balance_comprobacion['index'] == $this->TIPO_CUENTA) {
+                $temp_cuenta = $balance_comprobacion;
+                continue;
+            }
+            if ($balance_comprobacion['index'] == $this->TIPO_SUBCUENTA) {
+                $temp_subcuenta = $balance_comprobacion;
+                continue;
+            }
+            // control de creacion de nuevas estructuras del arbol
+            if ($temp_cuenta['id_cuenta'] == $asiento->getIdCuenta()->getId()) $no_cuenta = false;
+            if ($temp_subcuenta['id_subcuenta'] == $asiento->getIdSubcuenta()->getId()) $no_subcuenta = false;
+            if ($balance_comprobacion['criterio'] == $this->generateCriterioOneAsiento($asiento)) $no_criterio = false;
+
+            print_r('\n' . $asiento->getId() . '---' . $temp_subcuenta['credito_mes']);
+            // si coincide se suman los valores
+            if (
+                $temp_cuenta['id_cuenta'] == $asiento->getIdCuenta()->getId() &&
+                $temp_subcuenta['id_subcuenta'] == $asiento->getIdSubcuenta()->getId() &&
+                $balance_comprobacion['criterio'] == $this->generateCriterioOneAsiento($asiento)
+            ) {
+//                dd($balance_comprobacion);
+                $temp_cuenta['credito_mes'] += $asiento->getCredito();
+                $temp_subcuenta['credito_mes'] += $asiento->getCredito();
+                $balance_comprobacion['credito_mes'] += $asiento->getCredito();
+
+                $temp_cuenta['debito_mes'] += $asiento->getDebito();
+                $temp_subcuenta['debito_mes'] += $asiento->getDebito();
+                $balance_comprobacion['debito_mes'] += $asiento->getDebito();
+            }
+        }
+        if ($no_cuenta) {
+            // generar la Cuenta
+            $saldo_cuenta = $this->getSumbayor($em, $asiento->getIdCuenta(), null, $asiento_er, $year, $unidad, 0);
+            $group_cuenta[] = array(
+                'id_cuenta' => $asiento->getIdCuenta()->getId(),
+                'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
+                'criterio' => '',
+                'codigo' => $asiento->getIdCuenta()->getNroCuenta(),
+
+                'descripcion' => $asiento->getIdCuenta()->getNombre(),
+                'credito_acumulado' => '',
+                'debito_acumulado' => 0,
+                'credito_mes' => 0,
+                'debito_mes' => 0,
+                'index' => $this->TIPO_CUENTA
+            );
+        }
+
+        if ($no_subcuenta) {
+            // generar la Sub-Cuenta
+            $saldo_subcuenta = $this->getSumbayor($em, $asiento->getIdCuenta(), $asiento->getIdSubcuenta(), $asiento_er, $year, $unidad, 0);
+            $group_cuenta[] = array(
+                'id_cuenta' => $asiento->getIdCuenta()->getId(),
+                'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
+                'criterio' => '',
+                'codigo' => $asiento->getIdSubcuenta()->getNroSubcuenta(),
+
+                'descripcion' => $asiento->getIdSubcuenta()->getDescripcion(),
+                'credito_acumulado' => '',
+                'debito_acumulado' => 0,
+                'credito_mes' => 0,
+                'debito_mes' => 0,
+                'index' => $this->TIPO_SUBCUENTA
+            );
+        }
+
+        if ($no_criterio) {
+            // generar la Criterio
+            $group_cuenta[] = array(
+                'id_cuenta' => $asiento->getIdCuenta()->getId(),
+                'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
+                'criterio' => $this->generateCriterioOneAsiento($asiento),
+                'codigo' => $this->generateCriterioOneAsiento($asiento),
+
+                'descripcion' => $this->generateCriterioOneAsientoDesc($asiento),
+                'credito_acumulado' => '',
+                'debito_acumulado' => 0.00,
+                'credito_mes' => $asiento->getCredito(),
+                'debito_mes' => $asiento->getDebito(),
+                'index' => $this->TIPO_CRITERIO
+            );
+        }
+
+    }
+
+
+    private
+    function generateCriterioOneAsiento(Asiento $asiento)
+    {
+        $lista = [];
+        if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getCodigo());
+        if ($asiento->getIdCentroCosto()) array_push($lista, $asiento->getIdCentroCosto()->getCodigo());
+        if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getCodigo());
+        if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getCodigo());
+        if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getCodigo());
+
+        return implode('-', $lista);
+    }
+
+    private
+    function generateCriterioOneAsientoDesc(Asiento $asiento)
+    {
+        $lista = [];
+        if ($asiento->getIdAlmacen()) array_push($lista, 'ALM');
+        if ($asiento->getIdCentroCosto()) array_push($lista, 'CCT');
+        if ($asiento->getIdElementoGasto()) array_push($lista, 'EG');
+        if ($asiento->getIdOrdenTrabajo()) array_push($lista, 'OT');
+        if ($asiento->getIdExpediente()) array_push($lista, 'EXP');
+
+        return implode('-', $lista);
+    }
+
+    /*
      * @Route("/", name="contabilidad_general_balance_comprobacion_saldo")
      */
     public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
@@ -31,8 +172,8 @@ class BalanceComprobacionSaldoController extends AbstractController
         $cuenta_er = $em->getRepository(Cuenta::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
         $asiento_er = $em->getRepository(Asiento::class);
-        $year = Date('Y');
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $year = AuxFunctions::getCurrentYear($em, $unidad);
 
         $data_asiento = $asiento_er->findBy([
             'anno' => $year,
@@ -157,7 +298,7 @@ class BalanceComprobacionSaldoController extends AbstractController
 //                    );
 //                }
 
-            foreach ($criterios as $criterio) {
+                foreach ($criterios as $criterio) {
                     $codigo_criterio = '';
                     $descripcion_criterio = '';
                     $debito_criterio = 0;
@@ -166,17 +307,17 @@ class BalanceComprobacionSaldoController extends AbstractController
                     if ($criterio == 'CCT') {
                         /** @var Asiento $item */
                         foreach ($data_asiento_subcuenta as $item) {
-                            if ($item->getIdCentroCosto()){
+                            if ($item->getIdCentroCosto()) {
                                 if (!in_array($item->getIdCentroCosto()->getCodigo(), $data_criterio)) {
                                     $data_criterio[count($data_criterio)] = $item->getIdCentroCosto()->getCodigo();
                                 }
                             }
                         }
-                        foreach ($data_criterio as $criteria){
-                            $debito_criterio =0;
-                            $credito_criterio =0;
-                            foreach ($data_asiento_subcuenta as $data){
-                                if($data->getIdCentroCosto() && $data->getIdCentroCosto()->getCodigo() == $criteria){
+                        foreach ($data_criterio as $criteria) {
+                            $debito_criterio = 0;
+                            $credito_criterio = 0;
+                            foreach ($data_asiento_subcuenta as $data) {
+                                if ($data->getIdCentroCosto() && $data->getIdCentroCosto()->getCodigo() == $criteria) {
                                     $codigo_criterio = $criteria;
                                     $descripcion_criterio = $data->getIdCentroCosto()->getNombre();
                                     $debito_criterio += $data->getDebito();
@@ -250,6 +391,32 @@ class BalanceComprobacionSaldoController extends AbstractController
             'controller_name' => 'BalanceComprobacionSaldoController',
             'cuentas' => $paginator
         ]);
+    }
+
+    public function getSumbayorCriterio($obj_cuenta, $obj_subcuenta, $arr_asiento)
+    {
+
+        /*** (1)-para buscar el saldo inicial de la cuenta solamente, busco los saldos iniciales
+         * para el espacio de tiempo especificado de
+         * todas sus subcuentas, entonces los suma y pan ya
+         ***/
+
+        /** @var Asiento $asiento */
+        $sado_ = 0;
+        foreach ($arr_asiento as $asiento) {
+            if (!$obj_subcuenta) {
+                if ($obj_cuenta->getDeudora())
+                    $sado_ += ($asiento->getDebito() - $asiento->getCredito());
+                else
+                    $sado_ += ($asiento->getCredito() - $asiento->getDebito());
+            } else {
+                if ($obj_subcuenta->getDeudora())
+                    $sado_ += ($asiento->getDebito() - $asiento->getCredito());
+                else
+                    $sado_ += ($asiento->getCredito() - $asiento->getDebito());
+            }
+        }
+        return $sado_;
     }
 
     public function getSumbayor(EntityManagerInterface $em, $obj_cuenta, $obj_subcuenta, $asiento_er, $anno, $unidad, $periodo)
