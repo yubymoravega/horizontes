@@ -34,11 +34,6 @@ class Empleado
     private $correo;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $salario_x_hora;
-
-    /**
      * @ORM\Column(type="date", nullable=true)
      */
     private $fecha_alta;
@@ -99,6 +94,11 @@ class Empleado
      */
     private $id_usuario;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $identificacion;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,18 +124,6 @@ class Empleado
     public function setCorreo(?string $correo): self
     {
         $this->correo = $correo;
-
-        return $this;
-    }
-
-    public function getSalarioXHora(): ?float
-    {
-        return $this->salario_x_hora;
-    }
-
-    public function setSalarioXHora(?float $salario_x_hora): self
-    {
-        $this->salario_x_hora = $salario_x_hora;
 
         return $this;
     }
@@ -280,6 +268,18 @@ class Empleado
     public function setIdUsuario(?User $id_usuario): self
     {
         $this->id_usuario = $id_usuario;
+
+        return $this;
+    }
+
+    public function getIdentificacion(): ?string
+    {
+        return $this->identificacion;
+    }
+
+    public function setIdentificacion(string $identificacion): self
+    {
+        $this->identificacion = $identificacion;
 
         return $this;
     }

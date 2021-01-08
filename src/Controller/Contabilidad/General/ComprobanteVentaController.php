@@ -446,7 +446,7 @@ class ComprobanteVentaController extends AbstractController
             ->setIdUsuario($this->getUser())
             ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
             ->setAnno($year_)
-            ->setTipo(2)
+            ->setTipo(AuxFunctions::$COMMPROBANTE_OPERACONES_VENTA)
             ->setCredito(floatval($credito))
             ->setDebito(floatval($debito))
             ->setIdTipoComprobante($em->getRepository(TipoComprobante::class)->find(2))

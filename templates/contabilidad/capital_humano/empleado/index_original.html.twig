@@ -1,0 +1,218 @@
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Empleados
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        {{ include('contabilidad/capital_humano/empleado/form_modal.html.twig', {title:'Crear Empleado'}) }}
+
+        {# list #}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-2">Nombre</th>
+            <th scope="col-1">Correo</th>
+            <th scope="col-1">Cargo</th>
+            <th scope="col-1">Rol</th>
+            <th scope="col-1">Salario x hora</th>
+            <th scope="col-1">Teléfono</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in empleados %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.correo }}</td>
+                    <td style="font-weight:400;">{{ item.cargo_nombre }}</td>
+                    <td style="font-weight:400;">{{ item.rol }}</td>
+                    <td style="font-weight:400;">{{ item.salario_x_hora }}</td>
+                    <td style="font-weight:400;">{{ item.telefono }}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        nombre: '{{ item.nombre }}',
+                                        correo: '{{ item.correo }}',
+                                        cargo_nombre: '{{ item.cargo_nombre }}',
+                                        id_cargo: '{{ item.id_cargo }}',
+                                        rol: '{{ item.rol }}',
+                                        salario_x_hora: '{{ item.salario_x_hora }}',
+                                        telefono: '{{ item.telefono }}',
+                                        is_usuario: '{{ item.is_usuario }}',
+                                        unidad_nombre: '{{ item.unidad_nombre }}',
+                                        id_unidad: '{{ item.id_unidad }}',
+                                        direccion: '{{ item.direccion }}',
+                                        fecha_alta: '{{ item.fecha_alta }}',
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Dar baja"
+                                onclick="onDeleteConfirm({
+                                        title:'Dar baja',
+                                        message:'Está seguro que desea dar baja a {{ item.nombre }}  ?',
+                                        url:'{{ path('contabilidad_capital_humano_empleado_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-sign-out"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
+        const onUpdate = function (config) {
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {
+                id = '', nombre = '',
+                correo = '', telefono = '', fecha_alta = '', salario_x_hora = '',
+                id_unidad = '', direccion = '', id_cargo = '',
+                is_usuario = '', rol= ''
+            } = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar " + nombre)
+
+            $('#id_empleado').val(id)
+            $('#empleado_nombre').val(nombre)
+            $('#empleado_correo').val(correo)
+            $('#empleado_telefono').val(telefono)
+            $('#empleado_fecha_alta').val(fecha_alta)
+            $('#empleado_salario_x_hora').val(salario_x_hora)
+            $('#empleado_id_unidad').val(id_unidad)
+            $('#empleado_id_cargo').val(id_cargo)
+            $('#empleado_direccion_particular').val(direccion)
+            $('#empleado_rol').val(rol)
+
+            if (is_usuario == 'true' || is_usuario == true) {
+                $('#is-user').prop('checked', true)
+                $('#div_rol').css("display", "block")
+                $('#empleado_rol').val(rol)
+
+            } else {
+                $('#is-user').prop('checked', false)
+                $('#div_rol').css("display", "none")
+            }
+
+        }
+        $('#div_rol').css("display", "none")
+        $(document).ready(function () {
+            // init
+            $('select').prepend('<option selected = "false" value = "0" disabled>... seleccione ...</option>');
+            $('#modal__btn__actualizar').hide()
+
+            $('#is-user').on('change', function () {
+                if ($( this ).is(':checked'))
+                    $('#div_rol').css("display", "block")
+                else
+                    $('#div_rol').css("display", "none")
+            })
+
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'empleado[id_empleado]': "required",
+                    'empleado[nombre]': "required",
+                    'empleado[correo]': "required",
+                    'empleado[telefono]': "required",
+                    'empleado[fecha_alta]': "required",
+                    'empleado[salario_x_hora]': "required",
+                    'empleado[id_unidad]': "required",
+                    'empleado[id_cargo]': "required",
+                    'empleado[direccion_particular]': "required",
+                    'empleado[rol]': "required",
+                },
+                messages: {
+                    'empleado[id_empleado]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[correo]': 'obligatorio',
+                    'empleado[telefono]': 'obligatorio',
+                    'empleado[fecha_alta]': 'obligatorio',
+                    'empleado[salario_x_hora]': 'obligatorio',
+                    'empleado[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[id_cargo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[direccion_particular]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'empleado[rol]': CONTAB_MSG.REQUIRED_NOT_BLANK
+                }
+            })
+
+
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/capital-humano/empleado-add`)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+            $('#modal__btn__actualizar').on('click', function () {
+                const id = $('#id_empleado').val()
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', 'POST')
+                formulario.attr('action', '/contabilidad/capital-humano/empleado-upd/' + id)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+            $('#modal__form__id').on('show.bs.modal', function (event) {
+                validateForm.resetForm()
+                $('#modal__form__label__id').text('Adicionar empleado')
+            })
+
+            $('#is-user').on('change', function () {
+                if ($( this ).is(':checked'))
+                    $('#div_rol').css("display", "block")
+                else
+                    $('#div_rol').css("display", "none")
+            })
+        })
+
+    </script>
+{% endblock %}

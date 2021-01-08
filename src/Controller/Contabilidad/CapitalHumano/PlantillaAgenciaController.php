@@ -37,7 +37,7 @@ class PlantillaAgenciaController extends AbstractController
                     'correo' => $item->getCorreo(),
                     'cargo_nombre' => $item->getIdCargo() ? $item->getIdCargo()->getNombre() : '',
                     'rol' => $item->getRol() ? $item->getRol() : '',
-                    'salario_x_hora' => number_format($item->getSalarioXHora(),2),
+                    'identificacion' => $item->getIdentificacion(),
                     'telefono' => $item->getTelefono(),
                     'id_cargo' => $item->getIdCargo() ? $item->getIdCargo()->getId() : '',
                     'salario_basico' => number_format($item->getIdCargo()->getSalarioBase(),2),
