@@ -24,7 +24,9 @@ class EmpleadoType extends AbstractType
         $builder
             ->add('nombre', TextType::class)
             ->add('correo', EmailType::class)
-            ->add('salario_x_hora')
+            ->add('identificacion',TextType::class, array(
+                'label'=>'Identificación'
+            ))
             ->add('fecha_alta', DateType::class, array(
                 'input' => 'datetime',
                 'widget' => 'single_text',

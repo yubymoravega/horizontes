@@ -1,4 +1,4 @@
-{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% extends 'base.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -7,81 +7,86 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="container-fluid">
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <div class="row mt-0 p-0">
+                    <div class="col-8 form-group input-group input-group-sm d-block">
+                        <h1 class="text-reporte text-right mr-0" id="normal_div">Adicionar Empleado</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0">
+                    <div class="col-12 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(form.nombre) }}
+                        {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(form.correo) }}
+                        {{ form_widget(form.correo,{'attr': {'class': 'form-control w-100','placeholder':'usuario@dominio.com'}}) }}
+                    </div>
+                    <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.telefono) }}
+                        {{ form_widget(form.telefono,{'attr': {'class': 'form-control w-100','placeholder':'+## ########'}}) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(form.fecha_alta) }}
+                        {{ form_widget(form.fecha_alta, {'attr': {'class': 'w-100'}}) }}
+                    </div>
+                    <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.identificacion) }}
+                        {{ form_widget(form.identificacion,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.id_unidad) }}
+                        {{ form_widget(form.id_unidad,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="mt-0 col-6 form-group input-group input-group-sm d-block">
+                        {{ form_label(form.id_cargo) }}
+                        {{ form_widget(form.id_cargo, {'attr': {'class': 'w-100'}}) }}
+                    </div>
+                </div>
+                <div class="form-group input-group input-group-sm d-block">
+                    {{ form_label(form.direccion_particular) }}
+                    {{ form_widget(form.direccion_particular, {'attr': {'class': 'w-100'}}) }}
+                </div>
+                <label for="is-user" class="form-check-label ">Es usuario del
+                    sistema</label>
+                <input type="checkbox" class="form-check-input ml-2" id="is-user" name="is_usuario">
+                <div class="container-fluid ml-0 p-0 pt-2 form-group input-group input-group-sm" id="div_rol">
+                    {{ form_label(form.rol) }}
+                    {{ form_widget(form.rol, {'attr': {'class': 'w-100'}}) }}
+                </div>
 
-        {# header #}
-        <div class="d-flex align-items-center">
-            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Empleados
-            </h4>
-            <div>
-                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
-                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
-                        onclick="mostrarBtn()">
-                    <i class="fa fa-plus"> Adicionar</i>
-                </button>
+
+                <input type="text" id="id_empleado" hidden>
+                {{ form_end(form) }}
+                <div class="d-flex mt-2">
+                    <div class="mr-auto">
+                        <a href="{{ url('capital_humano') }}"
+                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnCancelar">cancelar</button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-secondary' id="btnAdd">aceptar</button>
+                    </div>
+                    <div class="ml-2">
+                        <button class='my-0 btn btn-warning' id="btnUpdate">actualizar</button>
+                    </div>
+                </div>
+
             </div>
         </div>
-        {# end header #}
-
-        {# Modal de adicionar#}
-        {{ include('contabilidad/capital_humano/empleado/form_modal.html.twig', {title:'Crear Empleado'}) }}
-
-        {# list #}
-        <table class="table table-hover text-light">
-            <thead class="thead-dark">
-            <th scope="col-2">Nombre</th>
-            <th scope="col-1">Correo</th>
-            <th scope="col-1">Cargo</th>
-            <th scope="col-1">Rol</th>
-            <th scope="col-1">Salario x hora</th>
-            <th scope="col-1">Teléfono</th>
-            <th scope="col-1" width="150px">Acciones</th>
-            </thead>
-            <tbody>
-            {% for item in empleados %}
-                <tr>
-                    <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.correo }}</td>
-                    <td style="font-weight:400;">{{ item.cargo_nombre }}</td>
-                    <td style="font-weight:400;">{{ item.rol }}</td>
-                    <td style="font-weight:400;">{{ item.salario_x_hora }}</td>
-                    <td style="font-weight:400;">{{ item.telefono }}</td>
-                    <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Actualizar"
-                                onclick="onUpdate({
-                                        id: '{{ item.id }}',
-                                        nombre: '{{ item.nombre }}',
-                                        correo: '{{ item.correo }}',
-                                        cargo_nombre: '{{ item.cargo_nombre }}',
-                                        id_cargo: '{{ item.id_cargo }}',
-                                        rol: '{{ item.rol }}',
-                                        salario_x_hora: '{{ item.salario_x_hora }}',
-                                        telefono: '{{ item.telefono }}',
-                                        is_usuario: '{{ item.is_usuario }}',
-                                        unidad_nombre: '{{ item.unidad_nombre }}',
-                                        id_unidad: '{{ item.id_unidad }}',
-                                        direccion: '{{ item.direccion }}',
-                                        fecha_alta: '{{ item.fecha_alta }}',
-                                        })">
-                            <i class="fa fa-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Dar baja"
-                                onclick="onDeleteConfirm({
-                                        title:'Dar baja',
-                                        message:'Está seguro que desea dar baja a {{ item.nombre }}  ?',
-                                        url:'{{ path('contabilidad_capital_humano_empleado_delete',{id: item.id}) }}'
-                                        })">
-                            <i class="fa fa-sign-out"></i>
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {# end list #}
     </div>
 {% endblock %}
 
@@ -89,59 +94,21 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        function mostrarBtn() {
-            $('#modal__btn__actualizar').hide()
-            $('#modal__btn__aceptar').show()
-        }
-        const onUpdate = function (config) {
-            $('#modal__btn__actualizar').show()
-            $('#modal__btn__aceptar').hide()
+        $('#btnCancelar').hide()
+        $('#btnUpdate').hide()
+        let cuentas = [];
+        let consecutivo = '';
 
-            const {
-                id = '', nombre = '',
-                correo = '', telefono = '', fecha_alta = '', salario_x_hora = '',
-                id_unidad = '', direccion = '', id_cargo = '',
-                is_usuario = '', rol= ''
-            } = config
-
-            $('#modal__form__id').modal('show')
-            $('#modal__form__label__id').text("Modificar " + nombre)
-
-            $('#id_empleado').val(id)
-            $('#empleado_nombre').val(nombre)
-            $('#empleado_correo').val(correo)
-            $('#empleado_telefono').val(telefono)
-            $('#empleado_fecha_alta').val(fecha_alta)
-            $('#empleado_salario_x_hora').val(salario_x_hora)
-            $('#empleado_id_unidad').val(id_unidad)
-            $('#empleado_id_cargo').val(id_cargo)
-            $('#empleado_direccion_particular').val(direccion)
-            $('#empleado_rol').val(rol)
-
-            if (is_usuario == 'true' || is_usuario == true) {
-                $('#is-user').prop('checked', true)
-                $('#div_rol').css("display", "block")
-                $('#empleado_rol').val(rol)
-
-            } else {
-                $('#is-user').prop('checked', false)
-                $('#div_rol').css("display", "none")
-            }
-
-        }
         $('#div_rol').css("display", "none")
         $(document).ready(function () {
             // init
             $('select').prepend('<option selected = "false" value = "0" disabled>... seleccione ...</option>');
-            $('#modal__btn__actualizar').hide()
-
             $('#is-user').on('change', function () {
-                if ($( this ).is(':checked'))
+                if ($(this).is(':checked'))
                     $('#div_rol').css("display", "block")
                 else
                     $('#div_rol').css("display", "none")
             })
-
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
                 errorClass: 'invalid-label-orange',
@@ -164,7 +131,7 @@
                     'empleado[correo]': "required",
                     'empleado[telefono]': "required",
                     'empleado[fecha_alta]': "required",
-                    'empleado[salario_x_hora]': "required",
+                    'empleado[identificacion]': "required",
                     'empleado[id_unidad]': "required",
                     'empleado[id_cargo]': "required",
                     'empleado[direccion_particular]': "required",
@@ -176,43 +143,416 @@
                     'empleado[correo]': 'obligatorio',
                     'empleado[telefono]': 'obligatorio',
                     'empleado[fecha_alta]': 'obligatorio',
-                    'empleado[salario_x_hora]': 'obligatorio',
+                    'empleado[identificacion]': 'obligatorio',
                     'empleado[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'empleado[id_cargo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'empleado[direccion_particular]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'empleado[rol]': CONTAB_MSG.REQUIRED_NOT_BLANK
                 }
             })
-
-
-            $('#modal__btn__aceptar').on('click', function () {
+            $('#btnAdd').on('click', function () {
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/capital-humano/empleado-add`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
-            $('#modal__btn__actualizar').on('click', function () {
+            $('#btnUpdate').on('click', function () {
                 const id = $('#id_empleado').val()
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', 'POST')
                 formulario.attr('action', '/contabilidad/capital-humano/empleado-upd/' + id)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
-            })
-
-            $('#modal__form__id').on('show.bs.modal', function (event) {
-                validateForm.resetForm()
-                $('#modal__form__label__id').text('Adicionar empleado')
-            })
-
-            $('#is-user').on('change', function () {
-                if ($( this ).is(':checked'))
-                    $('#div_rol').css("display", "block")
-                else
-                    $('#div_rol').css("display", "none")
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
         })
 
+        $('#empleado_nombre').on('keyup', function (e) {
+            if (e.which == 13) {
+                resetFormulario()
+                if ($('#empleado_nombre').val() != '') {
+                    llenarFormulario($('#empleado_nombre').val())
+                } else {
+                    $('#btnAdd').show()
+                    $('#btnUpdate').hide()
+                    $('#btnCancelar').hide()
+                    alertTemplate('Tiene que introducir el nombre del empleado a buscar', 'danger')
+                }
+            }
+        })
+
+        $('#empleado_identificacion').on('keyup', function (e) {
+            if (e.which == 13) {
+                resetFormulario()
+                if ($('#empleado_identificacion').val() != '') {
+                    llenarFormularioIdentificacion($('#empleado_identificacion').val())
+                } else {
+                    $('#btnAdd').show()
+                    $('#btnUpdate').hide()
+                    $('#btnCancelar').hide()
+                    alertTemplate('Tiene que introducir el identificador del empleado a buscar', 'danger')
+                }
+            }
+        })
+
+        function resetFormulario() {
+            $('#btnCancelar').hide()
+            $('#btnUpdate').hide()
+            $('#btnAdd').show()
+            $('#form_modal_target')[0].reset()
+        }
+
+        function llenarFormulario(nombre) {
+            if (nombre == '') {
+                alertTemplate('El nombre no puede ser vacío.', 'danger')
+                resetFormulario()
+            } else {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/capital-humano/empleado/getEmpleadoByNombre/' + nombre,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success == true) {
+                            let empleado = result
+                            if(empleado.id != ''){
+                                $('#id_empleado').val(empleado.id)
+                                $('#empleado_nombre').val(empleado.nombre)
+                                $('#empleado_correo').val(empleado.correo)
+                                $('#empleado_telefono').val(empleado.telefono)
+                                $('#empleado_fecha_alta').val(empleado.fecha_alta)
+                                $('#empleado_identificacion').val(empleado.identificacion)
+                                $('#empleado_id_unidad').val(empleado.id_unidad)
+                                $('#empleado_id_cargo').val(empleado.id_cargo)
+                                $('#empleado_direccion_particular').val(empleado.direccion)
+                                $('#empleado_rol').val(empleado.rol)
+                                if (empleado.is_user) {
+                                    $('#is-user').prop('checked', true)
+                                    $('#div_rol').css("display", "block")
+                                } else {
+                                    $('#is-user').prop('checked', false)
+                                    $('#div_rol').css("display", "none")
+                                }
+
+                                $('#btnUpdate').show()
+                                $('#btnAdd').hide()
+                                $('#btnCancelar').show()
+                            }
+                            else{
+                                resetFormulario()
+                                alertTemplate('El empleado no existe en la Agencia.', 'danger')
+                                $('#is-user').prop('checked', false)
+                                $('#div_rol').css("display", "none")
+
+                                $('#btnUpdate').hide()
+                                $('#btnAdd').show()
+                                $('#btnCancelar').hide()
+
+                            }
+                            loadingModal.close()
+                        }
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+        }
+        function llenarFormularioIdentificacion(identificacion) {
+            if (identificacion == '') {
+                alertTemplate('El nombre no puede ser vacío.', 'danger')
+                resetFormulario()
+            } else {
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/capital-humano/empleado/getEmpleadoByIdentificacion/' + identificacion,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success == true) {
+                            let empleado = result
+                            if(empleado.id != ''){
+                                $('#id_empleado').val(empleado.id)
+                                $('#empleado_nombre').val(empleado.nombre)
+                                $('#empleado_correo').val(empleado.correo)
+                                $('#empleado_telefono').val(empleado.telefono)
+                                $('#empleado_fecha_alta').val(empleado.fecha_alta)
+                                $('#empleado_identificacion').val(empleado.identificacion)
+                                $('#empleado_id_unidad').val(empleado.id_unidad)
+                                $('#empleado_id_cargo').val(empleado.id_cargo)
+                                $('#empleado_direccion_particular').val(empleado.direccion)
+                                $('#empleado_rol').val(empleado.rol)
+                                if (empleado.is_user) {
+                                    $('#is-user').prop('checked', true)
+                                    $('#div_rol').css("display", "block")
+                                } else {
+                                    $('#is-user').prop('checked', false)
+                                    $('#div_rol').css("display", "none")
+                                }
+                                $('#btnUpdate').show()
+                                $('#btnAdd').hide()
+                                $('#btnCancelar').show()
+                            }
+                            else{
+                                resetFormulario()
+                                alertTemplate('El empleado no existe en la Agencia.', 'danger')
+                                $('#is-user').prop('checked', false)
+                                $('#div_rol').css("display", "none")
+                                $('#btnUpdate').hide()
+                                $('#btnAdd').show()
+                                $('#btnCancelar').hide()
+                            }
+                            loadingModal.close()
+                        }
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+        }
+
+
+        // const loadingData = function () {
+        //     loadingModal.show()
+        //     $('#id_unidad').find('option').remove();
+        //     $('#id_unidad').prepend('<option selected = "true" value = "0" disabled> -- Seleccione -- </option>');
+        //     $('#movimiento_activo_fijo_id_cuenta').val('')
+        //     $('#movimiento_activo_fijo_id_subcuenta').val('')
+        //     $.ajax({
+        //         url: '/contabilidad/activo-fijo/traslados-enviados/getCuentas',
+        //         method: 'POST',
+        //         dataType: 'json',
+        //         success: function (result) {
+        //             consecutivo = result.nros
+        //             $('#select_nros').val(consecutivo)
+        //             $('#select_nros').prop('max', consecutivo)
+        //             $('#select_nros').prop('min', 1)
+        //             cuentas = result.cuentas;
+        //             result.unidades.forEach(
+        //                 el => $('#id_unidad').append(`<option value = "${el.id}">${el.nombre} </option>`)
+        //             )
+        //             loadingModal.close()
+        //         },
+        //         error: function () {
+        //         }
+        //     })
+        // }
+        // loadingData()
+        //
+        // $('#movimiento_activo_fijo_nro_inventatio').on('keyup', function (e) {
+        //     $('#btnSubbmitTraslado').hide();
+        //     if (e.which == 13) {
+        //         let codigo = $('#movimiento_activo_fijo_nro_inventatio').val()
+        //         if (codigo !== '') {
+        //             getData(codigo)
+        //         } else {
+        //             alertTemplate('El campo código es obligatorio.', 'danger')
+        //         }
+        //     } else {
+        //         $('#movimiento_activo_fijo_descripcion').val('')
+        //         $('#movimiento_activo_fijo_id_cuenta').val('')
+        //         $('#movimiento_activo_fijo_id_subcuenta').val('')
+        //         $('#movimiento_activo_fijo_fecha').val('')
+        //         $('#movimiento_activo_fijo_centro_costo').val('')
+        //         $('#movimiento_activo_fijo_area_responsabilidad').val('')
+        //     }
+        // })
+        //
+        // function getData(codigo) {
+        //     loadingModal.show("Cargando activo fijo...")
+        //     $.ajax({
+        //         url: '/contabilidad/activo-fijo/traslados-enviados/getNroInv/' + codigo,
+        //         method: 'POST',
+        //         dataType: 'json',
+        //         success: function (result) {
+        //             if (result.descripcion != '') {
+        //                 $('#movimiento_activo_fijo_descripcion').val(result.descripcion)
+        //                 $('#movimiento_activo_fijo_id_cuenta').val(result.cuenta)
+        //                 $('#movimiento_activo_fijo_id_subcuenta').val(result.subcuenta)
+        //                 $('#movimiento_activo_fijo_fecha').val(result.fecha)
+        //                 $('#movimiento_activo_fijo_id_activo').val(result.id);
+        //                 $('#movimiento_activo_fijo_centro_costo').val(result.centro_costo)
+        //                 $('#movimiento_activo_fijo_area_responsabilidad').val(result.area_responsabilidad)
+        //                 $('#btnSubbmitTraslado').show();
+        //             } else {
+        //                 $('#btnSubbmitTraslado').hide();
+        //                 alertTemplate('En la unidad no existen activos fijos con ese código', 'danger')
+        //             }
+        //             loadingModal.close()
+        //         },
+        //         error: function () {
+        //         }
+        //     })
+        // }
+        //
+        // $(document).ready(function () {
+        //     let form_activo_fijo = $('#movimiento_activo_fijo')
+        //     form_activo_fijo.validate({
+        //         errorClass: 'invalid-label-orange',
+        //         errorPlacement: function (error, element) {
+        //             error.attr('style', 'font-size: .8rem;')
+        //             error.insertAfter(element);
+        //         },
+        //         rules: {
+        //             'movimiento_activo_fijo[id_cuenta]': "required",
+        //             'movimiento_activo_fijo[id_subcuenta]': "required",
+        //             'movimiento_activo_fijo[fecha]': "required",
+        //             'movimiento_activo_fijo[nro_inventatio]': "required",
+        //             'movimiento_activo_fijo[descripcion]': "required",
+        //             'movimiento_activo_fijo[fundamentacion]': "required",
+        //             'movimiento_activo_fijo[id_unidad]': "required",
+        //         },
+        //         messages: {
+        //             'movimiento_activo_fijo[id_cuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //             'movimiento_activo_fijo[id_subcuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //             'movimiento_activo_fijo[fecha]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //             'movimiento_activo_fijo[nro_inventatio]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //             'movimiento_activo_fijo[descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //             'movimiento_activo_fijo[fundamentacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //             'movimiento_activo_fijo[id_unidad]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+        //         }
+        //     })
+        // })
+        //
+        // $("#btnSubbmitTraslado").click(function (e) {
+        //     if ($('#movimiento_activo_fijo').valid()) {
+        //         $('#movimiento_activo_fijo').attr('method', `POST`)
+        //         $('#movimiento_activo_fijo').attr('action', `/contabilidad/activo-fijo/traslados-enviados/`)
+        //         $('#movimiento_activo_fijo').submit()
+        //         if (validateForm.errorList.length === 0) loadingModal.show()
+        //     }
+        // });
+        //
+        // $('#select_nros').on('keyup', function (e) {
+        //     if (e.which == 13) {
+        //         if ($('#select_nros').val() != '') {
+        //             if ($('#select_nros').val() == consecutivo) {
+        //                 $('#btnSubbmitTraslado').show()
+        //                 $('#btnImprimir').show()
+        //                 $('#btnCancelar').hide()
+        //                 resetFormulario()
+        //             } else if ($('#select_nros').val() > consecutivo) {
+        //                 $('#btnSubbmitTraslado').hide()
+        //                 $('#btnImprimir').hide()
+        //                 $('#btnCancelar').hide()
+        //                 resetFormulario()
+        //                 alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
+        //             } else {
+        //                 $('#btnImprimir').show()
+        //                 $('#btnSubbmitTraslado').hide()
+        //                 // $('#btnCancelar').show()
+        //                 llenarFormulario($('#select_nros').val())
+        //             }
+        //         } else {
+        //             $('#btnImprimir').hide()
+        //             $('#btnSubbmitTraslado').hide()
+        //             $('#btnCancelar').hide()
+        //             alertTemplate('Tiene que introducir el número del traslado', 'danger')
+        //         }
+        //     }
+        // })
+        //
+        // function resetFormulario() {
+        //     $('#btnCancelar').hide()
+        //     $('#btnImprimir').show()
+        //     $('#btnSubbmitTraslado').show()
+        //     $('#movimiento_activo_fijo_fecha').attr('type', 'date')
+        //     $('#movimiento_activo_fijo')[0].reset()
+        //     loadingData()
+        // }
+        //
+        // function llenarFormulario(nro) {
+        //     if (nro < 1) {
+        //         alertTemplate('El menor número permitido es 1', 'danger')
+        //         resetFormulario()
+        //     } else {
+        //         loadingModal.show()
+        //         $.ajax({
+        //             url: '/contabilidad/activo-fijo/traslados-enviados/getTraslado/' + nro,
+        //             method: 'POST',
+        //             dataType: 'json',
+        //             success: function (result) {
+        //                 if (result.success == true) {
+        //                     let traslado = result.traslado;
+        //
+        //                     // if(traslado.cancelado == true || traslado.cancelado == 'true'){
+        //                     //     ActiveDesactive(false)
+        //                     // }
+        //                     // else{
+        //                     //     ActiveDesactive(true)
+        //                     // }
+        //                     $('#movimiento_activo_fijo_nro_inventatio').val(traslado.nro_inv);
+        //                     $('#movimiento_activo_fijo_descripcion').val(traslado.desc);
+        //                     $('#movimiento_activo_fijo_id_cuenta').val(traslado.nro_cuenta);
+        //                     $('#movimiento_activo_fijo_id_subcuenta').val(traslado.nro_subcuenta);
+        //                     $('#movimiento_activo_fijo_centro_costo').val(traslado.centro_costo);
+        //                     $('#movimiento_activo_fijo_area_responsabilidad').val(traslado.area_responsabilidad);
+        //                     $('#movimiento_activo_fijo_fecha').attr('type', 'text');
+        //                     $('#movimiento_activo_fijo_fecha').val(traslado.fecha);
+        //                     $('#movimiento_activo_fijo_id_movimiento').val(traslado.id);
+        //                     $('#movimiento_activo_fijo_id_activo').val(traslado.id_activo);
+        //                     $('#movimiento_activo_fijo_fundamentacion').val(traslado.fundamentacion);
+        //                     $('#id_unidad').val(traslado.id_unidad);
+        //
+        //                     loadingModal.close()
+        //                 }
+        //                 if (result.success == false) {
+        //                     loadingModal.close()
+        //                     alertTemplate(result.message, 'danger')
+        //                 }
+        //             },
+        //             error: function (result) {
+        //             }
+        //         })
+        //     }
+        // }
+        //
+        // $("#btnCancelar").click(function (e) {
+        //     let nro = $('#select_nros').val()
+        //     if (nro != '') {
+        //         $('body').append(`
+        //             <form action='/contabilidad/activo-fijo/traslados-enviados/cancelTraslado'
+        //                  method="post" id='form_cancel'>
+        //                     <input type='text' hidden name='nro' value='${nro}'/>
+        //             </form>`)
+        //         const fomrulario = $('#form_cancel')
+        //         fomrulario.submit()
+        //         fomrulario.remove()
+        //     }
+        // });
+        //
+        // function printTraslado() {
+        //     if ($('#movimiento_activo_fijo_id_movimiento').val() != '') {
+        //         window.open('/contabilidad/activo-fijo/print-movimiento/' + $('#movimiento_activo_fijo_id_movimiento').val(), '_blank');
+        //     } else {
+        //         const fundamentacion = $("#movimiento_activo_fijo_fundamentacion").val()
+        //         const id_activo = $("#movimiento_activo_fijo_id_activo").val()
+        //         const tipo_movimiento = 4
+        //         const consecutivo = $("#select_nros").val()
+        //         $('body').append(`
+        //             <form action='/contabilidad/activo-fijo/print-movimiento/print_current/'
+        //                  method="post" id='form_print_current' target='_blank'>
+        //                 <input type='text' hidden name='fundamentacion' value='${fundamentacion}'/>
+        //                 <input type='text' hidden name='id_activo' value='${id_activo}'/>
+        //                 <input type='text' hidden name='tipo_movimiento' value='${tipo_movimiento}'/>
+        //                 <input type='text' hidden name='nro' value="${consecutivo}" />
+        //             </form>`)
+        //         const fomrulario = $('#form_print_current')
+        //         fomrulario.submit()
+        //         fomrulario.remove()
+        //     }
+        // }
+        //
+        // function ActiveDesactive(active) {
+        //     if(active){
+        //         $('#normal_div').text('Traslado Recibido')
+        //         $('#normal_div').attr('class','text-reporte text-right mr-0 text-white mt-2')
+        //         // $('#btnCancelar').show()
+        //     }
+        //     else{
+        //         $('#normal_div').text('Traslado Cancelado')
+        //         $('#normal_div').attr('class','text-reporte text-right mr-0 mt-2 text-danger text-uppercase')
+        //         $('#btnCancelar').hide()
+        //     }
+        // }
     </script>
 {% endblock %}
