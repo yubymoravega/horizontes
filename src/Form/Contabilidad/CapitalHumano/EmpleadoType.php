@@ -22,7 +22,9 @@ class EmpleadoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombre', TextType::class)
+            ->add('nombre', TextType::class, array(
+                'label'=>'Nombre completo'
+            ))
             ->add('correo', EmailType::class)
             ->add('identificacion',TextType::class, array(
                 'label'=>'Identificación'
@@ -32,17 +34,9 @@ class EmpleadoType extends AbstractType
                 'widget' => 'single_text',
                 'placeholder' => 'Fecha de alta'
             ))
-            ->add('telefono')
-            ->add('id_unidad', EntityType::class, [
-                'class' => Unidad::class,
-                'choice_label' => 'nombre',
-                'label' => 'Unidad a la que pertenece',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
-            ])
+            ->add('telefono',TextType::class, array(
+                'label'=>'Teléfono'
+            ))
             ->add('id_cargo', EntityType::class, [
                 'class' => Cargo::class,
                 'label' => 'Cargo en la Empresa',

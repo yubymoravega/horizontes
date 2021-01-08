@@ -32,9 +32,9 @@ class EmpleadoController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Environment $env)
     {
         $form = $this->createForm(EmpleadoType::class);
-
         $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
         $roles = self::getRoles();
+
         return $this->render($callback, [
             'controller_name' => 'EmpleadoController',
             'form' => $form->createView(),
@@ -47,50 +47,81 @@ class EmpleadoController extends AbstractController
      */
     public function getEmpleadoByNombre(EntityManagerInterface $em, $nombre)
     {
-        $obj_unidad= AuxFunctions::getUnidad($em,$this->getUser());
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
         /** @var Empleado $empleado */
         $empleado = $em->getRepository(Empleado::class)->findOneBy([
-           'nombre'=>$nombre,
-           'id_unidad'=>$obj_unidad
+            'nombre' => $nombre,
+            'id_unidad' => $obj_unidad
         ]);
 
         return new JsonResponse([
-            'id' => $empleado?$empleado->getId():'',
-            'nombre' => $empleado?$empleado->getNombre():'',
-            'correo' => $empleado?$empleado->getCorreo():'',
-            'telefono' => $empleado?$empleado->getTelefono():'',
-            'fecha_alta' => $empleado?$empleado->getFechaAlta()->format('d/m/Y'):'',
-            'identificacion' => $empleado?$empleado->getIdentificacion():'',
-            'id_unidad' => $empleado?$empleado->getIdUnidad()->getId():'',
-            'direccion' => $empleado?$empleado->getDireccionParticular():'',
-            'rol' => $empleado?$empleado->getRol():'',
-            'is_user' => $empleado&&$empleado->getRol()?true:false,
+            'id' => $empleado ? $empleado->getId() : '',
+            'nombre' => $empleado ? $empleado->getNombre() : '',
+            'correo' => $empleado ? $empleado->getCorreo() : '',
+            'telefono' => $empleado ? $empleado->getTelefono() : '',
+            'fecha_alta' => $empleado ? $empleado->getFechaAlta()->format('d/m/Y') : '',
+            'identificacion' => $empleado ? $empleado->getIdentificacion() : '',
+            'id_unidad' => $empleado ? $empleado->getIdUnidad()->getId() : '',
+            'direccion' => $empleado ? $empleado->getDireccionParticular() : '',
+            'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
+            'rol' => $empleado ? $empleado->getRol() : '',
+            'is_user' => $empleado && $empleado->getRol() ? true : false,
             'success' => true
         ]);
     }
+
+    /**
+     * @Route("/getEmpleadoByCorreo/{correo}", name="contabilidad_capital_humano_empleado_by_correo")
+     */
+    public function getEmpleadoByCorreo(EntityManagerInterface $em, $correo)
+    {
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy([
+            'correo' => $correo,
+            'id_unidad' => $obj_unidad
+        ]);
+
+        return new JsonResponse([
+            'id' => $empleado ? $empleado->getId() : '',
+            'nombre' => $empleado ? $empleado->getNombre() : '',
+            'correo' => $empleado ? $empleado->getCorreo() : '',
+            'telefono' => $empleado ? $empleado->getTelefono() : '',
+            'fecha_alta' => $empleado ? $empleado->getFechaAlta()->format('d/m/Y') : '',
+            'identificacion' => $empleado ? $empleado->getIdentificacion() : '',
+            'id_unidad' => $empleado ? $empleado->getIdUnidad()->getId() : '',
+            'direccion' => $empleado ? $empleado->getDireccionParticular() : '',
+            'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
+            'rol' => $empleado ? $empleado->getRol() : '',
+            'is_user' => $empleado && $empleado->getRol() ? true : false,
+            'success' => true
+        ]);
+    }
+
     /**
      * @Route("/getEmpleadoByIdentificacion/{identificacion}", name="contabilidad_capital_humano_empleado_by_identificacion")
      */
     public function getEmpleadoByIdentificacion(EntityManagerInterface $em, $identificacion)
     {
-        $obj_unidad= AuxFunctions::getUnidad($em,$this->getUser());
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
         /** @var Empleado $empleado */
         $empleado = $em->getRepository(Empleado::class)->findOneBy([
-           'identificacion'=>$identificacion,
-           'id_unidad'=>$obj_unidad
+            'identificacion' => $identificacion,
+            'id_unidad' => $obj_unidad
         ]);
 
         return new JsonResponse([
-            'id' => $empleado?$empleado->getId():'',
-            'nombre' => $empleado?$empleado->getNombre():'',
-            'correo' => $empleado?$empleado->getCorreo():'',
-            'telefono' => $empleado?$empleado->getTelefono():'',
-            'fecha_alta' => $empleado?$empleado->getFechaAlta()->format('d/m/Y'):'',
-            'identificacion' => $empleado?$empleado->getIdentificacion():'',
-            'id_unidad' => $empleado?$empleado->getIdUnidad()->getId():'',
-            'direccion' => $empleado?$empleado->getDireccionParticular():'',
-            'rol' => $empleado?$empleado->getRol():'',
-            'is_user' => $empleado&&$empleado->getRol()?true:false,
+            'id' => $empleado ? $empleado->getId() : '',
+            'nombre' => $empleado ? $empleado->getNombre() : '',
+            'correo' => $empleado ? $empleado->getCorreo() : '',
+            'telefono' => $empleado ? $empleado->getTelefono() : '',
+            'fecha_alta' => $empleado ? $empleado->getFechaAlta()->format('d/m/Y') : '',
+            'identificacion' => $empleado ? $empleado->getIdentificacion() : '',
+            'id_unidad' => $empleado ? $empleado->getIdUnidad()->getId() : '',
+            'direccion' => $empleado ? $empleado->getDireccionParticular() : '',
+            'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
+            'rol' => $empleado ? $empleado->getRol() : '',
+            'is_user' => $empleado && $empleado->getRol() ? true : false,
             'success' => true
         ]);
     }
@@ -109,11 +140,12 @@ class EmpleadoController extends AbstractController
         $errors = $validator->validate($obj_empleado);
         if ($form->isSubmitted() && $form->isValid()) {
             //---ADICIONO EL EMPLEADO
-//            dd($request->get('is_usuario'));
+            /** @var  $obj_empleado Empleado */
             $obj_empleado
                 ->setBaja(false)
                 ->setAcumuladoTiempoVacaciones(0)
                 ->setAcumuladoDineroVacaciones(0)
+                ->setIdUnidad(AuxFunctions::getUnidad($em, $this->getUser()))
                 ->setActivo(true);
 
             if ($request->get('is_usuario') == "on") {
@@ -199,7 +231,6 @@ class EmpleadoController extends AbstractController
         if ($errors->count()) $this->addFlash('error', $errors->get(0)->getMessage());
         return $this->redirectToRoute('contabilidad_capital_humano_empleado');
     }
-
 
     /**
      * @Route("/empleado-delete/{id}", name="contabilidad_capital_humano_empleado_delete")

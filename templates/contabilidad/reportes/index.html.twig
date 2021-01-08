@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+{% block title %} Economía | Contabilidad {% endblock %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block navBar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a class="navbar-brand text-white" href="{{ url ('contabilidad_reportes') }}">Reportes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Inventario
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_expedientes') }}">Expedientes</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_config_orden_trabajo') }}">Ordenes de
+                        Trabajo</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Venta
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_comprobante_operaciones') }}">Comprobante
+                        de Operaciones</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_comprobante_venta_generar') }}">Generar
+                        Comprobante de Venta</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Activo Fijo
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Registro de Comprobante</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Movimiento de Cuentas</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Saldo</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo_cuenta_subcuenta') }}">Balance de Comprobación de Cuentas y Subcuentas </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_cobrar') }}">Cuenta por Cobrar</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_pagar') }}">Cuenta por Pagar</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Capital Humano
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Registro de Comprobante</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Movimiento de Cuentas</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Saldo</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo_cuenta_subcuenta') }}">Balance de Comprobación de Cuentas y Subcuentas </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_cobrar') }}">Cuenta por Cobrar</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_pagar') }}">Cuenta por Pagar</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Contabilidad
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Registro de Comprobante</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Movimiento de Cuentas</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Saldo</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo_cuenta_subcuenta') }}">Balance de Comprobación de Cuentas y Subcuentas </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_cobrar') }}">Cuenta por Cobrar</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_pagar') }}">Cuenta por Pagar</a>
+                </div>
+            </li>
+        </ul>
+        {{ include('utils/unidadChoices.html.twig') }}
+    </nav>
+{% endblock %}

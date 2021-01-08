@@ -22,16 +22,7 @@ class CentroCostoType extends AbstractType
     {
         $builder
             ->add('nombre')
-            ->add('codigo')
-            ->add('id_unidad', EntityType::class, [
-                'class' => Unidad::class,
-                'choice_label' => 'nombre',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
-            ]);
+            ->add('codigo');
     }
 
     public function configureOptions(OptionsResolver $resolver)
