@@ -30,7 +30,7 @@ class ComprobanteOperacionesController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
-        dd(AuxFunctions::getUnidades($em, $this->getUser()));
+       // dd(AuxFunctions::getUnidades($em, $this->getUser()));
         $data_movimientos = $this->getData($em,$request);
         $row = [];
         $retur_rows = [];
@@ -232,7 +232,7 @@ class ComprobanteOperacionesController extends AbstractController
             ->setIdUsuario($this->getUser())
             ->setFecha(\DateTime::createFromFormat('d-m-Y', $fecha))
             ->setAnno($year_)
-            ->setTipo(5)
+            ->setTipo(AuxFunctions::$COMMPROBANTE_OPERACONES_ACTIVO_FIJO)
             ->setCredito(floatval($credito))
             ->setDebito(floatval($debito))
             ->setIdAlmacen(null)

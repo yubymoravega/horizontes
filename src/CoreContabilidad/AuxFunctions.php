@@ -66,6 +66,11 @@ class AuxFunctions
 {
     public static $ACTION_ADD = 'add';
     public static $ACTION_UPD = 'upd';
+    public static $COMMPROBANTE_OPERACONES_INVENTARIO = 1;
+    public static $COMMPROBANTE_OPERACONES_VENTA = 2;
+    public static $COMMPROBANTE_OPERACONES_CONTABILIDAD = 3;
+    public static $COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO = 4;
+    public static $COMMPROBANTE_OPERACONES_ACTIVO_FIJO = 5;
 
     /**
      * Si es padre no puede eliminarse sin reuvicar las undades hijas, retorna true/false en el caso que se cumpla

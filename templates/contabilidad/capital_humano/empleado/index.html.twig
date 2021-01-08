@@ -169,7 +169,6 @@
 
         $('#empleado_nombre').on('keyup', function (e) {
             if (e.which == 13) {
-                resetFormulario()
                 if ($('#empleado_nombre').val() != '') {
                     llenarFormulario($('#empleado_nombre').val())
                 } else {
@@ -183,7 +182,6 @@
 
         $('#empleado_identificacion').on('keyup', function (e) {
             if (e.which == 13) {
-                resetFormulario()
                 if ($('#empleado_identificacion').val() != '') {
                     llenarFormularioIdentificacion($('#empleado_identificacion').val())
                 } else {

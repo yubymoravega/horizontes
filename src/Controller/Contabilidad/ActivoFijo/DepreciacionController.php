@@ -186,7 +186,7 @@ class DepreciacionController extends AbstractController
                     ->setIdUsuario($this->getUser())
                     ->setFecha($today)
                     ->setAnno($year_)
-                    ->setTipo(4)
+                    ->setTipo(AuxFunctions::$COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO)
                     ->setCredito(floatval($total))
                     ->setDebito(floatval($total))
                     ->setIdAlmacen(null)
