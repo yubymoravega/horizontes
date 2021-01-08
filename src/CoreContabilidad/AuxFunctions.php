@@ -2860,11 +2860,12 @@ class AuxFunctions
             ->setIdElementoGasto($obj_elemento_gasto)
             ->setIdExpediente($obj_expediente)
             ->setIdProveedor($obj_proveedor)
-            ->setIdCliente($id_cliente)
+            ->setIdCliente($id_cliente == 0 ? null : $id_cliente)
             ->setTipoCliente($tipo_cliente)
             ->setIdActivoFijo($id_activo)
             ->setIdAreaResponsabilidad($id_area_responsabilidad)
-            ->setIdComprobante($comprobante);
+            ->setIdComprobante($comprobante)
+            ->setIdTipoComprobante($comprobante ? $comprobante->getIdTipoComprobante() : null);
         $em->persist($new_asiento);
         return $new_asiento;
     }

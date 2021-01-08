@@ -32,15 +32,16 @@ class GlobalEventListener
      * @param RequestEvent $event
      * @return string
      */
-    public function onCloseAlmacen(RequestEvent $event)
+    public function onRequestListener(RequestEvent $event)
     {
 
-        // Filtro de Unidad Seleccionada ...
+        /** Filtro de Unidad Seleccionada ... */
         $is__selected__unidad = $event->getRequest()->get('__selected__unidad');
         if (!is_null($is__selected__unidad)) $GLOBALS['selected__unidad'] = $is__selected__unidad;
         else $GLOBALS['selected__unidad'] = null;
 
 
+        /** Seleccion de Alamcén */
         // para peticiones que no sean AJAX
         if (!$event->getRequest()->isXmlHttpRequest()) {
 

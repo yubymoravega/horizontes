@@ -19,6 +19,34 @@ class AsientoRepository extends ServiceEntityRepository
         parent::__construct($registry, Asiento::class);
     }
 
+    public function GroupForBalanceComprobacion($anno, $unidad)
+    {
+        return $this->getEntityManager()
+            ->createQuery('SELECT sum(a.credito) as credito, sum(a.debito) as debito, a AS asiento               
+                 FROM App\Entity\Contabilidad\General\Asiento a
+                 WHERE a.anno = :panno AND a.id_unidad = :punidad
+                 GROUP BY a.id_cuenta, a.id_subcuenta, a.id_almacen,
+                  a.id_centro_costo, a.id_elemento_gasto, a.id_orden_trabajo, a.id_expediente, a.id_cliente, a.tipo_cliente
+                 ORDER BY a.id_cuenta , a.id_subcuenta      
+           ')
+            ->setParameters(['panno' => $anno, 'punidad' => $unidad])
+            ->getResult();
+        /*return $this->createQueryBuilder('a')
+            ->where('a.anno = :panno')
+            ->andWhere('a.id_unidad = :punidad')
+            ->setParameters(['panno' => $anno, 'punidad' => $unidad])
+            ->groupBy('a.id_cuenta')
+            ->addGroupBy('a.id_subcuenta')
+            ->addGroupBy('a.id_almacen')
+            ->addGroupBy('a.id_centro_costo')
+            ->addGroupBy('a.id_elemento_gasto')
+            ->addGroupBy('a.id_orden_trabajo')
+            ->addGroupBy('a.id_expediente')
+            ->getQuery()
+            ;*/
+
+    }
+
     // /**
     //  * @return Asiento[] Returns an array of Asiento objects
     //  */
