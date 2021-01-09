@@ -64,13 +64,13 @@ use function Sodium\add;
 
 class AuxFunctions
 {
-    public static $ACTION_ADD = 'add';
-    public static $ACTION_UPD = 'upd';
-    public static $COMMPROBANTE_OPERACONES_INVENTARIO = 1;
-    public static $COMMPROBANTE_OPERACONES_VENTA = 2;
-    public static $COMMPROBANTE_OPERACONES_CONTABILIDAD = 3;
-    public static $COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO = 4;
-    public static $COMMPROBANTE_OPERACONES_ACTIVO_FIJO = 5;
+    public const ACTION_ADD = 'add';
+    public const ACTION_UPD = 'upd';
+    public const COMMPROBANTE_OPERACONES_INVENTARIO = 1;
+    public const COMMPROBANTE_OPERACONES_VENTA = 2;
+    public const COMMPROBANTE_OPERACONES_CONTABILIDAD = 3;
+    public const COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO = 4;
+    public const COMMPROBANTE_OPERACONES_ACTIVO_FIJO = 5;
 
     /**
      * Si es padre no puede eliminarse sin reuvicar las undades hijas, retorna true/false en el caso que se cumpla
@@ -136,12 +136,12 @@ class AuxFunctions
     public static function isDuplicate($entity, $fields, $action, $id = null)
     {
         $arr_obj = $entity->findBy($fields);
-        if ($action == AuxFunctions::$ACTION_UPD) {
+        if ($action == AuxFunctions::ACTION_UPD) {
             foreach ($arr_obj as $obj) {
                 if ($obj->getId() != $id)
                     return true;
             }
-        } elseif ($action == AuxFunctions::$ACTION_ADD) {
+        } elseif ($action == AuxFunctions::ACTION_ADD) {
             if (!empty($arr_obj))
                 return true;
         }
@@ -267,6 +267,7 @@ class AuxFunctions
 
     /**
      * Obtener la unidad del usuario
+     * @return Unidad | null
      */
 
     public static function getUnidad($em, $user)

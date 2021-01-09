@@ -232,7 +232,7 @@ class ComprobanteOperacionesController extends AbstractController
             ->setIdUsuario($this->getUser())
             ->setFecha(\DateTime::createFromFormat('d-m-Y', $fecha))
             ->setAnno($year_)
-            ->setTipo(AuxFunctions::$COMMPROBANTE_OPERACONES_ACTIVO_FIJO)
+            ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_ACTIVO_FIJO)
             ->setCredito(floatval($credito))
             ->setDebito(floatval($debito))
             ->setIdAlmacen(null)
