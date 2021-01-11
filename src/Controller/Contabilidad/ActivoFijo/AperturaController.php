@@ -156,7 +156,7 @@ class AperturaController extends AbstractController
         return new JsonResponse([
             'cuentas' => $row,
             'success' => true,
-            'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, Date('Y'))
+            'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, AuxFunctions::getCurrentYear($em, $unidad))
         ]);
     }
 
@@ -199,7 +199,7 @@ class AperturaController extends AbstractController
         /** @var MovimientoActivoFijo $obj_movimiento_activo_fijo */
         $obj_movimiento_activo_fijo = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
             'id_tipo_movimiento' => $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento),
-            'anno' => Date('Y'),
+            'anno' => AuxFunctions::getCurrentYear($em, $id_unidad),
             'id_unidad' => $id_unidad,
             'nro_consecutivo' => $nro
         ]);
@@ -231,8 +231,8 @@ class AperturaController extends AbstractController
     public function cancelApertura(Request $request, EntityManagerInterface $em)
     {
         $nro = $request->request->get('nro');
-        $anno = Date('Y');
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $anno = AuxFunctions::getCurrentYear($em, $unidad);
 
         $cancelado = AuxFunctions::CancelarActivoFijo($em, $this->tipo_movimiento, intval($nro), $anno, $unidad, $this->getUser());
         if (!$cancelado)

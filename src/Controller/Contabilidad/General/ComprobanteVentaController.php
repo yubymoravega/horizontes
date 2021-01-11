@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\General;
 
+use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Cliente;
 use App\Entity\Contabilidad\Config\Almacen;
@@ -45,8 +46,9 @@ class ComprobanteVentaController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request)
     {
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $year_ = AuxFunctions::getCurrentYear($em, $unidad);
         $facturas = $em->getRepository(Factura::class)->findBy([
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $unidad,
             'contabilizada' => false
         ]);
@@ -75,16 +77,17 @@ class ComprobanteVentaController extends AbstractController
     {
         /** @var Unidad $unidad */
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $year_ = AuxFunctions::getCurrentYear($em, $unidad);
         //hacer que las traiga todas, incluyendo las eliminadas y todo
         $facturas = $em->getRepository(Factura::class)->findBy([
             'contabilizada' => true,
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $unidad,
             'activo' => false
         ]);
 
         $facturas_contabiliazadas = $em->getRepository(FacturasComprobante::class)->findBy([
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $unidad
         ]);
         $arr_facturas = [];
@@ -113,11 +116,11 @@ class ComprobanteVentaController extends AbstractController
             $anno = $factura->getFechaFactura()->format('Y');
             $nro_doc = 'FACT-' . $factura->getNroFactura();
             /** Addiciono la factura con la cuenta de obligacion */
-            if ($factura->getTipoCliente() == 1) {
+            if ($factura->getTipoCliente() == ClientesAdapter::PERSONA) {
                 $cliente = $persona_natural->find($factura->getIdCliente())->getNombre();
-            } elseif ($factura->getTipoCliente() == 2) {
+            } elseif ($factura->getTipoCliente() == ClientesAdapter::UNIDAD_SISTEMA) {
                 $cliente = $cliente_interno->find($factura->getIdCliente())->getCodigo();
-            } elseif ($factura->getTipoCliente() == 3) {
+            } elseif ($factura->getTipoCliente() == ClientesAdapter::CLIENTE_CONTABILIDAD) {
                 $cliente = $cliente_extero->find($factura->getIdCliente())->getCodigo();
             }
             $row[] = array(
@@ -267,7 +270,7 @@ class ComprobanteVentaController extends AbstractController
 
         return $this->render('contabilidad/general/comprobante_venta/comprobante.html.twig', [
             'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
-            'fecha' => Date('d-m-Y'),
+            'fecha' => AuxFunctions::getCurrentDate($em, $unidad)->format('d-m-Y'),
             'datos' => $data,
             'total_debito' => number_format($total_debito, 2),
             'total_credito' => number_format($total_debito, 2),
@@ -430,9 +433,9 @@ class ComprobanteVentaController extends AbstractController
 
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
-        $fecha = Date('Y-m-d');
-        $arr_fecha = explode('-', $fecha);
-        $year_ = intval($arr_fecha[0]);
+        $fecha = AuxFunctions::getCurrentDate($em, $obj_unidad);
+//        $arr_fecha = explode('-', $fecha);
+        $year_ = AuxFunctions::getCurrentYear($em, $obj_unidad);
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_unidad' => $obj_unidad,
@@ -444,7 +447,7 @@ class ComprobanteVentaController extends AbstractController
         $new_registro
             ->setDescripcion($observacion)
             ->setIdUsuario($this->getUser())
-            ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+            ->setFecha($fecha)
             ->setAnno($year_)
             ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_VENTA)
             ->setCredito(floatval($credito))
@@ -457,11 +460,11 @@ class ComprobanteVentaController extends AbstractController
         $facturas = $em->getRepository(Factura::class)->findBy([
             'contabilizada' => true,
             'activo' => true,
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $obj_unidad
         ]);
         $facturas_comprobante = $em->getRepository(FacturasComprobante::class)->findBy([
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $obj_unidad
         ]);
         $fact = [];
@@ -481,7 +484,7 @@ class ComprobanteVentaController extends AbstractController
                 $fact_comp
                     ->setIdFactura($fac)
                     ->setIdUnidad($obj_unidad)
-                    ->setAnno(Date('Y'))
+                    ->setAnno($year_)
                     ->setIdComprobante($new_registro);
                 $em->persist($fact_comp);
             }

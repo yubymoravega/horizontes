@@ -50,9 +50,11 @@ class ComprobanteOperacionesController extends AbstractController
 //            dd($add);
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
-        $fecha = Date('Y-m-d');
+       /* $fecha = Date('Y-m-d');
         $arr_fecha = explode('-', $fecha);
-        $year_ = intval($arr_fecha[0]);
+        $year_ = intval($arr_fecha[0]);*/
+        $fecha = AuxFunctions::getCurrentDate($em, $obj_unidad);
+        $year_ = AuxFunctions::getCurrentYear($em, $obj_unidad);
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_unidad' => $obj_unidad,
@@ -86,7 +88,7 @@ class ComprobanteOperacionesController extends AbstractController
                 $new_registro
                     ->setDescripcion($comprobante['explicacion'])
                     ->setIdUsuario($this->getUser())
-                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+                    ->setFecha($fecha)
                     ->setAnno($year_)
                     ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_CONTABILIDAD)
                     ->setCredito($total_credito)
@@ -165,7 +167,7 @@ class ComprobanteOperacionesController extends AbstractController
                     //asentando las operacones
                     $new_asiento = new Asiento();
                     $new_asiento
-                        ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+                        ->setFecha($fecha)
                         ->setAnno($year_)
                         ->setNroDocumento('-')
                         ->setIdDocumento(null)

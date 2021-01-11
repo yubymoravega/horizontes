@@ -178,7 +178,7 @@ class ComprobanteOperacionesController extends AbstractController
 
     public function getData(EntityManagerInterface $em,Request $request){
         $unidad = AuxFunctions::getUnidad($em,$this->getUser());
-        $anno = Date('Y');
+        $anno = AuxFunctions::getCurrentYear($em, $unidad);
         $movimientos_activoFijo = $em->getRepository(MovimientoActivoFijo::class)->findBy([
             'anno'=>$anno,
             'id_unidad'=>$unidad,

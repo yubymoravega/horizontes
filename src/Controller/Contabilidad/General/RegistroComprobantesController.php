@@ -57,7 +57,7 @@ class RegistroComprobantesController extends AbstractController
             /** @var Unidad $obj_unidad */
             $obj_unidad = $empleado->getIdUnidad();
             $comprobantes = $em->getRepository(RegistroComprobantes::class)->findBy(array(
-                'anno' => Date('Y'),
+                'anno' => AuxFunctions::getCurrentYear($em, $obj_unidad),
                 'id_unidad' => $obj_unidad
             ));
             /** @var RegistroComprobantes $comp */
@@ -132,9 +132,9 @@ class RegistroComprobantesController extends AbstractController
             foreach ($cierres_por_comprobantes as $comprobanteCierre) {
                 $row = array_merge($row, $this->getDataDetalles($request, $em, $comprobanteCierre->getIdCierre()->getFecha(), $obj_almacen));
             }
-        } elseif ($registro_obj->getTipo() == 2) {
+        } elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_VENTA) {
             $row = $this->getDataDetallesVenta($em, $registro_obj->getId(), $obj_unidad->getId());
-        } elseif ($registro_obj->getTipo() == 3) {
+        } elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_CONTABILIDAD) {
             $row = $this->getDataDetallesComprobanteOperaciones($em, $registro_obj->getId(), $obj_unidad->getId());
         }
 
