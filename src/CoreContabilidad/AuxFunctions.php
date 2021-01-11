@@ -16,6 +16,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\PeriodoSistema;
 use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TerminoPago;
@@ -46,6 +47,7 @@ use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\Contabilidad\Venta\MovimientoServicio;
 use App\Entity\User;
+use Container3fnRoky\get_ServiceLocator_9utEldQService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -3128,5 +3130,36 @@ class AuxFunctions
             return $exception->getMessage();
         }
         return true;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param Unidad $obj_unidad
+     * @param \DateTime $fecha
+     * @param int $tipo
+     * @param Almacen|null $obj_almacen
+     * @return bool
+     */
+    public static function puedeTrabajar(EntityManagerInterface $em, Unidad $obj_unidad, \DateTime $fecha, int $tipo, Almacen $obj_almacen = null)
+    {
+        if ($tipo === 1)
+            $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'cerrado' => false,
+                'id_unidad' => $obj_unidad,
+                'id_almacen' => $obj_almacen
+            ]);
+        else
+            $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'cerrado' => false,
+                'id_unidad' => $obj_unidad
+            ]);
+
+        /** @var $periodo_abierto PeriodoSistema */
+        if (!$periodo_abierto)
+            return true;
+
+        if ($fecha->format('m') == $periodo_abierto->getMes() && $fecha->format('Y') == $periodo_abierto->getAnno())
+            return true;
+        return false;
     }
 }
