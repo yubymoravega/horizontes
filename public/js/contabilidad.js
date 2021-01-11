@@ -105,28 +105,31 @@ $(document).ready(function () {
     })
 
     $.ajax({
-        url: '/contabilidad/config/unidad/load-unidades',
+        url: '/contabilidad/reportes/load-unidades',
         method: 'POST',
         dataType: 'json',
         success: function (result) {
             $('#__selected__unidad__almacen__id').find('option').remove()
             $('#__selected__unidad__almacen__id').prepend('<option value = "0" selected disabled> ..seleccione..</option>')
 
+            const selected_unidad = result.selected_unidad
             // CHOICES_UNIDADES = result
             $(result.data).each(function (pos, valor) {
-                $('#__selected__unidad__id').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                const selected = valor.id == selected_unidad ? 'selected' : ''
+                cl(selected_unidad, selected)
+                $('#__selected__unidad__id').append(`<option ${selected} value = "${valor.id}"> ${valor.nombre} </option>`);
                 $('#__selected__unidad__almacen__id').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
             })
         }
     })
 
-    $('#__selected__unidad__almacen__id').on('change',function () {
+    $('#__selected__unidad__almacen__id').on('change', function () {
         let val = $('#__selected__unidad__almacen__id').val()
         $('#__selected__almacen__id').find('option').remove()
         $('#__selected__almacen__id').prepend('<option value = "0" selected disabled> ..seleccione..</option>')
         loadingModal.show()
         $.ajax({
-            url: '/contabilidad/config/almacen/load-almacenes/'+val,
+            url: '/contabilidad/config/almacen/load-almacenes/' + val,
             method: 'POST',
             dataType: 'json',
             success: function (result) {
@@ -138,15 +141,15 @@ $(document).ready(function () {
             }
         })
     })
-    $('#btn_filter').on('click',function () {
+    $('#btn_filter').on('click', function () {
         let unidad = $('#__selected__unidad__almacen__id').val()
         let almacen = $('#__selected__almacen__id').val()
         loadingModal.show()
         $.ajax({
             url: '/contabilidad/reportes/asignarVariables',
-            params:{
-                unidad:unidad,
-                almacen:almacen
+            params: {
+                unidad: unidad,
+                almacen: almacen
             },
             method: 'POST',
             dataType: 'json',

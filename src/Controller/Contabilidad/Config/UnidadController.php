@@ -135,23 +135,6 @@ class UnidadController extends AbstractController
         return $this->redirectToRoute('contabilidad_config_unidad');
     }
 
-    /**
-     * @Route("/load-unidades", name="contabilidad_config_load_unidades")
-     */
-    public function loadUnidades(EntityManagerInterface $em, Request $request)
-    {
-        // load unidades por el usuario en AuxFuncions::getUnidades()
-        $unidades = AuxFunctions::getUnidades($em, $this->getUser());
-        $row = [];
-        foreach ($unidades as $unidad) {
-            array_push($row, [
-                'id'=>$unidad->getId(),
-                'nombre'=>$unidad->getNombre(),
-            ]);
-        }
-        return new JsonResponse(['data' => $row]);
-    }
-
     /****************--METODOS AUXILIARES*************************/
 
     /******Si es padre no puede eliminarse sin reuvicar las undades hijas, retorna true/false en el caso que se cumpla********/

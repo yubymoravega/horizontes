@@ -34,18 +34,31 @@ class GlobalEventListener
      */
     public function onRequestListener(RequestEvent $event)
     {
-
-        /** Filtro de Unidad Seleccionada ... */
-        $is__selected__unidad = $event->getRequest()->get('__selected__unidad');
-        if (!is_null($is__selected__unidad)) $GLOBALS['selected__unidad'] = $is__selected__unidad;
-        else $GLOBALS['selected__unidad'] = null;
-
-
-        /** Seleccion de Alamcén */
         // para peticiones que no sean AJAX
         if (!$event->getRequest()->isXmlHttpRequest()) {
-
             $uri = $event->getRequest()->getRequestUri();
+
+            /**                 -------------------------------------                         */
+            /**                 --- Filtro de Unidad Seleccionada ---                         */
+            /**                 -------------------------------------                         */
+
+            $is_reportes = strpos($uri, 'contabilidad/reportes');
+            if ($is_reportes) {
+                $is__selected__unidad = $event->getRequest()->get('__selected__unidad');
+                if (!is_null($is__selected__unidad)) $GLOBALS['selected__unidad'] = $is__selected__unidad;
+                else if (!array_key_exists('selected__unidad', $GLOBALS)) {
+                    $GLOBALS['selected__unidad'] = null;
+                }
+            } else {
+                $GLOBALS['selected__unidad'] = null;
+            }
+
+
+            /**                 ----------------------------                                  */
+            /**                 --- Seleccion de Alamcén ---                                  */
+            /**                 ----------------------------                                  */
+
+
             $is_inventario = strpos($uri, 'contabilidad/inventario');
             $almacen_id = $event->getRequest()->getSession()->get('selected_almacen/id');
             $id_usuario = $this->security->getUser();
@@ -67,7 +80,8 @@ class GlobalEventListener
 
                                 $event->getRequest()->getSession()->set('selected_almacen/id', null);
                                 $event->getRequest()->getSession()->set('selected_almacen/name', null);
-                            } catch (FileException $e) {
+                            } catch
+                            (FileException $e) {
                                 return $e->getMessage();
                             }
                         }
