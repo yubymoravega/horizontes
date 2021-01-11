@@ -4,6 +4,9 @@ namespace App\Controller\Contabilidad\General;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
+use App\Entity\Contabilidad\ActivoFijo\ComprobanteMovimientoActivoFijo;
+use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\TipoComprobante;
@@ -533,51 +536,144 @@ class RegistroComprobantesController extends AbstractController
     {
         $retur_rows = [];
         $registro = $em->getRepository(RegistroComprobantes::class)->find($registro_id);
-        $arr_data_comprobante = $em->getRepository(OperacionesComprobanteOperaciones::class)->findBy([
-            'id_registro_comprobantes' => $registro
+        $arr_data_movimientos_comprobante = $em->getRepository(ComprobanteMovimientoActivoFijo::class)->findBy([
+            'id_registro_comprobante' => $registro
         ]);
-//        dd($registro);
-        /** @var OperacionesComprobanteOperaciones $data */
-        foreach ($arr_data_comprobante as $index => $data) {
-            if ($index == 0)
-                $retur_rows[] = [
-                    'nro_doc' => $registro->getNroConsecutivo(),
-                    'fecha' => $registro->getFecha()->format('d/m/Y'),
-                    'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
-                    'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => '',
-                    'analisis_2' => '',
-                    'analisis_3' => '',
-                    'value_1' => '',
-                    'value_2' => '',
-                    'value_3' => '',
-                    'mes' => $registro->getFecha()->format('m'),
-                    'anno' => $registro->getFecha()->format('Y'),
-                    'debito' => number_format($data->getDebito(), 2),
-                    'credito' => number_format($data->getCredito(), 2)
-                ];
-            else
-                $retur_rows[] = [
-                    'nro_doc' => '',
-                    'fecha' => '',
-                    'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
-                    'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => '',
-                    'analisis_2' => '',
-                    'analisis_3' => '',
-                    'value_1' => '',
-                    'value_2' => '',
-                    'value_3' => '',
-                    'mes' => $registro->getFecha()->format('m'),
-                    'anno' => $registro->getFecha()->format('Y'),
-                    'debito' => number_format($data->getDebito(), 2),
-                    'credito' => number_format($data->getCredito(), 2)
-                ];
+
+        $total = 0;
+
+        if (!empty($arr_data_movimientos_comprobante)) {
+            $cuenta_activo_er = $em->getRepository(ActivoFijoCuentas::class);
+            /** @var ComprobanteMovimientoActivoFijo $data */
+            foreach ($arr_data_movimientos_comprobante as $data) {
+                $movimiento = $data->getIdMovimientoActivo();
+                /** @var ActivoFijoCuentas $cuentas_activo_fijo */
+                $cuentas_activo_fijo = $cuenta_activo_er->findOneBy(['id_activo' => $movimiento->getIdActivoFijo()]);
+                $total += $movimiento->getIdActivoFijo()->getValorInicial();
+                if ($movimiento->getEntrada()) {
+                    $row[] = array(
+                        'nro' => $movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $movimiento->getNroConsecutivo(),
+                        'fecha' => $movimiento->getFecha()->format('d/m/Y'),
+                        'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaActivo()->getNroCuenta(),
+                        'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaActivo()->getNroSubcuenta(),
+                        'debito' => number_format($movimiento->getIdActivoFijo()->getValorInicial(), 2),
+                        'credito' => '',
+                        'analisis_1' => $cuentas_activo_fijo->getIdCentroCostoActivo()->getCodigo(),
+                        'analisis_2' => $cuentas_activo_fijo->getIdAreaResponsabilidadActivo()->getCodigo()
+                    );
+                    if ($movimiento->getIdActivoFijo()->getDepreciacionAcumulada() > 0) {
+                        $row[] = array(
+                            'nro' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaDepreciacion()->getNroCuenta(),
+                            'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaDepreciacion()->getNroSubcuenta(),
+                            'debito' => '',
+                            'credito' => number_format($movimiento->getIdActivoFijo()->getDepreciacionAcumulada(), 2),
+                            'analisis_1' => '',
+                            'analisis_2' => ''
+                        );
+                    }
+                    $row[] = array(
+                        'nro' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaAcreedora() ? $cuentas_activo_fijo->getIdCuentaAcreedora()->getNroCuenta() : '',
+                        'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaAcreedora() ? $cuentas_activo_fijo->getIdSubcuentaAcreedora()->getNroSubcuenta() : '',
+                        'debito' => '',
+                        'credito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                        'analisis_1' => '',
+                        'analisis_2' => ''
+                    );
+                    $row[] = array(
+                        'nro' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => '',
+                        'nro_subcuenta' => '',
+                        'debito' => number_format($movimiento->getIdActivoFijo()->getValorInicial(), 2),
+                        'credito' => number_format($movimiento->getIdActivoFijo()->getValorInicial(), 2),
+                        'analisis_1' => '',
+                        'analisis_2' => ''
+                    );
+                } else {
+                    if ($movimiento->getIdTipoMovimiento()->getId() == 6)
+                        $row[] = array(
+                            'nro' => $movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $movimiento->getNroConsecutivo(),
+                            'fecha' => $movimiento->getFecha()->format('d/m/Y'),
+                            'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaGasto() ? $cuentas_activo_fijo->getIdCuentaGasto()->getNroCuenta() : '',
+                            'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaGasto() ? $cuentas_activo_fijo->getIdSubcuentaGasto()->getNroSubcuenta() : '',
+                            'credito' => '',
+                            'debito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                            'analisis_1' => '',
+                            'analisis_2' => ''
+                        );
+                    else if ($movimiento->getIdTipoMovimiento()->getId() == 3)
+                        $row[] = array(
+                            'nro' => $movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $movimiento->getNroConsecutivo(),
+                            'fecha' => $movimiento->getFecha()->format('d/m/Y'),
+                            'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaActivo() ? $cuentas_activo_fijo->getIdCuentaActivo()->getNroCuenta() : '',
+                            'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaActivo() ? $cuentas_activo_fijo->getIdSubcuentaActivo()->getNroSubcuenta() : '',
+                            'credito' => '',
+                            'debito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                            'analisis_1' => '',
+                            'analisis_2' => ''
+                        );
+                    else
+                        $row[] = array(
+                            'nro' => $movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $movimiento->getNroConsecutivo(),
+                            'fecha' => $movimiento->getFecha()->format('d/m/Y'),
+                            'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaAcreedora() ? $cuentas_activo_fijo->getIdCuentaAcreedora()->getNroCuenta() : '',
+                            'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaAcreedora() ? $cuentas_activo_fijo->getIdSubcuentaAcreedora()->getNroSubcuenta() : '',
+                            'credito' => '',
+                            'debito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                            'analisis_1' => '',
+                            'analisis_2' => ''
+                        );
+                    if ($movimiento->getIdActivoFijo()->getDepreciacionAcumulada() > 0) {
+                        $row[] = array(
+                            'nro' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaDepreciacion()->getNroCuenta(),
+                            'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaDepreciacion()->getNroSubcuenta(),
+                            'credito' => '',
+                            'debito' => number_format($movimiento->getIdActivoFijo()->getDepreciacionAcumulada(), 2),
+                            'analisis_1' => '',
+                            'analisis_2' => ''
+                        );
+                    }
+                    $row[] = array(
+                        'nro' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $cuentas_activo_fijo->getIdCuentaActivo()->getNroCuenta(),
+                        'nro_subcuenta' => $cuentas_activo_fijo->getIdSubcuentaActivo()->getNroSubcuenta(),
+                        'credito' => number_format($movimiento->getIdActivoFijo()->getValorInicial(), 2),
+                        'debito' => '',
+                        'analisis_1' => $cuentas_activo_fijo->getIdCentroCostoActivo()->getCodigo(),
+                        'analisis_2' => $cuentas_activo_fijo->getIdAreaResponsabilidadActivo()->getCodigo()
+                    );
+
+                    $row[] = array(
+                        'nro' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => '',
+                        'nro_subcuenta' => '',
+                        'debito' => number_format($movimiento->getIdActivoFijo()->getValorInicial(), 2),
+                        'credito' => number_format($movimiento->getIdActivoFijo()->getValorInicial(), 2),
+                        'analisis_1' => '',
+                        'analisis_2' => ''
+                    );
+                }
+
+                $retur_rows [] = array(
+                    'nro_doc' => $row[0]['nro'],
+                    'datos' => $row
+                );
+                $row = [];
+            }
         }
-        $data_return [] = array(
-            'nro_doc' => $registro->getDocumento(),
-            'datos' => $retur_rows
-        );
-        return $data_return;
+
+//        $data_return [] = array(
+//            'nro_doc' => $registro->getDocumento(),
+//            'datos' => $retur_rows
+//        );
+        return $retur_rows;
     }
 }
