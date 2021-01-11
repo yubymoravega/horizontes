@@ -1,0 +1,64 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir SUBMAYOR {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column align-items-center" style="height: 1000px;">
+        <table border="1" width="960px" class="mt-1">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">submayor de inventario
+                    por producto
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center"><strong>Almacén</strong></td>
+                <td colspan="5" class="text-center"><strong>Unidad</strong></td>
+            </tr>
+            <tr>
+                <td colspan="2">{{ datos.nombre_almacen }}</td>
+                <td colspan="2"><strong>Código:  </strong>{{ datos.codigo_unidad }}</td>
+                <td colspan="3"><strong>Nombre:  </strong>{{ datos.nombre_unidad }}</td>
+            </tr>
+            <tr>
+                <td colspan="7" class="text-center text-uppercase font-weight-bold">Datos del producto</td>
+            </tr>
+            <tr>
+                <td><strong>Código:  </strong>{{ datos.codigo_producto }}</td>
+                <td colspan="5"><strong>Descripción:  </strong>{{ datos.descripcion_producto }}</td>
+                <td><strong>UM:  </strong>{{ datos.um_producto }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="1" width="960px">
+            <tr>
+                <td width="120" rowspan="2" class="text-center"><strong>Fecha</strong></td>
+                <td width="120" rowspan="2" class="text-center"><strong>Documento</strong></td>
+                <td colspan="2" class="text-center"><strong>Entradas</strong></td>
+                <td colspan="2" class="text-center"><strong>Salidas</strong></td>
+                <td colspan="2" class="text-center"><strong>Existencia</strong></td>
+            </tr>
+            <tr>
+                <td class="text-center"><strong>Cantidad</strong></td>
+                <td class="text-center"><strong>Importe</strong></td>
+                <td class="text-center"><strong>Cantidad</strong></td>
+                <td class="text-center"><strong>Importe</strong></td>
+                <td class="text-center"><strong>Cantidad</strong></td>
+                <td class="text-center"><strong>Importe</strong></td>
+
+            </tr>
+            <tbody>
+            {% for item in movimientos %}
+                <tr>
+                    <td width="120" {#rowspan="{{ datos.cant_movimientos-1 }}"#}>{{ item.fecha }}</td>
+                    <td width="120" class="text-center">{{ item.nro_documento }}</td>
+                    <td class="text-right">{{ item.cant_entrada }}</td>
+                    <td class="text-right">{{ item.importe_entrada }}</td>
+                    <td class="text-right">{{ item.cant_salida }}</td>
+                    <td class="text-right">{{ item.importe_salida }}</td>
+                    <td class="text-right">{{ item.cant_existencia }}</td>
+                    <td class="text-right">{{ item.importe_existencia }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

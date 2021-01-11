@@ -1,0 +1,113 @@
+{% extends 'contabilidad/general/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Registro de comprobantes
+            </h4>
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
+                    title="Imprimir Registro de Comprobantes"
+                    onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">
+                <i class="fa fa-print"></i>
+            </button>
+        </div>
+        {# end header #}
+
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="100px">#</th>
+            <th width="400px" class="pr-0 pl-0">Almacén ó Unidad</th>
+            <th width="90px" class="pl-0 text-center pr-0">Fecha</th>
+            <th scope="col-1" class="pl-2 text-center">Usuario</th>
+            <th width="180">Débito</th>
+            <th width="180">Crédito</th>
+            <th width="100px">Imprimir</th>
+            </thead>
+            <tbody>
+            {% for item in registro %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.abreviatura_comprobante }}-{{ item.nro }}</td>
+                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.almacen }}</td>
+                    <td style="font-weight:400;" class="pl-0 pr-0">{{ item.fecha }}</td>
+                    <td style="font-weight:400;" class="text-center">{{ item.usuario }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
+                    <td style="font-weight:400;" class="text-right" hidden>{{ item.descripcion }}</td>
+                    <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning"
+                                                                        title="Imprimir Comprobante"
+                                                                        onclick="Print_Comprobante({{ item.id }})"></i>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+    <div class="row w-100 ml-1" id="observacion_div">
+        <div class="col-11 mb-0">
+            <p class="text-uppercase font-weight-bold text-white section-relative">Descricpción del comprobante seleccionado:</p>
+        </div>
+        <div class="col-1 mt-0 mb-0 text-right">
+            <button class="btn fa-minus-circle text-danger" onclick="CerrarDescripcion()"></button>
+        </div>
+        <div class="col-12 mt-0">
+            <textarea readonly id="observacion_p" class="form-group input-group input-group-sm form-control w-100"></textarea>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#observacion_div').hide()
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+
+        function CerrarDescripcion() {
+            $('#observacion_div').hide()
+        }
+        function Print_Comprobante(id) {
+            CerrarDescripcion()
+            let url = '/contabilidad/general/registro-comprobantes/detalles/' + id
+            window.open(url, 'blank_')
+        }
+
+        $("div.container-fluid table").delegate('tr', 'click', function (e) {
+            // setTimeout(function() {
+            //     $("#observacion_div").fadeOut(0);
+            // },0);
+            let arr = e.currentTarget.innerHTML.split('hidden="">');
+            if (arr.length > 1){
+                let sub_arr = arr[1].split('</td>');
+                $('#observacion_p').val(sub_arr[0])
+                $('#observacion_div').show()
+
+                // setTimeout(function() {
+                //     $("#observacion_div").fadeIn(1500);
+                // },0);
+                //
+                // setTimeout(function() {
+                //     $("#observacion_div").fadeOut(20000);
+                // },0);
+            }
+            else{
+                // $('#observacion_div').hide()
+                $('#observacion_p').val('')
+                console.info('Dio click afuera')
+            }
+
+        });
+    </script>
+{% endblock %}

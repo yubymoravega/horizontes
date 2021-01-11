@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title> Listado de existencia en almacén</title>
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+    <style>
+        @media print {
+
+            table {
+                page-break-before: always;
+                page-break-after: always;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto
+            }
+
+            td {
+                page-break-inside: avoid;
+                page-break-after: auto
+            }
+
+            thead {
+                display: table-header-group
+            }
+
+            tfoot {
+                display: table-footer-group
+            }
+        }
+
+        th {
+            padding: .2rem 0;
+            border: solid black 1px;
+            width: 80px;
+        }
+
+        td {
+            padding: 0 .3rem;
+        }
+
+        .cuenta-print-listado {
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        .subcuenta-print-listado {
+            font-style: italic;
+        }
+
+        .total-print {
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+    <table border="1" width="960px" class="mt-1">
+        <tbody>
+        <tr>
+            <td colspan="7" height="70px" class="font-weight-bold text-center">Listado de existencia en almacén <br>
+            Unidad: {{ unidad }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table border="0" width="960px" style="margin-bottom: 1rem;">
+        <thead class="thead-dark">
+        <th width="130px">Códico</th>
+        <th scope="col-1">Descripción</th>
+        <th width="100px">UM</th>
+        <th width="160px">Existencia</th>
+        <th width="150px">Precio</th>
+        <th width="150px">Importe</th>
+        </thead>
+        <tbody>
+        {% for item in mercancias %}
+            <tr>
+                <td class="row-group-conta text-white" colspan="6">{{ item.almacen }}</td>
+                {#                        <td class="row-group-subconta text-right">{{ item.total }}</td>#}
+            </tr>
+            <tr>
+                <td class="row-group-subconta text-white" colspan="5">{{ item.data.cuenta }}</td>
+                <td class="row-group-subconta text-right text-white">{{ item.data.total }}</td>
+            </tr>
+            {% for new_item in item.data.existencia %}
+                <tr>
+                    <td class="" colspan="5">{{ new_item.subcuenta }}</td>
+                    <td class="text-right font-weight-bold">{{ new_item.total }}</td>
+                </tr>
+                {% for new_item_2 in new_item.existencia_subcuenta %}
+                    <tr>
+                        <td style="font-weight:400;">{{ new_item_2.codigo }}</td>
+                        <td style="font-weight:400;">{{ new_item_2.descripcion }}</td>
+                        <td style="font-weight:400;">{{ new_item_2.unidad_medida }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item_2.existencia }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item_2.precio }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item_2.importe }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script src="{{ asset('js/core.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/script.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/contabilidad.js') }}" type="text/javascript"></script>
+</body>
+</html>

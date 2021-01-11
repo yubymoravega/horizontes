@@ -53,7 +53,6 @@ class EmpleadoController extends AbstractController
             'nombre' => $nombre,
             'id_unidad' => $obj_unidad
         ]);
-
         return new JsonResponse([
             'id' => $empleado ? $empleado->getId() : '',
             'nombre' => $empleado ? $empleado->getNombre() : '',
@@ -233,18 +232,20 @@ class EmpleadoController extends AbstractController
     }
 
     /**
-     * @Route("/empleado-delete/{id}", name="contabilidad_capital_humano_empleado_delete")
+     * @Route("/empleado-baja", name="contabilidad_capital_humano_empleado_baja")
      */
-    public function deleteEmpleado($id)
+    public function deleteBaja(EntityManagerInterface $em,Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $empleado_er = $em->getRepository(Empleado::class);
-        $empleado_obj = $empleado_er->find($id);
+        $empleado_obj = $em->getRepository(Empleado::class)->find($request->request->get('id_empleado'));
         $msg = 'No se pudo dar baja al empleado seleccionado';
         $success = 'error';
         if ($empleado_obj) {
             /**@var $empleado_obj Empleado** */
-            $empleado_obj->setActivo(false);
+            $empleado_obj
+                ->setActivo(false)
+                ->setBaja(true)
+                ->setFechaBaja(\DateTime::createFromFormat('Y-m-d',$request->request->get('fecha_baja')));
+
             if ($empleado_obj->getIdUsuario())
                 $obj_user = $empleado_obj->getIdUsuario()->setStatus(false);
             try {

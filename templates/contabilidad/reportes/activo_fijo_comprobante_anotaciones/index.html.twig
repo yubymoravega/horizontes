@@ -1,0 +1,73 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Comprobante de Anotaciones Activo Fijo {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Comprobante de
+                    anotaciones de Activo Fijo
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Unidad: </strong> {{ unidad }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0" width="960px" class="text-center">
+            <thead>
+            <th width="70px">Documento</th>
+            <th width="70px">Fecha</th>
+            <th width="175px">Cuenta</th>
+            <th width="120px">Subcuenta</th>
+            <th width="120px">Análisis 1</th>
+            <th width="120px">Análisis 2</th>
+            <th width="120px">Débitos</th>
+            <th width="120px">Créditos</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                {% if item.cuenta == '' %}
+                    <tr>
+                        <td style="font-weight:400;" class="text-left">{{ item.nro }}</td>
+                        <td style="font-weight:400;">{{ item.fecha }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ item.cuenta }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ item.subcuenta }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ item.criterio_1 }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ item.criterio_2 }}</td>
+                        <td style="font-weight:400;" class="text-right border-top pb-3">{{ item.debito }}</td>
+                        <td style="font-weight:400;" class="text-right border-top pb-3">{{ item.credito }}</td>
+                    </tr>
+                {% else %}
+                    {% if item.cuenta == 'TOTAL' %}
+                        <tr class="border pb-2" style="background-color: gainsboro">
+                            <td style="font-weight:400;" class="text-left">{{ item.nro }}</td>
+                            <td style="font-weight:400;">{{ item.fecha }}</td>
+                            <td style="font-weight:400;" class="text-center font-weight-bold">{{ item.cuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.subcuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.criterio_1 }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.criterio_2 }}</td>
+                            <td style="font-weight:400;" class="text-right font-weight-bold">{{ item.debito }}</td>
+                            <td style="font-weight:400;" class="text-right font-weight-bold">{{ item.credito }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td style="font-weight:400;" class="text-left">{{ item.nro }}</td>
+                            <td style="font-weight:400;">{{ item.fecha }}</td>
+                            <td style="font-weight:400;" class="text-center">{{ item.cuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.subcuenta }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.criterio_1 }}</td>
+                            <td style="font-weight:400;" class="text-left">{{ item.criterio_2 }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="navigation mt-5">
+            {{ knp_pagination_render(datos) }}
+        </div>
+    </div>
+{% endblock %}

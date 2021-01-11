@@ -119,6 +119,16 @@ class MovimientoActivoFijo
      */
     private $id_movimiento_cancelado;
 
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $fecha_factura;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_factura;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -336,6 +346,30 @@ class MovimientoActivoFijo
     public function setIdMovimientoCancelado(?self $id_movimiento_cancelado): self
     {
         $this->id_movimiento_cancelado = $id_movimiento_cancelado;
+
+        return $this;
+    }
+
+    public function getFechaFactura(): ?\DateTimeInterface
+    {
+        return $this->fecha_factura;
+    }
+
+    public function setFechaFactura(?\DateTimeInterface $fecha_factura): self
+    {
+        $this->fecha_factura = $fecha_factura;
+
+        return $this;
+    }
+
+    public function getNroFactura(): ?string
+    {
+        return $this->nro_factura;
+    }
+
+    public function setNroFactura(?string $nro_factura): self
+    {
+        $this->nro_factura = $nro_factura;
 
         return $this;
     }
