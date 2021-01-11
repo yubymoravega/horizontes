@@ -3,6 +3,7 @@
 namespace App\Controller\Contabilidad;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\Form\Contabilidad\Reportes\UnidadChoicesType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,9 @@ class ReportesController extends AbstractController
     public function index(EntityManagerInterface $em)
     {
 //        $this->limpiarVariables();
+        $form = $this->createForm(UnidadChoicesType::class);
         return $this->render('contabilidad/reportes/index.html.twig', [
+            'form_unidades' => $form->createView(),
             'controller_name' => 'ReportesController',
         ]);
     }

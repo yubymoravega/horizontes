@@ -1,10 +1,13 @@
 <div>
-    <form action="" method="post" class="d-flex">
+    {#<form action="" method="post" class="d-flex">
         <select class="mr-2 form-control" name="__selected__unidad" id="__selected__unidad__id"
-                style="width: 250px; height: 38px;">
+               value="3" style="width: 250px; height: 38px;">
         </select>
         <button class="btn btn-primary btn-sm mr-5">
             <i class="fa fa-search"></i>
         </button>
-    </form>
+    </form>#}
+    {{ form(form_unidades) }}
+  {#  {{ form_start('form_unidades') }}
+    {{ form_end('form_unidades') }}#}
 </div>

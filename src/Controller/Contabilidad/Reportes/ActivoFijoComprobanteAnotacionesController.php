@@ -6,6 +6,7 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Form\Contabilidad\Reportes\UnidadChoicesType;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

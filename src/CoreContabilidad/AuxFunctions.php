@@ -274,8 +274,9 @@ class AuxFunctions
 
     public static function getUnidad($em, $user)
     {
-        if ($GLOBALS['selected__unidad'])
-            return $em->getRepository(Unidad::class)->find($GLOBALS['selected__unidad']);
+        if (array_key_exists('selected__unidad', $GLOBALS))
+            if ($GLOBALS['selected__unidad'])
+                return $em->getRepository(Unidad::class)->find($GLOBALS['selected__unidad']);
 
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,
@@ -285,6 +286,7 @@ class AuxFunctions
             return $obj_empleado->getIdUnidad();
         }
         return null;
+
     }
 
     public static function getCuentasInventario($em)
