@@ -10,6 +10,7 @@ use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Contabilidad\OperacionesComprobanteOperaciones;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
+use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Contabilidad\General\FacturasComprobante;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\ComprobanteCierre;
@@ -124,6 +125,7 @@ class RegistroComprobantesController extends AbstractController
         $nombre_unidad = $obj_unidad->getNombre();
 
         $row = [];
+        //comprobante de operaciones de inventario
         if ($registro_obj->getTipo() == 1) {
             $cierres_por_comprobantes = $em->getRepository(ComprobanteCierre::class)->findBy(array(
                 'id_comprobante' => $registro_obj
@@ -132,9 +134,17 @@ class RegistroComprobantesController extends AbstractController
             foreach ($cierres_por_comprobantes as $comprobanteCierre) {
                 $row = array_merge($row, $this->getDataDetalles($request, $em, $comprobanteCierre->getIdCierre()->getFecha(), $obj_almacen));
             }
-        } elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_VENTA) {
+        } //comprobante de venta
+        elseif ($registro_obj->getTipo() == 2) {
             $row = $this->getDataDetallesVenta($em, $registro_obj->getId(), $obj_unidad->getId());
-        } elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_CONTABILIDAD) {
+        } //comprobante de operaciones de la contabilidad
+        elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_CONTABILIDAD) {
+            $row = $this->getDataDetallesComprobanteOperaciones($em, $registro_obj->getId(), $obj_unidad->getId());
+        } //depreciacion de activo fijo
+        elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO) {
+            $row = $this->getDataDetallesDepreciacion($em, $registro_obj->getId(), $obj_unidad->getId());
+        } //comprobante de operaciones de activo fijo
+        elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_ACTIVO_FIJO) {
             $row = $this->getDataDetallesComprobanteOperaciones($em, $registro_obj->getId(), $obj_unidad->getId());
         }
 
@@ -228,6 +238,57 @@ class RegistroComprobantesController extends AbstractController
         ]);
 //        dd($registro);
         /** @var OperacionesComprobanteOperaciones $data */
+        foreach ($arr_data_comprobante as $index => $data) {
+            if ($index == 0)
+                $retur_rows[] = [
+                    'nro_doc' => $registro->getNroConsecutivo(),
+                    'fecha' => $registro->getFecha()->format('d/m/Y'),
+                    'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
+                    'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
+                    'analisis_1' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'mes' => $registro->getFecha()->format('m'),
+                    'anno' => $registro->getFecha()->format('Y'),
+                    'debito' => number_format($data->getDebito(), 2),
+                    'credito' => number_format($data->getCredito(), 2)
+                ];
+            else
+                $retur_rows[] = [
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
+                    'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
+                    'analisis_1' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'mes' => $registro->getFecha()->format('m'),
+                    'anno' => $registro->getFecha()->format('Y'),
+                    'debito' => number_format($data->getDebito(), 2),
+                    'credito' => number_format($data->getCredito(), 2)
+                ];
+        }
+        $data_return [] = array(
+            'nro_doc' => $registro->getDocumento(),
+            'datos' => $retur_rows
+        );
+        return $data_return;
+    }
+
+    public function getDataDetallesDepreciacion(EntityManagerInterface $em, $registro_id, $id_unidad)
+    {
+        $retur_rows = [];
+        $registro = $em->getRepository(RegistroComprobantes::class)->find($registro_id);
+        $arr_data_comprobante = $em->getRepository(Asiento::class)->findBy([
+            'id_comprobante' => $registro
+        ]);
+        /** @var Asiento $data */
         foreach ($arr_data_comprobante as $index => $data) {
             if ($index == 0)
                 $retur_rows[] = [

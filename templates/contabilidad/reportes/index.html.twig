@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %} Economía | Contabilidad {% endblock %}
+{% block title %} Economía | Reportes {% endblock %}
 {% block style %}
     <style>
         label {
@@ -22,21 +22,19 @@
                     Inventario
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{{ url ('contabilidad_config_expedientes') }}">Expedientes</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_config_orden_trabajo') }}">Ordenes de
-                        Trabajo</a>
-                </div>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Venta
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_comprobante_operaciones') }}">Comprobante
-                        de Operaciones</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_comprobante_venta_generar') }}">Generar
-                        Comprobante de Venta</a>
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_reportes_inventario_existencia_almacen',{nro_cuenta:'one'}) }}">Existencia en
+                        Almacén</a>
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_reportes_inventario_submayor_productos') }}">Submayor de
+                        inventario por producto</a>
+                    <div class="dropdown-divider"></div>
+                    <h6 class="text-center">Comprobante de anotaciones</h6>
+                    <div class="dropdown-divider"></div>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                       href="{{ url ('contabilidad_reportes_inventario_comprobante_anotaciones_entrada') }}">Entrada</a>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                       href="{{ url ('contabilidad_reportes_inventario_comprobante_anotaciones_salida') }}">Salida</a>
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -45,14 +43,12 @@
                     Activo Fijo
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Registro de Comprobante</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Movimiento de Cuentas</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Saldo</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo_cuenta_subcuenta') }}">Balance de Comprobación de Cuentas y Subcuentas </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_cobrar') }}">Cuenta por Cobrar</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_pagar') }}">Cuenta por Pagar</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_reportes_activo_fijo_por_criterio') }}">Activos Fijos por
+                        criterio</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_reportes_activo_fijo_depreciacion') }}">Listado de
+                        Depreciación</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_reportes_activo_fijo_comprobante_anotaciones') }}" target="_blank">Comprobante de
+                        Anotaciones</a>
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -61,14 +57,8 @@
                     Capital Humano
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_registro_comprobantes') }}">Registro de Comprobante</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Movimiento de Cuentas</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo') }}">Balance de Comprobación de Saldo</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_balance_comprobacion_saldo_cuenta_subcuenta') }}">Balance de Comprobación de Cuentas y Subcuentas </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_cobrar') }}">Cuenta por Cobrar</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_general_cuenta_por_pagar') }}">Cuenta por Pagar</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_reportes_capital_humano_plantilla_empleados') }}">Plantilla de Empleados</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_general_movimiento_cuenta') }}">Nóminas de Salario</a>
                 </div>
             </li>
             <li class="nav-item dropdown">

@@ -50,11 +50,9 @@ class ComprobanteOperacionesController extends AbstractController
 //            dd($add);
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
-       /* $fecha = Date('Y-m-d');
+        $fecha = AuxFunctions::getCurrentDate($em,$obj_unidad);
         $arr_fecha = explode('-', $fecha);
-        $year_ = intval($arr_fecha[0]);*/
-        $fecha = AuxFunctions::getCurrentDate($em, $obj_unidad);
-        $year_ = AuxFunctions::getCurrentYear($em, $obj_unidad);
+        $year_ = AuxFunctions::getCurrentYear($em,$obj_unidad);
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_unidad' => $obj_unidad,

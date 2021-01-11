@@ -21,12 +21,19 @@
                     </button>
                 </div>
                 <div class="modal-body bg-dark-app">
-                    <div class="d-flex mt-4">
-                        <button class="btn btn-outline-secondary mr-auto" type="button" data-dismiss="modal"
-                                aria-hidden="true">Cancelar
-                        </button>
-                        <button type="button" class="my-0 btn btn-outline-danger" id="btn_aceptar">Dar Baja</button>
-                    </div>
+                    <form id="formulario_baja" action="/contabilidad/capital-humano/empleado/empleado-baja" method="post">
+                        <label for="fecha_baja">Está seguro que desea darle baja al trabajador?<br> Fecha en que se
+                            realizara la baja:
+                            <input type="date" class="ml-2" name="fecha_baja" id="fecha_baja">
+                        </label>
+                        <input type="hidden" name="id_empleado" id="id_empleado_baja">
+                        <div class="d-flex mt-4">
+                            <button class="btn btn-outline-secondary mr-auto" type="button" data-dismiss="modal"
+                                    aria-hidden="true">Cancelar
+                            </button>
+                            <button type="submit" class="my-0 btn btn-outline-danger" id="btn_baja">Dar Baja</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -229,6 +236,7 @@
             $('#btnUpdate').hide()
             $('#btnAdd').show()
             $('#form_modal_target')[0].reset()
+            $('#id_empleado_baja').val('')
         }
 
         function llenarFormulario(nombre) {
@@ -273,6 +281,7 @@
                     if (result.success == true) {
                         let empleado = result
                         if (empleado.id != '') {
+                            $('#id_empleado_baja').val(empleado.id)
                             $('#id_empleado').val(empleado.id)
                             $('#empleado_nombre').val(empleado.nombre)
                             $('#empleado_correo').val(empleado.correo)
@@ -308,5 +317,15 @@
                 }
             })
         }
+        //
+        // $('#btn_baja').on('click', function () {
+        //     const id_empleado_baja = $('#id_empleado_baja').val()
+        //     const fecha_baja = $('#fecha_baja').val()
+        //     const formulario = $('#form_modal_target')
+        //     formulario.attr('method', 'POST')
+        //     formulario.attr('action', '/contabilidad/capital-humano/empleado/empleado-baja/' + id_empleado_baja)
+        //     formulario.submit()
+        //     if (validateForm.errorList.length === 0) loadingModal.show()
+        // })
     </script>
 {% endblock %}
