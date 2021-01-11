@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\General;
 
+use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Venta\ClienteContabilidad;
@@ -55,6 +56,11 @@ class CobrosPagos
      * @ORM\ManyToOne(targetEntity=Proveedor::class)
      */
     private $id_proveedor;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=MovimientoActivoFijo::class)
+     */
+    private $id_movimiento_activo_fijo;
 
     public function getId(): ?int
     {
@@ -141,6 +147,18 @@ class CobrosPagos
     public function setIdProveedor(?Proveedor $id_proveedor): self
     {
         $this->id_proveedor = $id_proveedor;
+
+        return $this;
+    }
+
+    public function getIdMovimientoActivoFijo(): ?MovimientoActivoFijo
+    {
+        return $this->id_movimiento_activo_fijo;
+    }
+
+    public function setIdMovimientoActivoFijo(?MovimientoActivoFijo $id_movimiento_activo_fijo): self
+    {
+        $this->id_movimiento_activo_fijo = $id_movimiento_activo_fijo;
 
         return $this;
     }
