@@ -610,7 +610,7 @@
                                         '<td style="font-weight:400;"> ' +
                                         '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
                                         '<td style="font-weight:400;" class="text-center" hidden><input type="number" id="' + valor.id + '_id" value="' + valor.id + '"></td>' +
-                                        '<td style="font-weight:400;" class="text-center" hidden><input type="text" id="' + valor.id + '_type" value="IR"></td>' +
+                                        '<td style="font-weight:400;" class="text-center" hidden><input type="text" id="' + valor.id + '_type" value="'+valor.tipo+'"></td>' +
                                         '</td>' +
                                         '<td style="font-weight:400;" class="text-center" hidden> ' + valor.id + '</td>' +
                                         '<td style="font-weight:400;" class="text-center"> ' + valor.documento + '</td>' +
@@ -726,8 +726,6 @@
                 $('#cuentas_comprobante_operaciones_id_factura').val('')
                 $('#cuentas_comprobante_operaciones_id_informe_recepcion').val(str)
             }
-            console.log( $('#cuentas_comprobante_operaciones_id_factura').val())
-            console.log( str)
         }
     </script>
 {% endblock %}

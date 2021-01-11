@@ -100,7 +100,7 @@ class InventarioComprobanteAnotacionesSalidaController extends AbstractControlle
     }
 
     /**
-     * @Route("/print/{id}", name="contabilidad_inventario_comprobante_anotaciones_print_salida")
+     * @Route("/print/{id}", name="contabilidad_reportes_inventario_comprobante_anotaciones_print_salida")
      */
     public function printSalida(Request $request, EntityManagerInterface $em, PaginatorInterface $pagination,$id)
     {
