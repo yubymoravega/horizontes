@@ -3,10 +3,12 @@
 namespace App\Controller\Contabilidad\Reportes;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,19 +20,22 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes/inventario-comprobante-anotaciones-entrada")
  */
-class InventarioComprobanteAnotacionesEntradaController extends AbstractController
+class InventarioComprobanteAnotacionesEntradaController extends ControllerContabilidadReport
 {
     /**
      * @Route("/", name="contabilidad_reportes_inventario_comprobante_anotaciones_entrada")
      */
-    public function index()
+    public function index(EntityManagerInterface $em, AlmacenRepository $almacenRepository)
     {
+        $alamcenes = $almacenRepository->findBy(['id_unidad' => AuxFunctions::getUnidad($em, $this->getUser())]);
+
         return $this->render('contabilidad/reportes/inventario_comprobante_anotaciones_entrada/index.html.twig', [
             'controller_name' => 'InventarioComprobanteAnotacionesEntradaController',
+            'almacenes' => $alamcenes
         ]);
     }
 
-    public function getDataEntrada($request, $em,$id_almacen)
+    public function getDataEntrada($request, $em, $id_almacen)
     {
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
@@ -48,19 +53,19 @@ class InventarioComprobanteAnotacionesEntradaController extends AbstractControll
             $id_tipo_documento = $obj_documento->getIdTipoDocumento()->getId();
             //informe recepcion mercancia
             if ($id_tipo_documento == 1) {
-                if(!$obj_documento->getIdDocumentoCancelado()){
+                if (!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_informe = AuxFunctions::getDataInformeRecepcion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_informe);
                 }
             } //informe recepcion producto
             elseif ($id_tipo_documento == 2) {
-                if(!$obj_documento->getIdDocumentoCancelado()) {
+                if (!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_informe);
                 }
             } //Ajuste de entrada
             elseif ($id_tipo_documento == 3) {
-                if(!$obj_documento->getIdDocumentoCancelado()) {
+                if (!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_ajuste_entreada);
                 }
@@ -72,7 +77,7 @@ class InventarioComprobanteAnotacionesEntradaController extends AbstractControll
                 }
             } //transferencia de entrada
             elseif ($id_tipo_documento == 5) {
-                if(!$obj_documento->getIdDocumentoCancelado()) {
+                if (!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_transferencia_entrada = AuxFunctions::getDataTransferenciaEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_transferencia_entrada);
                 }
@@ -93,13 +98,13 @@ class InventarioComprobanteAnotacionesEntradaController extends AbstractControll
                 //  $rows = array_merge($rows, []);
             }//devolucion
             elseif ($id_tipo_documento == 9) {
-                if(!$obj_documento->getIdDocumentoCancelado()) {
+                if (!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_devolucion);
                 }
             }//Factura
             elseif ($id_tipo_documento == 10) {
-                if(!$obj_documento->getIdDocumentoCancelado()) {
+                if (!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_venta = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_venta);
                 }
@@ -111,12 +116,12 @@ class InventarioComprobanteAnotacionesEntradaController extends AbstractControll
     /**
      * @Route("/print/{id}", name="contabilidad_reportes_comprobante_anotaciones_print_entrada")
      */
-    public function printEntrada(Request $request, EntityManagerInterface $em, PaginatorInterface $pagination,$id)
+    public function printEntrada(Request $request, EntityManagerInterface $em, PaginatorInterface $pagination, $id)
     {
         /** @var Almacen $almacen_obj */
         $almacen_obj = $em->getRepository(Almacen::class)->find($id);
 
-        $rows = $this->getDataEntrada($request, $em,$id);
+        $rows = $this->getDataEntrada($request, $em, $id);
         $total = 0;
         foreach ($rows as $d) {
             if (isset($d['total'])) {

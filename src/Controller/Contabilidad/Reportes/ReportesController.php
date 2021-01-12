@@ -5,6 +5,7 @@ namespace App\Controller\Contabilidad\Reportes;
 
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes")
  */
-class ReportesController extends AbstractController
+class ReportesController extends ControllerContabilidadReport
 {
 
     /**

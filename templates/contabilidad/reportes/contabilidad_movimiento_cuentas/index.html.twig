@@ -1,4 +1,4 @@
-{% extends 'contabilidad/general/index.html.twig' %}
+{% extends 'contabilidad/reportes/index.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -291,7 +291,7 @@
             hiddenParents()
             loadingModal.show()
             $.ajax({
-                url: '/contabilidad/general/movimiento-cuenta/getDatos',
+                url: '/contabilidad/reportes/contabilidad-movimiento-cuentas/getDatos',
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
@@ -352,7 +352,7 @@
                 }
                 loadingModal.show()
                 $.ajax({
-                    url: '/contabilidad/general/movimiento-cuenta/getSubmayor',
+                    url: '/contabilidad/reportes/contabilidad-movimiento-cuentas/getSubmayor',
                     method: 'POST',
                     dataType: 'json',
                     data: params,

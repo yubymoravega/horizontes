@@ -104,7 +104,7 @@ $(document).ready(function () {
 
     })
 
-    $.ajax({
+    /*$.ajax({
         url: '/contabilidad/reportes/load-unidades',
         method: 'POST',
         dataType: 'json',
@@ -121,7 +121,7 @@ $(document).ready(function () {
                 $('#__selected__unidad__almacen__id').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
             })
         }
-    })
+    })*/
 
     $('#__selected__unidad__almacen__id').on('change', function () {
         let val = $('#__selected__unidad__almacen__id').val()

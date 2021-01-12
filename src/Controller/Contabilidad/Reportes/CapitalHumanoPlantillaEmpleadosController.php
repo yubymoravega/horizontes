@@ -3,6 +3,7 @@
 namespace App\Controller\Contabilidad\Reportes;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes/capital-humano-plantilla-empleados")
  */
-class CapitalHumanoPlantillaEmpleadosController extends AbstractController
+class CapitalHumanoPlantillaEmpleadosController extends ControllerContabilidadReport
 {
     /**
      * @Route("/", name="contabilidad_reportes_capital_humano_plantilla_empleados")

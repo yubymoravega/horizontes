@@ -3,6 +3,7 @@
 namespace App\Controller\Contabilidad\Reportes;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Ajuste;
@@ -27,7 +28,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes/inventario-submayor-productos")
  */
-class InventarioSubmayorProductosController extends AbstractController
+class InventarioSubmayorProductosController extends ControllerContabilidadReport
 {
     /**
      * @Route("/", name="contabilidad_reportes_inventario_submayor_productos")

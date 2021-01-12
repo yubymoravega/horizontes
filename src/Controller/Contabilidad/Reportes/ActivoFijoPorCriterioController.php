@@ -3,6 +3,7 @@
 namespace App\Controller\Contabilidad\Reportes;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijo;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\Config\AreaResponsabilidad;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes/activo-fijo-x-criterio")
  */
-class ActivoFijoPorCriterioController extends AbstractController
+class ActivoFijoPorCriterioController extends ControllerContabilidadReport
 {
     /**
      * @Route("/", name="contabilidad_reportes_activo_fijo_por_criterio")

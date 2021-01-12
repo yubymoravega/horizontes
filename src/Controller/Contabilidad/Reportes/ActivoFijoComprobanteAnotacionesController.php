@@ -3,6 +3,7 @@
 namespace App\Controller\Contabilidad\Reportes;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\ActivoFijo\ActivoFijoCuentas;
 use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Config\Unidad;
@@ -13,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ActivoFijoComprobanteAnotacionesController extends AbstractController
+class ActivoFijoComprobanteAnotacionesController extends ControllerContabilidadReport
 {
     /**
      * @Route("/contabilidad/reportes/activo-fijo-comprobante-anotaciones", name="contabilidad_reportes_activo_fijo_comprobante_anotaciones")

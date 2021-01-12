@@ -3,10 +3,12 @@
 namespace App\Controller\Contabilidad\Reportes;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
+use App\Repository\Contabilidad\Config\AlmacenRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,15 +20,17 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes/inventario-comprobante-anotaciones-salida")
  */
-class InventarioComprobanteAnotacionesSalidaController extends AbstractController
+class InventarioComprobanteAnotacionesSalidaController extends ControllerContabilidadReport
 {
     /**
      * @Route("/contabilidad/reportes/inventario/comprobante/anotaciones/salida", name="contabilidad_reportes_inventario_comprobante_anotaciones_salida")
      */
-    public function index()
+    public function index(EntityManagerInterface $em, AlmacenRepository $almacenRepository)
     {
+        $alamcenes = $almacenRepository->findBy(['id_unidad' => AuxFunctions::getUnidad($em, $this->getUser())]);
         return $this->render('contabilidad/reportes/inventario_comprobante_anotaciones_salida/index.html.twig', [
             'controller_name' => 'InventarioComprobanteAnotacionesSalidaController',
+            'almacenes' => $alamcenes
         ]);
     }
 

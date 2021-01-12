@@ -24,27 +24,14 @@ class UnidadChoicesType extends AbstractType
     {
         $unidades = AuxFunctions::getUnidades($this->em, $this->security->getUser());
         $choices = [];
-//        dd($unidades);
         foreach ($unidades as $unidad)
             $choices[$unidad->getNombre()] = $unidad->getId();
-//        dd($choices);
         $builder
-            ->add('id_cliente', ChoiceType::class, [
-                'attr' => ['class' => 'w-100'],
+            ->add('__selected__unidad', ChoiceType::class, [
+                'attr' => ['class' => 'mr-2 form-control'],
+                'data' => AuxFunctions::getUnidad($this->em, $this->security->getUser())->getId(),
                 'choices' => $choices
             ]);
-        /*->add('buscar', ButtonType::class, [
-
-        ]);*/
-        /*->add('id_unidad', EntityType::class, [
-            'class' => Unidad::class,
-            'choice_label' => 'nombre',
-            'query_builder' => function (EntityRepository $er) {
-                return $er->createQueryBuilder('u')
-                    ->where('u.activo = true')
-                    ->orderBy('u.nombre', 'ASC');
-            }
-        ]);*/
     }
 
 }

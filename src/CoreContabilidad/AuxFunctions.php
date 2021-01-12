@@ -272,11 +272,11 @@ class AuxFunctions
      * @return Unidad | null
      */
 
-    public static function getUnidad($em, $user)
+    public static function getUnidad($em, User $user)
     {
-        if (array_key_exists('selected__unidad', $GLOBALS))
-            if ($GLOBALS['selected__unidad'])
-                return $em->getRepository(Unidad::class)->find($GLOBALS['selected__unidad']);
+        $selected_unidad = $GLOBALS['_SESSION']['_sf2_attributes']['selected__unidad'];
+        if ($selected_unidad)
+            return $em->getRepository(Unidad::class)->find($selected_unidad);
 
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,
@@ -885,8 +885,14 @@ class AuxFunctions
             return array_merge($selec_unidades, $unidades_hijas);
         };
 
-        $root_unidad = self::getUnidad($em, $user);
+        $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $user
+        ));
+
+        $root_unidad = $obj_empleado->getIdUnidad();
         $unidades = $allUnidades($root_unidad);
+
         return [$root_unidad, ...$unidades];
 
     }

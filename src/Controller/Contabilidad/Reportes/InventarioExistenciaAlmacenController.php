@@ -4,6 +4,7 @@ namespace App\Controller\Contabilidad\Reportes;
 
 use App\Controller\Contabilidad\ActivoFijo\ActivoFijoXCriterioController;
 use App\CoreContabilidad\AuxFunctions;
+use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
@@ -20,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller\Contabilidad\Reportes
  * @Route("/contabilidad/reportes/inventario-existencia-almacen")
  */
-class InventarioExistenciaAlmacenController extends AbstractController
+class InventarioExistenciaAlmacenController extends ControllerContabilidadReport
 {
      /**
      * @Route("/", name="contabilidad_reportes_inventario_existencia_almacen", methods={"GET", "POST"})

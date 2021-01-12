@@ -47,7 +47,7 @@
     {{ parent() }}
     <script>
         function Print_Comprobante() {
-            if ($('#__selected__almacen__id option:selected').index()>0) {
+            if ($('#__selected__almacen__id option:selected').length > 0) {
                 let url = '/contabilidad/reportes/inventario-comprobante-anotaciones-salida/print/' +$('#__selected__almacen__id').val()
                 window.open(url, 'blank_')
             } else

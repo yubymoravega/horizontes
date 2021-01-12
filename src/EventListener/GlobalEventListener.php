@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -34,8 +35,10 @@ class GlobalEventListener
      */
     public function onRequestListener(RequestEvent $event)
     {
+
         // para peticiones que no sean AJAX
         if (!$event->getRequest()->isXmlHttpRequest()) {
+
             $uri = $event->getRequest()->getRequestUri();
 
             /**                 -------------------------------------                         */
@@ -44,15 +47,12 @@ class GlobalEventListener
 
             $is_reportes = strpos($uri, 'contabilidad/reportes');
             if ($is_reportes) {
-                $is__selected__unidad = $event->getRequest()->get('__selected__unidad');
-                if (!is_null($is__selected__unidad)) $GLOBALS['selected__unidad'] = $is__selected__unidad;
-                else if (!array_key_exists('selected__unidad', $GLOBALS)) {
-                    $GLOBALS['selected__unidad'] = null;
-                }
+                $selected__unidad = $event->getRequest()->get('unidad_choices');
+                if (!is_null($selected__unidad))
+                    $event->getRequest()->getSession()->set('selected__unidad', $selected__unidad['__selected__unidad']);
             } else {
-                $GLOBALS['selected__unidad'] = null;
+                $event->getRequest()->getSession()->set('selected__unidad', null);
             }
-
 
             /**                 ----------------------------                                  */
             /**                 --- Seleccion de Alamcén ---                                  */

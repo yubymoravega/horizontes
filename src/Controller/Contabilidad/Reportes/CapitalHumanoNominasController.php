@@ -2,10 +2,11 @@
 
 namespace App\Controller\Contabilidad\Reportes;
 
+use App\CoreContabilidad\ControllerContabilidadReport;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class CapitalHumanoNominasController extends AbstractController
+class CapitalHumanoNominasController extends ControllerContabilidadReport
 {
     /**
      * @Route("/contabilidad/reportes/capital/humano/nominas", name="contabilidad_reportes_capital_humano_nominas")
