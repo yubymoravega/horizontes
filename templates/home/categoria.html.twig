@@ -44,9 +44,9 @@
 			
 		</div>
 
-			<div id="turismo" class="card 3">
+			<div id="inpospak" class="card 3">
 			<div class="card_image">
-			
+			<img src="{{ asset('images/servicios/inpospak.png') }}"/>
 			</div>
 			
 		</div>
@@ -158,6 +158,11 @@ $( "#remesa" ).click(function() {
 $( "#turismo" ).click(function() {
   
   window.location.href = "/turismo/solicitud/"+{{tel}};
+});
+
+$( "#inpospak" ).click(function() {
+  
+  window.location.href = "/mia_cargo/facturas/"+{{tel}};
 });
 
 	</script>

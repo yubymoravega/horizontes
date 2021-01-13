@@ -52,6 +52,15 @@ public function __construct(EntityManagerInterface $entityManager)
        
     }
 
+       /**
+     * @Route("/agencias/reporte", name="empresas/reporte")
+     */
+    public function empresas()
+    {
+
+       
+    }
+
      /**
      * @Route("/agencias/reporte", name="agencias/reporte")
      */

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{{ asset('css/tarjetas.css') }}"  />
+
+<div class="confirm">
+
+<img id='aprobada'  class="imagen-resultado" src="{{ asset('images/iconos/aprobada.svg') }}" > 
+
+<h1 id='mensaje' style="text-align: center;"></h1>
+
+     <a class='boton-agregar-tarjeta'  id='home' href="{{ path('home')}}">
+       Finalizar
+    </a>
+
+   
+
+{% endblock %} 
+
+{% block javascripts %} 
+{{parent()}}
+
+<script>
+
+// A $( document ).ready() block.
+$( document ).ready(function() {
+
+    window.open('/mia_cargo/pdf/'+{{id}}, '_blank');
+});
+
+</script>
+
+
+{% endblock %} 
