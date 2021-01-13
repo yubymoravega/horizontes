@@ -350,7 +350,7 @@ function editar(id) {
             data: {'id' : ""},
             url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/mia_cargo/facturas/edit/save/"+idFactura+"/"+
             document.getElementById("editCedula").value+"/"+document.getElementById("editCasillero").value+"/"+document.getElementById("editCiudad").value
-            +"/"+document.getElementById("editSh").value+"/"+document.getElementById("editMonto").value,
+            +"/"+document.getElementById("editSh").value+"/"+document.getElementById("editMonto").value+"/"+document.getElementById("editPeso").value,
             dataType: 'html',
             success: function (data) {
 
