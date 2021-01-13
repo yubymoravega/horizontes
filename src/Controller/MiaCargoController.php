@@ -25,8 +25,6 @@ use App\Entity\Contabilidad\Config\Moneda;
 class MiaCargoController extends AbstractController
 {
 
-
-
      // 2. Expose the EntityManager in the class level
      private $entityManager; 
 
