@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Subcuenta;

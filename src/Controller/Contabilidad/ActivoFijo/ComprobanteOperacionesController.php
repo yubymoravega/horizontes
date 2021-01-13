@@ -30,12 +30,12 @@ class ComprobanteOperacionesController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
-        dd(AuxFunctions::getUnidades($em, $this->getUser()));
+       // dd(AuxFunctions::getUnidades($em, $this->getUser()));
         $data_movimientos = $this->getData($em,$request);
         $row = [];
         $retur_rows = [];
         $total = 0;
-        if(!empty($data_movimientos)){
+        if (!empty($data_movimientos)) {
             $cuenta_activo_er = $em->getRepository(ActivoFijoCuentas::class);
             /** @var MovimientoActivoFijo $movimiento */
             foreach ($data_movimientos as $movimiento) {
@@ -85,8 +85,7 @@ class ComprobanteOperacionesController extends AbstractController
                         'criterio_1' => '',
                         'criterio_2' => ''
                     );
-                }
-                else {
+                } else {
                     if ($movimiento->getIdTipoMovimiento()->getId() == 6)
                         $row[] = array(
                             'nro' => $movimiento->getIdTipoMovimiento()->getCodigo() . '-' . $movimiento->getNroConsecutivo(),
@@ -163,11 +162,11 @@ class ComprobanteOperacionesController extends AbstractController
             }
         }
         /** @var Unidad $unidad */
-        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         return $this->render('contabilidad/activo_fijo/comprobante_operaciones/index.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',
             'unidad' => $unidad->getNombre(),
-            'fecha' => AuxFunctions::getCurrentDate($em,$unidad)->format('d-m-Y'),
+            'fecha' => AuxFunctions::getCurrentDate($em, $unidad)->format('d-m-Y'),
             'datos' => $retur_rows,
             'total_debito' => number_format($total, 2),
             'total_credito' => number_format($total, 2),
@@ -176,28 +175,29 @@ class ComprobanteOperacionesController extends AbstractController
         ]);
     }
 
-    public function getData(EntityManagerInterface $em,Request $request){
-        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
-        $anno = Date('Y');
+    public function getData(EntityManagerInterface $em, Request $request)
+    {
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $anno = AuxFunctions::getCurrentYear($em, $unidad);
         $movimientos_activoFijo = $em->getRepository(MovimientoActivoFijo::class)->findBy([
-            'anno'=>$anno,
-            'id_unidad'=>$unidad,
-            'activo'=>true
+            'anno' => $anno,
+            'id_unidad' => $unidad,
+            'activo' => true
         ]);
         $comprobantes_operaciones = $em->getRepository(ComprobanteMovimientoActivoFijo::class)->findBy([
-            'anno'=>$anno,
-            'id_unidad'=>$unidad
+            'anno' => $anno,
+            'id_unidad' => $unidad
         ]);
         $arr_id_movimientos_comprobante = [];
         /** @var ComprobanteMovimientoActivoFijo $movimientos_en_comprobante */
-        foreach ($comprobantes_operaciones as $movimientos_en_comprobante){
-            $arr_id_movimientos_comprobante[count($arr_id_movimientos_comprobante)]= $movimientos_en_comprobante->getIdMovimientoActivo()->getId();
+        foreach ($comprobantes_operaciones as $movimientos_en_comprobante) {
+            $arr_id_movimientos_comprobante[count($arr_id_movimientos_comprobante)] = $movimientos_en_comprobante->getIdMovimientoActivo()->getId();
         }
         $rows = [];
         /** @var MovimientoActivoFijo $movimiento */
-        foreach ($movimientos_activoFijo as $movimiento){
-            if(!in_array($movimiento->getId(),$arr_id_movimientos_comprobante)){
-                $rows[]= $movimiento;
+        foreach ($movimientos_activoFijo as $movimiento) {
+            if (!in_array($movimiento->getId(), $arr_id_movimientos_comprobante)) {
+                $rows[] = $movimiento;
             }
         }
         return $rows;
@@ -211,9 +211,9 @@ class ComprobanteOperacionesController extends AbstractController
         $asiento_er = $em->getRepository(Asiento::class);
         $tipo_comprobante_obj = $em->getRepository(TipoComprobante::class)->find($this->tipo_coprobante);
         /** @var Unidad $obj_unidad */
-        $obj_unidad = AuxFunctions::getUnidad($em,$this->getUser());
-        $fecha = $request->request->get('fecha');
-        $year_ = AuxFunctions::getCurrentYear($em,$obj_unidad);
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $fecha = AuxFunctions::getCurrentDate($em,$obj_unidad);
+        $year_ = AuxFunctions::getCurrentYear($em, $obj_unidad);
 
         $registro_comprobantes = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_tipo_comprobante' => $tipo_comprobante_obj,
@@ -224,15 +224,15 @@ class ComprobanteOperacionesController extends AbstractController
         $observacion = $request->request->get('observacion');
         $debito = $request->request->get('debito');
         $credito = $request->request->get('credito');
-        $consecutivo = count($registro_comprobantes)+1;
+        $consecutivo = count($registro_comprobantes) + 1;
 
         $new_registro = new RegistroComprobantes();
         $new_registro
             ->setDescripcion($observacion)
             ->setIdUsuario($this->getUser())
-            ->setFecha(\DateTime::createFromFormat('d-m-Y', $fecha))
+            ->setFecha($fecha)
             ->setAnno($year_)
-            ->setTipo(5)
+            ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_ACTIVO_FIJO)
             ->setCredito(floatval($credito))
             ->setDebito(floatval($debito))
             ->setIdAlmacen(null)
@@ -241,19 +241,18 @@ class ComprobanteOperacionesController extends AbstractController
             ->setNroConsecutivo($consecutivo);
         $em->persist($new_registro);
 
-
-       // 1. Obtener todos los movimientos que voy a actualizar
-        $movimientos = $this->getData($em,$request);
+        // 1. Obtener todos los movimientos que voy a actualizar
+        $movimientos = $this->getData($em, $request);
         /** @var MovimientoActivoFijo $movimiento_activo_fijo */
-        foreach ($movimientos as $movimiento_activo_fijo){
+        foreach ($movimientos as $movimiento_activo_fijo) {
             /**
              * actualizando datos de asiento
              */
             $asientos = $asiento_er->findBy([
-                'id_activo_fijo'=>$movimiento_activo_fijo->getIdActivoFijo()
+                'id_activo_fijo' => $movimiento_activo_fijo->getIdActivoFijo()
             ]);
             /** @var Asiento $asiento */
-            foreach ($asientos as $asiento){
+            foreach ($asientos as $asiento) {
                 $asiento
                     ->setIdComprobante($new_registro)
                     ->setIdTipoComprobante($tipo_comprobante_obj);

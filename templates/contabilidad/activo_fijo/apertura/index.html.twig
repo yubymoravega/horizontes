@@ -92,8 +92,6 @@
 
         const loadingData = function () {
             loadingModal.show()
-            $('#movimiento_activo_fijo_id_cuenta').val('')
-            $('#movimiento_activo_fijo_id_subcuenta').val('')
             $.ajax({
                 url: '/contabilidad/activo-fijo/apertura/getCuentas',
                 method: 'POST',
@@ -244,6 +242,8 @@
             $('#btnSubbmitApertura').show()
             $('#movimiento_activo_fijo_fecha').attr('type', 'date')
             $('#movimiento_activo_fijo')[0].reset()
+            $('#movimiento_activo_fijo_id_cuenta').val('')
+            $('#movimiento_activo_fijo_id_subcuenta').val('')
             loadingData()
         }
 

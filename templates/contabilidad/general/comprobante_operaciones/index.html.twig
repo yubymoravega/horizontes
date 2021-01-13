@@ -129,7 +129,7 @@
                                 {{ form_widget(form_cuentas_comprobantes.cliente,{'attr': {'class': 'form-control w-100'}}) }}
                             </div>
                             <div class="col-1 mt-0 p-0">
-                                <button class="btn btn-secondary btn-sm" type="button" id="btnSearchCliente"
+                                <button style="height: 50px !important;" class="btn btn-secondary btn-sm" type="button" id="btnSearchCliente"
                                         onclick="buscarFacturas()">
                                     <i class="fa fa-search"></i>
                                 </button>
@@ -143,7 +143,7 @@
                                 {{ form_widget(form_cuentas_comprobantes.proveedor,{'attr': {'class': 'form-control w-100'}}) }}
                             </div>
                             <div class="col-1 mt-0 p-0">
-                                <button class="btn btn-secondary btn-sm" type="button" id="btnSearchProveedor"
+                                <button style="height: 50px !important;" class="btn btn-secondary btn-sm" type="button" id="btnSearchProveedor"
                                         onclick="buscarDeudas()">
                                     <i class="fa fa-search"></i>
                                 </button>
@@ -610,7 +610,7 @@
                                         '<td style="font-weight:400;"> ' +
                                         '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
                                         '<td style="font-weight:400;" class="text-center" hidden><input type="number" id="' + valor.id + '_id" value="' + valor.id + '"></td>' +
-                                        '<td style="font-weight:400;" class="text-center" hidden><input type="text" id="' + valor.id + '_type" value="IR"></td>' +
+                                        '<td style="font-weight:400;" class="text-center" hidden><input type="text" id="' + valor.id + '_type" value="'+valor.tipo+'"></td>' +
                                         '</td>' +
                                         '<td style="font-weight:400;" class="text-center" hidden> ' + valor.id + '</td>' +
                                         '<td style="font-weight:400;" class="text-center"> ' + valor.documento + '</td>' +
@@ -726,8 +726,6 @@
                 $('#cuentas_comprobante_operaciones_id_factura').val('')
                 $('#cuentas_comprobante_operaciones_id_informe_recepcion').val(str)
             }
-            console.log( $('#cuentas_comprobante_operaciones_id_factura').val())
-            console.log( str)
         }
     </script>
 {% endblock %}

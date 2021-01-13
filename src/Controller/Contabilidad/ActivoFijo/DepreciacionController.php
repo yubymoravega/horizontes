@@ -186,7 +186,7 @@ class DepreciacionController extends AbstractController
                     ->setIdUsuario($this->getUser())
                     ->setFecha($today)
                     ->setAnno($year_)
-                    ->setTipo(4)
+                    ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO)
                     ->setCredito(floatval($total))
                     ->setDebito(floatval($total))
                     ->setIdAlmacen(null)
@@ -213,20 +213,17 @@ class DepreciacionController extends AbstractController
                         AuxFunctions::getCurrentYear($em, $unidad),
                         0, $grupos_total[$key],
                         0, null, null, null, $new_comprobante);
-
-                    $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em,
-                        $cuentas_activo_fijo->getIdCuentaDepreciacion(),
-                        $cuentas_activo_fijo->getIdSubcuentaDepreciacion(),
-                        null,
-                        $cuentas_activo_fijo->getIdActivo()->getIdUnidad(),
-                        null, null, null, null, null, null, 0, 0,
-                        AuxFunctions::getCurrentDate($em, $unidad),
-                        AuxFunctions::getCurrentYear($em, $unidad),
-                        $grupos_total[$key], 0,
-                        0, null, null, null, $new_comprobante);
-
                 }
-
+                $asiento_cuenta_depreciacion = AuxFunctions::createAsiento($em,
+                    $cuentas_activo_fijo->getIdCuentaDepreciacion(),
+                    $cuentas_activo_fijo->getIdSubcuentaDepreciacion(),
+                    null,
+                    $cuentas_activo_fijo->getIdActivo()->getIdUnidad(),
+                    null, null, null, null, null, null, 0, 0,
+                    AuxFunctions::getCurrentDate($em, $unidad),
+                    AuxFunctions::getCurrentYear($em, $unidad),
+                    $new_comprobante->getCredito(), 0,
+                    0, null, null, null, $new_comprobante);
             }
 
             try {
@@ -236,7 +233,12 @@ class DepreciacionController extends AbstractController
                 $this->addFlash('error', $e->getMessage());
             }
         }
-        return $this->redirectToRoute('contabilidad_activo_fijo_depreciacion');
+//        return $this->redirectToRoute('contabilidad_activo_fijo_depreciacion');
+        return $this->render('contabilidad/activo_fijo/success.html.twig', [
+            'controller_name' => 'ComprobanteOperacionesController',
+            'title' => '!!Exito',
+            'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' . $tipo_comprobante_obj->getAbreviatura() . '-' . $consecutivo . ', para ver detalles consulte el registro de comprobantes .'
+        ]);
     }
 
     private function canDepreciarEnMes(EntityManagerInterface $em, ActivoFijo $activo_fijo, $unidad)

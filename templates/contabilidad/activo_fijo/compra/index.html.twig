@@ -59,6 +59,19 @@
                     <select name="movimiento_activo_fijo[id_proveedor]" class="w-100 form-control"
                             id="id_proveedor"> </select>
                 </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-6 mt-0 pl-3 pr-2 form-group input-group input-group-sm d-block">
+                        <label for="fecha_factura">Fecha de la factura</label>
+                        <input type="date" name="movimiento_activo_fijo[fecha_factura]" id="fecha_factura"
+                               class="form form-control w-100">
+                    </div>
+                    <div class="col-6 mt-0 pl-3 pr-2 form-group input-group input-group-sm d-block">
+                        <label for="nro_factura">Número de la Factura</label>
+                        <input type="text" name="movimiento_activo_fijo[nro_factura]" id="nro_factura"
+                               class="form form-control w-100">
+                    </div>
+                </div>
+
                 <div class="mt-0 form-group input-group input-group-sm pa-2 d-block">
                     {{ form_label(formulario.fundamentacion) }}
                     {{ form_widget(formulario.fundamentacion) }}
@@ -99,8 +112,6 @@
             loadingModal.show()
             $('#id_proveedor').find('option').remove();
             $('#id_proveedor').prepend('<option selected = "true" value = "0" disabled> -- Seleccione -- </option>');
-            $('#movimiento_activo_fijo_id_cuenta').val('')
-            $('#movimiento_activo_fijo_id_subcuenta').val('')
             $.ajax({
                 url: '/contabilidad/activo-fijo/compra/getCuentas',
                 method: 'POST',
@@ -138,6 +149,8 @@
                 $('#movimiento_activo_fijo_fecha').val('')
                 $('#movimiento_activo_fijo_centro_costo').val('')
                 $('#movimiento_activo_fijo_area_responsabilidad').val('')
+                $('#fecha_factura').val('')
+                $('#nro_factura').val('')
             }
         })
 
@@ -184,6 +197,8 @@
                     'movimiento_activo_fijo[descripcion]': "required",
                     'movimiento_activo_fijo[fundamentacion]': "required",
                     'movimiento_activo_fijo[id_proveedor]': "required",
+                    'movimiento_activo_fijo[nro_factura]': "required",
+                    'movimiento_activo_fijo[fecha_factura]': "required",
                 },
                 messages: {
                     'movimiento_activo_fijo[id_cuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -192,7 +207,9 @@
                     'movimiento_activo_fijo[nro_inventatio]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_activo_fijo[descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'movimiento_activo_fijo[fundamentacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'movimiento_activo_fijo[id_proveedor]   ': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_activo_fijo[id_proveedor]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_activo_fijo[nro_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                    'movimiento_activo_fijo[fecha_factura]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 }
             })
         })
@@ -240,7 +257,10 @@
             $('#btnImprimir').show()
             $('#btnSubbmitCompra').show()
             $('#movimiento_activo_fijo_fecha').attr('type', 'date')
+            $('#fecha_factura').attr('type', 'date')
             $('#movimiento_activo_fijo')[0].reset()
+            $('#movimiento_activo_fijo_id_cuenta').val('')
+            $('#movimiento_activo_fijo_id_subcuenta').val('')``
             loadingData()
         }
 
@@ -271,6 +291,9 @@
                             $('#movimiento_activo_fijo_area_responsabilidad').val(compra.area_responsabilidad);
                             $('#movimiento_activo_fijo_fecha').attr('type', 'text');
                             $('#movimiento_activo_fijo_fecha').val(compra.fecha);
+                            $('#fecha_factura').attr('type', 'text');
+                            $('#fecha_factura').val(compra.fecha_factura);
+                            $('#nro_factura').val(compra.nro_factura);
                             $('#movimiento_activo_fijo_id_movimiento').val(compra.id);
                             $('#movimiento_activo_fijo_id_activo').val(compra.id_activo);
                             $('#movimiento_activo_fijo_fundamentacion').val(compra.fundamentacion);

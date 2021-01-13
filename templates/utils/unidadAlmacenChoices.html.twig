@@ -1,0 +1,15 @@
+<div>
+    <form action="" method="post" class="d-flex mt-2">
+        <div class="row form-group input-group">
+            <div class="col-12 mt-0">
+                <label for="" class="text-white">Seleccione el almacén:</label>
+                <select class="mr-0 form-control w-100" name="almacen" id="__selected__almacen__id"
+                        style="width: 250px; height: 38px;">
+                    {% for alamcen in almacenes %}
+                        <option value="{{ alamcen.id }}"> {{ alamcen.codigo }} - {{ alamcen.descripcion }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+</div>

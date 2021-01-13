@@ -26,7 +26,10 @@ class ComprobanteAnotacionesController extends AbstractController
     {
         /** @var Unidad $unidad */
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
-        $data_movimientos = $em->getRepository(MovimientoActivoFijo::class)->findBy(['anno' => Date('Y'), 'id_unidad' => $unidad]);
+        $data_movimientos = $em->getRepository(MovimientoActivoFijo::class)->findBy([
+            'anno' => AuxFunctions::getCurrentYear($em, $unidad),
+            'id_unidad' => $unidad
+        ]);
         $cuenta_activo_er = $em->getRepository(ActivoFijoCuentas::class);
         $row = [];
         /** @var MovimientoActivoFijo $movimiento */

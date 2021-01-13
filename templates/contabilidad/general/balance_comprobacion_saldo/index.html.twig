@@ -16,7 +16,7 @@
             </h4>
             <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
                     title="Imprimir Registro de Comprobantes"
-                    onclick="Print('{{ path('contabilidad_general_registro_comprobantes_print') }}')">
+                    onclick="Print('{{ path('contabilidad_general_balance_comprobacion_saldo_print') }}')">
                 <i class="fa fa-print"></i>
             </button>
         </div>
@@ -31,56 +31,43 @@
                 <td rowspan="2" width="100px">Criterio</td>
                 <td rowspan="2" class="text-center">Descripción</td>
                 <td colspan="2" width="260px" class="text-center">Movimientos del Mes</td>
-                <td colspan="2" width="260px" class="text-center">Saldo Acumulado</td>
+                <td rowspan="2" width="260px" class="text-center">Saldo Acumulado</td>
             </tr>
             <tr class="bg-dark font-weight-bold">
-                <td width="130px" class="text-center">Débito</td>
-                <td width="130px" class="text-center">Crédito</td>
                 <td width="130px" class="text-center">Débito</td>
                 <td width="130px" class="text-center">Crédito</td>
             </tr>
             <tbody>
             {% for item in cuentas %}
-                {% if item.cuenta != '' and item.subcuenta == '' %}
+                {% if item.index == 1 %}
                     <tr style="background-color: black;">
-                        <td style="font-weight:400;">{{ item.cuenta }}</td>
-                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
-                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.criterio }}</td>
+                        <td style="font-weight:400;">{{ item.codigo }}</td>
+                        <td style="font-weight:400;" class="pl-0 pr-0"></td>
+                        <td style="font-weight:400;" class="pl-0 pr-0"></td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.saldo }}</td>
                     </tr>
-                {% elseif item.cuenta == '' and item.subcuenta != '' %}
+                {% elseif item.index == 2 %}
                     <tr class="row-group-subconta">
-                        <td style="font-weight:400;">{{ item.cuenta }}</td>
-                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
-                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.criterio }}</td>
+                        <td style="font-weight:400;"></td>
+                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.codigo }}</td>
+                        <td style="font-weight:400;" class="pl-0 pr-0"></td>
                         <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.saldo }}</td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td style="font-weight:400;">{{ item.cuenta }}</td>
-                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.subcuenta }}</td>
-                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.criterio }}</td>
-                        {% if item.index == 2 or item.index == '2' %}
-                            <td style="font-weight:400;" class="pl-0 pr-0"><a
-                                        >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>{{ item.descripcion }}</td>
-                        {% elseif item.index == 3 or item.index == '3' %}
-                            <td style="font-weight:400;" class="pl-0 pr-0"><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>{{ item.descripcion }}
-                            </td>
-                        {% else %}
-                            <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
-                        {% endif %}
+                        <td style="font-weight:400;"></td>
+                        <td style="font-weight:400;"></td>
+                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.codigo }}</td>
+                        <td style="font-weight:400;" class="pl-0 pr-0">{{ item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                         <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.debito_acumulado }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito_acumulado }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.saldo }}</td>
                     </tr>
                 {% endif %}
             {% endfor %}

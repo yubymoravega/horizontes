@@ -162,7 +162,7 @@ class TrasladosEnviadosController extends AbstractController
             'cuentas' => $row,
             'success' => true,
             'unidades' => $unidades,
-            'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, Date('Y'))
+            'nros' => AuxFunctions::getConsecutivoActivoFijo($em, $tipo_movimiento, $unidad, AuxFunctions::getCurrentYear($em, $unidad))
         ]);
     }
 
@@ -205,7 +205,7 @@ class TrasladosEnviadosController extends AbstractController
         /** @var MovimientoActivoFijo $obj_movimiento_activo_fijo */
         $obj_movimiento_activo_fijo = $em->getRepository(MovimientoActivoFijo::class)->findOneBy([
             'id_tipo_movimiento' => $em->getRepository(TipoMovimiento::class)->find($this->tipo_movimiento),
-            'anno' => Date('Y'),
+            'anno' => AuxFunctions::getCurrentYear($em, $id_unidad),
             'id_unidad' => $id_unidad,
             'nro_consecutivo' => $nro
         ]);

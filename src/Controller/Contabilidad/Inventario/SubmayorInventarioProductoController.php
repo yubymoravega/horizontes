@@ -47,7 +47,7 @@ class SubmayorInventarioProductoController extends AbstractController
         $descripcion = '';
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
-        $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
         $msg = 'Producto encontrado con éxito';
         $obj_mercancia = $mercancia_er->findOneBy(array(
             'codigo' => $codigo,
@@ -555,7 +555,6 @@ class SubmayorInventarioProductoController extends AbstractController
         }
         return 0;
     }
-
 
     public function printOriginal(EntityManagerInterface $em, $cod, Request $request)
     {

@@ -2,11 +2,13 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Form\Contabilidad\Config\UnidadType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -38,7 +40,7 @@ class UnidadController extends AbstractController
                 'direccion' => $item->getDireccion(),
                 'id_padre' => $item->getIdPadre() ? $item->getIdPadre()->getId() : '',
                 'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : '',
-                );
+            );
         }
         return $this->render('contabilidad/config/unidad/index.html.twig', [
             'controller_name' => 'UnidadController',

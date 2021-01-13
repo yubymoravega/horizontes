@@ -1,0 +1,62 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir listado de Depreciación de Activos Fijos {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">listado de Depreciación de Activos Fijos
+                    Fijos
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7"><strong>Unidad: </strong> {{ unidad }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0" width="960px" class="text-center">
+            <thead>
+            <th width="90px">Nro. Inv.</th>
+            <th >Descripcion</th>
+            <th >Valor Inicial</th>
+            <th >Depreciación del Mes</th>
+            <th >Depreciación Acumulada</th>
+            <th >Valor Real</th>
+            <th >Tasa de Depreciación</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                <tr>
+                    <td style="background-color: gainsboro" colspan="7"
+                        class="font-weight-bold text-left border-bottom border-top">{{ item.area_responsabilidad }}</td>
+                </tr>
+                {% for new_item in item.datos %}
+                    <tr>
+                        <td style="font-weight:400;" class="text-left">{{ new_item.nro_inventario }}</td>
+                        <td style="font-weight:400;" class="text-left">{{ new_item.descripcion }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.valor_inicial }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.depreciacion_mes }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.depreciacion_acumulada }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.valor_real }}</td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.tasa_depreciacion }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
+{% endblock %}

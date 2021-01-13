@@ -19,48 +19,114 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Environment;
 
+/**
+ * Class EmpleadoController
+ * @package App\Controller\Contabilidad\CapitalHumano
+ * @Route("/contabilidad/capital-humano/empleado")
+ */
 class EmpleadoController extends AbstractController
 {
     /**
-     * @Route("/contabilidad/capital-humano/empleado", name="contabilidad_capital_humano_empleado")
+     * @Route("/", name="contabilidad_capital_humano_empleado")
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, Environment $env)
     {
         $form = $this->createForm(EmpleadoType::class);
-
-        $empleado_arr = $em->getRepository(Empleado::class)->findByActivo(true);
-        $row = [];
-        foreach ($empleado_arr as $item) {
-            /**@var $item Empleado** */
-            $row [] = array(
-                'id' => $item->getId(),
-                'nombre' => $item->getNombre(),
-                'correo' => $item->getCorreo(),
-                'cargo_nombre' => $item->getIdCargo() ? $item->getIdCargo()->getNombre() : '',
-                'rol' => $item->getRol() ? $item->getRol() : '',
-                'salario_x_hora' => $item->getSalarioXHora(),
-                'telefono' => $item->getTelefono(),
-                'id_cargo' => $item->getIdCargo() ? $item->getIdCargo()->getId() : '',
-                'is_usuario' => $item->getIdUsuario() ? true : false,
-                'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
-                'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',
-                'direccion' => $item->getDireccionParticular(),
-                'fecha_alta' => $item->getFechaAlta()->format('Y-m-d')
-            );
-        }
         $callback = 'contabilidad/capital_humano/empleado/index.html.twig';
-//        dd($row);
         $roles = self::getRoles();
+
         return $this->render($callback, [
             'controller_name' => 'EmpleadoController',
-            'empleados' => $row,
             'form' => $form->createView(),
             'roles' => $roles
         ]);
     }
 
     /**
-     * @Route("/contabilidad/capital-humano/empleado-add", name="contabilidad_capital_humano_empleado_add")
+     * @Route("/getEmpleadoByNombre/{nombre}", name="contabilidad_capital_humano_empleado_by_nombre")
+     */
+    public function getEmpleadoByNombre(EntityManagerInterface $em, $nombre)
+    {
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy([
+            'nombre' => $nombre,
+            'id_unidad' => $obj_unidad
+        ]);
+        return new JsonResponse([
+            'id' => $empleado ? $empleado->getId() : '',
+            'nombre' => $empleado ? $empleado->getNombre() : '',
+            'correo' => $empleado ? $empleado->getCorreo() : '',
+            'telefono' => $empleado ? $empleado->getTelefono() : '',
+            'fecha_alta' => $empleado ? $empleado->getFechaAlta()->format('d/m/Y') : '',
+            'identificacion' => $empleado ? $empleado->getIdentificacion() : '',
+            'id_unidad' => $empleado ? $empleado->getIdUnidad()->getId() : '',
+            'direccion' => $empleado ? $empleado->getDireccionParticular() : '',
+            'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
+            'rol' => $empleado ? $empleado->getRol() : '',
+            'is_user' => $empleado && $empleado->getRol() ? true : false,
+            'success' => true
+        ]);
+    }
+
+    /**
+     * @Route("/getEmpleadoByCorreo/{correo}", name="contabilidad_capital_humano_empleado_by_correo")
+     */
+    public function getEmpleadoByCorreo(EntityManagerInterface $em, $correo)
+    {
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy([
+            'correo' => $correo,
+            'id_unidad' => $obj_unidad
+        ]);
+
+        return new JsonResponse([
+            'id' => $empleado ? $empleado->getId() : '',
+            'nombre' => $empleado ? $empleado->getNombre() : '',
+            'correo' => $empleado ? $empleado->getCorreo() : '',
+            'telefono' => $empleado ? $empleado->getTelefono() : '',
+            'fecha_alta' => $empleado ? $empleado->getFechaAlta()->format('d/m/Y') : '',
+            'identificacion' => $empleado ? $empleado->getIdentificacion() : '',
+            'id_unidad' => $empleado ? $empleado->getIdUnidad()->getId() : '',
+            'direccion' => $empleado ? $empleado->getDireccionParticular() : '',
+            'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
+            'rol' => $empleado ? $empleado->getRol() : '',
+            'is_user' => $empleado && $empleado->getRol() ? true : false,
+            'success' => true
+        ]);
+    }
+
+    /**
+     * @Route("/getEmpleadoByIdentificacion/{identificacion}", name="contabilidad_capital_humano_empleado_by_identificacion")
+     */
+    public function getEmpleadoByIdentificacion(EntityManagerInterface $em, $identificacion)
+    {
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->findOneBy([
+            'identificacion' => $identificacion,
+            'id_unidad' => $obj_unidad
+        ]);
+
+        return new JsonResponse([
+            'id' => $empleado ? $empleado->getId() : '',
+            'nombre' => $empleado ? $empleado->getNombre() : '',
+            'correo' => $empleado ? $empleado->getCorreo() : '',
+            'telefono' => $empleado ? $empleado->getTelefono() : '',
+            'fecha_alta' => $empleado ? $empleado->getFechaAlta()->format('d/m/Y') : '',
+            'identificacion' => $empleado ? $empleado->getIdentificacion() : '',
+            'id_unidad' => $empleado ? $empleado->getIdUnidad()->getId() : '',
+            'direccion' => $empleado ? $empleado->getDireccionParticular() : '',
+            'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
+            'rol' => $empleado ? $empleado->getRol() : '',
+            'is_user' => $empleado && $empleado->getRol() ? true : false,
+            'success' => true
+        ]);
+    }
+
+    /**
+     * @Route("/empleado-add", name="contabilidad_capital_humano_empleado_add")
      */
     public function addEmplpeado(EntityManagerInterface $em, Request $request,
                                  ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
@@ -73,11 +139,12 @@ class EmpleadoController extends AbstractController
         $errors = $validator->validate($obj_empleado);
         if ($form->isSubmitted() && $form->isValid()) {
             //---ADICIONO EL EMPLEADO
-//            dd($request->get('is_usuario'));
+            /** @var  $obj_empleado Empleado */
             $obj_empleado
                 ->setBaja(false)
                 ->setAcumuladoTiempoVacaciones(0)
                 ->setAcumuladoDineroVacaciones(0)
+                ->setIdUnidad(AuxFunctions::getUnidad($em, $this->getUser()))
                 ->setActivo(true);
 
             if ($request->get('is_usuario') == "on") {
@@ -111,7 +178,7 @@ class EmpleadoController extends AbstractController
     }
 
     /**
-     * @Route("/contabilidad/capital-humano/empleado-upd/{id}", name="contabilidad_capital_humano_empleado_upd")
+     * @Route("/empleado-upd/{id}", name="contabilidad_capital_humano_empleado_upd")
      */
     public function updEmpleado(EntityManagerInterface $em, Request $request, Empleado $empleado,
                                 ValidatorInterface $validator, UserPasswordEncoderInterface $passEncoder)
@@ -164,20 +231,21 @@ class EmpleadoController extends AbstractController
         return $this->redirectToRoute('contabilidad_capital_humano_empleado');
     }
 
-
     /**
-     * @Route("/contabilidad/capital-humano/empleado-delete/{id}", name="contabilidad_capital_humano_empleado_delete")
+     * @Route("/empleado-baja", name="contabilidad_capital_humano_empleado_baja")
      */
-    public function deleteEmpleado($id)
+    public function deleteBaja(EntityManagerInterface $em,Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $empleado_er = $em->getRepository(Empleado::class);
-        $empleado_obj = $empleado_er->find($id);
+        $empleado_obj = $em->getRepository(Empleado::class)->find($request->request->get('id_empleado'));
         $msg = 'No se pudo dar baja al empleado seleccionado';
         $success = 'error';
         if ($empleado_obj) {
             /**@var $empleado_obj Empleado** */
-            $empleado_obj->setActivo(false);
+            $empleado_obj
+                ->setActivo(false)
+                ->setBaja(true)
+                ->setFechaBaja(\DateTime::createFromFormat('Y-m-d',$request->request->get('fecha_baja')));
+
             if ($empleado_obj->getIdUsuario())
                 $obj_user = $empleado_obj->getIdUsuario()->setStatus(false);
             try {
@@ -210,4 +278,6 @@ class EmpleadoController extends AbstractController
         }
         return $roles_list;
     }
+
+
 }

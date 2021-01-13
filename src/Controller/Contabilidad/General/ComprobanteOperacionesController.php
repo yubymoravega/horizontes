@@ -3,6 +3,7 @@
 namespace App\Controller\Contabilidad\General;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\ActivoFijo\MovimientoActivoFijo;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
@@ -50,9 +51,9 @@ class ComprobanteOperacionesController extends AbstractController
 //            dd($add);
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
-        $fecha = Date('Y-m-d');
-        $arr_fecha = explode('-', $fecha);
-        $year_ = intval($arr_fecha[0]);
+        $fecha = AuxFunctions::getCurrentDate($em,$obj_unidad);
+//        $arr_fecha = explode('-', $fecha);
+        $year_ = AuxFunctions::getCurrentYear($em,$obj_unidad);
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_unidad' => $obj_unidad,
@@ -86,9 +87,9 @@ class ComprobanteOperacionesController extends AbstractController
                 $new_registro
                     ->setDescripcion($comprobante['explicacion'])
                     ->setIdUsuario($this->getUser())
-                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+                    ->setFecha($fecha)
                     ->setAnno($year_)
-                    ->setTipo(3)
+                    ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_CONTABILIDAD)
                     ->setCredito($total_credito)
                     ->setDebito($total_debito)
                     ->setIdTipoComprobante($obj_tipo_comprobante)
@@ -107,9 +108,11 @@ class ComprobanteOperacionesController extends AbstractController
                 $almacen_er = $em->getRepository(Almacen::class);
                 $unidad_er = $em->getRepository(Unidad::class);
                 $informe_recepcion_er = $em->getRepository(InformeRecepcion::class);
+                $movimiento_activo_fijo_er = $em->getRepository(MovimientoActivoFijo::class);
                 $factura_er = $em->getRepository(Factura::class);
 
                 if (!empty($pagos_cobros)){
+//                    dd($pagos_cobros);
                     foreach ($pagos_cobros as $pagos) {
                         if ($pagos->type == 'IR') {
                             $informe_recepcion_obj = $informe_recepcion_er->find(intval($pagos->id_factura));
@@ -117,6 +120,17 @@ class ComprobanteOperacionesController extends AbstractController
                             $new_cobro_pago
                                 ->setIdInforme($informe_recepcion_obj)
                                 ->setIdProveedor($informe_recepcion_obj->getIdProveedor())
+                                ->setCredito(floatval($pagos->importe))
+                                ->setDebito(0);
+                            $em->persist($new_cobro_pago);
+                        }
+                        if ($pagos->type == 'AF') {
+                            /** @var MovimientoActivoFijo $movimiento_obj */
+                            $movimiento_obj = $movimiento_activo_fijo_er->find(intval($pagos->id_factura));
+                            $new_cobro_pago = new CobrosPagos();
+                            $new_cobro_pago
+                                ->setIdMovimientoActivoFijo($movimiento_obj)
+                                ->setIdProveedor($movimiento_obj->getIdProveedor())
                                 ->setCredito(floatval($pagos->importe))
                                 ->setDebito(0);
                             $em->persist($new_cobro_pago);
@@ -165,7 +179,7 @@ class ComprobanteOperacionesController extends AbstractController
                     //asentando las operacones
                     $new_asiento = new Asiento();
                     $new_asiento
-                        ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+                        ->setFecha($fecha)
                         ->setAnno($year_)
                         ->setNroDocumento('-')
                         ->setIdDocumento(null)
@@ -262,9 +276,9 @@ class ComprobanteOperacionesController extends AbstractController
         $almacenes = $em->getRepository(Almacen::class)->findBy([
             'id_unidad' => $unidad
         ]);
-
+        $obj_proveedor = $em->getRepository(Proveedor::class)->find(intval($proveedor));
         $informes = $em->getRepository(InformeRecepcion::class)->findBy([
-            'id_proveedor' => $em->getRepository(Proveedor::class)->find(intval($proveedor)),
+            'id_proveedor' => $obj_proveedor,
             'activo' => true,
             'producto' => false
         ]);
@@ -291,9 +305,37 @@ class ComprobanteOperacionesController extends AbstractController
                         'importe' => number_format($resto, 2),
                         'resto' => number_format($resto,2),
                         'fecha' => $item->getFechaFactura()->format('d-m-Y'),
-                        'antiguedad' => $today->diff($item->getFechaFactura())->days
+                        'antiguedad' => $today->diff($item->getFechaFactura())->days,
+                        'tipo'=>'IR'
                     );
             }
+        }
+
+        $compras_af = $em->getRepository(MovimientoActivoFijo::class)->findBy([
+            'id_proveedor'=> $obj_proveedor,
+            'activo'=>true
+        ]);
+        /** @var MovimientoActivoFijo $item */
+        foreach ($compras_af as $item){
+            $pago_informe = $cobros_er->findBy([
+                'id_movimiento_activo_fijo' => $item
+            ]);
+            $resto = floatval($item->getIdActivoFijo()->getValorReal());
+            if (!empty($pago_informe))
+                /** @var CobrosPagos $cobro */
+                foreach ($pago_informe as $cobro)
+                    $resto = $resto - floatval($cobro->getCredito());
+            if ($resto > 0)
+                $row[] = array(
+                    'id' => $item->getId(),
+                    'documento' => $item->getNroFactura(),
+                    'importe_mostrar' => number_format($item->getIdActivoFijo()->getValorReal(), 2),
+                    'importe' => number_format($resto, 2),
+                    'resto' => number_format($resto,2),
+                    'fecha' => $item->getFechaFactura()->format('d-m-Y'),
+                    'antiguedad' => $today->diff($item->getFechaFactura())->days,
+                    'tipo'=>'AF'
+                );
         }
         return new JsonResponse(['success' => true, 'data' => $row]);
     }

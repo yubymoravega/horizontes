@@ -16,6 +16,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\CuentaCriterioAnalisis;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\PeriodoSistema;
 use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TerminoPago;
@@ -46,6 +47,7 @@ use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\Contabilidad\Venta\MovimientoServicio;
 use App\Entity\User;
+use Container3fnRoky\get_ServiceLocator_9utEldQService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -64,8 +66,16 @@ use function Sodium\add;
 
 class AuxFunctions
 {
-    public static $ACTION_ADD = 'add';
-    public static $ACTION_UPD = 'upd';
+    public const ACTION_ADD = 'add';
+    public const ACTION_UPD = 'upd';
+    public const COMMPROBANTE_OPERACONES_INVENTARIO = 1;
+    public const COMMPROBANTE_OPERACONES_VENTA = 2;
+    public const COMMPROBANTE_OPERACONES_CONTABILIDAD = 3;
+    public const COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO = 4;
+    public const COMMPROBANTE_OPERACONES_ACTIVO_FIJO = 5;
+
+    public const TIPO_PERIODO_INVENTARIO = 1;
+    public const TIPO_PERIODO_ACTIVO_FIJO = 2;
 
     /**
      * Si es padre no puede eliminarse sin reuvicar las undades hijas, retorna true/false en el caso que se cumpla
@@ -131,12 +141,12 @@ class AuxFunctions
     public static function isDuplicate($entity, $fields, $action, $id = null)
     {
         $arr_obj = $entity->findBy($fields);
-        if ($action == AuxFunctions::$ACTION_UPD) {
+        if ($action == AuxFunctions::ACTION_UPD) {
             foreach ($arr_obj as $obj) {
                 if ($obj->getId() != $id)
                     return true;
             }
-        } elseif ($action == AuxFunctions::$ACTION_ADD) {
+        } elseif ($action == AuxFunctions::ACTION_ADD) {
             if (!empty($arr_obj))
                 return true;
         }
@@ -262,10 +272,15 @@ class AuxFunctions
 
     /**
      * Obtener la unidad del usuario
+     * @return Unidad | null
      */
 
-    public static function getUnidad($em, $user)
+    public static function getUnidad($em, User $user)
     {
+        $selected_unidad = $GLOBALS['_SESSION']['_sf2_attributes']['selected__unidad'];
+        if ($selected_unidad)
+            return $em->getRepository(Unidad::class)->find($selected_unidad);
+
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
             'activo' => true,
             'id_usuario' => $user
@@ -274,6 +289,7 @@ class AuxFunctions
             return $obj_empleado->getIdUnidad();
         }
         return null;
+
     }
 
     public static function getCuentasInventario($em)
@@ -872,8 +888,14 @@ class AuxFunctions
             return array_merge($selec_unidades, $unidades_hijas);
         };
 
-        $root_unidad = self::getUnidad($em, $user);
+        $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
+            'activo' => true,
+            'id_usuario' => $user
+        ));
+
+        $root_unidad = $obj_empleado->getIdUnidad();
         $unidades = $allUnidades($root_unidad);
+
         return [$root_unidad, ...$unidades];
 
     }
@@ -2852,11 +2874,12 @@ class AuxFunctions
             ->setIdElementoGasto($obj_elemento_gasto)
             ->setIdExpediente($obj_expediente)
             ->setIdProveedor($obj_proveedor)
-            ->setIdCliente($id_cliente)
+            ->setIdCliente($id_cliente == 0 ? null : $id_cliente)
             ->setTipoCliente($tipo_cliente)
             ->setIdActivoFijo($id_activo)
             ->setIdAreaResponsabilidad($id_area_responsabilidad)
-            ->setIdComprobante($comprobante);
+            ->setIdComprobante($comprobante)
+            ->setIdTipoComprobante($comprobante ? $comprobante->getIdTipoComprobante() : null);
         $em->persist($new_asiento);
         return $new_asiento;
     }
@@ -3118,5 +3141,36 @@ class AuxFunctions
             return $exception->getMessage();
         }
         return true;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param Unidad $obj_unidad
+     * @param \DateTime $fecha
+     * @param int $tipo
+     * @param Almacen|null $obj_almacen
+     * @return bool
+     */
+    public static function puedeTrabajar(EntityManagerInterface $em, Unidad $obj_unidad, \DateTime $fecha, int $tipo, Almacen $obj_almacen = null)
+    {
+        if ($tipo === 1)
+            $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'cerrado' => false,
+                'id_unidad' => $obj_unidad,
+                'id_almacen' => $obj_almacen
+            ]);
+        else
+            $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'cerrado' => false,
+                'id_unidad' => $obj_unidad
+            ]);
+
+        /** @var $periodo_abierto PeriodoSistema */
+        if (!$periodo_abierto)
+            return true;
+
+        if ($fecha->format('m') == $periodo_abierto->getMes() && $fecha->format('Y') == $periodo_abierto->getAnno())
+            return true;
+        return false;
     }
 }

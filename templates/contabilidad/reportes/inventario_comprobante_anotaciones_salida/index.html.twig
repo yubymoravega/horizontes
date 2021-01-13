@@ -1,0 +1,64 @@
+{% extends 'contabilidad/reportes/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="seleccionarProducto" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="seleccionarProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="seleccionarProductoLabel">Visualizar comprobante de anotaciones</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app">
+                    <form method="post" autocomplete="off">
+                        {{ include('utils/unidadAlmacenChoices.html.twig') }}
+                    </form>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <a class="btn btn-outline-secondary text-white" type="button"
+                               aria-label="Cerrar" data-dismiss="modal">
+                                <span aria-hidden="true">Salir</span>
+                            </a>
+                        </div>
+                        <div class="ml-2">
+                            <button class="my-0 btn btn-secondary" onclick="Print_Comprobante()"
+                                    id="btnAceptarPrintSubmayor">
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print_Comprobante() {
+            if ($('#__selected__almacen__id option:selected').length > 0) {
+                let url = '/contabilidad/reportes/inventario-comprobante-anotaciones-salida/print/' +$('#__selected__almacen__id').val()
+                window.open(url, 'blank_')
+            } else
+                alertTemplate('Debe seleccionar el almacén', 'danger')
+        }
+
+
+        $(document).ready(function () {
+            $('#seleccionarProducto').modal('show')
+        })
+
+
+    </script>
+{% endblock %}

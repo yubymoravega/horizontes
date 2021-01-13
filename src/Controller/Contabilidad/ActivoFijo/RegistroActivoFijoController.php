@@ -40,9 +40,6 @@ class RegistroActivoFijoController extends AbstractController
      */
     public function search(EntityManagerInterface $em, Request $request, $search)
     {
-//        $nro_inventario =  $request->get('nro_inventario');
-//        dd($search);
-
         return $this->render('contabilidad/activo_fijo/registro_activo_fijo/index.html.twig', [
             'controller_name' => 'RegistroActivoFijoController',
             'datos' => $this->getData($em, $search),

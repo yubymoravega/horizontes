@@ -27,6 +27,7 @@ class CuentaPorCobrarController extends AbstractController
     {
         $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+//        $today = AuxFunctions::getCurrentDate($em, $unidad);
         $facturas = $em->getRepository(Factura::class)->findBy([
             'id_unidad' => $unidad,
             'activo' => true,

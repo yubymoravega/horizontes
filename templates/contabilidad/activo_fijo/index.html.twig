@@ -40,7 +40,7 @@
                     <div class="dropdown-divider"></div>
 
                     <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_depreciacion') }}">Depreciación</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_config_tipo_cuenta') }}">Cerrar Periodo
+                    <a class="dropdown-item" href="{{ url ('contabilidad_activo_fijo_cerrar_periodo') }}">Cerrar Periodo
                         Mensual</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_config_cuenta') }}">Cerrar año</a>
                 </div>
@@ -65,5 +65,7 @@
                 </div>
             </li>
         </ul>
+
+{#        {{ include('utils/unidadChoices.html.twig') }}#}
     </nav>
 {% endblock %}
