@@ -3153,7 +3153,7 @@ class AuxFunctions
      */
     public static function puedeTrabajar(EntityManagerInterface $em, Unidad $obj_unidad, \DateTime $fecha, int $tipo, Almacen $obj_almacen = null)
     {
-        if ($tipo === 1)
+        if ($tipo === self::TIPO_PERIODO_INVENTARIO)
             $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
                 'cerrado' => false,
                 'id_unidad' => $obj_unidad,
