@@ -1,0 +1,381 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+
+	<!-- Section Input Groups-->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<section class="section novi-background section-66 section-sm-bottom-110">
+		<div class="container">
+			<h1 class="text-reporte">Facturas de {{ cliente.nombre}} {{ cliente.apellidos}}
+			</h1>
+			<hr class="divider bg-mantis">
+			<button id="add" class="btn btn-sm btn-outline-dark" type="submit" data-toggle="modal" data-target="#exampleModalCenter">Agregar Factura</button>
+		<!-- Bootstrap Table-->
+		<div class="table-responsive clearfix">
+			<table class="table table-striped tabla-reporte">
+				<tbody>
+					<tr>
+						<th>ID</th>
+						<th>Fecha</th>
+						<th>Cliente</th>
+						<th>Cedula</th>
+						<th>Casillero</th>
+						<th>Valor</th>         
+						<th>Ciudad</th>
+						<th>SH</th>
+						<th>Pago</th>
+						<th>Cierre</th>
+						<th>Accion</th>
+					</tr>
+					{# table body #}
+        {% for data in pagination %}
+        <tr {% if loop.index is odd %}class="color"{% endif %}>
+            <td>{{data.id}}</td>
+            <td>{{data.fecha |date("m/d/Y")}} <br> {{data.fecha |date("h:i:s A")}}</td>           
+			<td>{{data.idCliente}}</td> 
+			<td>{{data.cedula}}</td>
+            <td>{{data.casillero}}</td>    
+           <td>{{data.json.monto}} USD</td>  
+		   
+
+			<td>{{data.ciudad}}</td>
+			<td>{{data.sh}}</td>
+
+			{% if data.pago == "0" %}
+            <td>Pendiente</td>   
+            {% else %}
+            <td>Saldada</td>   
+            {% endif %}
+
+			{% if data.cierre == "0" %}
+            <td>Pendiente</td>   
+            {% else %}
+            <td>Enviada</td>   
+            {% endif %}
+
+            <td>
+			<svg  onClick="editar({{data.id}})" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+</svg>
+
+<svg onClick="procesar({{data.id}})" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
+  <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1z"/>
+</svg>
+			</td>           
+        </tr>
+    {% endfor %}    
+				</tbody>
+			</table>
+		
+			{# display navigation #}
+			<div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+      <div class="count contador">Factusras: {{ pagination.getTotalItemCount }} </div>
+	</div>
+</div></div></div></section>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-dark">
+        <h5 class="modal-title text-light" id="exampleModalLongTitle">Datos de la Factura</h5>
+        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+      </div>
+      <div class="modal-body  ">
+
+	   <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger" role="alert"></div>
+
+	   <form action="{{ path('mia_cargo/facturas/save', {tel:cliente.telefono}) }}" method="POST" name="formFactura" id="formFactura">
+
+		<div class="form-group">
+    <label for="cedula">Cedula</label>
+    <input type="text" class="form-control" id="cedula"  name="cedula" aria-describedby="helpCedula" placeholder="Cedula">
+    <small id="helpCedula" class="form-text text-muted">Introdusca la Cedula del cliente</small>
+  </div>
+
+	 <div class="form-group">
+    <label for="casillero">Casillero</label>
+    <input type="text" class="form-control" name="casillero" id="casillero" aria-describedby="helpCasillero" placeholder="Casillero">
+    <small id="helpCasillero" class="form-text text-muted">Introdusca el Casillero del cliente</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpCiudad">Ciudad</label>
+    <input type="text" class="form-control" id="ciudad" name="ciudad" aria-describedby="helpCiudad" placeholder="Ciudad">
+    <small id="helpCiudad" class="form-text text-muted">Introdusca la Ciudad del cliente</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpSH">SH</label>
+    <input type="text" class="form-control" id="sh"  name="sh" aria-describedby="helpSH" placeholder="SH">
+    <small id="emailHelp" class="form-text text-muted">Introdusca el SH del cliente</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpSH">Peso (Lb)</label>
+    <input type="text" class="form-control" id="peso"  name="peso" aria-describedby="helpPeso" placeholder="Peso (Lb)">
+    <small id="helpPeso" class="form-text text-muted">Introdusca el Peso (Lb) del paquete</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpMonto">Monto</label>
+    <input type="text" class="form-control" id="monto" name="monto" aria-describedby="helpMonto" placeholder="Monto ha Facturar">
+    <small id="emailHelp" class="form-text text-muted">Introdusca el Monto del la Factura</small>
+  </div>
+ <button type="submit"  style="float: right;" class="my-0 btn btn-secondary">Guardar</button>
+  </form>
+
+      </div>
+     
+    </div>
+  </div>
+</div>  
+
+
+<!-- Modal -->
+<div class="modal fade" id="editarFactura" tabindex="-1" role="dialog" aria-labelledby="editarFactura" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-dark">
+        <h5 class="modal-title text-light" id="exampleModalLongTitle">Editar Factura</h5>
+        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+      </div>
+      <div class="modal-body  ">
+
+	   <div id="messageBoxEdit" style="display: none;  text-align: center;" class="alert alert-danger" role="alert">
+     
+     <span id="textError"></span> 
+     </div>
+
+		<div class="form-group">
+    <label for="cedula">Cedula</label>
+    <input type="text" class="form-control" id="editCedula"  name="editCedula" aria-describedby="helpCedula" placeholder="Editar la Cedula">
+    <small id="helpCedula" class="form-text text-muted">Editar la Cedula</small>
+  </div>
+
+	 <div class="form-group">
+    <label for="casillero">Editar Casillero</label>
+    <input type="text" class="form-control" name="editCasillero" id="editCasillero" aria-describedby="helpCasillero" placeholder=" Editar Casillero">
+    <small id="helpCasillero" class="form-text text-muted">Editar el Casillero del cliente</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpCiudad">Ciudad</label>
+    <input type="text" class="form-control" id="editCiudad" name="editCiudad" aria-describedby="helpCiudad" placeholder="Ciudad">
+    <small id="helpCiudad" class="form-text text-muted">Introdusca la Ciudad del cliente</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpSH">SH</label>
+    <input type="text" class="form-control" id="editSh"  name="editSh" aria-describedby="helpSH" placeholder="SH">
+    <small id="emailHelp" class="form-text text-muted">Introdusca el SH del cliente</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpSH">Peso (Lb)</label>
+    <input type="text" class="form-control" id="editPeso"  name="editPeso" aria-describedby="helpPeso" placeholder="Peso (Lb)">
+    <small id="helpPeso" class="form-text text-muted">Introdusca el Peso (Lb) del paquete</small>
+  </div>
+
+   <div class="form-group">
+    <label for="helpMonto">Monto</label>
+    <input type="text" class="form-control" id="editMonto" name="editMonto" aria-describedby="helpMonto" placeholder="Monto ha Facturar">
+    <small id="emailHelp" class="form-text text-muted">Introdusca el Monto del la Factura</small>
+  </div>
+ <button type="button" id="editBoton" style="float: right;" class="my-0 btn btn-secondary">Guardar</button>
+      </div>
+     
+    </div>
+  </div>
+</div>  
+
+
+<!-- Modal -->
+<div class="modal fade" id="confirmar" tabindex="-1" role="dialog" aria-labelledby="confirmar" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-dark">
+        <h5 class="modal-title text-light" id="exampleModalLongTitle">Procesar la Factura</h5>
+        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+      </div>
+      <div class="modal-body  ">
+
+	  
+ <button type="button" id="procesar" style="float: right;" class="my-0 btn btn-secondary">Procesar</button>
+      </div>
+     
+    </div>
+  </div>
+</div>  
+
+
+
+<style>
+
+.box {
+    width: 20%;
+    height: 150%;
+}
+
+</style>
+
+ {% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+
+<script>
+
+let idFactura = null;
+
+$("#formFactura").validate({
+   errorLabelContainer: "#messageBox",
+    wrapper: "li",
+    rules: {
+      'cedula': {
+      required: true, minlength: 6},
+	   'casillero': {
+      required: true, minlength: 6},
+	  'ciudad': {
+      required: true, minlength: 4},
+	   'sh': {
+      required: true, minlength: 4},
+	   'monto': {
+      required: true, minlength: 1},
+      'peso': {
+      required: true, minlength: 1},
+    },
+    
+
+    messages: {
+      'cedula': {required: "Cedula Requerida", minlength: "Minimo 6 Caracteres" },
+	  'casillero': {required: "Casillero Requerido", minlength: "Minimo 6 Caracteres" },
+	  'ciudad': {required: "Ciudad Requerida", minlength: "Minimo 4 Caracteres" },
+	  'sh': {required: "SH Requerido", minlength: "Minimo 4 Caracteres" },
+	  'monto': {required: "Monto Requerido", minlength: "Minimo 1 Caractere" },
+    'peso': {required: "Cedula Requerida", minlength: "Minimo 1 Caracteres" },
+	}
+ });
+     
+ $('#monto').on('input', function () { 
+    this.value = this.value.replace(/[^0-9.]/g,'');
+});    
+
+
+
+
+function editar(id) {
+  
+  $.ajax({
+            type: 'POST',
+            data: {'id' : id},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/mia_cargo/facturas/edit/"+id,
+            dataType: 'html',
+            success: function (data) {
+
+            let json = JSON.parse(data);  
+              document.getElementById("editCedula").value = json.cedula;
+              document.getElementById("editCasillero").value = json.casillero;
+              document.getElementById("editCiudad").value = json.ciudad;
+              document.getElementById("editSh").value = json.sh;
+              document.getElementById("editMonto").value =  json.json;
+               document.getElementById("editPeso").value =  json.peso;
+              
+               idFactura = json.id;
+
+              $('#editarFactura').modal('show');
+
+              if(json.pago == 1){
+
+                window.location.href = '/mia_cargo/redirec/'+{{cliente.telefono}};
+
+              }
+
+			        
+            }
+        });
+
+ }
+
+ function procesar(id) {
+  
+  idFactura = id;
+ $('#confirmar').modal('show');
+
+ }
+
+ $( "#procesar" ).click(function() {
+  
+   window.location.href = '/mia_cargo/carrito/'+idFactura;
+});
+
+
+ $( "#editBoton" ).click(function() {
+  
+    if(document.getElementById("editCedula").value.length < 6){
+
+      $('#textError').text('Cedula Minimo 6 Caracteres');
+      $("#messageBoxEdit").css("display", "");
+    
+    } else if (document.getElementById("editCasillero").value.length < 6) {
+
+       $('#textError').text('Casillero Minimo 6 Caracteres');
+      $("#messageBoxEdit").css("display", "");
+  
+      }else if (document.getElementById("editCiudad").value.length < 4) {
+
+        $('#textError').text('Ciudad Minimo 4 Caracteres');
+      $("#messageBoxEdit").css("display", "");
+  
+       }else if (document.getElementById("editSh").value.length < 4) {
+
+          $('#textError').text('SH Minimo 4 Caracteres');
+      $("#messageBoxEdit").css("display", "");
+  
+     } else if (document.getElementById("editMonto").value.length < 1) {
+       $('#textError').text('Monto Minimo 1 Caracteres');
+      $("#messageBoxEdit").css("display", "");
+     }else{
+
+         $.ajax({
+            type: 'POST',
+            data: {'id' : ""},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/mia_cargo/facturas/edit/save/"+idFactura+"/"+
+            document.getElementById("editCedula").value+"/"+document.getElementById("editCasillero").value+"/"+document.getElementById("editCiudad").value
+            +"/"+document.getElementById("editSh").value+"/"+document.getElementById("editMonto").value,
+            dataType: 'html',
+            success: function (data) {
+
+               window.location.href = '/mia_cargo/facturas/'+{{cliente.telefono}};
+            }
+        });
+
+
+     }
+
+});
+
+
+ $('#editMonto').on('input', function () { 
+    this.value = this.value.replace(/[^0-9.]/g,'');
+});    
+
+ $('#peso').on('input', function () { 
+    this.value = this.value.replace(/[^0-9.]/g,'');
+});    
+
+ </script>
+
+
+
+{% endblock %}
+
+
