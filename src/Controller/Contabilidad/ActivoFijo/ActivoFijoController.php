@@ -11,6 +11,7 @@ use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\GrupoActivos;
+use App\Entity\Contabilidad\Config\PeriodoSistema;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumentoActivoFijo;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -84,7 +86,7 @@ class ActivoFijoController extends AbstractController
         $codigo = $data_request[0];
         $type = $data_request[1];
 
-        $form = $this->createForm(ActivoFijoType::class, ['nro_inventario' => $codigo,'type'=>$type]);
+        $form = $this->createForm(ActivoFijoType::class, ['nro_inventario' => $codigo, 'type' => $type]);
 
         $error = null;
         $form->handleRequest($request);
@@ -288,5 +290,79 @@ class ActivoFijoController extends AbstractController
         return new JsonResponse(['success' => true, 'cuenta_activo' => $cuenta_activo, 'cuenta_depreciacion' => $cuenta_depreciacion,
             'cuenta_gasto' => $cuenta_gasto, 'paises' => $paises, 'centro_costo' => $rows_cc, 'area_responsabilidad' => $rows_ar,
             'elemento_gasto' => $rows_eg, 'grupo_activos' => $rows_ga]);
+    }
+
+    /**
+     * @Route("/cierre-periodo", name="contabilidad_activo_fijo_cerrar_periodo")
+     */
+    public function cierrePeriodo(EntityManagerInterface $em)
+    {
+
+        $periodo = $em->getRepository(PeriodoSistema::class)->findOneBy([
+            'id_unidad' => AuxFunctions::getUnidad($em, $this->getUser()),
+            'tipo' => AuxFunctions::TIPO_PERIODO_ACTIVO_FIJO,
+            'cerrado' => false
+        ]);
+
+        if (!$periodo) {
+            $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+            $anno = AuxFunctions::getCurrentYear($em, $unidad);
+            $fecha = AuxFunctions::getCurrentDate($em, $unidad);
+
+            $periodo = new PeriodoSistema();
+            $periodo->setFecha(\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
+            $periodo->setAnno($anno);
+            $periodo->setIdAlmacen(null);
+            $periodo->setCerrado(0);
+            $periodo->setIdUnidad($unidad);
+            $periodo->setIdUsuario($this->getUser());
+            $periodo->setMes($fecha->format('m'));
+            $periodo->setTipo(AuxFunctions::TIPO_PERIODO_ACTIVO_FIJO);
+
+            $em->persist($periodo);
+            $em->flush();
+        }
+
+        $mes = $periodo->getMes();
+
+        return $this->render('contabilidad/activo_fijo/cierres/cierre_periodo.html.twig', [
+            'periodo' => $periodo->getId(),
+            'mes' => $mes,
+            'text' => AuxFunctions::getNombreMes($mes) . ' de ' . $periodo->getAnno(),
+        ]);
+    }
+
+    /**
+     * @Route("/on-close-periodo/{id}", name="contabilidad_activo_fijo_on_cerrar_periodo")
+     */
+    public function onClosePeriodo(EntityManagerInterface $em, PeriodoSistema $periodoSistema)
+    {
+
+        $periodoSistema->setCerrado(true);
+
+        // nuevo periodo
+        $periodo = new PeriodoSistema();
+        $periodo->setFecha(\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
+        $periodo->setIdAlmacen(null);
+        $periodo->setCerrado(0);
+        $periodo->setIdUnidad($periodoSistema->getIdUnidad());
+        $periodo->setIdUsuario($this->getUser());
+        $periodo->setTipo(AuxFunctions::TIPO_PERIODO_ACTIVO_FIJO);
+
+        $mes = $periodoSistema->getMes();
+        $anno = $periodoSistema->getAnno();
+        if ($mes == 12) {
+            $mes = 1;
+            $anno++;
+        } else $mes++;
+
+        $periodo->setMes($mes);
+        $periodo->setAnno($anno);
+
+        $em->persist($periodo);
+        $em->flush();
+
+        $this->addFlash('success', "Periodo mensual cerrado, se abrio el periodo correspondiente al mes $mes de $anno");
+        return $this->redirectToRoute('activo_fijo');
     }
 }

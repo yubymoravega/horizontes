@@ -74,6 +74,9 @@ class AuxFunctions
     public const COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO = 4;
     public const COMMPROBANTE_OPERACONES_ACTIVO_FIJO = 5;
 
+    public const TIPO_PERIODO_INVENTARIO = 1;
+    public const TIPO_PERIODO_ACTIVO_FIJO = 2;
+
     /**
      * Si es padre no puede eliminarse sin reuvicar las undades hijas, retorna true/false en el caso que se cumpla
      */
