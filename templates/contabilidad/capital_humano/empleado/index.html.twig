@@ -80,6 +80,16 @@
                         {{ form_widget(form.id_cargo, {'attr': {'class': 'w-100'}}) }}
                     </div>
                 </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(form.sueldo_bruto_mensual) }}
+                        {{ form_widget(form.sueldo_bruto_mensual,{'type':'number','attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.salario_x_hora) }}
+                        {{ form_widget(form.salario_x_hora,{'type':'number','attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                </div>
                 <div class="form-group input-group input-group-sm d-block">
                     {{ form_label(form.direccion_particular) }}
                     {{ form_widget(form.direccion_particular, {'attr': {'class': 'w-100'}}) }}
@@ -163,6 +173,8 @@
                     'empleado[id_cargo]': "required",
                     'empleado[direccion_particular]': "required",
                     'empleado[rol]': "required",
+                    // 'empleado[sueldo_bruto_mensual]': "required",
+                    // 'empleado[salario_x_hora]': "required",
                 },
                 messages: {
                     'empleado[id_empleado]': CONTAB_MSG.REQUIRED_NOT_BLANK,
@@ -173,7 +185,9 @@
                     'empleado[identificacion]': 'obligatorio',
                     'empleado[id_cargo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'empleado[direccion_particular]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'empleado[rol]': CONTAB_MSG.REQUIRED_NOT_BLANK
+                    'empleado[rol]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    // 'empleado[sueldo_bruto_mensual]': 'obligatorio',
+                    // 'empleado[salario_x_hora]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
             $('#btnAdd').on('click', function () {
@@ -218,6 +232,7 @@
                 }
             }
         })
+
         $('#empleado_identificacion').on('keyup', function (e) {
             if (e.which == 13) {
                 if ($('#empleado_identificacion').val() != '') {
@@ -231,6 +246,12 @@
             }
         })
 
+        $('#empleado_sueldo_bruto_mensual').on('keyup',function(e){
+            $('#empleado_salario_x_hora').val('')
+        })
+        $('#empleado_salario_x_hora').on('keyup',function(e){
+            $('#empleado_sueldo_bruto_mensual').val('')
+        })
         function resetFormulario() {
             $('#btnCancelar').hide()
             $('#btnUpdate').hide()
@@ -291,6 +312,8 @@
                             $('#empleado_id_cargo').val(empleado.id_cargo)
                             $('#empleado_direccion_particular').val(empleado.direccion)
                             $('#empleado_rol').val(empleado.rol)
+                            $('#empleado_sueldo_bruto_mensual').val(empleado.sueldo_bruto_mensual)
+                            $('#empleado_salario_x_hora').val(empleado.salario_x_hora)
                             if (empleado.is_user) {
                                 $('#is-user').prop('checked', true)
                                 $('#div_rol').css("display", "block")
@@ -317,15 +340,5 @@
                 }
             })
         }
-        //
-        // $('#btn_baja').on('click', function () {
-        //     const id_empleado_baja = $('#id_empleado_baja').val()
-        //     const fecha_baja = $('#fecha_baja').val()
-        //     const formulario = $('#form_modal_target')
-        //     formulario.attr('method', 'POST')
-        //     formulario.attr('action', '/contabilidad/capital-humano/empleado/empleado-baja/' + id_empleado_baja)
-        //     formulario.submit()
-        //     if (validateForm.errorList.length === 0) loadingModal.show()
-        // })
     </script>
 {% endblock %}

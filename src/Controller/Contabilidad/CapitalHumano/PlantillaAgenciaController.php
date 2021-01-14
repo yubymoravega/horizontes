@@ -40,7 +40,7 @@ class PlantillaAgenciaController extends AbstractController
                     'identificacion' => $item->getIdentificacion(),
                     'telefono' => $item->getTelefono(),
                     'id_cargo' => $item->getIdCargo() ? $item->getIdCargo()->getId() : '',
-                    'salario_basico' => number_format($item->getIdCargo()->getSalarioBase(),2),
+                    'sueldo_bruto' => number_format($item->getSueldoBrutoMensual(),2),
                     'is_usuario' => $item->getIdUsuario() ? true : false,
                     'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                     'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',

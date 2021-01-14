@@ -29,7 +29,7 @@ class CargoController extends AbstractController
             $row [] = array(
                 'id' => $item->getId(),
                 'nombre' => $item->getNombre(),
-                'salario_base' => $item->getSalarioBase()
+//                'salario_base' => $item->getSalarioBase()
             );
         }
         return $this->render('contabilidad/capital_humano/cargo/index.html.twig', [
@@ -54,7 +54,7 @@ class CargoController extends AbstractController
 
             $obj_cargo
                 ->setNombre($request->get('nombre'))
-                ->setSalarioBase($request->get('salario_base'))
+//                ->setSalarioBase($request->get('salario_base'))
                 ->setActivo(true);
             try {
                 $em->persist($obj_cargo);
@@ -83,7 +83,7 @@ class CargoController extends AbstractController
             $obj_cargo = $entity_repository->find($request->get('id_cargo'));
             $obj_cargo
                 ->setNombre($request->get('nombre'))
-                ->setSalarioBase($request->get('salario_base'))
+//                ->setSalarioBase($request->get('salario_base'))
                 ->setActivo(true);
             try {
                 $em->persist($obj_cargo);
