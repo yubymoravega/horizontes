@@ -365,4 +365,25 @@ class ActivoFijoController extends AbstractController
         $this->addFlash('success', "Periodo mensual cerrado, se abrio el periodo correspondiente al mes $mes de $anno");
         return $this->redirectToRoute('activo_fijo');
     }
+
+    /**
+     * @Route("/puede-dar-acta", name="contabilidad_activo_fijo_puede_dar_acta")
+     */
+    public function puedeDarActa(EntityManagerInterface $em, Request $request)
+    {
+        $fecha = $request->get('fecha_alta');
+        $fecha_date = \DateTime::createFromFormat('Y-m-d', $fecha);
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $puede = AuxFunctions::puedeTrabajar($em, $unidad, $fecha_date, AuxFunctions::TIPO_PERIODO_ACTIVO_FIJO);
+        if ($puede)
+            return new JsonResponse(['success' => true, 'puede' => $puede]);
+        else {
+            $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'cerrado' => false,
+                'id_unidad' => $unidad
+            ]);
+            throw new \Error('La fecha debe corresponder al periodo del mes : '
+                . AuxFunctions::getNombreMes($periodo_abierto->getMes()) . ' de ' . $periodo_abierto->getAnno());
+        }
+    }
 }
