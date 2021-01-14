@@ -37,6 +37,14 @@ class EmpleadoType extends AbstractType
             ->add('telefono',TextType::class, array(
                 'label'=>'Teléfono'
             ))
+            ->add('sueldo_bruto_mensual',TextType::class, array(
+                'label'=>'Sueldo Bruto (mensual)',
+                'required'=>false
+            ))
+            ->add('salario_x_hora',TextType::class, array(
+                'label'=>'Salario por hora',
+                'required'=>false
+            ))
             ->add('id_cargo', EntityType::class, [
                 'class' => Cargo::class,
                 'label' => 'Cargo en la Empresa',

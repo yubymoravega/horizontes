@@ -23,11 +23,6 @@ class Cargo
     private $nombre;
 
     /**
-     * @ORM\Column(type="float")
-     */
-    private $salario_base;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $activo;
@@ -45,18 +40,6 @@ class Cargo
     public function setNombre(string $nombre): self
     {
         $this->nombre = $nombre;
-
-        return $this;
-    }
-
-    public function getSalarioBase(): ?float
-    {
-        return $this->salario_base;
-    }
-
-    public function setSalarioBase(float $salario_base): self
-    {
-        $this->salario_base = $salario_base;
 
         return $this;
     }

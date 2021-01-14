@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Plantilla de la Agencia
+                Nómina de Pago
             </h4>
             <div>
                 <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
@@ -28,22 +28,18 @@
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
+            <th width="25px">#</th>
             <th scope="col-1">Nombre</th>
-            <th width="280px">Correo</th>
-            <th width="350px">Cargo</th>
-            <th width="300px">Rol</th>
-            <th width="190px">Sueldo Bruto</th>
-            <th width="220px">Teléfono</th>
+            <th width="150px">Sueldo Bruto</th>
+            <th width="150px">Comisión Mensual</th>
             </thead>
             <tbody>
             {% for item in empleados %}
                 <tr>
+                    <td style="font-weight:400;">{{ item.nro }}</td>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.correo }}</td>
-                    <td style="font-weight:400;">{{ item.cargo_nombre }}</td>
-                    <td style="font-weight:400;">{{ item.rol }}</td>
-                    <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>
-                    <td style="font-weight:400;">{{ item.telefono }}</td>
+                    <td style="font-weight:400;">{{ item.sueldo_bruto }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -65,6 +65,8 @@ class EmpleadoController extends AbstractController
             'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
             'rol' => $empleado ? $empleado->getRol() : '',
             'is_user' => $empleado && $empleado->getRol() ? true : false,
+            'sueldo_bruto_mensual' => $empleado && $empleado->getSueldoBrutoMensual() ? $empleado->getSueldoBrutoMensual() : '',
+            'salario_x_hora' => $empleado && $empleado->getSalarioXHora() ? $empleado->getSalarioXHora() : '',
             'success' => true
         ]);
     }
@@ -93,7 +95,9 @@ class EmpleadoController extends AbstractController
             'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
             'rol' => $empleado ? $empleado->getRol() : '',
             'is_user' => $empleado && $empleado->getRol() ? true : false,
-            'success' => true
+            'success' => true,
+            'sueldo_bruto_mensual' => $empleado && $empleado->getSueldoBrutoMensual() ? $empleado->getSueldoBrutoMensual() : '',
+            'comision_mensual' => $empleado && $empleado->getSalarioXHora() ? $empleado->getSalarioXHora() : '',
         ]);
     }
 
@@ -121,7 +125,9 @@ class EmpleadoController extends AbstractController
             'id_cargo' => $empleado ? $empleado->getIdCargo()->getId() : '',
             'rol' => $empleado ? $empleado->getRol() : '',
             'is_user' => $empleado && $empleado->getRol() ? true : false,
-            'success' => true
+            'success' => true,
+            'sueldo_bruto_mensual' => $empleado && $empleado->getSueldoBrutoMensual() ? $empleado->getSueldoBrutoMensual() : '',
+            'salario_x_hora' => $empleado && $empleado->getSalarioXHora() ? $empleado->getSalarioXHora() : '',
         ]);
     }
 
@@ -142,8 +148,6 @@ class EmpleadoController extends AbstractController
             /** @var  $obj_empleado Empleado */
             $obj_empleado
                 ->setBaja(false)
-                ->setAcumuladoTiempoVacaciones(0)
-                ->setAcumuladoDineroVacaciones(0)
                 ->setIdUnidad(AuxFunctions::getUnidad($em, $this->getUser()))
                 ->setActivo(true);
 

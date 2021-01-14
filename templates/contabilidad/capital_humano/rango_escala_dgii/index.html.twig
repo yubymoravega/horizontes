@@ -1,0 +1,165 @@
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Rango de Escala de la DGII
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+
+        {{ include('contabilidad/capital_humano/rango_escala_dgii/form_modal.html.twig',{title: 'Adicionar Rango de Escala'}) }}
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-2">Escala Anual</th>
+            <th width="120px">Valor Fijo</th>
+            <th width="120px">%</th>
+            <th width="250px">Mínimo</th>
+            <th width="250px">Máximo</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in rangos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.escala }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.valor_fijo }}</td>
+                    <td style="font-weight:400;" class="text-center">{{ item.por_ciento }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.minimo }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.maximo }}</td>
+                    <td class="align-content-center">
+                        <button type="button" class="btn btn-warning btn-sm px-1 ml-5" data-toggle="tooltip"
+                                data-placement="bottom" title="Editar"
+                                onclick="onUpdate({
+                                        escala:'{{ item.escala }}',
+                                        por_ciento:'{{ item.por_ciento }}' ,
+                                        minimo:'{{ item.minimo_value }}' ,
+                                        maximo:'{{ item.maximo_value }}' ,
+                                        anno:'{{ item.anno }}' ,
+                                        valor_fijo:'{{ item.valor_fijo_value }}' ,
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el rango de escala seleccionado ?',
+                                        url:'{{ path('contabilidad_capital_humano_rango_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
+
+        const onUpdate = function (config) {
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {id = '', escala = '', minimo = '', maximo = '', anno = '', por_ciento = '', valor_fijo = ''} = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar Rango de Escala")
+
+            $('#rango_escala_dgii_escala').val(escala)
+            $('#rango_escala_dgii_minimo').val(minimo)
+            $('#rango_escala_dgii_maximo').val(maximo)
+            $('#rango_escala_dgii_anno').val(anno)
+            $('#rango_escala_dgii_por_ciento').val(por_ciento)
+            $('#rango_escala_dgii_valor_fijo').val(valor_fijo)
+            $('#id_rango').val(id)
+        }
+
+        $(document).ready(function () {
+            // init
+            $('#modal__btn__actualizar').hide()
+
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'rango_escala_dgii[escala]': "required",
+                    'rango_escala_dgii[minimo]': "required",
+                    'rango_escala_dgii[maximo]': "required",
+                    'rango_escala_dgii[anno]': "required",
+                    'rango_escala_dgii[por_ciento]': "required",
+                    'rango_escala_dgii[valor_fijo]': "required",
+                },
+                messages: {
+                    'rango_escala_dgii[escala]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'rango_escala_dgii[minimo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'rango_escala_dgii[maximo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'rango_escala_dgii[anno]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'rango_escala_dgii[por_ciento]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'rango_escala_dgii[valor_fijo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                }
+            })
+
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/capital-humano/rango-escala-dgii/add`)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+            $('#modal__btn__actualizar').on('click', function () {
+
+                const id_rango = $('#id_rango').val()
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/contabilidad/capital-humano/rango-escala-dgii/upd/${id_rango}`)
+                formulario.submit()
+                if(validateForm.errorList.length === 0) loadingModal.show()
+            })
+        })
+    </script>
+{% endblock %}
+
