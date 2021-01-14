@@ -33,10 +33,10 @@ class NominaPagoType extends AbstractType
             ->add('mes')
             ->add('anno')
             ->add('fecha')
-            ->add('elaborada')
-            ->add('aprobada')
-            ->add('id_empleado')
-            ->add('id_usuario_aprueba')
+//            ->add('elaborada')
+//            ->add('aprobada')
+//            ->add('id_empleado')
+//            ->add('id_usuario_aprueba')
         ;
     }
 

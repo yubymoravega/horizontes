@@ -4,6 +4,8 @@ namespace App\Controller\Contabilidad\CapitalHumano;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Form\Contabilidad\CapitalHumano\EmpleadoType;
+use App\Form\Contabilidad\CapitalHumano\NominaPagoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,6 +50,19 @@ class NominaPagoController extends AbstractController
         return $this->render('contabilidad/capital_humano/nomina_pago/index.html.twig', [
             'controller_name' => 'NominaPagoController',
             'empleados' => $rows,
+        ]);
+    }
+    /**
+     * @Route("/pagar/{id}", name="contabilidad_capital_humano_nomina_pago_pagar")
+     */
+    public function pagar(EntityManagerInterface $em,Request $request,$id)
+    {
+        $form = $this->createForm(NominaPagoType::class);
+        $callback = 'contabilidad/capital_humano/nomina_pago/nomina.html.twig';
+
+        return $this->render($callback, [
+            'controller_name' => 'EmpleadoController',
+            'form' => $form->createView(),
         ]);
     }
 }

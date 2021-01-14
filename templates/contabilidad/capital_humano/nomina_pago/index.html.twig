@@ -16,7 +16,7 @@
             </h4>
             <div>
                 <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
-                        title="Imprimir Registro de Activos"
+                        title="Imprimir Nomina de Pago"
                         onclick="Print('{{ path('contabilidad_capital_humano_plantilla_imprimir') }}')">
                     <i class="fa fa-print"></i>
                 </button>
@@ -28,10 +28,18 @@
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-            <th width="25px">#</th>
+            <th width="30px">#</th>
             <th scope="col-1">Nombre</th>
-            <th width="150px">Sueldo Bruto</th>
-            <th width="150px">Comisión Mensual</th>
+            <th width="150px" class="text-center">Cantidad de Hrs</th>
+            <th width="150px" class="text-center">Salario x Hrs</th>
+            <th width="150px" class="text-center">Sueldo Bruto</th>
+            <th width="150px" class="text-center">Comisión</th>
+            <th width="150px" class="text-center">Vacaciones</th>
+            <th width="150px" class="text-center">Horas Extra</th>
+            <th width="150px" class="text-center">Total de Ingresos</th>
+            <th width="150px" class="text-center">Ingresos Cotizables a TSS</th>
+            <th width="150px" class="text-center">Sueldo Neto a Pagar</th>
+            <th width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in empleados %}
@@ -40,6 +48,28 @@
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400;">{{ item.sueldo_bruto }}</td>
                     <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td>
+                        <button type="button" class="btn btn-primary btn-sm w-50" data-toggle="tooltip"
+                                data-placement="bottom" title="Pagar"
+                                onclick="Pagar({{ item.id }})">
+                            <i class="fa fa-dollar"></i>
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Imprimir"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar cargo seleccionado ?',
+                                        url:'{{ path('contabilidad_capital_humano_cargo_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-print"></i>
+                        </button>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -54,6 +84,9 @@
     <script>
         function Print(url) {
             window.open(url, 'blank_')
+        }
+        function Pagar(id) {
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + id);
         }
     </script>
 {% endblock %}
