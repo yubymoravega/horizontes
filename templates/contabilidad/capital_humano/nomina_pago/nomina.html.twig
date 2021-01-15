@@ -7,71 +7,201 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="container d-flex justify-content-center">
-        <div class="card mt-1" style="width: 50rem;">
-            <div class="container">
+    <div class="container-fluid">
+        <div class="card mt-1">
+            <div class="container-fluid">
                 <div class="row mt-0 p-0">
                     <div class="col-8 form-group input-group input-group-sm d-block">
-                        <h1 class="text-reporte text-right mr-0" id="normal_div">Adicionar Empleado</h1>
+                        <h1 class="text-reporte text-right mr-0" id="normal_div">Nómina de {{ nombre }}</h1>
                     </div>
                 </div>
             </div>
             <div class="card-body">
                 {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
-{#                <div class="row mt-0 p-0">#}
-{#                    <div class="col-12 form-group input-group input-group-sm pa-2 d-block">#}
-{#                        {{ form_label(form.nombre) }}#}
-{#                        {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="row mt-0 p-0">#}
-{#                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">#}
-{#                        {{ form_label(form.correo) }}#}
-{#                        {{ form_widget(form.correo,{'attr': {'class': 'form-control w-100','placeholder':'usuario@dominio.com'}}) }}#}
-{#                    </div>#}
-{#                    <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">#}
-{#                        {{ form_label(form.telefono) }}#}
-{#                        {{ form_widget(form.telefono,{'attr': {'class': 'form-control w-100','placeholder':'+## ########'}}) }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="row mt-0 p-0">#}
-{#                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">#}
-{#                        {{ form_label(form.fecha_alta) }}#}
-{#                        {{ form_widget(form.fecha_alta, {'attr': {'class': 'w-100'}}) }}#}
-{#                    </div>#}
-{#                    <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">#}
-{#                        {{ form_label(form.identificacion) }}#}
-{#                        {{ form_widget(form.identificacion,{'attr': {'class': 'form-control w-100'}}) }}#}
-{#                    </div>#}
-{#                    <div class="mt-0 col-5 form-group input-group input-group-sm d-block">#}
-{#                        {{ form_label(form.id_cargo) }}#}
-{#                        {{ form_widget(form.id_cargo, {'attr': {'class': 'w-100'}}) }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="row mt-0 p-0">#}
-{#                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">#}
-{#                        {{ form_label(form.sueldo_bruto_mensual) }}#}
-{#                        {{ form_widget(form.sueldo_bruto_mensual,{'type':'number','attr': {'class': 'form-control w-100'}}) }}#}
-{#                    </div>#}
-{#                    <div class="col-7 form-group input-group input-group-sm mt-0 pt-0 d-block">#}
-{#                        {{ form_label(form.salario_x_hora) }}#}
-{#                        {{ form_widget(form.salario_x_hora,{'type':'number','attr': {'class': 'form-control w-100'}}) }}#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="form-group input-group input-group-sm d-block">#}
-{#                    {{ form_label(form.direccion_particular) }}#}
-{#                    {{ form_widget(form.direccion_particular, {'attr': {'class': 'w-100'}}) }}#}
-{#                </div>#}
-{#                <label for="is-user" class="form-check-label ">Es usuario del#}
-{#                    sistema</label>#}
-{#                <input type="checkbox" class="form-check-input ml-2" id="is-user" name="is_usuario">#}
-{#                <div class="container-fluid ml-0 p-0 pt-2 form-group input-group input-group-sm" id="div_rol">#}
-{#                    {{ form_label(form.rol) }}#}
-{#                    {{ form_widget(form.rol, {'attr': {'class': 'w-100'}}) }}#}
-{#                </div>#}
+                <div class="row mt-0 p-0">
+                    {% if sueld_bruto_boolean %}
+                        <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                            <label for="sueldo_bruto">Sueldo Bruto</label>
+                            <input type="number" id="sueldo_bruto" placeholder="${{ sueldo_bruto }}"
+                                   value="{{ sueldo_bruto_value }}"
+                                   class="form-control w-100 form-control">
+                        </div>
+                    {% else %}
+                        <div class="col-2 form-group input-group input-group-sm pa-2 d-block">
+                            <label for="salario_x_hora">Salario x hora</label>
+                            <input type="text" class="form-control w-100 form-control" id="salario_x_hora" readonly
+                                   value="${{ salario_x_hora }}">
+                        </div>
+                        <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            <label for="horas_trabajadas">Horas trabajadas</label>
+                            <input type="number" class="form-control w-100 form-control" id="horas_trabajadas">
+                        </div>
+                    {% endif %}
+                    <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.comision) }}
+                        {{ form_widget(form.comision,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.vacaciones) }}
+                        {{ form_widget(form.vacaciones,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.horas_extra) }}
+                        {{ form_widget(form.horas_extra,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.otros) }}
+                        {{ form_widget(form.otros,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(form.total_ingresos) }}
+                        {{ form_widget(form.total_ingresos,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                    </div>
+                    <div class="col-5 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        {{ form_label(form.ingresos_cotizables_tss) }}
+                        {{ form_widget(form.ingresos_cotizables_tss,{'attr': {'class': 'form-control w-100','readonly':'true'}}) }}
+                    </div>
+                    <div class="col-2 form-group input-group input-group-sm mt-4 pt-2 mr-auto d-block">
+                        <button id="btn_calcular" type="button" name="btn_calcular" class="btn btn-primary"><i
+                                    class="fa fa-calculator"></i> Calcular
+                        </button>
+                    </div>
+                </div>
+                <div id="div_data" style="display: none">
+                    {#               IMPUESTO SOBRE LA RENTA         #}
+                    <div id="calculo_impuesto_sobre_renta" style="display: none">
+                        <div class="d-flex align-items-center mt-3 pl-2">
+                            <h3 class="text-light mr-auto" style="font-weight: 300;">Cálculo de Impuesto Sobre la
+                                Renta(ISR)</h3>
+                        </div>
+                        <hr color="dimgray" class="my-1 ml-2" size=3>
+                        <div class="row mt-0 p-0">
+                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.seguridad_social_mensual) }}
+                                {{ form_widget(form.impuesto_sobre_renta.seguridad_social_mensual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.salario_bruto_anual) }}
+                                {{ form_widget(form.impuesto_sobre_renta.salario_bruto_anual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.seguridad_social_anual) }}
+                                {{ form_widget(form.impuesto_sobre_renta.seguridad_social_anual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.salario_despues_seguridad_social) }}
+                                {{ form_widget(form.impuesto_sobre_renta.salario_despues_seguridad_social,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.monto_segun_rango_escala) }}
+                                {{ form_widget(form.impuesto_sobre_renta.monto_segun_rango_escala,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.excedente_segun_rango_escala) }}
+                                {{ form_widget(form.impuesto_sobre_renta.excedente_segun_rango_escala,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                        </div>
+                        <div class="row mt-0 p-0">
+                            <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.por_ciento_impuesto_excedente) }}
+                                {{ form_widget(form.impuesto_sobre_renta.por_ciento_impuesto_excedente,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.monto_adicional_rango_escala) }}
+                                {{ form_widget(form.impuesto_sobre_renta.monto_adicional_rango_escala,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.impuesto_renta_pagar_anual) }}
+                                {{ form_widget(form.impuesto_sobre_renta.impuesto_renta_pagar_anual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                {{ form_label(form.impuesto_sobre_renta.impuesto_renta_pagar_mensual) }}
+                                {{ form_widget(form.impuesto_sobre_renta.impuesto_renta_pagar_mensual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                        </div>
+                    </div>
 
+                    {#               DEDUCCIONES         #}
+                    <div class="d-flex align-items-center mt-3 pl-2">
+                        <h3 class="text-light mr-auto" style="font-weight: 300;">Deducciones</h3>
+                    </div>
+                    <hr color="dimgray" class="my-1 ml-2" size=3>
+                    <div class="row mt-0 p-0">
 
-{#                <input type="text" id="id_empleado" hidden>#}
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.isr) }}
+                            <div class="row m-0 p-0">
+                                <div class="col-11 p-0">
+                                    {{ form_widget(form.isr,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                                </div>
+                                <div class="col-1 mt-0 p-0">
+                                    <button class="btn btn-primary btn-sm" type="button" id="btn_show_calculo"
+                                            style="height: 40px !important;">
+                                        <i id="btn_detail" class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.ars) }}
+                            {{ form_widget(form.ars,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.afp) }}
+                            {{ form_widget(form.afp,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.cooperativa) }}
+                            {{ form_widget(form.cooperativa,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                    </div>
+                    <div class="row mt-0 p-0">
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.plan_medico_complementario) }}
+                            {{ form_widget(form.plan_medico_complementario,{'attr': {'class': 'form-control w-100'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.restaurant) }}
+                            {{ form_widget(form.restaurant,{'attr': {'class': 'form-control w-100'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.total_deducido) }}
+                            {{ form_widget(form.total_deducido,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.sueldo_neto_pagar) }}
+                            {{ form_widget(form.sueldo_neto_pagar,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                    </div>
+
+                    {#               PAGO EMPLEADOR         #}
+                    <div class="d-flex align-items-center mt-3 pl-2">
+                        <h3 class="text-light mr-auto" style="font-weight: 300;">Pagos Empleador</h3>
+                    </div>
+                    <hr color="dimgray" class="my-1 ml-2" size=3>
+                    <div class="row mt-0 p-0">
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.afp_empleador) }}
+                            {{ form_widget(form.afp_empleador,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.sfs_empleador) }}
+                            {{ form_widget(form.sfs_empleador,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.srl_empleador) }}
+                            {{ form_widget(form.srl_empleador,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                        <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            {{ form_label(form.infotep_empleador) }}
+                            {{ form_widget(form.infotep_empleador,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                        </div>
+                    </div>
+                </div>
+
+                <input type="text" id="id_empleado" hidden value="{{ id_empleado }}">
                 {{ form_end(form) }}
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
@@ -88,8 +218,119 @@
     </div>
 {% endblock %}
 
-
 {% block javascripts %}
     {{ parent() }}
+    <script>
+        let sueldo_bruto = $('#sueldo_bruto')
+        let horas_trabajadas = $('#horas_trabajadas')
+        let salario_x_hora = $('#salario_x_hora')
+        let comision = $('#nomina_pago_comision')
+        let vacaciones = $('#nomina_pago_vacaciones')
+        let horas_extra = $('#nomina_pago_horas_extra')
+        let otros = $('#nomina_pago_otros')
+        let ingresos_cotizables_tss = $('#nomina_pago_ingresos_cotizables_tss')
+        let nomina_pago_total_ingresos = $('#nomina_pago_total_ingresos')
 
+        $('#btn_show_calculo').on('click', function () {
+            showDivCalculo()
+        })
+        $('#btn_calcular').on('click', function () {
+            let ars = (ingresos_cotizables_tss.val() * 0.0304)
+            let afp = (ingresos_cotizables_tss.val() * 0.0287)
+            let cooperativa = 0
+            /** se calcula el 3.04% de ingresos_cotizables_tss **/
+            $('#nomina_pago_ars').val(ars.toFixed(2))
+            /** se calcula el 2.87% de ingresos_cotizables_tss **/
+            $('#nomina_pago_afp').val(afp.toFixed(2))
+
+            /*** Cooperativa se complica porque hay que tener en cuenta el tipo de pago si es por hora o bruto**/
+            if (salario_x_hora.length == 1) {
+                cooperativa = ((salario_x_hora.val() * horas_trabajadas.val() + comision.val()) * 0.025)
+            } else if (sueldo_bruto.length == 1) {
+                cooperativa = ((parseFloat(sueldo_bruto.val()) + parseFloat(comision.val())) * 0.025)
+            }
+            $('#nomina_pago_cooperativa').val(cooperativa.toFixed(2))
+
+            let total_deducido = ars + afp + cooperativa
+            $('#nomina_pago_total_deducido').val(total_deducido.toFixed(2))
+            let sueldo_neto_pagar = parseFloat($('#nomina_pago_total_ingresos').val()) - total_deducido
+            $('#nomina_pago_sueldo_neto_pagar').val(sueldo_neto_pagar.toFixed(2))
+            /** total deducido **/
+
+            showDivData()
+        })
+
+        $('#nomina_pago_comision').on('keyup', function () {
+            hideDivData()
+        })
+
+        function showDivData() {
+            $('#div_data').css('display', 'block')
+        }
+
+        function hideDivData() {
+            $('#div_data').css('display', 'none')
+        }
+
+        function showDivCalculo() {
+            let div_calculo = $('#calculo_impuesto_sobre_renta');
+            if (div_calculo.css('display') == 'block') {
+                div_calculo.css('display', 'none')
+                $('#btn_detail').removeClass('fa-eye-slash')
+                $('#btn_detail').addClass('fa fa-eye')
+                $('#btn_show_calculo').removeClass('btn btn-danger btn-sm')
+                $('#btn_show_calculo').addClass('btn btn-primary btn-sm')
+            } else {
+                div_calculo.css('display', 'block')
+                $('#btn_detail').removeClass('fa fa-eye')
+                $('#btn_detail').addClass('fa-eye-slash')
+                $('#btn_show_calculo').removeClass('btn btn-primary btn-sm')
+                $('#btn_show_calculo').addClass('btn btn-danger btn-sm')
+            }
+        }
+
+        /** Eventos donde recalcula el total de ingrasos y los ingresos cotizables a TSS**/
+        $('#sueldo_bruto').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+        $('#horas_trabajadas').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+        $('#salario_x_hora').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+        $('#nomina_pago_comision').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+        $('#nomina_pago_vacaciones').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+        $('#nomina_pago_horas_extra').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+        $('#nomina_pago_otros').on('keyup', function () {
+            calcular_TotalIngreso_IngresosCotizablesTSS()
+        })
+
+        function calcular_TotalIngreso_IngresosCotizablesTSS() {
+            let horas_trabajadas_value = horas_trabajadas.val() == '' ? 0 : parseFloat(horas_trabajadas.val())
+            let salario_x_hora_value = salario_x_hora.val() == '' ? 0 : parseFloat(salario_x_hora.val())
+            let sueldo_bruto_value = sueldo_bruto.val() == '' ? 0 : parseFloat(sueldo_bruto.val())
+            let comision_value = comision.val() == '' ? 0 : parseFloat(comision.val())
+            let vacaciones_value = vacaciones.val() == '' ? 0 : parseFloat(vacaciones.val())
+            let horas_extra_value = horas_extra.val() == '' ? 0 : parseFloat(horas_extra.val())
+            let otros_value = otros.val() == '' ? 0 : parseFloat(otros.val())
+
+            let ingresos_cotizables = 0
+            if (salario_x_hora.length == 1)
+                ingresos_cotizables = (horas_trabajadas_value * salario_x_hora_value) + comision_value + vacaciones_value
+            else if (sueldo_bruto.length == 1)
+                ingresos_cotizables = sueldo_bruto_value + comision_value + vacaciones_value
+            let total_ingreso = ingresos_cotizables + horas_extra_value + otros_value
+            nomina_pago_total_ingresos.val(total_ingreso)
+            ingresos_cotizables_tss.val(ingresos_cotizables)
+        }
+
+        calcular_TotalIngreso_IngresosCotizablesTSS()
+    </script>
 {% endblock %}

@@ -57,12 +57,21 @@ class NominaPagoController extends AbstractController
      */
     public function pagar(EntityManagerInterface $em,Request $request,$id)
     {
+        /** @var Empleado $empleado */
+        $empleado = $em->getRepository(Empleado::class)->find($id);
         $form = $this->createForm(NominaPagoType::class);
         $callback = 'contabilidad/capital_humano/nomina_pago/nomina.html.twig';
 
         return $this->render($callback, [
             'controller_name' => 'EmpleadoController',
             'form' => $form->createView(),
+            'nombre'=>$empleado->getNombre(),
+            'sueld_bruto_boolean'=>$empleado->getSalarioXHora()!=''||$empleado->getSalarioXHora()>0?false:true,
+            'sueldo_bruto'=>number_format($empleado->getSueldoBrutoMensual(),2),
+            'sueldo_bruto_value'=>$empleado->getSueldoBrutoMensual(),
+            'salario_x_hora'=>number_format($empleado->getSalarioXHora(),2),
+            'salario_x_hora_value'=>$empleado->getSalarioXHora(),
+            'id_empleado'=>$empleado->getId()
         ]);
     }
 }
