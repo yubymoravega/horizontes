@@ -28,41 +28,24 @@
                                          {% for iten in carrito %}
                                         <tr>
 											<th>
-												<img src="images/shop/product-01-70x70.jpg" width="70" height="70" alt="">
+												<img  src="{{ asset('images/servicios/inpospak.png') }}" width="150" height="130" alt="">
 											</th>
 											<td class="big text-middle">
 												<h5 class="text-regular" style="color:white;"> </h5>
-													{{iten.json.servicio}} - {{iten.recibirMoneda}} ${{iten.json.recibir}}   </br></br>                                      
+												    Inposdom Courier   </br></br>                                      
 	<a  data-toggle="collapse" href="#coll{{iten.id}}" role="button" aria-expanded="false" aria-controls="coll{{iten.id}}"> 
-		<span style="color:white;"> <b> {{iten.json.primerNombre}} {{iten.json.primerApellido}} {{iten.json.segundoApellido}} </b><span> </br>
+		<span style="color:white;"> <b> {{iten.json.sh |upper}}   </b><span> </br>
 	</a>
 	
 
-<div class="collapse" id="coll{{iten.id}}" style="margin-top: 20px;">
-	
-		<ul style="list-style-type:disc">
-  <li><b> Remitente:</b> {{iten.json.idCliente}}</li>
-  <li><b> Alternativo:</b> {{iten.json.alternativoNombre}} {{iten.json.alternativoApellido}} {{iten.json.alternativoSegundoApellido}}</li>
-  <li><b> Contactos:</b> {{iten.json.telefono}} - {{iten.json.telefonoCasa}}</li>
-  <li><b> Identificacion:</b> {{iten.json.identificacion}}</li>
-  <li><b> Direccion:</b> {{iten.json.calle}} No: {{iten.json.no}} / {{iten.json.entre}} y {{iten.json.y}},  
-   Edificio: {{iten.json.edificio}} Apto: {{iten.json.apto}}, Localidad: {{iten.json.reparto}}.
 
-  {{iten.json.municipio}}. {{iten.json.provincia}}</li>
-</ul>
-
-</div>
 												
 											</td>
 											<td class="text-middle">1</td>
-											<td class="text-middle">{{iten.json.monto}} {{moneda}}</td>
+											<td class="text-middle">{{iten.json.json.monto}} {{moneda}}</td>
                                             <td class="text-middle">
                                             
-			<a  onClick="editarIten('{{ iten.id }}');" > 
-<svg width="1em" height="1em" viewbox="0 0 16 16" class=" box bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-	<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-	<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-</svg> </a>
+			
 <a  onClick="eliminarIten('{{ iten.id }}');" > 
 <svg width="1em" height="1em" viewbox="0 0 16 16" class=" box bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 	<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
@@ -79,8 +62,7 @@
 								<p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
                                 <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuesto: &nbsp; &nbsp; &nbsp; $0.00 {{moneda}}</p>
                                 <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
-								<a  onclick="cotizacion()" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
-									<span class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></span>Cotizacion</a>
+								
                                 
                                      <a  onclick="cobrar()" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
 									<span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
@@ -177,7 +159,7 @@ function sleep(ms) {
 
           function cobrar() {
 
-        window.location.href = "/factura/pago/";
+        window.location.href = "mia_cargo/procesar/";
 
                      }             
 

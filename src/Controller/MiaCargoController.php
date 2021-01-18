@@ -18,6 +18,7 @@ use App\Entity\Carrito;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+use App\Entity\FacturaNoContable;
 
 use App\Entity\Contabilidad\Config\Moneda;
 
@@ -255,76 +256,159 @@ class MiaCargoController extends AbstractController
     } 
 
       /**
-     * @Route("/mia_cargo/procesar/{id}", name="mia_cargo/procesar")
+     * @Route("/mia_cargo/procesar/", name="mia_cargo/procesar")
      */
-    public function procesar($id)
+    public function procesar()
     {
 
         $user =  $this->getUser();
+        $total = null;
+        $pago = null;
+        $json = null;
 
         $dataBase = $this->getDoctrine()->getManager();
 
-        $facturaImposdom = $this->getDoctrine()
-            ->getRepository(FacturaImposdom::class)->find($id);
+        $data = $dataBase->getRepository(Carrito::class)->findBy(['empleado' => $user->getUsername()]);
+        
+        if(count($data) < 1){
 
-           if( $facturaImposdom->getPago() == 1){
+            $this->addFlash(
+                'success',
+                'Nada a facturar'
+            );
+            
+            return $this->redirectToRoute('home');
+        }
+
+        $con = count( $data);
+        $contador = 0;
+
+        while($contador < $con){
+
+            $json[$contador] = array(
+                'id' => $data[$contador]->getId(),
+                'json' => \json_decode($data[$contador]->getJson()),
+
+            ); 
+
+            $total = $total + $json[$contador]['json']->json->monto;
+
+            if(  $json[$contador]['json']->pago == 1){
+
+               $pago = 1;
+
+               } 
+
+            $contador++;
+        }
+
+        if($pago == 1){
 
             $this->addFlash(
                 'error',
-                'Factura Pagada'
+                'Eliminar Carrito'
             );
 
-            return $this->redirectToRoute('mia_cargo/facturas',['tel' => $facturaImposdom->getIdCliente()]);
-
-           } 
+            return $this->redirectToRoute('mia_cargo/facturas',['tel' => $json[$contador]['json']->idCliente]);
+        }
 
         if($user->getIdMoneda() == 1){
 
-            $monto = number_format($facturaImposdom->getJson()['monto'], 2, '.', '');
-            return $this->render('mia_cargo/usd.html.twig',['monto' => $monto,'moneda' => "USD",'id'=>$id]);
+            $monto = number_format($total, 2, '.', '');
+            return $this->render('mia_cargo/usd.html.twig',['monto' => $monto,'moneda' => "USD"]);
 
         }else{
 
             $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>2]);
 
-            $monto =  $facturaImposdom->getJson()['monto'] * $tasa[0]->getTasa();
+            $monto =  $total * $tasa[0]->getTasa();
             $monto = number_format($monto , 2, '.', '');
-            return $this->render('mia_cargo/dop.html.twig',['monto' => $monto,'moneda' => "DOP",'id'=>$id]);
+            return $this->render('mia_cargo/dop.html.twig',['monto' => $monto,'moneda' => "DOP"]);
 
         }
-
 
     } 
 
      /**
-     * @Route("/mia_cargo/procesar/save/{cambio}/{id}", name="mia_cargo/procesar/save")
+     * @Route("/mia_cargo/procesar/save/{cambio}/{pagado}", name="mia_cargo/procesar/save")
      */
-    public function procesarSave($cambio,$id)
+    public function procesarSave($cambio,$pagado)
     {
 
         $user =  $this->getUser();
-
+        $json = null;
         $dataBase = $this->getDoctrine()->getManager();
+        $total = null;
+
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda() ]);
 
         date_default_timezone_set('America/Santo_Domingo');
-            $date = new DateTime('NOW');
+        $date = new DateTime('NOW');
 
-        $facturaImposdom = $this->getDoctrine()
-            ->getRepository(FacturaImposdom::class)->find($id);
+        $data = 
+        $dataBase->getRepository(Carrito::class)->findBy
+        (['empleado' => $user->getUsername()]);
 
-            $json = array(
-                'cambio' => $cambio,
-                'moneda' => $user->getIdMoneda(),
-                'monto' => $facturaImposdom->getJson()['monto'],
-                'fecha' => $date,
-                'user'  =>  $user->getId()
-            );    
+        $con = count( $data);
+        $contador = 0;
 
-            $facturaImposdom->setJson(\json_encode($json));
+        while($contador < $con){
+
+            $json[$contador] = array(
+                'id' => $data[$contador]->getId(),
+                'json' => \json_decode($data[$contador]->getJson()),
+                'cambio' =>  number_format($cambio , 2, '.', ''),
+                'pagado' =>  number_format($pagado, 2, '.', '')
+
+            ); 
+
+            $total = $total + $json[$contador]['json']->json->monto;
+            $json[$contador]['json']->pago = 1;
+            $json[$contador]['json']->json->monto =  number_format($json[$contador]['json']->json->monto * $tasa[0]->getTasa(), 2, '.', '');
+
+            $facturaImposdom = $this->getDoctrine()
+            ->getRepository(FacturaImposdom::class)->find($json[$contador]['json']->id);
+
             $facturaImposdom->setPago(1);
-
             $dataBase->flush($facturaImposdom);
-            return $this->redirectToRoute('mia_cargo/finalizar',['id' => $id]);
+
+            $contador++;
+        }
+
+
+        $cliente = $this->getDoctrine()
+            ->getRepository(Cliente::class)->findBy(['telefono' => $json[0]['json']->idCliente]);
+
+        $nombreCliente = $cliente[0]->getNombre()." ".$cliente[0]->getApellidos();
+        
+        
+
+        $facturaNoContable = new FacturaNoContable;
+        $facturaNoContable->setJson(json_encode($json)); 
+        $facturaNoContable->setIdMoneda( ($user->getIdMoneda() == 1) ? "USD":"DOP" );
+        $facturaNoContable->setEmpleado($user->getUsername());
+        $facturaNoContable->setDatetime($date);
+        $facturaNoContable->setTotal(number_format($total * $tasa[0]->getTasa(), 2, '.', ''));
+        $facturaNoContable->setIdCliente($json[0]['json']->idCliente);
+        $facturaNoContable->setNombreCliente($nombreCliente);
+
+        $dataBase->persist($facturaNoContable);
+        $dataBase->flush();
+
+        $con = count( $data);
+        $contador = 0;
+
+        while($contador < $con){
+
+            $dataBase->remove($data[$contador]);
+            $dataBase->flush();
+
+            $contador++;
+        }
+
+            //return new Response("200");
+
+            return $this->redirectToRoute('mia_cargo/finalizar',['id' => $facturaNoContable->getId()]);
     } 
 
     /**
@@ -348,13 +432,13 @@ class MiaCargoController extends AbstractController
             $date = new DateTime('NOW');
 
         $facturaImposdom = $this->getDoctrine()
-            ->getRepository(FacturaImposdom::class)->find($id);
+            ->getRepository(FacturaNoContable::class)->find($id);
 
             $cliente = $this->getDoctrine()
             ->getRepository(Cliente::class)->findBy(['telefono'=>$facturaImposdom->getIdCliente()]);
 
             $html = $this->renderView("mia_cargo/pdf.html.twig",
-        ["factura" => $facturaImposdom, 'user' => $user->getUsername(),'cliente' => $cliente[0]]);
+        ["factura" => $facturaImposdom,"json" => \json_decode($facturaImposdom->getJson()), 'user' => $user->getUsername(),'cliente' => $cliente[0]]);
         $filename = 'factura.pdf'; 
 
         //return $this->render("mia_cargo/pdf.html.twig", ["factura" => $facturaImposdom, 'user' => $user->getUsername(),'cliente' => $cliente[0]]);
@@ -402,6 +486,12 @@ class MiaCargoController extends AbstractController
                 return $this->redirectToRoute('mia_cargo/facturas',['tel' => $facturaImposdom->getIdCliente()]);
             }
 
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda() ]);
+
+            $monto = array(
+                "monto" => number_format(round($facturaImposdom->getJson()['monto'] , 2) , 2, '.', '') 
+            );
+
         $json = array(
             'id' => $facturaImposdom->getId(),
             'libra' => $facturaImposdom->getLb(),
@@ -410,7 +500,7 @@ class MiaCargoController extends AbstractController
             'casillero' => $facturaImposdom->getCasillero(),
             'ciudad' => $facturaImposdom->getCiudad(),
             'sh' => $facturaImposdom->getSh(),
-            'json' => $facturaImposdom->getJson(),
+            'json' => $monto,
             'fecha' => $facturaImposdom->getFecha(),
             'pago' => $facturaImposdom->getPago(),
             'cierre' => $facturaImposdom->getCierre()

@@ -16,46 +16,41 @@
 			<table class="table table-striped tabla-reporte">
 				<tbody>
 					<tr>
-						<th>ID</th>
+					
 						<th>Fecha</th>
 						<th>Cliente</th>
-						<th>Cedula</th>
+			
 						<th>Casillero</th>
 						<th>Valor</th>         
-						<th>Ciudad</th>
+						
 						<th>SH</th>
-						<th>Pago</th>
-						<th>Cierre</th>
+
+					
 						<th>Accion</th>
 					</tr>
 					{# table body #}
         {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{data.id}}</td>
+           
             <td>{{data.fecha |date("m/d/Y")}} <br> {{data.fecha |date("h:i:s A")}}</td>           
-			<td>{{data.idCliente}}</td> 
-			<td>{{data.cedula}}</td>
+			<td>{{data.idCliente}} <br> - <br> {{data.cedula}}</td> 
+		
             <td>{{data.casillero}}</td>    
            <td>{{data.json.monto}} USD</td>  
 		   
-
-			<td>{{data.ciudad}}</td>
-			<td>{{data.sh}}</td>
-
-			{% if data.pago == "0" %}
-            <td>Pendiente</td>   
+			<td>{{data.sh}}
+      	{% if data.pago == "0" %}
+           <br> Pendiente de Pago
             {% else %}
-            <td>Saldada</td>   
+            <br>Pagada<br> 
             {% endif %}
-
-			{% if data.cierre == "0" %}
-            <td>Pendiente</td>   
-            {% else %}
-            <td>Enviada</td>   
-            {% endif %}
+      
+      </td>
 
             <td>
-			<svg  onClick="editar({{data.id}})" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+
+        {% if data.pago == 0 %}
+   		<svg  onClick="editar({{data.id}})" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
 </svg>
@@ -63,6 +58,8 @@
 <svg onClick="procesar({{data.id}})" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
   <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1z"/>
 </svg>
+{% endif %}
+
 			</td>           
         </tr>
     {% endfor %}    

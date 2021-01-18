@@ -67,7 +67,7 @@
       <div class="col-5">
         <h1 class="document-type display-4" style="FONT-SIZE: 30PX;">COMPROBANTE DE PAGO</h1>
         <p class="text-right">
-        <strong>Fecha  {{factura.fecha|date("d/m/Y ")}}
+        <strong>Fecha  {{json[0].json.fecha.date|date("d/m/Y ")}}
         <br> No: 000{{factura.id}}</strong></p>
          
       </div>
@@ -108,16 +108,23 @@
       <tbody>
           
 
-<tr> 
-          <td> <p  class="mayuscula">Carga Courier</P></td>
-         <td class="mayuscula"> {{factura.casillero}} </td>
-         <td> <p  class="mayuscula">{{factura.sh  }} </P></td>
+
+
+           {% for data in json %}
+           <tr> 
+         <td> <p  class="mayuscula">Carga Courier</P></td>
+         <td class="mayuscula"> {{data.json.casillero}} </td>
+         <td> <p  class="mayuscula">{{data.json.sh  }} </P></td>
         
-         <td class="text-right">2.55 </td>
-         <td class="text-right"> $25.60 USD</td>
+         <td class="text-right">{{data.json.libra  }}  </td>
+         <td class="text-right"> {{data.json.json.monto }} {{factura.idMoneda}}</td>
+             </tr>  
+    {% endfor %}
+
+        
           
    
-    </tr>  
+
 
       </tbody>
     </table>
@@ -128,177 +135,15 @@
         <table class="table table-sm text-right">
           <tbody><tr>
             <td><strong>Total Cobrado</strong></td>
-            <td class="text-right">$25.60 USD </td>
+            <td class="text-right">{{factura.total}} {{factura.idMoneda}}</td>
+          </tr>
+           <tr>
+            <td>Pagado</td>
+            <td class="text-right">{{json[0].pagado }} {{factura.idMoneda}}</td>
           </tr>
           <tr>
             <td>Cambio</td>
-            <td class="text-right">$ 0.00 USD</td>
-          </tr>
-         
-        </tbody></table>
-      </div>
-    </div>
-    <br> <br> 
-     ________________________
-     <br>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Firma 
-     <br>
-     
-     <h6>Gracias por utilizar nuestros servicios</h6>
-    <p class="conditions">
-     Consulte los términos y condiciones de los servicios en <strong>www.inpospak.com</strong> 
-    </p>
-    
-   
-    
-
-    <hr>
-    <p class="bottom-page text-center">
-      <strong>INPOSPAK </strong><br>
-        
-        Tel: 829-956-1225 | info@inpospak.com
-<br> Processed By MIA-CARGO
-
-    </p>
-  </div>
-</div>
-  
-
-</body> <hr>
-
-<html lang="en" class=""><head>
-
-  <meta charset="UTF-8">
-  <title>Factura</title>
-
-  <meta name="robots" content="noindex">
-
-  <link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
-  <link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111">
-
-  
-  
-  
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
-
-  <style class="INLINE_PEN_STYLESHEET_ID">
-    body {
-  /*background: #ccc;*/
-  padding: 0px;
-}
-
-.container {
-  width: 30cm;
-  min-height: 19.7cm;
-}
-
-.invoice {
-  background: #fff;
-  width: 100%;
-  padding: 40px;
-}
-
-.logo {
-  width: 7cm;
-}
-
-.document-type {
-  text-align: right;
-  color: #444;
-}
-
-.conditions {
-  font-size: 0.7em;
-  color: #666;
-}
-
-.bottom-page {
-  font-size: 0.7em;
-}
-.mayuscula{
-    text-transform: uppercase;
-}
-
-  </style>
-
- 
-</head>
-
-<body>
-  <div class="container">
-  <div class="invoice">
-    <div class="row">
-      <div class="col-7">
-        <img src="https://inpospak.com/wp-content/uploads/2019/11/logo.png" class="logo">
-      </div>
-      <div class="col-5">
-        <h1 class="document-type display-4" style="FONT-SIZE: 30PX;">COMPROBANTE DE PAGO</h1>
-        <p class="text-right">
-        <strong>Fecha  {{factura.fecha|date("d/m/Y ")}}
-        <br> No: 000{{factura.id}}</strong></p>
-         
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-7">
-        <p>
-       
-         C/ Héroes de Luperón esq. Rafael Damirón <br> Centro de Los Héroes, Sede Principal
-      <br><strong>Empleado:</strong> {{user}}
-         </p>
-      </div>
-      <div style="text-align: right;" class="col-5">
-       
-        <p>
-          <strong>{{cliente.nombre}} {{cliente.apellidos}}</strong><br>
-          {{cliente.correo}}<br>
-           {{cliente.direccion}}<br>
-         {{cliente.telefono}}
-        </p>
-      </div>
-    </div>
-
-    
-    <br>
-    <table class="table table-striped">
-      <thead>
-        <tr> 
-         <th class="text-left">Servicio</th>
-         <th class="text-left">Casillero</th>
-         <th class="text-left">Factura</th>
-          
-           <th class="text-right">Peso (Lb)</th>
-          <th class="text-right">Total Facturado</th>
-         
-        </tr>
-      </thead>
-      <tbody>
-          
-
-<tr> 
-          <td> <p  class="mayuscula">Carga Courier</P></td>
-         <td class="mayuscula"> {{factura.casillero}} </td>
-         <td> <p  class="mayuscula">{{factura.sh  }} </P></td>
-        
-         <td class="text-right">2.55 </td>
-         <td class="text-right"> $25.60 USD</td>
-          
-   
-    </tr>  
-
-      </tbody>
-    </table>
-    <div class="row">
-      <div class="col-8">
-      </div>
-      <div class="col-4">
-        <table class="table table-sm text-right">
-          <tbody><tr>
-            <td><strong>Total Cobrado</strong></td>
-            <td class="text-right">$25.60 USD </td>
-          </tr>
-          <tr>
-            <td>Cambio</td>
-            <td class="text-right">$ 0.00 USD</td>
+            <td class="text-right">{{json[0].cambio }} {{factura.idMoneda}}</td>
           </tr>
          
         </tbody></table>
@@ -330,7 +175,6 @@
   
 
 </body>
-
 
 
 

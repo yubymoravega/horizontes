@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<section class="section novi-background section-66 section-sm-bottom-110">
 		<div class="container">
-			<h1 class="text-reporte">Reporte de Facturas
+			<h1 class="text-reporte">Reporte de Facturas Inposdom
 			</h1>
 			<hr class="divider bg-mantis">
 			<form id="payment-form" name='payment-form' action="{{ path('factura/reporte') }}" method="GET">
@@ -41,6 +41,7 @@
 						<th>Cliente</th>
 						<th class="th-monto">Total</th>
 						<th>Empleado</th>
+						<th>SH</th>
 						
                         <th>PDF</th>
 					</tr>
@@ -50,8 +51,36 @@
             <td> {{ data.id }}</td>     
             <td>{{ data.datetime | date('d-M-y') }} </br> {{ data.datetime | date('h:i a') }}</td>
             <td>{{ data.nombreCliente }} </br> {{ data.idCliente }}</td>     
-            <td>{{ data.total }}  {{ data.idMoneda }}</td> {% set total = total + data.total %}
+            <td>{{ data.total }}  {{ data.idMoneda }}  <br>
+			
+			{% set jsons = data.json |decodeJson %}
+			{% set con = 0 %}
+			
+			 {% for json in jsons %}
+
+			{% if con == 0 %}
+				 {% if json.json.cierre == "0" %}
+				Pendiente de Cierre
+				{% set con = 1 %}
+			{% else %} 
+			Cierre Procesado	
+			{% set con = 1 %}
+			
+        {% endif %}
+	
+        {% endif %}		
+    {% endfor %}
+	
+			 </td> 
             <td>{{ data.empleado }}</td>
+
+			<td>
+			{% set jsons = data.json |decodeJson %}
+			
+			 {% for json in jsons %}
+         {{json.json.sh}}  <br>
+    {% endfor %}
+			</td>
 		
             <td>
 		<a  onClick="pdf('{{ data.id }}');" > 	<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +162,8 @@ function procesar(auth) {
   }; 
 
   function pdf(id) {
-   window.open("/factura/pdf/"+id, '_blank') ;
+   //window.open("/factura/pdf/"+id, '_blank') ;
+   window.open('/mia_cargo/pdf/'+id, '_blank');
   }; 
 
 function caja(estado,auth) {

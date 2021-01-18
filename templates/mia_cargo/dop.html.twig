@@ -289,7 +289,7 @@ $("#messageBox").text("Cambio debe ser mayor o igual que $0.00");
 $("#messageBox").css({"display": ""});
 } else {
 $("#messageBox").css({"display": "none"});
-var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/mia_cargo/procesar/save/"+document.getElementById("cambio").textContent+"/"+{{id}};
+var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/mia_cargo/procesar/save/"+document.getElementById("cambio").textContent+"/"+Number(document.getElementById("monto").textContent);
 
  window.location.href = url;
 }

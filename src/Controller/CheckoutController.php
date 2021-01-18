@@ -44,31 +44,19 @@ class CheckoutController extends AbstractController
         $con = count( $data);
         $contador = 0;
         $total = null;
+
+        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda() ]);
        
         while($contador < $con){
 
             $json[$contador] = array(
                 'id' => $data[$contador]->getId(),
                 'json' => \json_decode($data[$contador]->getJson()),
-
             ); 
 
- 
-        $dataBase = $this->getDoctrine()->getManager();
-        $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]['json']->provincia]);
-        $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]['json']->municipio]); 
+            $json[$contador]['json']->json->monto = $json[$contador]['json']->json->monto * $tasa[0]->getTasa();
 
-        $json[$contador]['json']->provincia = $provincia[0]->getNombre();
-        $json[$contador]['json']->municipio = $municipio[0]->getNombre();
-
-        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]['json']->montoMoneda]);
-
-        $dolares = $json[$contador]['json']->monto / $tasa[0]->getTasa();
-        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
-        $json[$contador]['json']->monto = $dolares * $tasa[0]->getTasa();
-        $json[$contador]['recibirMoneda'] = $dataBase->getRepository(Moneda::class)->find($json[$contador]['json']->recibirMoneda)->getNombre();
-
-            $total = $total + $json[$contador]['json']->monto;
+            $total = $total + ($json[$contador]['json']->json->monto);
 
             $contador++;
         }
@@ -80,7 +68,7 @@ class CheckoutController extends AbstractController
         //return new Response(var_dump($json ));
 
         return $this->render('checkout/index.html.twig', [
-            'moneda' => $moneda,'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
+            'moneda' => ($user->getIdMoneda() == 1) ? "USD":"DOP",'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
         ]);
     }
 
