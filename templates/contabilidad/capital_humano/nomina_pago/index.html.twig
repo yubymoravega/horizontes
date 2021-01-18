@@ -16,10 +16,15 @@
             </h4>
             <div>
                 <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
-                        title="Imprimir Nomina de Pago"
-                        onclick="Print('{{ path('contabilidad_capital_humano_plantilla_imprimir') }}')">
-                    <i class="fa fa-print"></i>
+                        title="Aceptar pago de empleados"
+                        onclick="AceptarPago({{ quincena }})">
+                    <i class="fa fa-upload"></i> <strong>Aceptar Pago</strong>
                 </button>
+                {#                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"#}
+                {#                        title="Imprimir Nomina de Pago"#}
+                {#                        onclick="Print('{{ path('contabilidad_capital_humano_plantilla_imprimir') }}')">#}
+                {#                    <i class="fa fa-print"></i>#}
+                {#                </button>#}
             </div>
         </div>
         {# end header #}
@@ -28,39 +33,41 @@
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-            <th width="30px">#</th>
+            <th width="25px">#</th>
             <th scope="col-1">Nombre</th>
-            <th width="150px" class="text-center">Cantidad de Hrs</th>
-            <th width="150px" class="text-center">Salario x Hrs</th>
-            <th width="150px" class="text-center">Sueldo Bruto</th>
-            <th width="150px" class="text-center">Comisión</th>
-            <th width="150px" class="text-center">Vacaciones</th>
-            <th width="150px" class="text-center">Horas Extra</th>
-            <th width="150px" class="text-center">Total de Ingresos</th>
-            <th width="150px" class="text-center">Total Deducido</th>
-            <th width="150px" class="text-center">Sueldo Neto a Pagar</th>
-            <th width="150px">Pagar</th>
+            <th width="200px" class="text-center">Total Ingresos</th>
+            <th width="200px" class="text-center">Ingresos Cotisables TSS</th>
+            <th width="200px" class="text-center">Total Deducido</th>
+            <th width="200px" class="text-center">Impuesto Sobre la Renta</th>
+            <th width="200px" class="text-center">Sueldo Neto</th>
+            <th width="200px" class="text-center">Total de Pagos Empleador</th>
+            <th width="100px">Pagar</th>
             </thead>
             <tbody>
             {% for item in empleados %}
                 <tr>
                     <td style="font-weight:400;">{{ item.nro }}</td>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.sueldo_bruto }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
-                    <td style="font-weight:400;">{{ item.comision_mensual }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.total_ingreso }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.total_ingreso_cotizable }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.total_deducido }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.impuesto_sobre_renta }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.sueldo_neto_pagar }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.pago_empleador }}</td>
                     <td>
-                        <button type="button" class="btn btn-primary btn-sm w-50" data-toggle="tooltip"
-                                data-placement="bottom" title="Pagar"
-                                onclick="Pagar({{ item.id }},{{ quincena }})">
-                            <i class="fa fa-dollar"></i>
-                        </button>
+                        {% if item.pagado == false %}
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Pagar"
+                                    onclick="Pagar({{ item.id }},{{ quincena }})">
+                                <i class="fa fa-dollar"></i> Pagar
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Revisar"
+                                    onclick="Revisar({{ item.id_nomina }})">
+                                <i class="fa fa-eye"></i> Revisar
+                            </button>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -74,12 +81,33 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+        loadingModal.close()
+
         function Print(url) {
             window.open(url, 'blank_')
         }
-        function Pagar(id,quincena) {
-            let data = id+'-'+quincena
+
+        function Pagar(id, quincena) {
+            let data = id + '-' + quincena
             window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + data);
+        }
+
+        function Revisar(id_nomina) {
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/revisar/' + id_nomina);
+        }
+
+        function AceptarPago(quincena) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/nomina-pago/aceptar-pago'
+                         method="post" id='form_aprobar_pago'>
+                        <input type='text' hidden name='quincena' value='${quincena}'/>
+
+                    </form>`)
+
+            const fomrulario = $('#form_aprobar_pago')
+            fomrulario.submit()
+            fomrulario.remove()
         }
     </script>
 {% endblock %}

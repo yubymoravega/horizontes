@@ -156,6 +156,16 @@ class NominaPago
      */
     private $quincena;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $salario_bruto;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $cant_horas_trabajadas;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -481,6 +491,30 @@ class NominaPago
     public function setQuincena(int $quincena): self
     {
         $this->quincena = $quincena;
+
+        return $this;
+    }
+
+    public function getSalarioBruto(): ?float
+    {
+        return $this->salario_bruto;
+    }
+
+    public function setSalarioBruto(?float $salario_bruto): self
+    {
+        $this->salario_bruto = $salario_bruto;
+
+        return $this;
+    }
+
+    public function getCantHorasTrabajadas(): ?float
+    {
+        return $this->cant_horas_trabajadas;
+    }
+
+    public function setCantHorasTrabajadas(?float $cant_horas_trabajadas): self
+    {
+        $this->cant_horas_trabajadas = $cant_horas_trabajadas;
 
         return $this;
     }

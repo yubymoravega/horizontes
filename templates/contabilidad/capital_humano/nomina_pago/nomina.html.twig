@@ -69,7 +69,11 @@
                         </button>
                     </div>
                 </div>
-                <div id="div_data" style="display: none">
+                {% if elaborado %}
+                    <div id="div_data" style="display: block">
+                {% else %}
+                    <div id="div_data" style="display: none">
+                {% endif %}
                     {#               IMPUESTO SOBRE LA RENTA         #}
                     <div id="calculo_impuesto_sobre_renta" style="display: none">
                         <div class="d-flex align-items-center mt-3 pl-2">
@@ -121,6 +125,9 @@
                             <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.impuesto_renta_pagar_mensual) }}
                                 {{ form_widget(form.impuesto_sobre_renta.impuesto_renta_pagar_mensual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
+                            </div>
+                            <div class="col-3 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                                <input type="text" readonly hidden="true" id="nomina_pago_impuesto_sobre_renta_id_escala_escala" name="nomina_pago[impuesto_sobre_renta][id_escala_escala]">
                             </div>
                         </div>
                     </div>
@@ -209,7 +216,7 @@
                 <input type="number" id="afp_empleador" hidden value="{{ AFP_empleador }}">
                 <input type="number" id="sfs" hidden value="{{ SFS }}">
                 <input type="number" id="srl" hidden value="{{ SRL }}">
-                <input type="number" id="quincena" name=name="nomina_pago[quincena]" hidden value="{{ quincena }}">
+                <input type="number" id="quincena" name="nomina_pago[quincena]" hidden value="{{ quincena }}">
                 <input type="number" id="infotep" hidden value="{{ Infotep }}">
                 <input type="number" id="id_empleado" name="nomina_pago[id_empleado]" hidden value="{{ id_empleado }}">
                 {{ form_end(form) }}
@@ -262,7 +269,7 @@
 
             /*** Cooperativa se complica porque hay que tener en cuenta el tipo de pago si es por hora o bruto**/
             if (salario_x_hora.length == 1) {
-                salario_bruto_mensual = salario_x_hora.val() * horas_trabajadas.val() + comision.val()
+                salario_bruto_mensual = parseFloat(salario_x_hora.val()) * parseFloat(horas_trabajadas.val()) + parseFloat(comision.val())
                 cooperativa = (salario_bruto_mensual * parseFloat($('#cooperativa').val()))/100
             } else if (sueldo_bruto.length == 1) {
                 salario_bruto_mensual = parseFloat(sueldo_bruto.val()) + parseFloat(comision.val())
@@ -295,6 +302,7 @@
                 dataType: 'json',
                 success: function (result) {
                     if (result.success) {
+                        $('#nomina_pago_impuesto_sobre_renta_id_escala_escala').val(result.id_rango_escala)
                         $('#nomina_pago_impuesto_sobre_renta_monto_segun_rango_escala').val(parseFloat(result.minimo).toFixed(2))
                         $('#nomina_pago_impuesto_sobre_renta_excedente_segun_rango_escala').val(parseFloat(result.excedente).toFixed(2))
                         $('#nomina_pago_impuesto_sobre_renta_por_ciento_impuesto_excedente').val(parseFloat(result.porciento).toFixed(2))
@@ -312,6 +320,7 @@
                 }
             })
         })
+
 
         function showDivCalculo() {
             let div_calculo = $('#calculo_impuesto_sobre_renta');
@@ -333,28 +342,34 @@
         /** Eventos donde recalcula el total de ingrasos y los ingresos cotizables a TSS**/
         $('#sueldo_bruto').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
         $('#horas_trabajadas').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
         $('#salario_x_hora').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
         $('#nomina_pago_comision').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
         $('#nomina_pago_vacaciones').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
         $('#nomina_pago_horas_extra').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
         $('#nomina_pago_otros').on('keyup', function () {
             calcular_TotalIngreso_IngresosCotizablesTSS()
+            hideDivData()
         })
 
         function calcular_TotalIngreso_IngresosCotizablesTSS() {
-            hideDivData()
             let horas_trabajadas_value = horas_trabajadas.val() == '' ? 0 : parseFloat(horas_trabajadas.val())
             let salario_x_hora_value = salario_x_hora.val() == '' ? 0 : parseFloat(salario_x_hora.val())
             let sueldo_bruto_value = sueldo_bruto.val() == '' ? 0 : parseFloat(sueldo_bruto.val())
