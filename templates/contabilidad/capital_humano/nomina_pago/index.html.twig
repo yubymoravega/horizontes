@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Plantilla de la Empresa (Nómina de Pago)
+                {{ title }}
             </h4>
             <div>
                 <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
@@ -37,9 +37,9 @@
             <th width="150px" class="text-center">Vacaciones</th>
             <th width="150px" class="text-center">Horas Extra</th>
             <th width="150px" class="text-center">Total de Ingresos</th>
-            <th width="150px" class="text-center">Ingresos Cotizables a TSS</th>
+            <th width="150px" class="text-center">Total Deducido</th>
             <th width="150px" class="text-center">Sueldo Neto a Pagar</th>
-            <th width="150px">Acciones</th>
+            <th width="150px">Pagar</th>
             </thead>
             <tbody>
             {% for item in empleados %}
@@ -58,16 +58,8 @@
                     <td>
                         <button type="button" class="btn btn-primary btn-sm w-50" data-toggle="tooltip"
                                 data-placement="bottom" title="Pagar"
-                                onclick="Pagar({{ item.id }})">
+                                onclick="Pagar({{ item.id }},{{ quincena }})">
                             <i class="fa fa-dollar"></i>
-                        </button>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Imprimir"
-                                onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar cargo seleccionado ?',
-                                        url:'{{ path('contabilidad_capital_humano_cargo_delete',{id: item.id}) }}'
-                                        })">
-                            <i class="fa fa-print"></i>
                         </button>
                     </td>
                 </tr>
@@ -85,8 +77,9 @@
         function Print(url) {
             window.open(url, 'blank_')
         }
-        function Pagar(id) {
-            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + id);
+        function Pagar(id,quincena) {
+            let data = id+'-'+quincena
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + data);
         }
     </script>
 {% endblock %}

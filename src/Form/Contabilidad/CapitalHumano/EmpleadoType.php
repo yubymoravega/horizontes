@@ -38,7 +38,7 @@ class EmpleadoType extends AbstractType
                 'label'=>'Teléfono'
             ))
             ->add('sueldo_bruto_mensual',TextType::class, array(
-                'label'=>'Sueldo Bruto (mensual)',
+                'label'=>'Salario por Iguala',
                 'required'=>false
             ))
             ->add('salario_x_hora',TextType::class, array(

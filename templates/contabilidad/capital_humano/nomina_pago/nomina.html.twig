@@ -17,24 +17,24 @@
                 </div>
             </div>
             <div class="card-body">
-                {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
+                {{ form_start(form,{'attr': {'class': 'text-left','id':'form_nomina_pago','method':'POST','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
                     {% if sueld_bruto_boolean %}
                         <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
                             <label for="sueldo_bruto">Sueldo Bruto</label>
-                            <input type="number" id="sueldo_bruto" placeholder="${{ sueldo_bruto }}"
+                            <input type="number" id="sueldo_bruto" name="nomina_pago[sueldo_bruto]" placeholder="${{ sueldo_bruto }}"
                                    value="{{ sueldo_bruto_value }}"
                                    class="form-control w-100 form-control">
                         </div>
                     {% else %}
                         <div class="col-2 form-group input-group input-group-sm pa-2 d-block">
                             <label for="salario_x_hora">Salario x hora</label>
-                            <input type="text" class="form-control w-100 form-control" id="salario_x_hora" readonly
-                                   value="${{ salario_x_hora }}">
+                            <input type="text" class="form-control w-100 form-control" id="salario_x_hora" name="nomina_pago[salario_x_hora]" readonly
+                                   value="{{ salario_x_hora_value }}">
                         </div>
                         <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
                             <label for="horas_trabajadas">Horas trabajadas</label>
-                            <input type="number" class="form-control w-100 form-control" id="horas_trabajadas">
+                            <input type="number" class="form-control w-100 form-control" id="horas_trabajadas" name="nomina_pago[horas_trabajadas]">
                         </div>
                     {% endif %}
                     <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
@@ -78,27 +78,29 @@
                         </div>
                         <hr color="dimgray" class="my-1 ml-2" size=3>
                         <div class="row mt-0 p-0">
-                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            <div class="col-4 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.seguridad_social_mensual) }}
                                 {{ form_widget(form.impuesto_sobre_renta.seguridad_social_mensual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
                             </div>
-                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            <div class="col-4 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.salario_bruto_anual) }}
                                 {{ form_widget(form.impuesto_sobre_renta.salario_bruto_anual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
                             </div>
-                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            <div class="col-4 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.seguridad_social_anual) }}
                                 {{ form_widget(form.impuesto_sobre_renta.seguridad_social_anual,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
                             </div>
-                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                        </div>
+                        <div class="row mt-0 p-0">
+                            <div class="col-4 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.salario_despues_seguridad_social) }}
                                 {{ form_widget(form.impuesto_sobre_renta.salario_despues_seguridad_social,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
                             </div>
-                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            <div class="col-4 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.monto_segun_rango_escala) }}
                                 {{ form_widget(form.impuesto_sobre_renta.monto_segun_rango_escala,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
                             </div>
-                            <div class="col-2 form-group input-group input-group-sm mt-0 pt-0 d-block">
+                            <div class="col-4 form-group input-group input-group-sm mt-0 pt-0 d-block">
                                 {{ form_label(form.impuesto_sobre_renta.excedente_segun_rango_escala) }}
                                 {{ form_widget(form.impuesto_sobre_renta.excedente_segun_rango_escala,{'attr': {'class': 'form-control w-100', 'readonly':'true'}}) }}
                             </div>
@@ -201,18 +203,30 @@
                     </div>
                 </div>
 
-                <input type="text" id="id_empleado" hidden value="{{ id_empleado }}">
+                <input type="number" id="ars" hidden value="{{ ars }}">
+                <input type="number" id="afp" hidden value="{{ afp }}">
+                <input type="number" id="cooperativa" hidden value="{{ cooperativa }}">
+                <input type="number" id="afp_empleador" hidden value="{{ AFP_empleador }}">
+                <input type="number" id="sfs" hidden value="{{ SFS }}">
+                <input type="number" id="srl" hidden value="{{ SRL }}">
+                <input type="number" id="quincena" name=name="nomina_pago[quincena]" hidden value="{{ quincena }}">
+                <input type="number" id="infotep" hidden value="{{ Infotep }}">
+                <input type="number" id="id_empleado" name="nomina_pago[id_empleado]" hidden value="{{ id_empleado }}">
                 {{ form_end(form) }}
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
-                        <a href="{{ url('contabilidad_capital_humano_nomina_pago') }}"
-                           class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                        {% if quincena == 1 %}
+                            <a href="{{ url('contabilidad_capital_humano_nomina_pago_primera_quincena') }}"
+                               class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                        {% else %}
+                            <a href="{{ url('contabilidad_capital_humano_nomina_pago_segunda_quincena') }}"
+                               class="btn btn-outline-secondary" id="btn_salir">Salir</a>
+                        {% endif %}
                     </div>
                     <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnAdd">aceptar</button>
+                        <button class='my-0 btn btn-secondary' id="btnAdd" onclick="submitData()">aceptar</button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -230,13 +244,16 @@
         let otros = $('#nomina_pago_otros')
         let ingresos_cotizables_tss = $('#nomina_pago_ingresos_cotizables_tss')
         let nomina_pago_total_ingresos = $('#nomina_pago_total_ingresos')
+        let total_deducido = 0
+        let sueldo_neto_pagar = 0
 
         $('#btn_show_calculo').on('click', function () {
             showDivCalculo()
         })
         $('#btn_calcular').on('click', function () {
-            let ars = (ingresos_cotizables_tss.val() * 0.0304)
-            let afp = (ingresos_cotizables_tss.val() * 0.0287)
+            let ars = (ingresos_cotizables_tss.val() * parseFloat($('#ars').val()))/100
+            let afp = (ingresos_cotizables_tss.val() * parseFloat($('#afp').val()))/100
+            let salario_bruto_mensual = 0
             let cooperativa = 0
             /** se calcula el 3.04% de ingresos_cotizables_tss **/
             $('#nomina_pago_ars').val(ars.toFixed(2))
@@ -245,32 +262,56 @@
 
             /*** Cooperativa se complica porque hay que tener en cuenta el tipo de pago si es por hora o bruto**/
             if (salario_x_hora.length == 1) {
-                cooperativa = ((salario_x_hora.val() * horas_trabajadas.val() + comision.val()) * 0.025)
+                salario_bruto_mensual = salario_x_hora.val() * horas_trabajadas.val() + comision.val()
+                cooperativa = (salario_bruto_mensual * parseFloat($('#cooperativa').val()))/100
             } else if (sueldo_bruto.length == 1) {
-                cooperativa = ((parseFloat(sueldo_bruto.val()) + parseFloat(comision.val())) * 0.025)
+                salario_bruto_mensual = parseFloat(sueldo_bruto.val()) + parseFloat(comision.val())
+                cooperativa = (salario_bruto_mensual * parseFloat($('#cooperativa').val()))/100
             }
             $('#nomina_pago_cooperativa').val(cooperativa.toFixed(2))
 
-            let total_deducido = ars + afp + cooperativa
-            $('#nomina_pago_total_deducido').val(total_deducido.toFixed(2))
-            let sueldo_neto_pagar = parseFloat($('#nomina_pago_total_ingresos').val()) - total_deducido
-            $('#nomina_pago_sueldo_neto_pagar').val(sueldo_neto_pagar.toFixed(2))
             /** total deducido **/
+            total_deducido = ars + afp + cooperativa
+            $('#nomina_pago_total_deducido').val(total_deducido.toFixed(2))
+            sueldo_neto_pagar = parseFloat($('#nomina_pago_total_ingresos').val()) - total_deducido
+            $('#nomina_pago_sueldo_neto_pagar').val(sueldo_neto_pagar.toFixed(2))
 
-            showDivData()
+            $('#nomina_pago_afp_empleador').val((ingresos_cotizables_tss.val() * parseFloat($('#afp_empleador').val())/100).toFixed(2))
+            $('#nomina_pago_sfs_empleador').val((ingresos_cotizables_tss.val() * parseFloat($('#sfs').val())/100).toFixed(2))
+            $('#nomina_pago_srl_empleador').val((salario_bruto_mensual * parseFloat($('#srl').val())/100).toFixed(2))
+            $('#nomina_pago_infotep_empleador').val((salario_bruto_mensual * parseFloat($('#infotep').val())/100).toFixed(2))
+
+            /** Impuesto sobre la Renta**/
+            $('#nomina_pago_impuesto_sobre_renta_seguridad_social_mensual').val(parseFloat(ars + afp).toFixed(2))
+            $('#nomina_pago_impuesto_sobre_renta_salario_bruto_anual').val(parseFloat(salario_bruto_mensual * 12).toFixed(2))
+            $('#nomina_pago_impuesto_sobre_renta_seguridad_social_anual').val(parseFloat((ars + afp) * 12).toFixed(2))
+            $('#nomina_pago_impuesto_sobre_renta_salario_despues_seguridad_social').val(((parseFloat(salario_bruto_mensual * 12)) - parseFloat((ars + afp) * 12)).toFixed(2))
+
+            let salario_despues_seguridad_social = $('#nomina_pago_impuesto_sobre_renta_salario_despues_seguridad_social').val()
+            loadingModal.show()
+            $.ajax({
+                url: '/contabilidad/capital-humano/nomina-pago/get-rango-escala-dgii/' + salario_despues_seguridad_social,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        $('#nomina_pago_impuesto_sobre_renta_monto_segun_rango_escala').val(parseFloat(result.minimo).toFixed(2))
+                        $('#nomina_pago_impuesto_sobre_renta_excedente_segun_rango_escala').val(parseFloat(result.excedente).toFixed(2))
+                        $('#nomina_pago_impuesto_sobre_renta_por_ciento_impuesto_excedente').val(parseFloat(result.porciento).toFixed(2))
+                        $('#nomina_pago_impuesto_sobre_renta_monto_adicional_rango_escala').val(parseFloat(result.fijo).toFixed(2))
+                        $('#nomina_pago_impuesto_sobre_renta_impuesto_renta_pagar_anual').val(parseFloat(result.monto_segun_rango).toFixed(2))
+                        $('#nomina_pago_impuesto_sobre_renta_impuesto_renta_pagar_mensual').val(parseFloat(result.impuesto_sobre_rente_mensual).toFixed(2))
+                        $('#nomina_pago_isr').val(parseFloat(result.impuesto_sobre_rente_mensual).toFixed(2))
+                        loadingModal.close()
+                        total_deducido += parseFloat($('#nomina_pago_isr').val())
+                        sueldo_neto_pagar -= parseFloat($('#nomina_pago_isr').val())
+                        $('#nomina_pago_total_deducido').val(total_deducido.toFixed(2))
+                        $('#nomina_pago_sueldo_neto_pagar').val(sueldo_neto_pagar.toFixed(2))
+                        showDivData()
+                    }
+                }
+            })
         })
-
-        $('#nomina_pago_comision').on('keyup', function () {
-            hideDivData()
-        })
-
-        function showDivData() {
-            $('#div_data').css('display', 'block')
-        }
-
-        function hideDivData() {
-            $('#div_data').css('display', 'none')
-        }
 
         function showDivCalculo() {
             let div_calculo = $('#calculo_impuesto_sobre_renta');
@@ -313,6 +354,7 @@
         })
 
         function calcular_TotalIngreso_IngresosCotizablesTSS() {
+            hideDivData()
             let horas_trabajadas_value = horas_trabajadas.val() == '' ? 0 : parseFloat(horas_trabajadas.val())
             let salario_x_hora_value = salario_x_hora.val() == '' ? 0 : parseFloat(salario_x_hora.val())
             let sueldo_bruto_value = sueldo_bruto.val() == '' ? 0 : parseFloat(sueldo_bruto.val())
@@ -332,5 +374,46 @@
         }
 
         calcular_TotalIngreso_IngresosCotizablesTSS()
+
+        $('#nomina_pago_plan_medico_complementario').on('keyup', function () {
+            actualizarDeducciones()
+        })
+        $('#nomina_pago_restaurant').on('keyup', function () {
+            actualizarDeducciones()
+        })
+
+        function actualizarDeducciones() {
+            let val_plan_medico = $('#nomina_pago_plan_medico_complementario').val()
+            let val_restaurant = $('#nomina_pago_restaurant').val()
+            if (val_plan_medico != '' && val_restaurant != '') {
+                $('#nomina_pago_total_deducido').val((total_deducido + parseFloat(val_plan_medico) + parseFloat(val_restaurant)).toFixed(2))
+                $('#nomina_pago_sueldo_neto_pagar').val((sueldo_neto_pagar - parseFloat(val_plan_medico) - parseFloat(val_restaurant)).toFixed(2))
+            } else if (val_plan_medico != '' && val_restaurant == '') {
+                $('#nomina_pago_total_deducido').val((total_deducido + parseFloat(val_plan_medico)).toFixed(2))
+                $('#nomina_pago_sueldo_neto_pagar').val((sueldo_neto_pagar - parseFloat(val_plan_medico)).toFixed(2))
+            } else if (val_plan_medico == '' && val_restaurant != '') {
+                $('#nomina_pago_total_deducido').val((total_deducido + parseFloat(val_restaurant)).toFixed(2))
+                $('#nomina_pago_sueldo_neto_pagar').val((sueldo_neto_pagar - parseFloat(val_restaurant)).toFixed(2))
+            } else {
+                $('#nomina_pago_total_deducido').val(total_deducido.toFixed(2))
+                $('#nomina_pago_sueldo_neto_pagar').val(sueldo_neto_pagar.toFixed(2))
+            }
+        }
+
+        function showDivData() {
+            $('#div_data').css('display', 'block')
+        }
+
+        function hideDivData() {
+            $('#div_data').css('display', 'none')
+        }
+
+        function submitData() {
+            const formulario = $('#form_nomina_pago')
+            formulario.attr('method', `POST`)
+            formulario.attr('action', `/contabilidad/capital-humano/nomina-pago/add`)
+            formulario.submit()
+            if(validateForm.errorList.length === 0) loadingModal.show()
+        }
     </script>
 {% endblock %}

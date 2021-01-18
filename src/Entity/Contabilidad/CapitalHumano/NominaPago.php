@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\CapitalHumano;
 
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
 use App\Repository\Contabilidad\CapitalHumano\NominaPagoRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -143,6 +144,17 @@ class NominaPago
      * @ORM\ManyToOne(targetEntity=User::class)
      */
     private $id_usuario_aprueba;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_unidad;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $quincena;
 
     public function getId(): ?int
     {
@@ -445,6 +457,30 @@ class NominaPago
     public function setIdUsuarioAprueba(?User $id_usuario_aprueba): self
     {
         $this->id_usuario_aprueba = $id_usuario_aprueba;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
+    public function getQuincena(): ?int
+    {
+        return $this->quincena;
+    }
+
+    public function setQuincena(int $quincena): self
+    {
+        $this->quincena = $quincena;
 
         return $this;
     }

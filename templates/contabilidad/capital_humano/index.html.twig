@@ -26,7 +26,13 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Cargo</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_empleado') }}">Empleados</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago') }}">Nómina de Pago</a>
+                    <div class="dropdown-divider"></div>
+                    <h6 class="text-center">Nómina de Pago</h6>
+                    <div class="dropdown-divider"></div>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago_primera_quincena') }}">Primera Quincena</a>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago_segunda_quincena') }}">Segunda Quincena</a>
+                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago_segunda_quincena') }}">Extraordinaria</a>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_rango_escala_d_g_i_i') }}">Rango de Escala DGII</a>
                 </div>
             </li>
@@ -38,6 +44,7 @@
                     Informes
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_pro_ciento_nominas') }}">Procientos Aplicables a las Nóminas</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_plantilla_agencia') }}">Plantilla de la
                         Agencia</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_config_instrumento_cobro') }}">Reporte de Nóminas</a>
