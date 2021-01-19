@@ -9,6 +9,8 @@
 		<div class="container">
 			<h1 class="text-reporte">Facturas de {{ cliente.nombre}} {{ cliente.apellidos}}
 			</h1>
+      <h2 style="text-align: center;color: white;">{{ cliente.telefono}}
+			</h2>
 			<hr class="divider bg-mantis">
 			<button id="add" class="btn btn-sm btn-outline-dark" type="submit" data-toggle="modal" data-target="#exampleModalCenter">Agregar Factura</button>
 		<!-- Bootstrap Table-->
@@ -16,16 +18,11 @@
 			<table class="table table-striped tabla-reporte">
 				<tbody>
 					<tr>
-					
 						<th>Fecha</th>
-						<th>Cliente</th>
-			
 						<th>Casillero</th>
-						<th>Valor</th>         
-						
-						<th>SH</th>
-
-					
+            <th>Tracking</th>
+            <th>Libra</th>
+						<th>Monto</th>         
 						<th>Accion</th>
 					</tr>
 					{# table body #}
@@ -33,20 +30,16 @@
         <tr {% if loop.index is odd %}class="color"{% endif %}>
            
             <td>{{data.fecha |date("m/d/Y")}} <br> {{data.fecha |date("h:i:s A")}}</td>           
-			<td>{{data.idCliente}} <br> - <br> {{data.cedula}}</td> 
-		
             <td>{{data.casillero}}</td>    
-           <td>{{data.json.monto}} USD</td>  
-		   
-			<td>{{data.sh}}
+           	<td>{{data.sh}}
       	{% if data.pago == "0" %}
            <br> Pendiente de Pago
             {% else %}
             <br>Pagada<br> 
             {% endif %}
-      
-      </td>
-
+      </td> 
+            <td>{{data.lb}}</td>
+            <td> {{data.json.monto}} USD </td>
             <td>
 
         {% if data.pago == 0 %}
@@ -120,8 +113,8 @@
 
    <div class="form-group">
     <label for="helpMonto">Monto</label>
-    <input type="text" class="form-control" id="monto" name="monto" aria-describedby="helpMonto" placeholder="Monto ha Facturar">
-    <small id="emailHelp" class="form-text text-muted">Introdusca el Monto del la Factura</small>
+    <input type="text" class="form-control" id="monto" name="monto" aria-describedby="helpMonto" placeholder="Monto a Facturar">
+    <small id="emailHelp" class="form-text text-muted">Introdusca el Monto de la Factura</small>
   </div>
  <button type="submit"  style="float: right;" class="my-0 btn btn-secondary">Guardar</button>
   </form>
@@ -169,7 +162,7 @@
   </div>
 
    <div class="form-group">
-    <label for="helpSH">SH</label>
+    <label for="helpSH">Tracking</label>
     <input type="text" class="form-control" id="editSh"  name="editSh" aria-describedby="helpSH" placeholder="SH">
     <small id="emailHelp" class="form-text text-muted">Introdusca el SH del cliente</small>
   </div>
@@ -198,7 +191,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header bg-dark">
-        <h5 class="modal-title text-light" id="exampleModalLongTitle">Procesar la Factura</h5>
+        <h5 class="modal-title text-light" id="exampleModalLongTitle">Agregar al Carrito?</h5>
         <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -206,7 +199,7 @@
       <div class="modal-body  ">
 
 	  
- <button type="button" id="procesar" style="float: right;" class="my-0 btn btn-secondary">Procesar</button>
+ <button type="button" id="procesar" style="float: right;" class="my-0 btn btn-secondary">Agregar</button>
       </div>
      
     </div>

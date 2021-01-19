@@ -45,7 +45,7 @@ class MiaCargoController extends AbstractController
             ->getRepository(Cliente::class)
             ->findOneBy(['telefono' => $tel]);
 
-        $dql = "SELECT a FROM App:FacturaImposdom a "; 
+        $dql = "SELECT a FROM App:FacturaImposdom a  WHERE a.idCliente = $tel "; 
 
         $dql .= " ORDER BY a.fecha DESC";
         $query = $em->createQuery($dql);
