@@ -8,27 +8,34 @@
 {% endblock %}
 {% block content %}
     <div class="container-fluid">
-
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 {{ title }}
             </h4>
             <div>
-                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
-                        title="Aceptar pago de empleados"
-                        onclick="AceptarPago({{ quincena }})">
-                    <i class="fa fa-upload"></i> <strong>Aceptar Pago</strong>
-                </button>
-                {#                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"#}
-                {#                        title="Imprimir Nomina de Pago"#}
-                {#                        onclick="Print('{{ path('contabilidad_capital_humano_plantilla_imprimir') }}')">#}
-                {#                    <i class="fa fa-print"></i>#}
-                {#                </button>#}
+                {% if return_pago %}
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-toggle="modal"
+                            data-target="#modal__form__id" data-placement="bottom"
+                            title="Revertir último pago de empleados"
+                            onclick="mostrarBtn({{ quincena }},1)">
+                        <i class="fa fa-download"></i> <strong>Revertir último Pago</strong>
+                    </button>
+                {% elseif aceptar_pago %}
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                            data-target="#modal__form__id" data-placement="bottom"
+                            title="Aceptar pago de empleados"
+                            onclick="mostrarBtn({{ quincena }},0)">
+                        <i class="fa fa-upload"></i> <strong>Aceptar Pago</strong>
+                    </button>
+                {% endif %}
             </div>
         </div>
         {# end header #}
 
+
+        {# Modal aceptar y revertir pago#}
+        {{ include('contabilidad/capital_humano/nomina_pago/modal_pago.html.twig', {title:'Observación'}) }}
 
         {# list #}
         <table class="table table-hover text-light">
@@ -96,16 +103,53 @@
             window.location.replace('/contabilidad/capital-humano/nomina-pago/revisar/' + id_nomina);
         }
 
-        function AceptarPago(quincena) {
+        function mostrarBtn(quincena,option) {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+            $('#quincena').val(quincena)
+            $('#option').val(option)
+        }
+
+        $('#modal__btn__aceptar').on('click', function () {
+            let quincena = $('#quincena').val();
+            let option = $('#option').val();
+            let observacion = $('#observacion').val();
+            if(option == 1){
+                //revertir pago
+                RevertirPago(quincena,observacion)
+            }
+            else{
+                //aceptar pago
+                AceptarPago(quincena,observacion)
+            }
+        })
+
+        function AceptarPago(quincena,observacion) {
             loadingModal.show()
             $('body').append(`
                     <form action='/contabilidad/capital-humano/nomina-pago/aceptar-pago'
                          method="post" id='form_aprobar_pago'>
                         <input type='text' hidden name='quincena' value='${quincena}'/>
+                        <input type='text' hidden name='observacion' value='${observacion}'/>
 
                     </form>`)
 
             const fomrulario = $('#form_aprobar_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+
+        function RevertirPago(quincena,observacion) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/nomina-pago/revertir-pago'
+                         method="post" id='form_revertir_pago'>
+                        <input type='text' hidden name='quincena' value='${quincena}'/>
+                        <input type='text' hidden name='observacion' value='${observacion}'/>
+
+                    </form>`)
+
+            const fomrulario = $('#form_revertir_pago')
             fomrulario.submit()
             fomrulario.remove()
         }

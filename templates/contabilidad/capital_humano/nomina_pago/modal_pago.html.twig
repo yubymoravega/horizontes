@@ -1,0 +1,10 @@
+{% extends 'utils/modal_form.html.twig' %}
+
+{% block modalbody %}
+    <form id="formulario_pago_accion" action="" method="post">
+        <label for="observacion">Observación: </label>
+        <textarea name="observacion" id="observacion" cols="63" rows="4"></textarea>
+        <input type="hidden" name="quincena" id="quincena">
+        <input type="hidden" name="option" id="option">
+    </form>
+{% endblock %}

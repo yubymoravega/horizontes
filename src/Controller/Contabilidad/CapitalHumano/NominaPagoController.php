@@ -8,8 +8,13 @@ use App\Entity\Contabilidad\CapitalHumano\ImpuestoSobreRenta;
 use App\Entity\Contabilidad\CapitalHumano\NominaPago;
 use App\Entity\Contabilidad\CapitalHumano\PorCientoNominas;
 use App\Entity\Contabilidad\CapitalHumano\RangoEscalaDGII;
+use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoComprobante;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Form\Contabilidad\CapitalHumano\EmpleadoType;
 use App\Form\Contabilidad\CapitalHumano\NominaPagoType;
+use ContainerK07jWwZ\getUnidadChoicesTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,13 +36,48 @@ class NominaPagoController extends AbstractController
      */
     public function index_primera_quincena(EntityManagerInterface $em, Request $request)
     {
-        $rows = $this->getData($em, 1);
+        $obj_user = $this->getUser();
+        $obj_unidad = AuxFunctions::getUnidad($em, $obj_user);
+        $current_date = AuxFunctions::getCurrentDate($em, $obj_unidad);
+        $mes = $current_date->format('m');
+        $anno = $current_date->format('Y');
+
+        $pago_nomina = $em->getRepository(NominaPago::class)->findBy([
+            'id_unidad' => $obj_unidad,
+            'elaborada' => true,
+            'mes' => $mes,
+            'anno' => $anno
+        ]);
+        $rows = [];
+        $return_pago = false;
+        if (!empty($pago_nomina)) {
+            /** @var NominaPago $pago */
+            $pago = $pago_nomina[count($pago_nomina) - 1];
+            if ($pago->getQuincena() == 1)
+                if ($pago->getAprobada() == true) {
+                    $return_pago = true;
+                    $rows = [];
+                } else {
+                    $return_pago = false;
+                    $rows = $this->getData($em, 1);
+                }
+            else {
+                $return_pago = false;
+                $rows = [];
+            }
+        } else {
+            $return_pago = false;
+            $rows = $this->getData($em, 2);
+        }
+
         return $this->render('contabilidad/capital_humano/nomina_pago/index.html.twig', [
             'controller_name' => 'NominaPagoController',
             'empleados' => $rows,
             'title' => 'Pago de Primera Quincena',
             'quincena' => 1,
-            'aprobado'=>false
+            'aprobado' => false,
+            'return_pago' => $return_pago,
+            'aceptar_pago' => empty($rows) ? false : true
         ]);
     }
 
@@ -46,12 +86,51 @@ class NominaPagoController extends AbstractController
      */
     public function index_segunda_quincena(EntityManagerInterface $em, Request $request)
     {
-        $rows = $this->getData($em, 2);
+        $obj_user = $this->getUser();
+        $obj_unidad = AuxFunctions::getUnidad($em, $obj_user);
+        $current_date = AuxFunctions::getCurrentDate($em, $obj_unidad);
+        $mes = $current_date->format('m');
+        $anno = $current_date->format('Y');
+
+        $pago_nomina = $em->getRepository(NominaPago::class)->findBy([
+            'id_unidad' => $obj_unidad,
+            'elaborada' => true,
+            'mes' => $mes,
+            'anno' => $anno
+        ]);
+
+        $return_pago = false;
+        if (!empty($pago_nomina)) {
+            /** @var NominaPago $pago */
+            $pago = $pago_nomina[count($pago_nomina) - 1];
+            if ($pago->getQuincena() == 2)
+                if ($pago->getAprobada() == true) {
+                    $return_pago = true;
+                    $rows = [];
+                } else {
+                    $return_pago = false;
+                    $rows = $this->getData($em, 2);
+                }
+            else
+                if ($pago->getAprobada() == true) {
+                    $return_pago = false;
+                    $rows = $this->getData($em, 2);
+                } else {
+                    $return_pago = false;
+                    $rows = [];
+                }
+        } else {
+            $return_pago = false;
+            $rows = $this->getData($em, 2);
+        }
         return $this->render('contabilidad/capital_humano/nomina_pago/index.html.twig', [
             'controller_name' => 'NominaPagoController',
             'empleados' => $rows,
             'title' => 'Pago de Segunda Quincena',
-            'quincena' => 2
+            'quincena' => 2,
+            'aprobado' => false,
+            'return_pago' => $return_pago,
+            'aceptar_pago' => empty($rows) ? false : true
         ]);
     }
 
@@ -79,13 +158,16 @@ class NominaPagoController extends AbstractController
                 'id_empleado' => $item,
 //                'aprobada'=>false
             ]);
-            if($nomina_pago) {
-                if (!$item->getBaja() || $item->getFechaBaja()->format('Y') < $year) {
+//            if($nomina_pago) {
+            if (!$item->getBaja() || $item->getFechaBaja()->format('Y') < $year) {
+                if (!$nomina_pago || $nomina_pago->getAprobada() == false) {
                     $index++;
                     $rows[] = array(
                         'nro' => $index,
                         'id' => $item->getId(),
                         'id_nomina' => $nomina_pago ? $nomina_pago->getId() : '',
+                        'elaborada' => $nomina_pago ? $nomina_pago->getElaborada() : false,
+                        'aprobada' => $nomina_pago ? $nomina_pago->getAprobada() : false,
                         'nombre' => $item->getNombre(),
                         'pagado' => $nomina_pago ? true : false,
                         'total_ingreso' => $nomina_pago ? number_format($nomina_pago->getTotalIngresos(), 2) : '',
@@ -97,6 +179,7 @@ class NominaPagoController extends AbstractController
 
                     );
                 }
+//                }
             }
         }
         return $rows;
@@ -296,11 +379,12 @@ class NominaPagoController extends AbstractController
     }
 
     /**
-     * @Route("/aceptar-pago", name="aceptar pago")
+     * @Route("/aceptar-pago", name="aceptar_pago")
      */
     public function aceptarPago(EntityManagerInterface $em, Request $request)
     {
         $quincena = intval($request->request->get('quincena'));
+        $observacion = $request->request->get('observacion');
         $fecha = AuxFunctions::getCurrentDate($em, AuxFunctions::getUnidad($em, $this->getUser()));
         $mes = $fecha->format('m');
         $anno = $fecha->format('Y');
@@ -309,6 +393,146 @@ class NominaPagoController extends AbstractController
         $data_nominas = $em->getRepository(NominaPago::class)->findBy([
             'elaborada' => true,
             'aprobada' => false,
+            'mes' => $mes,
+            'anno' => $anno,
+            'id_unidad' => $unidad,
+            'quincena' => $quincena
+        ]);
+        if (empty($data_nominas)) {
+            $this->addFlash('success', 'No ha nominas pagadas que apectar');
+            return $this->redirectToRoute($quincena == 1 ? 'contabilidad_capital_humano_nomina_pago_primera_quincena' : 'contabilidad_capital_humano_nomina_pago_segunda_quincena');
+        }
+
+        //debito  a la 823/0010 elemento de gasto 5001
+        $total_ingreso = 0;
+        $total_ingreso_cotisable_tss = 0;
+        // credito 440/0005
+        $total_impuesto_sobre_renta = 0;
+        // credito 440/0006
+        $total_ars = 0;
+        // credito 440/0007
+        $total_afp = 0;
+        // credito 440/0008
+        $total_cooperativa = 0;
+        // credito 440/0009
+        $total_plan_medico_complementario = 0;
+        // credito 440/0010
+        $total_restaurant = 0;
+        $total_deducido = 0;
+        //credito 455/0010(por crear la subcuenta)
+        $total_sueldo_neto = 0;
+        //debito  a la 855/0010 credito a la 440/0011
+        $total_afp_empleador = 0;
+        //debito  a la 855/0020 credito a la 440/0012
+        $total_sfs_empleador = 0;
+        //debito 855/0030 credito 440/0013
+        $total_srl_empleador = 0;
+        //debito 855/0040 credito 440/0014
+        $total_infotep_empleador = 0;
+
+        /** @var NominaPago $item */
+        foreach ($data_nominas as $item) {
+            $item
+                ->setAprobada(true)
+                ->setIdUsuarioAprueba($this->getUser());
+            $em->persist($item);
+            $total_ingreso += $item->getTotalIngresos();
+            $total_ingreso_cotisable_tss += $item->getIngresosCotizablesTss();
+            $total_impuesto_sobre_renta += $item->getIsr();
+            $total_ars += $item->getArs();
+            $total_afp += $item->getAfp();
+            $total_cooperativa += $item->getCooperativa();
+            $total_plan_medico_complementario += $item->getPlanMedicoComplementario();
+            $total_restaurant += $item->getRestaurant();
+            $total_deducido += $item->getTotalDeducido();
+            $total_sueldo_neto += $item->getSueldoNetoPagar();
+            $total_afp_empleador += $item->getAfpEmpleador();
+            $total_sfs_empleador += $item->getSfsEmpleador();
+            $total_srl_empleador += $item->getSrlEmpleador();
+            $total_infotep_empleador += $item->getInfotepEmpleador();
+        }
+
+        /** Creando el Comprobante */
+        $tipo_comprobante = $em->getRepository(TipoComprobante::class)->find(2);
+        $all_comprobantes_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy([
+            'id_tipo_comprobante' => $tipo_comprobante,
+            'id_unidad' => $unidad,
+            'anno' => $anno
+        ]);
+        $consecutivo = count($all_comprobantes_operaciones) + 1;
+
+        /** Obteniendo debitos y creditos */
+        $debito = $total_ingreso + $total_afp_empleador + $total_sfs_empleador + $total_srl_empleador + $total_infotep_empleador;
+
+        $new_registro_comprobante = new RegistroComprobantes();
+        $new_registro_comprobante
+            ->setDescripcion($observacion)
+            ->setIdUsuario($this->getUser())
+            ->setFecha($fecha)
+            ->setAnno($anno)
+            ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_NOMINAS)
+            ->setCredito(floatval($debito))
+            ->setDebito(floatval($debito))
+            ->setIdAlmacen(null)
+            ->setIdTipoComprobante($tipo_comprobante)
+            ->setIdUnidad($unidad)
+            ->setNroConsecutivo($consecutivo);
+        $em->persist($new_registro_comprobante);
+
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        /**** Obteniendo las cuentas y subcuentas **/
+        //DEBITOS
+        $cuenta_total_ingreso = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'823']);
+        $cuenta_debito_empleador = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'855']);
+        $subcuenta_total_ingreso = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_total_ingreso,'nro_subcuenta'=>'0010']);
+        $subcuenta_afp_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0010']);
+        $subcuenta_sfs_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0020']);
+        $subcuenta_srl_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0030']);
+        $subcuenta_infotep_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0040']);
+
+        //CREDITOS
+        $cuenta_creditos = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'440']);
+        $cuenta_efectivo_creditos = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'455']);
+        $subcuenta_efectivo_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_efectivo_creditos,'nro_subcuenta'=>'0010']);
+        $subcuenta_isr_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0005']);
+        $subcuenta_ars_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0006']);
+        $subcuenta_afp_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0007']);
+        $subcuenta_cooperativa_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0008']);
+        $subcuenta_plan_medico_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0009']);
+        $subcuenta_restaurant_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0010']);
+        $subcuenta_sfs_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0011']);
+        $subcuenta_afp_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0012']);
+        $subcuenta_srl_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0013']);
+        $subcuenta_infotep_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0014']);
+
+        /** Asentando las operaciones */
+        /****** DEBITOS *****/
+        //GASTO DE SUELDO
+
+        $em->flush();
+        $this->addFlash('success', 'El pago ha sido Aceptado satisfactoriamente');
+
+        if ($quincena == 1)
+            return $this->index_primera_quincena($em, $request);
+        return $this->index_segunda_quincena($em, $request);
+    }
+
+    /**
+     * @Route("/revertir-pago", name="revertir_pago")
+     */
+    public function revertirPago(EntityManagerInterface $em, Request $request)
+    {
+        $quincena = intval($request->request->get('quincena'));
+        $observacion = $request->request->get('observacion');
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $fecha = AuxFunctions::getCurrentDate($em, $unidad);
+        $mes = $fecha->format('m');
+        $anno = $fecha->format('Y');
+
+        $data_nominas = $em->getRepository(NominaPago::class)->findBy([
+            'elaborada' => true,
+            'aprobada' => true,
             'mes' => $mes,
             'anno' => $anno,
             'id_unidad' => $unidad,
@@ -323,20 +547,16 @@ class NominaPagoController extends AbstractController
         /** @var NominaPago $item */
         foreach ($data_nominas as $item) {
             $item
-                ->setAprobada(true)
-                ->setIdUsuarioAprueba($this->getUser());
+                ->setAprobada(false)
+                ->setIdUsuarioAprueba(null);
             $em->persist($item);
         }
         $em->flush();
-        $this->addFlash('success', 'El pago ha sido Aceptado satisfactoriamente');
+        $this->addFlash('success', 'El pago ha sido revertido satisfactoriamente');
 
-        return $this->render('contabilidad/capital_humano/nomina_pago/index.html.twig', [
-            'controller_name' => 'NominaPagoController',
-            'empleados' => $this->getData($em,$quincena),
-            'title' => $quincena==1?'Pago de Primera Quincena':'Pago de Segunda Quincena',
-            'quincena' => $quincena,
-            'aprobado'=>true
-        ]);
+        if ($quincena == 1)
+            return $this->index_primera_quincena($em, $request);
+        return $this->index_segunda_quincena($em, $request);
     }
 
     /**
@@ -426,7 +646,6 @@ class NominaPagoController extends AbstractController
             ->setExcedenteSegunRangoEscala(isset($impuesto_sobre_renta['excedente_segun_rango_escala']) ? floatval($impuesto_sobre_renta['excedente_segun_rango_escala']) : 0)
             ->setIdNominaPago($nomina_pago)
             ->setIdEmpleado($nomina_pago->getIdEmpleado())
-            ->setIdRangoEscala($em->getRepository(RangoEscalaDGII::class)->find(intval($impuesto_sobre_renta['id_escala_escala'])))
             ->setImpuestoRentaPagarAnual(isset($impuesto_sobre_renta['impuesto_renta_pagar_anual']) ? floatval($impuesto_sobre_renta['impuesto_renta_pagar_anual']) : 0)
             ->setMontoAdicionalRangoEscala(isset($impuesto_sobre_renta['monto_adicional_rango_escala']) ? floatval($impuesto_sobre_renta['monto_adicional_rango_escala']) : 0)
             ->setImpuestoRentaPagarMensual(isset($impuesto_sobre_renta['impuesto_renta_pagar_mensual']) ? floatval($impuesto_sobre_renta['impuesto_renta_pagar_mensual']) : 0)
@@ -437,17 +656,21 @@ class NominaPagoController extends AbstractController
             ->setSalarioDespuesSeguridadSocial(isset($impuesto_sobre_renta['salario_despues_seguridad_social']) ? floatval($impuesto_sobre_renta['salario_despues_seguridad_social']) : 0)
             ->setSeguridadSocialAnual(isset($impuesto_sobre_renta['seguridad_social_anual']) ? floatval($impuesto_sobre_renta['seguridad_social_anual']) : 0)
             ->setSeguridadSocialMensual(isset($impuesto_sobre_renta['seguridad_social_mensual']) ? floatval($impuesto_sobre_renta['seguridad_social_mensual']) : 0);
+
+        if (isset($impuesto_sobre_renta['id_escala_escala']) && $impuesto_sobre_renta['id_escala_escala'] != '') {
+            $obj_impuesto_sobre_renta
+                ->setIdRangoEscala($em->getRepository(RangoEscalaDGII::class)->find(intval($impuesto_sobre_renta['id_escala_escala'])));
+        }
+
         $em->persist($obj_impuesto_sobre_renta);
 
-        $em->flush();
 
+        $em->flush();
 
         if ($quincena == '1' || $quincena == 1)
             $url = 'contabilidad_capital_humano_nomina_pago_primera_quincena';
         else
             $url = 'contabilidad_capital_humano_nomina_pago_segunda_quincena';
-
-
         return $this->redirectToRoute($url);
     }
 }
