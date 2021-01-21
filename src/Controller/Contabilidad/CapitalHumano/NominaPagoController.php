@@ -3,15 +3,18 @@
 namespace App\Controller\Contabilidad\CapitalHumano;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\CapitalHumano\ComprobanteSalario;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\CapitalHumano\ImpuestoSobreRenta;
 use App\Entity\Contabilidad\CapitalHumano\NominaPago;
 use App\Entity\Contabilidad\CapitalHumano\PorCientoNominas;
 use App\Entity\Contabilidad\CapitalHumano\RangoEscalaDGII;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\ElementoGasto;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
+use App\Entity\Contabilidad\General\Asiento;
 use App\Form\Contabilidad\CapitalHumano\EmpleadoType;
 use App\Form\Contabilidad\CapitalHumano\NominaPagoType;
 use ContainerK07jWwZ\getUnidadChoicesTypeService;
@@ -62,14 +65,17 @@ class NominaPagoController extends AbstractController
                     $rows = $this->getData($em, 1);
                 }
             else {
-                $return_pago = false;
+                if ($pago->getAprobada() == true)
+                    $return_pago = false;
+                else {
+                    $return_pago = true;
+                }
                 $rows = [];
             }
         } else {
             $return_pago = false;
-            $rows = $this->getData($em, 2);
+            $rows = $this->getData($em, 1);
         }
-
         return $this->render('contabilidad/capital_humano/nomina_pago/index.html.twig', [
             'controller_name' => 'NominaPagoController',
             'empleados' => $rows,
@@ -483,32 +489,107 @@ class NominaPagoController extends AbstractController
         $subcuenta_er = $em->getRepository(Subcuenta::class);
         /**** Obteniendo las cuentas y subcuentas **/
         //DEBITOS
-        $cuenta_total_ingreso = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'823']);
-        $cuenta_debito_empleador = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'855']);
-        $subcuenta_total_ingreso = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_total_ingreso,'nro_subcuenta'=>'0010']);
-        $subcuenta_afp_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0010']);
-        $subcuenta_sfs_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0020']);
-        $subcuenta_srl_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0030']);
-        $subcuenta_infotep_empleador = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_debito_empleador,'nro_subcuenta'=>'0040']);
+        $cuenta_total_ingreso = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '823']);
+        $cuenta_debito_empleador = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '855']);
+        $subcuenta_total_ingreso = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_total_ingreso, 'nro_subcuenta' => '0010']);
+        $subcuenta_afp_empleador = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_debito_empleador, 'nro_subcuenta' => '0010']);
+        $subcuenta_sfs_empleador = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_debito_empleador, 'nro_subcuenta' => '0020']);
+        $subcuenta_srl_empleador = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_debito_empleador, 'nro_subcuenta' => '0030']);
+        $subcuenta_infotep_empleador = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_debito_empleador, 'nro_subcuenta' => '0040']);
 
         //CREDITOS
-        $cuenta_creditos = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'440']);
-        $cuenta_efectivo_creditos = $cuenta_er->findOneBy(['activo'=>true,'nro_cuenta'=>'455']);
-        $subcuenta_efectivo_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_efectivo_creditos,'nro_subcuenta'=>'0010']);
-        $subcuenta_isr_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0005']);
-        $subcuenta_ars_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0006']);
-        $subcuenta_afp_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0007']);
-        $subcuenta_cooperativa_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0008']);
-        $subcuenta_plan_medico_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0009']);
-        $subcuenta_restaurant_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0010']);
-        $subcuenta_sfs_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0011']);
-        $subcuenta_afp_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0012']);
-        $subcuenta_srl_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0013']);
-        $subcuenta_infotep_empleador_credito = $subcuenta_er->findOneBy(['activo'=>true,'id_cuenta'=>$cuenta_creditos,'nro_subcuenta'=>'0014']);
+        $cuenta_creditos = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '440']);
+        $cuenta_efectivo_creditos = $cuenta_er->findOneBy(['activo' => true, 'nro_cuenta' => '455']);
+        $subcuenta_efectivo_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_efectivo_creditos, 'nro_subcuenta' => '0010']);
+        $subcuenta_isr_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0005']);
+        $subcuenta_ars_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0006']);
+        $subcuenta_afp_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0007']);
+        $subcuenta_cooperativa_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0008']);
+        $subcuenta_plan_medico_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0009']);
+        $subcuenta_restaurant_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0010']);
+        $subcuenta_sfs_empleador_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0011']);
+        $subcuenta_afp_empleador_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0012']);
+        $subcuenta_srl_empleador_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0013']);
+        $subcuenta_infotep_empleador_credito = $subcuenta_er->findOneBy(['activo' => true, 'id_cuenta' => $cuenta_creditos, 'nro_subcuenta' => '0014']);
+
+        //ELEMENTO DEL GASTO
+        $elemento_gasto = $em->getRepository(ElementoGasto::class)->findOneBy(['activo' => true, 'codigo' => '5001']);
 
         /** Asentando las operaciones */
         /****** DEBITOS *****/
-        //GASTO DE SUELDO
+        $gasto_sueldo = AuxFunctions::createAsiento($em, $cuenta_total_ingreso, $subcuenta_total_ingreso, null, $unidad, null,
+            null, $elemento_gasto, null, null, null, 0, 0, $fecha, $anno,
+            0, $total_ingreso, '', null, null, null, $new_registro_comprobante);
+        $afp_patrimonial = AuxFunctions::createAsiento($em, $cuenta_debito_empleador, $subcuenta_afp_empleador, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            0, $total_afp_empleador, '', null, null, null, $new_registro_comprobante);
+        $sfs_patrimonial = AuxFunctions::createAsiento($em, $cuenta_debito_empleador, $subcuenta_sfs_empleador, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            0, $total_sfs_empleador, '', null, null, null, $new_registro_comprobante);
+        $srl_patrimonial = AuxFunctions::createAsiento($em, $cuenta_debito_empleador, $subcuenta_srl_empleador, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            0, $total_srl_empleador, '', null, null, null, $new_registro_comprobante);
+        $infotep_patrimonial = AuxFunctions::createAsiento($em, $cuenta_debito_empleador, $subcuenta_infotep_empleador, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            0, $total_infotep_empleador, '', null, null, null, $new_registro_comprobante);
+        /****** CREDITOS *****/
+        $efectivo = AuxFunctions::createAsiento($em, $cuenta_efectivo_creditos, $subcuenta_efectivo_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_sueldo_neto, 0, '', null, null, null, $new_registro_comprobante);
+        $isr = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_isr_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_impuesto_sobre_renta, 0, '', null, null, null, $new_registro_comprobante);
+        $ars = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_ars_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_ars, 0, '', null, null, null, $new_registro_comprobante);
+        $afp = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_afp_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_afp, 0, '', null, null, null, $new_registro_comprobante);
+        $cooperativa = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_cooperativa_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_cooperativa, 0, '', null, null, null, $new_registro_comprobante);
+        $plan_medico = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_plan_medico_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_plan_medico_complementario, 0, '', null, null, null, $new_registro_comprobante);
+        $restaurant = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_restaurant_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_restaurant, 0, '', null, null, null, $new_registro_comprobante);
+        $afp_patrimonial_credito = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_afp_empleador_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_afp_empleador, 0, '', null, null, null, $new_registro_comprobante);
+        $sfs_patrimonial_credito = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_sfs_empleador_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_sfs_empleador, 0, '', null, null, null, $new_registro_comprobante);
+        $srl_patrimonial_credito = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_srl_empleador_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_srl_empleador, 0, '', null, null, null, $new_registro_comprobante);
+        $infotep_patrimonial_credito = AuxFunctions::createAsiento($em, $cuenta_creditos, $subcuenta_infotep_empleador_credito, null, $unidad, null,
+            null, null, null, null, null, 0, 0, $fecha, $anno,
+            $total_infotep_empleador, 0, '', null, null, null, $new_registro_comprobante);
+
+
+        /** ACTUALIZAR LA ENTIDAD DE ComprobanteSalario**/
+        $comprobante_salario_obj = $em->getRepository(ComprobanteSalario::class)->findOneBy([
+            'mes'=>$mes,
+            'anno'=>$anno,
+            'quincena'=>$quincena,
+            'id_unidad'=>$unidad
+        ]);
+        if(!$comprobante_salario_obj){
+            $new_comprobante_salario = new ComprobanteSalario();
+            $new_comprobante_salario
+                ->setQuincena($quincena)
+                ->setMes($mes)
+                ->setAnno($anno)
+                ->setIdUnidad($unidad)
+                ->setIdRegistroComprobante($new_registro_comprobante);
+            $em->persist($new_comprobante_salario);
+        }
+        else{
+            $comprobante_salario_obj
+                ->setIdRegistroComprobante($new_registro_comprobante);
+            $em->persist($comprobante_salario_obj);
+        }
 
         $em->flush();
         $this->addFlash('success', 'El pago ha sido Aceptado satisfactoriamente');
@@ -543,7 +624,6 @@ class NominaPagoController extends AbstractController
             $this->addFlash('success', 'No ha nominas pagadas que apectar');
             return $this->redirectToRoute($quincena == 1 ? 'contabilidad_capital_humano_nomina_pago_primera_quincena' : 'contabilidad_capital_humano_nomina_pago_segunda_quincena');
         }
-
         /** @var NominaPago $item */
         foreach ($data_nominas as $item) {
             $item
@@ -551,6 +631,49 @@ class NominaPagoController extends AbstractController
                 ->setIdUsuarioAprueba(null);
             $em->persist($item);
         }
+
+        /*** OBTENER EL cOMPROBANTE DE SALARIO PARA REVERTIR LOS ASIENTOS**/
+        /** @var ComprobanteSalario $comprobante_salario_obj */
+        $comprobante_salario_obj = $em->getRepository(ComprobanteSalario::class)->findOneBy([
+            'mes'=>$mes,
+            'anno'=>$anno,
+            'quincena'=>$quincena,
+            'id_unidad'=>$unidad
+        ]);
+
+        $all_comprobantes_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy([
+            'id_tipo_comprobante' => $comprobante_salario_obj->getIdRegistroComprobante()->getIdTipoComprobante(),
+            'id_unidad' => $unidad,
+            'anno' => $anno
+        ]);
+        $consecutivo = count($all_comprobantes_operaciones) + 1;
+
+        /**YA CON EL COMPROBANTE, PROCEDO A INVERTIRNLO**/
+        $new_registro_comprobante = new RegistroComprobantes();
+        $new_registro_comprobante
+            ->setDescripcion($observacion)
+            ->setIdUsuario($this->getUser())
+            ->setFecha($fecha)
+            ->setAnno($anno)
+            ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_NOMINAS)
+            ->setCredito($comprobante_salario_obj->getIdRegistroComprobante()->getDebito())
+            ->setDebito($comprobante_salario_obj->getIdRegistroComprobante()->getDebito())
+            ->setIdAlmacen(null)
+            ->setIdTipoComprobante($comprobante_salario_obj->getIdRegistroComprobante()->getIdTipoComprobante())
+            ->setIdUnidad($unidad)
+            ->setNroConsecutivo($consecutivo);
+        $em->persist($new_registro_comprobante);
+
+        /*** OBTENER TODOS LOS ASIENTOS CONTABLES DEL COMPROBANTE REVERTIDO ***/
+        $asientos = $em->getRepository(Asiento::class)->findBy([
+            'id_comprobante'=>$comprobante_salario_obj->getIdRegistroComprobante()
+        ]);
+        foreach ($asientos as $item){
+            $new_asiento = AuxFunctions::createAsiento($em, $item->getIdCuenta(), $item->getIdSubcuenta(), null, $unidad, null,
+                null, null, null, null, null, 0, 0, $fecha, $anno,
+                $item->getDebito(), $item->getCredito(), '', null, null, null, $new_registro_comprobante);
+        }
+
         $em->flush();
         $this->addFlash('success', 'El pago ha sido revertido satisfactoriamente');
 
