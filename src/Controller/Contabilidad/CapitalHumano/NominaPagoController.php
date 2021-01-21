@@ -641,6 +641,7 @@ class NominaPagoController extends AbstractController
             'id_unidad'=>$unidad
         ]);
 
+
         $all_comprobantes_operaciones = $em->getRepository(RegistroComprobantes::class)->findBy([
             'id_tipo_comprobante' => $comprobante_salario_obj->getIdRegistroComprobante()->getIdTipoComprobante(),
             'id_unidad' => $unidad,
@@ -792,8 +793,40 @@ class NominaPagoController extends AbstractController
 
         if ($quincena == '1' || $quincena == 1)
             $url = 'contabilidad_capital_humano_nomina_pago_primera_quincena';
+        elseif ($quincena == '3' || $quincena == 3)
+            $url = 'contabilidad_capital_humano_get_empleados';
         else
             $url = 'contabilidad_capital_humano_nomina_pago_segunda_quincena';
         return $this->redirectToRoute($url);
     }
+
+    /**
+     * @Route("/getEmpleados", name="contabilidad_capital_humano_get_empleados")
+     */
+    public function getEmpleados(EntityManagerInterface $em){
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $empleados = $em->getRepository(Empleado::class)->findBy([
+            'id_unidad'=>$unidad
+        ]);
+        $fecha = AuxFunctions::getCurrentDate($em,$unidad);
+        $row = [];
+        /** @var Empleado $item */
+        foreach ($empleados as $item){
+            if (!$item->getBaja() || $item->getFechaBaja()->format('Y') < $fecha->format('Y')){
+                $row[]=array(
+                    'id'=>$item->getId(),
+                    'nombre'=>$item->getNombre()
+                );
+            }
+        }
+        return $this->render('contabilidad/capital_humano/nomina_pago/seltrabajador.html.twig', [
+            'controller_name' => 'NominaPagoController',
+            'empleados' => $row,
+            'title' => 'Seleccionar Trabajador',
+            'quincena' => 3
+        ]);
+    }
+
+
+
 }
