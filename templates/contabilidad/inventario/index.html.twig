@@ -47,13 +47,14 @@
                         Salida
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-{#                        <h6 class="text-center">Vale de Salida</h6>#}
-{#                        <div class="dropdown-divider"></div>#}
+                        {#                        <h6 class="text-center">Vale de Salida</h6>#}
+                        {#                        <div class="dropdown-divider"></div>#}
                         <a class="dropdown-item"
-                           href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Vale de Salida de Mercancía o Materiales</a>
-{#                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"#}
-{#                           href="{{ url ('contabilidad_inventario_vale_salida_producto_gestionar') }}">Producto</a>#}
-{#                        <div class="dropdown-divider"></div>#}
+                           href="{{ url ('contabilidad_inventario_vale_salida_gestionar') }}">Vale de Salida de
+                            Mercancía o Materiales</a>
+                        {#                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"#}
+                        {#                           href="{{ url ('contabilidad_inventario_vale_salida_producto_gestionar') }}">Producto</a>#}
+                        {#                        <div class="dropdown-divider"></div>#}
                         <a class="dropdown-item"
                            href="{{ url ('contabilidad_inventario_transferencia_salida_gestionar') }}">Transferencia</a>
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_ajuste_salida_gestionar') }}">Ajuste</a>
@@ -67,6 +68,8 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url ('contabilidad_inventario_cerrar_dia') }}">Cerrar
                             Día</a>
+                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_cerrar_periodo') }}">Cerrar
+                            Periodo Mensual</a>
                         {#                        <a class="dropdown-item" href="{{ url ('contabilidad_inventario_transferencia_entrada') }}">Cerrar#}
                         {#                            Mes</a>#}
                         <a class="dropdown-item" {#target="_blank"#}
@@ -90,9 +93,11 @@
                         <div class="dropdown-divider"></div>
                         <h6 class="text-center">Comprobante de anotaciones</h6>
                         <div class="dropdown-divider"></div>
-                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" target="_blank"
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                           target="_blank"
                            href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print_entrada') }}">Entrada</a>
-                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" target="_blank"
+                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                           target="_blank"
                            href="{{ url ('contabilidad_inventario_comprobante_anotaciones_print_salida') }}">Salida</a>
                     </div>
                 </li>

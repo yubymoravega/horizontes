@@ -1,0 +1,62 @@
+{% extends 'contabilidad/inventario/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="modal" id="modalcerrar" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="modalcerrarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="modalcerrarLabel">
+                        <i class="fa fa-warning text-warning"></i>
+                        Cierre del preriodo mensual</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app text-white">
+                    ¿Seguro que desea hacer el cierre del periodo correspondiente al mes de : <span
+                            class="badge badge-info"> {{ text }}</span> ?
+                    <form method="post" action="{{ url('contabilidad_inventario_on_cerrar_periodo',{id: periodo}) }}"
+                          autocomplete="off" id="form_close_periodo">
+                        <input type="hidden" value="{{ mes }}" name="mes_cerrar">
+                    </form>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <a class="btn btn-outline-secondary text-white" type="button"
+                               aria-label="Cerrar" data-dismiss="modal">
+                                <span aria-hidden="true">Salir</span>
+                            </a>
+                        </div>
+                        <div class="ml-2">
+                            <button class="my-0 btn btn-secondary" id="btnAceptarClose">
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#modalcerrar').modal('show')
+
+            $('#btnAceptarClose').on('click', function () {
+                const formulario = $('#form_close_periodo')
+                formulario.submit()
+            })
+        })
+    </script>
+{% endblock %}

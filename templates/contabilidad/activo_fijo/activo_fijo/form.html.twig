@@ -146,7 +146,6 @@
                 <div class="d-flex mt-2">
                     <div class="mr-auto">
                         <button class="btn btn-outline-secondary" id="btn_cancelar">Salir</button>
-
                     </div>
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnSubbmit">Guardar</button>
@@ -344,10 +343,22 @@
             //Adicionar activo fijo
             $("#btnSubbmit").click(function (e) {
                 if (form_activo_fijo.valid()) {
-                    form_activo_fijo.attr('method', `POST`)
-                    form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val() + '&type=' + $('#activo_fijo_type').val())
-                    form_activo_fijo.submit()
-                    if (validateForm.errorList.length === 0) loadingModal.show()
+                    // validar fecha para el activo fijo
+                    $.ajax({
+                        url: '/contabilidad/activo-fijo/puede-dar-acta',
+                        method: 'POST',
+                        data: {fecha_alta: $('#activo_fijo_fecha_alta').val()},
+                        dataType: 'json',
+                        success: function (result) {
+                            form_activo_fijo.attr('method', `POST`)
+                            form_activo_fijo.attr('action', `/contabilidad/activo-fijo/gestionar/` + $('#activo_fijo_nro_inventario').val() + '&type=' + $('#activo_fijo_type').val())
+                            form_activo_fijo.submit()
+                            if (validateForm.errorList.length === 0) loadingModal.show()
+                        },
+                        error: function (error) {
+                            alertTemplate(error.responseJSON.detail, 'danger')
+                        }
+                    })
                 }
             });
 

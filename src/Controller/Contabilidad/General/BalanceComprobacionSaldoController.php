@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\General;
 
+use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
@@ -130,10 +131,10 @@ class BalanceComprobacionSaldoController extends AbstractController
             $list_balance_comprobacion[] = array(
                 'id_cuenta' => $asiento->getIdCuenta()->getId(),
                 'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
-                'criterio' => $this->generateCriterioOneAsiento($asiento),
-                'codigo' => $this->generateCriterioOneAsiento($asiento),
+                'criterio' => $this->generateCriterioOneAsiento($asiento, $em),
+                'codigo' => $this->generateCriterioOneAsiento($asiento, $em),
 
-                'descripcion' => $this->generateCriterioOneAsientoDesc($asiento),
+                'descripcion' => $this->generateCriterioOneAsientoDesc($asiento, $em),
                 'saldo' => number_format($saldo_criterio, 2),
                 'credito_mes' => number_format($credito, 2),
                 'debito_mes' => number_format($debito, 2),
@@ -145,7 +146,7 @@ class BalanceComprobacionSaldoController extends AbstractController
     }
 
 
-    private function generateCriterioOneAsiento(Asiento $asiento)
+    private function generateCriterioOneAsiento(Asiento $asiento, EntityManagerInterface $em)
     {
         $lista = [];
         if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getCodigo());
@@ -153,24 +154,32 @@ class BalanceComprobacionSaldoController extends AbstractController
         if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getCodigo());
         if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getCodigo());
         if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getCodigo());
-        if ($asiento->getIdCliente()) array_push($lista, $asiento->getIdCliente());
-        if ($asiento->getTipoCliente()) array_push($lista, $asiento->getTipoCliente());
+        if ($asiento->getIdCliente()) {
+            $cliente = ClientesAdapter::getClienteFactory($em, $asiento->getTipoCliente());
+            $data = $cliente->find($asiento->getIdCliente());
+            array_push($lista, $data['codigo']);
+        }
+//        if ($asiento->getTipoCliente()) array_push($lista, $asiento->getTipoCliente());
 
-        return implode('-', $lista);
+        return implode('; ', $lista);
     }
 
-    private function generateCriterioOneAsientoDesc(Asiento $asiento)
+    private function generateCriterioOneAsientoDesc(Asiento $asiento, EntityManagerInterface $em)
     {
         $lista = [];
-        if ($asiento->getIdAlmacen()) array_push($lista, 'ALM');
-        if ($asiento->getIdCentroCosto()) array_push($lista, 'CCT');
-        if ($asiento->getIdElementoGasto()) array_push($lista, 'EG');
-        if ($asiento->getIdOrdenTrabajo()) array_push($lista, 'OT');
-        if ($asiento->getIdExpediente()) array_push($lista, 'EXP');
-        if ($asiento->getIdCliente()) array_push($lista, 'CLT');
-        if ($asiento->getTipoCliente()) array_push($lista, 'TCLT');
+        if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getDescripcion());
+        if ($asiento->getIdCentroCosto()) array_push($lista, $asiento->getIdCentroCosto()->getNombre());
+        if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getDescripcion());
+        if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getDescripcion());
+        if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getDescripcion());
+        if ($asiento->getIdCliente()) {
+            $cliente = ClientesAdapter::getClienteFactory($em, $asiento->getTipoCliente());
+            $data = $cliente->find($asiento->getIdCliente());
+            array_push($lista, $data['nombre']);
+        }
+//        if ($asiento->getTipoCliente()) array_push($lista, 'TCLT');
 
-        return implode('-', $lista);
+        return implode('; ', $lista);
     }
 
     public function getSumbayorAll($cuenta, $subcuenta = null, $arr_asiento)

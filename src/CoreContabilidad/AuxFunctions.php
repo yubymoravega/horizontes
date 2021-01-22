@@ -73,6 +73,7 @@ class AuxFunctions
     public const COMMPROBANTE_OPERACONES_CONTABILIDAD = 3;
     public const COMMPROBANTE_OPERACONES_DEPRECIACIONACTIVO_FIJO = 4;
     public const COMMPROBANTE_OPERACONES_ACTIVO_FIJO = 5;
+    public const COMMPROBANTE_OPERACONES_NOMINAS = 6;
 
     public const TIPO_PERIODO_INVENTARIO = 1;
     public const TIPO_PERIODO_ACTIVO_FIJO = 2;
@@ -184,6 +185,40 @@ class AuxFunctions
                 return 'Noviembre';
             case 12:
                 return 'Diciembre';
+        }
+    }
+
+    /**
+     * @param int $mes numero que representa el mes (1-12)
+     * @return string Nombre del mes
+     */
+    public static function getUltimoDiaMes(int $mes)
+    {
+        switch ($mes) {
+            case 1:
+                return 31;
+            case 2:
+                return 28;
+            case 3:
+                return 31;
+            case 4:
+                return 30;
+            case 5:
+                return 31;
+            case 6:
+                return 30;
+            case 7:
+                return 31;
+            case 8:
+                return 31;
+            case 9:
+                return 30;
+            case 10:
+                return 31;
+            case 11:
+                return 30;
+            case 12:
+                return 31;
         }
     }
 
@@ -792,6 +827,7 @@ class AuxFunctions
                 'id_almacen' => $almacen_obj,
                 'activo' => true
             ));
+
             if (empty($arr_documento)) {
                 /**es el primer documento que se hace por lo que retorno la fecha del servidor**/
                 return Date('Y-m-d');
@@ -3153,7 +3189,7 @@ class AuxFunctions
      */
     public static function puedeTrabajar(EntityManagerInterface $em, Unidad $obj_unidad, \DateTime $fecha, int $tipo, Almacen $obj_almacen = null)
     {
-        if ($tipo === 1)
+        if ($tipo === self::TIPO_PERIODO_INVENTARIO)
             $periodo_abierto = $em->getRepository(PeriodoSistema::class)->findOneBy([
                 'cerrado' => false,
                 'id_unidad' => $obj_unidad,
