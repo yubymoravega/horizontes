@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\CapitalHumano\ComprobanteSalario;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\CapitalHumano\ImpuestoSobreRenta;
 use App\Entity\Contabilidad\CapitalHumano\NominaPago;
+use App\Entity\Contabilidad\CapitalHumano\NominaTerceroComprobante;
 use App\Entity\Contabilidad\CapitalHumano\PorCientoNominas;
 use App\Entity\Contabilidad\CapitalHumano\RangoEscalaDGII;
 use App\Entity\Contabilidad\Config\Cuenta;
@@ -53,9 +54,15 @@ class NominaPagoController extends AbstractController
         ]);
         $rows = [];
         $return_pago = false;
-        if (!empty($pago_nomina)) {
+        $pago_chequear = [];
+        /** @var NominaPago $item */
+        foreach ($pago_nomina as $item) {
+            if ($item->getQuincena() < 3)
+                $pago_chequear[] = $item;
+        }
+        if (!empty($pago_chequear)) {
             /** @var NominaPago $pago */
-            $pago = $pago_nomina[count($pago_nomina) - 1];
+            $pago = $pago_chequear[count($pago_chequear) - 1];
             if ($pago->getQuincena() == 1)
                 if ($pago->getAprobada() == true) {
                     $return_pago = true;
@@ -105,10 +112,16 @@ class NominaPagoController extends AbstractController
             'anno' => $anno
         ]);
 
+        $pago_chequear = [];
+        /** @var NominaPago $item */
+        foreach ($pago_nomina as $item) {
+            if ($item->getQuincena() < 3)
+                $pago_chequear[] = $item;
+        }
         $return_pago = false;
-        if (!empty($pago_nomina)) {
+        if (!empty($pago_chequear)) {
             /** @var NominaPago $pago */
-            $pago = $pago_nomina[count($pago_nomina) - 1];
+            $pago = $pago_chequear[count($pago_chequear) - 1];
             if ($pago->getQuincena() == 2)
                 if ($pago->getAprobada() == true) {
                     $return_pago = true;
@@ -164,7 +177,6 @@ class NominaPagoController extends AbstractController
                 'id_empleado' => $item,
 //                'aprobada'=>false
             ]);
-//            if($nomina_pago) {
             if (!$item->getBaja() || $item->getFechaBaja()->format('Y') < $year) {
                 if (!$nomina_pago || $nomina_pago->getAprobada() == false) {
                     $index++;
@@ -185,7 +197,6 @@ class NominaPagoController extends AbstractController
 
                     );
                 }
-//                }
             }
         }
         return $rows;
@@ -570,12 +581,12 @@ class NominaPagoController extends AbstractController
 
         /** ACTUALIZAR LA ENTIDAD DE ComprobanteSalario**/
         $comprobante_salario_obj = $em->getRepository(ComprobanteSalario::class)->findOneBy([
-            'mes'=>$mes,
-            'anno'=>$anno,
-            'quincena'=>$quincena,
-            'id_unidad'=>$unidad
+            'mes' => $mes,
+            'anno' => $anno,
+            'quincena' => $quincena,
+            'id_unidad' => $unidad
         ]);
-        if(!$comprobante_salario_obj){
+        if (!$comprobante_salario_obj) {
             $new_comprobante_salario = new ComprobanteSalario();
             $new_comprobante_salario
                 ->setQuincena($quincena)
@@ -584,8 +595,7 @@ class NominaPagoController extends AbstractController
                 ->setIdUnidad($unidad)
                 ->setIdRegistroComprobante($new_registro_comprobante);
             $em->persist($new_comprobante_salario);
-        }
-        else{
+        } else {
             $comprobante_salario_obj
                 ->setIdRegistroComprobante($new_registro_comprobante);
             $em->persist($comprobante_salario_obj);
@@ -635,10 +645,10 @@ class NominaPagoController extends AbstractController
         /*** OBTENER EL cOMPROBANTE DE SALARIO PARA REVERTIR LOS ASIENTOS**/
         /** @var ComprobanteSalario $comprobante_salario_obj */
         $comprobante_salario_obj = $em->getRepository(ComprobanteSalario::class)->findOneBy([
-            'mes'=>$mes,
-            'anno'=>$anno,
-            'quincena'=>$quincena,
-            'id_unidad'=>$unidad
+            'mes' => $mes,
+            'anno' => $anno,
+            'quincena' => $quincena,
+            'id_unidad' => $unidad
         ]);
 
 
@@ -667,9 +677,9 @@ class NominaPagoController extends AbstractController
 
         /*** OBTENER TODOS LOS ASIENTOS CONTABLES DEL COMPROBANTE REVERTIDO ***/
         $asientos = $em->getRepository(Asiento::class)->findBy([
-            'id_comprobante'=>$comprobante_salario_obj->getIdRegistroComprobante()
+            'id_comprobante' => $comprobante_salario_obj->getIdRegistroComprobante()
         ]);
-        foreach ($asientos as $item){
+        foreach ($asientos as $item) {
             $new_asiento = AuxFunctions::createAsiento($em, $item->getIdCuenta(), $item->getIdSubcuenta(), null, $unidad, null,
                 null, null, null, null, null, 0, 0, $fecha, $anno,
                 $item->getDebito(), $item->getCredito(), '', null, null, null, $new_registro_comprobante);
@@ -793,9 +803,10 @@ class NominaPagoController extends AbstractController
 
         if ($quincena == '1' || $quincena == 1)
             $url = 'contabilidad_capital_humano_nomina_pago_primera_quincena';
-        elseif ($quincena == '3' || $quincena == 3)
+        elseif ($quincena == '3' || $quincena == 3) {
+            $this->addNominaComprobante($em, $nomina_pago);
             $url = 'contabilidad_capital_humano_get_empleados';
-        else
+        } else
             $url = 'contabilidad_capital_humano_nomina_pago_segunda_quincena';
         return $this->redirectToRoute($url);
     }
@@ -803,19 +814,20 @@ class NominaPagoController extends AbstractController
     /**
      * @Route("/getEmpleados", name="contabilidad_capital_humano_get_empleados")
      */
-    public function getEmpleados(EntityManagerInterface $em){
-        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+    public function getEmpleados(EntityManagerInterface $em)
+    {
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $empleados = $em->getRepository(Empleado::class)->findBy([
-            'id_unidad'=>$unidad
+            'id_unidad' => $unidad
         ]);
-        $fecha = AuxFunctions::getCurrentDate($em,$unidad);
+        $fecha = AuxFunctions::getCurrentDate($em, $unidad);
         $row = [];
         /** @var Empleado $item */
-        foreach ($empleados as $item){
-            if (!$item->getBaja() || $item->getFechaBaja()->format('Y') < $fecha->format('Y')){
-                $row[]=array(
-                    'id'=>$item->getId(),
-                    'nombre'=>$item->getNombre()
+        foreach ($empleados as $item) {
+            if (!$item->getBaja() || $item->getFechaBaja()->format('Y') < $fecha->format('Y')) {
+                $row[] = array(
+                    'id' => $item->getId(),
+                    'nombre' => $item->getNombre()
                 );
             }
         }
@@ -827,6 +839,36 @@ class NominaPagoController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/cancelar-nomina", name="contabilidad_capital_humano_cancelar_nomina")
+     */
+    public function cacelarNomina(EntityManagerInterface $em, Request $request)
+    {
+        $id = $request->request->get('id');
+        $quincena = $request->request->get('quincena');
+        $pago_nomina = $em->getRepository(NominaPago::class)->findOneBy(['id_empleado' => $id, 'quincena' => $quincena]);
+        $impuesto = $em->getRepository(ImpuestoSobreRenta::class)->findOneBy(['id_nomina_pago' => $pago_nomina]);
+        $em->remove($impuesto);
+        $em->remove($pago_nomina);
+        $em->flush();
 
+        $this->addFlash('success', 'El pago ha sido cancelado satisfactoriamente');
 
+        if ($quincena == 1)
+            return $this->index_primera_quincena($em, $request);
+        return $this->index_segunda_quincena($em, $request);
+    }
+
+    public function addNominaComprobante(EntityManagerInterface $em, NominaPago $nomina_pago)
+    {
+        $nomina_extraordinaria = new NominaTerceroComprobante();
+        $nomina_extraordinaria
+            ->setIdUnidad($nomina_pago->getIdUnidad())
+            ->setAnno($nomina_pago->getAnno())
+            ->setIdComprobante(null)
+            ->setIdNomina($nomina_pago)
+            ->setMes($nomina_pago->getMes());
+        $em->persist($nomina_extraordinaria);
+        $em->flush();
+    }
 }

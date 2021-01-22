@@ -74,6 +74,11 @@
                                     onclick="Revisar({{ item.id_nomina }})">
                                 <i class="fa fa-eye"></i> Revisar
                             </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Cancelar"
+                                    onclick="Cancelar({{ item.id }},{{ quincena }})">
+                                <i class="fa fa-trash"></i> Cancelar
+                            </button>
                         {% endif %}
                     </td>
                 </tr>
@@ -150,6 +155,20 @@
                     </form>`)
 
             const fomrulario = $('#form_revertir_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+
+        function Cancelar(id,quincena) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/nomina-pago/cancelar-nomina'
+                         method="post" id='form_cancelar_pago'>
+                        <input type='text' hidden name='quincena' value='${quincena}'/>
+                        <input type='text' hidden name='id' value='${id}'/>
+                    </form>`)
+
+            const fomrulario = $('#form_cancelar_pago')
             fomrulario.submit()
             fomrulario.remove()
         }

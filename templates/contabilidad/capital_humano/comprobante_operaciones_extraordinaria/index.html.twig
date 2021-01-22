@@ -1,20 +1,94 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello ComprobanteOperacionesExtraordinariaController!{% endblock %}
-
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Comprobante de Operaciones {% endblock %}
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Comprobante de
+                    operaciones <br> Pago de Nómina Extraordinaria
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td style="width: 180px"><strong>Fecha: </strong> {{ fecha }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="1" width="960px" class="text-center">
+            <thead>
+            <th width="70px">Fecha</th>
+            <th width="175px">Cuenta</th>
+            <th width="120px">Subcuenta</th>
+            <th width="120px">Análisis 1</th>
+            <th width="120px">Análisis 2</th>
+            <th width="120px">Débitos</th>
+            <th width="120px">Créditos</th>
+            </thead>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+            <tbody>
+            {% for info in datos %}
+            <table border="0" width="960px" class="text-center">
+                <div style="background-color: #cecbcb; width: 960px; height: 30px">
+                    <p><strong>Empleado: </strong>{{ info.empleado }}</p>
+                </div>
+                {% for item in info.datos %}
+                    {% if item.cuenta != '' %}
+                    <tr>
+                        <td style="font-weight:400;width:136px">{{ item.fecha }}</td>
+                        <td style="font-weight:400;width:136px" class="text-center">{{ item.cuenta }}</td>
+                        <td style="font-weight:400;width:136px" class="text-center">{{ item.subcuenta }}</td>
+                        <td style="font-weight:400;width:136px" class="text-center">{{ item.criterio_1 }}</td>
+                        <td style="font-weight:400;width:136px" class="text-center"></td>
+                        <td style="font-weight:400;width:136px" class="text-right">{{ item.debito }}</td>
+                        <td style="font-weight:400;width:136px" class="text-right">{{ item.credito }}</td>
+                    </tr>
+                        {% else %}
+                            <tr>
+                                <td style="font-weight:400;width:136px"></td>
+                                <td style="font-weight:400;width:136px" class="text-center"></td>
+                                <td style="font-weight:400;width:136px" class="text-center"></td>
+                                <td style="font-weight:400;width:136px" class="text-center"></td>
+                                <td style="font-weight:400;width:136px" class="text-center"></td>
+                                <td style="font-weight:400;width:136px" class="text-right font-italic">{{ item.debito }}</td>
+                                <td style="font-weight:400;width:136px" class="text-right font-italic" >{{ item.credito }}</td>
+                            </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </table>
+        {% endfor %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'D:/9.Proyectos/horizontes/src/Controller/Contabilidad/CapitalHumano/ComprobanteOperacionesExtraordinariaController.php'|file_link(0) }}">src/Controller/Contabilidad/CapitalHumano/ComprobanteOperacionesExtraordinariaController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'D:/9.Proyectos/horizontes/templates/contabilidad/capital_humano/comprobante_operaciones_extraordinaria/index.html.twig'|file_link(0) }}">templates/contabilidad/capital_humano/comprobante_operaciones_extraordinaria/index.html.twig</a></code></li>
-    </ul>
-</div>
+        <table width="960px" class="text-center">
+            <tr>
+                <td width="700px" class="font-weight-bold">TOTAL</td>
+                <td class="font-weight-bold text-right">{{ total_debito }}</td>
+                <td class="font-weight-bold text-right">{{ total_credito }}</td>
+            </tr>
+        </table>
+        <form action="{{ path('contabilidad_capital_humano_comprobante_operaciones_extraordinaria_aceptar_comprobante') }}" method="post">
+            <div style="width: 960px" class="mt-5">
+                <label for="observacion" class="font-weight-bold">Observación:</label>
+                <textarea name="observacion" id="observacion" cols="120" rows="4" class="w-100"></textarea>
+                <input type="text" name="fecha" hidden value="{{ fecha }}">
+                <input type="text" name="debito" hidden value="{{ debito }}">
+                <input type="text" name="credito" hidden value="{{ credito }}">
+            </div>
+            <div class="d-flex" style="width: 960px">
+                <div class="mr-auto">
+                    <a type="button" name="btn_cancelas" href="{{ url('capital_humano') }}"
+                       class="btn btn-secondary text-uppercase mt-2 font-weight-bold">
+                        Atras
+                    </a>
+                </div>
+                <div class="">
+                    <button type="submit" name="btn_generar"
+                            class="btn btn-secondary text-uppercase mt-2 font-weight-bold">
+                        Aceptar Comprobante
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}
