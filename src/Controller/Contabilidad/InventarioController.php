@@ -6,8 +6,11 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\PeriodoSistema;
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
+use App\Entity\Contabilidad\Inventario\Apertura;
 use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
@@ -26,13 +29,25 @@ class InventarioController extends AbstractController
     /**
      * @Route("/contabilidad/inventario", name="inventario")
      */
-    public function index()
+    public function index(EntityManagerInterface $em, Request $request)
     {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
 
         return $this->render('contabilidad/inventario/index.html.twig', [
             'controller_name' => 'Dashboard',
             'config' => array(
-                ['title' => 'Ejemplo', 'descrip' => 'Descripcion de prueba....'],)
+                ['title' => 'Ejemplo', 'descrip' => 'Descripcion de prueba....'],),
+            'apertura'=>empty($documentos_apertura)?true:false
         ]);
     }
 

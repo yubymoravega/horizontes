@@ -47,7 +47,8 @@ class AjusteController extends AbstractController
     {
         $ajuste_er = $em->getRepository(Ajuste::class);
 
-        $year_ = Date('Y');
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $year_ = AuxFunctions::getCurrentDate($em,$unidad)->format('Y');
         $ajuste_arr = $ajuste_er->findBy(array(
             'activo' => true,
             'anno' => $year_,
@@ -149,7 +150,7 @@ class AjusteController extends AbstractController
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
-                    ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                    ->setFecha($obj_date)
                     ->setAnno($year_)
                     ->setIdTipoDocumento($obj_tipo_documento)
                     ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
@@ -214,7 +215,7 @@ class AjusteController extends AbstractController
                             ->setEntrada(true)
                             ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                             ->setCantidad($cantidad_mercancia)
-                            ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                            ->setFecha($obj_date)
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
                             ->setIdUsuario($this->getUser());

@@ -183,6 +183,7 @@ class MovimientoCuentaController extends AbstractController
                         'tipo_comprobante' => $asiento->getIdTipoComprobante()->getAbreviatura(),
                         'nro_comprobante' => $asiento->getIdComprobante()->getNroConsecutivo(),
                         'nro_consecutivo' => $asiento->getNroDocumento(),
+                        'fecha' => $asiento->getFecha()->format('d-m-Y'),
                         'debito' => $asiento->getDebito() == 0 ? '' : number_format($asiento->getDebito(),2),
                         'credito' => $asiento->getCredito() == 0 ? '' : number_format($asiento->getCredito(),2),
                         'total' => number_format($sado_, 2)
@@ -193,6 +194,7 @@ class MovimientoCuentaController extends AbstractController
                             'tipo_comprobante' => $asiento->getIdTipoComprobante()->getAbreviatura(),
                             'nro_comprobante' => $asiento->getIdComprobante()->getNroConsecutivo(),
                             'nro_consecutivo' => $asiento->getNroDocumento(),
+                            'fecha' => $asiento->getFecha()->format('d-m-Y'),
                             'debito' => $asiento->getDebito() == 0 ? '' : number_format($asiento->getDebito(),2),
                             'credito' => $asiento->getCredito() == 0 ? '' : number_format($asiento->getCredito(),2),
                             'total' => number_format($sado_, 2)

@@ -222,7 +222,8 @@ class ComprobanteOperacionesExtraordinariaController extends AbstractController
                 'datos' => $data,
                 'fecha' => $obj_nomina->getFecha()->format('d-m-Y'),
                 'total_debito' => number_format($total_debito,2),
-                'total_credito' => number_format($total_credito,2)
+                'total_credito' => number_format($total_credito,2),
+                'id_nomina'=>$obj_nomina->getId()
             ];
             $total_general_debito += $total_debito;
             $total_general_credito += $total_credito;

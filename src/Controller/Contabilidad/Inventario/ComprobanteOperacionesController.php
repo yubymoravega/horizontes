@@ -193,6 +193,14 @@ class ComprobanteOperacionesController extends AbstractController
                 $rows = array_merge($rows, $datos_venta);
                 $datos_venta_cancelada = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_venta_cancelada);
+            }//producto
+            elseif ($id_tipo_documento == 12) {
+                $datos_transferencia_entrada = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_transferencia_entrada);
+            }//producto
+            elseif ($id_tipo_documento == 13) {
+                $datos_transferencia_entrada = AuxFunctions::getDataAperturaProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_transferencia_entrada);
             }
             $retur_rows [] = array(
                 'nro_doc' => $rows[0]['nro_doc'],
@@ -380,9 +388,22 @@ class ComprobanteOperacionesController extends AbstractController
             }
         }
         $em->flush();
+
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
         return $this->render('contabilidad/inventario/comprobante_operaciones/success.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',
             'title' => '!!Exito',
+            'apertura'=>empty($documentos_apertura)?true:false,
             'message' => 'Comprobante de operaciones generado satisfactoriamente, su nro es ' . $new_registro->getIdTipoComprobante()->getAbreviatura() . '-' . $nro_consecutivo . ', para ver detalles consulte el registro de comprobantes .'
         ]);
     }

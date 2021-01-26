@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2021 at 12:02 PM
+-- Generation Time: Jan 23, 2021 at 06:05 PM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.8
 
@@ -57,18 +57,6 @@ CREATE TABLE `activo_fijo` (
   `fecha_ultima_depreciacion` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `activo_fijo`
---
-
-INSERT INTO `activo_fijo` (`id`, `id_unidad_id`, `id_grupo_activo_id`, `id_tipo_movimiento_baja_id`, `nro_inventario`, `valor_inicial`, `descripcion`, `fecha_alta`, `activo`, `fecha_baja`, `pais`, `id_tipo_movimiento_id`, `id_area_responsabilidad_id`, `nro_consecutivo`, `nro_documento_baja`, `depreciacion_acumulada`, `valor_real`, `annos_vida_util`, `modelo`, `tipo`, `marca`, `nro_motor`, `nro_serie`, `nro_chapa`, `nro_chasis`, `combustible`, `fecha_ultima_depreciacion`) VALUES
-(22, 1, 1, NULL, '214', 100, 'Monitor de Computadora', '2021-01-01', 1, NULL, 'CUBA', NULL, 1, 1, NULL, 20.83, 79.17, 10, 'ViewSonic', 'Monitor', 'Sonic', '', '', '', '', '', '2020-12-03'),
-(23, 1, 1, 6, '91', 500, 'Torre de PC', '2021-01-04', 0, '2021-01-05', 'CUBA', NULL, 1, 1, 2, 0, 500, 10, 'ASUS-PG421', 'PC de Escritorio', 'ASUS', '', '', '', '', '', NULL),
-(24, 1, 1, 6, '091', 55, 'Mouse y Teclado', '2021-01-04', 0, '2021-01-04', 'CUBA', NULL, 1, 1, 1, 15, 40, 2, ' Logitech-950', 'Mouse y Teclado', 'Logitech', '', '', '', '', '', '2021-01-04'),
-(25, 1, 2, NULL, '19233', 250, 'Buro de Trabajo', '2021-01-04', 0, NULL, 'CUBA', NULL, 1, 1, NULL, 0, 250, 10, 'Convencional', 'Buro de Trabjo', 'Artesanal', '', '', '', '', '', NULL),
-(26, 1, 2, 6, '192', 2500, 'Buro de Trabjo', '2021-01-04', 0, '2021-01-06', 'CUBA', NULL, 1, 1, 3, 0, 2500, 10, 'Convensional', 'Buro de Trabajo', 'ArtexProductions', '', '', '', '', '', NULL),
-(27, 1, 1, NULL, 'kmilo', 100, 'kamilo inc.', '2021-01-11', 1, NULL, 'CUBA', NULL, 1, 1, NULL, 0, 100, 10, 'k.inc', 'personal', 'kmilo', '', '', '', '', '', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -91,18 +79,6 @@ CREATE TABLE `activo_fijo_cuentas` (
   `id_cuenta_acreedora_id` int(11) DEFAULT NULL,
   `id_subcuenta_acreedora_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `activo_fijo_cuentas`
---
-
-INSERT INTO `activo_fijo_cuentas` (`id`, `id_activo_id`, `id_cuenta_activo_id`, `id_subcuenta_activo_id`, `id_centro_costo_activo_id`, `id_area_responsabilidad_activo_id`, `id_cuenta_depreciacion_id`, `id_subcuenta_depreciacion_id`, `id_cuenta_gasto_id`, `id_subcuenta_gasto_id`, `id_centro_costo_gasto_id`, `id_elemento_gasto_gasto_id`, `id_cuenta_acreedora_id`, `id_subcuenta_acreedora_id`) VALUES
-(22, 22, 22, 138, 25, 1, 33, 134, 69, 97, 25, 1, 54, 38),
-(23, 23, 22, 138, 25, 1, 33, 134, 69, 97, 25, 1, 54, 38),
-(24, 24, 22, 138, 25, 1, 33, 134, 69, 97, 25, 1, 54, 38),
-(25, 25, 22, 138, 25, 1, 33, 134, 69, 97, 25, 1, NULL, NULL),
-(26, 26, 22, 138, 5, 1, 33, 134, 69, 97, 25, 1, 54, 38),
-(27, 27, 22, 138, 9, 1, 33, 134, 69, 97, 9, 1, 54, 38);
 
 -- --------------------------------------------------------
 
@@ -160,16 +136,6 @@ CREATE TABLE `ajuste` (
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `ajuste`
---
-
-INSERT INTO `ajuste` (`id`, `id_documento_id`, `nro_cuenta_inventario`, `observacion`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_concecutivo`, `anno`, `activo`, `entrada`, `nro_subcuenta_acreedora`) VALUES
-(16, 150, '696', 'UNIFICANDO CODIGOS', '0099', '', '1', 2020, 1, 0, ''),
-(17, 151, '', 'UNIFICANDO CODIGOS', '', '697', '1', 2020, 1, 1, '0099'),
-(18, 154, '', 'Sobrante en conteo fisico', '', '555', '2', 2020, 1, 1, '0020'),
-(19, 155, '332', 'Faltante en conteo fisico', '0020', '', '2', 2020, 1, 0, '');
-
 -- --------------------------------------------------------
 
 --
@@ -191,7 +157,8 @@ CREATE TABLE `almacen` (
 INSERT INTO `almacen` (`id`, `id_unidad_id`, `descripcion`, `activo`, `codigo`) VALUES
 (1, 1, 'Almacén de Matriales y Mercancias', 1, '01'),
 (2, 1, 'Almacén Mercancias para la Venta', 1, '02'),
-(3, 1, 'Almacén de Productos Terminados', 1, '03');
+(3, 1, 'Almacén de Productos Terminados', 1, '03'),
+(4, 1, 'Almacén de Materias Primas y Materiales', 0, '001');
 
 -- --------------------------------------------------------
 
@@ -203,6 +170,33 @@ CREATE TABLE `almacen_ocupado` (
   `id` int(11) NOT NULL,
   `id_almacen_id` int(11) NOT NULL,
   `id_usuario_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `almacen_ocupado`
+--
+
+INSERT INTO `almacen_ocupado` (`id`, `id_almacen_id`, `id_usuario_id`) VALUES
+(243, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `apertura`
+--
+
+CREATE TABLE `apertura` (
+  `id` int(11) NOT NULL,
+  `id_documento_id` int(11) NOT NULL,
+  `nro_cuenta_inventario` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `observacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nro_subcuenta_inventario` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nro_cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nro_concecutivo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `anno` int(11) NOT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `entrada` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -257,441 +251,6 @@ CREATE TABLE `asiento` (
   `id_activo_fijo_id` int(11) DEFAULT NULL,
   `id_area_responsabilidad_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `asiento`
---
-
-INSERT INTO `asiento` (`id`, `id_cuenta_id`, `id_subcuenta_id`, `id_documento_id`, `id_almacen_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `id_orden_trabajo_id`, `id_expediente_id`, `id_proveedor_id`, `id_unidad_id`, `tipo_cliente`, `id_cliente`, `fecha`, `anno`, `credito`, `debito`, `nro_documento`, `id_tipo_comprobante_id`, `id_comprobante_id`, `id_factura_id`, `id_activo_fijo_id`, `id_area_responsabilidad_id`) VALUES
-(67, 10, 65, 138, 1, NULL, NULL, NULL, NULL, 1, 1, 0, 0, '2020-12-13', 2020, 0, 81.18, 'IRM-1', 2, 26, NULL, NULL, NULL),
-(68, 10, 65, 138, 1, NULL, NULL, NULL, NULL, 1, 1, 0, 0, '2020-12-13', 2020, 0, 45.23, 'IRM-1', 2, 26, NULL, NULL, NULL),
-(69, 10, 65, 138, 1, NULL, NULL, NULL, NULL, 1, 1, 0, 0, '2020-12-13', 2020, 0, 112.5, 'IRM-1', 2, 26, NULL, NULL, NULL),
-(70, 36, 63, 138, 1, NULL, NULL, NULL, NULL, 1, 1, 0, 0, '2020-12-13', 2020, 238.91, 0, 'IRM-1', 2, 26, NULL, NULL, NULL),
-(71, 10, 65, 139, 1, NULL, NULL, NULL, NULL, 2, 1, 0, 0, '2020-12-13', 2020, 0, 30.1, 'IRM-2', 2, 26, NULL, NULL, NULL),
-(72, 10, 65, 139, 1, NULL, NULL, NULL, NULL, 2, 1, 0, 0, '2020-12-13', 2020, 0, 28.4, 'IRM-2', 2, 26, NULL, NULL, NULL),
-(73, 10, 65, 139, 1, NULL, NULL, NULL, NULL, 2, 1, 0, 0, '2020-12-13', 2020, 0, 70, 'IRM-2', 2, 26, NULL, NULL, NULL),
-(74, 36, 63, 139, 1, NULL, NULL, NULL, NULL, 2, 1, 0, 0, '2020-12-13', 2020, 128.5, 0, 'IRM-2', 2, 26, NULL, NULL, NULL),
-(75, 10, 66, 140, 1, NULL, NULL, NULL, NULL, 3, 1, 0, 0, '2020-12-13', 2020, 0, 60.3, 'IRM-3', 2, 26, NULL, NULL, NULL),
-(76, 10, 66, 140, 1, NULL, NULL, NULL, NULL, 3, 1, 0, 0, '2020-12-13', 2020, 0, 39, 'IRM-3', 2, 26, NULL, NULL, NULL),
-(77, 10, 66, 140, 1, NULL, NULL, NULL, NULL, 3, 1, 0, 0, '2020-12-13', 2020, 0, 30, 'IRM-3', 2, 26, NULL, NULL, NULL),
-(78, 36, 63, 140, 1, NULL, NULL, NULL, NULL, 3, 1, 0, 0, '2020-12-13', 2020, 129.3, 0, 'IRM-3', 2, 26, NULL, NULL, NULL),
-(79, 10, 66, 141, 1, NULL, NULL, NULL, NULL, 4, 1, 0, 0, '2020-12-13', 2020, 0, 10.13, 'IRM-4', 2, 26, NULL, NULL, NULL),
-(80, 10, 66, 141, 1, NULL, NULL, NULL, NULL, 4, 1, 0, 0, '2020-12-13', 2020, 0, 3.96, 'IRM-4', 2, 26, NULL, NULL, NULL),
-(81, 10, 66, 141, 1, NULL, NULL, NULL, NULL, 4, 1, 0, 0, '2020-12-13', 2020, 0, 31.64, 'IRM-4', 2, 26, NULL, NULL, NULL),
-(82, 36, 63, 141, 1, NULL, NULL, NULL, NULL, 4, 1, 0, 0, '2020-12-13', 2020, 45.73, 0, 'IRM-4', 2, 26, NULL, NULL, NULL),
-(83, 10, 67, 142, 1, NULL, NULL, NULL, NULL, 5, 1, 0, 0, '2020-11-20', 2020, 0, 3073.3, 'IRM-5', 2, 26, NULL, NULL, NULL),
-(84, 10, 67, 142, 1, NULL, NULL, NULL, NULL, 5, 1, 0, 0, '2020-11-20', 2020, 0, 561, 'IRM-5', 2, 26, NULL, NULL, NULL),
-(85, 10, 67, 142, 1, NULL, NULL, NULL, NULL, 5, 1, 0, 0, '2020-11-20', 2020, 0, 765.05, 'IRM-5', 2, 26, NULL, NULL, NULL),
-(86, 36, 63, 142, 1, NULL, NULL, NULL, NULL, 5, 1, 0, 0, '2020-11-20', 2020, 4399.35, 0, 'IRM-5', 2, 26, NULL, NULL, NULL),
-(87, 10, 67, 143, 1, NULL, NULL, NULL, NULL, 6, 1, 0, 0, '2020-11-20', 2020, 0, 190, 'IRM-6', 2, 26, NULL, NULL, NULL),
-(88, 10, 67, 143, 1, NULL, NULL, NULL, NULL, 6, 1, 0, 0, '2020-11-20', 2020, 0, 1670.4, 'IRM-6', 2, 26, NULL, NULL, NULL),
-(89, 10, 67, 143, 1, NULL, NULL, NULL, NULL, 6, 1, 0, 0, '2020-11-20', 2020, 0, 510, 'IRM-6', 2, 26, NULL, NULL, NULL),
-(90, 36, 63, 143, 1, NULL, NULL, NULL, NULL, 6, 1, 0, 0, '2020-11-20', 2020, 2370.4, 0, 'IRM-6', 2, 26, NULL, NULL, NULL),
-(91, 63, 51, 144, 1, 22, 2, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 26.09, 'VSM-1', 2, 26, NULL, NULL, NULL),
-(92, 10, 65, 144, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 8.56, 0, 'VSM-1', 2, 26, NULL, NULL, NULL),
-(93, 10, 65, 144, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 5.03, 0, 'VSM-1', 2, 26, NULL, NULL, NULL),
-(94, 10, 65, 144, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 12.5, 0, 'VSM-1', 2, 26, NULL, NULL, NULL),
-(95, 63, 51, 145, 1, 24, 3, 10, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 15.25, 'VSM-2', 2, 26, NULL, NULL, NULL),
-(96, 63, 51, 145, 1, 24, 7, 10, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 3, 'VSM-2', 2, 26, NULL, NULL, NULL),
-(97, 10, 66, 145, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 10.05, 0, 'VSM-2', 2, 26, NULL, NULL, NULL),
-(98, 10, 66, 145, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 5.2, 0, 'VSM-2', 2, 26, NULL, NULL, NULL),
-(99, 10, 66, 145, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 3, 0, 'VSM-2', 2, 26, NULL, NULL, NULL),
-(100, 63, 51, 146, 1, 23, 7, 11, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 312.11, 'VSM-3', 2, 26, NULL, NULL, NULL),
-(101, 10, 67, 146, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 25.5, 0, 'VSM-3', 2, 26, NULL, NULL, NULL),
-(102, 10, 67, 146, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 225.89, 0, 'VSM-3', 2, 26, NULL, NULL, NULL),
-(103, 10, 67, 146, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 60.72, 0, 'VSM-3', 2, 26, NULL, NULL, NULL),
-(104, 63, 51, 147, 1, 22, 2, 12, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 18.26, 'VSM-4', 2, 26, NULL, NULL, NULL),
-(105, 10, 65, 147, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 5.99, 0, 'VSM-4', 2, 26, NULL, NULL, NULL),
-(106, 10, 65, 147, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 3.52, 0, 'VSM-4', 2, 26, NULL, NULL, NULL),
-(107, 10, 65, 147, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 8.75, 0, 'VSM-4', 2, 26, NULL, NULL, NULL),
-(108, 63, 51, 148, 1, 24, 3, 13, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 21.8, 'VSM-5', 2, 26, NULL, NULL, NULL),
-(109, 10, 66, 148, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 11.3, 0, 'VSM-5', 2, 26, NULL, NULL, NULL),
-(110, 10, 66, 148, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 6.75, 0, 'VSM-5', 2, 26, NULL, NULL, NULL),
-(111, 10, 66, 148, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 3.75, 0, 'VSM-5', 2, 26, NULL, NULL, NULL),
-(112, 63, 51, 149, 1, 23, 7, 14, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 0, 561.79, 'VSM-6', 2, 26, NULL, NULL, NULL),
-(113, 10, 67, 149, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 45.9, 0, 'VSM-6', 2, 26, NULL, NULL, NULL),
-(114, 10, 67, 149, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 406.6, 0, 'VSM-6', 2, 26, NULL, NULL, NULL),
-(115, 10, 67, 149, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-20', 2020, 109.29, 0, 'VSM-6', 2, 26, NULL, NULL, NULL),
-(116, 10, 65, 150, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 91.25, 0, 'AS-1', 2, 26, NULL, NULL, NULL),
-(117, 10, 66, 150, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 3.96, 0, 'AS-1', 2, 26, NULL, NULL, NULL),
-(118, 61, 46, 150, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 95.21, 'AS-1', 2, 26, NULL, NULL, NULL),
-(119, 10, 65, 151, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 91.25, 'AE-1', 2, 26, NULL, NULL, NULL),
-(120, 10, 66, 151, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 3.96, 'AE-1', 2, 26, NULL, NULL, NULL),
-(121, 62, 49, 151, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 95.21, 0, 'AE-1', 2, 26, NULL, NULL, NULL),
-(122, 10, 65, 152, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 52.16, 0, 'TS-1', 2, 26, NULL, NULL, NULL),
-(123, 10, 66, 152, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 10.4, 0, 'TS-1', 2, 26, NULL, NULL, NULL),
-(124, 10, 67, 152, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 204, 0, 'TS-1', 2, 26, NULL, NULL, NULL),
-(125, 10, 67, 152, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 1807.2, 0, 'TS-1', 2, 26, NULL, NULL, NULL),
-(126, 61, 45, 152, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 2073.76, 'TS-1', 2, 26, NULL, NULL, NULL),
-(127, 15, 60, 153, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 52.16, 'TE-1', 2, 28, NULL, NULL, NULL),
-(128, 15, 61, 153, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 10.4, 'TE-1', 2, 28, NULL, NULL, NULL),
-(129, 15, 62, 153, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 204, 'TE-1', 2, 28, NULL, NULL, NULL),
-(130, 15, 62, 153, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 0, 1807.2, 'TE-1', 2, 28, NULL, NULL, NULL),
-(131, 62, 48, 153, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-21', 2020, 2073.76, 0, 'TE-1', 2, 28, NULL, NULL, NULL),
-(132, 10, 66, 154, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 0.52, 'AE-2', 2, 26, NULL, NULL, NULL),
-(133, 50, 70, 154, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0.52, 0, 'AE-2', 2, 26, NULL, NULL, NULL),
-(134, 10, 65, 155, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 2.85, 0, 'AS-2', 2, 26, NULL, NULL, NULL),
-(135, 30, 31, 155, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 2.85, 'AS-2', 2, 26, NULL, NULL, NULL),
-(136, 69, 97, 156, 1, 25, 2, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 5.44, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(137, 69, 97, 156, 1, 25, 7, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 21.64, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(138, 69, 97, 156, 1, 24, 3, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 2.94, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(139, 10, 65, 156, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 2.01, 0, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(140, 10, 65, 156, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 3.43, 0, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(141, 10, 67, 156, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 12.14, 0, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(142, 10, 67, 156, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 9.5, 0, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(143, 10, 66, 156, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 2.94, 0, 'VSM-7', 2, 26, NULL, NULL, NULL),
-(144, 10, 66, 157, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 10.05, 'D-1', 2, 26, NULL, NULL, NULL),
-(145, 10, 66, 157, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 5.2, 'D-1', 2, 26, NULL, NULL, NULL),
-(146, 10, 66, 157, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 3, 'D-1', 2, 26, NULL, NULL, NULL),
-(147, 63, 51, 157, 1, 4, 3, 10, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 18.25, 0, 'D-1', 2, 26, NULL, NULL, NULL),
-(148, 10, 67, 158, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 45.9, 'D-2', 2, 26, NULL, NULL, NULL),
-(149, 10, 67, 158, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 406.6, 'D-2', 2, 26, NULL, NULL, NULL),
-(150, 10, 67, 158, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 0, 109.29, 'D-2', 2, 26, NULL, NULL, NULL),
-(151, 63, 51, 158, 1, 3, 7, 14, NULL, NULL, 1, 0, 0, '2020-11-27', 2020, 561.79, 0, 'D-2', 2, 26, NULL, NULL, NULL),
-(152, 15, 62, 159, 2, NULL, NULL, NULL, NULL, 9, 1, 0, 0, '2020-11-23', 2020, 0, 12500, 'IRM-1', 2, 28, NULL, NULL, NULL),
-(153, 15, 62, 159, 2, NULL, NULL, NULL, NULL, 9, 1, 0, 0, '2020-11-23', 2020, 0, 10000, 'IRM-1', 2, 28, NULL, NULL, NULL),
-(154, 15, 62, 159, 2, NULL, NULL, NULL, NULL, 9, 1, 0, 0, '2020-11-23', 2020, 0, 7500, 'IRM-1', 2, 28, NULL, NULL, NULL),
-(155, 36, 63, 159, 2, NULL, NULL, NULL, NULL, 9, 1, 0, 0, '2020-11-23', 2020, 30000, 0, 'IRM-1', 2, 28, NULL, NULL, NULL),
-(156, 15, 59, 160, 2, NULL, NULL, NULL, NULL, 7, 1, 0, 0, '2020-11-23', 2020, 0, 3000, 'IRM-2', 2, 28, NULL, NULL, NULL),
-(157, 36, 63, 160, 2, NULL, NULL, NULL, NULL, 7, 1, 0, 0, '2020-11-23', 2020, 3000, 0, 'IRM-2', 2, 28, NULL, NULL, NULL),
-(158, 15, 59, 161, 2, NULL, NULL, NULL, NULL, 8, 1, 0, 0, '2020-11-23', 2020, 0, 6000, 'IRM-3', 2, 28, NULL, NULL, NULL),
-(159, 36, 63, 161, 2, NULL, NULL, NULL, NULL, 8, 1, 0, 0, '2020-11-23', 2020, 6000, 0, 'IRM-3', 2, 28, NULL, NULL, NULL),
-(160, 15, 59, 162, 2, NULL, NULL, NULL, NULL, 7, 1, 0, 0, '2020-11-23', 2020, 0, 1500, 'IRM-4', 2, 28, NULL, NULL, NULL),
-(161, 36, 63, 162, 2, NULL, NULL, NULL, NULL, 7, 1, 0, 0, '2020-11-23', 2020, 1500, 0, 'IRM-4', 2, 28, NULL, NULL, NULL),
-(162, 14, 4, 163, 3, 22, NULL, 15, NULL, NULL, 1, 0, 0, '2020-11-24', 2020, 0, 26.09, 'IRP-1', 2, 27, NULL, NULL, NULL),
-(163, 14, 4, 163, 3, 23, NULL, 11, NULL, NULL, 1, 0, 0, '2020-11-24', 2020, 0, 312.11, 'IRP-1', 2, 27, NULL, NULL, NULL),
-(164, 63, 54, 163, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-24', 2020, 338.2, 0, 'IRP-1', 2, 27, NULL, NULL, NULL),
-(165, 14, 4, 164, 3, 22, NULL, 12, NULL, NULL, 1, 0, 0, '2020-11-24', 2020, 0, 18.26, 'IRP-2', 2, 27, NULL, NULL, NULL),
-(166, 14, 4, 164, 3, 24, NULL, 13, NULL, NULL, 1, 0, 0, '2020-11-24', 2020, 0, 21.8, 'IRP-2', 2, 27, NULL, NULL, NULL),
-(167, 63, 54, 164, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-24', 2020, 40.06, 0, 'IRP-2', 2, 27, NULL, NULL, NULL),
-(168, 63, 51, 165, 1, 22, 2, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 0, 83.59, 'VSM-8', 2, 26, NULL, NULL, NULL),
-(169, 10, 65, 165, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 25.71, 0, 'VSM-8', 2, 26, NULL, NULL, NULL),
-(170, 10, 65, 165, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 15.07, 0, 'VSM-8', 2, 26, NULL, NULL, NULL),
-(171, 10, 65, 165, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 42.81, 0, 'VSM-8', 2, 26, NULL, NULL, NULL),
-(172, 63, 51, 166, 1, 23, 7, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 0, 1241.41, 'VSM-9', 2, 26, NULL, NULL, NULL),
-(173, 10, 67, 166, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 903.54, 0, 'VSM-9', 2, 26, NULL, NULL, NULL),
-(174, 10, 67, 166, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 242.87, 0, 'VSM-9', 2, 26, NULL, NULL, NULL),
-(175, 10, 67, 166, 1, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 95, 0, 'VSM-9', 2, 26, NULL, NULL, NULL),
-(176, 14, 4, 167, 3, 22, NULL, 16, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 0, 55.73, 'IRP-3', 2, 27, NULL, NULL, NULL),
-(177, 14, 4, 167, 3, 23, NULL, 17, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 0, 993.13, 'IRP-3', 2, 27, NULL, NULL, NULL),
-(178, 63, 54, 167, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 1048.86, 0, 'IRP-3', 2, 27, NULL, NULL, NULL),
-(179, 14, 4, 168, 3, 22, NULL, 16, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 0, 27.86, 'IRP-4', 2, 27, NULL, NULL, NULL),
-(180, 14, 4, 168, 3, 22, NULL, 16, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 0, 248.28, 'IRP-4', 2, 27, NULL, NULL, NULL),
-(181, 63, 54, 168, 3, 22, NULL, 16, NULL, NULL, 1, 0, 0, '2020-11-28', 2020, 276.14, 0, 'IRP-4', 2, 27, NULL, NULL, NULL),
-(182, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-11-29', 2020, 0, 158.12, 'FACT-1', 2, 67, 37, NULL, NULL),
-(183, 67, 73, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 558.6345, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(184, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 67.5, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(185, 67, 73, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 13.931675, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(186, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 31.25, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(187, 67, 74, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 17.44, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(188, 76, 81, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 45, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(189, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 14.37, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(190, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 5, '2020-11-29', 2020, 0, 3973.74, 'FACT-2', 2, 67, 38, NULL, NULL),
-(191, 67, 73, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 682.7755, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(192, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 825, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(193, 67, 73, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 69.658375, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(194, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 3125, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(195, 67, 74, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 4.36, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(196, 76, 81, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 11.25, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(197, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 12.49, 0, 'FACT-2', 2, 67, 38, NULL, NULL),
-(198, 8, 9, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, '2020-11-29', 2020, 0, 10100, 'FACT-3', 2, 67, 39, NULL, NULL),
-(199, 68, 87, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 6000, 0, 'FACT-3', 2, 67, 39, NULL, NULL),
-(200, 75, 82, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 7200, 0, 'FACT-3', 2, 67, 39, NULL, NULL),
-(201, 68, 87, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 1800, 0, 'FACT-3', 2, 67, 39, NULL, NULL),
-(202, 75, 82, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 3000, 0, 'FACT-3', 2, 67, 39, NULL, NULL),
-(203, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 100, 0, 'FACT-3', 2, 67, 39, NULL, NULL),
-(204, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-11-29', 2020, 0, 10907, 'FACT-4', 2, 67, 40, NULL, NULL),
-(205, 68, 90, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 5000, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(206, 75, 85, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 6000, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(207, 68, 90, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 3000, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(208, 75, 85, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 4125, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(209, 67, 73, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 15.654, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(210, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 45, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(211, 67, 75, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 312.11, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(212, 76, 80, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 625, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(213, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-11-29', 2020, 112, 0, 'FACT-4', 2, 67, 40, NULL, NULL),
-(214, 8, 9, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, '2020-12-01', 2020, 0, 217, 'FACT-5', 2, 67, 41, NULL, NULL),
-(215, 75, 84, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-01', 2020, 200, 0, 'FACT-5', 2, 67, 41, NULL, NULL),
-(216, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-01', 2020, 15, 0, 'FACT-5', 2, 67, 41, NULL, NULL),
-(217, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-01', 2020, 2, 0, 'FACT-5', 2, 67, 41, NULL, NULL),
-(218, 68, 89, 174, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-01', 2020, 0.052, 0, 'FACT-5', 2, 29, 41, NULL, NULL),
-(219, 67, 73, 175, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-01', 2020, 0.5218, 0, 'FACT-5', 2, 30, 41, NULL, NULL),
-(220, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 0, 100, 'FACT-1', 2, 67, 37, NULL, NULL),
-(221, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 100, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(222, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(223, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(224, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(225, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(226, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(227, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-17', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(228, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(229, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(230, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(231, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(232, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(233, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(234, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(235, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(236, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(237, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(238, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(239, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(240, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(241, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(242, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(243, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(244, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(245, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(246, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(247, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(248, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(249, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(250, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(251, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(252, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(253, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(254, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(255, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(256, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(257, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(258, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(259, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(260, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(261, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(262, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(263, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(264, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(265, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(266, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(267, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(268, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(269, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(270, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(271, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(272, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(273, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(274, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 0, 20, 'FACT-1', 2, 67, 37, NULL, NULL),
-(275, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-18', 2020, 20, 0, 'FACT-1', 2, 67, 37, NULL, NULL),
-(276, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-22', 2020, 10158.12, 0, '', 2, 63, NULL, NULL, NULL),
-(277, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 0, '2020-12-22', 2020, 0, 10158.12, '', 2, 63, NULL, NULL, NULL),
-(278, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '2020-12-22', 2020, 0, 10158.12, '', 2, 64, NULL, NULL, NULL),
-(279, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-22', 2020, 10158.12, 0, '', 2, 64, NULL, NULL, NULL),
-(280, 8, 71, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, '2020-12-22', 2020, 0, 200, '-', 2, 65, NULL, NULL, NULL),
-(281, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '2020-12-22', 2020, 200, 0, '-', 2, 65, NULL, NULL, NULL),
-(282, 8, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-02', 2020, 0, 2000, 'FACT-6', 2, 67, 42, NULL, NULL),
-(283, 75, 85, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 1000, 0, 'FACT-6', 2, 67, 42, NULL, NULL),
-(284, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 1000, 0, 'FACT-6', 2, 67, 42, NULL, NULL),
-(285, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-6', 2, 67, 42, NULL, NULL),
-(286, 15, 62, 176, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-6', 2, 68, 42, NULL, NULL),
-(287, 68, 90, 176, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 250, 'FACT-6', 2, 68, 42, NULL, NULL),
-(288, 14, 4, 177, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-6', NULL, NULL, 42, NULL, NULL),
-(289, 67, 73, 177, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0.52171428571429, 'FACT-6', NULL, NULL, 42, NULL, NULL),
-(290, 8, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 4, '2020-12-02', 2020, 0, 1200, 'FACT-7', 2, 67, 43, NULL, NULL),
-(291, 75, 83, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 1000, 0, 'FACT-7', 2, 67, 43, NULL, NULL),
-(292, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 200, 0, 'FACT-7', 2, 67, 43, NULL, NULL),
-(293, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-7', 2, 67, 43, NULL, NULL),
-(294, 15, 60, 178, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-7', 2, 68, 43, NULL, NULL),
-(295, 68, 88, 178, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0.17101639344262, 'FACT-7', 2, 68, 43, NULL, NULL),
-(296, 14, 4, 179, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-7', NULL, NULL, 43, NULL, NULL),
-(297, 67, 73, 179, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0.52171428571428, 'FACT-7', NULL, NULL, 43, NULL, NULL),
-(298, 8, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 5, '2020-12-02', 2020, 0, 1300, 'FACT-8', 2, 67, 44, NULL, NULL),
-(299, 75, 85, NULL, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 1000, 0, 'FACT-8', 2, 67, 44, NULL, NULL),
-(300, 76, 79, NULL, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 300, 0, 'FACT-8', 2, 67, 44, NULL, NULL),
-(301, 41, 34, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0, 'FACT-8', 2, 67, 44, NULL, NULL),
-(302, 15, 62, 180, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 102, 0, 'FACT-8', 2, 68, 44, NULL, NULL),
-(303, 68, 90, 180, 2, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 1.02, 'FACT-8', 2, 68, 44, NULL, NULL),
-(304, 14, 4, 181, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 1.5651428571428, 0, 'FACT-8', NULL, NULL, 44, NULL, NULL),
-(305, 67, 73, 181, 3, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-02', 2020, 0, 0.52171428571426, 'FACT-8', NULL, NULL, 44, NULL, NULL),
-(306, 24, 9, NULL, NULL, 23, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 100, 'AP-7', NULL, NULL, NULL, NULL, NULL),
-(307, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 20, 0, 'AP-7', NULL, NULL, NULL, NULL, NULL),
-(308, 76, 80, NULL, NULL, 13, 15, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 80, 0, 'AP-7', NULL, NULL, NULL, NULL, NULL),
-(309, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(310, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(311, 24, 9, NULL, NULL, 20, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 5000, 'AP-9', NULL, NULL, NULL, NULL, NULL),
-(312, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 500, 0, 'AP-9', NULL, NULL, NULL, NULL, NULL),
-(313, 75, 82, NULL, NULL, 20, 18, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 4500, 0, 'AP-9', NULL, NULL, NULL, NULL, NULL),
-(314, 24, 10, NULL, NULL, 23, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 250, 'A-1', NULL, NULL, NULL, NULL, NULL),
-(315, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 50, 0, 'A-1', NULL, NULL, NULL, NULL, NULL),
-(316, 76, 81, NULL, NULL, 21, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 200, 0, 'A-1', NULL, NULL, NULL, NULL, NULL),
-(317, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 120, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(318, 76, 80, NULL, NULL, 24, 15, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 120, 0, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(319, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 10, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(320, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 2, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(321, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 8, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(322, 24, 9, NULL, NULL, 22, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 0, 450, 'TR-2', NULL, NULL, NULL, NULL, NULL),
-(323, 76, 79, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-25', 2020, 450, 0, 'TR-2', NULL, NULL, NULL, NULL, NULL),
-(324, 24, 9, NULL, NULL, 23, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 100, 0, 'AP-7', NULL, NULL, NULL, NULL, NULL),
-(325, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 20, 'AP-7', NULL, NULL, NULL, NULL, NULL),
-(326, 76, 80, NULL, NULL, 13, 15, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 80, 'AP-7', NULL, NULL, NULL, NULL, NULL),
-(327, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(328, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(329, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(330, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(331, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(332, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(333, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(334, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(335, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(336, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(337, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(338, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(339, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 1000, 0, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(340, 76, 79, NULL, NULL, 22, 17, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 1000, 'AP-8', NULL, NULL, NULL, NULL, NULL),
-(341, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 120, 0, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(342, 76, 80, NULL, NULL, 24, 15, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 120, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(343, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 120, 0, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(344, 76, 80, NULL, NULL, 24, 15, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 120, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(345, 24, 8, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 120, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(346, 76, 80, NULL, NULL, 24, 15, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 120, 0, 'A-2', NULL, NULL, NULL, NULL, NULL),
-(347, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 10, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(348, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 2, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(349, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 8, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(350, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 10, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(351, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 2, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(352, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 8, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(353, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 10, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(354, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 2, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(355, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 8, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(356, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 10, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(357, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 2, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(358, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 8, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(359, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 10, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(360, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 2, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(361, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 8, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(362, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 10, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(363, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 2, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(364, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 8, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(365, 24, 9, NULL, NULL, 21, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 10, 0, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(366, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 2, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(367, 76, 80, NULL, NULL, 23, 16, NULL, NULL, NULL, 1, 0, 0, '2020-12-29', 2020, 0, 8, 'TR-1', NULL, NULL, NULL, NULL, NULL),
-(368, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-01', 2021, 0, 100, 'AP-1', 2, 69, NULL, 22, NULL),
-(369, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-01', 2021, 20, 0, 'AP-1', 2, 69, NULL, 22, NULL),
-(370, 54, 38, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-01', 2021, 80, 0, 'AP-1', 2, 69, NULL, 22, NULL),
-(371, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 500, 'A-1', 2, 70, NULL, 23, NULL),
-(372, 54, 38, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 500, 0, 'A-1', 2, 70, NULL, 23, NULL),
-(373, 85, 38, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 500, 'A-1', 2, 70, NULL, 23, NULL),
-(374, 37, 38, NULL, NULL, 25, 1, NULL, NULL, 7, 1, 0, 0, '2021-01-04', 2021, 500, 0, 'A-1', 2, 70, NULL, 23, NULL),
-(375, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 55, 'TR-1', 2, 69, NULL, 24, NULL),
-(376, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 15, 0, 'TR-1', 2, 69, NULL, 24, NULL),
-(377, 54, 38, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 40, 0, 'TR-1', 2, 69, NULL, 24, NULL),
-(378, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 2500, 'AP-2', 2, 74, NULL, 26, NULL),
-(379, 54, 38, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 2500, 0, 'AP-2', 2, 74, NULL, 26, NULL),
-(382, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 15, 'BA-1', 2, 69, NULL, 24, NULL),
-(383, 69, 97, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 40, 'BA-1', 2, 69, NULL, 24, NULL),
-(384, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 55, 0, 'BA-1', 2, 69, NULL, 24, NULL),
-(385, 69, 97, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 500, 'BA-2', 2, 70, NULL, 23, NULL),
-(386, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 500, 0, 'BA-2', 2, 70, NULL, 23, NULL),
-(387, 22, 138, NULL, NULL, 5, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 2500, 'TI-1', 2, 74, NULL, 26, 1),
-(388, 22, 138, NULL, NULL, 25, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 2500, 0, 'TI-1', 2, 74, NULL, 26, 1),
-(389, 69, 97, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 0, 2500, 'BA-3', 2, 74, NULL, 26, NULL),
-(390, 22, 138, NULL, NULL, 5, NULL, NULL, NULL, NULL, 1, 0, 0, '2021-01-04', 2021, 2500, 0, 'BA-3', 2, 74, NULL, 26, NULL),
-(391, 69, 97, NULL, NULL, 25, 1, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 0.83, '0', 2, 75, NULL, NULL, NULL),
-(392, 33, 134, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0.83, 0, '0', 2, 75, NULL, NULL, NULL),
-(393, 22, 138, NULL, NULL, 9, NULL, NULL, NULL, NULL, 1, 0, NULL, '2021-01-11', 2021, 0, 100, 'A-2', NULL, NULL, NULL, 27, 1),
-(394, 54, 38, NULL, NULL, 9, 1, NULL, NULL, NULL, 1, 0, NULL, '2021-01-11', 2021, 100, 0, 'A-2', NULL, NULL, NULL, 27, NULL),
-(395, 85, 38, NULL, NULL, 9, 1, NULL, NULL, NULL, 1, 0, NULL, '2021-01-11', 2021, 0, 100, 'A-2', NULL, NULL, NULL, 27, NULL),
-(396, 37, 38, NULL, NULL, 9, 1, NULL, NULL, 1, 1, 0, NULL, '2021-01-11', 2021, 100, 0, 'A-2', NULL, NULL, NULL, 27, NULL),
-(397, 36, 63, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, '2020-12-03', 2020, 0, 138.91, '-', 2, 76, NULL, NULL, NULL),
-(398, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '2020-12-03', 2020, 138.91, 0, '-', 2, 76, NULL, NULL, NULL),
-(399, 36, 63, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, '2020-12-03', 2020, 0, 138.91, '-', 2, 77, NULL, NULL, NULL),
-(400, 2, 133, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '2020-12-03', 2020, 138.91, 0, '-', 2, 77, NULL, NULL, NULL),
-(401, 69, 97, NULL, NULL, NULL, 13, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 2708873, '', 2, 78, NULL, NULL, NULL),
-(402, 74, 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 191992.73, '', 2, 78, NULL, NULL, NULL),
-(403, 74, 140, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 191722.32, '', 2, 78, NULL, NULL, NULL),
-(404, 74, 141, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 29744.13, '', 2, 78, NULL, NULL, NULL),
-(405, 74, 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 27040.12, '', 2, 78, NULL, NULL, NULL),
-(406, 42, 152, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1892045.79, '', 2, 78, NULL, NULL, NULL),
-(407, 41, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 585248.24, '', 2, 78, NULL, NULL, NULL),
-(408, 41, 143, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 82205.34, '', 2, 78, NULL, NULL, NULL),
-(409, 41, 144, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 77608.33, '', 2, 78, NULL, NULL, NULL),
-(410, 41, 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 67600.3, '', 2, 78, NULL, NULL, NULL),
-(411, 41, 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1669, '', 2, 78, NULL, NULL, NULL),
-(412, 41, 147, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 3622, '', 2, 78, NULL, NULL, NULL),
-(413, 41, 149, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 191992.73, '', 2, 78, NULL, NULL, NULL),
-(414, 41, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 191722.32, '', 2, 78, NULL, NULL, NULL),
-(415, 41, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 29744.13, '', 2, 78, NULL, NULL, NULL),
-(416, 41, 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 27040.12, '', 2, 78, NULL, NULL, NULL),
-(417, 69, 97, NULL, NULL, NULL, 13, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 2708873, '', 2, 79, NULL, NULL, NULL),
-(418, 74, 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 191992.73, '', 2, 79, NULL, NULL, NULL),
-(419, 74, 140, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 191722.32, '', 2, 79, NULL, NULL, NULL),
-(420, 74, 141, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 29744.13, '', 2, 79, NULL, NULL, NULL),
-(421, 74, 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 27040.12, '', 2, 79, NULL, NULL, NULL),
-(422, 42, 152, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1892045.79, 0, '', 2, 79, NULL, NULL, NULL),
-(423, 41, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 585248.24, 0, '', 2, 79, NULL, NULL, NULL),
-(424, 41, 143, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 82205.34, 0, '', 2, 79, NULL, NULL, NULL),
-(425, 41, 144, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 77608.33, 0, '', 2, 79, NULL, NULL, NULL),
-(426, 41, 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 67600.3, 0, '', 2, 79, NULL, NULL, NULL),
-(427, 41, 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1669, 0, '', 2, 79, NULL, NULL, NULL),
-(428, 41, 147, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3622, 0, '', 2, 79, NULL, NULL, NULL),
-(429, 41, 149, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 191992.73, 0, '', 2, 79, NULL, NULL, NULL),
-(430, 41, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 191722.32, 0, '', 2, 79, NULL, NULL, NULL),
-(431, 41, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 29744.13, 0, '', 2, 79, NULL, NULL, NULL),
-(432, 41, 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 27040.12, 0, '', 2, 79, NULL, NULL, NULL),
-(433, 69, 97, NULL, NULL, NULL, 13, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 107900, '', 2, 80, NULL, NULL, NULL),
-(434, 74, 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7483.4, '', 2, 80, NULL, NULL, NULL),
-(435, 74, 140, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7472.86, '', 2, 80, NULL, NULL, NULL),
-(436, 74, 141, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1159.4, '', 2, 80, NULL, NULL, NULL),
-(437, 74, 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1054, '', 2, 80, NULL, NULL, NULL),
-(438, 42, 152, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 91067.41, 0, '', 2, 80, NULL, NULL, NULL),
-(439, 41, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 5368.45, 0, '', 2, 80, NULL, NULL, NULL),
-(440, 41, 143, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3204.16, 0, '', 2, 80, NULL, NULL, NULL),
-(441, 41, 144, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3024.98, 0, '', 2, 80, NULL, NULL, NULL),
-(442, 41, 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 2635, 0, '', 2, 80, NULL, NULL, NULL),
-(443, 41, 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1000, 0, '', 2, 80, NULL, NULL, NULL),
-(444, 41, 147, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1600, 0, '', 2, 80, NULL, NULL, NULL),
-(445, 41, 149, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7483.4, 0, '', 2, 80, NULL, NULL, NULL),
-(446, 41, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7472.86, 0, '', 2, 80, NULL, NULL, NULL),
-(447, 41, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1159.4, 0, '', 2, 80, NULL, NULL, NULL),
-(448, 41, 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1054, 0, '', 2, 80, NULL, NULL, NULL),
-(449, 69, 97, NULL, NULL, NULL, 13, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 107900, '', 2, 81, NULL, NULL, NULL),
-(450, 74, 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7483.4, '', 2, 81, NULL, NULL, NULL),
-(451, 74, 140, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7472.86, '', 2, 81, NULL, NULL, NULL),
-(452, 74, 141, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1159.4, '', 2, 81, NULL, NULL, NULL),
-(453, 74, 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1054, '', 2, 81, NULL, NULL, NULL),
-(454, 42, 152, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 91067.41, 0, '', 2, 81, NULL, NULL, NULL),
-(455, 41, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 5368.45, 0, '', 2, 81, NULL, NULL, NULL),
-(456, 41, 143, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3204.16, 0, '', 2, 81, NULL, NULL, NULL),
-(457, 41, 144, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3024.98, 0, '', 2, 81, NULL, NULL, NULL),
-(458, 41, 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 2635, 0, '', 2, 81, NULL, NULL, NULL),
-(459, 41, 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1000, 0, '', 2, 81, NULL, NULL, NULL),
-(460, 41, 147, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1600, 0, '', 2, 81, NULL, NULL, NULL),
-(461, 41, 149, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7483.4, 0, '', 2, 81, NULL, NULL, NULL),
-(462, 41, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7472.86, 0, '', 2, 81, NULL, NULL, NULL),
-(463, 41, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1159.4, 0, '', 2, 81, NULL, NULL, NULL),
-(464, 41, 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1054, 0, '', 2, 81, NULL, NULL, NULL),
-(465, 69, 97, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 107900, 0, '', 2, 82, NULL, NULL, NULL),
-(466, 74, 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7483.4, 0, '', 2, 82, NULL, NULL, NULL),
-(467, 74, 140, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7472.86, 0, '', 2, 82, NULL, NULL, NULL);
-INSERT INTO `asiento` (`id`, `id_cuenta_id`, `id_subcuenta_id`, `id_documento_id`, `id_almacen_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `id_orden_trabajo_id`, `id_expediente_id`, `id_proveedor_id`, `id_unidad_id`, `tipo_cliente`, `id_cliente`, `fecha`, `anno`, `credito`, `debito`, `nro_documento`, `id_tipo_comprobante_id`, `id_comprobante_id`, `id_factura_id`, `id_activo_fijo_id`, `id_area_responsabilidad_id`) VALUES
-(468, 74, 141, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1159.4, 0, '', 2, 82, NULL, NULL, NULL),
-(469, 74, 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1054, 0, '', 2, 82, NULL, NULL, NULL),
-(470, 42, 152, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 91067.41, '', 2, 82, NULL, NULL, NULL),
-(471, 41, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 5368.45, '', 2, 82, NULL, NULL, NULL),
-(472, 41, 143, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 3204.16, '', 2, 82, NULL, NULL, NULL),
-(473, 41, 144, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 3024.98, '', 2, 82, NULL, NULL, NULL),
-(474, 41, 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 2635, '', 2, 82, NULL, NULL, NULL),
-(475, 41, 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1000, '', 2, 82, NULL, NULL, NULL),
-(476, 41, 147, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1600, '', 2, 82, NULL, NULL, NULL),
-(477, 41, 149, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7483.4, '', 2, 82, NULL, NULL, NULL),
-(478, 41, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7472.86, '', 2, 82, NULL, NULL, NULL),
-(479, 41, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1159.4, '', 2, 82, NULL, NULL, NULL),
-(480, 41, 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1054, '', 2, 82, NULL, NULL, NULL),
-(481, 69, 97, NULL, NULL, NULL, 13, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 107900, '', 2, 83, NULL, NULL, NULL),
-(482, 74, 139, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7483.4, '', 2, 83, NULL, NULL, NULL),
-(483, 74, 140, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 7472.86, '', 2, 83, NULL, NULL, NULL),
-(484, 74, 141, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1159.4, '', 2, 83, NULL, NULL, NULL),
-(485, 74, 142, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 0, 1054, '', 2, 83, NULL, NULL, NULL),
-(486, 42, 152, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 91067.41, 0, '', 2, 83, NULL, NULL, NULL),
-(487, 41, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 5368.45, 0, '', 2, 83, NULL, NULL, NULL),
-(488, 41, 143, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3204.16, 0, '', 2, 83, NULL, NULL, NULL),
-(489, 41, 144, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 3024.98, 0, '', 2, 83, NULL, NULL, NULL),
-(490, 41, 145, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 2635, 0, '', 2, 83, NULL, NULL, NULL),
-(491, 41, 146, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1000, 0, '', 2, 83, NULL, NULL, NULL),
-(492, 41, 147, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1600, 0, '', 2, 83, NULL, NULL, NULL),
-(493, 41, 149, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7483.4, 0, '', 2, 83, NULL, NULL, NULL),
-(494, 41, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 7472.86, 0, '', 2, 83, NULL, NULL, NULL),
-(495, 41, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1159.4, 0, '', 2, 83, NULL, NULL, NULL),
-(496, 41, 151, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, '2020-12-03', 2021, 1054, 0, '', 2, 83, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -822,30 +381,6 @@ CREATE TABLE `cierre` (
   `debito` double NOT NULL,
   `credito` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cierre`
---
-
-INSERT INTO `cierre` (`id`, `id_almacen_id`, `id_usuario_id`, `diario`, `mes`, `anno`, `fecha`, `saldo`, `abierto`, `debito`, `credito`) VALUES
-(44, 1, 1, 1, 12, 2020, '2020-11-20', 0, 0, 7312.19, 958.3),
-(45, 1, 1, 1, 12, 2020, '2020-11-21', 6353.89, 0, 95.21, 2168.97),
-(46, 1, 1, 1, 12, 2020, '2020-11-27', 4280.13, 0, 580.56, 32.87),
-(47, 1, 1, 1, 12, 2020, '2020-11-28', 4827.82, 0, 0, 1325),
-(48, 2, 1, 1, 12, 2020, '2020-11-21', 0, 0, 2073.76, 0),
-(49, 2, 1, 1, 12, 2020, '2020-11-23', 2073.76, 0, 40500, 0),
-(50, 2, 1, 1, 12, 2020, '2020-11-29', 42573.76, 0, 0, 15800),
-(51, 3, 1, 1, 12, 2020, '2020-11-24', 0, 0, 378.26, 0),
-(52, 3, 1, 1, 12, 2020, '2020-11-28', 378.26, 0, 1325, 0),
-(53, 1, 1, 1, 12, 2020, '2020-11-29', 3502.82, 0, 0, 0),
-(54, 3, 1, 1, 12, 2020, '2020-11-29', 1703.26, 0, 0, 1674.564),
-(55, 1, 1, 1, 12, 2020, '2020-11-30', 3502.82, 0, 0, 0),
-(56, 2, 1, 1, 12, 2020, '2020-12-01', 26773.76, 0, 0, 0.52),
-(57, 1, 1, 1, 12, 2020, '2020-12-01', 3502.82, 1, 0, 0),
-(58, 3, 1, 1, 12, 2020, '2020-12-01', 28.696, 0, 0, 0.5218),
-(59, 2, 1, 1, 12, 2020, '2020-12-02', 26773.24, 0, 0, 2603.7101639344),
-(60, 3, 1, 1, 12, 2020, '2020-12-02', 28.1742, 1, 0, 0),
-(61, 2, 1, 1, 12, 2020, '2020-12-03', 24169.529836066, 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -982,17 +517,6 @@ CREATE TABLE `cobros_pagos` (
   `id_movimiento_activo_fijo_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `cobros_pagos`
---
-
-INSERT INTO `cobros_pagos` (`id`, `id_factura_id`, `id_informe_id`, `id_proveedor_id`, `debito`, `credito`, `id_tipo_cliente`, `id_cliente_venta`, `id_movimiento_activo_fijo_id`) VALUES
-(32, 37, NULL, NULL, 0, 20, 3, 4, NULL),
-(33, 37, NULL, NULL, 0, 20, 3, 4, NULL),
-(34, 37, NULL, NULL, 158.12, 0, 3, 4, NULL),
-(35, 40, NULL, NULL, 10000, 0, 3, 4, NULL),
-(38, NULL, 52, 1, 0, 200, NULL, NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -1004,27 +528,6 @@ CREATE TABLE `comprobante_cierre` (
   `id_comprobante_id` int(11) NOT NULL,
   `id_cierre_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `comprobante_cierre`
---
-
-INSERT INTO `comprobante_cierre` (`id`, `id_comprobante_id`, `id_cierre_id`) VALUES
-(23, 26, 44),
-(24, 26, 45),
-(25, 26, 46),
-(26, 26, 47),
-(27, 26, 53),
-(28, 26, 55),
-(29, 27, 51),
-(30, 27, 52),
-(31, 28, 48),
-(32, 28, 49),
-(33, 28, 50),
-(34, 29, 56),
-(35, 30, 54),
-(36, 30, 58),
-(37, 68, 59);
 
 -- --------------------------------------------------------
 
@@ -1039,25 +542,6 @@ CREATE TABLE `comprobante_movimiento_activo_fijo` (
   `id_unidad_id` int(11) NOT NULL,
   `anno` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `comprobante_movimiento_activo_fijo`
---
-
-INSERT INTO `comprobante_movimiento_activo_fijo` (`id`, `id_registro_comprobante_id`, `id_movimiento_activo_id`, `id_unidad_id`, `anno`) VALUES
-(1, 69, 30, 1, 2021),
-(2, 69, 31, 1, 2021),
-(3, 69, 32, 1, 2021),
-(4, 69, 33, 1, 2021),
-(5, 69, 35, 1, 2021),
-(6, 70, 36, 1, 2021),
-(7, 71, 37, 1, 2020),
-(8, 72, 37, 1, 2020),
-(9, 72, 38, 1, 2020),
-(10, 73, 37, 1, 2020),
-(11, 73, 38, 1, 2020),
-(12, 74, 37, 1, 2020),
-(13, 74, 38, 1, 2020);
 
 -- --------------------------------------------------------
 
@@ -1193,19 +677,6 @@ CREATE TABLE `cuadre_diario` (
   `credito` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `cuadre_diario`
---
-
-INSERT INTO `cuadre_diario` (`id`, `id_cuenta_id`, `id_subcuenta_id`, `id_cierre_id`, `id_almacen_id`, `str_analisis`, `fecha`, `saldo`, `debito`, `credito`) VALUES
-(73, 15, 59, 50, 2, '02', '2020-11-29', '0.00', 0, 7800),
-(74, 15, 62, 50, 2, '02', '2020-11-29', '0.00', 0, 8000),
-(75, 14, 4, 54, 3, '03', '2020-11-29', '0.00', 0, 1674.564),
-(76, 15, 61, 56, 2, '02', '2020-12-01', '0.00', 0, 0.52),
-(77, 14, 4, 58, 3, '03', '2020-12-01', '-1674.56', 0, 0.5218),
-(78, 15, 60, 59, 2, '02', '2020-12-02', '0.00', 0, 1.7101639344262),
-(79, 15, 62, 59, 2, '02', '2020-12-02', '-8000.00', 0, 2602);
-
 -- --------------------------------------------------------
 
 --
@@ -1283,7 +754,7 @@ INSERT INTO `cuenta` (`id`, `id_tipo_cuenta_id`, `nro_cuenta`, `nombre`, `deudor
 (51, 10, 565, 'Cuentas por Pagar Diversas', 0, 0, 0, 1, 0, 0),
 (52, 10, 569, 'Cuentas por Pagar Compra de Monedas', 0, 0, 0, 1, 0, 0),
 (53, 10, 570, 'Ingresos de Periodos Futuros', 0, 0, 0, 1, 0, 0),
-(54, 11, 600, 'Patrimonio', 0, 0, 0, 1, 0, 0),
+(54, 11, 600, 'Capital Contable', 0, 0, 0, 1, 0, 0),
 (55, 11, 605, 'Acciones por Emitir', 1, 0, 0, 1, 0, 0),
 (56, 11, 608, 'Acciones Suscritas', 0, 0, 0, 1, 0, 0),
 (57, 11, 615, 'Revalorizacion de Activos Fijos Tangibles', 1, 0, 0, 1, 0, 0),
@@ -1436,13 +907,6 @@ CREATE TABLE `depreciacion` (
   `fundamentacion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `depreciacion`
---
-
-INSERT INTO `depreciacion` (`id`, `fecha`, `anno`, `total`, `unidad_id`, `fundamentacion`) VALUES
-(1, '2020-12-03', 2020, 0.83, 1, 'depreciacion de diciembre 2020');
-
 -- --------------------------------------------------------
 
 --
@@ -1463,14 +927,6 @@ CREATE TABLE `devolucion` (
   `id_elemento_gasto_id` int(11) DEFAULT NULL,
   `id_orden_tabajo_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `devolucion`
---
-
-INSERT INTO `devolucion` (`id`, `id_documento_id`, `id_unidad_id`, `id_almacen_id`, `nro_cuenta`, `nro_subcuenta`, `anno`, `activo`, `nro_concecutivo`, `id_centro_costo_id`, `id_elemento_gasto_id`, `id_orden_tabajo_id`) VALUES
-(5, 157, 1, 1, '700', '0020', 2020, 1, '1', 24, 3, 10),
-(6, 158, 1, 1, '700', '0020', 2020, 1, '2', 23, 7, 14);
 
 -- --------------------------------------------------------
 
@@ -1514,7 +970,9 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20210117051230', '2021-01-17 06:12:35', 2059),
 ('DoctrineMigrations\\Version20210118165534', '2021-01-18 17:55:55', 329),
 ('DoctrineMigrations\\Version20210118165752', '2021-01-18 17:57:57', 142),
-('DoctrineMigrations\\Version20210121103943', '2021-01-21 11:40:04', 1881);
+('DoctrineMigrations\\Version20210121103943', '2021-01-21 11:40:04', 1881),
+('DoctrineMigrations\\Version20210123042333', '2021-01-23 05:23:40', 5718),
+('DoctrineMigrations\\Version20210123161100', '2021-01-23 17:11:27', 1135);
 
 -- --------------------------------------------------------
 
@@ -1534,56 +992,6 @@ CREATE TABLE `documento` (
   `anno` int(11) DEFAULT NULL,
   `id_documento_cancelado_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `documento`
---
-
-INSERT INTO `documento` (`id`, `id_almacen_id`, `id_unidad_id`, `id_moneda_id`, `importe_total`, `fecha`, `activo`, `id_tipo_documento_id`, `anno`, `id_documento_cancelado_id`) VALUES
-(138, 1, 1, 1, 238.91, '2020-11-20', 1, 1, 2020, NULL),
-(139, 1, 1, 1, 128.5, '2020-11-20', 1, 1, 2020, NULL),
-(140, 1, 1, 1, 129.3, '2020-11-20', 1, 1, 2020, NULL),
-(141, 1, 1, 1, 45.73, '2020-11-20', 1, 1, 2020, NULL),
-(142, 1, 1, 1, 4399.35, '2020-11-20', 1, 1, 2020, NULL),
-(143, 1, 1, 1, 2370.4, '2020-11-20', 1, 1, 2020, NULL),
-(144, 1, 1, 1, 26.09, '2020-11-20', 1, 7, 2020, NULL),
-(145, 1, 1, 1, 18.25, '2020-11-20', 1, 7, 2020, NULL),
-(146, 1, 1, 1, 312.11, '2020-11-20', 1, 7, 2020, NULL),
-(147, 1, 1, 1, 18.26, '2020-11-20', 1, 7, 2020, NULL),
-(148, 1, 1, 1, 21.8, '2020-11-20', 1, 7, 2020, NULL),
-(149, 1, 1, 1, 561.79, '2020-11-20', 1, 7, 2020, NULL),
-(150, 1, 1, 1, 95.21, '2020-11-21', 1, 4, 2020, NULL),
-(151, 1, 1, 1, 95.21, '2020-11-21', 1, 3, 2020, NULL),
-(152, 1, 1, 1, 2073.76, '2020-11-21', 1, 6, 2020, NULL),
-(153, 2, 1, 1, 2073.76, '2020-11-21', 1, 5, 2020, NULL),
-(154, 1, 1, 1, 0.52, '2020-11-27', 1, 3, 2020, NULL),
-(155, 1, 1, 1, 2.85, '2020-11-27', 1, 4, 2020, NULL),
-(156, 1, 1, 1, 30.02, '2020-11-27', 1, 7, 2020, NULL),
-(157, 1, 1, 1, 18.25, '2020-11-27', 1, 9, 2020, NULL),
-(158, 1, 1, 1, 561.79, '2020-11-27', 1, 9, 2020, NULL),
-(159, 2, 1, 1, 30000, '2020-11-23', 1, 1, 2020, NULL),
-(160, 2, 1, 1, 3000, '2020-11-23', 1, 1, 2020, NULL),
-(161, 2, 1, 1, 6000, '2020-11-23', 1, 1, 2020, NULL),
-(162, 2, 1, 1, 1500, '2020-11-23', 1, 1, 2020, NULL),
-(163, 3, 1, 1, 338.2, '2020-11-24', 1, 2, 2020, NULL),
-(164, 3, 1, 1, 40.06, '2020-11-24', 1, 2, 2020, NULL),
-(165, 1, 1, 1, 83.59, '2020-11-28', 1, 7, 2020, NULL),
-(166, 1, 1, 1, 1241.41, '2020-11-28', 1, 7, 2020, NULL),
-(167, 3, 1, 1, 1048.86, '2020-11-28', 1, 2, 2020, NULL),
-(168, 3, 1, 1, 276.14, '2020-11-28', 1, 2, 2020, NULL),
-(169, 3, 1, 1, 590.00616666667, '2020-11-29', 1, 10, 2020, NULL),
-(170, 3, 1, 1, 756.79383333333, '2020-11-29', 1, 10, 2020, NULL),
-(171, 2, 1, 1, 7800, '2020-11-29', 1, 10, 2020, NULL),
-(172, 2, 1, 1, 8000, '2020-11-29', 1, 10, 2020, NULL),
-(173, 3, 1, 1, 327.764, '2020-11-29', 1, 10, 2020, NULL),
-(174, 2, 1, 1, 0.52, '2020-12-01', 1, 10, 2020, NULL),
-(175, 3, 1, 1, 0.5218, '2020-12-01', 1, 10, 2020, NULL),
-(176, 2, 1, 1, 2500, '2020-12-02', 1, 10, 2020, NULL),
-(177, 3, 1, 1, 5.2171428571429, '2020-12-02', 1, 10, 2020, NULL),
-(178, 2, 1, 1, 1.7101639344262, '2020-12-02', 1, 10, 2020, NULL),
-(179, 3, 1, 1, 1.0434285714286, '2020-12-02', 1, 10, 2020, NULL),
-(180, 2, 1, 1, 102, '2020-12-02', 1, 10, 2020, NULL),
-(181, 3, 1, 1, 1.5651428571428, '2020-12-02', 1, 10, 2020, NULL);
 
 -- --------------------------------------------------------
 
@@ -1658,11 +1066,7 @@ CREATE TABLE `empleado` (
 --
 
 INSERT INTO `empleado` (`id`, `id_unidad_id`, `id_cargo_id`, `id_usuario_id`, `nombre`, `correo`, `fecha_alta`, `baja`, `fecha_baja`, `direccion_particular`, `telefono`, `rol`, `activo`, `identificacion`, `sueldo_bruto_mensual`, `salario_x_hora`) VALUES
-(1, 1, 1, 1, 'Alberto hernandez Correa', 'admin@solyag.com', '2020-10-28', 0, NULL, 'Calle A', '555555555', 'ROLE_ADMIN', 1, '123', NULL, 1000),
-(2, 1, 1, NULL, 'Maria Maire Valdes Llende', 'aaa@gmal.cd', '2021-01-14', 0, NULL, 'sdsdasasdas', '2112121', NULL, 1, '23213123', NULL, 15000),
-(3, 1, 1, 2, 'Marlon Hernandez Valdes', 'sss@aasas.ass', '2021-01-08', 0, NULL, 'fdsfdsfdsfdsd', '323123223', 'ROLE_USER', 1, '12365', 25000, NULL),
-(4, 1, 1, NULL, 'Camilo Alberto Hernandez', 'ccc@cc.cc', '2021-01-14', 0, NULL, 'Pepe Portilla', '+5355816826', NULL, 1, '89102815009', 65000, NULL),
-(5, 1, 1, NULL, 'Leidiana Delgado Prado', 'aaaa@aaa.aa', '2021-01-14', 0, NULL, 'dsfdsfds', '45896544', NULL, 1, '8815896523', 330000, NULL);
+(6, 1, 1, 1, 'Anibal Valdes Llende', 'anibal@solyag.com', '2020-11-01', 0, NULL, 'Calle 2da', '55816826', 'ROLE_ADMIN', 1, '89102815009', 65000, NULL);
 
 -- --------------------------------------------------------
 
@@ -1721,20 +1125,6 @@ CREATE TABLE `factura` (
   `servicio` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `factura`
---
-
-INSERT INTO `factura` (`id`, `id_unidad_id`, `id_usuario_id`, `fecha_factura`, `tipo_cliente`, `id_cliente`, `nro_factura`, `anno`, `id_contrato_id`, `cuenta_obligacion`, `subcuenta_obligacion`, `activo`, `id_centro_costo_id`, `id_orden_trabajo_id`, `id_elemento_gasto_id`, `id_expediente_id`, `importe`, `contabilizada`, `id_categoria_cliente_id`, `id_termino_pago_id`, `id_moneda_id`, `id_factura_cancela_id`, `ncf`, `cancelada`, `motivo_cancelacion`, `servicio`) VALUES
-(37, 1, 1, '2020-11-29', 3, 4, 1, 2020, NULL, '135', '0030', 1, NULL, NULL, NULL, NULL, 158.12, 1, 1, 4, 1, NULL, 'B0100000001', 0, NULL, NULL),
-(38, 1, 1, '2020-11-29', 3, 5, 2, 2020, NULL, '135', '0030', 1, NULL, NULL, NULL, NULL, 3973.74, 1, 1, 4, 1, NULL, 'B0100000002', 0, NULL, NULL),
-(39, 1, 1, '2020-11-29', 1, 1, 3, 2020, NULL, '135', '0010', 1, NULL, NULL, NULL, NULL, 10100, 1, 1, 4, 1, NULL, 'B0100000003', 0, NULL, NULL),
-(40, 1, 1, '2020-11-29', 3, 4, 4, 2020, NULL, '135', '0030', 1, NULL, NULL, NULL, NULL, 10907, 1, 1, 4, 1, NULL, 'B0100000004', 0, NULL, NULL),
-(41, 1, 1, '2020-12-01', 1, 1, 5, 2020, NULL, '135', '0010', 1, NULL, NULL, NULL, NULL, 217, 1, 1, 1, 1, NULL, 'B0100000005', 0, NULL, NULL),
-(42, 1, 1, '2020-12-02', 3, 4, 6, 2020, NULL, '135', '0030', 1, NULL, NULL, NULL, NULL, 2000, 1, 2, 2, 1, NULL, 'B0200000001', 0, NULL, NULL),
-(43, 1, 1, '2020-12-02', 3, 4, 7, 2020, NULL, '135', '0030', 1, NULL, NULL, NULL, NULL, 1200, 1, 3, 1, 1, NULL, 'B0300000001', 0, NULL, NULL),
-(44, 1, 1, '2020-12-02', 3, 5, 8, 2020, NULL, '135', '0030', 1, NULL, NULL, NULL, NULL, 1300, 1, 3, 1, 1, NULL, 'B0300000002', 0, NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -1749,20 +1139,6 @@ CREATE TABLE `facturas_comprobante` (
   `anno` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `facturas_comprobante`
---
-
-INSERT INTO `facturas_comprobante` (`id`, `id_factura_id`, `id_comprobante_id`, `id_unidad_id`, `anno`) VALUES
-(35, 37, 31, 1, 2020),
-(36, 38, 31, 1, 2020),
-(37, 39, 31, 1, 2020),
-(38, 40, 31, 1, 2020),
-(39, 41, 31, 1, 2020),
-(40, 42, 66, 1, 2020),
-(41, 43, 67, 1, 2020),
-(42, 44, 67, 1, 2020);
-
 -- --------------------------------------------------------
 
 --
@@ -1775,32 +1151,6 @@ CREATE TABLE `factura_documento` (
   `id_documento_id` int(11) NOT NULL,
   `id_movimiento_venta_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `factura_documento`
---
-
-INSERT INTO `factura_documento` (`id`, `id_factura_id`, `id_documento_id`, `id_movimiento_venta_id`) VALUES
-(42, 37, 169, NULL),
-(43, 37, 169, NULL),
-(44, 37, 169, NULL),
-(45, 38, 170, NULL),
-(46, 38, 170, NULL),
-(47, 38, 170, NULL),
-(48, 39, 171, NULL),
-(49, 39, 171, NULL),
-(50, 40, 172, NULL),
-(51, 40, 172, NULL),
-(52, 40, 173, NULL),
-(53, 40, 173, NULL),
-(54, 41, 174, NULL),
-(55, 41, 175, NULL),
-(56, 42, 176, NULL),
-(57, 42, 177, NULL),
-(58, 43, 178, NULL),
-(59, 43, 179, NULL),
-(60, 44, 180, NULL),
-(61, 44, 181, NULL);
 
 -- --------------------------------------------------------
 
@@ -1909,19 +1259,6 @@ CREATE TABLE `impuesto_sobre_renta` (
   `fecha` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `impuesto_sobre_renta`
---
-
-INSERT INTO `impuesto_sobre_renta` (`id`, `id_empleado_id`, `id_nomina_pago_id`, `id_rango_escala_id`, `seguridad_social_mensual`, `salario_bruto_anual`, `seguridad_social_anual`, `salario_despues_seguridad_social`, `monto_segun_rango`, `monto_segun_rango_escala`, `excedente_segun_rango_escala`, `por_ciento_impuesto_excedente`, `monto_adicional_rango_escala`, `impuesto_renta_pagar_anual`, `impuesto_renta_pagar_mensual`, `fecha`) VALUES
-(10, 4, 11, 3, 4137, 840000, 49644, 790356, 624329.01, 624329.01, 166026.99, 33205.4, 31216, 64421.4, 5368.45, '2020-12-03'),
-(11, 3, 12, 1, 1654.8, 336000, 19857.6, 316142.4, 0, 0, 316142.4, 0, 0, 0, 0, '2020-12-03'),
-(12, 5, 13, 4, 22458, 4560000, 269496, 4290504, 867123.01, 867123.01, 3423380.99, 855845.25, 79776, 935621.25, 77968.44, '2020-12-03'),
-(13, 2, 14, 4, 257209.11, 52224000, 3086509.32, 49137490.68, 867123.01, 867123.01, 48270367.67, 12067591.92, 79776, 12147367.92, 1012280.66, '2020-12-03'),
-(14, 1, 15, 1, 1442.04, 290400, 17304.48, 273095.52, 0, 0, 273095.52, 0, 0, 0, 0, '2020-12-03'),
-(20, 4, 21, 3, 4137, 840000, 49644, 790356, 624329.01, 624329.01, 166026.99, 33205.4, 31216, 64421.4, 5368.45, '2020-12-03'),
-(21, 5, 22, 1, 2092.14, 424800, 25105.68, 399694.32, 0, 0, 399694.32, 0, 0, 0, 0, '2020-12-03');
-
 -- --------------------------------------------------------
 
 --
@@ -1943,26 +1280,6 @@ CREATE TABLE `informe_recepcion` (
   `activo` tinyint(1) NOT NULL,
   `producto` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `informe_recepcion`
---
-
-INSERT INTO `informe_recepcion` (`id`, `id_documento_id`, `id_proveedor_id`, `nro_cuenta_inventario`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`, `nro_concecutivo`, `anno`, `codigo_factura`, `fecha_factura`, `activo`, `producto`) VALUES
-(52, 138, 1, '', '', '405', '0010', '1', 2020, '25', '2020-11-02', 1, 0),
-(53, 139, 2, '', '', '405', '0010', '2', 2020, '152', '2020-11-03', 1, 0),
-(54, 140, 3, '', '', '405', '0010', '3', 2020, '68', '2020-11-09', 1, 0),
-(55, 141, 4, '', '', '405', '0010', '4', 2020, '189', '2020-11-10', 1, 0),
-(56, 142, 5, '', '', '405', '0010', '5', 2020, '1095', '2020-11-10', 1, 0),
-(57, 143, 6, '', '', '405', '0010', '6', 2020, '20381', '2020-11-17', 1, 0),
-(58, 159, 9, '', '', '405', '0010', '1', 2020, '31', '2020-11-17', 1, 0),
-(59, 160, 7, '', '', '405', '0010', '2', 2020, '250', '2020-11-17', 1, 0),
-(60, 161, 8, '', '', '405', '0010', '3', 2020, '1025', '2020-11-18', 1, 0),
-(61, 162, 7, '', '', '405', '0010', '4', 2020, '295', '2020-11-18', 1, 0),
-(62, 163, NULL, '', '', '700', '0050', '1', 2020, NULL, NULL, 1, 1),
-(63, 164, NULL, '', '', '700', '0050', '2', 2020, NULL, NULL, 1, 1),
-(64, 167, NULL, '', '', '700', '0050', '3', 2020, NULL, NULL, 1, 1),
-(65, 168, NULL, '', '', '700', '0050', '4', 2020, NULL, NULL, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1996,36 +1313,6 @@ CREATE TABLE `mercancia` (
   `nro_cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `mercancia`
---
-
-INSERT INTO `mercancia` (`id`, `id_amlacen_id`, `id_unidad_medida_id`, `codigo`, `cuenta`, `descripcion`, `existencia`, `importe`, `activo`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`) VALUES
-(92, 1, 13, '1046-01', '183', 'Detergente', 90, 15.43, 1, '0010', '405', '0010'),
-(93, 1, 13, '1046-51', '183', 'Jabon', 195, 19.6, 1, '0010', '405', '0010'),
-(94, 1, 13, '1046-12', '183', 'Shampu', 0, 0, 0, '0010', '405', '0010'),
-(95, 1, 13, '108051', '183', 'Jabon', 200, 28.4, 1, '0010', '405', '0010'),
-(96, 1, 13, '1075-23', '183', 'Shampu', 405, 115.59, 1, '0010', '405', '0010'),
-(97, 1, 13, '1080-01', '183', 'Jamon 250 grs', 120, 60.3, 1, '0020', '405', '0010'),
-(98, 1, 8, '1080-010', '183', 'Arroz', 560, 29.12, 1, '0020', '405', '0010'),
-(99, 1, 10, '1080-025', '183', 'Aceite', 185, 27.27, 1, '0020', '405', '0010'),
-(100, 1, 8, '1070-015', '183', 'Arroz', 75, 3.38, 1, '0020', '405', '0010'),
-(101, 1, 10, '1070-030', '183', 'Aceite', 0, 0, 0, '0020', '405', '0010'),
-(102, 1, 13, '1070-02', '183', 'Jamon 300 grs', 45, 20.34, 1, '0020', '405', '0010'),
-(103, 1, 13, '263543', '183', 'Omeprazol', 200, 1807.07, 1, '0030', '405', '0010'),
-(104, 1, 14, '2571-02', '183', 'Dipirona', 325, 331.5, 1, '0030', '405', '0010'),
-(105, 1, 13, '1070-040', '183', 'Vitamina C', 395, 959.32, 1, '0030', '405', '0010'),
-(106, 1, 14, '2571-002', '183', 'Dipirona', 90, 85.5, 1, '0030', '405', '0010'),
-(107, 2, 13, '1046-01', '189', 'Detergentes', 295, 50.449836065574, 1, '0020', '697', '0020'),
-(108, 2, 8, '1080-010', '189', 'Arroz', 190, 9.88, 1, '0030', '697', '0020'),
-(109, 2, 14, '2571-02', '189', 'Dipirona', 100, 102, 1, '0040', '697', '0020'),
-(110, 2, 13, '263543', '189', 'Omeprazol', 200, 1807.2, 1, '0040', '697', '0020'),
-(111, 2, 13, '2013151', '189', 'Split 2.0 T', 20, 5000, 1, '0040', '405', '0010'),
-(112, 2, 13, '20131453', '189', 'Split 1.5 Ton', 35, 7000, 1, '0040', '405', '0010'),
-(113, 2, 13, '20131452', '189', 'Split de 1.0 Ton', 50, 7500, 1, '0040', '405', '0010'),
-(114, 2, 13, '2018340', '189', 'Recargas', 150, 2700, 1, '0010', '405', '0010'),
-(115, 2, 13, '2018342', '189', 'Recarga 30 USD', 0, 0, 0, '0010', '405', '0010');
 
 -- --------------------------------------------------------
 
@@ -2130,21 +1417,6 @@ CREATE TABLE `movimiento_activo_fijo` (
   `nro_factura` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `movimiento_activo_fijo`
---
-
-INSERT INTO `movimiento_activo_fijo` (`id`, `id_unidad_id`, `id_activo_fijo_id`, `id_tipo_movimiento_id`, `id_cuenta_id`, `id_subcuenta_id`, `id_usuario_id`, `fecha`, `fundamentacion`, `entrada`, `nro_consecutivo`, `anno`, `activo`, `id_unidad_destino_origen_id`, `id_proveedor_id`, `id_tipo_cliente`, `id_cliente`, `id_movimiento_cancelado_id`, `cancelado`, `fecha_factura`, `nro_factura`) VALUES
-(30, 1, 22, 1, 22, 138, 1, '2021-01-01', 'Monitor de PC de Escritorio', 1, 1, 2021, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(31, 1, 23, 2, 22, 138, 1, '2021-01-04', 'Compra de PC para Programadores', 1, 1, 2021, 1, NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
-(32, 1, 24, 5, 22, 138, 1, '2021-01-04', 'Mouse y Teclado para armar completamente la computadore de los programadores, proveniento de la Unidad 002', 1, 1, 2021, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(33, 1, 26, 1, 22, 138, 1, '2021-01-04', 'Buro de trabajo para los programadores, tamanno estandar', 1, 2, 2021, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(35, 1, 24, 6, 22, 138, 1, '2021-01-04', 'DEVOLUCION POR PROBLEMAS TECNICOS', 0, 1, 2021, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(36, 1, 23, 6, 22, 138, 1, '2021-01-05', 'vaja del centro, pro problemas tecnicos', 0, 2, 2021, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(37, 1, 26, 3, 22, 138, 1, '2021-01-04', 'fdfdfdf', 0, 1, 2021, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(38, 1, 26, 6, 22, 138, 1, '2021-01-06', 'sasa', 0, 3, 2021, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(39, 1, 27, 2, 22, 138, 1, '2021-01-11', 'cccxxxcxc', 1, 2, 2021, 1, NULL, 1, NULL, NULL, NULL, NULL, '2021-01-11', '123');
-
 -- --------------------------------------------------------
 
 --
@@ -2174,93 +1446,6 @@ CREATE TABLE `movimiento_mercancia` (
   `id_movimiento_cancelado_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `movimiento_mercancia`
---
-
-INSERT INTO `movimiento_mercancia` (`id`, `id_mercancia_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`, `id_almacen_id`, `id_expediente_id`, `id_orden_trabajo_id`, `id_factura_id`, `cuenta`, `nro_subcuenta_deudora`, `id_movimiento_cancelado_id`) VALUES
-(266, 92, 138, 1, 1, NULL, NULL, 450, 81.18, 450, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(267, 93, 138, 1, 1, NULL, NULL, 450, 45.23, 450, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(268, 94, 138, 1, 1, NULL, NULL, 450, 112.5, 450, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(269, 92, 139, 1, 1, NULL, NULL, 200, 30.1, 650, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(270, 95, 139, 1, 1, NULL, NULL, 200, 28.4, 200, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(271, 96, 139, 1, 1, NULL, NULL, 200, 70, 200, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(272, 97, 140, 1, 1, NULL, NULL, 120, 60.3, 120, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(273, 98, 140, 1, 1, NULL, NULL, 750, 39, 750, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(274, 99, 140, 1, 1, NULL, NULL, 200, 30, 200, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(275, 100, 141, 1, 1, NULL, NULL, 225, 10.13, 225, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(276, 101, 141, 1, 1, NULL, NULL, 30, 3.96, 30, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(277, 102, 141, 1, 1, NULL, NULL, 70, 31.64, 70, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(278, 103, 142, 1, 1, NULL, NULL, 325, 3073.3, 325, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(279, 104, 142, 1, 1, NULL, NULL, 550, 561, 550, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(280, 105, 142, 1, 1, NULL, NULL, 325, 765.05, 325, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(281, 106, 143, 1, 1, NULL, NULL, 200, 190, 200, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(282, 103, 143, 1, 1, NULL, NULL, 200, 1670.4, 525, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(283, 105, 143, 1, 1, NULL, NULL, 200, 510, 525, '2020-11-20', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(284, 92, 144, 7, 1, 22, 2, 50, 8.56, 600, '2020-11-20', 1, 0, 1, NULL, 15, NULL, NULL, NULL, NULL),
-(285, 93, 144, 7, 1, 22, 2, 50, 5.03, 400, '2020-11-20', 1, 0, 1, NULL, 15, NULL, NULL, NULL, NULL),
-(286, 94, 144, 7, 1, 22, 2, 50, 12.5, 400, '2020-11-20', 1, 0, 1, NULL, 15, NULL, NULL, NULL, NULL),
-(287, 97, 145, 7, 1, 24, 3, 20, 10.05, 100, '2020-11-20', 1, 0, 1, NULL, 10, NULL, NULL, NULL, NULL),
-(288, 98, 145, 7, 1, 24, 3, 100, 5.2, 650, '2020-11-20', 1, 0, 1, NULL, 10, NULL, NULL, NULL, NULL),
-(289, 99, 145, 7, 1, 24, 7, 20, 3, 180, '2020-11-20', 1, 0, 1, NULL, 10, NULL, NULL, NULL, NULL),
-(290, 104, 146, 7, 1, 23, 7, 25, 25.5, 525, '2020-11-20', 1, 0, 1, NULL, 11, NULL, NULL, NULL, NULL),
-(291, 103, 146, 7, 1, 23, 7, 25, 225.89, 500, '2020-11-20', 1, 0, 1, NULL, 11, NULL, NULL, NULL, NULL),
-(292, 105, 146, 7, 1, 23, 7, 25, 60.72, 500, '2020-11-20', 1, 0, 1, NULL, 11, NULL, NULL, NULL, NULL),
-(293, 92, 147, 7, 1, 22, 2, 35, 5.99, 565, '2020-11-20', 1, 0, 1, NULL, 12, NULL, NULL, NULL, NULL),
-(294, 93, 147, 7, 1, 22, 2, 35, 3.52, 365, '2020-11-20', 1, 0, 1, NULL, 12, NULL, NULL, NULL, NULL),
-(295, 94, 147, 7, 1, 22, 2, 35, 8.75, 365, '2020-11-20', 1, 0, 1, NULL, 12, NULL, NULL, NULL, NULL),
-(296, 102, 148, 7, 1, 24, 3, 25, 11.3, 45, '2020-11-20', 1, 0, 1, NULL, 13, NULL, NULL, NULL, NULL),
-(297, 100, 148, 7, 1, 24, 3, 150, 6.75, 75, '2020-11-20', 1, 0, 1, NULL, 13, NULL, NULL, NULL, NULL),
-(298, 99, 148, 7, 1, 24, 3, 25, 3.75, 155, '2020-11-20', 1, 0, 1, NULL, 13, NULL, NULL, NULL, NULL),
-(299, 104, 149, 7, 1, 23, 7, 45, 45.9, 480, '2020-11-20', 1, 0, 1, NULL, 14, NULL, NULL, NULL, NULL),
-(300, 103, 149, 7, 1, 23, 7, 45, 406.6, 455, '2020-11-20', 1, 0, 1, NULL, 14, NULL, NULL, NULL, NULL),
-(301, 105, 149, 7, 1, 23, 7, 45, 109.29, 455, '2020-11-20', 1, 0, 1, NULL, 14, NULL, NULL, NULL, NULL),
-(302, 94, 150, 4, 1, NULL, NULL, 365, 91.25, 0, '2020-11-21', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(303, 101, 150, 4, 1, NULL, NULL, 30, 3.96, 0, '2020-11-21', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(304, 96, 151, 3, 1, NULL, NULL, 365, 91.25, 565, '2020-11-21', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(305, 99, 151, 3, 1, NULL, NULL, 30, 3.96, 185, '2020-11-21', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(306, 92, 152, 6, 1, NULL, NULL, 305, 52.16, 260, '2020-11-21', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(307, 98, 152, 6, 1, NULL, NULL, 200, 10.4, 450, '2020-11-21', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(308, 104, 152, 6, 1, NULL, NULL, 200, 204, 280, '2020-11-21', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(309, 103, 152, 6, 1, NULL, NULL, 200, 1807.2, 255, '2020-11-21', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(310, 107, 153, 5, 1, NULL, NULL, 305, 52.16, 305, '2020-11-21', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(311, 108, 153, 5, 1, NULL, NULL, 200, 10.4, 200, '2020-11-21', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(312, 109, 153, 5, 1, NULL, NULL, 200, 204, 200, '2020-11-21', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(313, 110, 153, 5, 1, NULL, NULL, 200, 1807.2, 200, '2020-11-21', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(314, 98, 154, 3, 1, NULL, NULL, 10, 0.52, 460, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(315, 96, 155, 4, 1, NULL, NULL, 10, 2.85, 555, '2020-11-27', 1, 0, 1, 2, NULL, NULL, NULL, NULL, NULL),
-(316, 93, 156, 7, 1, 25, 2, 20, 2.01, 345, '2020-11-27', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(317, 92, 156, 7, 1, 25, 2, 20, 3.43, 240, '2020-11-27', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(318, 105, 156, 7, 1, 25, 7, 5, 12.14, 450, '2020-11-27', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(319, 106, 156, 7, 1, 25, 7, 10, 9.5, 190, '2020-11-27', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(320, 99, 156, 7, 1, 24, 3, 20, 2.94, 165, '2020-11-27', 1, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(321, 97, 157, 9, 1, NULL, NULL, 20, 10.05, 120, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(322, 98, 157, 9, 1, NULL, NULL, 100, 5.2, 560, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(323, 99, 157, 9, 1, NULL, NULL, 20, 3, 185, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(324, 104, 158, 9, 1, NULL, NULL, 45, 45.9, 325, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(325, 103, 158, 9, 1, NULL, NULL, 45, 406.6, 300, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(326, 105, 158, 9, 1, NULL, NULL, 45, 109.29, 495, '2020-11-27', 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(327, 111, 159, 1, 1, NULL, NULL, 50, 12500, 50, '2020-11-23', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(328, 112, 159, 1, 1, NULL, NULL, 50, 10000, 50, '2020-11-23', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(329, 113, 159, 1, 1, NULL, NULL, 50, 7500, 50, '2020-11-23', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(330, 114, 160, 1, 1, NULL, NULL, 150, 3000, 150, '2020-11-23', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(331, 115, 161, 1, 1, NULL, NULL, 200, 6000, 200, '2020-11-23', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(332, 114, 162, 1, 1, NULL, NULL, 100, 1500, 250, '2020-11-23', 1, 1, 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(333, 92, 165, 7, 1, 22, 2, 150, 25.71, 90, '2020-11-28', 1, 0, 1, NULL, 16, NULL, NULL, NULL, NULL),
-(334, 93, 165, 7, 1, 22, 2, 150, 15.07, 195, '2020-11-28', 1, 0, 1, NULL, 16, NULL, NULL, NULL, NULL),
-(335, 96, 165, 7, 1, 22, 2, 150, 42.81, 405, '2020-11-28', 1, 0, 1, NULL, 16, NULL, NULL, NULL, NULL),
-(336, 103, 166, 7, 1, 23, 7, 100, 903.54, 200, '2020-11-28', 1, 0, 1, NULL, 17, NULL, NULL, NULL, NULL),
-(337, 105, 166, 7, 1, 23, 7, 100, 242.87, 395, '2020-11-28', 1, 0, 1, NULL, 17, NULL, NULL, NULL, NULL),
-(338, 106, 166, 7, 1, 23, 7, 100, 95, 90, '2020-11-28', 1, 0, 1, NULL, 17, NULL, NULL, NULL, NULL),
-(339, 115, 171, 10, 1, NULL, NULL, 200, 6000, 0, '2020-11-29', 1, 0, 2, NULL, NULL, 39, '815', '0010', NULL),
-(340, 114, 171, 10, 1, NULL, NULL, 100, 1800, 150, '2020-11-29', 1, 0, 2, NULL, NULL, 39, '815', '0010', NULL),
-(341, 111, 172, 10, 1, NULL, NULL, 20, 5000, 30, '2020-11-29', 1, 0, 2, NULL, NULL, 40, '815', '0040', NULL),
-(342, 112, 172, 10, 1, NULL, NULL, 15, 3000, 35, '2020-11-29', 1, 0, 2, NULL, NULL, 40, '815', '0040', NULL),
-(343, 108, 174, 10, 1, NULL, NULL, 10, 0.52, 190, '2020-12-01', 1, 0, 2, NULL, NULL, 41, '815', '0030', NULL),
-(344, 111, 176, 10, 1, NULL, NULL, 10, 2500, 20, '2020-12-02', 1, 0, 2, NULL, NULL, 42, '815', '0040', NULL),
-(345, 107, 178, 10, 1, NULL, NULL, 10, 1.7101639344262, 295, '2020-12-02', 1, 0, 2, NULL, NULL, 43, '815', '0020', NULL),
-(346, 109, 180, 10, 1, NULL, NULL, 100, 102, 100, '2020-12-02', 1, 0, 2, NULL, NULL, 44, '815', '0040', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -2289,32 +1474,6 @@ CREATE TABLE `movimiento_producto` (
   `nro_subcuenta_deudora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `id_movimiento_cancelado_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `movimiento_producto`
---
-
-INSERT INTO `movimiento_producto` (`id`, `id_producto_id`, `id_documento_id`, `id_tipo_documento_id`, `id_usuario_id`, `id_centro_costo_id`, `id_elemento_gasto_id`, `cantidad`, `importe`, `existencia`, `fecha`, `activo`, `entrada`, `id_almacen_id`, `id_orden_trabajo_id`, `id_expediente_id`, `id_factura_id`, `cuenta`, `nro_subcuenta_deudora`, `id_movimiento_cancelado_id`) VALUES
-(32, 7, 163, 2, 1, 22, NULL, 50, 26.09, 50, '2020-11-24', 1, 1, 3, 15, NULL, NULL, NULL, NULL, NULL),
-(33, 8, 163, 2, 1, 23, NULL, 25, 312.11, 25, '2020-11-24', 1, 1, 3, 11, NULL, NULL, NULL, NULL, NULL),
-(34, 9, 164, 2, 1, 22, NULL, 35, 18.26, 35, '2020-11-24', 1, 1, 3, 12, NULL, NULL, NULL, NULL, NULL),
-(35, 10, 164, 2, 1, 24, NULL, 25, 21.8, 25, '2020-11-24', 1, 1, 3, 13, NULL, NULL, NULL, NULL, NULL),
-(36, 11, 167, 2, 1, 22, NULL, 100, 55.73, 100, '2020-11-28', 1, 1, 3, 16, NULL, NULL, NULL, NULL, NULL),
-(37, 12, 167, 2, 1, 23, NULL, 80, 993.13, 80, '2020-11-28', 1, 1, 3, 17, NULL, NULL, NULL, NULL, NULL),
-(38, 11, 168, 2, 1, 22, NULL, 50, 27.86, 150, '2020-11-28', 1, 1, 3, 16, NULL, NULL, NULL, NULL, NULL),
-(39, 12, 168, 2, 1, 22, NULL, 20, 248.28, 100, '2020-11-28', 1, 1, 3, 16, NULL, NULL, NULL, NULL, NULL),
-(40, 12, 169, 10, 1, NULL, NULL, 45, 558.6345, 55, '2020-11-29', 1, 0, 3, NULL, NULL, 37, '810', '0160', NULL),
-(41, 11, 169, 10, 1, NULL, NULL, 25, 13.931666666667, 125, '2020-11-29', 1, 0, 3, NULL, NULL, 37, '810', '0150', NULL),
-(42, 10, 169, 10, 1, NULL, NULL, 20, 17.44, 5, '2020-11-29', 1, 0, 3, NULL, NULL, 37, '810', '0170', NULL),
-(43, 12, 170, 10, 1, NULL, NULL, 55, 682.7755, 0, '2020-11-29', 1, 0, 3, NULL, NULL, 38, '810', '0160', NULL),
-(44, 11, 170, 10, 1, NULL, NULL, 125, 69.658333333333, 0, '2020-11-29', 1, 0, 3, NULL, NULL, 38, '810', '0150', NULL),
-(45, 10, 170, 10, 1, NULL, NULL, 5, 4.36, 0, '2020-11-29', 1, 0, 3, NULL, NULL, 38, '810', '0170', NULL),
-(46, 7, 173, 10, 1, NULL, NULL, 30, 15.654, 20, '2020-11-29', 1, 0, 3, NULL, NULL, 40, '810', '0150', NULL),
-(47, 8, 173, 10, 1, NULL, NULL, 25, 312.11, 0, '2020-11-29', 1, 0, 3, NULL, NULL, 40, '810', '0160', NULL),
-(48, 7, 175, 10, 1, NULL, NULL, 1, 0.5218, 19, '2020-12-01', 1, 0, 3, NULL, NULL, 41, '810', '0150', NULL),
-(49, 9, 177, 10, 1, NULL, NULL, 10, 5.2171428571429, 25, '2020-12-02', 1, 0, 3, NULL, NULL, 42, '810', '0150', NULL),
-(50, 9, 179, 10, 1, NULL, NULL, 2, 1.0434285714286, 23, '2020-12-02', 1, 0, 3, NULL, NULL, 43, '810', '0150', NULL),
-(51, 9, 181, 10, 1, NULL, NULL, 3, 1.5651428571428, 20, '2020-12-02', 1, 0, 3, NULL, NULL, 44, '810', '0150', NULL);
 
 -- --------------------------------------------------------
 
@@ -2370,32 +1529,6 @@ CREATE TABLE `movimiento_venta` (
   `id_mercancia` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `movimiento_venta`
---
-
-INSERT INTO `movimiento_venta` (`id`, `id_factura_id`, `mercancia`, `codigo`, `cantidad`, `precio`, `descuento_recarga`, `existencia`, `activo`, `id_almacen_id`, `cuenta`, `nro_subcuenta_deudora`, `costo`, `anno`, `id_centro_costo_acreedor_id`, `id_orden_trabajo_acreedor_id`, `id_elemento_gasto_acreedor_id`, `id_expediente_acreedor_id`, `cuenta_nominal_acreedora`, `subcuenta_nominal_acreedora`, `descripcion`, `id_mercancia`) VALUES
-(42, 37, 0, 'OT-09', 45, 1.5, 6.75, 55, 1, 3, '810', '0150', 12.4141, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'VENTAS DE PRODUCTOS', 12),
-(43, 37, 0, 'OT-07', 25, 1.25, 3.12, 125, 1, 3, '810', '0150', 0.557267, 2020, NULL, NULL, NULL, NULL, '900', '0160', 'VENTAS DE PRODUCTOS', 11),
-(44, 37, 0, 'OT-05', 20, 2.25, 4.5, 5, 1, 3, '810', '0170', 0.872, 2020, NULL, NULL, NULL, NULL, '900', '0170', 'VENTAS DE PRODUCTOS', 10),
-(45, 38, 0, 'OT-09', 55, 15, 8.25, 0, 1, 3, '810', '0150', 12.4141, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'VENTAS DE PRODUCCION', 12),
-(46, 38, 0, 'OT-07', 125, 25, 3.12, 0, 1, 3, '810', '0150', 0.557267, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'VENTAS DE PRODUCCION', 11),
-(47, 38, 0, 'OT-05', 5, 2.25, 1.12, 0, 1, 3, '810', '0170', 0.872, 2020, NULL, NULL, NULL, NULL, '900', '0170', 'VENTAS DE PRODUCCION', 10),
-(48, 39, 1, '2018342', 200, 36, 70, 0, 1, 2, '815', '0010', 30, 2020, NULL, NULL, NULL, NULL, '901', '0010', 'VENTAS DE  MERCANCIAS', 115),
-(49, 39, 1, '2018340', 100, 30, 30, 150, 1, 2, '815', '0010', 18, 2020, NULL, NULL, NULL, NULL, '901', '0010', 'VENTAS DE  MERCANCIAS', 114),
-(50, 40, 1, '2013151', 20, 300, 60, 30, 1, 2, '815', '0040', 250, 2020, NULL, NULL, NULL, NULL, '901', '0040', 'VENTAS DE  MERCANCIAS', 111),
-(51, 40, 1, '20131453', 15, 275, 41.25, 35, 1, 2, '815', '0040', 200, 2020, NULL, NULL, NULL, NULL, '901', '0040', 'VENTAS DE  MERCANCIAS', 112),
-(52, 40, 0, 'OT-01', 30, 1.5, 4.5, 20, 1, 3, '810', '0150', 0.5218, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'VENTAS DE  MERCANCIAS', 7),
-(53, 40, 0, 'OT-03', 25, 25, 6.25, 0, 1, 3, '810', '0160', 12.4844, 2020, NULL, NULL, NULL, NULL, '900', '0160', 'VENTAS DE  MERCANCIAS', 8),
-(54, 41, 1, '1080-010', 10, 20, 2, 190, 1, 2, '815', '0030', 0.052, 2020, NULL, NULL, NULL, NULL, '901', '0030', 'arroz para cuba', 108),
-(55, 41, 0, 'OT-01', 1, 15, 0, 19, 1, 3, '810', '0150', 0.5218, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'aseo para el personal', 7),
-(56, 42, 1, '2013151', 10, 100, 0, 20, 1, 2, '815', '0040', 250, 2020, NULL, NULL, NULL, NULL, '901', '0040', 'split 2.0T', 111),
-(57, 42, 0, 'OT-04', 10, 100, 0, 25, 1, 3, '810', '0150', 0.521714, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'aseos cuba', 9),
-(58, 43, 1, '1046-01', 10, 100, 0, 295, 1, 2, '815', '0020', 0.171016, 2020, NULL, NULL, NULL, NULL, '901', '0020', 'fffff', 107),
-(59, 43, 0, 'OT-04', 2, 100, 0, 23, 1, 3, '810', '0150', 0.521714, 2020, NULL, NULL, NULL, NULL, '900', '0150', '.,.,', 9),
-(60, 44, 1, '2571-02', 100, 10, 0, 100, 1, 2, '815', '0040', 1.02, 2020, NULL, NULL, NULL, NULL, '901', '0040', 'fgfgfg', 109),
-(61, 44, 0, 'OT-04', 3, 100, 0, 20, 1, 3, '810', '0150', 0.521714, 2020, NULL, NULL, NULL, NULL, '900', '0150', 'gggg', 9);
-
 -- --------------------------------------------------------
 
 --
@@ -2447,18 +1580,20 @@ CREATE TABLE `nomina_pago` (
   `cant_horas_trabajadas` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `nomina_pago`
+-- Table structure for table `nomina_tercero_comprobante`
 --
 
-INSERT INTO `nomina_pago` (`id`, `id_empleado_id`, `id_usuario_aprueba_id`, `comision`, `vacaciones`, `horas_extra`, `otros`, `total_ingresos`, `ingresos_cotizables_tss`, `isr`, `ars`, `afp`, `cooperativa`, `plan_medico_complementario`, `restaurant`, `total_deducido`, `sueldo_neto_pagar`, `afp_empleador`, `sfs_empleador`, `srl_empleador`, `infotep_empleador`, `mes`, `anno`, `fecha`, `elaborada`, `aprobada`, `id_unidad_id`, `quincena`, `salario_bruto`, `cant_horas_trabajadas`) VALUES
-(11, 4, 1, 5000, 0, 1250, 0, 71250, 70000, 5368.45, 2128, 2009, 1750, 500, 800, 12555.45, 58694.55, 4970, 4963, 770, 700, 12, 2020, '2020-12-03', 1, 1, 1, 1, 65000, 0),
-(12, 3, 1, 3000, 0, 2120, 0, 30120, 28000, 0, 851.2, 803.6, 700, 500, 800, 3654.8, 26465.2, 1988, 1985.2, 308, 280, 12, 2020, '2020-12-03', 1, 1, 1, 1, 25000, 0),
-(13, 5, 1, 50000, 0, 1250, 0, 381250, 380000, 77968.44, 11552, 10906, 9500, 300, 600, 110826.44, 270423.56, 26980, 26942, 4180, 3800, 12, 2020, '2020-12-03', 1, 1, 1, 1, 330000, 0),
-(14, 2, 1, 2000, 100, 120, 0, 4352220, 4352100, 1012280.66, 132303.84, 124905.27, 108800, 1000, 800, 1380089.77, 2972130.23, 308999.1, 308563.89, 47872, 43520, 12, 2020, '2020-12-03', 1, 1, 1, 1, 4350000, 290),
-(15, 1, 1, 1200, 200, 0, 0, 24400, 24400, 0, 741.76, 700.28, 605, 120, 250, 2417.04, 21982.96, 1732.4, 1729.96, 266.2, 242, 12, 2020, '2020-12-03', 1, 1, 1, 1, 23000, 23),
-(21, 4, 1, 5000, 0, 1250, 0, 71250, 70000, 5368.45, 2128, 2009, 1750, 500, 800, 12555.45, 58694.55, 4970, 4963, 770, 700, 12, 2020, '2020-12-03', 1, 1, 1, 2, 65000, 0),
-(22, 5, 1, 2400, 0, 1250, 0, 36650, 35400, 0, 1076.16, 1015.98, 885, 500, 800, 4277.14, 32372.86, 2513.4, 2509.86, 389.4, 354, 12, 2020, '2020-12-03', 1, 1, 1, 2, 33000, 0);
+CREATE TABLE `nomina_tercero_comprobante` (
+  `id` int(11) NOT NULL,
+  `id_nomina_id` int(11) NOT NULL,
+  `id_unidad_id` int(11) NOT NULL,
+  `id_comprobante_id` int(11) DEFAULT NULL,
+  `mes` int(11) NOT NULL,
+  `anno` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -2525,80 +1660,6 @@ CREATE TABLE `operaciones_comprobante_operaciones` (
   `debito` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `operaciones_comprobante_operaciones`
---
-
-INSERT INTO `operaciones_comprobante_operaciones` (`id`, `id_cuenta_id`, `id_subcuenta_id`, `id_centro_costo_id`, `id_orden_trabajo_id`, `id_elemento_gasto_id`, `id_expediente_id`, `id_proveedor_id`, `id_registro_comprobantes_id`, `id_almacen_id`, `id_unidad_id`, `id_cliente`, `id_tipo_cliente`, `credito`, `debito`) VALUES
-(11, 1, 1, NULL, NULL, NULL, NULL, NULL, 32, NULL, 1, 4, 3, 0, 100),
-(12, 8, 71, NULL, NULL, NULL, NULL, NULL, 32, NULL, 1, 4, 3, 0, 100),
-(13, 2, 133, NULL, NULL, NULL, NULL, NULL, 33, NULL, 1, 4, 3, 0, 20),
-(14, 8, 71, NULL, NULL, NULL, NULL, NULL, 33, NULL, 1, 4, 3, 0, 20),
-(15, 2, 133, NULL, NULL, NULL, NULL, NULL, 34, NULL, 1, 4, 3, 0, 20),
-(16, 8, 71, NULL, NULL, NULL, NULL, NULL, 34, NULL, 1, 4, 3, 0, 20),
-(17, 2, 133, NULL, NULL, NULL, NULL, NULL, 35, NULL, 1, 4, 3, 0, 20),
-(18, 8, 71, NULL, NULL, NULL, NULL, NULL, 35, NULL, 1, 4, 3, 20, 0),
-(19, 2, 133, NULL, NULL, NULL, NULL, NULL, 36, NULL, 1, 4, 3, 0, 20),
-(20, 8, 71, NULL, NULL, NULL, NULL, NULL, 36, NULL, 1, 4, 3, 20, 0),
-(21, 2, 133, NULL, NULL, NULL, NULL, NULL, 37, NULL, 1, 4, 3, 0, 20),
-(22, 8, 71, NULL, NULL, NULL, NULL, NULL, 37, NULL, 1, 4, 3, 20, 0),
-(23, 2, 133, NULL, NULL, NULL, NULL, NULL, 38, NULL, 1, 4, 3, 0, 20),
-(24, 8, 71, NULL, NULL, NULL, NULL, NULL, 38, NULL, 1, 4, 3, 20, 0),
-(25, 2, 133, NULL, NULL, NULL, NULL, NULL, 39, NULL, 1, 4, 3, 0, 20),
-(26, 8, 71, NULL, NULL, NULL, NULL, NULL, 39, NULL, 1, 4, 3, 20, 0),
-(27, 2, 133, NULL, NULL, NULL, NULL, NULL, 40, NULL, 1, 4, 3, 0, 20),
-(28, 8, 71, NULL, NULL, NULL, NULL, NULL, 40, NULL, 1, 4, 3, 20, 0),
-(29, 2, 133, NULL, NULL, NULL, NULL, NULL, 41, NULL, 1, 4, 3, 0, 20),
-(30, 8, 71, NULL, NULL, NULL, NULL, NULL, 41, NULL, 1, 4, 3, 20, 0),
-(31, 2, 133, NULL, NULL, NULL, NULL, NULL, 42, NULL, 1, 4, 3, 0, 20),
-(32, 8, 71, NULL, NULL, NULL, NULL, NULL, 42, NULL, 1, 4, 3, 20, 0),
-(33, 2, 133, NULL, NULL, NULL, NULL, NULL, 43, NULL, 1, 4, 3, 0, 20),
-(34, 8, 71, NULL, NULL, NULL, NULL, NULL, 43, NULL, 1, 4, 3, 20, 0),
-(35, 2, 133, NULL, NULL, NULL, NULL, NULL, 44, NULL, 1, 4, 3, 0, 20),
-(36, 8, 71, NULL, NULL, NULL, NULL, NULL, 44, NULL, 1, 4, 3, 20, 0),
-(37, 2, 133, NULL, NULL, NULL, NULL, NULL, 45, NULL, 1, 4, 3, 0, 20),
-(38, 8, 71, NULL, NULL, NULL, NULL, NULL, 45, NULL, 1, 4, 3, 20, 0),
-(39, 2, 133, NULL, NULL, NULL, NULL, NULL, 46, NULL, 1, 4, 3, 0, 20),
-(40, 8, 71, NULL, NULL, NULL, NULL, NULL, 46, NULL, 1, 4, 3, 20, 0),
-(41, 2, 133, NULL, NULL, NULL, NULL, NULL, 47, NULL, 1, 4, 3, 0, 20),
-(42, 8, 71, NULL, NULL, NULL, NULL, NULL, 47, NULL, 1, 4, 3, 20, 0),
-(43, 2, 133, NULL, NULL, NULL, NULL, NULL, 48, NULL, 1, 4, 3, 0, 20),
-(44, 8, 71, NULL, NULL, NULL, NULL, NULL, 48, NULL, 1, 4, 3, 20, 0),
-(45, 2, 133, NULL, NULL, NULL, NULL, NULL, 49, NULL, 1, 4, 3, 0, 20),
-(46, 8, 71, NULL, NULL, NULL, NULL, NULL, 49, NULL, 1, 4, 3, 20, 0),
-(47, 2, 133, NULL, NULL, NULL, NULL, NULL, 50, NULL, 1, 4, 3, 0, 20),
-(48, 8, 71, NULL, NULL, NULL, NULL, NULL, 50, NULL, 1, 4, 3, 20, 0),
-(49, 2, 133, NULL, NULL, NULL, NULL, NULL, 51, NULL, 1, 4, 3, 0, 20),
-(50, 8, 71, NULL, NULL, NULL, NULL, NULL, 51, NULL, 1, 4, 3, 20, 0),
-(51, 2, 133, NULL, NULL, NULL, NULL, NULL, 52, NULL, 1, 4, 3, 0, 20),
-(52, 8, 71, NULL, NULL, NULL, NULL, NULL, 52, NULL, 1, 4, 3, 20, 0),
-(53, 2, 133, NULL, NULL, NULL, NULL, NULL, 53, NULL, 1, 4, 3, 0, 20),
-(54, 8, 71, NULL, NULL, NULL, NULL, NULL, 53, NULL, 1, 4, 3, 20, 0),
-(55, 2, 133, NULL, NULL, NULL, NULL, NULL, 54, NULL, 1, 4, 3, 0, 20),
-(56, 8, 71, NULL, NULL, NULL, NULL, NULL, 54, NULL, 1, 4, 3, 20, 0),
-(57, 2, 133, NULL, NULL, NULL, NULL, NULL, 55, NULL, 1, 4, 3, 0, 20),
-(58, 8, 71, NULL, NULL, NULL, NULL, NULL, 55, NULL, 1, 4, 3, 20, 0),
-(59, 2, 133, NULL, NULL, NULL, NULL, NULL, 56, NULL, 1, 4, 3, 0, 20),
-(60, 8, 71, NULL, NULL, NULL, NULL, NULL, 56, NULL, 1, 4, 3, 20, 0),
-(61, 2, 133, NULL, NULL, NULL, NULL, NULL, 57, NULL, 1, 4, 3, 0, 20),
-(62, 8, 71, NULL, NULL, NULL, NULL, NULL, 57, NULL, 1, 4, 3, 20, 0),
-(63, 2, 133, NULL, NULL, NULL, NULL, NULL, 58, NULL, 1, 4, 3, 0, 20),
-(64, 8, 71, NULL, NULL, NULL, NULL, NULL, 58, NULL, 1, 4, 3, 20, 0),
-(65, 2, 133, NULL, NULL, NULL, NULL, NULL, 59, NULL, 1, 4, 3, 0, 20),
-(66, 8, 71, NULL, NULL, NULL, NULL, NULL, 59, NULL, 1, 4, 3, 20, 0),
-(67, 1, 1, NULL, NULL, NULL, NULL, NULL, 60, NULL, NULL, 0, NULL, 0, 1158.12),
-(68, 8, 71, NULL, NULL, NULL, NULL, NULL, 60, NULL, NULL, 4, 3, 1158.12, 0),
-(73, 8, 71, NULL, NULL, NULL, NULL, NULL, 63, NULL, 1, 4, 3, 10158.12, 0),
-(74, 1, 1, NULL, NULL, NULL, NULL, NULL, 63, NULL, 1, 0, NULL, 0, 10158.12),
-(75, 1, 1, NULL, NULL, NULL, NULL, NULL, 64, NULL, 1, NULL, NULL, 0, 10158.12),
-(76, 8, 71, NULL, NULL, NULL, NULL, NULL, 64, NULL, 1, 4, 3, 10158.12, 0),
-(77, 8, 71, NULL, NULL, NULL, NULL, 1, 65, NULL, 1, NULL, NULL, 0, 200),
-(78, 2, 133, NULL, NULL, NULL, NULL, NULL, 65, NULL, 1, NULL, NULL, 200, 0),
-(79, 36, 63, NULL, NULL, NULL, NULL, 1, 76, NULL, 1, NULL, NULL, 0, 138.91),
-(80, 2, 133, NULL, NULL, NULL, NULL, NULL, 76, NULL, 1, NULL, NULL, 138.91, 0),
-(81, 36, 63, NULL, NULL, NULL, NULL, 1, 77, NULL, 1, NULL, NULL, 0, 138.91),
-(82, 2, 133, NULL, NULL, NULL, NULL, NULL, 77, NULL, 1, NULL, NULL, 138.91, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -2614,28 +1675,6 @@ CREATE TABLE `orden_trabajo` (
   `activo` tinyint(1) NOT NULL,
   `anno` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `orden_trabajo`
---
-
-INSERT INTO `orden_trabajo` (`id`, `id_unidad_id`, `id_almacen_id`, `codigo`, `descripcion`, `activo`, `anno`) VALUES
-(2, 1, 1, '02', 'Combo de Alimento 2da Clase', 1, 2020),
-(3, 1, 1, '03', 'Combo de Medicamentos Clase 1', 1, 2020),
-(4, 1, 1, '04', 'Combo de Aseo 2da Clase', 1, 2020),
-(5, 1, 1, '05', 'Combo de Alimento Clase 2', 1, 2020),
-(6, 1, 1, '06', 'Combo de Medicina Clase 1', 1, 2020),
-(7, 1, 1, '7', 'Combo de Aseo', 1, 2020),
-(8, 1, 1, '9', 'Combo de Medicina', 1, 2020),
-(9, 1, 1, '01', 'Combo de Aseo', 1, 2020),
-(10, 1, 1, 'OT-02', 'Combo de Alimento', 1, 2020),
-(11, 1, 1, 'OT-03', 'Combo de Medicamento', 1, 2020),
-(12, 1, 1, 'OT-04', 'Combo de Aseo', 1, 2020),
-(13, 1, 1, 'OT-05', 'Combo de Alimento', 1, 2020),
-(14, 1, 1, 'OT-06', 'Combo de Medicamento', 1, 2020),
-(15, 1, 1, 'OT-01', 'Combo de Aseo', 1, 2020),
-(16, 1, 1, 'OT-07', 'Combo de Aseo', 1, 2020),
-(17, 1, 1, 'OT-09', 'Combo de Medicamento', 1, 2020);
 
 -- --------------------------------------------------------
 
@@ -2671,9 +1710,7 @@ CREATE TABLE `periodo_sistema` (
 --
 
 INSERT INTO `periodo_sistema` (`id`, `id_unidad_id`, `id_almacen_id`, `id_usuario_id`, `mes`, `anno`, `tipo`, `fecha`, `cerrado`) VALUES
-(1, 1, NULL, 1, 12, 2020, 2, '2021-01-13', 1),
-(2, 1, NULL, 1, 1, 2021, 2, '2021-01-13', 1),
-(3, 1, NULL, 1, 2, 2021, 2, '2021-01-16', 0);
+(4, 1, 1, 1, 1, 2021, 1, '2021-01-23', 0);
 
 -- --------------------------------------------------------
 
@@ -2722,18 +1759,6 @@ CREATE TABLE `producto` (
   `nro_cuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `producto`
---
-
-INSERT INTO `producto` (`id`, `id_amlacen_id`, `id_unidad_medida_id`, `codigo`, `cuenta`, `descripcion`, `existencia`, `importe`, `activo`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_subcuenta_acreedora`) VALUES
-(7, 3, 13, 'OT-01', '188', 'Combo de Aseo', 19, 9.9142, 1, '0020', '700', '0050'),
-(8, 3, 13, 'OT-03', '188', 'Combo de Medicamento', 0, 0, 0, '0020', '700', '0050'),
-(9, 3, 13, 'OT-04', '188', 'Combo de Aseo', 20, 10.434285714285, 1, '0020', '700', '0050'),
-(10, 3, 13, 'OT-05', '188', 'Combo de Alimento', 0, 0, 0, '0020', '700', '0050'),
-(11, 3, 13, 'OT-07', '188', 'Combo de Aseo', 0, 0, 0, '0020', '700', '0050'),
-(12, 3, 13, 'OT-09', '188', 'Combo de Medicamento', 0, 0, 0, '0020', '700', '0050');
 
 -- --------------------------------------------------------
 
@@ -2824,68 +1849,6 @@ CREATE TABLE `registro_comprobantes` (
   `tipo` int(11) DEFAULT NULL,
   `documento` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `registro_comprobantes`
---
-
-INSERT INTO `registro_comprobantes` (`id`, `id_unidad_id`, `id_tipo_comprobante_id`, `id_usuario_id`, `id_almacen_id`, `nro_consecutivo`, `fecha`, `descripcion`, `debito`, `credito`, `anno`, `tipo`, `documento`) VALUES
-(26, 1, 2, 1, 1, 1, '2020-12-01', 'Comprobante de operaciones del mes de noviembre dia 30', 12473.1, 12473.1, 2020, 1, NULL),
-(27, 1, 2, 1, 3, 2, '2020-11-29', 'Comprobante de operaciones del almacen 3 correspondiente al mes de noviembre dia 30', 1703.26, 1703.26, 2020, 1, NULL),
-(28, 1, 2, 1, 2, 3, '2020-11-30', 'comprobante de operaciones en el almacen 2 con la venta incluida', 58373.76, 58373.76, 2020, 1, NULL),
-(29, 1, 2, 1, 2, 4, '2020-12-02', 'zzz', 0.52, 0.52, 2020, 1, NULL),
-(30, 1, 2, 1, 3, 5, '2020-12-02', 'ventas', 1675.08, 1675.08, 2020, 1, NULL),
-(31, 1, 2, 1, NULL, 6, '2020-12-16', 'comprobante de ventas', 25355.86, 25355.86, 2020, 2, NULL),
-(32, 1, 2, 1, NULL, 7, '2020-12-17', 'Pagando factura de servicio, número FACT-1', 100, 100, 2020, 3, 'cheque'),
-(33, 1, 2, 1, NULL, 8, '2020-12-17', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(34, 1, 2, 1, NULL, 9, '2020-12-17', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(35, 1, 2, 1, NULL, 10, '2020-12-17', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(36, 1, 2, 1, NULL, 11, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(37, 1, 2, 1, NULL, 12, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(38, 1, 2, 1, NULL, 13, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(39, 1, 2, 1, NULL, 14, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(40, 1, 2, 1, NULL, 15, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(41, 1, 2, 1, NULL, 16, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(42, 1, 2, 1, NULL, 17, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(43, 1, 2, 1, NULL, 18, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(44, 1, 2, 1, NULL, 19, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(45, 1, 2, 1, NULL, 20, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(46, 1, 2, 1, NULL, 21, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(47, 1, 2, 1, NULL, 22, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(48, 1, 2, 1, NULL, 23, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(49, 1, 2, 1, NULL, 24, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(50, 1, 2, 1, NULL, 25, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(51, 1, 2, 1, NULL, 26, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(52, 1, 2, 1, NULL, 27, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(53, 1, 2, 1, NULL, 28, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(54, 1, 2, 1, NULL, 29, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(55, 1, 2, 1, NULL, 30, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(56, 1, 2, 1, NULL, 31, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(57, 1, 2, 1, NULL, 32, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(58, 1, 2, 1, NULL, 33, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(59, 1, 2, 1, NULL, 34, '2020-12-18', 'Pagando factura de servicio, número FACT-1', 20, 20, 2020, 3, 'transferencia'),
-(60, 1, 2, 1, NULL, 35, '2020-12-20', 'invento', 1158.12, 1158.12, 2020, 3, 'invento'),
-(63, 1, 2, 1, NULL, 36, '2020-12-22', 'pagando facturas', 10158.12, 10158.12, 2020, 3, 'cheque'),
-(64, 1, 2, 1, NULL, 37, '2020-12-22', 'pago', 10158.12, 10158.12, 2020, 3, 'cheque'),
-(65, 1, 2, 1, NULL, 38, '2020-12-22', 'pagando mercancia', 200, 200, 2020, 3, 'transferencia'),
-(66, 1, 2, 1, NULL, 39, '2020-12-23', 'generando comprobate de venta de 23-12-2020', 2000, 2000, 2020, 2, NULL),
-(67, 1, 2, 1, NULL, 40, '2020-12-23', 'zzxzxzxzx', 2500, 2500, 2020, 2, NULL),
-(68, 1, 2, 1, 2, 41, '2020-12-03', 'sdsdsd', 2603.71, 2603.71, 2020, 1, NULL),
-(69, 1, 2, 1, NULL, 1, '2021-01-05', 'comprobante de operaciones activo fijo 5-1-2021', 3210, 3210, 2021, 5, NULL),
-(70, 1, 2, 1, NULL, 2, '2021-01-05', 'comprobante de operaciones del dia 5-1-2021 en la tarde', 500, 500, 2021, 5, NULL),
-(71, 1, 2, 1, NULL, 42, '2021-01-06', 'fdddfdfd', 2500, 2500, 2020, 5, NULL),
-(72, 1, 2, 1, NULL, 43, '2020-12-03', 'xzzxzxz', 5000, 5000, 2020, 5, NULL),
-(73, 1, 2, 1, NULL, 44, '2020-12-03', 'cdsfdsfdsfdsdfsdfsdsf', 5000, 5000, 2020, 5, NULL),
-(74, 1, 2, 1, NULL, 45, '2020-12-03', 'cdsfdsfdsfdsdfsdfsdsf', 5000, 5000, 2020, 5, NULL),
-(75, 1, 2, 1, NULL, 46, '2020-12-03', 'Depreciación de activo fijo', 0.83, 0.83, 2020, 4, NULL),
-(76, 1, 2, 1, NULL, 47, '2020-12-03', 'qasw', 138.91, 138.91, 2020, 3, 'cheque'),
-(77, 1, 2, 1, NULL, 48, '2020-12-03', 'qasw', 138.91, 138.91, 2020, 3, 'cheque'),
-(78, 1, 2, 1, NULL, 49, '2020-12-03', 'PAGO DE SALARIO DEL MES DE DICIMBRE, SEGUNDA QUINCENA', 3149372.3, 3149372.3, 2020, 6, NULL),
-(79, 1, 2, 1, NULL, 50, '2020-12-03', 'RECTIFICANDO PAGO DE SALARIO DE DICIMEBRE SEGUNDA QUINCENA.(2020)', 3149372.3, 3149372.3, 2020, 6, NULL),
-(80, 1, 2, 1, NULL, 51, '2020-12-03', 'PAGO SEGUNDA QUINCENA 12/2020', 125069.66, 125069.66, 2020, 6, NULL),
-(81, 1, 2, 1, NULL, 52, '2020-12-03', 'revisando una ultima vez', 125069.66, 125069.66, 2020, 6, NULL),
-(82, 1, 2, 1, NULL, 53, '2020-12-03', 'errores en la nomina', 125069.66, 125069.66, 2020, 6, NULL),
-(83, 1, 2, 1, NULL, 54, '2020-12-03', 'sasasasasas', 125069.66, 125069.66, 2020, 6, NULL);
 
 -- --------------------------------------------------------
 
@@ -3352,22 +2315,6 @@ CREATE TABLE `subcuenta_proveedor` (
   `id_proveedor_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `subcuenta_proveedor`
---
-
-INSERT INTO `subcuenta_proveedor` (`id`, `id_subcuenta_id`, `id_proveedor_id`) VALUES
-(1, 63, 1),
-(2, 63, 2),
-(3, 63, 3),
-(4, 63, 4),
-(5, 63, 5),
-(6, 63, 6),
-(7, 63, 9),
-(8, 63, 7),
-(9, 63, 8),
-(10, 63, 10);
-
 -- --------------------------------------------------------
 
 --
@@ -3510,7 +2457,8 @@ INSERT INTO `tipo_documento` (`id`, `nombre`, `activo`) VALUES
 (8, 'VALE DE SALIDA PRODUCTO', 1),
 (9, 'DEVOLUCION', 1),
 (10, 'VENTA', 1),
-(11, 'DEVOLUCION VENTA', 1);
+(11, 'DEVOLUCION VENTA', 1),
+(12, 'APERTURA', 1);
 
 -- --------------------------------------------------------
 
@@ -3581,14 +2529,6 @@ CREATE TABLE `transferencia` (
   `entrada` tinyint(1) NOT NULL,
   `nro_subcuenta_acreedora` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `transferencia`
---
-
-INSERT INTO `transferencia` (`id`, `id_documento_id`, `id_unidad_id`, `id_almacen_id`, `nro_cuenta_inventario`, `nro_subcuenta_inventario`, `nro_cuenta_acreedora`, `nro_concecutivo`, `anno`, `activo`, `entrada`, `nro_subcuenta_acreedora`) VALUES
-(5, 152, NULL, 2, '696', '0020', '', '1', 2020, 1, 0, ''),
-(6, 153, NULL, 1, '', '', '697', '1', 2020, 1, 1, '0020');
 
 -- --------------------------------------------------------
 
@@ -3752,21 +2692,6 @@ CREATE TABLE `vale_salida` (
   `producto` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `vale_salida`
---
-
-INSERT INTO `vale_salida` (`id`, `id_documento_id`, `activo`, `nro_consecutivo`, `anno`, `fecha_solicitud`, `nro_solicitud`, `nro_cuenta_deudora`, `nro_subcuenta_deudora`, `producto`) VALUES
-(31, 144, 1, '1', 2020, '2020-11-20', '1', '700', '0020', 0),
-(32, 145, 1, '2', 2020, '2020-11-20', '2', '700', '0020', 0),
-(33, 146, 1, '3', 2020, '2020-11-20', '3', '700', '0020', 0),
-(34, 147, 1, '4', 2020, '2020-11-20', '4', '700', '0020', 0),
-(35, 148, 1, '5', 2020, '2020-11-20', '5', '700', '0020', 0),
-(36, 149, 1, '6', 2020, '2020-11-20', '6', '700', '0020', 0),
-(37, 156, 1, '7', 2020, '2020-11-27', '7', '823', '0010', 0),
-(38, 165, 1, '8', 2020, '2020-11-28', '8', '700', '0020', 0),
-(39, 166, 1, '9', 2020, '2020-11-28', '9', '700', '0020', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -3873,6 +2798,13 @@ ALTER TABLE `almacen_ocupado`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_AA53605839161EBF` (`id_almacen_id`),
   ADD KEY `IDX_AA5360587EB2C349` (`id_usuario_id`);
+
+--
+-- Indexes for table `apertura`
+--
+ALTER TABLE `apertura`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_DFFB55EB6601BA07` (`id_documento_id`);
 
 --
 -- Indexes for table `area_responsabilidad`
@@ -4345,6 +3277,15 @@ ALTER TABLE `nomina_pago`
   ADD KEY `IDX_5CB8BD331D34FA6B` (`id_unidad_id`);
 
 --
+-- Indexes for table `nomina_tercero_comprobante`
+--
+ALTER TABLE `nomina_tercero_comprobante`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_D4A77ABF2547677` (`id_nomina_id`),
+  ADD KEY `IDX_D4A77ABF1D34FA6B` (`id_unidad_id`),
+  ADD KEY `IDX_D4A77ABF1800963C` (`id_comprobante_id`);
+
+--
 -- Indexes for table `obligacion_cobro`
 --
 ALTER TABLE `obligacion_cobro`
@@ -4714,13 +3655,19 @@ ALTER TABLE `ajuste`
 -- AUTO_INCREMENT for table `almacen`
 --
 ALTER TABLE `almacen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `almacen_ocupado`
 --
 ALTER TABLE `almacen_ocupado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=241;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
+
+--
+-- AUTO_INCREMENT for table `apertura`
+--
+ALTER TABLE `apertura`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `area_responsabilidad`
@@ -4894,7 +3841,7 @@ ALTER TABLE `elemento_gasto`
 -- AUTO_INCREMENT for table `empleado`
 --
 ALTER TABLE `empleado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `expediente`
@@ -4954,7 +3901,7 @@ ALTER TABLE `hotel_origen`
 -- AUTO_INCREMENT for table `impuesto_sobre_renta`
 --
 ALTER TABLE `impuesto_sobre_renta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `informe_recepcion`
@@ -5038,7 +3985,13 @@ ALTER TABLE `municipios`
 -- AUTO_INCREMENT for table `nomina_pago`
 --
 ALTER TABLE `nomina_pago`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `nomina_tercero_comprobante`
+--
+ALTER TABLE `nomina_tercero_comprobante`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `obligacion_cobro`
@@ -5074,7 +4027,7 @@ ALTER TABLE `pais`
 -- AUTO_INCREMENT for table `periodo_sistema`
 --
 ALTER TABLE `periodo_sistema`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `producto`
@@ -5337,6 +4290,12 @@ ALTER TABLE `almacen`
 ALTER TABLE `almacen_ocupado`
   ADD CONSTRAINT `FK_AA53605839161EBF` FOREIGN KEY (`id_almacen_id`) REFERENCES `almacen` (`id`),
   ADD CONSTRAINT `FK_AA5360587EB2C349` FOREIGN KEY (`id_usuario_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `apertura`
+--
+ALTER TABLE `apertura`
+  ADD CONSTRAINT `FK_DFFB55EB6601BA07` FOREIGN KEY (`id_documento_id`) REFERENCES `documento` (`id`);
 
 --
 -- Constraints for table `area_responsabilidad`
@@ -5646,6 +4605,14 @@ ALTER TABLE `nomina_pago`
   ADD CONSTRAINT `FK_5CB8BD331D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
   ADD CONSTRAINT `FK_5CB8BD338D392AC7` FOREIGN KEY (`id_empleado_id`) REFERENCES `empleado` (`id`),
   ADD CONSTRAINT `FK_5CB8BD33AC6A6301` FOREIGN KEY (`id_usuario_aprueba_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `nomina_tercero_comprobante`
+--
+ALTER TABLE `nomina_tercero_comprobante`
+  ADD CONSTRAINT `FK_D4A77ABF1800963C` FOREIGN KEY (`id_comprobante_id`) REFERENCES `registro_comprobantes` (`id`),
+  ADD CONSTRAINT `FK_D4A77ABF1D34FA6B` FOREIGN KEY (`id_unidad_id`) REFERENCES `unidad` (`id`),
+  ADD CONSTRAINT `FK_D4A77ABF2547677` FOREIGN KEY (`id_nomina_id`) REFERENCES `nomina_pago` (`id`);
 
 --
 -- Constraints for table `obligacion_cobro`

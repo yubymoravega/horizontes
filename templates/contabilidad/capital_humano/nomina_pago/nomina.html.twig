@@ -272,10 +272,10 @@
 
             /*** Cooperativa se complica porque hay que tener en cuenta el tipo de pago si es por hora o bruto**/
             if (salario_x_hora.length == 1) {
-                salario_bruto_mensual = parseFloat(salario_x_hora.val()) * parseFloat(horas_trabajadas.val()) + parseFloat(comision.val())
+                salario_bruto_mensual = parseFloat(salario_x_hora.val()) * parseFloat(horas_trabajadas.val()) + (comision.val()==''?0:parseFloat(comision.val()))
                 cooperativa = (salario_bruto_mensual * parseFloat($('#cooperativa').val()))/100
             } else if (sueldo_bruto.length == 1) {
-                salario_bruto_mensual = parseFloat(sueldo_bruto.val()) + parseFloat(comision.val())
+                salario_bruto_mensual = parseFloat(sueldo_bruto.val()) + (comision.val()==''?0:parseFloat(comision.val()))
                 cooperativa = (salario_bruto_mensual * parseFloat($('#cooperativa').val()))/100
             }
             $('#nomina_pago_cooperativa').val(cooperativa.toFixed(2))

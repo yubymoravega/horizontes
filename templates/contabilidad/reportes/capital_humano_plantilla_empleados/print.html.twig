@@ -9,28 +9,33 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="7"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td class="text-right"><strong>Fecha impresión: </strong> {{ fecha_impresion }}</td>
             </tr>
             </tbody>
         </table>
         <table border="0" width="960px" class="text-center">
-            <thead>
+            <thead class="bg-dark font-weight-bold text-white">
             <th scope="col-1">Nombre</th>
             <th width="280px">Correo</th>
             <th width="350px">Cargo</th>
             <th width="300px">Rol</th>
-            <th width="190px">Salario básico</th>
+            <th width="220px">Sueldo Bruto</th>
             <th width="220px">Teléfono</th>
             </thead>
             <tbody>
             {% for item in empleados %}
-                <tr>
-                    <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.correo }}</td>
-                    <td style="font-weight:400;">{{ item.cargo_nombre }}</td>
-                    <td style="font-weight:400;">{{ item.rol }}</td>
-                    <td style="font-weight:400;" class="text-right">{{ item.salario_basico }}</td>
-                    <td style="font-weight:400;">{{ item.telefono }}</td>
+                {% if item.index == 0 %}
+                    <tr>
+                {% else %}
+                    <tr style="background-color: lightgrey !important;">
+                {% endif %}
+                <td style="font-weight:400;" class="text-left">{{ item.nombre }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.correo }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.cargo_nombre }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.rol }}</td>
+                <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.telefono }}</td>
                 </tr>
             {% endfor %}
             </tbody>

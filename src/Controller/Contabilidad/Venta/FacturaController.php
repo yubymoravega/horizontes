@@ -215,6 +215,11 @@ class FacturaController extends AbstractController
                         'id_producto' => $elemento,
                         'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find(2)
                     ]);
+                    if (empty($movimientos))
+                        $movimientos = $em->getRepository(MovimientoProducto::class)->findBy([
+                            'id_producto' => $elemento,
+                            'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find(13)
+                        ]);
                     $subcuenta_venta = '';
                     /** @var MovimientoProducto $mov_prod */
                     foreach ($movimientos as $mov_prod) {
@@ -255,7 +260,6 @@ class FacturaController extends AbstractController
                 $obj_subcuenta_venta_acreedora = $subcuenta_er->findOneBy(
                     ['nro_subcuenta' => $subcuenta_venta, 'activo' => true, 'id_cuenta' => $cuenta_nominal_acreedora_movimiento_venta]
                 );
-
                 $asiento_venta = AuxFunctions::createAsiento($em, $cuenta_nominal_acreedora_movimiento_venta, $obj_subcuenta_venta_acreedora, null,
                     $unidad, $almacenRepository->find($mercancia_obj->id_almacen), null, null, null, null,
                     null, 0, 0, $fecha_factura, $fecha_factura->format('Y'),
@@ -321,16 +325,17 @@ class FacturaController extends AbstractController
                         }
                         $em->persist($elemento);
 
-                        $cuenta_inventario = $cuenta_er->findOneBy(['nro_cuenta'=>$elemento->getCuenta(),'activo'=>true]);
+                        $cuenta_inventario = $cuenta_er->findOneBy(['nro_cuenta' => $elemento->getCuenta(), 'activo' => true]);
                         $subcuenta_inventatio_mercancia = $subcuenta_er->findOneBy(
-                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
+                            ['nro_subcuenta' => '0030', 'activo' => true, 'id_cuenta' => $cuenta_inventario]
+//                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
                         );
 
                         /** Asiento la operacion reduciento la cuenta de la mercancia */
                         $asiento_costo_venta_almacen = AuxFunctions::createAsiento($em, $cuenta_inventario, $subcuenta_inventatio_mercancia,
                             $document, $unidad, $elemento->getIdAmlacen(), null, null,
                             null, null, null, 0, 0, $fecha_factura,
-                            $fecha_factura->format('Y'), round(($precio*floatval($mercancia_obj->cantidad)),2),0,
+                            $fecha_factura->format('Y'), round(($precio * floatval($mercancia_obj->cantidad)), 2), 0,
                             'FACT-' . $factura->getNroFactura(), $factura);
 
 
@@ -368,6 +373,13 @@ class FacturaController extends AbstractController
                                 'id_tipo_documento' => $tipo_documento_er->find(2),
                                 'id_almacen' => $almacenRepository->find($mercancia_obj->id_almacen)
                             ]);
+                            if (empty($movimientos)) {
+                                $movimientos = $em->getRepository(MovimientoProducto::class)->findBy([
+                                    'id_producto' => $elemento,
+                                    'id_tipo_documento' => $tipo_documento_er->find(13),
+                                    'id_almacen' => $almacenRepository->find($mercancia_obj->id_almacen)
+                                ]);
+                            }
                             /** @var MovimientoProducto $mov_prod */
                             foreach ($movimientos as $mov_prod) {
                                 if ($mov_prod->getIdCentroCosto()) {
@@ -405,6 +417,8 @@ class FacturaController extends AbstractController
                         $obj_subcuenta_venta_deudora = $subcuenta_er->findOneBy(
                             ['nro_subcuenta' => $subcuenta_venta, 'activo' => true, 'id_cuenta' => $obj_cuenta_movimiento_venta]
                         );
+                        if (!$obj_subcuenta_venta_deudora)
+                            dd($obj_cuenta_movimiento_venta, $subcuenta_venta);
                         $asiento_costo_venta = AuxFunctions::createAsiento($em, $obj_cuenta_movimiento_venta, $obj_subcuenta_venta_deudora,
                             $document, $unidad, $almacenRepository->find($mercancia_obj->id_almacen), null, null,
                             null, null, null, 0, 0, $fecha_factura,
@@ -659,7 +673,6 @@ class FacturaController extends AbstractController
             /** 2.1 Pongo la factura cancelada como cancelada y adiciono el motivo de la cancelacion */
             $factura
                 ->setCancelada(true)
-//                ->setActivo(false)//para que cuando se valla a cargar la factura en el metodo load se vea
                 ->setMotivoCancelacion($request->query->get('explicacion'));
             $em->persist($factura);
 
@@ -719,7 +732,7 @@ class FacturaController extends AbstractController
                     ];
 
                     $fecha_update = '';
-                    /** Actualizo la existencia y el imprte de cada mercancia o producto */
+                    /** Actualizo la existencia y el importe de cada mercancia o producto */
                     if ($mercancia == true) {
                         /** @var Mercancia $mercancia_obj */
                         $mercancia_obj = $mercancia_er->findOneBy($array_conditions);
@@ -795,7 +808,6 @@ class FacturaController extends AbstractController
                                 ->setIdOrdenTrabajo($item->getIdOrdenTrabajo())
                                 ->setIdExpediente($item->getIdExpediente())
                                 ->setIdCentroCosto($item->getIdCentroCosto())
-//                            ->setFecha(\DateTime::createFromFormat('d-m-Y', Date('d-m-Y')))
                                 ->setFecha($fecha_update)
                                 ->setIdTipoDocumento($item->getIdTipoDocumento())
                                 ->setIdUsuario($this->getUser())
@@ -835,21 +847,38 @@ class FacturaController extends AbstractController
                     /**
                      * Asentando la operacion
                      */
-                    //--paso 1. obtener el arreglo de valores asentados para la factura en  un inicio
+                    //--paso 1. obtener el arreglo de valores asentados para la factura en un inicio
                     $asiento_arr = $em->getRepository(Asiento::class)->findBy([
                         'fecha' => $factura->getFechaFactura(),
                         'nro_documento' => 'FACT-' . $factura->getNroFactura(),
                         'anno' => $factura->getFechaFactura()->format('Y')
                     ]);
-                    /** @var Asiento $asiento */
                     $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
+                    /** @var Asiento $asiento */
                     foreach ($asiento_arr as $asiento) {
-                        if ($asiento->getIdDocumento() == $documento)
-                            $new_asiento = AuxFunctions::createAsiento($em, $asiento->getIdCuenta(), $asiento->getIdSubcuenta(),
-                                $asiento->getIdDocumento() != null ? $new_Documento : null, $asiento->getIdUnidad(), $asiento->getIdAlmacen(), $asiento->getIdCentroCosto(),
-                                $asiento->getIdElementoGasto(), $asiento->getIdOrdenTrabajo(), $asiento->getIdExpediente(), $asiento->getIdProveedor(),
-                                $asiento->getTipoCliente(), $asiento->getIdCliente(), $today, $today->format('Y'), $asiento->getDebito(),
-                                $asiento->getCredito(), $asiento->getNroDocumento(), $new_Factura);
+                        $new_element = AuxFunctions::createAsiento($em,
+                            $asiento->getIdCuenta(),
+                            $asiento->getIdSubcuenta(),
+                            $asiento->getIdDocumento(),
+                            $asiento->getIdUnidad(),
+                            $asiento->getIdAlmacen(),
+                            $asiento->getIdCentroCosto(),
+                            $asiento->getIdElementoGasto(),
+                            $asiento->getIdOrdenTrabajo(),
+                            $asiento->getIdExpediente(),
+                            $asiento->getIdProveedor(),
+                            $asiento->getTipoCliente()?$asiento->getTipoCliente():0,
+                            $asiento->getIdCliente()?$asiento->getIdCliente():0,
+                            $today,
+                            intval($today->format('Y')),
+                            $asiento->getDebito(),
+                            $asiento->getCredito(),
+                            $asiento->getNroDocumento(),
+                            $new_Factura,
+                            $asiento->getIdActivoFijo(),
+                            $asiento->getIdAreaResponsabilidad(),
+                            null
+                        );
                     }
                 }
             } else {
@@ -890,25 +919,40 @@ class FacturaController extends AbstractController
         $em->persist($new_Factura);
 
 
-        /**
-         * Asentando la operacion
-         */
-        //--paso 1. obtener el arreglo de valores asentados para la factura en  un inicio
-        $asiento_arr = $em->getRepository(Asiento::class)->findBy([
-            'fecha' => $factura->getFechaFactura(),
-            'nro_documento' => 'FACT-' . $factura->getNroFactura(),
-            'anno' => $factura->getFechaFactura()->format('Y')
-        ]);
-        /** @var Asiento $asiento */
-        $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
-        foreach ($asiento_arr as $asiento) {
-            if (!$asiento->getIdDocumento() || $asiento->getIdDocumento() == null)
-                $new_asiento = AuxFunctions::createAsiento($em, $asiento->getIdCuenta(), $asiento->getIdSubcuenta(),
-                    null, $asiento->getIdUnidad(), $asiento->getIdAlmacen(), $asiento->getIdCentroCosto(),
-                    $asiento->getIdElementoGasto(), $asiento->getIdOrdenTrabajo(), $asiento->getIdExpediente(), $asiento->getIdProveedor(),
-                    $asiento->getTipoCliente(), $asiento->getIdCliente(), $today, $today->format('Y'), $asiento->getDebito(),
-                    $asiento->getCredito(), $asiento->getNroDocumento(), $new_Factura);
-        }
+//        /**
+//         * Asentando la operacion
+//         */
+//        //--paso 1. obtener el arreglo de valores asentados para la factura en  un inicio
+//        $asiento_arr = $em->getRepository(Asiento::class)->findBy([
+//            'fecha' => $factura->getFechaFactura(),
+//            'nro_documento' => 'FACT-' . $factura->getNroFactura(),
+//            'anno' => $factura->getFechaFactura()->format('Y')
+//        ]);
+//        /** @var Asiento $asiento */
+//        $today = \DateTime::createFromFormat('d-m-Y', Date('d-m-Y'));
+//        foreach ($asiento_arr as $asiento) {
+////            if (!$asiento->getIdDocumento() || $asiento->getIdDocumento() == null)
+////            dd($today->format('Y'));
+//                $new_asiento = AuxFunctions::createAsiento($em,
+//                    $asiento->getIdCuenta(),
+//                    $asiento->getIdSubcuenta(),
+//                    null,
+//                    $asiento->getIdUnidad(),
+//                    $asiento->getIdAlmacen(),
+//                    $asiento->getIdCentroCosto(),
+//                    $asiento->getIdElementoGasto(),
+//                    $asiento->getIdOrdenTrabajo(),
+//                    $asiento->getIdExpediente(),
+//                    $asiento->getIdProveedor(),
+//                    $asiento->getTipoCliente()?$asiento->getTipoCliente():0,
+//                    $asiento->getIdCliente()?$asiento->getIdCliente():0,
+//                    $today,
+//                    intval($today->format('Y')),
+//                    $asiento->getDebito(),
+//                    $asiento->getCredito(),
+//                    $asiento->getNroDocumento(),
+//                    $new_Factura);
+//        }
 
         $em->flush();
         $this->addFlash('success', 'Factura número: ' . $nro . ' cancelada satisfactoriamente');

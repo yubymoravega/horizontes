@@ -56,10 +56,27 @@ class BalanceComprobacionSaldoController extends AbstractController
         /** @var Unidad $unidad */
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $list_balance_comprobacion = $this->getData($em);
+        $mes_credito = 0;
+        $mes_debito = 0;
+        $acumulado_credito = 0;
+        $acumulado_debito = 0;
+        foreach ($list_balance_comprobacion as $item){
+            if($item['index']==1||$item['index']=='1'){
+                $mes_debito += $item['debito_mes_value'];
+                $mes_credito += $item['credito_mes_value'];
+                $acumulado_debito += $item['saldo_deudor_value'];
+                $acumulado_credito += $item['saldo_acreedor_value'];
+            }
+        }
         return $this->render('contabilidad/general/balance_comprobacion_saldo/print.html.twig', [
             'datos' => $list_balance_comprobacion,
             'unidad_codigo' => $unidad->getCodigo(),
-            'unidad_nombre' => $unidad->getNombre()
+            'unidad_nombre' => $unidad->getNombre(),
+            'mes_debito'=>number_format($mes_debito,2),
+            'mes_credito'=>number_format($mes_credito,2),
+            'acumulado_debito'=>number_format($acumulado_debito,2),
+            'acumulado_credito'=>number_format($acumulado_credito,2),
+            'fecha_impresion'=>Date('d-m-Y')
         ]);
     }
 
@@ -102,9 +119,14 @@ class BalanceComprobacionSaldoController extends AbstractController
                     'codigo' => $asiento->getIdCuenta()->getNroCuenta(),
 
                     'descripcion' => $asiento->getIdCuenta()->getNombre(),
-                    'saldo' => number_format($saldo_cuenta['saldo'], 2),
-                    'credito_mes' => number_format($saldo_cuenta['credito'], 2),
-                    'debito_mes' => number_format($saldo_cuenta['debito'], 2),
+                    'saldo_deudor' => $asiento->getIdCuenta()->getDeudora()?number_format($saldo_cuenta['saldo'], 2):'',
+                    'saldo_acreedor' => $asiento->getIdCuenta()->getDeudora()?'':number_format($saldo_cuenta['saldo'], 2),
+                    'credito_mes' => $saldo_cuenta['credito']>0?number_format($saldo_cuenta['credito'], 2):'',
+                    'debito_mes' => $saldo_cuenta['debito']>0?number_format($saldo_cuenta['debito'], 2):'',
+                    'saldo_deudor_value' => $asiento->getIdCuenta()->getDeudora()? $saldo_cuenta['saldo']:0,
+                    'saldo_acreedor_value' => $asiento->getIdCuenta()->getDeudora()?0:$saldo_cuenta['saldo'],
+                    'credito_mes_value' => $saldo_cuenta['credito'],
+                    'debito_mes_value' => $saldo_cuenta['debito'],
                     'index' => $this->TIPO_CUENTA
                 );
             }
@@ -118,29 +140,34 @@ class BalanceComprobacionSaldoController extends AbstractController
                     'codigo' => $asiento->getIdSubcuenta()->getNroSubcuenta(),
 
                     'descripcion' => $asiento->getIdSubcuenta()->getDescripcion(),
-                    'saldo' => number_format($saldo_subcuenta['saldo'], 2),
-                    'credito_mes' => number_format($saldo_subcuenta['credito'], 2),
-                    'debito_mes' => number_format($saldo_subcuenta['debito'], 2),
+                    'saldo_deudor' => $asiento->getIdSubcuenta()->getDeudora()?number_format($saldo_subcuenta['saldo'], 2):'',
+                    'saldo_acreedor' => $asiento->getIdSubcuenta()->getDeudora()?'':number_format($saldo_subcuenta['saldo'], 2),
+                    'credito_mes' => $credito>0?number_format($saldo_subcuenta['credito'], 2):'',
+                    'debito_mes' => $debito>0?number_format($saldo_subcuenta['debito'], 2):'',
+
                     'index' => $this->TIPO_SUBCUENTA
                 );
             }
             // generar la Criterio
-            $saldo_criterio = $temp_cuenta->getDeudora()
-                ? $debito - $credito
-                : $credito - $debito;
-            $list_balance_comprobacion[] = array(
-                'id_cuenta' => $asiento->getIdCuenta()->getId(),
-                'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
-                'criterio' => $this->generateCriterioOneAsiento($asiento, $em),
-                'codigo' => $this->generateCriterioOneAsiento($asiento, $em),
+            $criterio = $this->generateCriterioOneAsiento($asiento, $em);
+            if(!empty($criterio)){
+                $saldo_criterio = $temp_cuenta->getDeudora()
+                    ? $debito - $credito
+                    : $credito - $debito;
+                $list_balance_comprobacion[] = array(
+                    'id_cuenta' => $asiento->getIdCuenta()->getId(),
+                    'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
+                    'criterio' => $criterio,
+                    'codigo' => $criterio,
 
-                'descripcion' => $this->generateCriterioOneAsientoDesc($asiento, $em),
-                'saldo' => number_format($saldo_criterio, 2),
-                'credito_mes' => number_format($credito, 2),
-                'debito_mes' => number_format($debito, 2),
-                'index' => $this->TIPO_CRITERIO
-            );
-
+                    'descripcion' => $this->generateCriterioOneAsientoDesc($asiento, $em),
+                    'saldo_deudor' => $asiento->getIdSubcuenta()->getDeudora()?number_format($saldo_criterio, 2):'',
+                    'saldo_acreedor' => $asiento->getIdSubcuenta()->getDeudora()?'':number_format($saldo_criterio, 2),
+                    'credito_mes' => $credito>0?number_format($credito, 2):'',
+                    'debito_mes' => $debito>0?number_format($debito, 2):'',
+                    'index' => $this->TIPO_CRITERIO
+                );
+            }
         }
         return $list_balance_comprobacion;
     }
@@ -148,16 +175,42 @@ class BalanceComprobacionSaldoController extends AbstractController
 
     private function generateCriterioOneAsiento(Asiento $asiento, EntityManagerInterface $em)
     {
+        $arr_criterios_analisis = AuxFunctions::getCriterioByCuenta($asiento->getIdCuenta()->getNroCuenta(),$em);
         $lista = [];
-        if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getCodigo());
-        if ($asiento->getIdCentroCosto()) array_push($lista, $asiento->getIdCentroCosto()->getCodigo());
-        if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getCodigo());
-        if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getCodigo());
-        if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getCodigo());
-        if ($asiento->getIdCliente()) {
-            $cliente = ClientesAdapter::getClienteFactory($em, $asiento->getTipoCliente());
-            $data = $cliente->find($asiento->getIdCliente());
-            array_push($lista, $data['codigo']);
+        if(empty($arr_criterios_analisis))
+            return [];
+        foreach ($arr_criterios_analisis as $item){
+            if($item == 'ALM'){
+                if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getCodigo());
+            }
+            elseif ($item == 'CCT'){
+                if ($asiento->getIdCentroCosto()) array_push($lista, $asiento->getIdCentroCosto()->getCodigo());
+            }
+            elseif ($item == 'EG'){
+                if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getCodigo());
+            }
+            elseif ($item == 'OT'){
+                if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getCodigo());
+            }
+            elseif ($item == 'AR'){
+                if ($asiento->getIdAreaResponsabilidad()) array_push($lista, $asiento->getIdAreaResponsabilidad()->getCodigo());
+            }
+            elseif ($item == 'GA'){
+                if ($asiento->getIdActivoFijo()->getIdGrupoActivo()) array_push($lista, $asiento->getIdActivoFijo()->getIdGrupoActivo()->getCodigo());
+            }
+            elseif ($item == 'EXP'){
+                if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getCodigo());
+            }
+            elseif ($item == 'CLIPRO'){
+                if ($asiento->getIdCliente()) {
+                    $cliente = ClientesAdapter::getClienteFactory($em, $asiento->getTipoCliente());
+                    $data = $cliente->find($asiento->getIdCliente());
+                    array_push($lista, $data['codigo']);
+                }
+                elseif ($asiento->getIdProveedor()){
+                    array_push($lista, $asiento->getIdProveedor()->getCodigo());
+                }
+            }
         }
 //        if ($asiento->getTipoCliente()) array_push($lista, $asiento->getTipoCliente());
 
@@ -166,18 +219,43 @@ class BalanceComprobacionSaldoController extends AbstractController
 
     private function generateCriterioOneAsientoDesc(Asiento $asiento, EntityManagerInterface $em)
     {
+        $arr_criterios_analisis = AuxFunctions::getCriterioByCuenta($asiento->getIdCuenta()->getNroCuenta(),$em);
         $lista = [];
-        if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getDescripcion());
-        if ($asiento->getIdCentroCosto()) array_push($lista, $asiento->getIdCentroCosto()->getNombre());
-        if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getDescripcion());
-        if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getDescripcion());
-        if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getDescripcion());
-        if ($asiento->getIdCliente()) {
-            $cliente = ClientesAdapter::getClienteFactory($em, $asiento->getTipoCliente());
-            $data = $cliente->find($asiento->getIdCliente());
-            array_push($lista, $data['nombre']);
-        }
-//        if ($asiento->getTipoCliente()) array_push($lista, 'TCLT');
+        if(empty($arr_criterios_analisis))
+            return [];
+        foreach ($arr_criterios_analisis as $item){
+            if($item == 'ALM'){
+                if ($asiento->getIdAlmacen()) array_push($lista, $asiento->getIdAlmacen()->getDescripcion());
+            }
+            elseif ($item == 'CCT'){
+                if ($asiento->getIdCentroCosto()) array_push($lista, $asiento->getIdCentroCosto()->getNombre());
+            }
+            elseif ($item == 'EG'){
+                if ($asiento->getIdElementoGasto()) array_push($lista, $asiento->getIdElementoGasto()->getDescripcion());
+            }
+            elseif ($item == 'OT'){
+                if ($asiento->getIdOrdenTrabajo()) array_push($lista, $asiento->getIdOrdenTrabajo()->getDescripcion());
+            }
+            elseif ($item == 'AR'){
+                if ($asiento->getIdAreaResponsabilidad()) array_push($lista, $asiento->getIdAreaResponsabilidad()->getNombre());
+            }
+            elseif ($item == 'GA'){
+                if ($asiento->getIdActivoFijo()->getIdGrupoActivo()) array_push($lista, $asiento->getIdActivoFijo()->getIdGrupoActivo()->getDescripcion());
+            }
+            elseif ($item == 'EXP'){
+                if ($asiento->getIdExpediente()) array_push($lista, $asiento->getIdExpediente()->getDescripcion());
+            }
+            elseif ($item == 'CLIPRO'){
+                if ($asiento->getIdCliente()) {
+                    $cliente = ClientesAdapter::getClienteFactory($em, $asiento->getTipoCliente());
+                    $data = $cliente->find($asiento->getIdCliente());
+                    array_push($lista, $data['nombre']);
+                }
+                elseif ($asiento->getIdProveedor()){
+                    array_push($lista, $asiento->getIdProveedor()->getNombre());
+                }
+            }
+        }//        if ($asiento->getTipoCliente()) array_push($lista, 'TCLT');
 
         return implode('; ', $lista);
     }

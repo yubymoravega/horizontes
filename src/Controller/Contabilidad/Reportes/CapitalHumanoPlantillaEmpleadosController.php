@@ -20,17 +20,17 @@ class CapitalHumanoPlantillaEmpleadosController extends ControllerContabilidadRe
     /**
      * @Route("/", name="contabilidad_reportes_capital_humano_plantilla_empleados")
      */
-    public function index(EntityManagerInterface $em,Request $request)
+    public function index(EntityManagerInterface $em, Request $request)
     {
-        $obj_unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $empleados = $em->getRepository(Empleado::class)->findBy([
-            'id_unidad'=>$obj_unidad
+            'id_unidad' => $obj_unidad
         ]);
-        $year = AuxFunctions::getCurrentYear($em,$obj_unidad);
+        $year = AuxFunctions::getCurrentYear($em, $obj_unidad);
         $rows = [];
         /** @var Empleado $item */
-        foreach ($empleados as $item){
-            if(!$item->getBaja()){
+        foreach ($empleados as $item) {
+            if (!$item->getBaja()) {
                 $rows[] = array(
                     'id' => $item->getId(),
                     'nombre' => $item->getNombre(),
@@ -40,7 +40,7 @@ class CapitalHumanoPlantillaEmpleadosController extends ControllerContabilidadRe
                     'identificacion' => $item->getIdentificacion(),
                     'telefono' => $item->getTelefono(),
                     'id_cargo' => $item->getIdCargo() ? $item->getIdCargo()->getId() : '',
-                    'salario_basico' => number_format($item->getIdCargo()->getSalarioBase(),2),
+                    'sueldo_bruto' => number_format($item->getSueldoBrutoMensual(), 2),
                     'is_usuario' => $item->getIdUsuario() ? true : false,
                     'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                     'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',
@@ -55,21 +55,23 @@ class CapitalHumanoPlantillaEmpleadosController extends ControllerContabilidadRe
             'empleados' => $rows,
         ]);
     }
+
     /**
      * @Route("/print", name="contabilidad_reportes_capital_humano_plantilla_imprimir")
      */
-    public function print(EntityManagerInterface $em,Request $request)
+    public function print(EntityManagerInterface $em, Request $request)
     {
-        $obj_unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $empleados = $em->getRepository(Empleado::class)->findBy([
-            'id_unidad'=>$obj_unidad
+            'id_unidad' => $obj_unidad
         ]);
         $year = Date('Y');
         $rows = [];
         /** @var Empleado $item */
-        foreach ($empleados as $item){
-            if(!$item->getBaja()){
+        foreach ($empleados as $key => $item) {
+            if (!$item->getBaja()) {
                 $rows[] = array(
+                    'index' => $key % 2,
                     'id' => $item->getId(),
                     'nombre' => $item->getNombre(),
                     'correo' => $item->getCorreo(),
@@ -79,7 +81,7 @@ class CapitalHumanoPlantillaEmpleadosController extends ControllerContabilidadRe
                     'salario_x_hora' => '',
                     'telefono' => $item->getTelefono(),
                     'id_cargo' => $item->getIdCargo() ? $item->getIdCargo()->getId() : '',
-                    'salario_basico' => number_format($item->getIdCargo()->getSalarioBase(),2),
+                    'sueldo_bruto' => number_format($item->getSueldoBrutoMensual(), 2),
                     'is_usuario' => $item->getIdUsuario() ? true : false,
                     'id_unidad' => $item->getIdUnidad() ? $item->getIdUnidad()->getId() : '',
                     'unidad_nombre' => $item->getIdUnidad() ? $item->getIdUnidad()->getNombre() : '',
@@ -93,6 +95,7 @@ class CapitalHumanoPlantillaEmpleadosController extends ControllerContabilidadRe
         return $this->render('contabilidad/capital_humano/plantilla_agencia/print.html.twig', [
             'controller_name' => 'PrintPlantilla',
             'empleados' => $rows,
+            'fecha_impresion' => Date('d-m-Y'),
             'unidad' => $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre()
         ]);
     }

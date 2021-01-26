@@ -3,6 +3,9 @@
 namespace App\Controller\Contabilidad\Inventario;
 
 use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Form\Contabilidad\Inventario\ProveedorType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +25,18 @@ class ProveedorController extends AbstractController
     {
         $form = $this->createForm(ProveedorType::class);
 
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
+
         $proveedor_arr = $em->getRepository(Proveedor::class)->findByActivo(true);
         $row = [];
         foreach ($proveedor_arr as $item) {
@@ -35,7 +50,8 @@ class ProveedorController extends AbstractController
         return $this->render('contabilidad/inventario/proveedor/index.html.twig', [
             'controller_name' => 'ProveedorController',
             'proveedores' => $row,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'apertura'=>empty($documentos_apertura)?true:false
         ]);
     }
 

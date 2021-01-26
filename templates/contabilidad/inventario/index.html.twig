@@ -26,6 +26,10 @@
                         Entrada
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if apertura == true %}
+                            <a class="dropdown-item" href="{{ url ('contabilidad_inventario_apertura_gestionar') }}">Apertura</a>
+                            <div class="dropdown-divider"></div>
+                        {% endif %}
                         <h6 class="text-center">Informe de Recepción</h6>
                         <div class="dropdown-divider"></div>
                         <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
@@ -151,7 +155,7 @@
                     <div class="modal-body" id="confirm_body">
                         Seleccione la fecha en la que desea trabajar
                         <input type="date" name="fecha_cierre"
-                               min="{{ app.session.get('min_date') }}"
+                                {#                               min="{{ app.session.get('min_date') }}"#}
                                max="{{ app.session.get('max_date') }}"
                                value="{{ app.session.get('min_date') }}">
                     </div>

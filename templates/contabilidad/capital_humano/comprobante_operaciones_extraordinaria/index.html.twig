@@ -30,29 +30,36 @@
             {% for info in datos %}
             <table border="0" width="960px" class="text-center">
                 <div style="background-color: #cecbcb; width: 960px; height: 30px">
-                    <p><strong>Empleado: </strong>{{ info.empleado }}</p>
+                    <p><strong>Empleado: </strong>{{ info.empleado }}
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Cancelar"
+                                onclick="Cancelar({{ info.id_nomina }})">Cancelar
+                        </button>
+                    </p>
                 </div>
                 {% for item in info.datos %}
                     {% if item.cuenta != '' %}
-                    <tr>
-                        <td style="font-weight:400;width:136px">{{ item.fecha }}</td>
-                        <td style="font-weight:400;width:136px" class="text-center">{{ item.cuenta }}</td>
-                        <td style="font-weight:400;width:136px" class="text-center">{{ item.subcuenta }}</td>
-                        <td style="font-weight:400;width:136px" class="text-center">{{ item.criterio_1 }}</td>
-                        <td style="font-weight:400;width:136px" class="text-center"></td>
-                        <td style="font-weight:400;width:136px" class="text-right">{{ item.debito }}</td>
-                        <td style="font-weight:400;width:136px" class="text-right">{{ item.credito }}</td>
-                    </tr>
-                        {% else %}
-                            <tr>
-                                <td style="font-weight:400;width:136px"></td>
-                                <td style="font-weight:400;width:136px" class="text-center"></td>
-                                <td style="font-weight:400;width:136px" class="text-center"></td>
-                                <td style="font-weight:400;width:136px" class="text-center"></td>
-                                <td style="font-weight:400;width:136px" class="text-center"></td>
-                                <td style="font-weight:400;width:136px" class="text-right font-italic">{{ item.debito }}</td>
-                                <td style="font-weight:400;width:136px" class="text-right font-italic" >{{ item.credito }}</td>
-                            </tr>
+                        <tr>
+                            <td style="font-weight:400;width:136px">{{ item.fecha }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.cuenta }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.subcuenta }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center">{{ item.criterio_1 }}</td>
+                            <td style="font-weight:400;width:136px" class="text-center"></td>
+                            <td style="font-weight:400;width:136px" class="text-right">{{ item.debito }}</td>
+                            <td style="font-weight:400;width:136px" class="text-right">{{ item.credito }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td style="font-weight:400;width:136px"></td>
+                            <td style="font-weight:400;width:136px" class="text-center"></td>
+                            <td style="font-weight:400;width:136px" class="text-center"></td>
+                            <td style="font-weight:400;width:136px" class="text-center"></td>
+                            <td style="font-weight:400;width:136px" class="text-center"></td>
+                            <td style="font-weight:400;width:136px"
+                                class="text-right font-italic">{{ item.debito }}</td>
+                            <td style="font-weight:400;width:136px"
+                                class="text-right font-italic">{{ item.credito }}</td>
+                        </tr>
                     {% endif %}
                 {% endfor %}
                 </tbody>
@@ -67,7 +74,8 @@
                 <td class="font-weight-bold text-right">{{ total_credito }}</td>
             </tr>
         </table>
-        <form action="{{ path('contabilidad_capital_humano_comprobante_operaciones_extraordinaria_aceptar_comprobante') }}" method="post">
+        <form action="{{ path('contabilidad_capital_humano_comprobante_operaciones_extraordinaria_aceptar_comprobante') }}"
+              method="post">
             <div style="width: 960px" class="mt-5">
                 <label for="observacion" class="font-weight-bold">Observación:</label>
                 <textarea name="observacion" id="observacion" cols="120" rows="4" class="w-100"></textarea>
@@ -91,4 +99,33 @@
             </div>
         </form>
     </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Cancelar(id) {
+            loadingModal.show();
+            $('#confirm__modal').modal('show')
+
+            $( "#confirm__modal__btn_ok" ).click(function() {
+
+                $.ajax({
+                    type: 'POST',
+                    data: {'code' : '200'},
+                    url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas.json.borrar/"+id,
+                    dataType: 'html',
+                    success: function (data) {
+
+                        window.location.href = "/home";
+
+
+                    }});
+
+
+
+            });
+        }
+    </script>
 {% endblock %}

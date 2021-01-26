@@ -72,8 +72,9 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light" id="dashboard">
             <thead class="thead-dark">
-            <th width="100px" class="pr-0 pl-0 text-center">Tipo</th>
-            <th width="100px" class="pl-0 text-center pr-0">Número</th>
+            <th width="30px" class="pr-0 pl-0 text-center">Tipo</th>
+            <th width="30px" class="pl-0 text-center pr-0">Comprobante</th>
+            <th width="100px" class="pl-0 text-center pr-0">Fecha</th>
             <th width="200px" class="pl-0 text-center pr-0">Documento</th>
             <th width="200px" class="pl-0 text-center pr-0">Débito</th>
             <th width="200px" class="pl-0 text-center pr-0">Crédito</th>
@@ -364,8 +365,9 @@
                             $('#rows_datos').find('tr').remove()
                             result.datos.forEach(datos => {
                                 $('#rows_datos').append(`<tr>
-                                    <td style="font-weight:400;"> ${datos['tipo_comprobante']} </td>
-                                    <td style="font-weight:400;"> ${datos['nro_comprobante']} </td>
+                                    <td style="font-weight:400;" class="text-right"> ${datos['tipo_comprobante']} </td>
+                                    <td style="font-weight:400;" class="text-right"> ${datos['nro_comprobante']} </td>
+                                    <td style="font-weight:400;" class="text-center"> ${datos['fecha']} </td>
                                     <td style="font-weight:400;" class="text-center"> ${datos['nro_consecutivo']} </td>
                                     <td style="font-weight:400;" class="text-right"> ${datos['debito']} </td>
                                     <td style="font-weight:400;" class="text-right"> ${datos['credito']} </td>

@@ -2,8 +2,11 @@
 
 namespace App\Controller\Contabilidad\Inventario;
 
+use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumento;
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\Producto;
 use Doctrine\ORM\EntityManagerInterface;
@@ -87,13 +90,27 @@ class MercanciaController extends AbstractController
                 ])
             ->getForm();
 
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
+
         if (empty($row) && $nro_cuenta != 'one')// una orden inexistente por parametros y no sea one
-            return $this->redirectToRoute('contabilidad_inventario_mercancia', ['nro_cuenta' => 'one']);
+            return $this->redirectToRoute('contabilidad_inventario_mercancia', ['nro_cuenta' => 'one','apertura'=>empty($documentos_apertura)?true:false]);
+
         return $this->render('contabilidad/inventario/mercancia/index.html.twig', [
             'controller_name' => 'MercanciaController',
             'mercancias' => $row,
             'list_cuentas' => $list_cuentas,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'apertura'=>empty($documentos_apertura)?true:false
         ]);
     }
 

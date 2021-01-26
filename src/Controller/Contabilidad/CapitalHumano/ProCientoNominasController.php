@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Class ProCientoNominasController
  * @package App\Controller\Contabilidad\CapitalHumano
- * @Route("/contabilidad/capital-humano/pro-ciento-nominas")
+ * @Route("/contabilidad/capital-humano/por-ciento-nominas")
  */
 class ProCientoNominasController extends AbstractController
 {

@@ -7,6 +7,7 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\PeriodoSistema;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\CuadreDiario;
 use App\Entity\Contabilidad\Inventario\Documento;
@@ -36,6 +37,17 @@ class CerrarDiaController extends AbstractController
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $cierre_er = $em->getRepository(Cierre::class);
         $today = AuxFunctions::getDateToClose($em, $id_almacen);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$almacen_obj,
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$almacen_obj,
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
         if ($today != false) {
             /** @var Cierre $obj_cierre_abierto */
             $obj_cierre_abierto = $cierre_er->findOneBy(array(
@@ -51,18 +63,21 @@ class CerrarDiaController extends AbstractController
                     'fecha_minima' => $arr[0] . '-' . $arr[1] . '-' . $arr[2],
                     'fecha_maxima' => Date('Y-m-d'),
                     'error' => true,
+                    'apertura'=>empty($documentos_apertura)?true:false
                 ]);
             } else
                 return $this->render('contabilidad/inventario/cerrar_dia/dia_cerrado.html.twig', [
                     'controller_name' => 'CerrarDiaController',
                     'message' => 'El Almacén ya se encuentra cerrado.',
-                    'ocultar' => false
+                    'ocultar' => false,
+                    'apertura'=>empty($documentos_apertura)?true:false
                 ]);
         } else
             return $this->render('contabilidad/inventario/cerrar_dia/dia_cerrado.html.twig', [
                 'controller_name' => 'CerrarDiaController',
                 'message' => 'No puede cerrar el almacén con una fecha mayor a la actual.',
-                'ocultar' => true
+                'ocultar' => true,
+                'apertura'=>empty($documentos_apertura)?true:false
             ]);
     }
 
@@ -73,16 +88,17 @@ class CerrarDiaController extends AbstractController
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
-        $year_ = Date('Y');
-        $month = Date('m');
         $user = $this->getUser();
+        $obj_unidad = AuxFunctions::getUnidad($em,$user);
+        $current_date = AuxFunctions::getDateToCloseDate($em,$id_almacen);
+        $year_ = $current_date?$current_date->format('Y'):Date('Y');
+        $month = $current_date?$current_date->format('m'):Date('m');
 
         $movimiento_mercancias_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $cierre_er = $em->getRepository(Cierre::class);
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
-
 
         $obj_cierre_abierto = $cierre_er->findOneBy(array(
             'id_almacen' => $almacen_obj,
@@ -182,7 +198,7 @@ class CerrarDiaController extends AbstractController
                     ->setDebito($debitos);
                 $em->persist($obj_cierre_abierto);
             }
-            // habro el proximo dia
+            // abro el proximo dia
             $new_cierre = new Cierre();
             $nuevo_saldo = $saldo_apertura + $debitos - $creditos;
             $next_day_fecha = \DateTime::createFromFormat('Y-m-d', date('Y-m-d', $next_day));
@@ -247,6 +263,7 @@ class CerrarDiaController extends AbstractController
 
             $session = $request->getSession();
             $fecha_sistema = AuxFunctions::getDateToClose($em, $id_almacen);
+//            dd($fecha_sistema);
             $arr_part_fecha = explode('-', $fecha_sistema);
             $fecha = $arr_part_fecha[2] . '/' . $arr_part_fecha[1] . '/' . $arr_part_fecha[0];
 

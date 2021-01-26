@@ -58,7 +58,7 @@ class CuentaPorPagarController extends AbstractController
                     $diferencia = $today->diff($informe->getFechaFactura())->days;
                     if ($diferencia >= 0 && $diferencia < 31) {
                         $row[] = [
-                            'cliente' => $informe->getIdProveedor()->getNombre(),
+                            'cliente' => $informe->getIdProveedor()->getCodigo().' - '.$informe->getIdProveedor()->getNombre(),
                             'factura' => $informe->getCodigoFactura(),
                             'fecha' => $informe->getFechaFactura()->format('d-m-Y'),
                             'case_1' => number_format($resto, 2),
@@ -68,7 +68,7 @@ class CuentaPorPagarController extends AbstractController
                         ];
                     } elseif ($diferencia > 30 && $diferencia < 46) {
                         $row[] = [
-                            'cliente' => $informe->getIdProveedor()->getNombre(),
+                            'cliente' => $informe->getIdProveedor()->getCodigo().' - '.$informe->getIdProveedor()->getNombre(),
                             'factura' => $informe->getCodigoFactura(),
                             'fecha' => $informe->getFechaFactura()->format('d-m-Y'),
                             'case_2' => number_format($resto, 2),
@@ -78,7 +78,7 @@ class CuentaPorPagarController extends AbstractController
                         ];
                     } elseif ($diferencia > 45 && $diferencia < 61) {
                         $row[] = [
-                            'cliente' => $informe->getIdProveedor()->getNombre(),
+                            'cliente' => $informe->getIdProveedor()->getCodigo().' - '.$informe->getIdProveedor()->getNombre(),
                             'factura' => $informe->getCodigoFactura(),
                             'fecha' => $informe->getFechaFactura()->format('d-m-Y'),
                             'case_3' => number_format($resto, 2),
@@ -88,7 +88,7 @@ class CuentaPorPagarController extends AbstractController
                         ];
                     } else {
                         $row[] = [
-                            'cliente' => $informe->getIdProveedor()->getNombre(),
+                            'cliente' => $informe->getIdProveedor()->getCodigo().' - '.$informe->getIdProveedor()->getNombre(),
                             'factura' => $informe->getCodigoFactura(),
                             'fecha' => $informe->getFechaFactura()->format('d-m-Y'),
                             'case_4' => number_format($resto, 2),

@@ -85,16 +85,16 @@ class CuentaPorCobrarController extends AbstractController
         }
         $rows_return = [];
         $proveedor_repeat = [];
-        foreach ($row as $data){
-            if(!in_array($data['cliente'],$proveedor_repeat))
-                $proveedor_repeat[count($proveedor_repeat)]= $data['cliente'];
+        foreach ($row as $data) {
+            if (!in_array($data['cliente'], $proveedor_repeat))
+                $proveedor_repeat[count($proveedor_repeat)] = $data['cliente'];
         }
-        foreach ($proveedor_repeat as $proveedor){
+        foreach ($proveedor_repeat as $proveedor) {
             $puntero = 0;
-            foreach ($row as $key => $data){
-                if($data['cliente']== $proveedor){
+            foreach ($row as $key => $data) {
+                if ($data['cliente'] == $proveedor) {
                     $rows_return[] = [
-                        'cliente' => $puntero==0?$proveedor:'',
+                        'cliente' => $puntero == 0 ? $proveedor : '',
                         'factura' => $data['factura'],
                         'fecha' => $data['fecha'],
                         'case_4' => $data['case_4'],
@@ -131,15 +131,18 @@ class CuentaPorCobrarController extends AbstractController
         $cliente = $em->getRepository(Cliente::class);
         $unidad = $em->getRepository(Unidad::class);
         $cliente_contabilidad = $em->getRepository(ClienteContabilidad::class);
+        $obj_cliente = $cliente->find($id_cliente);
+        $obj_cliente_unid = $unidad->find($id_cliente);
+        $obj_cliente_cont = $cliente_contabilidad->find($id_cliente);
         switch ($tipo_cliente) {
             case 1:
-                $nombre_cliente = $cliente->find($id_cliente)->getNombre();
+                $nombre_cliente = $obj_cliente->getTelefono() . ' - ' . $obj_cliente->getNombre();
                 break;
             case 2:
-                $nombre_cliente = $unidad->find($id_cliente)->getNombre();
+                $nombre_cliente = $obj_cliente_unid->getCodigo() . ' - ' . $obj_cliente_unid->getNombre();
                 break;
             case 3:
-                $nombre_cliente = $cliente_contabilidad->find($id_cliente)->getNombre();
+                $nombre_cliente = $obj_cliente_cont->getCodigo() . ' - ' . $obj_cliente_cont->getNombre();
                 break;
         }
         return $nombre_cliente;

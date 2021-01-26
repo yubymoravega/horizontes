@@ -105,7 +105,7 @@ class ContabilidadRegistroComprobanteController extends ControllerContabilidadRe
     /**
      * @param EntityManagerInterface $em
      * @param Request $request
-     * @Route("/detalles/{id}", name="contabilidad_general_registro_comprobantes_detalles", methods={"GET"})
+     * @Route("/detalles/{id}", name="contabilidad_general_registro_comprobantes_detalles_", methods={"GET"})
      */
     public function getDetalles(EntityManagerInterface $em, Request $request, $id)
     {

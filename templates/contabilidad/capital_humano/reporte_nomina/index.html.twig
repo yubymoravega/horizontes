@@ -1,4 +1,4 @@
-{% extends 'contabilidad/reportes/index.html.twig' %}
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -99,12 +99,14 @@
                     let quincena = $('#quincena').val()
                     let mes = $('#mes').val()
                     let anno = $('#anno').val()
+                    let tipo = 1
                     $('body').append(`
-                    <form action='/contabilidad/reportes/capital-humano/nominas/print'
+                    <form action='/contabilidad/capital-humano/reporte-nomina/print'
                          method="post" id='form_print' target='_blank'>
                         <input type='text' hidden name='anno' value='${anno}'/>
                         <input type='text' hidden name='mes' value='${mes}'/>
                         <input type='hidden' name='quincena' value='${quincena}'/>
+                        <input type='hidden' name='tipo' value='${tipo}'/>
                     </form>`)
                     const fomrulario = $('#form_print')
                     fomrulario.submit()

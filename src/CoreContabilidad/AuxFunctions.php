@@ -31,6 +31,7 @@ use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Contabilidad\General\CobrosPagos;
 use App\Entity\Contabilidad\Inventario\Ajuste;
+use App\Entity\Contabilidad\Inventario\Apertura;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
@@ -840,17 +841,19 @@ class AuxFunctions
                 return $arr_documento[0]->getFecha()->format('Y-m-d');
             }
         } else {
+//            dd($obj_cierre_abierto->getFecha(),\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
             if ($obj_cierre_abierto->getFecha() <= \DateTime::createFromFormat('Y-m-d', Date('Y-m-d')))
                 /**existe un cierre abierto, rretorno su fecha*/
                 return $obj_cierre_abierto->getFecha()->format('Y-m-d');
             else
-                return false;
+                return $obj_cierre_abierto->getFecha()->format('Y-m-d');
         }
     }
 
     public static function getDateToCloseDate(EntityManagerInterface $em, $id_almacen)
     {
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
+
         $cierre_er = $em->getRepository(Cierre::class);
 
         /** @var Cierre $obj_cierre_abierto */
@@ -879,7 +882,7 @@ class AuxFunctions
                 /**existe un cierre abierto, rretorno su fecha*/
                 return $obj_cierre_abierto->getFecha();
             else
-                return false;
+                return $obj_cierre_abierto->getFecha();
         }
     }
 
@@ -889,7 +892,7 @@ class AuxFunctions
         $year = 3000;
         /** @var Almacen $item */
         foreach ($almacenes as $item) {
-            $fecha = self::getDateToCloseDate($em, $item);
+            $fecha = self::getDateToCloseDate($em, $item->getId());
             if ($fecha->format('Y') < $year)
                 $year = $fecha->format('Y');
         }
@@ -902,7 +905,7 @@ class AuxFunctions
         $date = \DateTime::createFromFormat('d-m-Y', '01-01-2020');
         /** @var Almacen $item */
         foreach ($almacenes as $item) {
-            $fecha = self::getDateToCloseDate($em, $item);
+            $fecha = self::getDateToCloseDate($em, $item->getId());
             if ($fecha > $date)
                 $date = $fecha;
         }
@@ -1267,7 +1270,7 @@ class AuxFunctions
                 /** @var CentroCosto $cc */
                 $cc = $em->getRepository(CentroCosto::class)->find($arr_analisis[0]);
                 $codigo_cc = $cc->getCodigo();
-                $codigo_ot = $ot->getCodigo();
+                $codigo_ot = $ot?$ot->getCodigo():'';
                 $rows[] = array(
                     'nro_doc' => '',
                     'fecha' => '',
@@ -1756,6 +1759,234 @@ class AuxFunctions
                 'fecha' => '',
                 'nro_cuenta' => $obj_ajuste_entrada->getNroCuentaAcreedora(),
                 'nro_subcuenta' => $obj_ajuste_entrada->getNroSubcuentanroAcreedora(),
+                'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1' => $obj_documento->getIdAlmacen()->getDescripcion(),
+                'value_2' => '',
+                'value_3' => '',
+                'mes' => $obj_documento->getFecha()->format('m'),
+                'anno' => $obj_documento->getFecha()->format('Y'),
+                'debito' => '',
+                'credito' => number_format($obj_documento->getImporteTotal(), 2)
+            );
+
+            //totalizado
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => '',
+                'nro_subcuenta' => '',
+                'analisis_1' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1' => '',
+                'value_2' => '',
+                'value_3' => '',
+                'mes' => $obj_documento->getFecha()->format('m'),
+                'anno' => $obj_documento->getFecha()->format('Y'),
+                'debito' => number_format($obj_documento->getImporteTotal(), 2),
+                'credito' => number_format($obj_documento->getImporteTotal(), 2),
+                'total' => $obj_documento->getImporteTotal()
+            );
+
+            return $rows;
+        }
+    }
+
+    public static function getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
+    {
+        /**@var $obj_aapertura Apertura* */
+        $obj_aapertura = $em->getRepository(Apertura::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'entrada' => true,
+            'activo' => true
+        ));
+
+        if ($obj_aapertura) {
+            $nro_doc = 'AP' . '-' . $obj_aapertura->getNroConcecutivo();
+            $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+            $arr_obj_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
+                'id_documento' => $obj_documento,
+                'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+            ));
+            $cuentas_ir = [];
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+                $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                    $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+                }
+            }
+
+            foreach ($cuentas_ir as $key => $cuenta) {
+                $parte = 0;
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoMercancia */
+                    $cuenta_subcuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                    if ($cuenta_subcuenta == $cuenta) {
+                        $parte += floatval($obj_movimiento_mercancia->getImporte());
+                    }
+                }
+                $dat = explode(':', $cuenta);
+                if ($key == 0)
+                    $rows[] = array(
+                        'nro_doc' => $nro_doc,
+                        'fecha' => $fecha_doc,
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1' => $obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                        'value_2' => '',
+                        'value_3' => '',
+                        'mes' => $obj_documento->getFecha()->format('m'),
+                        'anno' => $obj_documento->getFecha()->format('Y'),
+                        'debito' => number_format($parte, 2),
+                        'credito' => ''
+                    );
+                else
+                    $rows[] = array(
+                        'nro_doc' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1' => $obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                        'value_2' => '',
+                        'value_3' => '',
+                        'mes' => $obj_documento->getFecha()->format('m'),
+                        'anno' => $obj_documento->getFecha()->format('Y'),
+                        'debito' => number_format($parte, 2),
+                        'credito' => ''
+                    );
+            }
+
+            //acreedora
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $obj_aapertura->getNroCuentaAcreedora(),
+                'nro_subcuenta' => $obj_aapertura->getNroSubcuentanroAcreedora(),
+                'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1' => $obj_documento->getIdAlmacen()->getDescripcion(),
+                'value_2' => '',
+                'value_3' => '',
+                'mes' => $obj_documento->getFecha()->format('m'),
+                'anno' => $obj_documento->getFecha()->format('Y'),
+                'debito' => '',
+                'credito' => number_format($obj_documento->getImporteTotal(), 2)
+            );
+
+            //totalizado
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => '',
+                'nro_subcuenta' => '',
+                'analisis_1' => '',
+                'analisis_2' => '',
+                'analisis_3' => '',
+                'value_1' => '',
+                'value_2' => '',
+                'value_3' => '',
+                'mes' => $obj_documento->getFecha()->format('m'),
+                'anno' => $obj_documento->getFecha()->format('Y'),
+                'debito' => number_format($obj_documento->getImporteTotal(), 2),
+                'credito' => number_format($obj_documento->getImporteTotal(), 2),
+                'total' => $obj_documento->getImporteTotal()
+            );
+
+            return $rows;
+        }
+    }
+
+    public static function getDataAperturaProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento)
+    {
+        /**@var $obj_aapertura Apertura* */
+        $obj_aapertura = $em->getRepository(Apertura::class)->findOneBy(array(
+            'id_documento' => $obj_documento,
+            'entrada' => true,
+            'activo' => true
+        ));
+
+        if ($obj_aapertura) {
+            $nro_doc = 'AP' . '-' . $obj_aapertura->getNroConcecutivo();
+            $fecha_doc = $obj_documento->getFecha()->format('d/m/Y');
+
+            $arr_obj_movimiento_mercancia = $movimiento_producto_er->findBy(array(
+                'id_documento' => $obj_documento,
+                'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+            ));
+            $cuentas_ir = [];
+            foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                /**@var $obj_movimiento_mercancia MovimientoProducto */
+                $nro_cuenta = $obj_movimiento_mercancia->getIdProducto()->getCuenta();
+                $sub_cuenta = $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario();
+                if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
+                    $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
+                }
+            }
+
+            foreach ($cuentas_ir as $key => $cuenta) {
+                $parte = 0;
+                foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
+                    /**@var $obj_movimiento_mercancia MovimientoProducto */
+                    $cuenta_subcuenta = $obj_movimiento_mercancia->getIdProducto()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario();
+                    if ($cuenta_subcuenta == $cuenta) {
+                        $parte += floatval($obj_movimiento_mercancia->getImporte());
+                    }
+                }
+                $dat = explode(':', $cuenta);
+                if ($key == 0)
+                    $rows[] = array(
+                        'nro_doc' => $nro_doc,
+                        'fecha' => $fecha_doc,
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1' => $obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                        'value_2' => '',
+                        'value_3' => '',
+                        'mes' => $obj_documento->getFecha()->format('m'),
+                        'anno' => $obj_documento->getFecha()->format('Y'),
+                        'debito' => number_format($parte, 2),
+                        'credito' => ''
+                    );
+                else
+                    $rows[] = array(
+                        'nro_doc' => '',
+                        'fecha' => '',
+                        'nro_cuenta' => $dat[0],
+                        'nro_subcuenta' => $dat[1],
+                        'analisis_1' => $cod_almacen,
+                        'analisis_2' => '',
+                        'analisis_3' => '',
+                        'value_1' => $obj_movimiento_mercancia->getIdAlmacen()->getDescripcion(),
+                        'value_2' => '',
+                        'value_3' => '',
+                        'mes' => $obj_documento->getFecha()->format('m'),
+                        'anno' => $obj_documento->getFecha()->format('Y'),
+                        'debito' => number_format($parte, 2),
+                        'credito' => ''
+                    );
+            }
+
+            //acreedora
+            $rows[] = array(
+                'nro_doc' => '',
+                'fecha' => '',
+                'nro_cuenta' => $obj_aapertura->getNroCuentaAcreedora(),
+                'nro_subcuenta' => $obj_aapertura->getNroSubcuentanroAcreedora(),
                 'analisis_1' => $obj_documento->getIdAlmacen()->getCodigo(),
                 'analisis_2' => '',
                 'analisis_3' => '',

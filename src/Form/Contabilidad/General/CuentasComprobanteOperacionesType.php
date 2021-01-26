@@ -182,10 +182,12 @@ class CuentasComprobanteOperacionesType extends AbstractType
             ->add('debito', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Débito',
+                'required'=>false
             ])
             ->add('credito', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Crédito',
+                'required'=>false
             ]);
     }
 

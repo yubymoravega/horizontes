@@ -88,8 +88,12 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 8) {
                 $rows = array_merge($rows, []);
             }//devolucion
-            elseif ($id_tipo_documento == 90) {
+            elseif ($id_tipo_documento == 9) {
                 $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_devolucion);
+            }//Apertura
+            elseif ($id_tipo_documento == 12) {
+                $datos_devolucion = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_devolucion);
             }
         }
@@ -168,6 +172,18 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 10) {
                 if(!$obj_documento->getIdDocumentoCancelado()) {
                     $datos_venta = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
+                }
+            }//Apertura mercancia
+            elseif ($id_tipo_documento == 12) {
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_venta = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
+                }
+            }//Apertura Producto
+            elseif ($id_tipo_documento == 13) {
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_venta = AuxFunctions::getDataAperturaProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
                     $rows = array_merge($rows, $datos_venta);
                 }
             }

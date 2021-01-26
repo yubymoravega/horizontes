@@ -24,6 +24,10 @@ configuraciones:
       name: "VENTA"
     - id: 11
       name: "DEVOLUCION VENTA"
+    - id: 12
+      name: "APERTURA"
+    - id: 13
+      name: "APERTURA PRODUCTO"
 
   modulo:
     - id: 1

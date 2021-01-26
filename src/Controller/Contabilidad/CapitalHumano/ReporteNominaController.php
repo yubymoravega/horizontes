@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Controller\Contabilidad\Reportes;
+namespace App\Controller\Contabilidad\CapitalHumano;
 
 use App\CoreContabilidad\AuxFunctions;
-use App\CoreContabilidad\ControllerContabilidadReport;
 use App\Entity\Contabilidad\CapitalHumano\NominaPago;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,28 +10,47 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class CapitalHumanoNominasController
- * @package App\Controller\Contabilidad\Reportes
- * @Route("/contabilidad/reportes/capital-humano/nominas")
+ * Class ReporteNominaController
+ * @package App\Controller\Contabilidad\CapitalHumano
+ * @Route("/contabilidad/capital-humano/reporte-nomina")
  */
-class CapitalHumanoNominasController extends ControllerContabilidadReport
+class ReporteNominaController extends AbstractController
 {
     /**
-     * @Route("/", name="contabilidad_reportes_capital_humano_nominas")
+     * @Route("/nominas", name="contabilidad_capital_humano_reporte_nomina")
      */
     public function index()
     {
-        return $this->render('contabilidad/reportes/capital_humano_nominas/index.html.twig', [
+        return $this->render('contabilidad/capital_humano/reporte_nomina/index.html.twig', [
+            'controller_name' => 'ReporteNominaController',
+        ]);
+    }
+    /**
+     * @Route("/deducciones", name="contabilidad_capital_humano_reporte_nomina_deduciones")
+     */
+    public function index_deducciones()
+    {
+        return $this->render('contabilidad/capital_humano/deducciones_nominas/index.html.twig', [
+            'controller_name' => 'ReporteNominaController',
+        ]);
+    }
+    /**
+     * @Route("/pagos-empleador", name="contabilidad_capital_humano_reporte_nomina_pago_empleador")
+     */
+    public function index_empleador()
+    {
+        return $this->render('contabilidad/capital_humano/pagos_empleador/index.html.twig', [
             'controller_name' => 'ReporteNominaController',
         ]);
     }
 
     /**
-     * @Route("/print", name="contabilidad_reporte_capital_humano_nomina_print")
+     * @Route("/print", name="contabilidad_capital_humano_reporte_nomina_print")
      */
     public function print(EntityManagerInterface $em, Request $request)
     {
         $anno = $request->request->get('anno');
+        $tipo = $request->request->get('tipo');
         $mes = $request->request->get('mes');
         $quincena = $request->request->get('quincena');
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
@@ -138,15 +156,27 @@ class CapitalHumanoNominasController extends ControllerContabilidadReport
             'srl_empleador' => number_format($srl_empleador, 2),
             'infotep_empleador' => number_format($infotep_empleador, 2),
         ];
-//        dd($row);
-        return $this->render('contabilidad/capital_humano/reporte_nomina/print.html.twig', [
+
+        if($tipo == 1){
+            $url = 'contabilidad/capital_humano/reporte_nomina/print.html.twig';
+            $title = $aprobada ? 'Nómina de Pago' : 'Prenomina de Pago';
+        }
+        elseif ($tipo == 2){
+            $url = 'contabilidad/capital_humano/deducciones_nominas/print.html.twig';
+            $title = 'Deducciones de la Nómina';
+        }
+        else{
+            $title = 'Pagos del empleador';
+            $url = 'contabilidad/capital_humano/pagos_empleador/print.html.twig';
+        }
+        return $this->render($url, [
             'controller_name' => 'ReporteNominaController',
             'mes' => AuxFunctions::getNombreMes($mes),
             'anno' => $anno,
             'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
             'fecha_impresion' => Date('d-m-Y'),
             'datos' => $row,
-            'title' => $aprobada ? 'Nómina de Pago' : 'Prenomina de Pago',
+            'title' => $title,
             'aprobada' => $aprobada,
             'quincena' => $quincena
         ]);

@@ -5,6 +5,7 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Ajuste;
+use App\Entity\Contabilidad\Inventario\Apertura;
 use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
@@ -34,8 +35,21 @@ class SubmayorInventarioProductoController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
         return $this->render('contabilidad/inventario/submayor_inventario_producto/index.html.twig', [
             'controller_name' => 'SubmayorInventarioProductoController',
+            'apertura'=>empty($documentos_apertura)?true:false
         ]);
     }
 
@@ -477,6 +491,15 @@ class SubmayorInventarioProductoController extends AbstractController
             case 10:
                 $prefijo = 'FACT';
                 break;
+            case 11:
+                $prefijo = 'DV';
+                break;
+            case 12:
+                $prefijo = 'AP';
+                break;
+            case 13:
+                $prefijo = 'APP';
+                break;
         }
         return $prefijo;
     }
@@ -521,6 +544,20 @@ class SubmayorInventarioProductoController extends AbstractController
                 'id_documento' => $id_documento
             ));
             return $factura_documento ? $factura_documento->getIdFactura()->getNroFactura() : '-';
+        }elseif ($id_tipo_documento == 12) {
+            //Factura
+            /** @var Apertura $factura_documento */
+            $factura_documento = $em->getRepository(Apertura::class)->findOneBy(array(
+                'id_documento' => $id_documento
+            ));
+            return $factura_documento ? $factura_documento->getNroConcecutivo() : '-';
+        }elseif ($id_tipo_documento == 13) {
+            //Factura
+            /** @var Apertura $factura_documento */
+            $factura_documento = $em->getRepository(Apertura::class)->findOneBy(array(
+                'id_documento' => $id_documento
+            ));
+            return $factura_documento ? $factura_documento->getNroConcecutivo() : '-';
         }
         return 0;
     }

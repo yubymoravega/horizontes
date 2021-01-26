@@ -10,20 +10,27 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="7"><strong>Unidad: </strong> {{ unidad_codigo }} : {{ unidad_nombre }}</td>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad_codigo }} : {{ unidad_nombre }}</td>
+                <td class="text-right"><strong>Fecha de Impresión: </strong> {{ fecha_impresion }}</td>
             </tr>
             </tbody>
         </table>
         <table border="0" width="960px" class="text-center">
-            <thead>
-            <th width="70px">Cuenta</th>
-            <th width="70px">Subcuenta</th>
-            <th width="70px">Criterio</th>
-            <th width="70px">Descripción</th>
-            <th width="70px">Débito</th>
-            <th width="175px">Crédito</th>
-            <th width="200px">Saldo</th>
-            </thead>
+            <tr class="bg-dark font-weight-bold text-white">
+                <td rowspan="2" width="100px">Cuenta</td>
+                <td rowspan="2" width="100px">Subcuenta</td>
+                <td rowspan="2" width="100px">Criterio</td>
+                <td rowspan="2" class="text-center" width="400px">Descripción</td>
+                <td colspan="2" width="260px" class="text-center">Movimientos del Mes</td>
+                <td colspan="2" width="260px" class="text-center">Saldo Acumulado</td>
+            </tr>
+            <tr class="bg-dark font-weight-bold text-white">
+                <td width="130px" class="text-center">Débito</td>
+                <td width="130px" class="text-center">Crédito</td>
+                <td width="130px" class="text-center">Débito</td>
+                <td width="130px" class="text-center">Crédito</td>
+            </tr>
+
             <tbody>
             {% for item in datos %}
 
@@ -46,10 +53,36 @@
                 <td style="font-weight:400; text-align: left" class="pl-0 pr-0">{{ item.descripcion }}</td>
                 <td style="font-weight:400;" class="text-right">{{ item.debito_mes }}</td>
                 <td style="font-weight:400;" class="text-right">{{ item.credito_mes }}</td>
-                <td style="font-weight:400;" class="text-right">{{ item.saldo }}</td>
+                <td style="font-weight:400;" class="text-right">{{ item.saldo_deudor }}</td>
+                <td style="font-weight:400;" class="text-right">{{ item.saldo_acreedor }}</td>
                 </tr>
             {% endfor %}
+            <tr class="bg-dark font-weight-bold text-white">
+                <td style="font-weight:400;" class="text-right"></td>
+                <td style="font-weight:400;" class="text-center"></td>
+                <td style="font-weight:400;" class="text-left text-uppercase font-weight-bold ">total</td>
+                <td style="font-weight:400;" class="text-left text-uppercase font-weight-bold "></td>
+                <td style="font-weight:400;" class="text-right">{{ mes_debito }}</td>
+                <td style="font-weight:400;" class="text-right">{{ mes_credito }}</td>
+                <td style="font-weight:400;" class="text-right">{{ acumulado_debito }}</td>
+                <td style="font-weight:400;" class="text-right">{{ acumulado_credito }}</td>
+            </tr>
+
             </tbody>
         </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
 {% endblock %}

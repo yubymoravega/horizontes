@@ -430,13 +430,9 @@
                 'cuentas_comprobante_operaciones[centro_costo]': "required",
                 'cuentas_comprobante_operaciones[orden_trabajo]': "required",
                 'cuentas_comprobante_operaciones[elemento_gasto]': "required",
-                'cuentas_comprobante_operaciones[expediente]': "required",
-                'cuentas_comprobante_operaciones[debito]': "required",
-                'cuentas_comprobante_operaciones[credito]': "required",
+                'cuentas_comprobante_operaciones[expediente]': "required"
             },
             messages: {
-                'cuentas_comprobante_operaciones[debito]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                'cuentas_comprobante_operaciones[credito]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 'cuentas_comprobante_operaciones[nro_cuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 'cuentas_comprobante_operaciones[nro_subcuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 'cuentas_comprobante_operaciones[centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
@@ -447,8 +443,8 @@
         })
 
         $('#btnAplicarMercancia').on('click', function () {
-            let debito = $('#cuentas_comprobante_operaciones_debito').val()
-            let credito = $('#cuentas_comprobante_operaciones_credito').val()
+            let debito = $('#cuentas_comprobante_operaciones_debito').val()==''?0:$('#cuentas_comprobante_operaciones_debito').val()
+            let credito = $('#cuentas_comprobante_operaciones_credito').val()==''?0:$('#cuentas_comprobante_operaciones_credito').val()
             if (form_cuentas_comprobante.valid() && (debito > 0 || credito > 0)) {
                 let cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta option:selected').val()
                 let text_cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta option:selected').text()
