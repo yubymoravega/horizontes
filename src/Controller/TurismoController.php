@@ -153,12 +153,6 @@ class TurismoController extends AbstractController
 
         $user =  $this->getUser();
 
-        if($user->getRoles()['rol'] == "5918"){
-
-            return $this->redirectToRoute('turismo/reporte/solicitud/agencia/'); 
-        }
-
-
         $dql = "SELECT a FROM App:SolicitudTurismo a ";
 
 
@@ -180,6 +174,11 @@ class TurismoController extends AbstractController
                     $dql .= " AND  a.stado = 'En Proceso'";
                 }elseif($request->get('estado') == 'Finalizada') {
                     $dql .= " AND  a.stado = 'Finalizada'";
+                }elseif($request->get('estado') == 'Cotizado') {
+                    $dql .= " AND  a.stado = 'Cotizado'";
+                }
+                elseif($request->get('estado') == 'Por Cotizar') {
+                    $dql .= " AND  a.stado = 'Por Cotizar'";
                 }
             }
 
@@ -200,6 +199,10 @@ class TurismoController extends AbstractController
                 $dql .= " WHERE  a.stado = 'En Proceso'";
             }elseif($request->get('estado') == 'Finalizada') {
                 $dql .= " WHERE  a.stado = 'Finalizada'";
+            }elseif($request->get('estado') == 'Cotizado') {
+                $dql .= " WHERE  a.stado = 'Cotizado'";
+            }elseif($request->get('estado') == 'Por Cotizar') {
+                $dql .= " WHERE  a.stado = 'Por Cotizar'";
             }
 
             if ($request->get('empleado')) {
