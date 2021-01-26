@@ -1483,4 +1483,35 @@ class TurismoController extends AbstractController
       return new Response(200);
         //return $this->redirectToRoute('turismo/reporte/solicitud/');
     }
+
+      /**
+     * @Route("turismo/urgente/{id}", name="turismo/urgente/")
+     */
+    public function urgente($id)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+       
+        $data = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
+        $user =  $this->getUser();
+
+        if( $data->getUrgente() == '1'){
+          
+        $data->setUrgente('0');
+        $data->setEmpleadoStatus($user->getUsername());
+        $dataBase->flush($data);
+
+        }else{
+            $data->setUrgente('1');
+            $data->setEmpleadoStatus($user->getUsername());
+            $dataBase->flush($data);   
+        }
+
+        $this->addFlash(
+            'success',
+            'Urgente!'
+        );
+
+      return new Response(200);
+        //return $this->redirectToRoute('turismo/reporte/solicitud/');
+    }
 }
