@@ -7,6 +7,45 @@
     </style>
 {% endblock %}
 {% block content %}
+    <div class="modal fade" id="seleccionarEmpleado" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="seleccionarEmpleadoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="seleccionarEmpleadoLabel">{{ title }}</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app">
+                    <form action="" method="post" autocomplete="off">
+                        <div class="form-group input-group input-group-sm">
+                            <select name="empleados_select" id="empleados_select" class="form-control">
+                                {% for item in empleados_pago %}
+                                    <option value="{{ item.id }}">{{ item.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button"
+                                   aria-label="Cerrar" data-dismiss="modal" >
+                                    <span aria-hidden="true">Salir</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-secondary" id="btnAceptarPagoExtraordinario">
+                                    Aceptar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container-fluid">
         {# header #}
         <div class="d-flex align-items-center">
@@ -14,6 +53,14 @@
                 {{ title }}
             </h4>
             <div>
+                {% if adicionar %}
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                            data-target="#seleccionarEmpleado" data-placement="bottom"
+                            title="Adicionar Pago"
+                            onclick="pagoExtraordinario()">
+                        <i class="fa fa-plus"></i> <strong>Adicionar Pago</strong>
+                    </button>
+                {% endif %}
                 {% if return_pago %}
                     <button type="button" class="btn btn-outline-warning btn-sm" data-toggle="modal"
                             data-target="#modal__form__id" data-placement="bottom"
@@ -108,28 +155,32 @@
             window.location.replace('/contabilidad/capital-humano/nomina-pago/revisar/' + id_nomina);
         }
 
-        function mostrarBtn(quincena,option) {
+        function mostrarBtn(quincena, option) {
             $('#modal__btn__actualizar').hide()
             $('#modal__btn__aceptar').show()
             $('#quincena').val(quincena)
             $('#option').val(option)
         }
 
+        $('#btnAceptarPagoExtraordinario').on('click',function(){
+            let data = $('#empleados_select').val() + '-3'
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + data);
+        })
+
         $('#modal__btn__aceptar').on('click', function () {
             let quincena = $('#quincena').val();
             let option = $('#option').val();
             let observacion = $('#observacion').val();
-            if(option == 1){
+            if (option == 1) {
                 //revertir pago
-                RevertirPago(quincena,observacion)
-            }
-            else{
+                RevertirPago(quincena, observacion)
+            } else {
                 //aceptar pago
-                AceptarPago(quincena,observacion)
+                AceptarPago(quincena, observacion)
             }
         })
 
-        function AceptarPago(quincena,observacion) {
+        function AceptarPago(quincena, observacion) {
             loadingModal.show()
             $('body').append(`
                     <form action='/contabilidad/capital-humano/nomina-pago/aceptar-pago'
@@ -144,7 +195,7 @@
             fomrulario.remove()
         }
 
-        function RevertirPago(quincena,observacion) {
+        function RevertirPago(quincena, observacion) {
             loadingModal.show()
             $('body').append(`
                     <form action='/contabilidad/capital-humano/nomina-pago/revertir-pago'
@@ -159,7 +210,7 @@
             fomrulario.remove()
         }
 
-        function Cancelar(id,quincena) {
+        function Cancelar(id, quincena) {
             loadingModal.show()
             $('body').append(`
                     <form action='/contabilidad/capital-humano/nomina-pago/cancelar-nomina'

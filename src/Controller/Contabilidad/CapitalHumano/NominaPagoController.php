@@ -91,7 +91,8 @@ class NominaPagoController extends AbstractController
             'quincena' => 1,
             'aprobado' => false,
             'return_pago' => $return_pago,
-            'aceptar_pago' => empty($rows) ? false : true
+            'aceptar_pago' => empty($rows) ? false : true,
+            'adicionar' => false
         ]);
     }
 
@@ -150,7 +151,32 @@ class NominaPagoController extends AbstractController
             'quincena' => 2,
             'aprobado' => false,
             'return_pago' => $return_pago,
-            'aceptar_pago' => empty($rows) ? false : true
+            'aceptar_pago' => empty($rows) ? false : true,
+            'adicionar' => false,
+            'empleados_pago' => []
+        ]);
+    }
+
+    /**
+     * @Route("/pago-extraordinario", name="contabilidad_capital_humano_nomina_pago_extraordinario")
+     */
+    public function index_pago_extraordinario(EntityManagerInterface $em, Request $request)
+    {
+        $current_date = AuxFunctions::getCurrentDate($em, AuxFunctions::getUnidad($em, $this->getUser()));
+        $mes = $current_date->format('m');
+        $nombre_mes = AuxFunctions::getNombreMes($mes);
+        $rows = $this->getDataExtraordinaria($em);
+
+        return $this->render('contabilidad/capital_humano/nomina_pago/index.html.twig', [
+            'controller_name' => 'NominaPagoController',
+            'empleados' => $rows,
+            'title' => 'Pago Extraordinario de ' . $nombre_mes,
+            'quincena' => 3,
+            'aprobado' => false,
+            'return_pago' => empty($rows) ? true : false,
+            'aceptar_pago' => empty($rows) ? false : true,
+            'adicionar' => true,
+            'empleados_pago' => $this->getEmpleados($em)
         ]);
     }
 
@@ -199,6 +225,47 @@ class NominaPagoController extends AbstractController
                     );
                 }
             }
+        }
+        return $rows;
+    }
+
+    //preguntar por las nominas
+    public function getDataExtraordinaria(EntityManagerInterface $em)
+    {
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $current_date = AuxFunctions::getCurrentDate($em, $unidad);
+        $year = $current_date->format('Y');
+        $mes = $current_date->format('m');
+
+        $empleados = $this->getEmpleados($em);
+        $rows = [];
+        $index = 0;
+        $nomina_pago_er = $em->getRepository(NominaPago::class);
+        $nomina_pago_extraordinaria = $nomina_pago_er->findBy([
+            'mes' => $mes,
+            'id_unidad' => $unidad,
+            'anno' => $year,
+            'quincena' => 3,
+            'aprobada' => false
+        ]);
+        /** @var NominaPago $item */
+        foreach ($nomina_pago_extraordinaria as $item) {
+            $rows[] = array(
+                'nro' => $index,
+                'id' => $item->getIdEmpleado()->getId(),
+                'id_nomina' => $item->getId(),
+                'elaborada' => $item->getElaborada(),
+                'aprobada' => $item->getAprobada(),
+                'nombre' => $item->getIdEmpleado()->getNombre(),
+                'pagado' => $item ? true : false,
+                'total_ingreso' => number_format($item->getTotalIngresos(), 2),
+                'total_ingreso_cotizable' => number_format($item->getIngresosCotizablesTss(), 2),
+                'total_deducido' => number_format($item->getTotalDeducido(), 2),
+                'impuesto_sobre_renta' => number_format($item->getIsr(), 2),
+                'sueldo_neto_pagar' => number_format($item->getSueldoNetoPagar(), 2),
+                'pago_empleador' => number_format(($item->getAfpEmpleador() + $item->getInfotepEmpleador() + $item->getSfsEmpleador() + $item->getSrlEmpleador()), 2),
+                'empleados_pago' => $empleados
+            );
         }
         return $rows;
     }
@@ -526,13 +593,13 @@ class NominaPagoController extends AbstractController
 
         //insertando consecutivo de la nomina
         $nominas = $em->getRepository(NominasConsecutivos::class)->findBy([
-            'anno'=>$anno,
-            'id_unidad'=>$unidad
+            'anno' => $anno,
+            'id_unidad' => $unidad
         ]);
-        $numero = count($nominas)+1;
+        $numero = count($nominas) + 1;
 
-        if($numero<10)
-            $str = '0'.$numero;
+        if ($numero < 10)
+            $str = '0' . $numero;
         else
             $str = $numero;
         $new_nomina_consecutivo = new NominasConsecutivos();
@@ -543,7 +610,7 @@ class NominaPagoController extends AbstractController
             ->setNroConsecutivo($numero);
         $em->persist($new_nomina_consecutivo);
 
-        $str_nomina = $str.'.'.$mes.'.'.$anno;
+        $str_nomina = $str . '.' . $mes . '.' . $anno;
 
         //ELEMENTO DEL GASTO
         $elemento_gasto = $em->getRepository(ElementoGasto::class)->findOneBy(['activo' => true, 'codigo' => '5001']);
@@ -628,7 +695,10 @@ class NominaPagoController extends AbstractController
 
         if ($quincena == 1)
             return $this->index_primera_quincena($em, $request);
-        return $this->index_segunda_quincena($em, $request);
+        elseif ($quincena == 2)
+            return $this->index_segunda_quincena($em, $request);
+        else
+            return $this->index_pago_extraordinario($em, $request);
     }
 
     /**
@@ -712,7 +782,10 @@ class NominaPagoController extends AbstractController
 
         if ($quincena == 1)
             return $this->index_primera_quincena($em, $request);
-        return $this->index_segunda_quincena($em, $request);
+        elseif ($quincena == 2)
+            return $this->index_segunda_quincena($em, $request);
+        else
+            return $this->index_pago_extraordinario($em, $request);
     }
 
     /**
@@ -826,8 +899,8 @@ class NominaPagoController extends AbstractController
         if ($quincena == '1' || $quincena == 1)
             $url = 'contabilidad_capital_humano_nomina_pago_primera_quincena';
         elseif ($quincena == '3' || $quincena == 3) {
-            $this->addNominaComprobante($em, $nomina_pago);
-            $url = 'contabilidad_capital_humano_get_empleados';
+//            $this->addNominaComprobante($em, $nomina_pago);
+            $url = 'contabilidad_capital_humano_nomina_pago_extraordinario';
         } else
             $url = 'contabilidad_capital_humano_nomina_pago_segunda_quincena';
         return $this->redirectToRoute($url);
@@ -853,12 +926,14 @@ class NominaPagoController extends AbstractController
                 );
             }
         }
-        return $this->render('contabilidad/capital_humano/nomina_pago/seltrabajador.html.twig', [
-            'controller_name' => 'NominaPagoController',
-            'empleados' => $row,
-            'title' => 'Seleccionar Trabajador',
-            'quincena' => 3
-        ]);
+//        return $this->render('contabilidad/capital_humano/nomina_pago/seltrabajador.html.twig', [
+//            'controller_name' => 'NominaPagoController',
+//            'empleados' => $row,
+//            'title' => 'Seleccionar Trabajador',
+//            'quincena' => 3
+//        ]);
+
+        return $row;
     }
 
     /**
@@ -878,7 +953,11 @@ class NominaPagoController extends AbstractController
 
         if ($quincena == 1)
             return $this->index_primera_quincena($em, $request);
-        return $this->index_segunda_quincena($em, $request);
+        elseif ($quincena == 2)
+            return $this->index_segunda_quincena($em, $request);
+        else
+            return $this->index_pago_extraordinario($em, $request);
+
     }
 
     public function addNominaComprobante(EntityManagerInterface $em, NominaPago $nomina_pago)
