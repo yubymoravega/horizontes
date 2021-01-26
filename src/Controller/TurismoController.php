@@ -153,12 +153,6 @@ class TurismoController extends AbstractController
 
         $user =  $this->getUser();
 
-        if($user->getRoles()['rol'] == "5918"){
-
-            return $this->redirectToRoute('turismo/reporte/solicitud/agencia/'); 
-        }
-
-
         $dql = "SELECT a FROM App:SolicitudTurismo a ";
 
 
@@ -180,6 +174,11 @@ class TurismoController extends AbstractController
                     $dql .= " AND  a.stado = 'En Proceso'";
                 }elseif($request->get('estado') == 'Finalizada') {
                     $dql .= " AND  a.stado = 'Finalizada'";
+                }elseif($request->get('estado') == 'Cotizado') {
+                    $dql .= " AND  a.stado = 'Cotizado'";
+                }
+                elseif($request->get('estado') == 'Por Cotizar') {
+                    $dql .= " AND  a.stado = 'Por Cotizar'";
                 }
             }
 
@@ -200,6 +199,10 @@ class TurismoController extends AbstractController
                 $dql .= " WHERE  a.stado = 'En Proceso'";
             }elseif($request->get('estado') == 'Finalizada') {
                 $dql .= " WHERE  a.stado = 'Finalizada'";
+            }elseif($request->get('estado') == 'Cotizado') {
+                $dql .= " WHERE  a.stado = 'Cotizado'";
+            }elseif($request->get('estado') == 'Por Cotizar') {
+                $dql .= " WHERE  a.stado = 'Por Cotizar'";
             }
 
             if ($request->get('empleado')) {
@@ -1477,6 +1480,37 @@ class TurismoController extends AbstractController
         );
 
      
+      return new Response(200);
+        //return $this->redirectToRoute('turismo/reporte/solicitud/');
+    }
+
+      /**
+     * @Route("turismo/urgente/{id}", name="turismo/urgente/")
+     */
+    public function urgente($id)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+       
+        $data = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
+        $user =  $this->getUser();
+
+        if( $data->getUrgente() == '1'){
+          
+        $data->setUrgente('0');
+        $data->setEmpleadoStatus($user->getUsername());
+        $dataBase->flush($data);
+
+        }else{
+            $data->setUrgente('1');
+            $data->setEmpleadoStatus($user->getUsername());
+            $dataBase->flush($data);   
+        }
+
+        $this->addFlash(
+            'success',
+            'Urgente!'
+        );
+
       return new Response(200);
         //return $this->redirectToRoute('turismo/reporte/solicitud/');
     }

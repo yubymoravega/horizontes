@@ -234,6 +234,23 @@ class SolicitudTurismo
      */
     private $empleadoStatus;
 
+     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $urgente;
+
+    public function getUrgente(): ?string
+    {
+        return $this->urgente;
+    }
+
+    public function setUrgente(string $urgente): self
+    {
+        $this->urgente = $urgente;
+
+        return $this;
+    }
+
     public function getEmpleadoStatus(): ?string
     {
         return $this->empleadoStatus;
