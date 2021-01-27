@@ -643,6 +643,28 @@ class RegistroComprobantesController extends AbstractController
                         'analisis_1' => $cuentas_activo_fijo->getIdCentroCostoActivo()->getCodigo(),
                         'analisis_2' => $cuentas_activo_fijo->getIdAreaResponsabilidadActivo()->getCodigo()
                     );
+                    if ($movimiento->getIdTipoMovimiento()->getId() == 2) {
+                        $row[] = array(
+                            'nro' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => '646',
+                            'nro_subcuenta' => '0010',
+                            'credito' => '',
+                            'debito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                            'analisis_1' => '',
+                            'analisis_2' => ''
+                        );
+                        $row[] = array(
+                            'nro' => '',
+                            'fecha' => '',
+                            'nro_cuenta' => '421',
+                            'nro_subcuenta' => '0010',
+                            'debito' => '',
+                            'credito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                            'analisis_1' => $movimiento->getIdProveedor()->getCodigo(),
+                            'analisis_2' => ''
+                        );
+                    }
                     if ($movimiento->getIdActivoFijo()->getDepreciacionAcumulada() > 0) {
                         $row[] = array(
                             'nro' => '',

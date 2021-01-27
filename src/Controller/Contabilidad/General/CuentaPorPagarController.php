@@ -160,6 +160,9 @@ class CuentaPorPagarController extends AbstractController
         }
         ///fin
 
+
+
+
         $rows_return = [];
         $proveedor_repeat = [];
         foreach ($row as $data) {

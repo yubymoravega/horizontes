@@ -49,6 +49,29 @@ class ComprobanteAnotacionesController extends AbstractController
                     'criterio_1' => $cuentas_activo_fijo->getIdCentroCostoActivo()->getCodigo(),
                     'criterio_2' => $cuentas_activo_fijo->getIdAreaResponsabilidadActivo()->getCodigo()
                 );
+
+                if ($movimiento->getIdTipoMovimiento()->getId() == 2) {
+                    $row[] = array(
+                        'nro' => '',
+                        'fecha' => '',
+                        'cuenta' => '646',
+                        'subcuenta' => '0010',
+                        'credito' => '',
+                        'debito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                        'criterio_1' => '',
+                        'criterio_2' => ''
+                    );
+                    $row[] = array(
+                        'nro' => '',
+                        'fecha' => '',
+                        'cuenta' => '421',
+                        'subcuenta' => '0010',
+                        'debito' => '',
+                        'credito' => number_format($movimiento->getIdActivoFijo()->getValorReal(), 2),
+                        'criterio_1' => $movimiento->getIdProveedor()->getCodigo(),
+                        'criterio_2' => ''
+                    );
+                }
                 if ($movimiento->getIdActivoFijo()->getDepreciacionAcumulada() > 0) {
                     $row[] = array(
                         'nro' => '',
