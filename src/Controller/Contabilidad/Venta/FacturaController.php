@@ -552,7 +552,7 @@ class FacturaController extends AbstractController
             'id_unidad' => $id_unidad
         ]);
 //        if ($factura->getServicio()) {
-//            $this->addFlash('danger', 'Para la factura de servicio aún no se ha implemenado el eliminar.');
+//            $this->addFlash('error', 'Para la factura de servicio aún no se ha implemenado el eliminar.');
 //            return $this->redirectToRoute('contabilidad_venta_factura');
 //        }
 

@@ -30,7 +30,7 @@ class ImpuestoSobreRentaType extends AbstractType
                 'label'=>'Monto Según Rango de Escala DGII',
             ))
             ->add('excedente_segun_rango_escala',TextType::class, array(
-                'label'=>'Escedente Según Rango de Escala DGII',
+                'label'=>'Excedente Según Rango de Escala DGII',
             ))
             ->add('por_ciento_impuesto_excedente',TextType::class, array(
                 'label'=>'% de Impuesto del Excedente',

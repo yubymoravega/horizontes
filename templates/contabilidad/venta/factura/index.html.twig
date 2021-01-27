@@ -87,7 +87,7 @@
                             <div class="col-1 mt-0 p-0">
                                 <button style="height: 40px !important;" class="btn btn-secondary btn-sm" type="button"
                                         id="btnSearchCliente"
-                                        onclick=""><i
+                                        onclick="buscarCliente()"><i
                                             class="fa fa-search"></i></button>
                             </div>
                         </div>
@@ -591,6 +591,59 @@
         })
 
         function buscarProducto() {
+            let tipo_cliente_combo = $("#factura_tipo_cliente option:selected").val();
+            if (tipo_cliente_combo == '')
+                alertTemplate('Debe seleccionar el tipo de cliente, para realizar la búsqueda.', 'danger')
+            else {
+                loadingModal.show()
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ path('cont_venta_get_mercancia_producto') }}',
+                    data: {
+                        tipo: tipo_cliente_combo
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            $('#rows_table').find('tr').remove();
+                            // if (result.data.length > 1) {
+                            //     mercancia = result.data
+                            //     $(result.data).each(function (pos, valor) {
+                            //         $('#rows_table').append('<tr>' +
+                            //             '<td style="font-weight:400;"> ' +
+                            //             '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
+                            //             '</td>' +
+                            //             '<td style="font-weight:400;" class="text-center"> ' + valor.cuenta + '/' + valor.subcuenta + '</td>' +
+                            //             '<td style="font-weight:400;" class="text-center"> ' + valor.codigo + '</td>' +
+                            //             '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                            //             '<td style="font-weight:400;" class="text-right"> ' + valor.existencia + '</td> </tr>'
+                            //         );
+                            //     })
+                            //     $('#listarMercanciasModal').modal('show')
+                            // } else if (result.data.length == 1) {
+                            //     $('#listarMercanciasModal').modal('hide')
+                            //     const data = result.data[0]
+                            //     $('#movimiento_venta_descripcion').val(data.descripcion)
+                            //     $('#movimiento_venta_um').val(data.um)
+                            //     $('#movimiento_venta_existencia').val(data.existencia)
+                            //     $('#movimiento_venta_codigo').val(data.codigo)
+                            //     $('#id_almacen').val(data.id_almacen)
+                            //     $('#id_mercancia').val(data.id)
+                            // } else {
+                            //     $('#listarMercanciasModal').modal('hide')
+                            //     let type = $('#movimiento_venta_mercancia').val() == 1 ? 'mercancías' : 'producto'
+                            //     alertTemplate('No existen ' + type + ' con el código especificado.', 'danger')
+                            // }
+                        }
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        loadingModal.close()
+                        alertTemplate('Error interno, verifique el código', 'danger')
+                    }
+                })
+            }
+        }
+        function buscarCliente() {
             if (fecha == '')
                 alertTemplate('Debe seleccionar la fecha para buscar las mercancías o productos', 'danger')
             else {

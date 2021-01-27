@@ -3201,132 +3201,134 @@ class AuxFunctions
             ['id_unidad' => $unidad, 'activo' => true, 'nro_factura' => $nro_factura]
         );
 
-        if ($obj_factura) {
-            $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
-                'id_unidad' => $unidad,
-                'anno' => $year_
-            ));
-            $nro_consecutivo_real = count($arr_registros) + 1;
+        if($importe <= $obj_factura->getImporte()){
 
-            $new_registro
-                ->setDescripcion('Pagando factura de servicio, número FACT-' . $obj_factura->getNroFactura())
-                ->setIdUsuario($usuario)
-                ->setFecha($fecha)
-                ->setAnno($year_)
-                ->setTipo(3)
-                ->setCredito($importe)
-                ->setDebito($importe)
-                ->setIdTipoComprobante($tipo_comprobante)
-                ->setIdUnidad($unidad)
-                ->setDocumento($documento)
-                ->setNroConsecutivo($nro_consecutivo_real);
-            $em->persist($new_registro);
+            if ($obj_factura) {
+                $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
+                    'id_unidad' => $unidad,
+                    'anno' => $year_
+                ));
+                $nro_consecutivo_real = count($arr_registros) + 1;
 
-            $new_cobro_pago = new CobrosPagos();
-            $new_cobro_pago
-                ->setIdFactura($obj_factura)
-                ->setIdTipoCliente($tipo_cliente)
-                ->setIdClienteVenta($id_cliente)
-                ->setDebito(0)
-                ->setCredito($importe);
-            $em->persist($new_cobro_pago);
+                $new_registro
+                    ->setDescripcion('Pagando factura de servicio, número FACT-' . $obj_factura->getNroFactura())
+                    ->setIdUsuario($usuario)
+                    ->setFecha($fecha)
+                    ->setAnno($year_)
+                    ->setTipo(3)
+                    ->setCredito($importe)
+                    ->setDebito($importe)
+                    ->setIdTipoComprobante($tipo_comprobante)
+                    ->setIdUnidad($unidad)
+                    ->setDocumento($documento)
+                    ->setNroConsecutivo($nro_consecutivo_real);
+                $em->persist($new_registro);
 
-            $new_operaciones_comprobante_debito = new OperacionesComprobanteOperaciones();
-            $new_operaciones_comprobante_debito
-                ->setIdCliente($id_cliente)
-                ->setIdProveedor(null)
-                ->setIdCentroCosto(null)
-                ->setIdOrdenTrabajo(null)
-                ->setIdElementoGasto(null)
-                ->setIdExpediente(null)
-                ->setIdAlmacen(null)
-                ->setIdUnidad($unidad)
-                ->setIdCuenta($clasificafor_documento == 1 ? $cta_efectivo_caja : $cta_efectivo_banco)
-                ->setIdSubcuenta($clasificafor_documento == 1 ? $subcuenta_efectivo_caja : $subcuenta_efectivo_banco)
-                ->setCredito(0)
-                ->setDebito($importe)
-                ->setIdTipoCliente($tipo_cliente)
-                ->setIdRegistroComprobantes($new_registro);
-            $em->persist($new_operaciones_comprobante_debito);
+                $new_cobro_pago = new CobrosPagos();
+                $new_cobro_pago
+                    ->setIdFactura($obj_factura)
+                    ->setIdTipoCliente($tipo_cliente)
+                    ->setIdClienteVenta($id_cliente)
+                    ->setDebito(0)
+                    ->setCredito($importe);
+                $em->persist($new_cobro_pago);
 
-            //asentando las operacones
-            $new_asiento = new Asiento();
-            $new_asiento
-                ->setIdCuenta($clasificafor_documento == 1 ? $cta_efectivo_caja : $cta_efectivo_banco)
-                ->setIdSubcuenta($clasificafor_documento == 1 ? $subcuenta_efectivo_caja : $subcuenta_efectivo_banco)
-                ->setFecha($fecha)
-                ->setAnno($year_)
-                ->setCredito(0)
-                ->setDebito($importe)
-                ->setNroDocumento('FACT-' . $obj_factura->getNroFactura())
-                ->setIdDocumento(null)
-                ->setIdUnidad($unidad)
-                ->setIdAlmacen(null)
-                ->setIdFactura($obj_factura)
-                ->setIdCentroCosto(null)
-                ->setIdOrdenTrabajo(null)
-                ->setIdElementoGasto(null)
-                ->setIdExpediente(null)
-                ->setIdProveedor(null)
-                ->setIdCliente($id_cliente)
-                ->setIdComprobante($new_registro)
-                ->setIdTipoComprobante($tipo_comprobante)
-                ->setTipoCliente($tipo_cliente);
-            $em->persist($new_asiento);
+                $new_operaciones_comprobante_debito = new OperacionesComprobanteOperaciones();
+                $new_operaciones_comprobante_debito
+                    ->setIdCliente($id_cliente)
+                    ->setIdProveedor(null)
+                    ->setIdCentroCosto(null)
+                    ->setIdOrdenTrabajo(null)
+                    ->setIdElementoGasto(null)
+                    ->setIdExpediente(null)
+                    ->setIdAlmacen(null)
+                    ->setIdUnidad($unidad)
+                    ->setIdCuenta($clasificafor_documento == 1 ? $cta_efectivo_caja : $cta_efectivo_banco)
+                    ->setIdSubcuenta($clasificafor_documento == 1 ? $subcuenta_efectivo_caja : $subcuenta_efectivo_banco)
+                    ->setCredito(0)
+                    ->setDebito($importe)
+                    ->setIdTipoCliente($tipo_cliente)
+                    ->setIdRegistroComprobantes($new_registro);
+                $em->persist($new_operaciones_comprobante_debito);
+
+                //asentando las operacones
+                $new_asiento = new Asiento();
+                $new_asiento
+                    ->setIdCuenta($clasificafor_documento == 1 ? $cta_efectivo_caja : $cta_efectivo_banco)
+                    ->setIdSubcuenta($clasificafor_documento == 1 ? $subcuenta_efectivo_caja : $subcuenta_efectivo_banco)
+                    ->setFecha($fecha)
+                    ->setAnno($year_)
+                    ->setCredito(0)
+                    ->setDebito($importe)
+                    ->setNroDocumento('FACT-' . $obj_factura->getNroFactura())
+                    ->setIdDocumento(null)
+                    ->setIdUnidad($unidad)
+                    ->setIdAlmacen(null)
+                    ->setIdFactura($obj_factura)
+                    ->setIdCentroCosto(null)
+                    ->setIdOrdenTrabajo(null)
+                    ->setIdElementoGasto(null)
+                    ->setIdExpediente(null)
+                    ->setIdProveedor(null)
+                    ->setIdCliente($id_cliente)
+                    ->setIdComprobante($new_registro)
+                    ->setIdTipoComprobante($tipo_comprobante)
+                    ->setTipoCliente($tipo_cliente);
+                $em->persist($new_asiento);
 
 
-            $new_operaciones_comprobante_credito = new OperacionesComprobanteOperaciones();
-            $new_operaciones_comprobante_credito
-                ->setIdCliente($id_cliente)
-                ->setIdProveedor(null)
-                ->setIdCentroCosto(null)
-                ->setIdOrdenTrabajo(null)
-                ->setIdElementoGasto(null)
-                ->setIdExpediente(null)
-                ->setIdAlmacen(null)
-                ->setIdUnidad($unidad)
-                ->setIdCuenta($cta_x_cobrar)
-                ->setIdSubcuenta($subcuenta_x_cobrar)
-                ->setCredito($importe)
-                ->setDebito(0)
-                ->setIdTipoCliente($tipo_cliente)
-                ->setIdRegistroComprobantes($new_registro);
-            $em->persist($new_operaciones_comprobante_credito);
+                $new_operaciones_comprobante_credito = new OperacionesComprobanteOperaciones();
+                $new_operaciones_comprobante_credito
+                    ->setIdCliente($id_cliente)
+                    ->setIdProveedor(null)
+                    ->setIdCentroCosto(null)
+                    ->setIdOrdenTrabajo(null)
+                    ->setIdElementoGasto(null)
+                    ->setIdExpediente(null)
+                    ->setIdAlmacen(null)
+                    ->setIdUnidad($unidad)
+                    ->setIdCuenta($cta_x_cobrar)
+                    ->setIdSubcuenta($subcuenta_x_cobrar)
+                    ->setCredito($importe)
+                    ->setDebito(0)
+                    ->setIdTipoCliente($tipo_cliente)
+                    ->setIdRegistroComprobantes($new_registro);
+                $em->persist($new_operaciones_comprobante_credito);
 
-            //asentando las operacones
-            $new_asiento = new Asiento();
-            $new_asiento
-                ->setIdCuenta($cta_x_cobrar)
-                ->setIdSubcuenta($subcuenta_x_cobrar)
-                ->setFecha($fecha)
-                ->setAnno($year_)
-                ->setCredito($importe)
-                ->setDebito(0)
-                ->setNroDocumento('FACT-' . $obj_factura->getNroFactura())
-                ->setIdDocumento(null)
-                ->setIdUnidad($unidad)
-                ->setIdAlmacen(null)
-                ->setIdFactura($obj_factura)
-                ->setIdCentroCosto(null)
-                ->setIdOrdenTrabajo(null)
-                ->setIdElementoGasto(null)
-                ->setIdExpediente(null)
-                ->setIdProveedor(null)
-                ->setIdCliente($id_cliente)
-                ->setIdComprobante($new_registro)
-                ->setIdTipoComprobante($tipo_comprobante)
-                ->setTipoCliente($tipo_cliente);
-            $em->persist($new_asiento);
+                //asentando las operacones
+                $new_asiento = new Asiento();
+                $new_asiento
+                    ->setIdCuenta($cta_x_cobrar)
+                    ->setIdSubcuenta($subcuenta_x_cobrar)
+                    ->setFecha($fecha)
+                    ->setAnno($year_)
+                    ->setCredito($importe)
+                    ->setDebito(0)
+                    ->setNroDocumento('FACT-' . $obj_factura->getNroFactura())
+                    ->setIdDocumento(null)
+                    ->setIdUnidad($unidad)
+                    ->setIdAlmacen(null)
+                    ->setIdFactura($obj_factura)
+                    ->setIdCentroCosto(null)
+                    ->setIdOrdenTrabajo(null)
+                    ->setIdElementoGasto(null)
+                    ->setIdExpediente(null)
+                    ->setIdProveedor(null)
+                    ->setIdCliente($id_cliente)
+                    ->setIdComprobante($new_registro)
+                    ->setIdTipoComprobante($tipo_comprobante)
+                    ->setTipoCliente($tipo_cliente);
+                $em->persist($new_asiento);
 
-            try {
-                $em->flush();
-            } catch (FileException $exception) {
-                return $exception->getMessage();
-            }
-            return $nro_consecutivo_real;
-        } else
-            return '';
-    }
+                try {
+                    $em->flush();
+                } catch (FileException $exception) {
+                    return $exception->getMessage();
+                }
+                return $nro_consecutivo_real;
+            } else
+                return '';
+        }    }
 
 
     /**

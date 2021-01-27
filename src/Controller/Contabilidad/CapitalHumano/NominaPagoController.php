@@ -19,6 +19,7 @@ use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\General\Asiento;
 use App\Form\Contabilidad\CapitalHumano\EmpleadoType;
 use App\Form\Contabilidad\CapitalHumano\NominaPagoType;
+use ContainerCR2nUpA\getCapitalHumanoNominasControllerService;
 use ContainerK07jWwZ\getUnidadChoicesTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\This;
@@ -61,6 +62,7 @@ class NominaPagoController extends AbstractController
             if ($item->getQuincena() < 3)
                 $pago_chequear[] = $item;
         }
+       // dd($pago_chequear);
         if (!empty($pago_chequear)) {
             /** @var NominaPago $pago */
             $pago = $pago_chequear[count($pago_chequear) - 1];
@@ -92,7 +94,8 @@ class NominaPagoController extends AbstractController
             'aprobado' => false,
             'return_pago' => $return_pago,
             'aceptar_pago' => empty($rows) ? false : true,
-            'adicionar' => false
+            'adicionar' => false,
+            'empleados_pago' => []
         ]);
     }
 
@@ -715,17 +718,41 @@ class NominaPagoController extends AbstractController
 
         $data_nominas = $em->getRepository(NominaPago::class)->findBy([
             'elaborada' => true,
+            'mes' => $mes,
+            'anno' => $anno,
+            'id_unidad' => $unidad,
+        ]);
+
+        if (empty($data_nominas)) {
+            $this->addFlash('error', 'No ha nominas pagadas que revertir');
+            return $this->redirectToRoute($quincena == 1 ? 'contabilidad_capital_humano_nomina_pago_primera_quincena' : 'contabilidad_capital_humano_nomina_pago_segunda_quincena');
+        }
+
+        $row_data = [];
+        /** @var NominaPago $item */
+        foreach ($data_nominas as $item){
+            if($item->getQuincena()<3){
+                $row_data[]=$item;
+            }
+        }
+
+        /** @var NominaPago $nomina */
+        if(!empty($row_data)){
+            $nomina = $row_data[count($row_data)-1];
+            if($nomina->getQuincena()> $quincena)
+                $this->addFlash('error', 'No se puede revertir el pago porque ya se elaboró el pago de un período superior.');
+            return $this->redirectToRoute($quincena == 1 ? 'contabilidad_capital_humano_nomina_pago_primera_quincena' : 'contabilidad_capital_humano_nomina_pago_segunda_quincena');
+        }
+
+        $data_nominas = $em->getRepository(NominaPago::class)->findBy([
+            'elaborada' => true,
             'aprobada' => true,
             'mes' => $mes,
             'anno' => $anno,
             'id_unidad' => $unidad,
             'quincena' => $quincena
         ]);
-//        dd($data_nominas);
-        if (empty($data_nominas)) {
-            $this->addFlash('success', 'No ha nominas pagadas que apectar');
-            return $this->redirectToRoute($quincena == 1 ? 'contabilidad_capital_humano_nomina_pago_primera_quincena' : 'contabilidad_capital_humano_nomina_pago_segunda_quincena');
-        }
+
         /** @var NominaPago $item */
         foreach ($data_nominas as $item) {
             $item
