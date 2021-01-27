@@ -259,7 +259,7 @@ class ComprobanteVentaController extends AbstractController
                     'mes' => '',
                     'anno' => '',
                     'debito' => $row[0]['debito'],
-                    'credito' => $row[0]['credito'],
+                    'credito' => $row[0]['debito'],
                 ];
                 $data [] = array(
                     'nro_doc' => $nro_doc,

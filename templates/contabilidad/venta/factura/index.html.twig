@@ -89,11 +89,15 @@
                         {{ form_widget(form_factura.id_contrato) }}
                     </div>
 
-                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                    <div class="col-3 pl-3 mt-4 form-group input-group input-group-sm d-block">
+                        <label for="no_ncf">No asignar NCF</label>
+                        <input type="checkbox" name="no_ncf" id="no_ncf" style="margin-left: 20px">
+                    </div>
+                    <div class="col-5 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.id_categoria_cliente) }}
                         {{ form_widget(form_factura.id_categoria_cliente, {'attr': {'class': 'form- control w-100'}}) }}
                     </div>
-                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                    <div class="col-4 mt-0 pl-3 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.ncf) }}
                         {{ form_widget(form_factura.ncf) }}
                     </div>
@@ -229,6 +233,19 @@
     <script>
         let mercancia = [];
         let fecha = $("#factura_fecha_factura").val();
+
+        $('#no_ncf').on('change', function () {
+            if ($(this).is(':checked')){
+                $('#factura_id_categoria_cliente').val(0)
+                $('#factura_ncf').val('')
+                $('#factura_id_categoria_cliente').prop('disabled', true)
+                $('#factura_ncf').prop('disabled', true)
+            }
+            else{
+                $('#factura_id_categoria_cliente').prop('disabled', false)
+                $('#factura_ncf').prop('disabled', false)
+            }
+        })
 
         /** Imprimir factura */
         function Print_Vale() {
