@@ -20,7 +20,7 @@ class ClienteContabilidadType extends AbstractType
         $builder
             ->add('codigo', TextType::class, array(
                 'required' => true,
-                'label' => 'NRF',
+                'label' => 'Identificación Fiscal',
                 'attr' => ['class' => 'w-100 '],
             ))
             ->add('nombre', TextType::class, array(

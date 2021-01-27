@@ -78,9 +78,19 @@
                         {{ form_label(form_factura.tipo_cliente) }}
                         {{ form_widget(form_factura.tipo_cliente) }}
                     </div>
-                    <div class="col-6 mt-0 pl-3 form-group input-group input-group-sm d-block">
+                    <div class="col-6 mt-0 pl-3 w-100 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.id_cliente) }}
-                        {{ form_widget(form_factura.id_cliente) }}
+                        <div class="row m-0 p-0">
+                            <div class="col-11 mt-0 p-0 w-100 form-group input-group input-group-sm d-block">
+                                {{ form_widget(form_factura.id_cliente) }}
+                            </div>
+                            <div class="col-1 mt-0 p-0">
+                                <button style="height: 40px !important;" class="btn btn-secondary btn-sm" type="button"
+                                        id="btnSearchCliente"
+                                        onclick=""><i
+                                            class="fa fa-search"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row mt-0 p-0 mb-3">
