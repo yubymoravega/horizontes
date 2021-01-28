@@ -126,7 +126,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-
     <script>
         $("#form-telefono").validate({
 
@@ -155,7 +154,13 @@
         });
 
         $("#turismo").click(function () {
-            window.location.href = "/turismo/solicitud/" +{{ tel }};
+
+            window.location.href = "/categorias/turismo/" +{{ tel }};
+        });
+
+        $("#inpospak").click(function () {
+
+            // window.location.href = "/mia_cargo/facturas/"+{{ tel }};
         });
 
         $("#turismo_new").click(function () {
@@ -169,12 +174,6 @@
             fomrulario.submit()
             fomrulario.remove()
         });
-
-        $("#inpospak").click(function () {
-
-            window.location.href = "/mia_cargo/facturas/" +{{ tel }};
-        });
-
     </script>
 
 {% endblock %}

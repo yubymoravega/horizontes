@@ -160,8 +160,18 @@ class FacturaController extends AbstractController
         $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]->provincia]);
         $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]->municipio]); 
 
-        // $json[$contador]->provincia = $provincia[0]->getNombre();
-        //$json[$contador]->municipio = $municipio[0]->getNombre();
+        if($user->getIdMoneda() != $json[$contador]->montoMoneda){
+
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]->montoMoneda]);
+            $doalres = $json[$contador]->monto  / $tasa[0]->getTasa();
+
+            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$user->getIdMoneda()]);
+            $json[$contador]->monto = $tasa[0]->getTasa() * $doalres ;
+
+            $json[$contador]->montoMoneda = $user->getIdMoneda();
+           
+           
+        }
 
             $total = $total + $json[$contador]->monto;
 
@@ -176,7 +186,7 @@ class FacturaController extends AbstractController
         $Cotizacion->setJson(json_encode($json));
         $Cotizacion->setEmpleado($user->getUsername());
         $Cotizacion->setDatetime($date);
-        $Cotizacion->setTotal($total);
+        $Cotizacion->setTotal(round( $total, 2, PHP_ROUND_HALF_EVEN));
         $Cotizacion->setEdit(true);
         $Cotizacion->setIdMoneda( $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre());
         $Cotizacion->setIdCliente($json[0]->idCliente);
@@ -308,6 +318,19 @@ class FacturaController extends AbstractController
         $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]->provincia]);
         $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]->municipio]); 
 
+            if($user->getIdMoneda() != $json[$contador]->montoMoneda){
+
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]->montoMoneda]);
+                $doalres = $json[$contador]->monto  / $tasa[0]->getTasa();
+
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$user->getIdMoneda()]);
+                $json[$contador]->monto = $tasa[0]->getTasa() * $doalres ;
+
+                $json[$contador]->montoMoneda = $user->getIdMoneda();
+               
+               
+            }
+
             $total = $total + $json[$contador]->monto;
 
             $contador++;
@@ -322,7 +345,7 @@ class FacturaController extends AbstractController
         $Cotizacion->setJson(json_encode($json));
         $Cotizacion->setEmpleado($user->getUsername());
         $Cotizacion->setDatetime($date);
-        $Cotizacion->setTotal($total);
+        $Cotizacion->setTotal(round( $total, 2, PHP_ROUND_HALF_EVEN));
         $Cotizacion->setEdit(true);
         $Cotizacion->setIdMoneda( $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre());
         $Cotizacion->setIdCliente($json[0]->idCliente);
