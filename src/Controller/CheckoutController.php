@@ -67,7 +67,7 @@ class CheckoutController extends AbstractController
         $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
         $json[$contador]['json']->monto = $dolares * $tasa[0]->getTasa();
         $json[$contador]['recibirMoneda'] = $dataBase->getRepository(Moneda::class)->find($json[$contador]['json']->recibirMoneda)->getNombre();
-
+        $json[$contador]['json']->monto = round( $json[$contador]['json']->monto, 2, PHP_ROUND_HALF_EVEN);
             $total = $total + $json[$contador]['json']->monto;
 
             $contador++;
@@ -109,6 +109,7 @@ class CheckoutController extends AbstractController
         $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $monedaTasa[0]->getId()]);
 
         $dolares = $data[0]->getTotal() / $tasa[0]->getTasa();
+       
         $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
         $total = $dolares * $tasa[0]->getTasa();
         
@@ -131,6 +132,8 @@ class CheckoutController extends AbstractController
  
 
         $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
+
+        //return new Response(number_format($dolares , 2, '.', ''));
 
         return $this->render('checkout/cotizacion.html.twig', [
            'moneda'=> $moneda ,'id' =>$id,  'data' =>$data[0],  'itens' => $json, 'total' =>number_format($total, 2, '.', '')

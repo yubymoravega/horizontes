@@ -5,53 +5,26 @@
 
 	<div class="cards-list">
 
-		<div class="card 1">
+		<div id="solicitud" class="card 1">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/telecomunicaciones.png') }}"/>
+				<img src="{{ asset('images/servicios/solicitud.png') }}"/>
 			</div>
 			
 		</div>
 
 		<div class="card 2">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/multiservicio.png') }}"/>
+				<img src="{{ asset('images/servicios/pasaporte.png') }}"/>
 			</div>
 			
 		</div>
 
-		<div id="turismo" class="card 3">
+		<div  class="card 3">
 			<div class="card_image">
-				<img src="{{ asset('images/servicios/turismo.png') }}"/>
+				
 			</div>
 			
 		</div>
-
-	</div>
-
-	<div class="cards-list">
-	
-		<div id="remesa" class="card 1">
-			<div class="card_image">
-				<img src="{{ asset('images/servicios/remesas.png') }}"/>
-			</div>
-			
-		</div>
-
-		<div class="card 2">
-			<div class="card_image">
-				<img src="{{ asset('images/servicios/paqueteria.png') }}"/>
-			</div>
-			
-		</div>
-
-			<div id="inpospak" class="card 3">
-			<div class="card_image">
-			<img src="{{ asset('images/servicios/inpospak.png') }}"/>
-			</div>
-			
-		</div>
-
-	
 
 	</div>
 
@@ -129,41 +102,14 @@
 	{{parent()}}
 
 	<script>
-		$("#form-telefono").validate({
+		
 
-errorLabelContainer: "#messageBox",
-wrapper: "li",
-rules: {
-required: true,
-minlength: 8
-},
-messages: {
-tel: {
-required: "Telefono Requerido",
-minlength: "Minimo 8 Caracteres"
-}
-}
 
-});
-
-$('#tel').on('input', function () {
-this.value = this.value.replace(/[^0-9]/g, '');
-});
-
-$( "#remesa" ).click(function() {
+$( "#solicitud" ).click(function() {
   
-  window.location.href = "/remesas/pais/"+{{tel}};
+  window.location.href = "/turismo/solicitud/"+{{tel}};
 });
 
-$( "#turismo" ).click(function() {
-  
-  window.location.href = "/categorias/turismo/"+{{tel}};
-});
-
-$( "#inpospak" ).click(function() {
-  
- // window.location.href = "/mia_cargo/facturas/"+{{tel}};
-});
 
 	</script>
 

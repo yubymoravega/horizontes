@@ -592,7 +592,7 @@ class RemesasController extends AbstractController
             $contador++;
         }
 
-        return new Response(round( $total, 2));
+        return new Response(round( $total, 0, PHP_ROUND_HALF_DOWN));
 
        
     }
@@ -608,7 +608,6 @@ class RemesasController extends AbstractController
         $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
         $total = null ;
 
-
         $monedaPais = $dataBase->getRepository(MonedaPais::class)->findBy(['idMoneda'=>$moneda,'idPais'=>$pais,'status'=>'1']);
         $reglasRemesas = $dataBase->getRepository(ReglasRemesas::class)->findBy(['idMonedaPais' => $monedaPais]);
 
@@ -623,62 +622,24 @@ class RemesasController extends AbstractController
 
                 if($reglasRemesas[$contador]->getTarifa() == "porciento"){
 
-                    $porciento = $cantidad /100; $total = $cantidad + ($porciento * $reglasRemesas[$contador]->getValor());
+                    $porciento =  $dolarRegla /100; 
+                    $total =  $dolarRegla + ($porciento * $reglasRemesas[$contador]->getValor());
                 
                 }else{
 
-                    $total = $cantidad + ( $tasa[0]->getTasa() * $reglasRemesas[$contador]->getValor());
+                    $total =  $dolarRegla  + $reglasRemesas[$contador]->getValor();
                 }
             }
             $contador++;
         }
 
-
-        if($user->getIdMoneda() == 1){
-
-            if($tasa[0]->getTasa() > 0){
-                $total = $total / $tasa[0]->getTasa();
-
-                
-            
-            }else{
-                $total = $total / $tasa[0]->getTasaSugerida();
-            }
-            
-            
-        }else{
-
-            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
-
-            if($tasa[0]->getTasa() > 0){
-
-                $total = $total / $tasa[0]->getTasa();
-                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
-
-                if($tasa[0]->getTasa() > 0){
-                    $total = $total * $tasa[0]->getTasa();
-               
-                }else{
-                    $total = $total * $tasa[0]->getTasaSugerida();
-                }
-            
-            }else{
-               
-                $total = $total / $tasa[0]->getTasaSugerida();
-                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$moneda]);
-
-                if($tasa[0]->getTasa() > 0){
-                    $total = $total * $tasa[0]->getTasa();
-               
-                }else{
-                    $total = $total * $tasa[0]->getTasaSugerida();
-                }
-            }
-
-        }
-        return new Response(round($total, 2));
-
+       // $total = round($total, 0, PHP_ROUND_HALF_DOWN);
        
+        $tasaUsuario = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$user->getIdMoneda()]);
+
+        $monedaPagada = $tasaUsuario[0]->getTasa() * $total ;
+        
+        return new Response(round($monedaPagada, 0, PHP_ROUND_HALF_EVEN));
     }
 
      /**

@@ -185,7 +185,7 @@ $( "#add" ).click(function() {
 
 			$( "#total" ).change(function() {
 				
-				if($('#monedasRecibir').val() == "0")
+				if($('#monedasRecibir option:selected').val() == "0")
 				{}else{
 
 					$.ajax({
@@ -204,7 +204,7 @@ $( "#add" ).click(function() {
 
 			$( "#monto" ).change(function() {
 				
-				if($('#monedasRecibir').val() == "0")
+				if($('#monedasRecibir option:selected').val() == "0")
 				{}else{
 
 					$.ajax({
@@ -223,10 +223,10 @@ $( "#add" ).click(function() {
 
 			$( "#monedasRecibir" ).change(function() {
 				
-				if($('#monedasRecibir').val() == "0")
-				{}else{
+				if($('#monto').val() > 0 || $('#total').val() > 0)
+				{
 
-					$.ajax({
+			$.ajax({
             type: 'POST',
             data: {'code' : 200},
             url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
@@ -236,12 +236,8 @@ $( "#add" ).click(function() {
 				$('#monto').val(data);
             }
         });
-	}
+				}
             });
-
-
-			
-
 
 		    $( "#dialog-monto" ).dialog({width: 500});
             $( "#dialdialog-monto" ).dialog( "open" );

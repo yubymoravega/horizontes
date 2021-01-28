@@ -79,6 +79,14 @@ class HomeController extends AbstractController
         return $this->render('home/categoria.html.twig',['tel' => $tel]);
     } 
 
+     /**
+     * @Route("/categorias/turismo/{tel}", name="categorias/turismo")
+     */
+    public function categoriasTurismo($tel)
+    {
+        return $this->render('home/categoriaTurismo.html.twig',['tel' => $tel]);
+    } 
+
     /**
      * @Route("/servicios", name="servicios")
      */
@@ -117,7 +125,7 @@ class HomeController extends AbstractController
                 'id' => $data[$contador]->getId(),
                 'json' => $data[$contador]->getJson(),
                 'moneda' => $moneda->getNombre(),
-                'total' => $total,
+                'total' => round( $total, 2, PHP_ROUND_HALF_EVEN),
             );
             $contador++;
         }
