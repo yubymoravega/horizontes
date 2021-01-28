@@ -66,6 +66,10 @@
 
             {# --------- Datos de la venta --------------#}
             <div class="card-body">
+                {#                <select data-tags="true" data-placeholder="Select an option"  id="my_select">#}
+                {#                    <option value="AL">Alabama</option>#}
+                {#                    <option value="WY">Wyoming</option>#}
+                {#                </select>#}
                 {{ form_start(form_factura,{'attr': {'class': 'text-left','id':'form_factura','method':'POST'}}) }}
                 <div class="row mt-0 p-0">
                     <input type="hidden" id="__token" name="_token" value="{{ csrf_token('authenticate') }}">
@@ -80,17 +84,7 @@
                     </div>
                     <div class="col-6 mt-0 pl-3 w-100 form-group input-group input-group-sm d-block">
                         {{ form_label(form_factura.id_cliente) }}
-                        <div class="row m-0 p-0">
-                            <div class="col-11 mt-0 p-0 w-100 form-group input-group input-group-sm d-block">
-                                {{ form_widget(form_factura.id_cliente) }}
-                            </div>
-                            <div class="col-1 mt-0 p-0">
-                                <button style="height: 40px !important;" class="btn btn-secondary btn-sm" type="button"
-                                        id="btnSearchCliente"
-                                        onclick="buscarCliente()"><i
-                                            class="fa fa-search"></i></button>
-                            </div>
-                        </div>
+                        {{ form_widget(form_factura.id_cliente) }}
                     </div>
                 </div>
                 <div class="row mt-0 p-0 mb-3">
@@ -244,14 +238,20 @@
         let mercancia = [];
         let fecha = $("#factura_fecha_factura").val();
 
+        $("#factura_id_cliente").select2({
+            tags: "true",
+            placeholder: "Seleccione una opción",
+            class:"form form-control"
+        });
+        $('#my_element').addClass('form form-control')
+
         $('#no_ncf').on('change', function () {
-            if ($(this).is(':checked')){
+            if ($(this).is(':checked')) {
                 $('#factura_id_categoria_cliente').val(0)
                 $('#factura_ncf').val('')
                 $('#factura_id_categoria_cliente').prop('disabled', true)
                 $('#factura_ncf').prop('disabled', true)
-            }
-            else{
+            } else {
                 $('#factura_id_categoria_cliente').prop('disabled', false)
                 $('#factura_ncf').prop('disabled', false)
             }
@@ -299,7 +299,9 @@
              */
 
             $('select').prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
+            $('span .select2-container').addClass('form form-control')
             $('select').val(0)
+            $('factura_id_cliente').find('option').remove()
 
             const form_factura = $('#form_factura')
             const form_movimientoventa = $('#form_movimientoventa')
@@ -398,16 +400,10 @@
                     window.location.replace('/contabilidad/venta/factura/' + $(this).val())
                 }
             })
-
-            // $('#factura_fecha_factura').change(function () {
-            //     fecha = $(this).val()
-            //     $('#rows_mercancias').find('tr').remove();
-            //     resetFormMercancia()
-            // })
             /** obtener los clientes por el tipo cliente seleccionado */
             cbx_tipoCliente.on('change', function () {
                 cbx_cliente.find('option').remove()
-                cbx_cliente.prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
+                // cbx_cliente.prepend(`<option value = 0 selected=false disabled> --- seleccione --- </option>`)
 
                 loadingModal.show()
                 $.ajax({
@@ -583,7 +579,7 @@
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
                 const mercancia = lista_mercancias.find(e => e.codigo === $(this).attr('id-mercancia'))
-                importe_total -= (Number.parseFloat(mercancia.importe)+Number.parseFloat(mercancia.descuento_recatrga))
+                importe_total -= (Number.parseFloat(mercancia.importe) + Number.parseFloat(mercancia.descuento_recatrga))
                 label_importeTotal.text('$' + importe_total.toFixed(2))
                 lista_mercancias = lista_mercancias.filter(e => e.codigo !== $(this).attr('id-mercancia'))
                 $(this).closest('tr').remove()
@@ -643,6 +639,7 @@
                 })
             }
         }
+
         function buscarCliente() {
             if (fecha == '')
                 alertTemplate('Debe seleccionar la fecha para buscar las mercancías o productos', 'danger')
