@@ -15,30 +15,30 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class VisadoController extends AbstractController
 {
+//    /**
+//     * @Route("/visado", name="turismo_module_visado")
+//     */
+//    public function index(Request $request)
+//    {
+//        $telefono = $request->request->get('telefono_cliente');
+//        $nombre = $request->request->get('nombre_cliente');
+//        $apellidos = $request->request->get('apellidos_cliente');
+//        $correo = $request->request->get('correo_cliente');
+//        $direccion = $request->request->get('direccion_cliente');
+//        $id_cliente = $request->request->get('id_cliente_cliente');
+//
+//        return $this->render('turismo_module/visado/index.html.twig', [
+//            'controller_name' => 'VisadoController',
+//            'telefono'=>$telefono,
+//            'nombre'=> $nombre,
+//            'apellidos'=>$apellidos,
+//            'correo'=>$correo,
+//            'direccion'=>$direccion,
+//            'id_cliente'=>$id_cliente
+//        ]);
+//    }
     /**
-     * @Route("/visado", name="turismo_module_visado")
-     */
-    public function index(Request $request)
-    {
-        $telefono = $request->request->get('telefono_cliente');
-        $nombre = $request->request->get('nombre_cliente');
-        $apellidos = $request->request->get('apellidos_cliente');
-        $correo = $request->request->get('correo_cliente');
-        $direccion = $request->request->get('direccion_cliente');
-        $id_cliente = $request->request->get('id_cliente_cliente');
-
-        return $this->render('turismo_module/visado/index.html.twig', [
-            'controller_name' => 'VisadoController',
-            'telefono'=>$telefono,
-            'nombre'=> $nombre,
-            'apellidos'=>$apellidos,
-            'correo'=>$correo,
-            'direccion'=>$direccion,
-            'id_cliente'=>$id_cliente
-        ]);
-    }
-    /**
-     * @Route("/", name="turismo_module")
+     * @Route("/visado", name="turismo_module")
      */
     public function indexDashboard(EntityManagerInterface $em,Request $request)
     {
@@ -47,7 +47,7 @@ class VisadoController extends AbstractController
         $cliente = $em->getRepository(Cliente::class)->findOneBy([
             'telefono'=>$telefono,
         ]);
-        return $this->render('turismo_module/dashboard.twig', [
+        return $this->render('turismo_module/visado/index.html.twig', [
             'controller_name' => 'TurismoController',
             'telefono'=>$telefono,
             'nombre'=> $cliente->getNombre(),

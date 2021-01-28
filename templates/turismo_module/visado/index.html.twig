@@ -10,7 +10,7 @@
 
 {% block navBar %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
-        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal">Paquete de Gestión Consular</a>
+        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal">| Paquete de Gestión Consular |</a>
         <button class="navbar-toggler order-md-2" type="button" data-toggle="collapse"
                 data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,9 +24,9 @@
                         Configuración
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                        <a class="dropdown-item"
                            href="{{ url ('turismo_module_visado_proveedor') }}">Proveedores</a>
-                        <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                        <a  class="dropdown-item"
                            href="{{ url ('turismo_module_visado_elementos_visa') }}">Elementos de la Visa</a>
                     </div>
                 </li>
@@ -44,7 +44,12 @@
                 </li>
             </ul>
         </div>
-        <span class="text-light p-1 order-md-1 ml-2"
+        <span id="go_back" class="text-light pl-1 order-md-1 ml-2" style="cursor: pointer;border-radius: 10px; border: gray solid 2px;">
+             <a class="btn">
+                <span href="#" class="novi-icon mdi mdi-arrow-left">Tursimo</span>
+            </a>
+        </span>
+        <span class="text-light p-1 py-2 order-md-1 ml-2"
               style="cursor: pointer;border-radius: 10px; border: gray solid 2px;"><a data-toggle="modal" data-target="#">Cliente: {{ nombre }} {{ apellidos }}</a></span>
     </nav>
     <!-- Modal -->
@@ -53,14 +58,13 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $('#btnAceptar__salir').on('click', function () {
-            // $.ajax({
-            //     url: '/contabilidad/inventario/salirAlmacen',
-            //     method: "POST",
-            //     data: {}
-            // }).then(res => {
-            //     window.location.replace('/contabilidad/inventario/selAlmacen');
-            // })
+        $('#go_back').on('click', function () {
+            window.location.href = "/categorias/turismo/" +{{ telefono }};
         })
+        // $('#go_back').mousemove(function( event ) {
+        //     var msg = "Handler for .mousemove() called at ";
+        //     msg += event.pageX + ", " + event.pageY;
+        //     alert(  msg  );
+        // });
     </script>
 {% endblock %}

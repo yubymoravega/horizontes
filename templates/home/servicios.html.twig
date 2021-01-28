@@ -1,133 +1,134 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-	{% include 'breadcrumbs.html.twig' %}
-	<!-- Classic Breadcrumbs-->
+    {% include 'breadcrumbs.html.twig' %}
+    <!-- Classic Breadcrumbs-->
 
-	<div class="cards-list">
+    <div class="cards-list">
 
-		<div class="card 1">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio">Telecomunicaciones</p>
-			</div>
-		</div>
+        <div class="card 1">
+            <div class="card_image">
+                <img src=""/>
+            </div>
+            <div class="card_title title-white">
+                <p class="texto-servicio">Telecomunicaciones</p>
+            </div>
+        </div>
 
-		<div class="card 2">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio">Multi Servicios</p>
-			</div>
-		</div>
+        <div class="card 2">
+            <div class="card_image">
+                <img src=""/>
+            </div>
+            <div class="card_title title-white">
+                <p class="texto-servicio">Multi Servicios</p>
+            </div>
+        </div>
 
-		<div class="card 3">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title">
-				<p class="texto-servicio">Turismo</p>
-			</div>
-		</div>
+        <div class="card 3">
+            <div class="card_image">
+                <img src=""/>
+            </div>
+            <div class="card_title">
+                <p class="texto-servicio">Turismo</p>
+            </div>
+        </div>
 
-	</div>
+    </div>
 
-	<style>
+    <style>
 
-		p.texto-servicio {
-			font-size: 23px;
-			font-weight: 100;
-		}
-		.cards-list {
-			z-index: 0;
-			width: 100%;
-			display: flex;
-			justify-content: space-around;
-			flex-wrap: wrap;
-		}
+        p.texto-servicio {
+            font-size: 23px;
+            font-weight: 100;
+        }
 
-		.card {
-			margin: 30px auto !important;
-			width: 300px;
-			height: 300px;
-			border-radius: 40px;
-			box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
-			cursor: pointer;
-			transition: 0.4s;
-		}
+        .cards-list {
+            z-index: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
 
-		.card .card_image {
-			width: inherit;
-			height: inherit;
-			border-radius: 40px;
-		}
+        .card {
+            margin: 30px auto !important;
+            width: 300px;
+            height: 300px;
+            border-radius: 40px;
+            box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
+            cursor: pointer;
+            transition: 0.4s;
+        }
 
-		.card .card_image img {
-			width: inherit;
-			height: inherit;
-			border-radius: 40px;
-			object-fit: cover;
-		}
+        .card .card_image {
+            width: inherit;
+            height: inherit;
+            border-radius: 40px;
+        }
 
-		.card .card_title {
-			text-align: center;
-			border-radius: 0 0 40px 40px;
-			font-family: sans-serif;
-			font-weight: bold;
-			font-size: 30px;
-			margin-top: -80px;
-			height: 40px;
-		}
+        .card .card_image img {
+            width: inherit;
+            height: inherit;
+            border-radius: 40px;
+            object-fit: cover;
+        }
 
-		.card:hover {
-			transform: scale(0.9, 0.9);
-			box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
-		}
+        .card .card_title {
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 30px;
+            margin-top: -80px;
+            height: 40px;
+        }
 
-		.title-white {
-			color: white;
-		}
+        .card:hover {
+            transform: scale(0.9, 0.9);
+            box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
+        }
 
-		.title-black {
-			color: black;
-		}
+        .title-white {
+            color: white;
+        }
 
-		@media all and(max-width: 500px) {
-			.card-list {
-				/* On small screens, we are no longer using row direction but column */
-				flex-direction: column;
-			}
-		}
-	</style>
+        .title-black {
+            color: black;
+        }
+
+        @media all and(max-width: 500px) {
+            .card-list {
+                /* On small screens, we are no longer using row direction but column */
+                flex-direction: column;
+            }
+        }
+    </style>
 
 {% endblock %}
 
 {% block javascripts %}
-	{{parent()}}
+    {{ parent() }}
 
-	<script>
-		$("#form-telefono").validate({
+    <script>
+        $("#form-telefono").validate({
 
-errorLabelContainer: "#messageBox",
-wrapper: "li",
-rules: {
-required: true,
-minlength: 8
-},
-messages: {
-tel: {
-required: "Telefono Requerido",
-minlength: "Minimo 8 Caracteres"
-}
-}
+            errorLabelContainer: "#messageBox",
+            wrapper: "li",
+            rules: {
+                required: true,
+                minlength: 8
+            },
+            messages: {
+                tel: {
+                    required: "Telefono Requerido",
+                    minlength: "Minimo 8 Caracteres"
+                }
+            }
 
-});
+        });
 
-$('#tel').on('input', function () {
-this.value = this.value.replace(/[^0-9]/g, '');
-});
-	</script>
+        $('#tel').on('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
 
 {% endblock %}
