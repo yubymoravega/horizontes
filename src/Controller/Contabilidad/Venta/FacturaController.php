@@ -1244,6 +1244,7 @@ class FacturaController extends AbstractController
                 if ($d->getIdAmlacen()->getDescripcion() == 'Almacén Mercancias para la Venta'
                     || $d->getIdAmlacen()->getDescripcion() == 'Almacén de Productos Terminados') {
                     $fecha_contable = AuxFunctions::getDateToCloseDate($em, $d->getIdAmlacen()->getId());
+//                    dd(AuxFunctions::getDateToCloseDate($em, $d->getIdAmlacen()->getId()),$fecha);
                     if ($fecha_contable->format('d-m-Y') == $fecha->format('d-m-Y')) {
                         if ($d->getExistencia() > 0) {
                             $row_data[] = array(
