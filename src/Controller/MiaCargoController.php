@@ -9,8 +9,10 @@ use Knp\Snappy\Pdf;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\InposdomCierre;
 use App\Entity\Cliente;
 use App\Entity\FacturaImposdom;
+
 use Symfony\Component\HttpFoundation\Response;
 use \Datetime;
 use App\Entity\TasaDeCambio;
@@ -519,5 +521,148 @@ class MiaCargoController extends AbstractController
         return $this->redirectToRoute('mia_cargo/facturas',['tel' => $facturaImposdom->getIdCliente()]);
 
     }
+
+      /**
+     * @Route("/mia_cargo/cierre/", name="mia_cargo/cierre")
+     */
+    public function inposdomCierre(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request)
+    {
+        $cliente = $this->getDoctrine()
+            ->getRepository(InposdomCierre::class)->findAll();
+
+        $dql = "SELECT a FROM App:InposdomCierre a "; 
+
+        $dql .= " ORDER BY a.fecha DESC";
+        $query = $em->createQuery($dql);
+
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            25 /*limit per page*/
+        );
+
+        return $this->render('mia_cargo/cierre.html.twig', [
+            'pagination' => $pagination
+        ]);
+    } 
+
+       /**
+     * @Route("/mia_cargo/cierre/save/", name="mia_cargo/cierre/save")
+     */
+    public function cierreSave()
+    {
+        $user =  $this->getUser();
+        $dataBase = $this->getDoctrine()->getManager();
+
+        $inposdomCierre = new InposdomCierre();
+        $contadorJson = 0;
+        $idFactura = 0;
+        $idComparar = 0;
+        $usd = 0;
+        $dop = 0;
+        $cantidadFacturas = 0;
+
+        $jsonCierre = null;
+
+        $facturasImposdom =  $dataBase->getRepository(FacturaNoContable::class)->findBy(['empleado' => $user->getUsername()]);
+
+        $con = count($facturasImposdom);
+        
+        $contador = 0;
+
+        while($contador < $con){
+
+        $idFactura = $facturasImposdom[$contador]->getId();
+
+        $sh = json_decode($facturasImposdom[$contador]->getJson());
+
+        if($facturasImposdom[$contador]->getIdMoneda() == "DOP"){
+
+            $dop = $dop + $facturasImposdom[$contador]->getTotal();
+        
+        }else{
+
+            $usd =  $usd + $facturasImposdom[$contador]->getTotal();
+        }
+
+        $contrSh = count($sh);
+        $contadorSh = 0;
+
+       while($contadorSh < $contrSh){
+
+        if($sh[$contadorSh]->json->cierre == '0'){
+
+            if($idFactura != $idComparar){
+                $cantidadFacturas++;
+            }
+
+        $idComparar = $facturasImposdom[$contador]->getId();    
+
+            $sh[$contadorSh]->json->cierre = '1';
+            
+            $jsonCierre[$contadorJson] = array(
+                'sh' => $sh[$contadorSh]->json->sh,
+                'monto' => $sh[$contadorSh]->json->json->monto,
+                'libra' => $sh[$contadorSh]->json->libra,
+                'moneda' => $facturasImposdom[$contador]->getIdMoneda()
+            );
+
+            $contadorJson++;
+        }
+
+        $contadorSh++;
+       }
+
+        $facturasImposdom[$contador]->setJson(json_encode($sh));
+        //$dataBase->persist();
+        $dataBase->flush($facturasImposdom[$contador]);
+        $contador++;
+        }
+
+        date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
+        
+        if($jsonCierre){
+            $inposdomCierre->setFecha($date); 
+        $inposdomCierre->setJson(json_encode($jsonCierre)); 
+        $inposdomCierre->setEmpleado($user->getUsername()); 
+        $inposdomCierre->setDop($dop); 
+        $inposdomCierre->setUsd($usd); 
+        $inposdomCierre->setFactura($cantidadFacturas);
+
+        $dataBase->persist($inposdomCierre); 
+        $dataBase->flush();
+        $this->addFlash(
+            'success',
+            'Cierre exitoso!'
+        );
+        return $this->redirectToRoute('mia_cargo/cierre');
+        }
+
+        $this->addFlash(
+            'error',
+            'No hay facturas para el Cierre'
+        );
+
+        return $this->redirectToRoute('mia_cargo/cierre');
+    } 
+
+      /**
+     * @Route("/mia_cargo/pdf/cierre/{id}", name="mia_cargo/pdf/cierre")
+     */
+    public function pdfCierre($id,  Pdf $pdf)
+    {
+      
+
+        $dataBase = $this->getDoctrine()->getManager();
+
+        $cierre = $this->getDoctrine()
+            ->getRepository(InposdomCierre::class)->find($id);
+
+            $html = $this->renderView("mia_cargo/pdfCierre.html.twig",
+        ["cierre" => $cierre,"json" => \json_decode($cierre->getJson())]);
+        $filename = 'factura.pdf'; 
+            return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
+    } 
 
 }

@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+
+	<!-- Section Input Groups-->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<section class="section novi-background section-66 section-sm-bottom-110">
+		<div class="container">
+			<h1 class="text-reporte">Cierre Inposdom
+			</h1>
+     
+			</h2>
+			<hr class="divider bg-mantis">
+			<button id="add" class="btn btn-sm btn-outline-dark" type="submit" data-toggle="modal" data-target="#confirmar">Agregar Cierre</button>
+		<!-- Bootstrap Table-->
+		<div class="table-responsive clearfix">
+			<table class="table table-striped tabla-reporte">
+				<tbody>
+					<tr>
+            <th>ID</th>
+            <th>Facuras</th>
+						<th>Fecha</th>
+            <th>Empleado</th>
+						<th>Monto DOP</th>   
+            <th>Monto USD</th>       
+						<th>Accion</th>
+					</tr>
+					{# table body #}
+        {% for data in pagination %}
+        <tr {% if loop.index is odd %}class="color"{% endif %}>
+           <td>C{{data.id}}</td>
+           <td>{{data.factura}}</td>
+            <td>{{data.fecha |date("m/d/Y")}} <br> {{data.fecha |date("h:i:s A")}}</td>           
+            <td>{{data.empleado}}</td>    
+           	<td>{{data.dop}}</td> 
+            <td>{{data.usd}}</td>
+          
+            <td>
+
+       <a  onClick="pdf('{{ data.id }}');" > <svg style="height: 30px; width: 30px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+  <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
+  <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+</svg></a>
+
+
+			</td>           
+        </tr>
+    {% endfor %}    
+				</tbody>
+			</table>
+		
+			{# display navigation #}
+			<div class="navigation">{{ knp_pagination_render(pagination) }}</div>
+      <div class="count contador">Cierre: {{ pagination.getTotalItemCount }} </div>
+	</div>
+</div></div></div></section>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmar" tabindex="-1" role="dialog" aria-labelledby="confirmar" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-dark">
+        <h5 class="modal-title text-light" id="exampleModalLongTitle">Procesar Cierre?</h5>
+        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+      </div>
+      <div class="modal-body  ">
+
+	  
+ <button type="button" id="procesar" style="float: right;" class="my-0 btn btn-secondary">Procesar</button>
+      </div>
+     
+    </div>
+  </div>
+</div>  
+
+
+
+<style>
+
+.box {
+    width: 20%;
+    height: 150%;
+}
+
+</style>
+
+ {% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+
+<script>
+
+$( "#procesar" ).click(function() {
+  $('#confirmar').modal('hide');
+
+window.location.href = '/mia_cargo/cierre/save/';
+  
+});
+
+     
+
+</script>
+
+
+
+{% endblock %}
+
+

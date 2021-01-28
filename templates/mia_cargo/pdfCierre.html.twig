@@ -1,0 +1,43 @@
+{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">SH</th>
+      <th scope="col">Libra(LB)</th>
+      <th scope="col">Monto DOP</th>
+      <th scope="col">Monto USD</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% set usd = 0 %} 
+  {% set dop = 0 %}
+
+    {% for data in json %}
+    <tr>
+       <th scope="row">{{data.sh}}</th>
+        <td>{{data.libra}}</td>
+        {% if data.moneda == "DOP" %}
+          <td>{{data.monto}}</td> {% set dop = dop + data.monto %}
+        {% else %}
+        <td></td>
+         <td>{{data.monto}}</td>
+{% endif %}
+     </tr>
+    {% endfor %}
+
+      <td>Empleado: {{cierre.empleado}}</td>
+      <td>Fecha: {{cierre.fecha|date("d/m/Y ")}}</td>
+      <td>Total: {{dop |number_format(2, '.', ',')}} </td>
+      <td>Total: {{usd |number_format(2, '.', ',')}}</td>
+
+       <tr>
+  </tbody>
+</table>
+
+
+
+{% endblock %}
+
+
+
