@@ -70,11 +70,9 @@ class HomeController extends AbstractController
     public function categorias($tel)
     {
         $user =  $this->getUser();
-
-        if($user->getRoles()['rol'] == "ROLE_5918"){
-
-            return $this->redirectToRoute('turismo/solicitud',['cliente' => $tel]); 
-        }
+//        if($user->getRoles()['rol'] == "ROLE_5918"){
+//            return $this->redirectToRoute('turismo/solicitud',['cliente' => $tel]);
+//        }
 
         return $this->render('home/categoria.html.twig',['tel' => $tel]);
     } 
