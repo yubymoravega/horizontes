@@ -516,9 +516,9 @@ class FacturaController extends AbstractController
         $factura->setJson(json_encode($json));
         $dataBase->persist($factura);
         $dataBase->flush();
-
-        $cotizacion->setJson(json_encode($json)); 
-        $dataBase->flush($cotizacion);
+        
+        $dataBase->remove($cotizacion);
+            $dataBase->flush();
 
         $efectivo = $dataBase->getRepository(ReporteEfectivo::class)->findBy(['idCotizacion'=>$cotizacion->getId()]);
         $clienteOrigen = $dataBase->getRepository(Cliente::class)->findby(['telefono' => $factura->getIdCliente()]);
