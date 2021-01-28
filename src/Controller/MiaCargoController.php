@@ -659,9 +659,11 @@ class MiaCargoController extends AbstractController
         $cierre = $this->getDoctrine()
             ->getRepository(InposdomCierre::class)->find($id);
 
+        $idCierre = $cierre->getId();
+
             $html = $this->renderView("mia_cargo/pdfCierre.html.twig",
         ["cierre" => $cierre,"json" => \json_decode($cierre->getJson())]);
-        $filename = 'factura.pdf'; 
+        $filename = "CierreNo-$idCierre.pdf"; 
             return new PdfResponse($pdf->getOutputFromHtml($html),$filename,'application/pdf',"inline");
     } 
 

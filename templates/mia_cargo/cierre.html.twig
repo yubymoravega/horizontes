@@ -21,7 +21,7 @@
             <th>ID</th>
             <th>Facuras</th>
 						<th>Fecha</th>
-            <th>Empleado</th>
+            
 						<th>Monto DOP</th>   
             <th>Monto USD</th>       
 						<th>Accion</th>
@@ -30,9 +30,9 @@
         {% for data in pagination %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
            <td>C{{data.id}}</td>
-           <td>{{data.factura}}</td>
+           <td>{{data.factura}} <br> {{data.empleado}}</td>
             <td>{{data.fecha |date("m/d/Y")}} <br> {{data.fecha |date("h:i:s A")}}</td>           
-            <td>{{data.empleado}}</td>    
+             
            	<td>{{data.dop}}</td> 
             <td>{{data.usd}}</td>
           
