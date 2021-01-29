@@ -38,7 +38,7 @@ class VisadoController extends AbstractController
 //        ]);
 //    }
     /**
-     * @Route("/visado", name="turismo_module")
+     * @Route("/gestion-consular", name="turismo_module")
      */
     public function indexDashboard(EntityManagerInterface $em,Request $request)
     {
