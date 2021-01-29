@@ -44,8 +44,6 @@ class HomeController extends AbstractController
      */
     public function home()
     {
-      
-
         //Código del módulo de CONTABILIDAD, NO BORRAR
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
