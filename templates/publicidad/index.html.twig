@@ -1,0 +1,189 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {% include 'breadcrumbs.html.twig' %}
+<!-- Section Input Groups-->
+<section class="section novi-background section-20" id='seccion-principal'>
+	<div class="container card">
+		<div class="card-header text-center">
+			<h1>Subir Imágenes
+			</h1>
+			<h4 style="color: white;">
+				El orden de las imágenes es de izquierda a derecha.
+			</h4>
+		</div>
+
+		<br><div class="container">
+			<form  name='formJpg' method="POST" enctype="multipart/form-data" action="{{ path('publicidad/save') }}">
+				<div class="row">
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div id="1" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 1<input type="file" name="1" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div  id="2" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 2<input type="file" name="2" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div  id="3" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 3<input type="file" name="3" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div  id="4" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 4<input type="file" name="4" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div  id="5" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 5<input type="file" name="5" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div  id="6" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 6<input type="file" name="6" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<div  id="7" class="imagePreview"></div>
+						<label class="btn btn-dark">
+							Subir 7<input type="file" name="7" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+
+					<div class="col-sm-3 col-sm-3 imgUp">
+						<button type="submit"  id="btnSubir" class="btn btn-default btn-icon btn-icon-right">
+							<span class="icon novi-icon mdi mdi-cloud-upload"></span>
+							<font style="vertical-align: inherit;">
+								<font style="vertical-align: inherit;">
+									Guardar</font>
+							</font>
+						</button>
+					</div>
+
+				</div>
+			</form>
+		</div>
+		<!-- container -->
+	</div>
+</section>
+
+<style>
+	body {
+		background-color: #f5f5f5;
+	}
+	.imagePreview {
+		width: 100%;
+		height: 180px;
+		background-position: center center;
+		background: url('http://cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg');
+		background-color: #fff;
+		background-size: cover;
+		background-repeat: no-repeat;
+		display: inline-block;
+		box-shadow: 0 -3px 6px 2px rgba(0, 0, 0, 0.2);
+	}
+	.btn-dark {
+		display: block;
+		border-radius: 0;
+		box-shadow: 0 4px 6px 2px rgba(0, 0, 0, 0.2);
+		margin-top: -5px;
+	}
+	.imgUp {
+		margin-bottom: 15px;
+	}
+	.del {
+		position: absolute;
+		top: 0;
+		right: 15px;
+		width: 30px;
+		height: 30px;
+		text-align: center;
+		line-height: 30px;
+		background-color: rgba(255, 255, 255, 0.6);
+		cursor: pointer;
+	}
+	.imgAdd {
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background-color: #4bd7ef;
+		color: #fff;
+		box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+		text-align: center;
+		line-height: 30px;
+		margin-top: 0;
+		cursor: pointer;
+		font-size: 15px;
+	}
+
+	button#btnSubir {
+		color: #fff;
+		border: 1px solid;
+		margin-left: 14%;
+		margin-top: 40%;
+	}
+	button#btnSubir:hover {
+		background-color: #fff;
+		color: #2f2f2f;
+	}
+</style>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script> 
+
+    $( document ).ready(function() {
+        $("#1").css("background-image", "url('{{ asset('images/imgHome/1.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+        $("#2").css("background-image", "url('{{ asset('images/imgHome/2.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+        $("#3").css("background-image", "url('{{ asset('images/imgHome/3.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+        $("#4").css("background-image", "url('{{ asset('images/imgHome/4.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+        $("#5").css("background-image", "url('{{ asset('images/imgHome/5.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+        $("#6").css("background-image", "url('{{ asset('images/imgHome/6.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+        $("#7").css("background-image", "url('{{ asset('images/imgHome/7.jpg') }}?fecha={{ 'now'|date('m/d/Y h:i a') }}')");
+});
+
+$(function() {
+    $(document).on("change",".uploadFile", function()
+    {
+    		var uploadFile = $(this);
+        var files = !!this.files ? this.files : [];
+        if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+ 
+        if (/^image/.test( files[0].type)){ // only image file
+            var reader = new FileReader(); // instance of the FileReader
+            reader.readAsDataURL(files[0]); // read the local file
+ 
+            reader.onloadend = function(){ // set image data as background of div
+                //alert(uploadFile.closest(".upimage").find('.imagePreview').length);
+            uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url("+this.result+")");
+            }
+        }
+      
+    });
+});
+
+    </script>
+
+{% endblock %}
