@@ -8,6 +8,7 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
+use App\Entity\Contabilidad\Config\InstrumentoCobro;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\Unidad;
@@ -52,7 +53,6 @@ class ComprobanteOperacionesController extends AbstractController
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $fecha = AuxFunctions::getCurrentDate($em,$obj_unidad);
-//        $arr_fecha = explode('-', $fecha);
         $year_ = AuxFunctions::getCurrentYear($em,$obj_unidad);
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
@@ -73,7 +73,6 @@ class ComprobanteOperacionesController extends AbstractController
 //            dd($comprobante,$operaciones,$pagos_cobros);
             if ($total_credito == $total_debito) {
                 $new_registro = new RegistroComprobantes();
-
                 /** verificando que el nro que mostre en pantalla sea el mismo que le corresponde al registro,
                  * y nadie halla hecho un comprobante en el tiempo que el usuario llenava el
                  * formulario
@@ -84,6 +83,7 @@ class ComprobanteOperacionesController extends AbstractController
                 ));
                 $nro_consecutivo_real = count($arr_registros) + 1;
                 $obj_tipo_comprobante = $em->getRepository(TipoComprobante::class)->find(intval($comprobante['tipo_comprobante']));
+//                dd($comprobante);
                 $new_registro
                     ->setDescripcion($comprobante['explicacion'])
                     ->setIdUsuario($this->getUser())
@@ -92,6 +92,7 @@ class ComprobanteOperacionesController extends AbstractController
                     ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_CONTABILIDAD)
                     ->setCredito($total_credito)
                     ->setDebito($total_debito)
+                    ->setIdInstrumentoCobro($em->getRepository(InstrumentoCobro::class)->find(intval($comprobante['id_instrumento_cobro'])))
                     ->setIdTipoComprobante($obj_tipo_comprobante)
                     ->setIdUnidad($obj_unidad)
                     ->setDocumento($comprobante['documento'])

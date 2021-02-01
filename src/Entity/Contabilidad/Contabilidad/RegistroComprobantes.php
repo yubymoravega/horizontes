@@ -3,6 +3,7 @@
 namespace App\Entity\Contabilidad\Contabilidad;
 
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\InstrumentoCobro;
 use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
@@ -84,6 +85,11 @@ class RegistroComprobantes
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $documento;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=InstrumentoCobro::class)
+     */
+    private $id_instrumento_cobro;
 
     public function getId(): ?int
     {
@@ -230,6 +236,18 @@ class RegistroComprobantes
     public function setDocumento(string $documento): self
     {
         $this->documento = $documento;
+
+        return $this;
+    }
+
+    public function getIdInstrumentoCobro(): ?InstrumentoCobro
+    {
+        return $this->id_instrumento_cobro;
+    }
+
+    public function setIdInstrumentoCobro(?InstrumentoCobro $id_instrumento_cobro): self
+    {
+        $this->id_instrumento_cobro = $id_instrumento_cobro;
 
         return $this;
     }

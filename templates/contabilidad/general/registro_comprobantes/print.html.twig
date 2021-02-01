@@ -1,35 +1,60 @@
 {% extends('contabilidad/inventario/print_base.html.twig') %}
-{% block title %} Imprimir Comprobante de Anotaciones {% endblock %}
+{% block title %} Imprimir Registro de Comprobantes {% endblock %}
 {% block body %}
     <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
         <table border="0" width="960px" class="mt-1 mb-2">
             <tbody>
             <tr>
-                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Registro de comprobantes
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Registro de
+                    comprobantes
                 </td>
             </tr>
             <tr>
-                <td colspan="7"><strong>Unidad: </strong> {{ unidad_codigo }} : {{ unidad_nombre }}</td>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad_codigo }} : {{ unidad_nombre }}</td>
+                <td class="text-right"><strong>Feha de impresión: </strong> {{ fecha_impresion }} </td>
             </tr>
             </tbody>
         </table>
         <table border="0" width="960px" class="text-center">
             <thead>
-            <th width="70px">Comprobante</th>
-            <th width="70px">Débito</th>
-            <th width="175px">Crédito</th>
+            <th style="width: 20px !important;" class="text-left">Comprobante</th>
+            <th width="100px">Débito</th>
+            <th width="100px">Crédito</th>
             <th width="200px">Anotado por</th>
+            <th scope="col-1" class="text-left">Detalles</th>
             </thead>
             <tbody>
             {% for item in datos %}
+                {% if item.index == 0 %}
                     <tr>
-                        <td style="font-weight:400;" class="text-right">{{ item.abreviatura_comprobante }} - {{ item.nro }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
-                        <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
-                        <td style="font-weight:400;" class="text-center">{{ item.usuario }} ({{ item.fecha }})
-                    </tr>
+                {% else %}
+                    <tr style="background-color: lightgrey !important;">
+                {% endif %}
+
+                    <td style="font-weight:400;" class="text-left">{{ item.abreviatura_comprobante }}
+                        - {{ item.nro }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.debito }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.credito }}</td>
+                    <td style="font-weight:400;" class="text-center">{{ item.usuario }} ({{ item.fecha }})
+                    <td style="font-weight:400;" class="text-left">{{ item.descripcion }}
+                </tr>
             {% endfor %}
             </tbody>
         </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
     </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
 {% endblock %}

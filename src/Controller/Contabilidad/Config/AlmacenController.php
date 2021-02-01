@@ -61,7 +61,9 @@ class AlmacenController extends AbstractController
         $errors = $validator->validate($alamcen);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $alamcen->setActivo(true);
+                $alamcen
+                    ->setIdUnidad(AuxFunctions::getUnidad($em,$this->getUser()))
+                    ->setActivo(true);
                 $em->persist($alamcen);
                 $em->flush();
                 $this->addFlash('success', "Alamacén adicionado satisfactoriamente");

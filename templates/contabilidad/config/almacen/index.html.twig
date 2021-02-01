@@ -29,22 +29,19 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Codigo</th>
-            <th scope="col-2">Descripción</th>
-            <th scope="col-3">Unidad</th>
-            <th scope="col-1" width="150px">Acciones</th>
+            <th scope="col-2" class="text-left">Codigo</th>
+            <th scope="col-2" class="text-left">Descripción</th>
+            <th scope="col-1" width="150px" class="text-left">Acciones</th>
             </thead>
             <tbody>
             {% for item in almacenes %}
                 <tr>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
-                    <td style="font-weight:400;">{{ item.unidad }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
-                                        id_unidad: '{{ item.id_unidad }}',
                                         descripcion:'{{ item.descripcion }}' ,
                                         codigo:'{{ item.codigo }}' ,
                                         id: '{{ item.id }}'
@@ -85,13 +82,11 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {descripcion = '', id = '',codigo='', id_unidad = ''} = config
+            const {descripcion = '', id = '', codigo = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + descripcion)
 
-
-            $('#almacen_id_unidad').val(id_unidad)
             $('#almacen_descripcion').val(descripcion)
             $('#almacen_codigo').val(codigo)
             $('#id_alamcen').val(id)
@@ -120,12 +115,10 @@
                 },
                 rules: {
                     'almacen[descripcion]': "required",
-                    'almacen[id_unidad]': "required",
                     'almacen[codigo]': "required",
                 },
                 messages: {
                     'almacen[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'almacen[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'almacen[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
@@ -134,7 +127,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/contabilidad/config/almacen/add`)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -143,7 +136,7 @@
                 formulario.attr('method', 'POST')
                 formulario.attr('action', '/contabilidad/config/almacen/upd/' + id_alamcen)
                 formulario.submit()
-                if(validateForm.errorList.length === 0) loadingModal.show()
+                if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__form__id').on('show.bs.modal', function (event) {

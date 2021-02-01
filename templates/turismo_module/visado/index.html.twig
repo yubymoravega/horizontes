@@ -25,9 +25,11 @@
                         Configuración
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" id="option_proveedor">Proveedores</a>
+                        <a class="dropdown-item" href="{{ url('turismo_module_visado_proveedor') }}">Proveedores</a>
                         <a class="dropdown-item"
                            href="{{ url ('turismo_module_visado_elementos_visa') }}">Elementos de la Visa</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_estado_solicitud') }}">Estados de las Solicitudes</a>
                     </div>
                 </li>
                 <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
@@ -78,20 +80,5 @@
         $('#go_back').on('click', function () {
             window.location.href = "/categorias/turismo/" +{{ telefono }};
         })
-
-        $('#option_proveedor').on('click', function () {
-            let id_cliente = {{ id_cliente }};
-            $('body').append(`
-                    <form action='/turismo/gestion-consular/proveedores/'
-                         method="post" id='form_turismo_proveedores'>
-                        <input type='text' hidden name='id_cliente' value='${id_cliente}'/>
-                    </form>`)
-            const fomrulario = $('#form_turismo_proveedores')
-            fomrulario.submit()
-            fomrulario.remove()
-        })
-
-
-
     </script>
 {% endblock %}

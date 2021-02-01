@@ -95,7 +95,6 @@ class MovimientoCuentaController extends AbstractController
                 ['nro_subcuenta' => $arr_subcuenta[0], 'activo' => true, 'id_cuenta' => $obj_cuenta]);
         else
             $obj_subcuenta = null;
-
         $asiento_er = $em->getRepository(Asiento::class);
         $centro_costo_er = $em->getRepository(CentroCosto::class);
         $orden_trabajo_er = $em->getRepository(OrdenTrabajo::class);
