@@ -267,7 +267,7 @@ class AuxFunctions
                    // Content
                    $mail->isHTML(true);                                  // Set email format to HTML
                    $mail->Subject = $asunto ;
-                   $mail->AltBody = $msg;
+                   $mail->Body  = $msg;
                    $mail->send();
 
                } catch (Exception $e) {
