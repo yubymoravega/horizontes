@@ -46,8 +46,6 @@
             </div>
         </div>
     </div>
-
-
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
@@ -57,7 +55,6 @@
                     </div>
                 </div>
             </div>
-
             {# --------- Datos de la venta --------------#}
             <div class="card-body">
                 {{ form_start(form_comprobante,{'attr': {'class': 'text-left','id':'form_comprobante','method':'POST'}}) }}
@@ -67,7 +64,11 @@
                         {{ form_label(form_comprobante.tipo_comprobante) }}
                         {{ form_widget(form_comprobante.tipo_comprobante) }}
                     </div>
-                    <div class="col-8 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_comprobante.id_instrumento_cobro) }}
+                        {{ form_widget(form_comprobante.id_instrumento_cobro) }}
+                    </div>
+                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(form_comprobante.documento) }}
                         {{ form_widget(form_comprobante.documento) }}
                     </div>
@@ -410,10 +411,12 @@
             rules: {
                 'comprobante_operaciones[tipo_comprobante]': "required",
                 'comprobante_operaciones[documento]': "required",
+                'comprobante_operaciones[id_instrumento_cobro]': "required",
                 'comprobante_operaciones[explicacion]': "required",
             },
             messages: {
                 'comprobante_operaciones[tipo_comprobante]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[id_instrumento_cobro]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 'comprobante_operaciones[documento]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                 'comprobante_operaciones[explicacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
             }

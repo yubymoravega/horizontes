@@ -2119,6 +2119,7 @@ class AuxFunctions
             'id_documento' => $obj_documento,
             'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
         ));
+
         $mercancia = true;
         if (empty($arr_obj_movimiento_mercancia)) {
             $arr_obj_movimiento_mercancia = $movimiento_producto_er->findBy(array(
@@ -2249,8 +2250,10 @@ class AuxFunctions
                 'credito' => number_format($obj_documento->getImporteTotal(), 2),
                 'total' => $obj_documento->getImporteTotal()
             );
+
             return $rows;
         }
+
         return [];
 
     }

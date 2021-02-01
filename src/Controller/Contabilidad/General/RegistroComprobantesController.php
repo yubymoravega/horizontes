@@ -25,6 +25,7 @@ use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\Contabilidad\Venta\MovimientoServicio;
 use App\Entity\Contabilidad\Venta\MovimientoVenta;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,16 +40,15 @@ class RegistroComprobantesController extends AbstractController
     /**
      * @Route("/", name="contabilidad_general_registro_comprobantes")
      */
-    public function index(EntityManagerInterface $em, Request $request)
+    public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
-
         return $this->render('contabilidad/general/registro_comprobantes/index.html.twig', [
             'controller_name' => 'RegistroComprobantesController',
-            'registro' => $this->getData($em, $request)
+            'registro' => $this->getData($em, $request,$pagination)
         ]);
     }
 
-    public function getData(EntityManagerInterface $em, Request $request)
+    public function getData(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -64,13 +64,14 @@ class RegistroComprobantesController extends AbstractController
                 'anno' => AuxFunctions::getCurrentYear($em, $obj_unidad),
                 'id_unidad' => $obj_unidad
             ));
+            $empleado_er = $em->getRepository(Empleado::class);
             /** @var RegistroComprobantes $comp */
-            foreach ($comprobantes as $comp) {
-                $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
-                    'activo' => true,
+            foreach ($comprobantes as $key=>$comp) {
+                $obj_empleado = $empleado_er->findOneBy(array(
                     'id_usuario' => $comp->getIdUsuario()->getId()
                 ));
                 $row[] = array(
+                    'index' => $key % 2,
                     'id' => $comp->getId(),
                     'nro' => $comp->getNroConsecutivo(),
                     'tipo_comprobante' => $comp->getIdTipoComprobante()->getDescripcion(),
@@ -84,7 +85,13 @@ class RegistroComprobantesController extends AbstractController
                 );
             }
         }
-        return $row;
+        $paginator = $pagination->paginate(
+            $row,
+            $request->query->getInt('page', $request->get("page") || 1), /*page number*/
+            10, /*limit per page*/
+            ['align' => 'center', 'style' => 'bottom',]
+        );
+        return $paginator;
     }
 
     /**
@@ -93,7 +100,7 @@ class RegistroComprobantesController extends AbstractController
      * @param $id
      * @Route("/print_registro", name="contabilidad_general_registro_comprobantes_print")
      */
-    public function print(EntityManagerInterface $em, Request $request)
+    public function print(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         $id_user = $this->getUser()->getId();
         $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
@@ -103,9 +110,10 @@ class RegistroComprobantesController extends AbstractController
         $codigo = $obj_empleado->getIdUnidad()->getCodigo();
         $nombre = $obj_empleado->getIdUnidad()->getNombre();
         return $this->render('contabilidad/general/registro_comprobantes/print.html.twig', [
-            'datos' => $this->getData($em, $request),
+            'datos' => $this->getData($em, $request,$pagination),
             'unidad_nombre' => $nombre,
-            'unidad_codigo' => $codigo
+            'unidad_codigo' => $codigo,
+            'fecha_impresion'=>Date('d-m-Y')
         ]);
     }
 
@@ -126,7 +134,6 @@ class RegistroComprobantesController extends AbstractController
         $cierre_er = $em->getRepository(Cierre::class);
         $nombre_almacen = $registro_obj->getIdAlmacen() ? $registro_obj->getIdAlmacen()->getDescripcion() : '';
         $nombre_unidad = $obj_unidad->getNombre();
-//dd($registro_obj->getTipo());
         $row = [];
         //comprobante de operaciones de inventario
         if ($registro_obj->getTipo() == 1) {
@@ -232,10 +239,12 @@ class RegistroComprobantesController extends AbstractController
                 $datos_venta = AuxFunctions::getDataAperturaProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_venta);
             }
-            $retur_rows [] = array(
-                'nro_doc' => $rows[0]['nro_doc'],
-                'datos' => $rows
-            );
+//
+            if (!empty($rows))
+                $retur_rows [] = array(
+                    'nro_doc' => $rows[0]['nro_doc'],
+                    'datos' => $rows
+                );
             $rows = [];
         }
         return !empty($retur_rows) ? $retur_rows : [];
@@ -287,7 +296,7 @@ class RegistroComprobantesController extends AbstractController
                 ];
         }
         $data_return [] = array(
-            'nro_doc' => $registro->getDocumento(),
+            'nro_doc' => $registro->getIdInstrumentoCobro() ? $registro->getIdInstrumentoCobro()->getNombre() . '-' . $registro->getDocumento() : $registro->getDocumento(),
             'datos' => $retur_rows
         );
         return $data_return;
@@ -313,8 +322,8 @@ class RegistroComprobantesController extends AbstractController
                     'fecha' => $registro->getFecha()->format('d/m/Y'),
                     'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
                     'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => $data->getIdCentroCosto()?$data->getIdCentroCosto()->getCodigo():'',
-                    'analisis_2' => $data->getIdElementoGasto()?$data->getIdElementoGasto()->getCodigo():'',
+                    'analisis_1' => $data->getIdCentroCosto() ? $data->getIdCentroCosto()->getCodigo() : '',
+                    'analisis_2' => $data->getIdElementoGasto() ? $data->getIdElementoGasto()->getCodigo() : '',
                     'analisis_3' => '',
                     'value_1' => '',
                     'value_2' => '',
@@ -330,8 +339,8 @@ class RegistroComprobantesController extends AbstractController
                     'fecha' => '',
                     'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
                     'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => $data->getIdCentroCosto()?$data->getIdCentroCosto()->getCodigo():'',
-                    'analisis_2' => $data->getIdElementoGasto()?$data->getIdElementoGasto()->getCodigo():'',
+                    'analisis_1' => $data->getIdCentroCosto() ? $data->getIdCentroCosto()->getCodigo() : '',
+                    'analisis_2' => $data->getIdElementoGasto() ? $data->getIdElementoGasto()->getCodigo() : '',
                     'analisis_3' => '',
                     'value_1' => '',
                     'value_2' => '',
@@ -386,8 +395,8 @@ class RegistroComprobantesController extends AbstractController
                     'fecha' => $registro->getFecha()->format('d/m/Y'),
                     'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
                     'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => $data->getIdCentroCosto()?$data->getIdCentroCosto()->getCodigo():'',
-                    'analisis_2' => $data->getIdElementoGasto()?$data->getIdElementoGasto()->getCodigo():'',
+                    'analisis_1' => $data->getIdCentroCosto() ? $data->getIdCentroCosto()->getCodigo() : '',
+                    'analisis_2' => $data->getIdElementoGasto() ? $data->getIdElementoGasto()->getCodigo() : '',
                     'analisis_3' => '',
                     'value_1' => '',
                     'value_2' => '',
@@ -403,8 +412,8 @@ class RegistroComprobantesController extends AbstractController
                     'fecha' => '',
                     'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
                     'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => $data->getIdCentroCosto()?$data->getIdCentroCosto()->getCodigo():'',
-                    'analisis_2' => $data->getIdElementoGasto()?$data->getIdElementoGasto()->getCodigo():'',
+                    'analisis_1' => $data->getIdCentroCosto() ? $data->getIdCentroCosto()->getCodigo() : '',
+                    'analisis_2' => $data->getIdElementoGasto() ? $data->getIdElementoGasto()->getCodigo() : '',
                     'analisis_3' => '',
                     'value_1' => '',
                     'value_2' => '',

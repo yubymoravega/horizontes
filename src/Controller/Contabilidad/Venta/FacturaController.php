@@ -174,7 +174,7 @@ class FacturaController extends AbstractController
 
             //asentando la cuenta por cobrar
             $obj_cuenta_factura = $cuenta_er->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
-            $obj_subcuenta_factura = $subcuenta_er->findOneBy(['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true]);
+            $obj_subcuenta_factura = $subcuenta_er->findOneBy(['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true,'id_cuenta'=>$obj_cuenta_factura]);
             $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_factura, $obj_subcuenta_factura, null,
                 $unidad, null, null, null, null, null,
                 null, $factura->getTipoCliente(), $factura->getIdCliente(), $fecha_factura,
@@ -328,8 +328,7 @@ class FacturaController extends AbstractController
 
                         $cuenta_inventario = $cuenta_er->findOneBy(['nro_cuenta' => $elemento->getCuenta(), 'activo' => true]);
                         $subcuenta_inventatio_mercancia = $subcuenta_er->findOneBy(
-                            ['nro_subcuenta' => '0030', 'activo' => true, 'id_cuenta' => $cuenta_inventario]
-//                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
+                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
                         );
 
                         /** Asiento la operacion reduciendo la cuenta de la mercancia para la venta */
@@ -348,6 +347,7 @@ class FacturaController extends AbstractController
                             $cuenta_movimiento_venta = '815';
                             /** En este caso deben coincidir las subcuentas de las cuentas 815,901 y 189, para poder usar el mismo patron  */
                             $subcuenta_venta = $elemento->getNroSubcuentaInventario();
+                            $subcuenta_venta_costo = $elemento->getNroSubcuentaInventario();
 
                             $new_movimiento_inventario = new MovimientoMercancia();
                             $new_movimiento_inventario
@@ -461,7 +461,7 @@ class FacturaController extends AbstractController
         // generar número de factura ?
         $form_factura = $this->createForm(FacturaType::class);
         $factura_new = new Factura();
-        $factura_new->setNroFactura(count($arr_factura) + 2);
+        $factura_new->setNroFactura(count($arr_factura) + 1);
         $form_factura->setData($factura_new);
 
 

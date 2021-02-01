@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
 use App\Form\ClienteType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -17,7 +19,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ClienteController extends AbstractController
 {
 
-    public $apiKey = 'sk_test_szvCvPRPHBF2sWZFxRWCp5hT'; 
+    public $apiKey = 'sk_test_szvCvPRPHBF2sWZFxRWCp5hT';
 
     /**
      * @Route("/cliente-index", name="cliente-index")
@@ -44,7 +46,7 @@ class ClienteController extends AbstractController
      */
     public function registrarCliente(Request $request, $tel)
     {
-        
+
         $cliente = new Cliente();
 
         $cliente->setTelefono($tel);
@@ -62,7 +64,7 @@ class ClienteController extends AbstractController
 
             $dataBase->persist($cliente);
             $dataBase->flush();
-          
+
             $this->addFlash(
                 'success',
                 'Cliente Agregado'
@@ -82,12 +84,12 @@ class ClienteController extends AbstractController
      */
     public function clienteEdit(Request $request, $tel)
     {
-        $email = true ;
+        $email = true;
 
         $dataBase = $this->getDoctrine()->getManager();
         $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
 
-        if(!$data[0]->getCorreo()){
+        if (!$data[0]->getCorreo()) {
             $email = false;
         }
 
@@ -98,7 +100,7 @@ class ClienteController extends AbstractController
         );
 
         return $this->render('cliente/editar.html.twig', [
-            'formulario' => $formulario->createView(), 'disabled' => true,'email' => $email
+            'formulario' => $formulario->createView(), 'disabled' => true, 'email' => $email
         ]);
     }
 
@@ -106,14 +108,20 @@ class ClienteController extends AbstractController
      * @Route("/edit-save/{tel}", name="edit-save")
      */
     public function editSave($tel, Request $request)
-    { 
-
+    {
         $stripe = new \Stripe\StripeClient(
             $this->apiKey
-           );
+        );
 
-          $dataBase = $this->getDoctrine()->getManager();
-          $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
+        $dataBase = $this->getDoctrine()->getManager();
+        $data = $dataBase->getRepository(Cliente::class)->findBy(['telefono' => $tel]);
+
+        /***
+         * Eliminar el registro de la tabla temporal de trabajo del usuario y
+         * volverlo a crear con los datos del cliente actualizados
+         * develop by Camilo
+         ***/
+        $update_table = AuxFunctionsTurismo::ActualizarDatosEmpleado($dataBase,$data[0],$this->getUser());
 
         $formulario = $this->createForm(ClienteType::class, $data[0]);
         $formulario->handleRequest($request);
@@ -148,23 +156,23 @@ class ClienteController extends AbstractController
             $dataBase->flush();
         }
 
-        if($data[0]->getToken()){
-        if($data[0]->getCorreo()){
-        $stripe->customers->update(
-            $data[0]->getToken(),
-            ['email' => $data[0]->getCorreo(),
-             'name'  => $data[0]->getNombre().$data[0]->getApellidos(),
-             'phone' =>  $data[0]->getTelefono() ]         
-          );
-        }
-    
-    }
+        if ($data[0]->getToken()) {
+            if ($data[0]->getCorreo()) {
+                $stripe->customers->update(
+                    $data[0]->getToken(),
+                    ['email' => $data[0]->getCorreo(),
+                        'name' => $data[0]->getNombre() . $data[0]->getApellidos(),
+                        'phone' => $data[0]->getTelefono()]
+                );
+            }
 
-    $this->addFlash(
-        'success',
-        'Cliente Editado'
-    );
-   
+        }
+
+        $this->addFlash(
+            'success',
+            'Cliente Editado'
+        );
+
         return $this->redirectToRoute('categorias', ['tel' => $tel]);
     }
 }

@@ -58,12 +58,13 @@ class ContabilidadRegistroComprobanteController extends ControllerContabilidadRe
                 'id_unidad' => $obj_unidad
             ));
             /** @var RegistroComprobantes $comp */
-            foreach ($comprobantes as $comp) {
+            foreach ($comprobantes as $key => $comp) {
                 $obj_empleado = $em->getRepository(Empleado::class)->findOneBy(array(
                     'activo' => true,
                     'id_usuario' => $comp->getIdUsuario()->getId()
                 ));
                 $row[] = array(
+                    'index' => $key % 2,
                     'id' => $comp->getId(),
                     'nro' => $comp->getNroConsecutivo(),
                     'tipo_comprobante' => $comp->getIdTipoComprobante()->getDescripcion(),
@@ -98,7 +99,8 @@ class ContabilidadRegistroComprobanteController extends ControllerContabilidadRe
         return $this->render('contabilidad/general/registro_comprobantes/print.html.twig', [
             'datos' => $this->getData($em, $request),
             'unidad_nombre' => $nombre,
-            'unidad_codigo' => $codigo
+            'unidad_codigo' => $codigo,
+            'fecha_impresion' => Date('d-m-Y')
         ]);
     }
 
@@ -297,8 +299,8 @@ class ContabilidadRegistroComprobanteController extends ControllerContabilidadRe
                     'fecha' => $registro->getFecha()->format('d/m/Y'),
                     'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
                     'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => $data->getIdCentroCosto()?$data->getIdCentroCosto()->getCodigo():'',
-                    'analisis_2' => $data->getIdElementoGasto()?$data->getIdElementoGasto()->getCodigo():'',
+                    'analisis_1' => $data->getIdCentroCosto() ? $data->getIdCentroCosto()->getCodigo() : '',
+                    'analisis_2' => $data->getIdElementoGasto() ? $data->getIdElementoGasto()->getCodigo() : '',
                     'analisis_3' => '',
                     'value_1' => '',
                     'value_2' => '',
@@ -314,8 +316,8 @@ class ContabilidadRegistroComprobanteController extends ControllerContabilidadRe
                     'fecha' => '',
                     'nro_cuenta' => $data->getIdCuenta()->getNroCuenta(),
                     'nro_subcuenta' => $data->getIdSubcuenta()->getNroSubcuenta(),
-                    'analisis_1' => $data->getIdCentroCosto()?$data->getIdCentroCosto()->getCodigo():'',
-                    'analisis_2' => $data->getIdElementoGasto()?$data->getIdElementoGasto()->getCodigo():'',
+                    'analisis_1' => $data->getIdCentroCosto() ? $data->getIdCentroCosto()->getCodigo() : '',
+                    'analisis_2' => $data->getIdElementoGasto() ? $data->getIdElementoGasto()->getCodigo() : '',
                     'analisis_3' => '',
                     'value_1' => '',
                     'value_2' => '',

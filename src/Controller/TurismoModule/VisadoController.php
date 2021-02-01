@@ -2,6 +2,7 @@
 
 namespace App\Controller\TurismoModule;
 
+use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,14 +43,11 @@ class VisadoController extends AbstractController
      */
     public function indexDashboard(EntityManagerInterface $em,Request $request)
     {
-        $telefono = $request->request->get('telefono');
-        /** @var Cliente $cliente */
-        $cliente = $em->getRepository(Cliente::class)->findOneBy([
-            'telefono'=>$telefono,
-        ]);
+        /** @var Cliente $obj_cliente */
+        $cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
         return $this->render('turismo_module/visado/index.html.twig', [
             'controller_name' => 'TurismoController',
-            'telefono'=>$telefono,
+            'telefono'=>$cliente->getTelefono(),
             'nombre'=> $cliente->getNombre(),
             'apellidos'=>$cliente->getApellidos(),
             'correo'=>$cliente->getCorreo(),

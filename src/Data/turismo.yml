@@ -1,0 +1,9 @@
+estados_solicitudes:
+  - id: 1
+    name: "Registrada"
+  - id: 2
+    name: "Procesada"
+  - id: 3
+    name: "Pagada"
+  - id: 4
+    name: "Aceptada"
