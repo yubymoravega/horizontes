@@ -244,7 +244,7 @@ class AuxFunctions
         $host = $config['config']['host'];
         $port = $config['config']['port'];
         $user = $config['config']['user'];
-        $alias = $config['config']['alias']; // no se donde poner este alias
+        $alias = $config['config']['alias']; 
         $password = $config['config']['password'];
 
                 // Instantiation and passing `true` enables exceptions
@@ -261,13 +261,43 @@ class AuxFunctions
                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
                    $mail->Port       = $port;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
                
-                   //Recipients
-                   $mail->setFrom($destinatario, $alias_destinatario);
+                   $mail->setFrom( $user, $alias);
+                   $mail->addAddress($destinatario, $alias_destinatario);     // Add a recipient
                         
                    // Content
                    $mail->isHTML(true);                                  // Set email format to HTML
                    $mail->Subject = $asunto ;
-                   $mail->Body  = $msg;
+                   $mail->Body    = "<table cellspacing='0' cellpadding='0' border='0' style='color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <tbody><tr width='100%'> 
+                   <td valign='top' align='left' style='background:#eef0f1;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> 
+                   <table style='border:none;padding:0 18px;margin:50px auto;width:500px'> <tbody> <tr width='100%' height='60'> 
+
+                    </tr> <tr width='100%'>
+                   <td valign='top' align='left' style='background:#fff;padding:18px'>
+                   <img height='auto' width='auto' src='https://solyag.com/wp-content/uploads/2021/02/imagen-1.jpg' title='Trello' style='font-weight:bold;font-size:18px;color:#fff;vertical-align:top' class='CToWUd'>
+
+            <h1 style='text-align:center !important; font-size:20px;margin:16px 0;color:#333;'> Mensaje del sistema <br> </h1>
+           
+            <p style='text-align:center !important;'> $msg</p>
+           
+            <div style='background:#f6f7f8;border-radius:3px'> <br>
+           
+            <p style='text-align:center !important; font:15px/1.25em 'Helvetica Neue',Arial,Helvetica;margin-bottom:0;text-align:center'> <a href='https://solyag.online/' style='border-radius:3px;background:#3aa54c;color:#fff;display:block;font-weight:700;font-size:16px;line-height:1.25em;margin:24px auto 6px;padding:10px 18px;text-decoration:none;width:180px' target='_blank'>Solya.online</a> </p>
+           
+            <br><br> </div>
+           
+            <p style='text-align:center; font:14px/1.25em 'Helvetica Neue',Arial,Helvetica;color:#333'> 
+              <strong style='text-align:center;' >SOLYAG S.R.L RNC: 1-32-13041-3 </strong><br>
+                     Calle. Juan S Ramirez esq Wenceslao Alvarez<br>
+                    Zona Universitaria, Santo Domingo, Rep Dom <br>
+                    Tel: +1-305-400-4243 & +1-809-770-2266
+             
+             </p>
+           
+            </td>
+           
+            </tr>
+           
+            </tbody> </table> </td> </tr></tbody> </table>";
                    $mail->send();
 
                } catch (Exception $e) {
