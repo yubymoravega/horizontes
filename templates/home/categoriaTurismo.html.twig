@@ -107,7 +107,7 @@
         $("#visado_card").click(function () {
             let telefono = {{ tel }}
             $('body').append(`
-                    <form action='/turismo/visado'
+                    <form action='/turismo/gestion-consular'
                          method="post" id='form_turismo_dashboard'>
                         <input type='text' hidden name='telefono' value='${telefono}'/>
                     </form>`)
