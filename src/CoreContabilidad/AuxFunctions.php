@@ -63,6 +63,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Yaml\Yaml;
 use function Sodium\add;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 
 class AuxFunctions
@@ -241,18 +244,36 @@ class AuxFunctions
         $host = $config['config']['host'];
         $port = $config['config']['port'];
         $user = $config['config']['user'];
-        $alias = $config['config']['alias'];
+        $alias = $config['config']['alias']; // no se donde poner este alias
         $password = $config['config']['password'];
 
-        $transport = (new \Swift_SmtpTransport($host, $port))
-            ->setUsername($user)
-            ->setPassword($password);
-        $mailer = new \Swift_Mailer($transport);
-        $message = (new \Swift_Message($asunto))
-            ->setFrom([$user => $alias])
-            ->setTo([$destinatario => $alias_destinatario])
-            ->setBody($msg);
-        $result = $mailer->send($message);
+                // Instantiation and passing `true` enables exceptions
+                $mail = new PHPMailer(true);
+
+                try {
+                   //Server settings
+                   //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+                   $mail->isSMTP();                                            // Send using SMTP
+                   $mail->Host       = $host ;                    // Set the SMTP server to send through
+                   $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+                   $mail->Username   = $user;                     // SMTP username
+                   $mail->Password   = $password;                               // SMTP password
+                   $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+                   $mail->Port       = $port;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+               
+                   //Recipients
+                   $mail->setFrom($destinatario, $alias_destinatario);
+                        
+                   // Content
+                   $mail->isHTML(true);                                  // Set email format to HTML
+                   $mail->Subject = $asunto ;
+                   $mail->Body  = $msg;
+                   $mail->send();
+
+               } catch (Exception $e) {
+                   
+                echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+               }
     }
 
     /**
