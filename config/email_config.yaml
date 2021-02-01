@@ -2,5 +2,5 @@ config:
   host: 'smtp.gmail.com'
   port: 587
   user: 'info@solyag.com'
-  password: 'solyag*2020'
+  password: 'Solyag*2020'
   alias: 'Solyag Sistema'
