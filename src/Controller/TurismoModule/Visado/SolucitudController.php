@@ -2,8 +2,10 @@
 
 namespace App\Controller\TurismoModule\Visado;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
+use App\Entity\TurismoModule\Utils\ConfigPrecioVentaServicio;
 use App\Entity\TurismoModule\Visado\ElementosVisa;
 use App\Form\TurismoModule\Visado\ElementosVisaType;
 use App\Form\TurismoModule\Visado\SolicitudType;
@@ -27,7 +29,19 @@ class SolucitudController extends AbstractController
         $form = $this->createForm(SolicitudType::class);
         $elementos = $em->getRepository(ElementosVisa::class)->findBy(['activo'=>true]);
         $costo_bisado = 0;
-        //$
+
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+
+        $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
+            'id_unidad' => $unidad,
+            'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_VISADO
+        ]);
+
+        $precio_total = 0;
+        if ($configuraciones) {
+            $precio_total = $configuraciones->getPrecioVentaTotal();
+        }
+
 
         /** @var Cliente $obj_cliente */
         $obj_cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
@@ -40,7 +54,9 @@ class SolucitudController extends AbstractController
             'apellidos'=>$obj_cliente->getApellidos(),
             'correo'=>$obj_cliente->getCorreo(),
             'direccion'=>$obj_cliente->getDireccion(),
-            'id_cliente'=>$obj_cliente->getId()
+            'id_cliente'=>$obj_cliente->getId(),
+            'precio_total_text'=>number_format($precio_total,2),
+            'precio_total'=>$precio_total
         ]);
     }
 }

@@ -24,7 +24,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class AuxFunctionsTurismo
 {
-    public const IDENTIFICADOR_VISADO = 1;
+    public const IDENTIFICADOR_VISADO = 11;
     public const IDENTIFICADOR_TRANSFER = 2;
 
     /**

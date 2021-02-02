@@ -15,8 +15,9 @@
                 {{ form_start(formulario, {'attr':{'id':'form_precioVenta','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
                     <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.identificador_servicio) }}
-                        {{ form_widget(formulario.identificador_servicio) }}
+                        <label for="costo_servicio">Costo del servicio</label>
+                        <input type="text" disabled name="costo_servicio" id="costo_servicio"
+                               value="{{ costo_servicio_text }}" class="w-100 form-control">
                     </div>
                     <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.prociento) }}
@@ -29,13 +30,14 @@
                 </div>
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Creditos de la venta del Servicio</h3>
-                    <div class="px-2" style="background: dimgray; border-radius: .3rem; vertical-align: auto">
-                        <label for="owner_client">Precio de Venta:0.00</label>
+                    <div class="px-2" style="background: dimgray; border-radius: .3rem;">
+                        <span class="pr-1">Precio de Venta Total : </span>
+                        <span id="importe-total">{{ precio_venta_total }}</span>
                     </div>
                 </div>
                 <hr color="dimgray" class="my-1 ml-2" size=3>
                 <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
-                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-7 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.credito.identificador_servicio) }}
                         {{ form_widget(formulario.credito.identificador_servicio) }}
                     </div>
@@ -43,12 +45,8 @@
                         {{ form_label(formulario.credito.importe) }}
                         {{ form_widget(formulario.credito.importe) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
-                        {{ form_label(formulario.credito.credito) }}
-                        {{ form_widget(formulario.credito.credito) }}
-                    </div>
                     <div class="col-2 pt-2 pl-1 mt-4">
-                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarCredito">ADICIONAR
                         </button>
                     </div>
                 </div>
@@ -57,12 +55,33 @@
             <div>
                 <table class="table-small-rows table table-hover text-light">
                     <thead class="thead-dark">
-                    <th width="120px">Servicio</th>
-                    <th width="120px">Importe</th>
-                    <th width="130px">Credito</th>
+                    <th width="120px" class="text-left">Servicio</th>
+                    <th width="120px" class="text-right">Importe</th>
                     <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
                     </thead>
-                    <tbody id="rows_solicitudes">
+                    <tbody id="rows_creditos">
+                    <script>
+                        let list_servicios = []
+                    </script>
+                    {% if creditos %}
+                        {% for item in creditos %}
+                            <script>
+                                list_servicios.push([{{ item.importe }},{{ item.servicio }}])
+                            </script>
+                            <tr>
+                                <td style="font-weight:400;">{{ item.servicio_nombre }}</td>
+                                <td style="font-weight:400;" class="text-right">{{ item.importe_text }}</td>
+                                <td hidden style="font-weight:400;" class="text-center">{{ item.importe }}</td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar"
+                                            servicio="{{ item.servicio }}">
+                                        <i class="fa fa-minus-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -81,122 +100,103 @@
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-{#    <script>#}
-{#        let lista_mercancias = []#}
-{#        let importe_total = 0#}
-{#        const form_solicitud = $('#form_solicitud')#}
-{#        const listado_solicitantes = $('#rows_solicitudes')#}
+    <script>
+        let list_servicios_creditos = []
+        const form = $('#form_precioVenta')
 
-{#        function resetFormSolicitud() {#}
-{#            $('#solicitud_nombre').val('')#}
-{#            $('#solicitud_primer_apellido').val('')#}
-{#            $('#solicitud_segundo_apellido').val('')#}
-{#            $('#solicitud_telefono_celular').val('')#}
-{#            $('#solicitud_telefono_fijo').val('')#}
-{#            $('#owner_client').prop('checked',false)#}
-{#            $('#solicitud_nombre').prop('disabled', false)#}
-{#            $('#solicitud_primer_apellido').prop('disabled', false)#}
-{#            $('#solicitud_segundo_apellido').prop('disabled', false)#}
-{#            $('#solicitud_telefono_celular').prop('disabled', false)#}
-{#            $('#solicitud_telefono_fijo').prop('disabled', false)#}
-{#        }#}
+        $('#btnSubbmitInforme').on('click', function (event) {
+            event.preventDefault()
+            // if (list_servicios_creditos.length) {
+            const listado = JSON.stringify(list_servicios_creditos)
+            form.append(`<input type="text" hidden name="mercancias" value='${listado}' />`)
+            form.attr('method', `POST`)
+            form.attr('action', `/turismo/gestion-consular/config-precio-venta/save`)
+            loadingModal.show()
+            form.submit()
+            // } else
+            //     alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+        })
 
-{#        $('#owner_client').on('change', function () {#}
-{#            if ($(this).is(':checked')) {#}
-{#                let nombre = $('#nombre').val()#}
-{#                let apellidos = $('#apellidos').val().split(' ');#}
-{#                let primer_apellido = apellidos[0]#}
-{#                let segundo_apellido = apellidos[1]#}
-{#                $('#solicitud_nombre').val(nombre)#}
-{#                $('#solicitud_primer_apellido').val(primer_apellido)#}
-{#                $('#solicitud_segundo_apellido').val(segundo_apellido)#}
-{#                $('#solicitud_telefono_celular').val($('#telefono').val())#}
-{#                $('#solicitud_telefono_fijo').val('')#}
+        $('#btnAplicarCredito').on('click', function () {
+            if ($('#config_precio_venta_servicio_credito_importe').val() != '' &&
+                $('#config_precio_venta_servicio_credito_identificador_servicio option:selected').text() != '') {
+                let importe = $('#config_precio_venta_servicio_credito_importe').val()
+                let servicio = $('#config_precio_venta_servicio_credito_identificador_servicio').val()
+                let nombre_servicio = $('#config_precio_venta_servicio_credito_identificador_servicio option:selected').text()
+                //validar que el servicio no se repita
+                if (list_servicios_creditos.some(e => e.servicio === servicio)) {
+                    alertTemplate('El servicio : <b>' + nombre_servicio + '</b> ya esta configurado.', 'danger')
+                } else {
+                    list_servicios_creditos.push({servicio, importe})
+                    $('#rows_creditos').append(`<tr>
+                    <td style="font-weight:400;"> ${nombre_servicio}</td>
+                    <td style="font-weight:400;" class="text-right"> ${importe}</td>
+                    <td class="text-center"> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" servicio="${servicio}">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                    </td></tr>`
+                    );
+                    $('#config_precio_venta_servicio_credito_importe').val('')
+                    $('#config_precio_venta_servicio_credito_identificador_servicio').val(0)
+                    incrementarPrecioVenta()
+                }
+            } else {
+                alertTemplate('Debe llenar los datos del formulario.', 'danger')
+            }
+        })
 
-{#                $('#solicitud_nombre').prop('disabled', true)#}
-{#                $('#solicitud_primer_apellido').prop('disabled', true)#}
-{#                $('#solicitud_segundo_apellido').prop('disabled', true)#}
-{#                $('#solicitud_telefono_celular').prop('disabled', true)#}
-{#                $('#solicitud_telefono_fijo').prop('disabled', true)#}
-{#            } else {#}
-{#                resetFormSolicitud()#}
-{#            }#}
-{#        })#}
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            const servicio_eliminado = list_servicios_creditos.filter(e => e.servicio === $(this).attr('servicio'))
+            console.info(servicio_eliminado)
+            let valor = parseFloat($("#importe-total").text()) - parseFloat(servicio_eliminado[0].importe)
+            $("#importe-total").text(valor.toFixed(2))
+            list_servicios_creditos = list_servicios_creditos.filter(e => e.servicio !== $(this).attr('servicio'))
+            $(this).closest('tr').remove()
+        })
 
-{#        form_solicitud.validate({#}
-{#            errorClass: 'invalid-label-orange',#}
-{#            errorPlacement: function (error, element) {#}
-{#                error.attr('style', 'font-size: .8rem;')#}
-{#                error.insertAfter(element);#}
-{#            },#}
-{#            rules: {#}
-{#                'solicitud[nombre]': "required",#}
-{#                'solicitud[primer_apellido]': "required",#}
-{#            },#}
-{#            messages: {#}
-{#                'solicitud[nombre]': '!Obligatorio',#}
-{#                'solicitud[primer_apellido]': '!Obligatorio',#}
-{#            }#}
-{#        })#}
+        $(document).ready(function () {
+            $('#config_precio_venta_servicio_prociento').prop('type', 'number')
+            $('#config_precio_venta_servicio_prociento').val( {{ prociento }})
+            $('#config_precio_venta_servicio_valor_fijo').prop('type', 'number')
+            $('#config_precio_venta_servicio_valor_fijo').val( {{ valor_fijo }})
+            $('#config_precio_venta_servicio_credito_importe').prop('type', 'number')
+            if (list_servicios.length > 0)
+                for (let i = 0; i < list_servicios.length; i++) {
+                    console.info(list_servicios[i])
+                    let servicio_tmp = ""+list_servicios[i][1]+""
+                    let importe_tmp = ""+list_servicios[i][0]+""
+                    list_servicios_creditos.push({'servicio':servicio_tmp, 'importe': importe_tmp})
+                }
+                console.info(list_servicios_creditos)
+        })
+        $('#config_precio_venta_servicio_prociento').on('keyup', function () {
+            $('#config_precio_venta_servicio_valor_fijo').val('')
+            incrementarPrecioVenta()
+        })
+        $('#config_precio_venta_servicio_valor_fijo').on('keyup', function () {
+            $('#config_precio_venta_servicio_prociento').val('')
+            incrementarPrecioVenta()
+        })
 
-
-{#        $('#btnAplicarMercancia').on('click', function () {#}
-{#            if (form_solicitud.valid()) {#}
-{#                const nombre = $('#solicitud_nombre').val()#}
-{#                const primer_apellido = $('#solicitud_primer_apellido').val()#}
-{#                const segundo_apellido = $('#solicitud_segundo_apellido').val()#}
-{#                const telefono_celular = $('#solicitud_telefono_celular').val()#}
-{#                const telefono_fijo = $('#solicitud_telefono_fijo').val()#}
-
-{#                if (telefono_celular != '' || telefono_fijo != '') {#}
-{#                    lista_mercancias.push({#}
-{#                        nombre,#}
-{#                        primer_apellido,#}
-{#                        segundo_apellido,#}
-{#                        telefono_celular,#}
-{#                        telefono_fijo#}
-{#                    })#}
-{#                    listado_solicitantes.append(`<tr>#}
-{#                        <td class="text-center"> ${nombre}</td>#}
-{#                        <td class="text-right"> ${primer_apellido} </td>#}
-{#                        <td class="text-right"> ${segundo_apellido} </td>#}
-{#                        <td class="text-right"> ${telefono_celular} </td>#}
-{#                        <td class="text-right"> ${telefono_fijo}</td>#}
-{#                        <td style="width: 45px;"> <button type="button"#}
-{#                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" nombre-solicitante="${nombre}">#}
-{#                            <i class="fa fa-minus-circle"></i>#}
-{#                        </button>#}
-{#                        </td#}
-{#                        ></tr>`#}
-{#                    );#}
-{#                    resetFormSolicitud()#}
-
-{#                } else {#}
-{#                    alertTemplate('Debe introducir al menos un número de teléfono como contacto del solicitante', 'danger')#}
-{#                }#}
-
-{#            }#}
-{#        })#}
-{#        $('#btnSubbmitInforme').on('click', function (event) {#}
-{#            // event.preventDefault()#}
-{#            // if (form_factura.valid()) {#}
-{#            //     if (lista_mercancias.length) {#}
-{#            //         // proceso de facturación#}
-{#            //         const listado = JSON.stringify(listado_solicitantes)#}
-{#            //         form_factura.append(`<input type="text" hidden name="mercancias" value='${listado}' />`)#}
-{#            //         loadingModal.show()#}
-{#            //         form_factura.submit()#}
-{#            //     } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')#}
-{#            // }#}
-{#        })#}
-
-{#        $(document).on('click', '.borrar', function (event) {#}
-{#            console.info(lista_mercancias)#}
-{#            console.info($(this).attr('nombre-solicitante'))#}
-{#            event.preventDefault();#}
-{#            lista_mercancias = lista_mercancias.filter(e => e.nombre !== $(this).attr('nombre-solicitante'))#}
-{#            $(this).closest('tr').remove()#}
-{#        })#}
-
+        function incrementarPrecioVenta() {
+            let costo = {{ costo_servicio_value }}
+                let
+            porciento = $('#config_precio_venta_servicio_prociento').val()
+            let valor_fijo = $('#config_precio_venta_servicio_valor_fijo').val()
+            let precio_venta = 0
+            if (porciento > 0)
+                precio_venta = costo + ((costo * porciento) / 100)
+            else if (valor_fijo > 0)
+                precio_venta = costo + parseFloat(valor_fijo)
+            else
+                precio_venta = costo
+            if (list_servicios_creditos.length > 0)
+                for (let i = 0; i < list_servicios_creditos.length; i++) {
+                    precio_venta = precio_venta + parseFloat(list_servicios_creditos[i]['importe'])
+                }
+            $('#importe-total').text(precio_venta.toFixed(2))
+        }
     </script>
 {% endblock %}

@@ -13,11 +13,6 @@ class ConfigPrecioVentaServicioType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('identificador_servicio',TextType::class, [
-                'required' => false,
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Servicio',
-            ])
             ->add('prociento',TextType::class, [
                 'required' => false,
                 'attr' => ['class' => 'w-100'],

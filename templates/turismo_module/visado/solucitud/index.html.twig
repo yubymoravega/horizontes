@@ -3,6 +3,32 @@
 {% block title %}Turismo | Gestión Consular{% endblock %}
 
 {% block content %}
+    <div class="modal fade" id="ModalConfirm" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="ModalConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="confirm_title">!Notificación</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="confirm_body">
+                    <p id="parragraph"></p>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" name="btn_generar" href="{{ url('capital_humano') }}"
+                       class="btn btn-outline-secondary text-uppercase mt-2 font-weight-bold">
+                        Aceptar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
@@ -78,7 +104,8 @@
                        class="btn btn-outline-secondary">Salir</a>
                 </div>
                 <div class="ml-2">
-                    <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">Aceptar</button>
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
+                            data-target="#ModalConfirm" data-placement="bottom">Aceptar</button>
                 </div>
             </div>
         </div>
@@ -184,6 +211,10 @@
             }
         })
         $('#btnSubbmitInforme').on('click', function (event) {
+            let precio_total = {{ precio_total }}
+            let cantidad_personas = lista_mercancias.length
+            let total_solicitud = parseFloat(precio_total)* parseFloat(cantidad_personas)
+            $('#parragraph').text('Usted ha configurado un total de '+cantidad_personas+' personas, el precio por solicitud es de '+precio_total.toFixed(2)+', por lo que el monto total de la solicitud asciende a '+total_solicitud.toFixed(2)+'. Está seguro que desea continuar?.')
             // event.preventDefault()
             // if (form_factura.valid()) {
             //     if (lista_mercancias.length) {
