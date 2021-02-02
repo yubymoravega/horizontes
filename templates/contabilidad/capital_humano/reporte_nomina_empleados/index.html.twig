@@ -48,12 +48,13 @@
                                                 <option value="10">Ocutbre</option>
                                                 <option value="11">Noviembre</option>
                                                 <option value="12">Diciembre</option>
+                                                <option value="13">Mes 13</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="row p-0 m-0">
                                         <div class="col-12">
-                                            <label for="quincena" class="text-white">Mes:</label>
+                                            <label for="quincena" class="text-white">Quincena:</label>
                                             <select class="mr-0 form-control w-100" name="quincena"
                                                     id="quincena"
                                                     style="width: 250px; height: 38px;">
@@ -96,6 +97,7 @@
                 alertTemplate('El año es no puede estar vacio.', 'danger')
             else {
                 if (anno > 2020) {
+                    $('#form_print').remove()
                     let quincena = $('#quincena').val()
                     let mes = $('#mes').val()
                     let anno = $('#anno').val()
@@ -110,7 +112,6 @@
                     </form>`)
                     const fomrulario = $('#form_print')
                     fomrulario.submit()
-                    fomrulario.remove()
                 } else
                     alertTemplate('El año de partida es 2021.', 'danger')
             }
@@ -118,6 +119,14 @@
 
         $(document).ready(function () {
             $('#seleccionarProducto').modal('show')
+        })
+        $('#mes').on('change',function () {
+            if($('#mes option:selected').index() == 12){
+                $('#quincena').prop('disabled',true)
+            }
+            else{
+                $('#quincena').prop('disabled',false)
+            }
         })
     </script>
 {% endblock %}

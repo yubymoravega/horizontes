@@ -800,7 +800,7 @@ class NominaPagoController extends AbstractController
         ]);
         foreach ($asientos as $item) {
             $new_asiento = AuxFunctions::createAsiento($em, $item->getIdCuenta(), $item->getIdSubcuenta(), null, $unidad, null,
-                null, null, null, null, null, 0, 0, $fecha, $anno,
+                null, $item->getIdElementoGasto(), null, null, null, 0, 0, $fecha, $anno,
                 $item->getDebito(), $item->getCredito(), $item->getNroDocumento(), null, null, null, $new_registro_comprobante);
         }
 

@@ -24,6 +24,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class AuxFunctionsTurismo
 {
+    public const IDENTIFICADOR_VISADO = 1;
+    public const IDENTIFICADOR_TRANSFER = 2;
 
     /**
      * @desc Esta Funcion Actualiza los registros donde se especifica con que cliente esta trabajando el usuario en el subsistema de turismo.

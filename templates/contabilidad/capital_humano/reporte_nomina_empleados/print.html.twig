@@ -68,6 +68,9 @@
         <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto mt-5"
                 onclick="imprimir()"> Imprimir
         </button>
+        <div id="paginator" class="navigation mt-5">
+            {{ knp_pagination_render(datos) }}
+        </div>
     </div>
 {% endblock %}
 
@@ -76,8 +79,10 @@
     <script>
         function imprimir() {
             $('#btn_print').hide()
+            $('#paginator').hide()
             window.print()
             $('#btn_print').show()
+            $('#paginator').show()
         }
     </script>
 {% endblock %}

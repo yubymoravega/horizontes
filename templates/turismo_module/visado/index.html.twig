@@ -27,9 +27,14 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url('turismo_module_visado_proveedor') }}">Proveedores</a>
                         <a class="dropdown-item"
-                           href="{{ url ('turismo_module_visado_elementos_visa') }}">Elementos de la Visa</a>
-                        <a class="dropdown-item"
                            href="{{ url ('turismo_module_visado_estado_solicitud') }}">Estados de las Solicitudes</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Gestión Consular</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"
+                        href="{{ url ('turismo_module_visado_elementos_visa') }}">Costo de Elementos</a>
+                        <a class="dropdown-item"
+                        href="{{ url ('turismo_module_visado_config_precio_venta') }}">Precio de Venta</a>
                     </div>
                 </li>
                 <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"

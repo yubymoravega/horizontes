@@ -1,20 +1,118 @@
-{% extends 'base.html.twig' %}
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Nómina de Pago Mes 13
+            </h4>
+            <div>
+{#                {% if return_pago %}#}
+{#                    <button type="button" class="btn btn-outline-warning btn-sm" data-toggle="modal"#}
+{#                            data-target="#modal__form__id" data-placement="bottom"#}
+{#                            title="Revertir último pago de empleados"#}
+{#                            onclick="mostrarBtn({{ quincena }},1)">#}
+{#                        <i class="fa fa-download"></i> <strong>Revertir último Pago</strong>#}
+{#                    </button>#}
+{#                {% elseif aceptar_pago %}#}
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                            data-target="#modal__form__id" data-placement="bottom"
+                            title="Aceptar pago de empleados"
+                            onclick="mostrarBtn()">
+                        <i class="fa fa-upload"></i> <strong>Aceptar Pago</strong>
+                    </button>
+{#                {% endif %}#}
+            </div>
+        </div>
+        {# end header #}
 
-{% block title %}Hello PagoNavidadesController!{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+        {# Modal aceptar y revertir pago#}
+        {{ include('contabilidad/capital_humano/nomina_pago/modal_pago.html.twig', {title:'Observación'}) }}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        {# list #}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-1" class="text-left">Nombre</th>
+            <th width="200px" class="text-right">Salario Mensual</th>
+            <th width="200px" class="text-right">Sueldo Neto</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.empleado }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.a_pagar }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'F:/sistemas/TIM/horizontes/src/Controller/Contabilidad/CapitalHumano/PagoNavidadesController.php'|file_link(0) }}">src/Controller/Contabilidad/CapitalHumano/PagoNavidadesController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'F:/sistemas/TIM/horizontes/templates/contabilidad/capital_humano/pago_navidades/index.html.twig'|file_link(0) }}">templates/contabilidad/capital_humano/pago_navidades/index.html.twig</a></code></li>
-    </ul>
-</div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        loadingModal.close()
+
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+            $('#quincena').val(4)
+            $('#option').val(0)
+        }
+
+        $('#modal__btn__aceptar').on('click', function () {
+            let option = $('#option').val();
+            let observacion = $('#observacion').val();
+            if (option == 1) {
+                //revertir pago
+                RevertirPago(observacion)
+            } else {
+                //aceptar pago
+                AceptarPago(observacion)
+            }
+        })
+
+        function AceptarPago(observacion) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/pago-mes-13/aceptar-pago'
+                         method="post" id='form_aprobar_pago'>
+                        <input type='text' hidden name='observacion' value='${observacion}'/>
+
+                    </form>`)
+
+            const fomrulario = $('#form_aprobar_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+
+        function RevertirPago(observacion) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/pago-mes-13/revertir-pago'
+                         method="post" id='form_revertir_pago'>
+                        <input type='text' hidden name='observacion' value='${observacion}'/>
+
+                    </form>`)
+
+            const fomrulario = $('#form_revertir_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+    </script>
 {% endblock %}

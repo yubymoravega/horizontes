@@ -5,6 +5,7 @@ namespace App\Controller\Contabilidad\CapitalHumano;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\NominaPago;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -53,6 +54,7 @@ class ReporteNominaController extends AbstractController
         ]);
     }
 
+    //deducciones
     /**
      * @Route("/print", name="contabilidad_capital_humano_reporte_nomina_print")
      */
@@ -194,7 +196,7 @@ class ReporteNominaController extends AbstractController
     /**
      * @Route("/print-nominas-empleados", name="contabilidad_capital_humano_reporte_nomina_print_nominas_empleados")
      */
-    public function printNominasEmpleados(EntityManagerInterface $em, Request $request)
+    public function printNominasEmpleados(EntityManagerInterface $em, Request $request, PaginatorInterface $pagination)
     {
         $anno = $request->request->get('anno');
         $tipo = $request->request->get('tipo');
@@ -304,26 +306,20 @@ class ReporteNominaController extends AbstractController
             'infotep_empleador' => number_format($infotep_empleador, 2),
         ];
 
-        if($tipo == 1){
-            $url = 'contabilidad/capital_humano/reporte_nomina/print.html.twig';
-            $title = $aprobada ? 'Nómina de Pago' : 'Prenomina de Pago';
-        }
-        elseif ($tipo == 2){
-            $url = 'contabilidad/capital_humano/deducciones_nominas/print.html.twig';
-            $title = 'Deducciones de la Nómina';
-        }
-        else{
-            $title = 'Pagos del empleador';
-            $url = 'contabilidad/capital_humano/pagos_empleador/print.html.twig';
-        }
-        return $this->render($url, [
+        $paginator = $pagination->paginate(
+            $row,
+            $request->query->getInt('page', $request->get("page") || 1), /*page number*/
+            1, /*limit per page*/
+            ['align' => 'center', 'style' => 'bottom',]
+        );
+        return $this->render('contabilidad/capital_humano/reporte_nomina_empleados/print.html.twig', [
             'controller_name' => 'ReporteNominaController',
             'mes' => AuxFunctions::getNombreMes($mes),
             'anno' => $anno,
             'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
             'fecha_impresion' => Date('d-m-Y'),
-            'datos' => $row,
-            'title' => $title,
+            'datos' => $paginator,
+            'title' => $aprobada ? 'Nómina de Pago' : 'Prenomina de Pago',
             'aprobada' => $aprobada,
             'quincena' => $quincena
         ]);
