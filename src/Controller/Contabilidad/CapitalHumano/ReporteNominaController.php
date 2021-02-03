@@ -282,43 +282,37 @@ class ReporteNominaController extends AbstractController
             $infotep_empleador += $item->getInfotepEmpleador();
 
         }
-        $row[] = [
-            'empleado' => 'TOTAL',
-            'identificacion' => '',
-            'sueldo_bruto' => number_format($sueldo_bruto, 2),
-            'comision' => number_format($comision, 2),
-            'vacaciones' => number_format($vacaciones, 2),
-            'horas_extra' => number_format($horas_extra, 2),
-            'otros' => number_format($otros, 2),
-            'total_ingresos' => number_format($total_ingresos, 2),
-            'ingresos_cotizables' => number_format($ingresos_cotizables, 2),
-            'isr' => number_format($isr, 2),
-            'ars' => number_format($ars, 2),
-            'afp' => number_format($afp, 2),
-            'cooperativa' => number_format($cooperativa, 2),
-            'plan_medico_complementario' => number_format($plan_medico_complementario, 2),
-            'restaurant' => number_format($restaurant, 2),
-            'total_deducido' => number_format($total_deducido, 2),
-            'sueldo_neto_pagar' => number_format($sueldo_neto_pagar, 2),
-            'afp_empleador' => number_format($afp_empleador, 2),
-            'sfs_empleador' => number_format($sfs_empleador, 2),
-            'srl_empleador' => number_format($srl_empleador, 2),
-            'infotep_empleador' => number_format($infotep_empleador, 2),
-        ];
+//        $row[] = [
+//            'empleado' => 'TOTAL',
+//            'identificacion' => '',
+//            'sueldo_bruto' => number_format($sueldo_bruto, 2),
+//            'comision' => number_format($comision, 2),
+//            'vacaciones' => number_format($vacaciones, 2),
+//            'horas_extra' => number_format($horas_extra, 2),
+//            'otros' => number_format($otros, 2),
+//            'total_ingresos' => number_format($total_ingresos, 2),
+//            'ingresos_cotizables' => number_format($ingresos_cotizables, 2),
+//            'isr' => number_format($isr, 2),
+//            'ars' => number_format($ars, 2),
+//            'afp' => number_format($afp, 2),
+//            'cooperativa' => number_format($cooperativa, 2),
+//            'plan_medico_complementario' => number_format($plan_medico_complementario, 2),
+//            'restaurant' => number_format($restaurant, 2),
+//            'total_deducido' => number_format($total_deducido, 2),
+//            'sueldo_neto_pagar' => number_format($sueldo_neto_pagar, 2),
+//            'afp_empleador' => number_format($afp_empleador, 2),
+//            'sfs_empleador' => number_format($sfs_empleador, 2),
+//            'srl_empleador' => number_format($srl_empleador, 2),
+//            'infotep_empleador' => number_format($infotep_empleador, 2),
+//        ];
 
-        $paginator = $pagination->paginate(
-            $row,
-            $request->query->getInt('page', $request->get("page") || 1), /*page number*/
-            1, /*limit per page*/
-            ['align' => 'center', 'style' => 'bottom',]
-        );
         return $this->render('contabilidad/capital_humano/reporte_nomina_empleados/print.html.twig', [
             'controller_name' => 'ReporteNominaController',
             'mes' => AuxFunctions::getNombreMes($mes),
             'anno' => $anno,
             'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
             'fecha_impresion' => Date('d-m-Y'),
-            'datos' => $paginator,
+            'datos' => $row,
             'title' => $aprobada ? 'Nómina de Pago' : 'Prenomina de Pago',
             'aprobada' => $aprobada,
             'quincena' => $quincena
