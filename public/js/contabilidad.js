@@ -227,7 +227,7 @@ const alertTemplate = (msg, type = 'success', time = 4000) => {
     }, time)
 }
 
-loadingModal = {
+/*loadingModal = {
     show: function (msg = 'Procesando...') {
         $('#loading-modal').modal('show')
         $('#loading-modal-msg').text(msg)
@@ -237,7 +237,7 @@ loadingModal = {
             $('#loading-modal').modal('hide');
         }, 500)
     }
-}
+}*/
 
 miniLoadin = {
     show: (config) => {
