@@ -100,6 +100,11 @@ class OperacionesComprobanteOperaciones
      */
     private $id_unidad;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=InstrumentoCobro::class)
+     */
+    private $id_instrumento_cobro;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -269,6 +274,18 @@ class OperacionesComprobanteOperaciones
     public function setIdUnidad(?Unidad $id_unidad): self
     {
         $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
+    public function getIdInstrumentoCobro(): ?InstrumentoCobro
+    {
+        return $this->id_instrumento_cobro;
+    }
+
+    public function setIdInstrumentoCobro(?InstrumentoCobro $id_instrumento_cobro): self
+    {
+        $this->id_instrumento_cobro = $id_instrumento_cobro;
 
         return $this;
     }

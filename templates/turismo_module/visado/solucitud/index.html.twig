@@ -18,10 +18,10 @@
                     <p id="parragraph"></p>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" name="btn_generar" href="{{ url('capital_humano') }}"
-                       class="btn btn-outline-secondary text-uppercase mt-2 font-weight-bold">
+                    <button name="btn_generar" class="btn btn-outline-secondary text-uppercase mt-2 font-weight-bold"
+                            id="btn_solicitar">
                         Aceptar
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -105,7 +105,8 @@
                 </div>
                 <div class="ml-2">
                     <button class='my-0 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
-                            data-target="#ModalConfirm" data-placement="bottom">Aceptar</button>
+                            data-target="#ModalConfirm" data-placement="bottom">Aceptar
+                    </button>
                 </div>
             </div>
         </div>
@@ -126,7 +127,7 @@
             $('#solicitud_segundo_apellido').val('')
             $('#solicitud_telefono_celular').val('')
             $('#solicitud_telefono_fijo').val('')
-            $('#owner_client').prop('checked',false)
+            $('#owner_client').prop('checked', false)
             $('#solicitud_nombre').prop('disabled', false)
             $('#solicitud_primer_apellido').prop('disabled', false)
             $('#solicitud_segundo_apellido').prop('disabled', false)
@@ -212,24 +213,29 @@
         })
         $('#btnSubbmitInforme').on('click', function (event) {
             let precio_total = {{ precio_total }}
-            let cantidad_personas = lista_mercancias.length
-            let total_solicitud = parseFloat(precio_total)* parseFloat(cantidad_personas)
-            $('#parragraph').text('Usted ha configurado un total de '+cantidad_personas+' personas, el precio por solicitud es de '+precio_total.toFixed(2)+', por lo que el monto total de la solicitud asciende a '+total_solicitud.toFixed(2)+'. Está seguro que desea continuar?.')
-            // event.preventDefault()
-            // if (form_factura.valid()) {
-            //     if (lista_mercancias.length) {
-            //         // proceso de facturación
-            //         const listado = JSON.stringify(listado_solicitantes)
-            //         form_factura.append(`<input type="text" hidden name="mercancias" value='${listado}' />`)
-            //         loadingModal.show()
-            //         form_factura.submit()
-            //     } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
-            // }
+                let
+            cantidad_personas = lista_mercancias.length
+            let total_solicitud = parseFloat(precio_total) * parseFloat(cantidad_personas)
+            $('#parragraph').text('Usted ha configurado un total de ' + cantidad_personas + ' personas, el precio por solicitud es de ' + precio_total.toFixed(2) + ', por lo que el monto total de la solicitud asciende a ' + total_solicitud.toFixed(2) + '. Está seguro que desea continuar?.')
+        })
+
+        $('#btn_solicitar').on('click', function (event) {
+            event.preventDefault()
+                if (lista_mercancias.length) {
+                    const listado = JSON.stringify(lista_mercancias)
+                    $('body').append(`
+                    <form action='/turismo/gestion-consular/solucitud/add-carrito'
+                         method="post" id='form_add_carrito'>
+                        <input type='hidden' name='solicitudes' value='${listado}'/>
+                    </form>`)
+                    const fomrulario = $('#form_add_carrito')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+
         })
 
         $(document).on('click', '.borrar', function (event) {
-            console.info(lista_mercancias)
-            console.info($(this).attr('nombre-solicitante'))
             event.preventDefault();
             lista_mercancias = lista_mercancias.filter(e => e.nombre !== $(this).attr('nombre-solicitante'))
             $(this).closest('tr').remove()
