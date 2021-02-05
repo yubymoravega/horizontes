@@ -6,6 +6,7 @@ use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Carrito;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\TurismoModule\Utils\ConfigPrecioVentaServicio;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Entity\TurismoModule\Visado\ElementosVisa;
@@ -93,6 +94,7 @@ class SolucitudController extends AbstractController
             'id_empleado'=>$obj_trabajo_tmp->getIdUsuario()->getId(),
             'id_cliente'=>$obj_trabajo_tmp->getIdCliente()->getId(),
             'id_servicio'=>$id_servicio,
+            'nombre_servicio'=>$em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
             'precio_servicio'=> $precio_total,
             'total'=>$precio_total*count($data_solicitudes),
             'data'=>$data_solicitudes,
