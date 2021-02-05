@@ -3,6 +3,7 @@
 namespace App\CoreTurismo;
 
 
+use App\Entity\Carrito;
 use App\Entity\Cliente;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Entity\User;
@@ -67,5 +68,43 @@ class AuxFunctionsTurismo
         return $obj_UserClient->getIdCliente();
     }
 
+    /**
+     * @param EntityManagerInterface $em
+     * @param string $empleado
+     * @param int $id_servicio
+     * @return array $data con el arreglo de datos contenidos en el JSON del carrito gestionado por el empleado para el servicio especificado
+     */
+    public static function getDataJsonCarrito(EntityManagerInterface $em,string $empleado,int $id_servicio){
+        $data = [];
+        $carrito_array = $em->getRepository(Carrito::class)->findBy(['empleado'=>$empleado]);
+        if(!empty($carrito_array)){
+            /** @var Carrito $item */
+            foreach ($carrito_array as $item){
+                $json = json_decode($item->getJson());
+                if($json->id_servicio == $id_servicio)
+                    return $json->data;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param string $empleado
+     * @param int $id_servicio
+     * @return int|null Devuelve el identificador de la fila del carrito que queremos editar
+     */
+    public static function getIdCarritoServicio(EntityManagerInterface $em,string $empleado,int $id_servicio){
+        $carrito_array = $em->getRepository(Carrito::class)->findBy(['empleado'=>$empleado]);
+        if(!empty($carrito_array)){
+            /** @var Carrito $item */
+            foreach ($carrito_array as $item){
+                $json = json_decode($item->getJson());
+                if($json->id_servicio == $id_servicio)
+                    return $item->getId();
+            }
+        }
+        return 0;
+    }
 
 }

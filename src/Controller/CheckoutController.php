@@ -56,7 +56,7 @@ class CheckoutController extends AbstractController
  
         $dataBase = $this->getDoctrine()->getManager();
         $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]['json']->provincia]);
-        $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]['json']->municipio]); 
+        $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]['json']->municipio]);
 
         $json[$contador]['json']->provincia = $provincia[0]->getNombre();
         $json[$contador]['json']->municipio = $municipio[0]->getNombre();
@@ -81,6 +81,73 @@ class CheckoutController extends AbstractController
 
         return $this->render('checkout/index.html.twig', [
             'moneda' => $moneda,'carrito' => $json, 'total' =>number_format($total, 2, '.', '')
+        ]);
+    }
+
+    /**
+     * @Route("/checkout_services", name="checkout_services")
+     */
+    public function checkout_services()
+    {
+
+//        $user =  $this->getUser();
+//        $dataBase = $this->getDoctrine()->getManager();
+//        $carrito = $dataBase->getRepository(Carrito::class)->findBy(['empleado' => $user->getUsername()]);
+//
+//        if(count($carrito) < 1){
+//
+//            $this->addFlash(
+//                'success',
+//                'Nada a facturar'
+//            );
+//
+//            return $this->redirectToRoute('home');
+//        }
+//
+//        $user =  $this->getUser();
+//
+//        $data = $dataBase->getRepository(Carrito::class)->findBY(['empleado' => $user->getUsername()]);
+//        $json = null;
+//        $con = count( $data);
+//        $contador = 0;
+//        $total = null;
+//
+//        while($contador < $con){
+//
+//            $json[$contador] = array(
+//                'id' => $data[$contador]->getId(),
+//                'json' => \json_decode($data[$contador]->getJson()),
+//
+//            );
+//
+//
+//        $dataBase = $this->getDoctrine()->getManager();
+//        $provincia = $dataBase->getRepository(Provincias::class)->findBy(['code' => $json[$contador]['json']->provincia]);
+//        $municipio = $dataBase->getRepository(Municipios::class)->findBy(['code' => $json[$contador]['json']->municipio]);
+//
+//        $json[$contador]['json']->provincia = $provincia[0]->getNombre();
+//        $json[$contador]['json']->municipio = $municipio[0]->getNombre();
+//
+//        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$json[$contador]['json']->montoMoneda]);
+//
+//        $dolares = $json[$contador]['json']->monto / $tasa[0]->getTasa();
+//        $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+//        $json[$contador]['json']->monto = $dolares * $tasa[0]->getTasa();
+//        $json[$contador]['recibirMoneda'] = $dataBase->getRepository(Moneda::class)->find($json[$contador]['json']->recibirMoneda)->getNombre();
+//        $json[$contador]['json']->monto = round( $json[$contador]['json']->monto, 2, PHP_ROUND_HALF_EVEN);
+//            $total = $total + $json[$contador]['json']->monto;
+//
+//            $contador++;
+//        }
+//
+//        $user =  $this->getUser();
+//
+//        $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda())->getNombre();
+
+        //return new Response(var_dump($json ));
+
+        return $this->render('checkout/index.html.twig', [
+            'moneda' => 'USD','carrito' => [], 'total' =>number_format(100, 2)
         ]);
     }
 
@@ -319,4 +386,6 @@ class CheckoutController extends AbstractController
             'banco'=> $banco ,'efectivo'=> $efectivo, 'moneda'=> $moneda ,'id' =>$id,  'data' =>$data[0],  'itens' => $json, 'total' =>number_format($total, 2, '.', '')
          ]);
     }
+
+
 }

@@ -30,30 +30,39 @@
 											<th>
 												<img src="images/shop/product-01-70x70.jpg" width="70" height="70" alt="">
 											</th>
-											<td class="big text-middle">
-												<h5 class="text-regular" style="color:white;"> </h5>
-													{{iten.json.servicio}} - {{iten.recibirMoneda}} ${{iten.json.recibir}}   </br></br>                                      
-	<a  data-toggle="collapse" href="#coll{{iten.id}}" role="button" aria-expanded="false" aria-controls="coll{{iten.id}}"> 
-		<span style="color:white;"> <b> {{iten.json.primerNombre}} {{iten.json.primerApellido}} {{iten.json.segundoApellido}} </b><span> </br>
-	</a>
-	
+                                            <td class="big text-middle">
+                                                <h5 class="text-regular" style="color:white;"></h5>
+                                                {{ iten.json.servicio }} - {{ iten.recibirMoneda }}
+                                                ${{ iten.json.recibir }} </br></br>
+                                                <a data-toggle="collapse" href="#coll{{ iten.id }}" role="button"
+                                                   aria-expanded="false" aria-controls="coll{{ iten.id }}">
+                                                    <span style="color:white;"> <b> {{ iten.json.primerNombre }} {{ iten.json.primerApellido }} {{ iten.json.segundoApellido }} </b></span> </br>
+                                                </a>
 
-<div class="collapse" id="coll{{iten.id}}" style="margin-top: 20px;">
-	
-		<ul style="list-style-type:disc">
-  <li><b> Remitente:</b> {{iten.json.idCliente}}</li>
-  <li><b> Alternativo:</b> {{iten.json.alternativoNombre}} {{iten.json.alternativoApellido}} {{iten.json.alternativoSegundoApellido}}</li>
-  <li><b> Contactos:</b> {{iten.json.telefono}} - {{iten.json.telefonoCasa}}</li>
-  <li><b> Identificacion:</b> {{iten.json.identificacion}}</li>
-  <li><b> Direccion:</b> {{iten.json.calle}} No: {{iten.json.no}} / {{iten.json.entre}} y {{iten.json.y}},  
-   Edificio: {{iten.json.edificio}} Apto: {{iten.json.apto}}, Localidad: {{iten.json.reparto}}.
 
-  {{iten.json.municipio}}. {{iten.json.provincia}}</li>
-</ul>
+                                                <div class="collapse" id="coll{{ iten.id }}" style="margin-top: 20px;">
 
-</div>
-												
-											</td>
+                                                    <ul style="list-style-type:disc">
+                                                        <li><b> Remitente:</b> {{ iten.json.idCliente }}</li>
+                                                        <li><b>
+                                                                Alternativo:</b> {{ iten.json.alternativoNombre }} {{ iten.json.alternativoApellido }} {{ iten.json.alternativoSegundoApellido }}
+                                                        </li>
+                                                        <li><b> Contactos:</b> {{ iten.json.telefono }}
+                                                            - {{ iten.json.telefonoCasa }}</li>
+                                                        <li><b> Identificacion:</b> {{ iten.json.identificacion }}</li>
+                                                        <li><b> Direccion:</b> {{ iten.json.calle }}
+                                                            No: {{ iten.json.no }} / {{ iten.json.entre }}
+                                                            y {{ iten.json.y }},
+                                                            Edificio: {{ iten.json.edificio }}
+                                                            Apto: {{ iten.json.apto }},
+                                                            Localidad: {{ iten.json.reparto }}.
+
+                                                            {{ iten.json.municipio }}. {{ iten.json.provincia }}</li>
+                                                    </ul>
+
+                                                </div>
+
+                                            </td>
 											<td class="text-middle">1</td>
 											<td class="text-middle">{{iten.json.monto  }} {{moneda}}</td>
                                             <td class="text-middle">

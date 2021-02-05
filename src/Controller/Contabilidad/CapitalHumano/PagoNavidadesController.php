@@ -124,6 +124,7 @@ class PagoNavidadesController extends AbstractController
             }
         }
         $em->flush();
+
         return $this->render('contabilidad/capital_humano/pago_navidades/index.html.twig', [
             'controller_name' => 'PagoNavidadesController',
             'datos ' => $rows
@@ -131,7 +132,7 @@ class PagoNavidadesController extends AbstractController
     }
 
     /**
-     * @Route("/aceptar-pago", name="aceptar_pago")
+     * @Route("/aceptar-pago", name="aceptar_pago_navidades")
      */
     public function aceptarPago(EntityManagerInterface $em, Request $request)
     {

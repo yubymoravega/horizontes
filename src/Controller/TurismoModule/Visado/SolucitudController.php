@@ -10,7 +10,6 @@ use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\TurismoModule\Utils\ConfigPrecioVentaServicio;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Entity\TurismoModule\Visado\ElementosVisa;
-use App\Form\TurismoModule\Visado\ElementosVisaType;
 use App\Form\TurismoModule\Visado\SolicitudType;
 use ContainerT8tBbGS\getReporteEfectivoRepositoryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +30,7 @@ class SolucitudController extends AbstractController
     public function index(EntityManagerInterface $em)
     {
         $form = $this->createForm(SolicitudType::class);
-        $elementos = $em->getRepository(ElementosVisa::class)->findBy(['activo'=>true]);
+        $elementos = $em->getRepository(ElementosVisa::class)->findBy(['activo' => true]);
         $costo_bisado = 0;
 
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
@@ -48,19 +47,19 @@ class SolucitudController extends AbstractController
 
 
         /** @var Cliente $obj_cliente */
-        $obj_cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
+        $obj_cliente = AuxFunctionsTurismo::GetDataCliente($em, $this->getUser());
         $nombre = $obj_cliente->getNombre();
         return $this->render('turismo_module/visado/solucitud/index.html.twig', [
             'controller_name' => 'SolucitudController',
-            'formulario'=>$form->createView(),
-            'telefono'=>$obj_cliente->getTelefono(),
-            'nombre'=>$nombre ,
-            'apellidos'=>$obj_cliente->getApellidos(),
-            'correo'=>$obj_cliente->getCorreo(),
-            'direccion'=>$obj_cliente->getDireccion(),
-            'id_cliente'=>$obj_cliente->getId(),
-            'precio_total_text'=>number_format($precio_total,2),
-            'precio_total'=>$precio_total
+            'formulario' => $form->createView(),
+            'telefono' => $obj_cliente->getTelefono(),
+            'nombre' => $nombre,
+            'apellidos' => $obj_cliente->getApellidos(),
+            'correo' => $obj_cliente->getCorreo(),
+            'direccion' => $obj_cliente->getDireccion(),
+            'id_cliente' => $obj_cliente->getId(),
+            'precio_total_text' => number_format($precio_total, 2),
+            'precio_total' => $precio_total
         ]);
     }
 
@@ -68,14 +67,17 @@ class SolucitudController extends AbstractController
     /**
      * @Route("/add-carrito", name="turismo_module_visado_solucitud_add_carrito")
      */
-    public function addCarrito(EntityManagerInterface $em, Request $request){
+    public function addCarrito(EntityManagerInterface $em, Request $request)
+    {
         $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_VISADO;
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
 
         /** @var UserClientTmp $obj_trabajo_tmp */
         $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
-            'id_usuario'=>$this->getUser()
+            'id_usuario' => $this->getUser()
         ]);
+
+        $empleado = $obj_trabajo_tmp->getIdUsuario()->getUsername();
 
         $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
             'id_unidad' => $unidad,
@@ -87,29 +89,93 @@ class SolucitudController extends AbstractController
             $precio_total = $configuraciones->getPrecioVentaTotal();
         }
 
-        $data_solicitudes = json_decode($request->request->get('solicitudes'), true);
+        $data_new_solicitudes = json_decode($request->request->get('solicitudes'), true);
+        $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);
+
+        $data_solicitudes = array_merge($data_new_solicitudes, $data_solicitudes_existente);
 
         //-- CONSTRUYO EL JSON PARA ADICIONAR AL CARRITO
         $json = array(
-            'id_empleado'=>$obj_trabajo_tmp->getIdUsuario()->getId(),
-            'id_cliente'=>$obj_trabajo_tmp->getIdCliente()->getId(),
-            'id_servicio'=>$id_servicio,
-            'nombre_servicio'=>$em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
-            'precio_servicio'=> $precio_total,
-            'total'=>$precio_total*count($data_solicitudes),
-            'data'=>$data_solicitudes,
+            'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),
+            'id_cliente' => $obj_trabajo_tmp->getIdCliente()->getId(),
+            'id_servicio' => $id_servicio,
+            'nombre_servicio' => $em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
+            'precio_servicio' => $precio_total,
+            'total' => $precio_total * count($data_solicitudes),
+            'data' => $data_solicitudes,
         );
 
-        $new_element_carrito = new Carrito();
+
+        if (!empty($data_solicitudes_existente)) {
+            $new_element_carrito = $em->getRepository(Carrito::class)->find(AuxFunctionsTurismo::getIdCarritoServicio($em, $empleado, $id_servicio));
+        } else {
+            $new_element_carrito = new Carrito();
+        }
         $new_element_carrito
-            ->setEmpleado($obj_trabajo_tmp->getIdUsuario()->getUsername())
+            ->setEmpleado($empleado)
             ->setJson(json_encode($json));
 
         $em->persist($new_element_carrito);
         $em->flush();
 
-        $this->addFlash('success','Solicitud adicionada al carrito');
+        $this->addFlash('success', 'Solicitud adicionada al carrito');
 
         return $this->redirectToRoute('turismo_module');
+    }
+
+    /**
+     * @Route("/delete-carrito", name="turismo_module_visado_solucitud_delete_carrito")
+     */
+    public function deletCarrito(EntityManagerInterface $em, Request $request)
+    {
+        $ruta = $request->request->get('path');
+        $nombre = $request->request->get('nombre');
+        $primer_apellido = $request->request->get('primer_apellido');
+        $segundo_apellido = $request->request->get('segundo_apellido');
+        $telefono_celular = $request->request->get('telefono_celular');
+        $telefono_fijo = $request->request->get('telefono_fijo');
+        $id_servicio = $request->request->get('id_servicio');
+
+        /** @var UserClientTmp $obj_trabajo_tmp */
+        $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
+            'id_usuario' => $this->getUser()
+        ]);
+        $empleado = $obj_trabajo_tmp->getIdUsuario()->getUsername();
+
+        $array_result = [];
+        $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);
+        foreach ($data_solicitudes_existente as $key => $item) {
+            $str_database = $item->nombre . '-' . $item->primer_apellido. '-' . $item->segundo_apellido . '-' . $item->telefono_celular . '-' . $item->telefono_fijo;
+            $str_font = $nombre . '-' . $primer_apellido . '-' . $segundo_apellido . '-' . $telefono_celular . '-' . $telefono_fijo;
+            if ($str_database != $str_font) {
+                $array_result[] = $data_solicitudes_existente[$key];
+            }
+        }
+
+        $id_carrito = AuxFunctionsTurismo::getIdCarritoServicio($em, $empleado, $id_servicio);
+        $obj_carrito = $em->getRepository(Carrito::class)->find($id_carrito);
+        $json = json_decode($obj_carrito->getJson());
+        $precio_servicio = floatval($json->precio_servicio);
+        $total_servicio = round(($precio_servicio*count($array_result)));
+
+        $json_updated = array(
+            'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),
+            'id_cliente' => $obj_trabajo_tmp->getIdCliente()->getId(),
+            'id_servicio' => $id_servicio,
+            'nombre_servicio' => $em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
+            'precio_servicio' => $precio_servicio,
+            'total' => $total_servicio,
+            'data' => $array_result,
+        );
+
+        if(!empty($array_result)){
+            $obj_carrito->setJson(json_encode($json_updated));
+            $em->persist($obj_carrito);
+        }
+        else{
+            $em->remove($obj_carrito);
+        }
+        $em->flush();
+        return $this->redirect($ruta);
     }
 }
