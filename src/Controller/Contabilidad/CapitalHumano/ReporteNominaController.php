@@ -238,6 +238,7 @@ class ReporteNominaController extends AbstractController
                 $aprobada = true;
             $row[] = [
                 'index' => $key % 2,
+                'sueldo_mes'=>number_format($item->getIdEmpleado()->getSueldoBrutoMensual(),2),
                 'empleado' => $item->getIdEmpleado()->getNombre(),
                 'identificacion' => $item->getIdEmpleado()->getIdentificacion(),
                 'sueldo_bruto' => number_format($item->getSalarioBruto(), 2),
@@ -310,7 +311,8 @@ class ReporteNominaController extends AbstractController
             'controller_name' => 'ReporteNominaController',
             'mes' => AuxFunctions::getNombreMes($mes),
             'anno' => $anno,
-            'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
+            'unidad_codigo' => $unidad->getCodigo(),
+            'unidad' => $unidad->getNombre(),
             'fecha_impresion' => Date('d-m-Y'),
             'datos' => $row,
             'title' => $aprobada ? 'Nómina de Pago' : 'Prenomina de Pago',
