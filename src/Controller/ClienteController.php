@@ -63,6 +63,13 @@ class ClienteController extends AbstractController
             $dataBase = $this->getDoctrine()->getManager();
 
             $dataBase->persist($cliente);
+            /***
+             * Eliminar el registro de la tabla temporal de trabajo del usuario y
+             * volverlo a crear con los datos del cliente actualizados
+             * develop by Camilo
+             ***/
+            $update_table = AuxFunctionsTurismo::ActualizarDatosEmpleado($dataBase,$cliente,$this->getUser());
+
             $dataBase->flush();
 
             $this->addFlash(

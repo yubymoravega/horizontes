@@ -137,11 +137,10 @@
             })
             $('#modal__btn__aceptar').on('click', function () {
                 const formulario = $('#form_modal_target')
-                console.log(validateForm)
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/turismo/gestion-consular/elementos-visa/add`)
                 formulario.submit()
-                if (validateForm.errorList.length === 0) loadingModal.show()
+                //if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__btn__actualizar').on('click', function () {
@@ -150,7 +149,7 @@
                 formulario.attr('method', `POST`)
                 formulario.attr('action', `/turismo/gestion-consular/elementos-visa/upd/${id_elemento}`)
                 formulario.submit()
-                if (validateForm.errorList.length === 0) loadingModal.show()
+                //if (validateForm.errorList.length === 0) loadingModal.show()
             })
 
             $('#modal__form__id').on('show.bs.modal', function (event) {

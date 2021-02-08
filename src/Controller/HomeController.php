@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use App\Entity\User;
 use App\Entity\Carrito;
@@ -94,7 +95,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/carrito", name="carrito")
      */
-    public function carrito()
+    public function carrito(EntityManagerInterface $em)
     {
         $dataBase = $this->getDoctrine()->getManager();
         $user =  $this->getUser();
@@ -104,25 +105,40 @@ class HomeController extends AbstractController
         $con = count( $data);
         $contador = 0;
         $decode = null;
-       
+
+        $servicio_er = $em->getRepository(Servicios::class);
+
         while($contador < $con){
-
+            /** @var Servicios $element_servicio */
             $decode = json_decode($data[$contador]->getJson());
-            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$decode->montoMoneda]);
+            $element_servicio = $servicio_er->find($decode->id_servicio);
+            if($decode->id_servicio == 11){
+                $json[$contador] = array(
+                    'servicio'=>$decode->id_servicio,
+                    'id' => $data[$contador]->getId(),
+                    'json' => $data[$contador]->getJson(),
+                    'moneda' => 'USD',
+                    'total' => number_format($decode->total, 2,),
+                    'servicio_nombre'=>$element_servicio?$element_servicio->getNombre():'-sin definir servicio-'
+                );
+            }
+            else{
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$decode->montoMoneda]);
 
-            $dolares = $decode->monto / $tasa[0]->getTasa();
-            $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
-            $total = $dolares * $tasa[0]->getTasa();
+                $dolares = $decode->monto / $tasa[0]->getTasa();
+                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
+                $total = $dolares * $tasa[0]->getTasa();
 
-            $dataBase = $this->getDoctrine()->getManager();
-            $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
+                $dataBase = $this->getDoctrine()->getManager();
+                $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
 
-            $json[$contador] = array(
-                'id' => $data[$contador]->getId(),
-                'json' => $data[$contador]->getJson(),
-                'moneda' => $moneda->getNombre(),
-                'total' => round( $total, 2, PHP_ROUND_HALF_EVEN),
-            );
+                $json[$contador] = array(
+                    'id' => $data[$contador]->getId(),
+                    'json' => $data[$contador]->getJson(),
+                    'moneda' => $moneda->getNombre(),
+                    'total' => round( $total, 2, PHP_ROUND_HALF_EVEN),
+                );
+            }
             $contador++;
         }
  
