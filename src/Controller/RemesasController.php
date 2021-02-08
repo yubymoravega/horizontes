@@ -23,6 +23,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\CoreTurismo\AuxFunctionsTurismo;
+use App\Entity\Contabilidad\Config\Servicios;
 
 
 class RemesasController extends AbstractController
@@ -242,20 +243,14 @@ class RemesasController extends AbstractController
     {
         $dataBase = $this->getDoctrine()->getManager();
       
-        $carrito = new Carrito();
         $user =  $this->getUser();
         $ClienteBeneficiario = $dataBase->getRepository(ClienteBeneficiario::class)->find($id);
         date_default_timezone_set('America/Santo_Domingo');
         $date = new DateTime('NOW');
 
-<<<<<<< HEAD
-        $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $user->getUsername(), AuxFunctionsTurismo::IDENTIFICADOR_REMESA);
-
-        $data_new_solicitudes = array(
-=======
-
-        $json = array(
->>>>>>> 40f8041dbe794508afd96b5034c8a4178b45314e
+        $data_remesa_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $user->getUsername(), AuxFunctionsTurismo::IDENTIFICADOR_REMESA);
+        
+        $data_new_remesa[] = array(
             'id' => $ClienteBeneficiario->getId(),
             'primerNombre' => $ClienteBeneficiario->getPrimerNombre(),
             'primerApellido' => $ClienteBeneficiario->getPrimerApellido(),
@@ -289,23 +284,23 @@ class RemesasController extends AbstractController
             'pais' => $pais,
             'servicio' => 'Remesa',
             'orden' => uniqid(),
-            'idCarrito' => count($data_solicitudes_existente) +1,
+            'idCarrito' => count($data_remesa_existente) +1,
             'nombreMostrar' => $ClienteBeneficiario->getPrimerNombre()." ".$ClienteBeneficiario->getPrimerApellido(),
             'montoMostrar' => $monto
         );
 
-        $data_solicitudes = array_merge($data_new_solicitudes, $data_solicitudes_existente);
+        $data_remesa = array_merge($data_new_remesa, $data_remesa_existente);
 
         $total = null;
 
-        foreach($data_solicitudes as $key=>$item){
-            
-            if(gettype($data_new_solicitudes[$key]) == 'array'){
+        foreach($data_remesa as $key=>$item){
+        
+            if(gettype($data_remesa[$key]) == 'array'){
 
-                $total =  $total + $data_new_solicitudes[$key]['monto'] ; 
+                $total =  $total + $data_remesa[$key]['monto'] ; 
 
             }else{
-                $total =  $total + $data_new_solicitudes[$key]->monto; 
+                $total =  $total + $data_remesa[$key]->monto; 
             }
 
         }
@@ -318,13 +313,30 @@ class RemesasController extends AbstractController
             'nombre_servicio' => $em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_REMESA)->getNombre(),
             'precio_servicio' => $monto,
             'total' => $total,
-            'data' => $data_solicitudes,
+            'data' => $data_remesa,
         );
        
-        $carrito->setEmpleado($user->getUsername());
-        $carrito->setJson(json_encode($json));
-        $dataBase->persist($carrito);
-        $dataBase->flush();
+        
+        if (!empty($data_remesa_existente)) {
+            $new_element_carrito = $em->getRepository(Carrito::class)->find(AuxFunctionsTurismo::getIdCarritoServicio($em, $user->getUsername(), AuxFunctionsTurismo::IDENTIFICADOR_REMESA));
+           
+            $new_element_carrito
+            ->setEmpleado($user->getUsername())
+            ->setJson(json_encode($json));
+
+            $em->flush($new_element_carrito);
+        
+        } else {
+            $new_element_carrito = new Carrito();
+           
+            $new_element_carrito
+            ->setEmpleado($user->getUsername())
+            ->setJson(json_encode($json));
+
+            $em->persist($new_element_carrito);
+            $em->flush();
+        }
+       
 
         $this->addFlash(
             'success',
