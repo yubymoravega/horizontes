@@ -3,7 +3,7 @@
     {% include 'breadcrumbs.html.twig' %}
 
     <h1 class="text-confirmar" style="text-align: center; ">Checkout</h1>
-    <hr class="divider-white bg-mantis-white">
+    <hr class="divider-white bg-mantis-white mb-0">
 
     <!-- Shop Checkout-->
     <section class="section novi-background section-20 section-sm-20" style="color:white;">
@@ -17,41 +17,42 @@
                                     <table class="table" style="color:white;">
                                         <tbody>
                                         {% for item in carrito %}
-                                            {% if item.id_servicio ==11 %}
+                                            <tr>
+                                                <td class="row-group-conta" colspan="5">Servicio:
+                                                    <i>{{ item.servicio }}</i></td>
+                                                <td class="row-group-conta text-right">Subtotal:
+                                                    <i>{{ item.sub_total }}</i></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left row-group-subconta">Nombre</td>
+                                                <td class="text-left row-group-subconta">Primer Apellido</td>
+                                                <td class="text-left row-group-subconta">Segundo Apellido</td>
+                                                <td class="text-left row-group-subconta">Teléfono Celular</td>
+                                                <td class="text-left row-group-subconta">Teléfono Fijo</td>
+                                                <td class="text-right row-group-subconta">Acciones</td>
+                                            </tr>
+                                            {% for new_item in item.data %}
                                                 <tr>
-                                                    <td class="row-group-conta" colspan="5">Servicio: <i>{{ item.servicio }}</i></td>
-                                                    <td class="row-group-conta text-right">Subtotal: <i>{{ item.sub_total }}</i></td>
+                                                    <td class="text-left">{{ new_item.nombre }}</td>
+                                                    <td class="text-left">{{ new_item.primer_apellido }}</td>
+                                                    <td class="text-left">{{ new_item.segundo_apellido }}</td>
+                                                    <td class="text-left">{{ new_item.telefono_celular }}</td>
+                                                    <td class="text-left">{{ new_item.telefono_fijo }}</td>
+                                                    <td class="text-right">
+                                                        <button type="button" class="btn btn-warning btn-sm px-1"
+                                                                data-toggle="tooltip"
+                                                                data-placement="bottom" title="Modificar">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm ml-1"
+                                                                data-toggle="tooltip"
+                                                                data-placement="bottom" title="Eliminar"
+                                                                onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </td>
                                                 </tr>
-                                                <tr>
-                                                    <td class="text-left row-group-subconta">Nombre</td>
-                                                    <td class="text-left row-group-subconta">Primer Apellido</td>
-                                                    <td class="text-left row-group-subconta">Segundo Apellido</td>
-                                                    <td class="text-left row-group-subconta">Teléfono Celular</td>
-                                                    <td class="text-left row-group-subconta">Teléfono Fijo</td>
-                                                    <td class="text-right row-group-subconta">Acciones</td>
-                                                </tr>
-                                                {% for new_item in item.data %}
-                                                    <tr>
-                                                        <td class="text-left">{{ new_item.nombre }}</td>
-                                                        <td class="text-left">{{ new_item.primer_apellido }}</td>
-                                                        <td class="text-left">{{ new_item.segundo_apellido }}</td>
-                                                        <td class="text-left">{{ new_item.telefono_celular }}</td>
-                                                        <td class="text-left">{{ new_item.telefono_fijo }}</td>
-                                                        <td class="text-right">
-                                                            <button type="button" class="btn btn-warning btn-sm px-1"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="bottom" title="Modificar">
-                                                                <i class="fa fa-edit"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="bottom" title="Eliminar">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            {% endif %}
+                                            {% endfor %}
                                         {% endfor %}
                                         </tbody>
                                     </table>
@@ -118,6 +119,26 @@
     {{ parent() }}
 
     <script>
+
+        function deleteElementCarrito(idCarrito, id_servicio) {
+            $('#confirm__modal').modal('show')
+            $('#confirm__modal__body').text('Está seguro que desea eliminar el servicio?')
+            $('#_token__confirm__modal').val($('#__token').val())
+            $("#confirm__modal__btn_ok").click(function () {
+                const path = window.location.pathname
+                $('body').append(`
+                    <form action='/turismo/gestion-consular/solucitud/delete-carrito'
+                         method="post" id='form_delet_element_servicio_carrito'>
+                        <input type='hidden' name='idCarrito' value='${idCarrito}'/>
+                        <input type='hidden' name='id_servicio' value='${id_servicio}'/>
+                        <input type='hidden' name='path' value='${path}'/>
+                    </form>`)
+                const fomrulario = $('#form_delet_element_servicio_carrito')
+                fomrulario.submit()
+                fomrulario.remove()
+            });
+        }
+
 
         function editarIten(id) {
             window.location.href = "/remesas.json.editar/" + id;

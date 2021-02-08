@@ -248,9 +248,14 @@ class RemesasController extends AbstractController
         date_default_timezone_set('America/Santo_Domingo');
         $date = new DateTime('NOW');
 
+<<<<<<< HEAD
         $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $user->getUsername(), AuxFunctionsTurismo::IDENTIFICADOR_REMESA);
 
         $data_new_solicitudes = array(
+=======
+
+        $json = array(
+>>>>>>> 40f8041dbe794508afd96b5034c8a4178b45314e
             'id' => $ClienteBeneficiario->getId(),
             'primerNombre' => $ClienteBeneficiario->getPrimerNombre(),
             'primerApellido' => $ClienteBeneficiario->getPrimerApellido(),

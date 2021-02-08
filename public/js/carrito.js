@@ -179,16 +179,14 @@ function ActualizarCarrito() {
                     $("#table_carrito").append('<tr id="tr_' + i + '" class="w-100 m-0 p-0"></tr>');
                     $("#tr_"+i).append('<td colspan="3" class="text-center font-weight-bold text-danger">'+json.nombre_servicio +'</td>');
 
-                    if(json.id_servicio == 11){
                         let arr = json.data
                         for (let j = 0; j < arr.length; j++) {
-                            // console.info(arr)
                             const asd = JSON.stringify(arr[j])
                             $("#table_carrito").append('<tr id="tr_' + i+'_'+j + '"></tr>');
-                            $("#tr_"+i+'_'+j).append(`<td class="text-left"> ${arr[j]['nombre']} ${arr[j]['primer_apellido']} </td>`);
-                            $("#tr_"+i+'_'+j).append(`<td class="text-right"> ${parseFloat(json.precio_servicio).toFixed(2)}</td>`);
+                            $("#tr_"+i+'_'+j).append(`<td class="text-left"> ${arr[j]['nombreMostrar']} </td>`);
+                            $("#tr_"+i+'_'+j).append(`<td class="text-right"> ${parseFloat(arr[j]['montoMostrar']).toFixed(2)}</td>`);
                             $("#tr_"+i+'_'+j).append(`<td class="text-right">
-                                                                <a class="btn btn-outline-danger p-1 ml-1" onclick='deleteElementCarrito(${asd},"${json.id_servicio}")'>
+                                                                <a class="btn btn-outline-danger p-1 ml-1" onclick='deleteElementCarrito("${arr[j]['idCarrito']}","${json.id_servicio}")'>
                                                                     <i class="fa fa-trash"></i>
                                                                 </a>
                                                             </td>`);
@@ -198,27 +196,8 @@ function ActualizarCarrito() {
                         $("#tr_"+i+'_subtotal').append('<td class="text-right text-danger">'+parseFloat(json.total).toFixed(2)+'</td>');
 
                         total_importe += parseFloat(json.total)
-                    }
-                    else{
-                        $("#carrito").append('<li id="li' + i + '"></li>');
-                        $("#li" + i).append('<div id="div' + i + '"' + ' class="rd-navbar-product-caption"></div>' +
-                            '<a class="svgCarrito" onClick="remesaBorrar(' + data[i].id + ');" >' +
-                            '<svg  width="1em" height="1em" viewbox="0 0 16 16" class="iconCarritoDelete box bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">' +
-                            '       <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>' +
-                            '       <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>' +
-                            '   </svg>' +
-                            '</a>');
-                        $("#div" + i).append('<a onClick="remesaEditar(' + data[i].id + ');"> ' +
-                            '<h6 id="h6' + i + '"' + ' class="rd-navbar-product-title">' + json.servicio + ' ' + json.primerNombre + ' ' + json.primerApellido + '</h6></a>');
-                        $("#h6" + i).append('<p class="rd-navbar-product-price">$' + data[i].total + '</p>');
-                    }
-
-                    // total = Number(total) + Number(data[i].total);
-                    // $("#totalCarrito").text(data[i].moneda + " $" + total);
                     $("#totalCarrito").text(data[i].moneda +' '+ parseFloat(total_importe).toFixed(2));
-
                     let iconCarrito = document.getElementById('iconCarrito');
-
                 }
 
             } else {
@@ -233,20 +212,20 @@ function ActualizarCarrito() {
     });
 }
 
-function deleteElementCarrito(arr,id_servicio) {
+function remesaEditar(id) {
+    window.location.href = "/remesas.json.editar/" + id;
+}
+
+function deleteElementCarrito(idCarrito,id_servicio) {
     $('#confirm__modal').modal('show')
-    $('#confirm__modal__body').text('Está seguro que desea eliminar el servicio para ' + arr.nombre +' '+arr.primer_apellido + '?')
+    $('#confirm__modal__body').text('Está seguro que desea eliminar el servicio?')
     $('#_token__confirm__modal').val($('#__token').val())
     $("#confirm__modal__btn_ok").click(function () {
         const path = window.location.pathname
         $('body').append(`
                     <form action='/turismo/gestion-consular/solucitud/delete-carrito'
                          method="post" id='form_delet_element_servicio_carrito'>
-                        <input type='hidden' name='nombre' value='${arr.nombre}'/>
-                        <input type='hidden' name='primer_apellido' value='${arr.primer_apellido}'/>
-                        <input type='hidden' name='segundo_apellido' value='${arr.segundo_apellido}'/>
-                        <input type='hidden' name='telefono_celular' value='${arr.telefono_celular}'/>
-                        <input type='hidden' name='telefono_fijo' value='${arr.telefono_fijo}'/>
+                        <input type='hidden' name='id' value='${idCarrito}'/> 
                         <input type='hidden' name='id_servicio' value='${id_servicio}'/>
                         <input type='hidden' name='path' value='${path}'/>
                     </form>`)
