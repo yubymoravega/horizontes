@@ -22,6 +22,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\CoreTurismo\AuxFunctionsTurismo;
 
 
 class RemesasController extends AbstractController
@@ -237,18 +238,19 @@ class RemesasController extends AbstractController
     /**
      * @Route("/remesas.carrito/{id}/{monto}/{recibir}/{idCliente}/{nombre}/{apellido}/{moneda}/{pais}", name="remesas.carrito")
      */
-    public function carrito($id, $monto, $recibir, $idCliente,$nombre,$apellido,$moneda,$pais)
+    public function carrito($id, $monto, $recibir, $idCliente,$nombre,$apellido,$moneda,$pais, EntityManagerInterface $em)
     {
         $dataBase = $this->getDoctrine()->getManager();
-       // $carritoDataBase = $dataBase->getRepository(Carrito::class)->findBy([''=>'']);
- 
+      
         $carrito = new Carrito();
         $user =  $this->getUser();
         $ClienteBeneficiario = $dataBase->getRepository(ClienteBeneficiario::class)->find($id);
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
 
-        $json = array(
+        $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $user->getUsername(), AuxFunctionsTurismo::IDENTIFICADOR_REMESA);
+
+        $data_new_solicitudes = array(
             'id' => $ClienteBeneficiario->getId(),
             'primerNombre' => $ClienteBeneficiario->getPrimerNombre(),
             'primerApellido' => $ClienteBeneficiario->getPrimerApellido(),
@@ -281,9 +283,39 @@ class RemesasController extends AbstractController
             'recibirMoneda' => $moneda,
             'pais' => $pais,
             'servicio' => 'Remesa',
-            'orden' => uniqid()
+            'orden' => uniqid(),
+            'idCarrito' => count($data_solicitudes_existente) +1,
+            'nombreMostrar' => $ClienteBeneficiario->getPrimerNombre()." ".$ClienteBeneficiario->getPrimerApellido(),
+            'montoMostrar' => $monto
         );
 
+        $data_solicitudes = array_merge($data_new_solicitudes, $data_solicitudes_existente);
+
+        $total = null;
+
+        foreach($data_solicitudes as $key=>$item){
+            
+            if(gettype($data_new_solicitudes[$key]) == 'array'){
+
+                $total =  $total + $data_new_solicitudes[$key]['monto'] ; 
+
+            }else{
+                $total =  $total + $data_new_solicitudes[$key]->monto; 
+            }
+
+        }
+
+        //-- CONSTRUYO EL JSON PARA ADICIONAR AL CARRITO
+        $json = array(
+            'id_empleado' => $user->getId(),
+            'id_cliente' => $idCliente,
+            'id_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_REMESA,
+            'nombre_servicio' => $em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_REMESA)->getNombre(),
+            'precio_servicio' => $monto,
+            'total' => $total,
+            'data' => $data_solicitudes,
+        );
+       
         $carrito->setEmpleado($user->getUsername());
         $carrito->setJson(json_encode($json));
         $dataBase->persist($carrito);
@@ -404,7 +436,7 @@ class RemesasController extends AbstractController
         return $this->render('remesas/reglas.html.twig',['pais'=> $pais->getNombre(), 
         'moneda' => $moneda->getNombre(),'idReglas' => $id, 'pagination' => $pagination]);
     }
-
+ 
     /**
      * @Route("/remesas/reglas/add/{id}", name="remesas/reglas/add/")
      */

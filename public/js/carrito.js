@@ -233,10 +233,6 @@ function ActualizarCarrito() {
     });
 }
 
-function remesaEditar(id) {
-    window.location.href = "/remesas.json.editar/" + id;
-}
-
 function deleteElementCarrito(arr,id_servicio) {
     $('#confirm__modal').modal('show')
     $('#confirm__modal__body').text('Está seguro que desea eliminar el servicio para ' + arr.nombre +' '+arr.primer_apellido + '?')
@@ -260,26 +256,5 @@ function deleteElementCarrito(arr,id_servicio) {
     });
 }
 
-function remesaBorrar(id) {
-    $('#confirm__modal').modal('show')
-
-    $("#confirm__modal__btn_ok").click(function () {
-
-        $.ajax({
-            type: 'POST',
-            data: {'code': '200'},
-            url: window.location.protocol + "//" + location.hostname + ":" + window.location.port + "/remesas.json.borrar/" + id,
-            dataType: 'html',
-            success: function (data) {
-
-                window.location.href = "/home";
-
-
-            }
-        });
-
-
-    });
-}
 
 
