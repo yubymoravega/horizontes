@@ -112,7 +112,6 @@ class HomeController extends AbstractController
             /** @var Servicios $element_servicio */
             $decode = json_decode($data[$contador]->getJson());
             $element_servicio = $servicio_er->find($decode->id_servicio);
-            if($decode->id_servicio == 11){
                 $json[$contador] = array(
                     'servicio'=>$decode->id_servicio,
                     'id' => $data[$contador]->getId(),
@@ -121,24 +120,6 @@ class HomeController extends AbstractController
                     'total' => number_format($decode->total, 2,),
                     'servicio_nombre'=>$element_servicio?$element_servicio->getNombre():'-sin definir servicio-'
                 );
-            }
-            else{
-                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=>$decode->montoMoneda]);
-
-                $dolares = $decode->monto / $tasa[0]->getTasa();
-                $tasa = $dataBase->getRepository(TasaDeCambio::class)->findBy(['idMoneda'=> $user->getIdMoneda()]);
-                $total = $dolares * $tasa[0]->getTasa();
-
-                $dataBase = $this->getDoctrine()->getManager();
-                $moneda = $dataBase->getRepository(Moneda::class)->find($user->getIdMoneda());
-
-                $json[$contador] = array(
-                    'id' => $data[$contador]->getId(),
-                    'json' => $data[$contador]->getJson(),
-                    'moneda' => $moneda->getNombre(),
-                    'total' => round( $total, 2, PHP_ROUND_HALF_EVEN),
-                );
-            }
             $contador++;
         }
  

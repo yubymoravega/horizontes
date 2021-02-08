@@ -109,13 +109,15 @@ class CheckoutController extends AbstractController
             $json_array_data = $json_array->data;
             $row_data = [];
             foreach ($json_array_data as $element) {
-                if ($json_array->id_servicio == 11 || $json_array->id_servicio == '11')
                     $row_data[] = [
                         'nombre' => $element->nombre,
                         'primer_apellido' => $element->primer_apellido,
                         'segundo_apellido' => $element->segundo_apellido,
                         'telefono_celular' => $element->telefono_celular,
                         'telefono_fijo' => $element->telefono_fijo,
+                        'nombreMostrar'=>$element->nombreMostrar,
+                        'montoMostrar'=>$element->montoMostrar,
+                        'idCarrito'=>$element->idCarrito
                     ];
             }
             $data[] = [

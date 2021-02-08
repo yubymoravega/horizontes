@@ -248,6 +248,7 @@ class RemesasController extends AbstractController
         $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
 
+
         $json = array(
             'id' => $ClienteBeneficiario->getId(),
             'primerNombre' => $ClienteBeneficiario->getPrimerNombre(),

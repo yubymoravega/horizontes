@@ -94,6 +94,18 @@ class SolucitudController extends AbstractController
 
         $data_solicitudes = array_merge($data_new_solicitudes, $data_solicitudes_existente);
 
+        foreach ($data_solicitudes as $key=>$item){
+            if(gettype($data_solicitudes[$key])=='array'){
+                $data_solicitudes[$key]['idCarrito'] = $key;
+                $data_solicitudes[$key]['nombreMostrar'] = $data_solicitudes[$key]['nombre'] .' '. $data_solicitudes[$key]['primer_apellido'];
+                $data_solicitudes[$key]['montoMostrar'] = $precio_total;
+            }
+            else{
+                $data_solicitudes[$key]->id = $key;
+                $data_solicitudes[$key]->nombreMostrar = $data_solicitudes[$key]->nombre .' '. $data_solicitudes[$key]->primer_apellido;
+                $data_solicitudes[$key]->montoMostrar = $precio_total;
+            }
+        }
         //-- CONSTRUYO EL JSON PARA ADICIONAR AL CARRITO
         $json = array(
             'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),
@@ -129,13 +141,9 @@ class SolucitudController extends AbstractController
     public function deletCarrito(EntityManagerInterface $em, Request $request)
     {
         $ruta = $request->request->get('path');
-        $nombre = $request->request->get('nombre');
-        $primer_apellido = $request->request->get('primer_apellido');
-        $segundo_apellido = $request->request->get('segundo_apellido');
-        $telefono_celular = $request->request->get('telefono_celular');
-        $telefono_fijo = $request->request->get('telefono_fijo');
+        $id = $request->request->get('idCarrito');
         $id_servicio = $request->request->get('id_servicio');
-
+//dd($request);
         /** @var UserClientTmp $obj_trabajo_tmp */
         $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
             'id_usuario' => $this->getUser()
@@ -144,11 +152,13 @@ class SolucitudController extends AbstractController
 
         $array_result = [];
         $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);
+
+        $total_servicio = 0;
         foreach ($data_solicitudes_existente as $key => $item) {
-            $str_database = $item->nombre . '-' . $item->primer_apellido. '-' . $item->segundo_apellido . '-' . $item->telefono_celular . '-' . $item->telefono_fijo;
-            $str_font = $nombre . '-' . $primer_apellido . '-' . $segundo_apellido . '-' . $telefono_celular . '-' . $telefono_fijo;
-            if ($str_database != $str_font) {
+            if ($id != $item->idCarrito) {
                 $array_result[] = $data_solicitudes_existente[$key];
+                $array_result[count($array_result)-1]->id=count($array_result)-1;
+                $total_servicio += floatval($item->montoMostrar);
             }
         }
 
@@ -156,7 +166,6 @@ class SolucitudController extends AbstractController
         $obj_carrito = $em->getRepository(Carrito::class)->find($id_carrito);
         $json = json_decode($obj_carrito->getJson());
         $precio_servicio = floatval($json->precio_servicio);
-        $total_servicio = round(($precio_servicio*count($array_result)));
 
         $json_updated = array(
             'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),

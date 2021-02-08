@@ -4,7 +4,7 @@
     <div>
         {% for item in datos %}
             <div style="page-break-before: always;"></div>
-            <table border="1px" width="800px" class="mt-3">
+            <table border="1px pa-5" width="800px" class="mt-3">
                 <tr>
                     <td class="text-left font-weight-bold">{{ unidad }}</td>
                     <td class="text-right font-weight-bold">RNC-{{ unidad_codigo }}</td>
@@ -30,17 +30,17 @@
                     <td class="text-right">{{ item.sueldo_bruto }}</td>
                 </tr>
                 {% if item.comision != '0.00' %}
-                <tr>
-                    <td>Comisiones</td>
-                    <td class="text-right">{{ item.comision }}</td>
-                </tr>
+                    <tr>
+                        <td>Comisiones</td>
+                        <td class="text-right">{{ item.comision }}</td>
+                    </tr>
                 {% endif %}
 
                 {% if item.vacaciones != '0.00' %}
-                <tr>
-                    <td>Vacaciones</td>
-                    <td class="text-right">{{ item.vacaciones }}</td>
-                </tr>
+                    <tr>
+                        <td>Vacaciones</td>
+                        <td class="text-right">{{ item.vacaciones }}</td>
+                    </tr>
                 {% endif %}
 
                 {% if item.horas_extra != '0.00' %}
@@ -168,4 +168,17 @@
             $('#paginator').show()
         }
     </script>
+{% endblock %}
+{% block stylesheets %}
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+{#    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">#}
+    <style>
+        table {
+            padding: 20px;
+        }
+
+        td, tr {
+            border: 0;
+        }
+    </style>
 {% endblock %}
