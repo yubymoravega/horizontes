@@ -143,7 +143,7 @@ class FacturaController extends AbstractController
      */
     public function cotizacion() 
     {
-        $dataBase = $this->getDoctrine()->getManager();
+  /*      $dataBase = $this->getDoctrine()->getManager();
         $user =  $this->getUser();
         
         $data = $dataBase->getRepository(Carrito::class)->findBY(['empleado' => $user->getUsername()]);
@@ -211,7 +211,7 @@ class FacturaController extends AbstractController
             'success',
             'Cotizacion'
         );
-
+*/
         return $this->redirectToRoute('factura/reporte/cotizacion');
     }
 
