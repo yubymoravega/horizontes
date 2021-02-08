@@ -6,9 +6,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Knp\Component\Pager\PaginatorInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\AgenciasTv;
+use App\Entity\Contabilidad\Config\Unidad;
 
 class PublicidadController extends AbstractController
 {
+
+     // 2. Expose the EntityManager in the class level
+     private $entityManager; 
+
+     public function __construct(EntityManagerInterface $entityManager)
+     {
+         // 3. Update the value of the private entityManager variable through injection
+         $this->entityManager = $entityManager;
+     }
+ 
+
     /**
      * @Route("/publicidad", name="publicidad")
      */
@@ -74,4 +89,44 @@ class PublicidadController extends AbstractController
 
         return $this->redirectToRoute('home');
     }
+
+    /**
+     * @Route("/publicidad/unidad", name="publicidad/unidad")
+     */
+    public function unidad(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request)
+    {
+        $dql = "SELECT a FROM App:Contabilidad\Config\Unidad a WHERE a.activo = '1'";
+
+        $dataBase = $this->getDoctrine()->getManager();
+        $tv = $dataBase->getRepository(AgenciasTv::class)->findAll();
+
+        $dql .= " ORDER BY a.nombre DESC";
+        $query = $em->createQuery($dql);
+
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            25 /*limit per page*/
+        );
+
+        return $this->render('publicidad/publicidadUnidad.html.twig',[
+            'pagination' => $pagination, 'tvs' => $tv
+        ]);
+    }
+
+
+    /**
+     * @Route("/publicidad/img/agencias", name="publicidad/img/agencias")
+     */
+    public function imgAgencias()
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+        $unidad = $dataBase->getRepository(Unidad::class)->findAll();
+    
+
+        return $this->render('publicidad/imgUnidad.html.twig', [
+            'unidades' => $unidad
+        ] );
+    }
+
 }
