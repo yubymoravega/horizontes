@@ -177,23 +177,23 @@ function ActualizarCarrito() {
                     let json = JSON.parse(data[i].json);
                     $("#carrito").append('<table id="table_carrito" class="w-100 p-0 m-0"></table>');
                     $("#table_carrito").append('<tr id="tr_' + i + '" class="w-100 m-0 p-0"></tr>');
-                    $("#tr_"+i).append('<td colspan="3" class="text-center font-weight-bold text-danger">'+json.nombre_servicio +'</td>');
+                    $("#tr_"+i).append('<td colspan="3" class="text-left font-weight-bold text-white">'+json.nombre_servicio +'</td>');
 
                         let arr = json.data
                         for (let j = 0; j < arr.length; j++) {
                             const asd = JSON.stringify(arr[j])
                             $("#table_carrito").append('<tr id="tr_' + i+'_'+j + '"></tr>');
-                            $("#tr_"+i+'_'+j).append(`<td class="text-left"> ${arr[j]['nombreMostrar']} </td>`);
-                            $("#tr_"+i+'_'+j).append(`<td class="text-right"> ${parseFloat(arr[j]['montoMostrar']).toFixed(2)}</td>`);
+                            $("#tr_"+i+'_'+j).append(`<td class="text-left text-secondary"> ${arr[j]['nombreMostrar']} </td>`);
+                            $("#tr_"+i+'_'+j).append(`<td class="text-right text-secondary"> ${parseFloat(arr[j]['montoMostrar']).toFixed(2)}</td>`);
                             $("#tr_"+i+'_'+j).append(`<td class="text-right">
-                                                                <a class="btn btn-outline-danger p-1 ml-1" onclick='deleteElementCarrito("${arr[j]['idCarrito']}","${json.id_servicio}")'>
+                                                                <a class="btn btn-outline-secondary p-1 ml-1" onclick='deleteElementCarrito("${arr[j]['idCarrito']}","${json.id_servicio}")'>
                                                                     <i class="fa fa-trash"></i>
                                                                 </a>
                                                             </td>`);
                         }
-                        $("#table_carrito").append('<tr id="tr_' + i+'_subtotal'+ '"></tr>');
-                        $("#tr_"+i+'_subtotal').append('<td class="text-center text-danger" >SubTotal</td>');
-                        $("#tr_"+i+'_subtotal').append('<td class="text-right text-danger">'+parseFloat(json.total).toFixed(2)+'</td>');
+                        // $("#table_carrito").append('<tr id="tr_' + i+'_subtotal'+ '"></tr>');
+                        // $("#tr_"+i+'_subtotal').append('<td class="text-center text-white" >SubTotal</td>');
+                        // $("#tr_"+i+'_subtotal').append('<td class="text-right text-white">'+parseFloat(json.total).toFixed(2)+'</td>');
 
                         total_importe += parseFloat(json.total)
                     $("#totalCarrito").text(data[i].moneda +' '+ parseFloat(total_importe).toFixed(2));
