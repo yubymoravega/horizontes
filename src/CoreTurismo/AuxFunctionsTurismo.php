@@ -119,15 +119,16 @@ class AuxFunctionsTurismo
      */
     public static function isClienteOrigen(EntityManagerInterface $em, string $empleado, int $id_cliente)
     {
-        $carrito = $em->getRepository(Carrito::class)->findBy(['empleado'=>$empleado]);
-        if(!empty($carrito)){
+        $carrito = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
+        if (!empty($carrito)) {
             /** @var Carrito $obj_carrito */
             $obj_carrito = $carrito[0];
             $json = json_decode($obj_carrito->getJson());
             $id_cliente_carrito = $json->id_cliente;
-            if($id_cliente_carrito = $id_cliente)
+            if ($id_cliente_carrito == $id_cliente)
                 return true;
-        }
-        return false;
+            return false;
+        } else
+            return true;
     }
 }
