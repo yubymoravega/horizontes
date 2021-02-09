@@ -58,20 +58,42 @@
                                             {% elseif item.id_servicio == 4 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta">Nombre</td>
-                                                    <td class="text-left row-group-subconta">Primer Apellido</td>
-                                                    <td class="text-left row-group-subconta">Segundo Apellido</td>
+                                                    <td class="text-left row-group-subconta">Cliente</td>
                                                     <td class="text-left row-group-subconta">Teléfono Celular</td>
-                                                    <td class="text-left row-group-subconta">Teléfono Fijo</td>
+                                                    <td class="text-left row-group-subconta">Monto</td>
+                                                   
+                                                    
                                                     <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
                                                 {% for new_item in item.data %}
-                                                    <tr>
-                                                        <td class="text-left">{{ new_item.primerNombre }}</td>
-                                                        <td class="text-left">{{ new_item.primerApellido }}</td>
-                                                        <td class="text-left">{{ new_item.segundoApellido }}</td>
-                                                        <td class="text-left"></td>
-                                                        <td class="text-left"></td>
+                                                        <td class="text-left">  <a data-toggle="collapse" href="#coll{{ new_item.orden }}" role="button"
+                                                   aria-expanded="false" aria-controls="coll{{ new_item.orden }}">
+                                                    <span style="color:white;"> <b> {{ new_item.nombreCliente }} </b></span> </br>
+                                                </a>  
+
+                                                <div class="collapse" id="coll{{ new_item.orden }}" style="margin-top: 20px;">
+
+                                                    <ul style="list-style-type:disc">
+                                                        <li><b> Beneficiario:</b> {{ new_item.primerNombre }}  {{ new_item.primerApellido }} {{ new_item.segundoApellido }}</li>
+                            
+                                                        <li><b> Contactos:</b> {{ new_item.telefono }} - {{ new_item.telefonoCasa }} </li>
+                                                        <li><b> Identificacion:</b> {{ new_item.identificacion }} </li>
+                                                        <li><b> Direccion:</b> 
+                                                            No: {{ new_item.no }}
+                                                            y {{ new_item.y }},
+                                                            Edificio: {{ new_item.edificio }}
+                                                            Apto: {{ new_item.apto }}, Reparto:{{ new_item.apto }} </li>
+                                                            <li>
+                                                             Municipio: {{ new_item.municipio }}, Provincia: {{ new_item.provincia }} </li>
+                                                    </ul>
+
+                                                </div>     
+                                                        </td>
+
+                                                        <td class="text-left">{{ new_item.idCliente }}</td>
+                                                        <td class="text-left">{{ new_item.monto }}</td>
+                                                       
+                                                        
                                                         <td class="text-right">
 {#                                                            <button type="button" class="btn btn-warning btn-sm px-1"#}
 {#                                                                    data-toggle="tooltip"#}
@@ -146,6 +168,13 @@
             </div>
         </div>
     </div>
+
+    <style>
+
+    .table td, .table th {
+  padding: .75rem !important;
+}
+    </style>
 
 {% endblock %}
 
