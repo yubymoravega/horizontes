@@ -92,7 +92,7 @@ class CotizacionController extends AbstractController
                 $new_carrito = new Carrito();
                 $new_carrito
                     ->setJson($element)
-                    ->setEmpleado($item->getEmpleado());
+                    ->setEmpleado($this->getUser()->getUsername());
                 $em->persist($new_carrito);
             }
             $em->remove($item);
