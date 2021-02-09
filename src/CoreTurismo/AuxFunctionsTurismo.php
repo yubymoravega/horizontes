@@ -36,10 +36,11 @@ class AuxFunctionsTurismo
      * @param User $usuario
      * @return bool|string true si inserta el binomio de cliente y usuario
      */
-    public static function ActualizarDatosEmpleado(EntityManagerInterface $em, Cliente $cliente, User $usuario){
+    public static function ActualizarDatosEmpleado(EntityManagerInterface $em, Cliente $cliente, User $usuario)
+    {
         /** Elimino la instancia que aparezca del usuario en la tabla de UserClientTmp */
-        $obj_UserClient = $em->getRepository(UserClientTmp::class)->findOneBy(['id_usuario'=>$usuario]);
-        if($obj_UserClient)
+        $obj_UserClient = $em->getRepository(UserClientTmp::class)->findOneBy(['id_usuario' => $usuario]);
+        if ($obj_UserClient)
             $em->remove($obj_UserClient);
         /** Creo una nueva instancia de UserClientTmp con el usuario y el cliente con el que se va a trabajar */
         $new_instance = new UserClientTmp();
@@ -49,8 +50,7 @@ class AuxFunctionsTurismo
         try {
             $em->persist($new_instance);
             $em->flush();
-        }
-        catch (FileException $exception){
+        } catch (FileException $exception) {
             return $exception->getMessage();
         }
         return true;
@@ -62,9 +62,10 @@ class AuxFunctionsTurismo
      * @param User $usuario
      * @return UserClientTmp|null
      */
-    public static function GetDataCliente(EntityManagerInterface $em,User $usuario){
-        $obj_UserClient = $em->getRepository(UserClientTmp::class)->findOneBy(['id_usuario'=>$usuario]);
-        if(!$obj_UserClient)
+    public static function GetDataCliente(EntityManagerInterface $em, User $usuario)
+    {
+        $obj_UserClient = $em->getRepository(UserClientTmp::class)->findOneBy(['id_usuario' => $usuario]);
+        if (!$obj_UserClient)
             return null;
         return $obj_UserClient->getIdCliente();
     }
@@ -75,14 +76,15 @@ class AuxFunctionsTurismo
      * @param int $id_servicio
      * @return array $data con el arreglo de datos contenidos en el JSON del carrito gestionado por el empleado para el servicio especificado
      */
-    public static function getDataJsonCarrito(EntityManagerInterface $em,string $empleado,int $id_servicio){
+    public static function getDataJsonCarrito(EntityManagerInterface $em, string $empleado, int $id_servicio)
+    {
         $data = [];
-        $carrito_array = $em->getRepository(Carrito::class)->findBy(['empleado'=>$empleado]);
-        if(!empty($carrito_array)){
+        $carrito_array = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
+        if (!empty($carrito_array)) {
             /** @var Carrito $item */
-            foreach ($carrito_array as $item){
+            foreach ($carrito_array as $item) {
                 $json = json_decode($item->getJson());
-                if($json->id_servicio == $id_servicio)
+                if ($json->id_servicio == $id_servicio)
                     return $json->data;
             }
         }
@@ -95,17 +97,37 @@ class AuxFunctionsTurismo
      * @param int $id_servicio
      * @return int|null Devuelve el identificador de la fila del carrito que queremos editar
      */
-    public static function getIdCarritoServicio(EntityManagerInterface $em,string $empleado,int $id_servicio){
-        $carrito_array = $em->getRepository(Carrito::class)->findBy(['empleado'=>$empleado]);
-        if(!empty($carrito_array)){
+    public static function getIdCarritoServicio(EntityManagerInterface $em, string $empleado, int $id_servicio)
+    {
+        $carrito_array = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
+        if (!empty($carrito_array)) {
             /** @var Carrito $item */
-            foreach ($carrito_array as $item){
+            foreach ($carrito_array as $item) {
                 $json = json_decode($item->getJson());
-                if($json->id_servicio == $id_servicio)
+                if ($json->id_servicio == $id_servicio)
                     return $item->getId();
             }
         }
         return 0;
     }
 
+    /**
+     * @param EntityManagerInterface $em
+     * @param string $empleado
+     * @param int $id_cliente
+     * @return bool falso si no se puede trabajar
+     */
+    public static function isClienteOrigen(EntityManagerInterface $em, string $empleado, int $id_cliente)
+    {
+        $carrito = $em->getRepository(Carrito::class)->findBy(['empleado'=>$empleado]);
+        if(!empty($carrito)){
+            /** @var Carrito $obj_carrito */
+            $obj_carrito = $carrito[0];
+            $json = json_decode($obj_carrito->getJson());
+            $id_cliente_carrito = $json->id_cliente;
+            if($id_cliente_carrito = $id_cliente)
+                return true;
+        }
+        return false;
+    }
 }
