@@ -23,36 +23,71 @@
                                                 <td class="row-group-conta text-right">Subtotal:
                                                     <i>{{ item.sub_total }}</i></td>
                                             </tr>
-                                            <tr>
-                                                <td class="text-left row-group-subconta">Nombre</td>
-                                                <td class="text-left row-group-subconta">Primer Apellido</td>
-                                                <td class="text-left row-group-subconta">Segundo Apellido</td>
-                                                <td class="text-left row-group-subconta">Teléfono Celular</td>
-                                                <td class="text-left row-group-subconta">Teléfono Fijo</td>
-                                                <td class="text-right row-group-subconta">Acciones</td>
-                                            </tr>
-                                            {% for new_item in item.data %}
+                                            {% if item.id_servicio == 11 %}
+                                            {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
                                                 <tr>
-                                                    <td class="text-left">{{ new_item.nombre }}</td>
-                                                    <td class="text-left">{{ new_item.primer_apellido }}</td>
-                                                    <td class="text-left">{{ new_item.segundo_apellido }}</td>
-                                                    <td class="text-left">{{ new_item.telefono_celular }}</td>
-                                                    <td class="text-left">{{ new_item.telefono_fijo }}</td>
-                                                    <td class="text-right">
-                                                        <button type="button" class="btn btn-warning btn-sm px-1"
-                                                                data-toggle="tooltip"
-                                                                data-placement="bottom" title="Modificar">
-                                                            <i class="fa fa-edit"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm ml-1"
-                                                                data-toggle="tooltip"
-                                                                data-placement="bottom" title="Eliminar"
-                                                                onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </td>
+                                                    <td class="text-left row-group-subconta">Nombre</td>
+                                                    <td class="text-left row-group-subconta">Primer Apellido</td>
+                                                    <td class="text-left row-group-subconta">Segundo Apellido</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Celular</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Fijo</td>
+                                                    <td class="text-right row-group-subconta">Acciones</td>
                                                 </tr>
-                                            {% endfor %}
+                                                {% for new_item in item.data %}
+                                                    <tr>
+                                                        <td class="text-left">{{ new_item.nombre }}</td>
+                                                        <td class="text-left">{{ new_item.primer_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.segundo_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_celular }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_fijo }}</td>
+                                                        <td class="text-right">
+                                                            <button type="button" class="btn btn-warning btn-sm px-1"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom" title="Modificar">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom" title="Eliminar"
+                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% elseif item.id_servicio == 4 %}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
+                                                <tr>
+                                                    <td class="text-left row-group-subconta">Nombre</td>
+                                                    <td class="text-left row-group-subconta">Primer Apellido</td>
+                                                    <td class="text-left row-group-subconta">Segundo Apellido</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Celular</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Fijo</td>
+                                                    <td class="text-right row-group-subconta">Acciones</td>
+                                                </tr>
+                                                {% for new_item in item.data %}
+                                                    <tr>
+                                                        <td class="text-left">{{ new_item.nombre }}</td>
+                                                        <td class="text-left">{{ new_item.primer_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.segundo_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_celular }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_fijo }}</td>
+                                                        <td class="text-right">
+                                                            <button type="button" class="btn btn-warning btn-sm px-1"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom" title="Modificar">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom" title="Eliminar"
+                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
                                         {% endfor %}
                                         </tbody>
                                     </table>

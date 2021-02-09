@@ -109,16 +109,32 @@ class CheckoutController extends AbstractController
             $json_array_data = $json_array->data;
             $row_data = [];
             foreach ($json_array_data as $element) {
-                    $row_data[] = [
-                        'nombre' => $element->nombre,
-                        'primer_apellido' => $element->primer_apellido,
-                        'segundo_apellido' => $element->segundo_apellido,
-                        'telefono_celular' => $element->telefono_celular,
-                        'telefono_fijo' => $element->telefono_fijo,
-                        'nombreMostrar'=>$element->nombreMostrar,
-                        'montoMostrar'=>$element->montoMostrar,
-                        'idCarrito'=>$element->idCarrito
-                    ];
+                switch ($json_array->id_servicio){
+                    case 11:
+                        $row_data[] = [
+                            'nombre' => $element->nombre,
+                            'primer_apellido' => $element->primer_apellido,
+                            'segundo_apellido' => $element->segundo_apellido,
+                            'telefono_celular' => $element->telefono_celular,
+                            'telefono_fijo' => $element->telefono_fijo,
+                            'nombreMostrar'=>$element->nombreMostrar,
+                            'montoMostrar'=>$element->montoMostrar,
+                            'idCarrito'=>$element->idCarrito
+                        ];
+                        break;
+                    case 4:
+                        $row_data[] = [
+                            'nombre' => $element->primerNombre,
+                            'primer_apellido' => $element->primerApellido,
+                            'segundo_apellido' => $element->segundoApellido,
+                            'telefono_celular' => '',
+                            'telefono_fijo' => '',
+                            'nombreMostrar'=>$element->nombreMostrar,
+                            'montoMostrar'=>$element->montoMostrar,
+                            'idCarrito'=>$element->idCarrito
+                        ];
+                        break;
+                }
             }
             $data[] = [
                 'id'=>$key,
