@@ -114,21 +114,16 @@ class AuxFunctionsTurismo
     /**
      * @param EntityManagerInterface $em
      * @param string $empleado
-     * @param int $id_cliente
-     * @return bool falso si no se puede trabajar
+     * @return string|FALSE Si hay algo en el carrito devuelve el telefono del cliente 
      */
-    public static function isClienteOrigen(EntityManagerInterface $em, string $empleado, int $id_cliente)
+    public static function isClienteOrigen(EntityManagerInterface $em, string $empleado)
     {
         $carrito = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
         if (!empty($carrito)) {
             /** @var Carrito $obj_carrito */
-            $obj_carrito = $carrito[0];
-            $json = json_decode($obj_carrito->getJson());
-            $id_cliente_carrito = $json->id_cliente;
-            if ($id_cliente_carrito == $id_cliente)
-                return true;
-            return false;
+                $json = json_decode($carrito[0]->getJson());
+                return $json->id_cliente;
         } else
-            return true;
+            return FALSE;
     }
 }
