@@ -146,4 +146,6 @@ class CotizacionController extends AbstractController
         $query = $em->createQuery($dql);
         return $query;
     }
+
+    
 }
