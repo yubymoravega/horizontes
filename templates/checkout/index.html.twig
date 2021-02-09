@@ -58,15 +58,13 @@
                                             {% elseif item.id_servicio == 4 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta">Cliente</td>
+                                                    <td class="text-left row-group-subconta" colspan="3">Cliente</td>
                                                     <td class="text-left row-group-subconta">Teléfono Celular</td>
                                                     <td class="text-left row-group-subconta">Monto</td>
-                                                   
-                                                    
                                                     <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
                                                 {% for new_item in item.data %}
-                                                        <td class="text-left">  <a data-toggle="collapse" href="#coll{{ new_item.orden }}" role="button"
+                                                        <td class="text-left" colspan="3">  <a data-toggle="collapse" href="#coll{{ new_item.orden }}" role="button"
                                                    aria-expanded="false" aria-controls="coll{{ new_item.orden }}">
                                                     <span style="color:white;"> <b> {{ new_item.nombreCliente }} </b></span> </br>
                                                 </a>  
