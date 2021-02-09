@@ -86,6 +86,7 @@ class InventarioController extends AbstractController
                 );
             }
         }
+
         //verifico si cerro el ultimo dia, o sea si tiene operaciones por liquidar
         return $this->render('contabilidad/inventario/selalmacen.html.twig', [
             'controller_name' => 'Dashboard',

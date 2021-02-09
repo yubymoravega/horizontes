@@ -25,6 +25,7 @@ use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Form\Contabilidad\Inventario\AjusteType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
+use Container99xZJRh\getUnidadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -100,19 +101,17 @@ class AperturaController extends AbstractController
         $error = null;
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-//            dd(json_decode($request->get('ajuste_entrada')['list_mercancia'],true));
             $list_mercancia = json_decode($request->get('ajuste_entrada')['list_mercancia'], true);
-//            if ($form->isValid()) {
             $apertura_entrada = $request->get('ajuste');
             $tipo_documento_er = $em->getRepository(TipoDocumento::class);
             $cuenta_er = $em->getRepository(Cuenta::class);
             $subcuenta_er = $em->getRepository(Subcuenta::class);
+            $centro_costo_er = $em->getRepository(CentroCosto::class);
 
             $cuenta = AuxFunctions::getNro($list_mercancia[0]['cuenta']);
             $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_APERTURA);
             if($cuenta == '188')
                 $obj_tipo_documento = $tipo_documento_er->find(self::$TIPO_DOC_APERTURA_PRODUCTO);
-//dd($obj_tipo_documento->getId(),$cuenta);
 
             /**  datos de AjusteEntradaType **/
             $observacion = $apertura_entrada['observacion'];
@@ -210,6 +209,7 @@ class AperturaController extends AbstractController
                         $descripcion = $mercancia['descripcion'];
                         $importe_mercancia = $mercancia['importe'];
                         $unidad_medida = $mercancia['um'];
+                        $centro_costo = $mercancia['centro_costo_aplicar'];
                         $cuenta_inventario = AuxFunctions::getNro($mercancia['cuenta']);
                         $subcuenta_inventario = AuxFunctions::getNro($mercancia['subcuenta']);
 
@@ -227,13 +227,13 @@ class AperturaController extends AbstractController
                                 ->setFecha($obj_date)
                                 ->setIdDocumento($documento)
                                 ->setIdTipoDocumento($obj_tipo_documento)
+                                ->setIdCentroCosto($centro_costo_er->find(intval($centro_costo))?$centro_costo_er->find(intval($centro_costo)):null)
                                 ->setIdUsuario($this->getUser());
 
                             //---ADICIONANDO/ACTUALIZANDO EN LA TABLA DE MERCANCIA
                             $obj_mercancia = $mercancia_er->findOneBy(array(
                                 'codigo' => $codigo_mercancia,
-                                'id_amlacen' => $id_almacen,
-//                            'activo' => true //-----Para que traiga tanto las mercancias con existencia como las que se eliminaron
+                                'id_amlacen' => $id_almacen
                             ));
                             if (!$obj_mercancia) {
                                 $new_mercancia = new Mercancia();
@@ -261,8 +261,6 @@ class AperturaController extends AbstractController
                                     $obj_mercancia
                                         ->setExistencia($existencia_actualizada)
                                         ->setActivo(true)
-//                                    ->setCuenta($cuenta_inventario)
-//                                    ->setNroSubcuentaInventario($subcuenta_inventario)
                                         ->setImporte($importe_actualizado);
                                     $movimiento_mercancia
                                         ->setIdMercancia($obj_mercancia)
@@ -308,7 +306,7 @@ class AperturaController extends AbstractController
                                 'id_cuenta' => $obj_cuenta_inv
                             ]);
                             $asiento_inv = AuxFunctions::createAsiento($em, $obj_cuenta_inv, $obj_subcuenta_inv, $documento,
-                                $obj_unidad, $obj_almacen, null, null, null, null,
+                                $obj_unidad, $obj_almacen, $movimiento_mercancia->getIdCentroCosto(), null, null, null,
                                 null, 0, 0, $obj_date, $obj_date->format('Y'), 0,
                                 $importe_mercancia, 'AP-' . $consecutivo);
                         }
@@ -323,6 +321,7 @@ class AperturaController extends AbstractController
                                 ->setIdAlmacen($obj_almacen)
                                 ->setCantidad($cantidad_mercancia)
                                 ->setFecha($obj_date)
+                                ->setIdCentroCosto($centro_costo_er->find(intval($centro_costo))?$centro_costo_er->find(intval($centro_costo)):null)
                                 ->setIdDocumento($documento)
                                 ->setIdTipoDocumento($obj_tipo_documento)
                                 ->setIdUsuario($this->getUser());
@@ -429,11 +428,11 @@ class AperturaController extends AbstractController
             } else {
                 return new JsonResponse(['success' => false, 'msg' => 'Usted no es empleado de la empresa.']);
             }
-//            }
+
         }
         return $this->render('contabilidad/inventario/apertura/form.html.twig', [
             'controller_name' => 'CRUDAjusteEntrada',
-            'formulario' => $form->createView()
+            'formulario' => $form->createView(),
         ]);
     }
 
@@ -501,10 +500,24 @@ class AperturaController extends AbstractController
                 );
             }
         }
+
+        $row_centro_costo = [];
+        $centro_costo = $em->getRepository(CentroCosto::class)->findBy([
+            'id_unidad'=>AuxFunctions::getUnidad($em,$this->getUser()),
+            'activo'=>true
+        ]);
+        /** @var CentroCosto $item */
+        foreach ($centro_costo as $item){
+            $row_centro_costo[]=[
+                'id'=>$item->getId(),
+                'nombre'=>$item->getCodigo().' - '.$item->getNombre()
+            ];
+        }
         return new JsonResponse([
             'cuentas_inventario' => $row_inventario,
             'cuentas_acreedoras' => $row_acreedoras,
             'monedas' => $rows,
+            'centro_costo' => $row_centro_costo,
             'success' => true
         ]);
     }

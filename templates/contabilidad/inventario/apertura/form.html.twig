@@ -49,13 +49,17 @@
 
                 {{ form_start(formulario.mercancia, {'attr':{'id':'form_mercancia','autocomplete':"off"}}) }}
                 <div class="row mt-0 p-0">
-                    <div class="col-6 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.mercancia.nro_cuenta_inventario) }}
                         {{ form_widget(formulario.mercancia.nro_cuenta_inventario) }}
                     </div>
-                    <div class="col-6 mt-0 form-group input-group input-group-sm d-block p-0">
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
                         {{ form_label(formulario.mercancia.nro_subcuenta_inventario) }}
                         {{ form_widget(formulario.mercancia.nro_subcuenta_inventario) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                        <label for="centro_costo">Centro de Costo</label>
+                        <select name="centro_costo" id="centro_costo" class="w-100 form-control ml-3"></select>
                     </div>
                     <div class="col-3 mt-0 form-group input-group input-group-sm pa-1 d-block">
                         {{ form_label(formulario.mercancia.codigo) }}
@@ -187,6 +191,7 @@
         let consecutivo = 0;
         let cuentas_inventarios = [];
         let cuentas_acreedoras = [];
+        let centro_costo = [];
         loadingModal.show()
         let list_mercancia = []
         let importe_total = 0;
@@ -339,6 +344,7 @@
                     success: function (result) {
                         cuentas_inventarios = result.cuentas_inventario
                         cuentas_acreedoras = result.cuentas_acreedoras
+                        centro_costo = result.centro_costo
                         $(result.cuentas_inventario).each(function (pos, valor) {
                             $('#ajuste_mercancia_nro_cuenta_inventario').append('<option value = "' + valor.nro_cuenta + '">' + valor.nro_cuenta + '</option>');
                         })
@@ -347,6 +353,9 @@
                         })
                         $(result.monedas).each(function (pos, valor) {
                             $('#ajuste_documento_id_moneda').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
+                        })
+                        $(result.centro_costo).each(function (pos, valor) {
+                            $('#centro_costo').append('<option value = "' + valor.id + '">' + valor.nombre + '</option>');
                         })
                         loadingModal.close()
                     },
@@ -469,6 +478,7 @@
                     error.insertAfter(element);
                 },
                 rules: {
+                    'centro_costo': "required",
                     'ajuste[mercancia][codigo]': "required",
                     'ajuste[mercancia][descripcion]': "required",
                     'ajuste[mercancia][id_unidad_medida]': "required",
@@ -478,6 +488,7 @@
                     'ajuste[mercancia][nro_subcuenta_inventario]': "required",
                 },
                 messages: {
+                    'centro_costo': 'Obligatorio!',
                     'ajuste[mercancia][codigo]': 'Obligatorio!',
                     'ajuste[mercancia][descripcion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
                     'ajuste[mercancia][id_unidad_medida]': 'Obligatorio!',
@@ -530,7 +541,7 @@
                     let descripcion = $('#ajuste_mercancia_descripcion').val()
                     let cuenta = $('#ajuste_mercancia_nro_cuenta_inventario').val()
                     let subcuenta = $('#ajuste_mercancia_nro_subcuenta_inventario').val()
-
+                    let centro_costo_aplicar = $('#centro_costo').val()
                     //validar que el codigo no se repita
                     if (list_mercancia.some(e => e.codigo === codigo)) {
                         alertTemplate('Ya existe una mercancia con el codigo: <b>' + codigo, 'danger')
@@ -544,10 +555,10 @@
                             um,
                             descripcion,
                             cuenta,
-                            subcuenta
+                            subcuenta,
+                            centro_costo_aplicar
                         })
                         importe_total += Number.parseFloat(importe)
-
                         $("#importe-total").text('$' + importe_total.toFixed(2))
                         $('#rows_mercancias').append(`<tr>
                         <td style="font-weight:400;"> ${codigo}</td>
@@ -573,8 +584,8 @@
                         $('#ajuste_mercancia_existencia_incremento').val('')
                         $('#ajuste_mercancia_nro_cuenta_inventario').val(0)
                         $('#ajuste_mercancia_nro_subcuenta_inventario').val(0)
+                        $('#centro_costo').val(0)
                     }
-
                 }
             })
 
