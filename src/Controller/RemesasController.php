@@ -311,7 +311,7 @@ class RemesasController extends AbstractController
             'id_cliente' => $idCliente,
             'id_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_REMESA,
             'nombre_servicio' => $em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_REMESA)->getNombre(),
-            'precio_servicio' => $monto,
+            'precio_servicio' => 0,
             'total' => $total,
             'data' => $data_remesa,
         );
