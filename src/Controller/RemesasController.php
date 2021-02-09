@@ -284,7 +284,7 @@ class RemesasController extends AbstractController
             'pais' => $pais,
             'servicio' => 'Remesa',
             'orden' => uniqid(),
-            'idCarrito' => count($data_remesa_existente) +1,
+            'idCarrito' => (count($data_remesa_existente) == 0)? 0: (count($data_remesa_existente)-1) +1,
             'nombreMostrar' => $ClienteBeneficiario->getPrimerNombre()." ".$ClienteBeneficiario->getPrimerApellido(),
             'montoMostrar' => $monto
         );

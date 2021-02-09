@@ -25,6 +25,7 @@ use Doctrine\ORM\Query;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Entity\SolicitudTurismo;
+use App\CoreTurismo\AuxFunctionsTurismo;
 
 class HomeController extends AbstractController
 {
@@ -43,7 +44,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/home", name="home")
      */
-    public function home()
+    public function home( EntityManagerInterface $em)
     {
         //Código del módulo de CONTABILIDAD, NO BORRAR
         $user = $this->getUser();
@@ -57,10 +58,22 @@ class HomeController extends AbstractController
             $em->flush();
         }
         //Fin del código
+        $respuesta = AuxFunctionsTurismo::isClienteOrigen($em,$user->getUsername());
+        
+        if($respuesta){
 
-        $user->getRoles();
+            $this->addFlash(
+                'error',
+                'Tiene datos en el Carrito!'
+            );
 
-        return $this->render('home/index.html.twig');
+            return $this->redirectToRoute('categorias', ['tel' => $respuesta]);
+
+        }else{
+            return $this->render('home/index.html.twig');
+        }
+
+        
     }
 
      /**
