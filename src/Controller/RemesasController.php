@@ -245,6 +245,7 @@ class RemesasController extends AbstractController
       
         $user =  $this->getUser();
         $ClienteBeneficiario = $dataBase->getRepository(ClienteBeneficiario::class)->find($id);
+        $cliente = $dataBase->getRepository(Cliente::class)->findby(['telefono' => $idCliente]);
         date_default_timezone_set('America/Santo_Domingo');
         $date = new DateTime('NOW');
 
@@ -286,7 +287,7 @@ class RemesasController extends AbstractController
             'orden' => uniqid(),
             'idCarrito' => (count($data_remesa_existente) == 0)? 0: (count($data_remesa_existente)-1) +1,
             'nombreMostrar' => $ClienteBeneficiario->getPrimerNombre()." ".$ClienteBeneficiario->getPrimerApellido(),
-            'montoMostrar' => $monto
+            'montoMostrar' => $monto 
         );
 
         $data_remesa = array_merge($data_new_remesa, $data_remesa_existente);
@@ -308,7 +309,7 @@ class RemesasController extends AbstractController
         //-- CONSTRUYO EL JSON PARA ADICIONAR AL CARRITO
         $json = array(
             'id_empleado' => $user->getId(),
-            'id_cliente' => $idCliente,
+            'id_cliente' => $cliente[0]->getId(),
             'id_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_REMESA,
             'nombre_servicio' => $em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_REMESA)->getNombre(),
             'precio_servicio' => 0,

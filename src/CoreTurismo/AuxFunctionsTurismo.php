@@ -122,7 +122,7 @@ class AuxFunctionsTurismo
         if (!empty($carrito)) {
             /** @var Carrito $obj_carrito */
                 $json = json_decode($carrito[0]->getJson());
-                return $json->id_cliente;
+                return $json->data[0]->idCliente;
         } else
             return FALSE;
     }

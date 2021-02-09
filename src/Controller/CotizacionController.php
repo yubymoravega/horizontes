@@ -42,7 +42,7 @@ class CotizacionController extends AbstractController
 
         /** @var Cliente $obj_cliente */
         $obj_cliente = $em->getRepository(Cliente::class)->find(intval($id_cliente));
-
+        
         if(!empty($data)){
             $new_cotizacion = new Cotizacion();
             $new_cotizacion
