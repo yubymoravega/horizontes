@@ -12,8 +12,6 @@ class PagosController extends AbstractController
      */
     public function index()
     {
-        return $this->render('pasarela_pago/pagos/index.html.twig', [
-            'controller_name' => 'PagosController',
-        ]);
+        return $this->render('pasarela_pago/pagos/index.html.twig', []);
     }
 }
