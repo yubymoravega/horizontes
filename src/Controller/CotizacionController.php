@@ -49,7 +49,7 @@ class CotizacionController extends AbstractController
                 ->setIdCliente($id_cliente)
                 ->setIdMoneda(1)
                 ->setDatetime(new DateTime('NOW'))
-                ->setEdit(false)
+                ->setEdit(true)
                 ->setEmpleado($nombre_empleado)
                 ->setJson(json_encode($data))
                 ->setNombreCliente($obj_cliente->getNombre())
