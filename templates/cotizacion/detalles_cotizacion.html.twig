@@ -2,7 +2,7 @@
 {% block content %}
     {% include 'breadcrumbs.html.twig' %}
 
-    <h1 class="text-confirmar" style="text-align: center; ">Checkout</h1>
+    <h1 class="text-confirmar" style="text-align: center; ">Detalles de la cotizacion</h1>
     <hr class="divider-white bg-mantis-white mb-0">
 
     <!-- Shop Checkout-->
@@ -24,14 +24,14 @@
                                                     <i>{{ item.sub_total }}</i></td>
                                             </tr>
                                             {% if item.id_servicio == 11 %}
-                                            {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta">Nombre</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Nombre</td>
                                                     <td class="text-left row-group-subconta">Primer Apellido</td>
                                                     <td class="text-left row-group-subconta">Segundo Apellido</td>
                                                     <td class="text-left row-group-subconta">Teléfono Celular</td>
                                                     <td class="text-left row-group-subconta">Teléfono Fijo</td>
-                                                    <td class="text-right row-group-subconta">Eliminar</td>
+                                                    {#                                                    <td class="text-right row-group-subconta">Eliminar</td>#}
                                                 </tr>
                                                 {% for new_item in item.data %}
                                                     <tr>
@@ -41,60 +41,81 @@
                                                         <td class="text-left">{{ new_item.telefono_celular }}</td>
                                                         <td class="text-left">{{ new_item.telefono_fijo }}</td>
                                                         <td class="text-right">
-                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="bottom" title="Eliminar"
-                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
+                                                            {#                                                            <button type="button" class="btn btn-warning btn-sm px-1"#}
+                                                            {#                                                                    data-toggle="tooltip"#}
+                                                            {#                                                                    data-placement="bottom" title="Modificar">#}
+                                                            {#                                                                <i class="fa fa-edit"></i>#}
+                                                            {#                                                            </button>#}
+                                                            {#                                                            <button type="button" class="btn btn-danger btn-sm ml-1"#}
+                                                            {#                                                                    data-toggle="tooltip"#}
+                                                            {#                                                                    data-placement="bottom" title="Eliminar"#}
+                                                            {#                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>#}
+                                                            {#                                                                <i class="fa fa-trash"></i>#}
+                                                            {#                                                            </button>#}
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
                                             {% elseif item.id_servicio == 4 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta" colspan="3">Cliente</td>
+                                                    <td class="text-left row-group-subconta" colspan="4">Cliente</td>
                                                     <td class="text-left row-group-subconta">Teléfono Celular</td>
                                                     <td class="text-left row-group-subconta">Monto</td>
-                                                    <td class="text-right row-group-subconta">Eliminar</td>
+                                                    {#                                                    <td class="text-right row-group-subconta">Eliminar</td>#}
                                                 </tr>
                                                 {% for new_item in item.data %}
-                                                        <td class="text-left" colspan="3">  <a data-toggle="collapse" href="#coll{{ new_item.orden }}" role="button"
-                                                   aria-expanded="false" aria-controls="coll{{ new_item.orden }}">
-                                                    <span style="color:white;"> <b> {{ new_item.nombreCliente }} </b></span> </br>
-                                                </a>  
+                                                    <td class="text-left" colspan="3"><a data-toggle="collapse"
+                                                                                         href="#coll{{ new_item.orden }}"
+                                                                                         role="button"
+                                                                                         aria-expanded="false"
+                                                                                         aria-controls="coll{{ new_item.orden }}">
+                                                            <span style="color:white;"> <b> {{ new_item.nombreCliente }} </b></span> </br>
+                                                        </a>
 
-                                                <div class="collapse" id="coll{{ new_item.orden }}" style="margin-top: 20px;">
+                                                        <div class="collapse" id="coll{{ new_item.orden }}"
+                                                             style="margin-top: 20px;">
 
-                                                    <ul style="list-style-type:disc">
-                                                        <li><b> Beneficiario:</b> {{ new_item.primerNombre }}  {{ new_item.primerApellido }} {{ new_item.segundoApellido }}</li>
-                            
-                                                        <li><b> Contactos:</b> {{ new_item.telefono }} - {{ new_item.telefonoCasa }} </li>
-                                                        <li><b> Identificacion:</b> {{ new_item.identificacion }} </li>
-                                                        <li><b> Direccion:</b> 
-                                                            No: {{ new_item.no }}
-                                                            y {{ new_item.y }},
-                                                            Edificio: {{ new_item.edificio }}
-                                                            Apto: {{ new_item.apto }}, Reparto:{{ new_item.apto }} </li>
-                                                            <li>
-                                                             Municipio: {{ new_item.municipio }}, Provincia: {{ new_item.provincia }} </li>
-                                                    </ul>
+                                                            <ul style="list-style-type:disc">
+                                                                <li><b>
+                                                                        Beneficiario:</b> {{ new_item.primerNombre }}  {{ new_item.primerApellido }} {{ new_item.segundoApellido }}
+                                                                </li>
 
-                                                </div>     
-                                                        </td>
+                                                                <li><b> Contactos:</b> {{ new_item.telefono }}
+                                                                    - {{ new_item.telefonoCasa }} </li>
+                                                                <li><b>
+                                                                        Identificacion:</b> {{ new_item.identificacion }}
+                                                                </li>
+                                                                <li><b> Direccion:</b>
+                                                                    No: {{ new_item.no }}
+                                                                    y {{ new_item.y }},
+                                                                    Edificio: {{ new_item.edificio }}
+                                                                    Apto: {{ new_item.apto }},
+                                                                    Reparto:{{ new_item.apto }} </li>
+                                                                <li>
+                                                                    Municipio: {{ new_item.municipio }},
+                                                                    Provincia: {{ new_item.provincia }} </li>
+                                                            </ul>
 
-                                                        <td class="text-left">{{ new_item.idCliente }}</td>
-                                                        <td class="text-left">${{ new_item.monto }}</td>
-                                                       
-                                                        
-                                                        <td class="text-right">
-                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="bottom" title="Eliminar"
-                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </td>
+                                                        </div>
+                                                    </td>
+
+                                                    <td class="text-left">{{ new_item.idCliente }}</td>
+                                                    <td class="text-left">${{ new_item.monto }}</td>
+
+
+                                                    <td class="text-right">
+                                                        {#                                                            <button type="button" class="btn btn-warning btn-sm px-1"#}
+                                                        {#                                                                    data-toggle="tooltip"#}
+                                                        {#                                                                    data-placement="bottom" title="Modificar">#}
+                                                        {#                                                                <i class="fa fa-edit"></i>#}
+                                                        {#                                                            </button>#}
+                                                        {#                                                        <button type="button" class="btn btn-danger btn-sm ml-1"#}
+                                                        {#                                                                data-toggle="tooltip"#}
+                                                        {#                                                                data-placement="bottom" title="Eliminar"#}
+                                                        {#                                                                onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>#}
+                                                        {#                                                            <i class="fa fa-trash"></i>#}
+                                                        {#                                                        </button>#}
+                                                    </td>
                                                     </tr>
                                                 {% endfor %}
                                             {% endif %}
@@ -159,9 +180,9 @@
 
     <style>
 
-    .table td, .table th {
-  padding: .75rem !important;
-}
+        .table td, .table th {
+            padding: .75rem !important;
+        }
     </style>
 
 {% endblock %}
@@ -233,6 +254,7 @@
                 window.location.href = "/cotizacion";
             });
         }
+
         function cobrar() {
             window.location.href = "/factura/pago/";
         }

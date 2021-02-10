@@ -76,7 +76,7 @@ class CotizacionController extends AbstractController
     }
 
     /**
-     * @Route("/revert-cotizacion", name="cotizacion_revert")
+     * @Route("/revert", name="cotizacion_revert")
      */
     public function revertCotizacion(EntityManagerInterface $em, Request $request)
     {
@@ -147,5 +147,45 @@ class CotizacionController extends AbstractController
         return $query;
     }
 
-    
+
+    /**
+     * @Route("/detalles-cotizacion/{id_cotizacion}", name="checkout_cotizacion")
+     */
+    public function checkout_cotizacion(EntityManagerInterface $em,$id_cotizacion)
+    {
+        $user = $this->getUser();
+        $cotizacion = $em->getRepository(Cotizacion::class)->find($id_cotizacion);
+
+        if (!$cotizacion) {
+            $this->addFlash(
+                'success',
+                'Nada a facturar'
+            );
+            return $this->redirectToRoute('cotizacion');
+        }
+
+        $data = [];
+        $total = 0;
+
+        $json = json_decode($cotizacion->getJson());
+
+        foreach ($json as $key=>$item) {
+            $json_array = json_decode($item);
+            $json_array_data = $json_array->data;
+            $data[] = [
+                'id'=>$key,
+                'servicio' => $json_array->nombre_servicio,
+                'sub_total' => number_format($json_array->total, 2),
+                'precio_servicio' => number_format($json_array->precio_servicio, 2),
+                'id_cliente' => $json_array->id_cliente,
+                'id_servicio' => $json_array->id_servicio,
+                'data' => $json_array_data
+            ];
+            $total += floatval($json_array->total);
+        }
+        return $this->render('cotizacion/detalles_cotizacion.html.twig', [
+            'carrito' => $data,
+            'total'=>number_format($total,2)
+        ]);
+    }
 }
