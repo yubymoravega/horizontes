@@ -23,27 +23,27 @@ class CotizacionController extends AbstractController
     /**
      * @Route("/", name="cotizacion")
      */
-    public function index(EntityManagerInterface $em, Request $request,PaginatorInterface $paginator)
+    public function index(EntityManagerInterface $em, Request $request, PaginatorInterface $paginator)
     {
         $nombre_empleado = $this->getUser()->getUsername();
         $carrito_er = $em->getRepository(Carrito::class);
-        $solicitudes_carrito = $carrito_er->findBy(['empleado'=>$nombre_empleado]);
+        $solicitudes_carrito = $carrito_er->findBy(['empleado' => $nombre_empleado]);
         $data = [];
         /** @var Carrito $item */
         $id_cliente = 0;
         $total = 0;
-        foreach ($solicitudes_carrito as $item){
-            $data[]=$item->getJson();
+        foreach ($solicitudes_carrito as $item) {
+            $data[] = $item->getJson();
             $json = json_decode($item->getJson());
             $id_cliente = $json->id_cliente;
-            $total+= floatval($json->total);
+            $total += floatval($json->total);
             $em->remove($item);
         }
 
         /** @var Cliente $obj_cliente */
         $obj_cliente = $em->getRepository(Cliente::class)->find(intval($id_cliente));
-        
-        if(!empty($data)){
+
+        if (!empty($data)) {
             $new_cotizacion = new Cotizacion();
             $new_cotizacion
                 ->setIdCliente($id_cliente)
@@ -58,7 +58,7 @@ class CotizacionController extends AbstractController
             $em->flush();
         }
 
-        $query = $this->getQueryCotizaciones($em,$request);
+        $query = $this->getQueryCotizaciones($em, $request);
 
         $pagination = $paginator->paginate(
             $query, /* query NOT result */
@@ -70,41 +70,38 @@ class CotizacionController extends AbstractController
 
         return $this->render('cotizacion/index.html.twig', [
             'controller_name' => 'CotizacionController',
-            'user'=>$user,
-            'pagination'=>$pagination
+            'user' => $user,
+            'pagination' => $pagination
         ]);
     }
 
     /**
-     * @Route("/revert", name="cotizacion_revert")
+     * @Route("/revert/{id_cotizacion}", name="cotizacion_revert")
      */
-    public function revertCotizacion(EntityManagerInterface $em, Request $request)
+    public function revertCotizacion(EntityManagerInterface $em, Request $request, $id_cotizacion)
     {
-        $id_cliente = 1;
-        //comenter by testing
-//        $id_cliente = $request->request->get('id_cliente');
         $cotizacion_er = $em->getRepository(Cotizacion::class);
-        $arr_cotizaciones = $cotizacion_er->findBy(['idCliente'=>$id_cliente]);
         /** @var Cotizacion $item */
-        foreach ($arr_cotizaciones as $item){
-            $data_jsons = json_decode($item->getJson());
-            foreach ($data_jsons as $element){
-                $new_carrito = new Carrito();
-                $new_carrito
-                    ->setJson($element)
-                    ->setEmpleado($this->getUser()->getUsername());
-                $em->persist($new_carrito);
-            }
-            $em->remove($item);
-        }
-        $em->flush();
+        $item = $cotizacion_er->findOneBy(['id'=>intval($id_cotizacion)]);
 
+        $data_jsons = json_decode($item->getJson());
+        foreach ($data_jsons as $element) {
+            $new_carrito = new Carrito();
+            $new_carrito
+                ->setJson($element)
+                ->setEmpleado($this->getUser()->getUsername());
+            $em->persist($new_carrito);
+        }
+        $em->remove($item);
+
+        $em->flush();
         return $this->render('home/index.html.twig', [
             'controller_name' => 'CotizacionController',
         ]);
     }
 
-    public function getQueryCotizaciones(EntityManagerInterface $em, Request $request){
+    public function getQueryCotizaciones(EntityManagerInterface $em, Request $request)
+    {
         $dql = "SELECT a FROM App:Cotizacion a ";
 
         if ($request->get('to') && $request->get('from')) {
@@ -150,7 +147,7 @@ class CotizacionController extends AbstractController
     /**
      * @Route("/detalles-cotizacion/{id_cotizacion}", name="checkout_cotizacion")
      */
-    public function checkout_cotizacion(EntityManagerInterface $em,$id_cotizacion)
+    public function checkout_cotizacion(EntityManagerInterface $em, $id_cotizacion)
     {
         $user = $this->getUser();
         $cotizacion = $em->getRepository(Cotizacion::class)->find($id_cotizacion);
@@ -168,11 +165,11 @@ class CotizacionController extends AbstractController
 
         $json = json_decode($cotizacion->getJson());
 
-        foreach ($json as $key=>$item) {
+        foreach ($json as $key => $item) {
             $json_array = json_decode($item);
             $json_array_data = $json_array->data;
             $data[] = [
-                'id'=>$key,
+                'id' => $key,
                 'servicio' => $json_array->nombre_servicio,
                 'sub_total' => number_format($json_array->total, 2),
                 'precio_servicio' => number_format($json_array->precio_servicio, 2),
@@ -184,7 +181,9 @@ class CotizacionController extends AbstractController
         }
         return $this->render('cotizacion/detalles_cotizacion.html.twig', [
             'carrito' => $data,
-            'total'=>number_format($total,2)
+            'id_cotizacion' => $id_cotizacion,
+            'editable' => $cotizacion->getEdit(),
+            'total' => number_format($total, 2)
         ]);
     }
 }
