@@ -1,116 +1,116 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+    {% include 'breadcrumbs.html.twig' %}
+    <section class="section novi-background section-66 section-sm-bottom-110 p-0">
+        <div class="container">
+            <h1 class="text-reporte">Metodo de pago</h1>
+            <hr class="divider bg-mantis">
+            <div class="cards-list">
+                <div id="efectivo" class="card 1">
+                    <div class="card_image">
+                        <img src="{{ asset('images/metodoDePago/efectivo.png') }}"/>
+                    </div>
+                    <div class="card_title title-white"></div>
+                </div>
+                <div id="tarjeta" class="card 2">
+                    <div class="card_image">
+                        <img src="{{ asset('images/metodoDePago/tarjeta.png') }}"/>
+                    </div>
+                    <div class="card_title title-white"></div>
+                </div>
+                <div id="transferencia" class="card 3">
+                    <div class="card_image">
+                        <img src="{{ asset('images/metodoDePago/transferencia.png') }}"/>
+                    </div>
+                    <div class="card_title"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <style>
+        p.texto-servicio {
+            font-size: 23px;
+            font-weight: 100;
+        }
 
-	{% include 'breadcrumbs.html.twig' %}
+        .cards-list {
+            z-index: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
 
-	<section class="section novi-background section-66 section-sm-bottom-110">
+        .card {
+            margin: 30px auto !important;
+            width: 300px;
+            height: 300px;
+            border-radius: 40px;
+            box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
+            cursor: pointer;
+            transition: 0.4s;
+        }
 
-		<div class="container">
+        .card .card_image {
+            width: inherit;
+            height: inherit;
+            border-radius: 40px;
+        }
 
-			<h1 class="text-reporte">Metodo de pago</h1>
+        .card .card_image img {
+            width: inherit;
+            height: inherit;
+            border-radius: 40px;
+            object-fit: cover;
+        }
 
-			<hr class="divider bg-mantis">
+        .card .card_title {
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 30px;
+            margin-top: -80px;
+            height: 40px;
+        }
 
-			<div class="cards-list">
+        .card:hover {
+            transform: scale(0.9, 0.9);
+            box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
+        }
 
-				<div id="monto" class="card 1">
-					<div class="card_image">
-						<img src="{{ asset('images/metodoDePago/efectivo.png') }}"/>
-					</div>
-					<div class="card_title title-white"></div>
-				</div>
+        .title-white {
+            color: white;
+        }
 
-				<div class="card 2">
-					<div class="card_image">
-						<img src="{{ asset('images/metodoDePago/tarjeta.png') }}"/>
-					</div>
-					<div class="card_title title-white"></div>
-				</div>
+        .title-black {
+            color: black;
+        }
 
-				<div id="banco" class="card 3">
-					<div class="card_image">
-						<img src="{{ asset('images/metodoDePago/transferencia.png') }}"/>
-					</div>
-					<div class="card_title"></div>
-				</div>
-
-			</div>
-		</div>
-	</section>
-
-
-	<style>
-		p.texto-servicio {
-			font-size: 23px;
-			font-weight: 100;
-		}
-		.cards-list {
-			z-index: 0;
-			width: 100%;
-			display: flex;
-			justify-content: space-around;
-			flex-wrap: wrap;
-		}
-
-		.card {
-			margin: 30px auto !important;
-			width: 300px;
-			height: 300px;
-			border-radius: 40px;
-			box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
-			cursor: pointer;
-			transition: 0.4s;
-		}
-
-		.card .card_image {
-			width: inherit;
-			height: inherit;
-			border-radius: 40px;
-		}
-
-		.card .card_image img {
-			width: inherit;
-			height: inherit;
-			border-radius: 40px;
-			object-fit: cover;
-		}
-
-		.card .card_title {
-			text-align: center;
-			border-radius: 0 0 40px 40px;
-			font-family: sans-serif;
-			font-weight: bold;
-			font-size: 30px;
-			margin-top: -80px;
-			height: 40px;
-		}
-
-		.card:hover {
-			transform: scale(0.9, 0.9);
-			box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
-		}
-
-		.title-white {
-			color: white;
-		}
-
-		.title-black {
-			color: black;
-		}
-
-		@media all and(max-width: 500px) {
-			.card-list {
-				/* On small screens, we are no longer using row direction but column */
-				flex-direction: column;
-			}
-		}
-	</style>
-
+        @media all and(max-width: 500px) {
+            .card-list {
+                /* On small screens, we are no longer using row direction but column */
+                flex-direction: column;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block javascripts %}
-	{{parent()}}
-	<script></script>
-
+    {{ parent() }}
+    <script>
+        $('#efectivo').on('click', function () {
+            let id_cotizacion = {{ id_cotizacion }}
+                window.location.href = "/pasarela-pago/efectivo/" + id_cotizacion;
+        })
+        $('#tarjeta').on('click', function () {
+            let id_cotizacion = {{ id_cotizacion }}
+                window.location.href = "/pasarela-pago/tarjeta/" + id_cotizacion;
+        })
+        $('#transferencia').on('click', function () {
+            let id_cotizacion = {{ id_cotizacion }}
+                window.location.href = "/pasarela-pago/deposito/" + id_cotizacion;
+        })
+    </script>
 {% endblock %}
