@@ -34,7 +34,7 @@
                                                 </tr>
                                                 {% for new_item in item.data %}
                                                     <tr>
-                                                        <td class="text-left">{{ new_item.nombre }}</td>
+                                                        <td class="text-left" colspan="2">{{ new_item.nombre }}</td>
                                                         <td class="text-left">{{ new_item.primer_apellido }}</td>
                                                         <td class="text-left">{{ new_item.segundo_apellido }}</td>
                                                         <td class="text-left">{{ new_item.telefono_celular }}</td>
@@ -50,7 +50,7 @@
 
                                                 </tr>
                                                 {% for new_item in item.data %}
-                                                    <td class="text-left" colspan="3"><a data-toggle="collapse"
+                                                    <td class="text-left" colspan="4"><a data-toggle="collapse"
                                                                                          href="#coll{{ new_item.orden }}"
                                                                                          role="button"
                                                                                          aria-expanded="false"
