@@ -1,175 +1,188 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-{% include 'breadcrumbs.html.twig' %}
-	
-{% set pagar = total %}
+    {% include 'breadcrumbs.html.twig' %}
 
-<h1 class="text-confirmar" style="text-align: center; ">cotización y cobros</h1>
-<hr class="divider-white bg-mantis-white">
+    {% set pagar = total %}
 
-<!-- Shop Checkout-->
-<section class="section novi-background section-20 section-sm-20" style="color:white;">
-	<div class="container">
-		<div class="rd-material-tabs checkout-tabs">
-			<div class="rd-material-tabs__container">
-				<div>
-					<div class="row justify-content-sm-center">
-						<div class="col-md-12 col-xl-12">
-							<div class="table-responsive">
-								<table class="table" style="color:white;" >
-									<thead>
-										<tr>
-											<th></th>
-											<th>Producto</th>
-											<th>Cantidad</th>
-											<th>Precio</th>
-                                           
-										</tr>
-									</thead>
-									<tbody>					
-                                         {% for iten in itens %}
+    <h1 class="text-confirmar" style="text-align: center; ">cotización y cobros</h1>
+    <hr class="divider-white bg-mantis-white">
+
+    <!-- Shop Checkout-->
+    <section class="section novi-background section-20 section-sm-20" style="color:white;">
+        <div class="container">
+            <div class="rd-material-tabs checkout-tabs">
+                <div class="rd-material-tabs__container">
+                    <div>
+                        <div class="row justify-content-sm-center">
+                            <div class="col-md-12 col-xl-12">
+                                <div class="table-responsive">
+                                    <table class="table" style="color:white;">
+                                        <thead>
                                         <tr>
-											<th>
-												<img src="images/shop/product-01-70x70.jpg" width="70" height="70" alt="">
-											</th>
-											<td class="big text-middle">
-												<h5 class="text-regular" style="color:white;"> </h5>
-													{{iten.servicio}} - ${{iten.recibir}}  {{iten.recibirMoneda}}  </br></br>                                      
-	<a  data-toggle="collapse" href="#coll{{iten.id}}" role="button" aria-expanded="false" aria-controls="coll{{iten.id}}"> 
-		<span style="color:white;"> <b> {{iten.primerNombre}} {{iten.primerApellido}} {{iten.segundoApellido}} </b><span> </br>
-	</a>  
-	
+                                            <th></th>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
 
-<div class="collapse" id="coll{{iten.id}}" style="margin-top: 20px;">
-	
-		<ul style="list-style-type:disc">
-  <li><b> Remitente:</b> {{iten.idCliente}}</li>
-  <li><b> Alternativo:</b> {{iten.alternativoNombre}} {{iten.alternativoApellido}} {{iten.alternativoSegundoApellido}}</li>
-  <li><b> Contactos:</b> {{iten.telefono}} - {{iten.telefonoCasa}}</li>
-  <li><b> Identificacion:</b> {{iten.identificacion}}</li>
-  <li><b> Direccion:</b> {{iten.calle}} No: {{iten.no}} / {{iten.entre}} y {{iten.y}},  
-   Edificio: {{iten.edificio}} Apto: {{iten.apto}}, Localidad: {{iten.reparto}}.
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for iten in itens %}
+                                            <tr>
+                                                <th>
+                                                    <img src="images/shop/product-01-70x70.jpg" width="70" height="70"
+                                                         alt="">
+                                                </th>
+                                                <td class="big text-middle">
+                                                    <h5 class="text-regular" style="color:white;"></h5>
+                                                    {{ iten.servicio }} -
+                                                    ${{ iten.recibir }}  {{ iten.recibirMoneda }} </br></br>
+                                                    <a data-toggle="collapse" href="#coll{{ iten.id }}" role="button"
+                                                       aria-expanded="false" aria-controls="coll{{ iten.id }}">
+		<span style="color:white;"> <b> {{ iten.primerNombre }} {{ iten.primerApellido }} {{ iten.segundoApellido }} </b><span> </br>
+                                                    </a>
 
-  {{iten.municipio}}. {{iten.provincia}}</li>
-</ul>
 
-</div>
-												
-											</td>
-											<td class="text-middle">1</td>
-											<td class="text-middle">{{iten.monto}} {{moneda}}</td>
-                                         
-										</tr>
-                                                 {% endfor %}			
-									</tbody> 
-								</table>
-							</div>
-							<div class="offset-top-10 text-right">
-								
-                                <p class="font-weight-bold inset-right-0 inset-xl-right-50">SubTotal: &nbsp; &nbsp; &nbsp; ${{total}} {{moneda}}</p>
-								 <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuestos: $0.00 {{moneda}}</p>
-								  <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total:$ {{total}} {{moneda}}</p>
-								  <hr class="hr-pago">
-                                 {% for data in banco %}
-								  {% set pagar = pagar - data.monto %}
-                               <p class="font-weight-bold inset-right-0 inset-xl-right-50">{{data.transaccion}} {{data.banco}}: ${{data.monto}} {{moneda}}</p>
-                                  {% endfor %}
- 
-								   {% for data in efectivo %}
-                               <p class="font-weight-bold inset-right-0 inset-xl-right-50">Efectivo: ${{data.monto}} {{moneda}}</p>
-							   <p class="font-weight-bold inset-right-0 inset-xl-right-50" style="color:#33FF33">Cambio: ${{data.cambio}} {{moneda}}</p>
-							    {% set pagar = pagar - data.monto %}
-                                  {% endfor %}
+                                                    <div class="collapse" id="coll{{ iten.id }}"
+                                                         style="margin-top: 20px;">
 
-								  <hr class="hr-pago">
-                                 
-                                <p id="texto-pagar" class="font-weight-bold inset-right-0 inset-xl-right-50">Por cobrar:$ <span id='pagar'>{{pagar}}</span> {{moneda}}</p>  
-                               
-                                     <a id="cobrar" onClick="cobrar('{{ id }}');" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
-									<span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
+                                                        <ul style="list-style-type:disc">
+                                                            <li><b> Remitente:</b> {{ iten.idCliente }}</li>
+                                                            <li><b>
+                                                                    Alternativo:</b> {{ iten.alternativoNombre }} {{ iten.alternativoApellido }} {{ iten.alternativoSegundoApellido }}
+                                                            </li>
+                                                            <li><b> Contactos:</b> {{ iten.telefono }}
+                                                                - {{ iten.telefonoCasa }}</li>
+                                                            <li><b> Identificacion:</b> {{ iten.identificacion }}</li>
+                                                            <li><b> Direccion:</b> {{ iten.calle }} No: {{ iten.no }}
+                                                                / {{ iten.entre }} y {{ iten.y }},
+                                                                Edificio: {{ iten.edificio }} Apto: {{ iten.apto }},
+                                                                Localidad: {{ iten.reparto }}.
 
-									 <a id="facturar" onClick="facturar('{{ id }}');" style="display:none;" class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn" data-index-to="1" href="#">
-									<span class="novi-icon icon mdi mdi-chevron-double-right"></span>Procesar factura</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
+                                                                {{ iten.municipio }}. {{ iten.provincia }}</li>
+                                                        </ul>
 
-<div class="modal fade" id="confirm__modal_cotizacion" data-backdrop="static" data-keyboard="false"
-     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-dark">
-                <h5 class="modal-title text-light" id="confirm__modal__title"><i class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></i>
-                    Cotizacion</h5>
-                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                                                    </div>
+
+                                                </td>
+                                                <td class="text-middle">1</td>
+                                                <td class="text-middle">{{ iten.monto }} {{ moneda }}</td>
+
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="offset-top-10 text-right">
+
+                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">SubTotal: &nbsp; &nbsp;
+                                        &nbsp; ${{ total }} {{ moneda }}</p>
+                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuestos:
+                                        $0.00 {{ moneda }}</p>
+                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">
+                                        Total:$ {{ total }} {{ moneda }}</p>
+                                    <hr class="hr-pago">
+                                    {% for data in banco %}
+                                        {% set pagar = pagar - data.monto %}
+                                        <p class="font-weight-bold inset-right-0 inset-xl-right-50">{{ data.transaccion }} {{ data.banco }}
+                                            : ${{ data.monto }} {{ moneda }}</p>
+                                    {% endfor %}
+
+                                    {% for data in efectivo %}
+                                        <p class="font-weight-bold inset-right-0 inset-xl-right-50">Efectivo:
+                                            ${{ data.monto }} {{ moneda }}</p>
+                                        <p class="font-weight-bold inset-right-0 inset-xl-right-50"
+                                           style="color:#33FF33">Cambio: ${{ data.cambio }} {{ moneda }}</p>
+                                        {% set pagar = pagar - data.monto %}
+                                    {% endfor %}
+
+                                    <hr class="hr-pago">
+
+                                    <p id="texto-pagar" class="font-weight-bold inset-right-0 inset-xl-right-50">Por
+                                        cobrar:$ <span id='pagar'>{{ pagar }}</span> {{ moneda }}</p>
+
+                                    <a id="cobrar" onClick="cobrar('{{ id }}');"
+                                       class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
+                                       data-index-to="1" href="#">
+                                        <span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
+
+                                    <a id="facturar" onClick="facturar('{{ id }}');" style="display:none;"
+                                       class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
+                                       data-index-to="1" href="#">
+                                        <span class="novi-icon icon mdi mdi-chevron-double-right"></span>Procesar
+                                        factura</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body" id="confirm__modal__body">
-               Seguro que decea agregar al carrito?
-            </div>
-            <form id="form__confirm__modal" method="post">
-                <input type="hidden" name="_method" value="DELETE">
-                <input id="_token__confirm__modal" type="hidden" name="_token" value="123...">
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar
-                </button>
-                <button type="button" class="my-0 btn btn-dark" id="confirm__modal__btn_contizacion">Aceptar
-                </button>
+        </div>
+    </section>
+
+    <div class="modal fade" id="confirm__modal_cotizacion" data-backdrop="static" data-keyboard="false"
+         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="confirm__modal__title"><i
+                                class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></i>
+                        Cotizacion</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="confirm__modal__body">
+                    Seguro que decea agregar al carrito?
+                </div>
+                <form id="form__confirm__modal" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input id="_token__confirm__modal" type="hidden" name="_token" value="123...">
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar
+                    </button>
+                    <button type="button" class="my-0 btn btn-dark" id="confirm__modal__btn_contizacion">Aceptar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
-{% block javascripts %} 
-{{parent()}}
+{% block javascripts %}
+    {{ parent() }}
 
-<script>
+    <script>
+        $(document).ready(function () {
+            if ($("#pagar").text() > 0) {
+                $("#pagar").css("color", "red");
+                $("#texto-pagar").css("color", "red");
+            } else {
+                $("#pagar").css("color", "white");
+                $("#texto-pagar").css("color", "white");
+                $("#cobrar").css("display", "none");
+                $("#facturar").css("display", "");
+            }
+        });
 
-$( document ).ready(function() {
+        function cobrar(id) {
+            window.location.href = "/factura/metodo/pago/" + id + "/" + $("#pagar").text();
 
-	if($("#pagar").text() > 0){
-    $("#pagar").css("color", "red");
-	$("#texto-pagar").css("color", "red");
-	}else{
-		$("#pagar").css("color", "white");
-	$("#texto-pagar").css("color", "white");
-	$("#cobrar").css("display", "none");
-	$("#facturar").css("display", "");
+        };
 
-	}
-   
-});
+        function facturar(id) {
 
-  function cobrar(id) {
+            window.open("/factura/virtual/" + id, '_blank');
 
-	  window.location.href = "/factura/metodo/pago/"+id+"/"+$("#pagar").text();
+            setTimeout(function () {
+                window.open("/factura/cash/" + id, '_blank');
+            }, 2000);
 
-  }; 
-
-  function facturar(id) {
-
-	    window.open("/factura/virtual/"+id, '_blank');
-
-		 setTimeout(function() { 
-          window.open("/factura/cash/"+id, '_blank');
-    }, 2000);
-
-	 setTimeout(function() { 
-           window.location.href = "/factura/end/";
-    }, 3000);
-	 
-	   
-
-  }
-
- </script>
+            setTimeout(function () {
+                window.location.href = "/factura/end/";
+            }, 3000);
+        }
+    </script>
 
 {% endblock %}

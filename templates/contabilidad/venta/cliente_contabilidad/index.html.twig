@@ -136,6 +136,7 @@
                             $('#rows_cuentas').append(`<tr>
                                     <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nro_cuenta']} </td>
                                     <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_moneda']}</td>
+                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_banco']}</td>
                                     <td><button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${list_cuentas_cliente[i]['nro_cuenta']}">
                             <i class="fa fa-minus-circle"></i>
@@ -163,27 +164,27 @@
             },
             rules: {
                 'cuentas_cliente[nro_cuenta]': "required",
-                'cuentas_cliente[id_moneda]': "required"
+                'cuentas_cliente[id_moneda]': "required",
+                'cuentas_cliente[id_banco]': "required"
             },
             messages: {
                 'cuentas_cliente[nro_cuenta]': 'Obligatorio!',
-                'cuentas_cliente[id_moneda]': 'Obligatorio!'
+                'cuentas_cliente[id_moneda]': 'Obligatorio!',
+                'cuentas_cliente[id_banco]': 'Obligatorio!'
             }
         })
         $('#btnAplicarCuenta').on('click', function () {
             if (form_cuentas.valid()) {
                 let nro_cuenta = $('#cuentas_cliente_nro_cuenta').val()
                 let moneda = $('#cuentas_cliente_id_moneda').val()
+                let banco = $('#cuentas_cliente_id_banco').val()
                 let nombre_moneda = $('#cuentas_cliente_id_moneda option:selected').text()
-                //validar que el codigo no se repita
-                // console.info(list_cuentas_cliente)
-                // if (list_cuentas_cliente.some(e => e.moneda === moneda)) {
-                //     alertTemplate('Ya existe una cuenta para la moneda: <b>' + nombre_moneda, 'danger')
-                // } else {
-                list_cuentas_cliente.push({moneda, nro_cuenta})
+                let nombre_banco = $('#cuentas_cliente_id_banco option:selected').text()
+                list_cuentas_cliente.push({moneda, nro_cuenta,banco})
                 $('#rows_cuentas').append(`<tr>
                     <td style="font-weight:400;"> ${nro_cuenta}</td>
                     <td style="font-weight:400;"> ${nombre_moneda}</td>
+                    <td style="font-weight:400;"> ${nombre_banco}</td>
                     <td> <button type="button"
                         class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${nro_cuenta}">
                         <i class="fa fa-minus-circle"></i>

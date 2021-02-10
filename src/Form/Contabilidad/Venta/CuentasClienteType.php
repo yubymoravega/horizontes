@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\Banco;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Venta\CuentasCliente;
 use Doctrine\ORM\EntityRepository;
@@ -26,6 +27,18 @@ class CuentasClienteType extends AbstractType
                 'label'=>'Moneda',
                 'required' => true,
                 'class' => Moneda::class,
+                'choice_label' => 'nombre',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('id_banco',EntityType::class,[
+                'attr' => ['class' => 'w-100'],
+                'label'=>'Banco',
+                'required' => true,
+                'class' => Banco::class,
                 'choice_label' => 'nombre',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')

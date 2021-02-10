@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\Banco;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Repository\Contabilidad\Venta\CuentasClienteRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,6 +40,11 @@ class CuentasCliente
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Banco::class)
+     */
+    private $id_banco;
 
     public function getId(): ?int
     {
@@ -89,6 +95,18 @@ class CuentasCliente
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getIdBanco(): ?Banco
+    {
+        return $this->id_banco;
+    }
+
+    public function setIdBanco(?Banco $id_banco): self
+    {
+        $this->id_banco = $id_banco;
 
         return $this;
     }
