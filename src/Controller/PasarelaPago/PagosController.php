@@ -8,10 +8,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class PagosController extends AbstractController
 {
     /**
-     * @Route("/pasarela/pago/pagos", name="pasarela_pago_pagos")
+     * @Route("/pasarela/pago/pagos/{idCotizacion}", name="pasarela_pago_pagos")
      */
-    public function index()
+    public function index($idCotizacion)
     {
-        return $this->render('pasarela_pago/pagos/index.html.twig', []);
+        return $this->render('pasarela_pago/pagos/index.html.twig', [
+            'idCotizacion' => $idCotizacion
+        ]);
     }
 }
