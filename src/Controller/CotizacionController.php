@@ -186,4 +186,48 @@ class CotizacionController extends AbstractController
             'total' => number_format($total, 2)
         ]);
     }
+
+    /**
+     * @Route("/pago", name="cotizacion_pago")
+     */
+    public function cotizacion_pago(EntityManagerInterface $em, Request $request, PaginatorInterface $paginator)
+    {
+        $nombre_empleado = $this->getUser()->getUsername();
+        $carrito_er = $em->getRepository(Carrito::class);
+        $solicitudes_carrito = $carrito_er->findBy(['empleado' => $nombre_empleado]);
+        $data = [];
+        /** @var Carrito $item */
+        $id_cliente = 0;
+        $total = 0;
+        foreach ($solicitudes_carrito as $item) {
+            $data[] = $item->getJson();
+            $json = json_decode($item->getJson());
+            $id_cliente = $json->id_cliente;
+            $total += floatval($json->total);
+            $em->remove($item);
+        }
+
+        /** @var Cliente $obj_cliente */
+        $obj_cliente = $em->getRepository(Cliente::class)->find(intval($id_cliente));
+
+        if (!empty($data)) {
+            $new_cotizacion = new Cotizacion();
+            $new_cotizacion
+                ->setIdCliente($id_cliente)
+                ->setIdMoneda(1)
+                ->setDatetime(new DateTime('NOW'))
+                ->setEdit(true)
+                ->setEmpleado($nombre_empleado)
+                ->setJson(json_encode($data))
+                ->setNombreCliente($obj_cliente->getNombre())
+                ->setTotal($total);
+            $em->persist($new_cotizacion);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('pasarela_pago_pagos',['idCotizacion' => $new_cotizacion->getId()]);
+
+
+    }
+
 }
