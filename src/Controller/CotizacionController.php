@@ -49,7 +49,7 @@ class CotizacionController extends AbstractController
                 ->setIdCliente($id_cliente)
                 ->setIdMoneda(1)
                 ->setDatetime(new DateTime('NOW'))
-                ->setEdit(true)
+                ->setEdit(false)
                 ->setEmpleado($nombre_empleado)
                 ->setJson(json_encode($data))
                 ->setNombreCliente($obj_cliente->getNombre())
@@ -146,7 +146,6 @@ class CotizacionController extends AbstractController
         $query = $em->createQuery($dql);
         return $query;
     }
-
 
     /**
      * @Route("/detalles-cotizacion/{id_cotizacion}", name="checkout_cotizacion")
