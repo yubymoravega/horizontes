@@ -5,6 +5,8 @@ namespace App\CoreTurismo;
 
 use App\Entity\Carrito;
 use App\Entity\Cliente;
+use App\Entity\Cotizacion;
+use App\Entity\PagosCotizacion;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Entity\User;
 use Container3fnRoky\get_ServiceLocator_9utEldQService;
@@ -129,5 +131,21 @@ class AuxFunctionsTurismo
                     return $json->data[0]->idCliente;
         } else
             return FALSE;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param int $id_cotizacion
+     * @return float|int resto de la cotizacion(lo que queda en cuenta por cobrar)
+     */
+    public static function getResto(EntityManagerInterface $em,int $id_cotizacion){
+        $cotizacion = $em->getRepository(Cotizacion::class)->find($id_cotizacion);
+        $pagos_cotizacion = $em->getRepository(PagosCotizacion::class)->findBy(['idCotizacion'=>$id_cotizacion]);
+        /** @var PagosCotizacion $item */
+        $total_pagado = 0;
+        foreach ($pagos_cotizacion as $item){
+            $total_pagado+=floatval($item->getMonto());
+        }
+        return floatval($cotizacion->getTotal())-$total_pagado;
     }
 }
