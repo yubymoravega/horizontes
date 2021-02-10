@@ -225,7 +225,7 @@ class CotizacionController extends AbstractController
             $em->flush();
         }
 
-        return $this->redirectToRoute('pasarela_pago_pagos',['idCotizacion' => $new_cotizacion->getId()]);
+        return $this->redirectToRoute('pasarela_pago_pagos',['id_cotizacion' => $new_cotizacion->getId()]);
 
 
     }
