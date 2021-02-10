@@ -19,7 +19,7 @@ class EfectivoController extends AbstractController
     {
         return $this->render('pasarela_pago/pagos/efectivo/index.html.twig', [
             'controller_name' => 'EfectivoController',
-            'id_cotizacion'=>$id_cotizacion
+            'id_cotizacion'=>$id_cotizacion, 'monto' => 50
         ]);
     }
 }
