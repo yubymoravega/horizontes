@@ -32,11 +32,12 @@ class DepositoType extends AbstractType
             ])
             ->add('nro_transaccion', TextType::class, [
                 'attr' => ['class' => 'w-100'],
-                'label' => 'No. Transacción',
+//                'label' => 'No. Transacción',
             ])
             ->add('nota', TextType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Nota',
+                'required'=>false
             ]);
     }
 

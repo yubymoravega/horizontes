@@ -36,7 +36,7 @@
             </div>
             <div class="form-row">
                 <div class="form-group input-group input-group-sm d-block col-md-12">
-                    {{ form_label(form.nro_transaccion) }}
+                    <label for="deposito_nro_transaccion" id="label_nro_transaccion" class="required">Nro. transacción</label>
                     {{ form_widget(form.nro_transaccion,{'attr': {'class': 'form-control w-100'}}) }}
                 </div>
             </div>
@@ -83,29 +83,48 @@
                 })
             })
             $('#deposito_transaccion').on('change', function () {
-                if ($('#deposito_transaccion').val() == 1)
-                    changeStatus('disable');
-                else
+                if ($('#deposito_transaccion').val() == 1){
+                    $('#label_nro_transaccion').text('Email de origen')
+                    changeStatus('disable')
+                }
+                else{
+                    $('#label_nro_transaccion').text('Nro. transacción')
                     changeStatus('enable')
-
+                }
             })
         })
 
         $("#banco").validate({
-            errorLabelContainer: "#messageBox",
-            wrapper: "li",
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                // colocar mensajes de error a la derecha de cada label para el componente
+                const error_label = element.closest("form").find(element.attr('id') + "-error")
+                if (error_label.length) {
+                    error_label.removeClass('hide')
+                } else {
+                    error.addClass('ml-3')
+                    error.css('position','fixed')
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+                }
+            },
             rules: {
-                'monto': {required: true},
-                'banco': {required: true},
-                'id': {required: true},
+                'deposito[transaccion]': "required",
+                'deposito[monto]': "required",
+                'deposito[nro_transaccion]': "required",
+                'deposito[banco]': "required",
+                'deposito[cuenta]': "required",
             },
             messages: {
-                'monto': {required: "Monto Requerido"},
-                'banco': {required: "Banco Requerido"},
-                'id': {required: "No. Transaccion Requerido"},
-
+                'deposito[cuenta]': '!Obligatorio',
+                'deposito[banco]': '!Obligatorio',
+                'deposito[transaccion]': '!Obligatorio',
+                'deposito[monto]': '!Obligatorio',
+                'deposito[nro_transaccion]': '!Obligatorio',
             }
-        });
+        })
 
         function changeStatus(status) {
             $('#deposito_banco').val(0)
@@ -118,6 +137,7 @@
                 $('#deposito_cuenta').enable(false)
             }
         }
+
     </script>
 
 {% endblock %}
