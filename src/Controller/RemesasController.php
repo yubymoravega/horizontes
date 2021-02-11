@@ -169,7 +169,10 @@ class RemesasController extends AbstractController
 
         return $this->render(
             'remesas/beneficiarios.html.twig',
-            ['pais' => $pais, 'monedaPais'=>$array, 'moneda' => $moneda, 'pagination' => $pagination, 'id' =>  $data[0]->getTelefono(), 'nombre' =>  $data[0]->getNombre(), 'apellido' => $data[0]->getApellidos()]
+            ['pais' => $pais, 'monedaPais'=>$array, 
+            'moneda' => $moneda, 'pagination' => $pagination, 
+            'id' =>  $data[0]->getTelefono(), 'nombre' =>  $data[0]->getNombre(),
+             'apellido' => $data[0]->getApellidos()]
         );
     }
 
