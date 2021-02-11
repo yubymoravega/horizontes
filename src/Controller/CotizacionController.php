@@ -53,6 +53,7 @@ class CotizacionController extends AbstractController
                 ->setEmpleado($nombre_empleado)
                 ->setJson(json_encode($data))
                 ->setNombreCliente($obj_cliente->getNombre())
+                ->setPagado(false)
                 ->setTotal($total);
             $em->persist($new_cotizacion);
             $em->flush();
@@ -102,7 +103,7 @@ class CotizacionController extends AbstractController
 
     public function getQueryCotizaciones(EntityManagerInterface $em, Request $request)
     {
-        $dql = "SELECT a FROM App:Cotizacion a ";
+        $dql = "SELECT a FROM App:Cotizacion a WHERE a.pagado = FALSE";
 
         if ($request->get('to') && $request->get('from')) {
 
@@ -112,7 +113,7 @@ class CotizacionController extends AbstractController
             $from = str_replace('/', "-", $request->get('from'));
             $from = $from[6] . $from[7] . $from[8] . $from[9] . '-' . $from[0] . $from[1] . '-' . $from[3] . $from[4];
 
-            $dql .= " WHERE a.datetime between '$from 00:00:00' AND '$to 23:59:59'";
+            $dql .= " AND a.datetime between '$from 00:00:00' AND '$to 23:59:59'";
 
             if ($request->get('empleado')) {
 
@@ -125,7 +126,7 @@ class CotizacionController extends AbstractController
             }
         } elseif ($request->get('empleado')) {
 
-            $dql .= " WHERE  a.empleado = '" . $request->get('empleado') . "'";
+            $dql .= " AND  a.empleado = '" . $request->get('empleado') . "'";
 
             if ($request->get('telefono')) {
 
@@ -135,7 +136,7 @@ class CotizacionController extends AbstractController
 
             if ($request->get('telefono')) {
 
-                $dql .= " WHERE  a.idCliente ='" . $request->get('telefono') . "'";
+                $dql .= " AND  a.idCliente ='" . $request->get('telefono') . "'";
             }
         }
 
@@ -220,6 +221,7 @@ class CotizacionController extends AbstractController
                 ->setEmpleado($nombre_empleado)
                 ->setJson(json_encode($data))
                 ->setNombreCliente($obj_cliente->getNombre())
+                ->setPagado(false)
                 ->setTotal($total);
             $em->persist($new_cotizacion);
             $em->flush();

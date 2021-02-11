@@ -17,6 +17,7 @@ use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Venta\Factura;
+use App\Entity\Cotizacion;
 use App\Repository\Contabilidad\General\AsientoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -151,6 +152,11 @@ class Asiento
      * @ORM\ManyToOne(targetEntity=AreaResponsabilidad::class)
      */
     private $id_area_responsabilidad;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Cotizacion::class)
+     */
+    private $id_cotizacion;
 
     public function getId(): ?int
     {
@@ -417,6 +423,18 @@ class Asiento
     public function setIdAreaResponsabilidad(?AreaResponsabilidad $id_area_responsabilidad): self
     {
         $this->id_area_responsabilidad = $id_area_responsabilidad;
+
+        return $this;
+    }
+
+    public function getIdCotizacion(): ?Cotizacion
+    {
+        return $this->id_cotizacion;
+    }
+
+    public function setIdCotizacion(?Cotizacion $id_cotizacion): self
+    {
+        $this->id_cotizacion = $id_cotizacion;
 
         return $this;
     }

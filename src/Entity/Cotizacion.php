@@ -57,6 +57,16 @@ class Cotizacion
      */
     private $idMoneda;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $pagado;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_factura;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,6 +164,30 @@ class Cotizacion
     public function setIdMoneda(string $idMoneda): self
     {
         $this->idMoneda = $idMoneda;
+
+        return $this;
+    }
+
+    public function getPagado(): ?bool
+    {
+        return $this->pagado;
+    }
+
+    public function setPagado(?bool $pagado): self
+    {
+        $this->pagado = $pagado;
+
+        return $this;
+    }
+
+    public function getIdFactura(): ?int
+    {
+        return $this->id_factura;
+    }
+
+    public function setIdFactura(?int $id_factura): self
+    {
+        $this->id_factura = $id_factura;
 
         return $this;
     }
