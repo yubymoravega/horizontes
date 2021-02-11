@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Class ElementosVisaController
  * @package App\Controller\TurismoModule\Visado
- * @Route("/turismo/gestion-consular/elementos-visa")
+ * @Route("/configuracion-turismo/gestion-consular/elementos-visa")
  */
 class ElementosVisaController extends AbstractController
 {

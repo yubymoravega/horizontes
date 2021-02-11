@@ -21,7 +21,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Class EstadoSolicitudController
  * @package App\Controller\TurismoModule\Visado
- * @Route("/turismo/gestion-consular/estados-solicitudes")
+ * @Route("/configuracion-turismo/gestion-consular/estados-solicitudes")
  */
 class EstadoSolicitudController extends AbstractController
 {

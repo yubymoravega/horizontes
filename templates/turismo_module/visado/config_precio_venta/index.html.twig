@@ -87,7 +87,7 @@
             </div>
             <div class="d-flex mt-2">
                 <div class="mr-auto">
-                    <a href="{{ url('turismo_module') }}"
+                    <a href="{{ url('turismo_module_configuracion') }}"
                        class="btn btn-outline-secondary">Salir</a>
                 </div>
                 <div class="ml-2">
@@ -110,7 +110,7 @@
             const listado = JSON.stringify(list_servicios_creditos)
             form.append(`<input type="text" hidden name="mercancias" value='${listado}' />`)
             form.attr('method', `POST`)
-            form.attr('action', `/turismo/gestion-consular/config-precio-venta/save`)
+            form.attr('action', `/configuracion-turismo/gestion-consular/config-precio-venta/save`)
             // loadingModal.show()
             form.submit()
             // } else

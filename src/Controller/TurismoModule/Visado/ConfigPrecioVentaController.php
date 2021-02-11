@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Encoder\JsonDecode;
 /**
  * Class ConfigPrecioVentaController
  * @package App\Controller\TurismoModule\Visado
- * @Route("/turismo/gestion-consular/config-precio-venta")
+ * @Route("/configuracion-turismo/gestion-consular/config-precio-venta")
  */
 class ConfigPrecioVentaController extends AbstractController
 {
@@ -151,6 +151,6 @@ class ConfigPrecioVentaController extends AbstractController
 
         $em->flush();
 
-        return $this->redirectToRoute('turismo_module');
+        return $this->redirectToRoute('turismo_module_configuracion');
     }
 }

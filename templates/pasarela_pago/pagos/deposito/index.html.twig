@@ -1,94 +1,124 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-
-<section class="section-lg-50 novi-background " id='seccion-principal'>
-
-	<div class="card-header text-center">
-		<img class="imagen-efectivo" src="{{ asset('images/iconos/money.svg') }}">
-		<h2>Pagos Bancarios</h2>
-	</div>
-	<hr class="divider bg-mantis">
-    <div class="container d-flex justify-content-center" style="margin-bottom: 30px;">
-     <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger " role="alert"></div>
-     </div>
-	<div class="container d-flex justify-content-center">
-              
-		<form id="banco"  method="POST">
-			<div class="form-row">
-				<div class="form-group col-md-6">
-					<label style="color:white;" for="inputState">Transaccion</label>
-					<select name="select" style="height: 38px;" id="inputState" class="form-control">
-						<option value="Deposito">Deposito</option>
-                        <option value="zeller">zeller</option>
-                        <option value="Tranferencia" selected>Tranferencia</option>
-						
-					</select>
-				</div>
-				<div class="form-group col-md-6">
-					<label style="color:white;">Monto</label>
-					<input name='monto' class="form-control" placeholder="Monto">
-				</div>
-			</div>
-
-			<div class="form-row">
-				<div class="form-group col-md-6">
-					<label style="color:white;" for="inputCity">Banco</label>
-					<input name='banco' type="text" class="form-control" id="inputCity">
-				</div>
-			
-				<div class="form-group col-md-6">
-					<label style="color:white;" for="inputZip">Cuenta</label>
-					<input name='cuenta' type="text" class="form-control" id="inputZip">
-				</div>
-			</div>
-
+    <section class="section-lg-50 novi-background " id='seccion-principal'>
+        <div class="card-header text-center">
+            <img class="imagen-efectivo" src="{{ asset('images/iconos/money.svg') }}">
+            <h2>Pagos Bancarios</h2>
+        </div>
+        <hr class="divider bg-mantis">
+        <div class="container d-flex justify-content-center" style="margin-bottom: 30px;">
+            <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger "
+                 role="alert"></div>
+        </div>
+        <div class="container d-flex justify-content-center ">
+            {{ form_start(form,{'attr': {'class': 'text-left text-white w-75','id':'banco','method':'POST','autocomplete':"off"}}) }}
             <div class="form-row">
-				<div class="form-group col-md-12">
-					<label style="color:white;" for="inputCity">No. Transaccion</label>
-					<input name='id' type="text" class="form-control" id="inputCity">
-				</div>
-			</div>
+                <div class="form-group input-group input-group-sm d-block col-md-6">
+                    {{ form_label(form.transaccion) }}
+                    {{ form_widget(form.transaccion,{'attr': {'class': 'form-control w-100'}}) }}
+                </div>
+                <div class="form-group input-group input-group-sm d-block col-md-6">
+                    {{ form_label(form.monto) }}
+                    {{ form_widget(form.monto,{'attr': {'class': 'form-control w-100'}}) }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group input-group input-group-sm d-block col-md-6">
+                    {{ form_label(form.banco) }}
+                    {{ form_widget(form.banco,{'attr': {'class': 'form-control w-100'}}) }}
+                </div>
 
+                <div class="form-group input-group input-group-sm d-block col-md-6">
+                    {{ form_label(form.cuenta) }}
+                    {{ form_widget(form.cuenta,{'attr': {'class': 'form-control w-100'}}) }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group input-group input-group-sm d-block col-md-12">
+                    {{ form_label(form.nro_transaccion) }}
+                    {{ form_widget(form.nro_transaccion,{'attr': {'class': 'form-control w-100'}}) }}
+                </div>
+            </div>
             <div class="form-row" style="margin-top: 11px;">
-				<div class="form-group col-md-12">
-					<label style="color:white;" for="inputCity">Nota</label>
-					<input name='nota' type="text" class="form-control" id="inputCity">
-				</div>
-			</div>
-        <div class="col d-flex justify-content-center container" style='margin-top: 25px;'>
-							<button id="procesar" type="submit" class="btn btn-dark">Procesar</button>
-						</div>
-		</form>
-	</div>
-</section>
+                <div class="form-group input-group input-group-sm d-block col-md-12">
+                    {{ form_label(form.nota) }}
+                    {{ form_widget(form.nota,{'attr': {'class': 'form-control w-100'}}) }}
+                </div>
+            </div>
+            <div class="col d-flex justify-content-center container" style='margin-top: 25px;'>
+                <button id="procesar" type="submit" class="btn btn-dark">Procesar</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </section>
 
 {% endblock %}
 
-{% block javascripts %} 
-{{parent()}}
+{% block javascripts %}
+    {{ parent() }}
 
-<script>
+    <script>
+        let cuentas_bancarias = []
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        changeStatus('disable')
 
-$("#banco").validate({
-   errorLabelContainer: "#messageBox",
-    wrapper: "li",
-    rules: {
-      'monto': {required: true},
-      'banco': {required: true},
-      'id': {required: true},
-      
-      
-    },
+        $(document).ready(function () {
+            const bancos = JSON.parse('{{ bancos|json_encode()|raw }}')
+            cuentas_bancarias = bancos
+            bancos.forEach(function (valor) {
+                    $('#deposito_banco').append('<option value = "' + valor.id_banco + '">' + valor.banco + '</option>')
+                }
+            )
 
-    messages: {
-      'monto': {required: "Monto Requerido" },
-      'banco': {required: "Banco Requerido" },
-      'id': {required: "No. Transaccion Requerido" },
-      
-}});
-     
- </script>
+            $('#deposito_banco').on('change', function () {
+                $('#deposito_cuenta').find('option').remove()
+                $('#deposito_cuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+                cuentas_bancarias.forEach(function (valor, pos) {
+                    if ($('#deposito_banco').val() == valor.id_banco) {
+                        for (var i = 0; i < valor.cuentas.length; i++) {
+                            $('#deposito_cuenta').append('<option value = "' + valor.cuentas[i]['id_cuenta'] + '">' + valor.cuentas[i]['nro_cuenta'] + '</option>');
+                        }
+                    }
+                })
+            })
+            $('#deposito_transaccion').on('change', function () {
+                if ($('#deposito_transaccion').val() == 1)
+                    changeStatus('disable');
+                else
+                    changeStatus('enable')
+
+            })
+        })
+
+        $("#banco").validate({
+            errorLabelContainer: "#messageBox",
+            wrapper: "li",
+            rules: {
+                'monto': {required: true},
+                'banco': {required: true},
+                'id': {required: true},
+            },
+            messages: {
+                'monto': {required: "Monto Requerido"},
+                'banco': {required: "Banco Requerido"},
+                'id': {required: "No. Transaccion Requerido"},
+
+            }
+        });
+
+        function changeStatus(status) {
+            $('#deposito_banco').val(0)
+            $('#deposito_cuenta').val(0)
+            if (status == 'enable') {
+                $('#deposito_banco').enable()
+                $('#deposito_cuenta').enable()
+            } else {
+                $('#deposito_banco').enable(false)
+                $('#deposito_cuenta').enable(false)
+            }
+        }
+    </script>
 
 {% endblock %}
 

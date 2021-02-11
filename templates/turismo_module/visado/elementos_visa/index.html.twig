@@ -1,4 +1,4 @@
-{% extends 'turismo_module/visado/index.html.twig' %}
+{% extends 'turismo_module/index.html.twig' %}
 {% block style %}
     <style>
         label {
@@ -138,7 +138,7 @@
             $('#modal__btn__aceptar').on('click', function () {
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/turismo/gestion-consular/elementos-visa/add`)
+                formulario.attr('action', `/configuracion-turismo/gestion-consular/elementos-visa/add`)
                 formulario.submit()
                 //if (validateForm.errorList.length === 0) loadingModal.show()
             })
@@ -147,7 +147,7 @@
                 const id_elemento = $('#id_elemento').val()
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/turismo/gestion-consular/elementos-visa/upd/${id_elemento}`)
+                formulario.attr('action', `/configuracion-turismo/gestion-consular/elementos-visa/upd/${id_elemento}`)
                 formulario.submit()
                 //if (validateForm.errorList.length === 0) loadingModal.show()
             })

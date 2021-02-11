@@ -131,8 +131,8 @@ class SolucitudController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Solicitud adicionada al carrito');
-
-        return $this->redirectToRoute('turismo_module');
+        //aqui
+        return  $this->render('home/categoriaTurismo.html.twig',['tel' => $obj_trabajo_tmp->getIdCliente()->getTelefono()]);
     }
 
     /**

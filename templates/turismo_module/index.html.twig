@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+{% block title %} Turismo | Configuración {% endblock %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block navBar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal">| Configuración de Servicios |</a>
+        <button class="navbar-toggler order-md-2" type="button" data-toggle="collapse"
+                data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Gestión Consular
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url('turismo_module_visado_proveedor') }}">Proveedores</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_estado_solicitud') }}">Estados de las Solicitudes</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Gestión Consular</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_elementos_visa') }}">Costo de Elementos</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_config_precio_venta') }}">Precio de Venta</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Transfer
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url('turismo_module_visado_proveedor') }}">Proveedores</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_estado_solicitud') }}">Estados de las Solicitudes</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Gestión Consular</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_elementos_visa') }}">Costo de Elementos</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_config_precio_venta') }}">Precio de Venta</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Modal -->
+{% endblock %}

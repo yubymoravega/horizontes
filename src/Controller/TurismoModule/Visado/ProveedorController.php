@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Class ProveedorController
  * @package App\Controller\TurismoModule\Visado
- * @Route("/turismo/gestion-consular/proveedores")
+ * @Route("/configuracion-turismo/gestion-consular/proveedores")
  */
 class ProveedorController extends AbstractController
 {

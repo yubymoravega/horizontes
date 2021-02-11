@@ -38,21 +38,21 @@ class VisadoController extends AbstractController
 //            'id_cliente'=>$id_cliente
 //        ]);
 //    }
-    /**
-     * @Route("/gestion-consular", name="turismo_module")
-     */
-    public function indexDashboard(EntityManagerInterface $em,Request $request)
-    {
-        /** @var Cliente $obj_cliente */
-        $cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
-        return $this->render('turismo_module/visado/index.html.twig', [
-            'controller_name' => 'TurismoController',
-            'telefono'=>$cliente->getTelefono(),
-            'nombre'=> $cliente->getNombre(),
-            'apellidos'=>$cliente->getApellidos(),
-            'correo'=>$cliente->getCorreo(),
-            'direccion'=>$cliente->getDireccion(),
-            'id_cliente'=>$cliente->getId()
-        ]);
-    }
+//    /**
+//     * @Route("/gestion-consular", name="turismo_module")
+//     */
+//    public function indexDashboard(EntityManagerInterface $em,Request $request)
+//    {
+//        /** @var Cliente $obj_cliente */
+//        $cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
+//        return $this->render('turismo_module/visado/index.html.twig', [
+//            'controller_name' => 'TurismoController',
+//            'telefono'=>$cliente->getTelefono(),
+//            'nombre'=> $cliente->getNombre(),
+//            'apellidos'=>$cliente->getApellidos(),
+//            'correo'=>$cliente->getCorreo(),
+//            'direccion'=>$cliente->getDireccion(),
+//            'id_cliente'=>$cliente->getId()
+//        ]);
+//    }
 }

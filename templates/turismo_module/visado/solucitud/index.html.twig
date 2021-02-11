@@ -100,8 +100,7 @@
             </div>
             <div class="d-flex mt-2">
                 <div class="mr-auto">
-                    <a href="{{ url('turismo_module') }}"
-                       class="btn btn-outline-secondary">Salir</a>
+                    <a class="btn btn-outline-secondary" id="salir">Salir</a>
                 </div>
                 <div class="ml-2">
                     <button class='my-0 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
@@ -135,6 +134,9 @@
             $('#solicitud_telefono_fijo').prop('disabled', false)
         }
 
+        $('#salir').on('click',function () {
+            window.location.href = "/categorias/turismo/" +{{ telefono }};
+        })
         $('#owner_client').on('change', function () {
             if ($(this).is(':checked')) {
                 let nombre = $('#nombre').val()
