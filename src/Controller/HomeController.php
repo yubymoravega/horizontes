@@ -26,6 +26,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Entity\SolicitudTurismo;
 use App\CoreTurismo\AuxFunctionsTurismo;
+use App\Entity\Cliente; 
 
 class HomeController extends AbstractController
 {
@@ -62,12 +63,14 @@ class HomeController extends AbstractController
         
         if($respuesta){
 
+         $cliente = $em->getRepository(Cliente::class)->find($respuesta);
+
             $this->addFlash(
                 'error',
                 'Tiene datos en el Carrito!'
             );
 
-            return $this->redirectToRoute('categorias', ['tel' => $respuesta]);
+            return $this->redirectToRoute('categorias', ['tel' => $cliente->getTelefono()]);
 
         }else{
             return $this->render('home/index.html.twig');
