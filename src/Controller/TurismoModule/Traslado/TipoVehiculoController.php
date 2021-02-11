@@ -5,10 +5,15 @@ namespace App\Controller\TurismoModule\Traslado;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class TipoVehiculoController
+ * @package App\Controller\TurismoModule\Traslado
+ * @Route("/configuracion-turismo/traslado/tipo-vehiculo")
+ */
 class TipoVehiculoController extends AbstractController
 {
     /**
-     * @Route("/turismo/module/traslado/tipo/vehiculo", name="turismo_module_traslado_tipo_vehiculo")
+     * @Route("/", name="turismo_module_traslado_tipo_vehiculo")
      */
     public function index()
     {
