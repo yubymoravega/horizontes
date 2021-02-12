@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\PagosCotizacion;
+use App\Entity\Cotizacion;
 use \Datetime;
 
 /**
@@ -29,13 +30,17 @@ class EfectivoController extends AbstractController
     } 
 
     /**
-     * @Route("/save/{id_cotizacion}/{$cambio}", name="pasarela_pago_pagos_efectivo_save")
+     * @Route("/save/{id_cotizacion}/{cambio}", name="pasarela_pago_pagos_efectivo_save")
      */
     public function pasarela_pago_pagos_efectivo_save(EntityManagerInterface $em, $id_cotizacion,$cambio)
     {
+      
       $cotizacionResto = AuxFunctionsTurismo::getResto($em,$id_cotizacion);
       
       $PagosCotizacion = new PagosCotizacion();
+      $Cotizacion = $em->getRepository(Cotizacion::class)->find($id_cotizacion);
+      $Cotizacion->setEdit(0);
+      $em->flush($Cotizacion);
 
             date_default_timezone_set('America/Santo_Domingo');
             $date = new DateTime('NOW');
