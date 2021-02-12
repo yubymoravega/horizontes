@@ -53,6 +53,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\Entity;
+use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\ErrorHandler\Error\FatalError;
@@ -3176,7 +3177,7 @@ class AuxFunctions
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
                                          int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
                                          Factura $id_factura = null, ActivoFijo $id_activo = null, AreaResponsabilidad $id_area_responsabilidad = null,
-                                         RegistroComprobantes $comprobante = null)
+                                         RegistroComprobantes $comprobante = null,int $orden)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -3201,7 +3202,9 @@ class AuxFunctions
             ->setIdActivoFijo($id_activo)
             ->setIdAreaResponsabilidad($id_area_responsabilidad)
             ->setIdComprobante($comprobante)
-            ->setIdTipoComprobante($comprobante ? $comprobante->getIdTipoComprobante() : null);
+            ->setIdTipoComprobante($comprobante ? $comprobante->getIdTipoComprobante() : null)
+            ->setOrdenOperacion($orden)
+        ;
         $em->persist($new_asiento);
         return $new_asiento;
     }

@@ -18,6 +18,7 @@ use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Venta\Factura;
 use App\Entity\Cotizacion;
+use App\Entity\TurismoModule\Visado\ElementosVisa;
 use App\Repository\Contabilidad\General\AsientoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -157,6 +158,16 @@ class Asiento
      * @ORM\ManyToOne(targetEntity=Cotizacion::class)
      */
     private $id_cotizacion;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $orden_operacion;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ElementosVisa::class)
+     */
+    private $id_elemento_visa;
 
     public function getId(): ?int
     {
@@ -435,6 +446,30 @@ class Asiento
     public function setIdCotizacion(?Cotizacion $id_cotizacion): self
     {
         $this->id_cotizacion = $id_cotizacion;
+
+        return $this;
+    }
+
+    public function getOrdenOperacion(): ?int
+    {
+        return $this->orden_operacion;
+    }
+
+    public function setOrdenOperacion(?int $orden_operacion): self
+    {
+        $this->orden_operacion = $orden_operacion;
+
+        return $this;
+    }
+
+    public function getIdElementoVisa(): ?ElementosVisa
+    {
+        return $this->id_elemento_visa;
+    }
+
+    public function setIdElementoVisa(?ElementosVisa $id_elemento_visa): self
+    {
+        $this->id_elemento_visa = $id_elemento_visa;
 
         return $this;
     }

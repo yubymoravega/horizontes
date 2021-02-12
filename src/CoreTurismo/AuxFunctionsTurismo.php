@@ -3,11 +3,16 @@
 namespace App\CoreTurismo;
 
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Carrito;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\Servicios;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Cotizacion;
 use App\Entity\PagosCotizacion;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
+use App\Entity\TurismoModule\Visado\ElementosVisa;
 use App\Entity\User;
 use Container3fnRoky\get_ServiceLocator_9utEldQService;
 use Doctrine\ORM\EntityManager;
@@ -138,25 +143,163 @@ class AuxFunctionsTurismo
      * @param int $id_cotizacion
      * @return float|int resto de la cotizacion(lo que queda en cuenta por cobrar)
      */
-    public static function getResto(EntityManagerInterface $em,int $id_cotizacion){
+    public static function getResto(EntityManagerInterface $em, int $id_cotizacion)
+    {
         $cotizacion = $em->getRepository(Cotizacion::class)->find($id_cotizacion);
-        $pagos_cotizacion = $em->getRepository(PagosCotizacion::class)->findBy(['idCotizacion'=>$id_cotizacion]);
+        $pagos_cotizacion = $em->getRepository(PagosCotizacion::class)->findBy(['idCotizacion' => $id_cotizacion]);
         /** @var PagosCotizacion $item */
         $total_pagado = 0;
-        foreach ($pagos_cotizacion as $item){
-            $total_pagado+=floatval($item->getMonto());
+        foreach ($pagos_cotizacion as $item) {
+            $total_pagado += floatval($item->getMonto());
         }
-        return floatval($cotizacion->getTotal())-$total_pagado;
+        return floatval($cotizacion->getTotal()) - $total_pagado;
     }
 
-    public static function asentarCotizacion(EntityManagerInterface $em,Cotizacion $obj_cotizacion){
+    public static function asentarCotizacion(EntityManagerInterface $em, Cotizacion $obj_cotizacion, User $usuario)
+    {
         $data_jsons = json_decode($obj_cotizacion->getJson());
-        //para la vuenta por cobrar que hay que crear
-        $total = self::getResto($em,$obj_cotizacion->getId());
-        $id_cliente = $obj_cotizacion->getIdCliente();
-        $tipo_cliente = 0;//persona natural
-        foreach ($data_jsons as $element) {
+        $cliente_er = $em->getRepository(Cliente::class);
+        $servicio_er = $em->getRepository(Servicios::class);
+        $cuenta_er = $em->getRepository(Cuenta::class);
+        $subcuenta_er = $em->getRepository(Subcuenta::class);
+        $elementos_costo_er = $em->getRepository(ElementosVisa::class);
+        $unidad = AuxFunctions::getUnidad($em, $usuario);
+        $today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+        $array_venta_servicios = [];
+        $array_proveedores_deuda = [];
 
+
+        //para la cuenta por cobrar que hay que crear y para la venta
+        $total = self::getResto($em, $obj_cotizacion->getId());
+        $id_cliente = $obj_cotizacion->getIdCliente();
+        /** @var Cliente $obj_cliente */
+        $obj_cliente = $cliente_er->find($id_cliente);
+        $nombre = $obj_cliente->getNombre();
+        $tipo_cliente = 1;//persona natural
+
+        //agrupando informacion para hacer los pagos
+        foreach ($data_jsons as $element) {
+            $servicio = json_decode($element);
+            $servicio_obj = $servicio_er->find($servicio->id_servicio);
+            $elementos_costos_servicio = $elementos_costo_er->findBy([
+                'id_servicio' => $servicio_obj,
+                'activo' => true
+            ]);
+            $costo_servicio = [];
+            /** @var ElementosVisa $item */
+            foreach ($elementos_costos_servicio as $item) {
+                $costo_servicio[] = [
+                    'id_proveedor' => $item->getIdProveedor(),
+                    'costo' => $item->getCosto(),
+                    'codigo_elemento' => $item->getCodigo(),
+                    'id_elemento_costo' => $item
+                ];
+            }
+            $array_venta_servicios[] = [
+                'codigo' => $servicio_obj->getCodigo(),
+                'importe' => $servicio->total,
+                'costos' => $costo_servicio
+            ];
         }
+
+        ///////////////////////////////
+        //   Asentando 135 -A- 903   //
+        ///////////////////////////////
+
+        // 1ra Operacion: asentando cuentas por cobrar
+        //1.1 ----Cuenta por Cobrar
+        $cuenta_por_cobrar = $cuenta_er->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
+        $subcuenta_por_cobrar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_por_cobrar]);
+        /*---asentando cuenta por cobrar---*/
+        $cuenta_cobrar = AuxFunctions::createAsiento($em, $cuenta_por_cobrar, $subcuenta_por_cobrar, null, $unidad, null, null
+            , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), 0, $total
+            , '', null, null, null, null, 1);
+        $cuenta_cobrar
+            ->setIdCotizacion($obj_cotizacion);
+        $em->persist($cuenta_cobrar);
+
+        //1.2 -----Venta de servicio
+        $cuenta_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '903', 'activo' => true]);
+        foreach ($array_venta_servicios as $item) {
+            $importe_venta_servicio = floatval($item['importe']);
+            $codigo = $item['codigo'];
+            $subcuenta_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo, 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
+            /*------asentando venta de servicio-----*/
+            $venta_servicio = AuxFunctions::createAsiento($em, $cuenta_venta_servicio, $subcuenta_venta_servicio, null, $unidad, null,
+                null, null, null, null, null, $tipo_cliente, $id_cliente,
+                $today, $today->format('Y'), $importe_venta_servicio, 0, '', null, null, null, null, 1);
+            $venta_servicio
+                ->setIdCotizacion($obj_cotizacion);
+            $em->persist($venta_servicio);
+        }
+
+
+        ///////////////////////////////
+        //   Asentando 816 -A- 405   //
+        ///////////////////////////////
+
+        // 2da Operacion: asentando cuentas por pagar
+        //2.1 ------ Costo de Venta del servicio
+        $cuenta_costo_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '816', 'activo' => true]);
+        foreach ($array_venta_servicios as $item) {
+            $codigo = $item['codigo'];
+            $subcuenta_costo_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo, 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
+            foreach ($item['costos'] as $costo) {
+                /*---------Para usar en la cuenta por pagar ---------*/
+                if (!in_array($costo['id_proveedor'], $array_proveedores_deuda)) {
+                    $array_proveedores_deuda[count($array_proveedores_deuda)] = $costo['id_proveedor'];
+                }
+                /*------asentando costo de venta de servicio-----*/
+                $costo_venta_servicio = AuxFunctions::createAsiento($em, $cuenta_costo_venta_servicio, $subcuenta_costo_venta_servicio, null, $unidad, null,
+                    null, null, null, null, null, 0, 0,
+                    $today, $today->format('Y'), 0, floatval($costo['costo']), '', null, null, null, null, 2);
+                $costo_venta_servicio
+                    ->setIdCotizacion($obj_cotizacion)
+                    ->setIdElementoVisa($costo['id_elemento_costo']);
+                $em->persist($costo_venta_servicio);
+            }
+        }
+
+        //2.2 ----- Cuenta por pagar
+        $array_pagar_proveedor = [];
+        foreach ($array_proveedores_deuda as $proveedor) {
+            $deuda_proveedor = 0;
+            foreach ($array_venta_servicios as $item) {
+                foreach ($item['costos'] as $costo) {
+                    if ($costo['id_proveedor'] == $proveedor) {
+                        $deuda_proveedor += floatval($costo['costo']);
+                    }
+                }
+            }
+            $array_pagar_proveedor[] = [
+                'id_proveedor'=>$proveedor,
+                'monto'=>$deuda_proveedor
+            ];
+        }
+
+        $cuenta_por_pagar = $cuenta_er->findOneBy(['nro_cuenta' => '405', 'activo' => true]);
+        $subcuenta_por_pagar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);//proveedores principales
+        foreach($array_pagar_proveedor as $item){
+            $obj_proveedor = $item['id_proveedor'];
+            $cuenta_por_pagar_proveedor = AuxFunctions::createAsiento($em, $cuenta_por_pagar, $subcuenta_por_pagar, null,
+                $unidad, null,null, null, null, null, $obj_proveedor,
+                0, 0,$today, $today->format('Y'),  floatval($item['monto']),0, '', null,
+                null, null, null, 2);
+            $cuenta_por_pagar_proveedor
+                ->setIdCotizacion($obj_cotizacion);
+            $em->persist($cuenta_por_pagar_proveedor);
+        }
+
+        // 3ra Operacion: asentando deposito de efectivo
+
+        ///////////////////////////////
+        //   Asentando 103 -A- 135   //
+        ///////////////////////////////
+
+        ///////////////////////////////
+        //   Asentando 109 -A- 135   //
+        ///////////////////////////////
+        $em->flush();
+        dd('Finalizo');
     }
 }

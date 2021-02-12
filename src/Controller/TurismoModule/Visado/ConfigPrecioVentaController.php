@@ -32,6 +32,7 @@ class ConfigPrecioVentaController extends AbstractController
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $elementos_visa_costo = $em->getRepository(ElementosVisa::class)->findBy([
             'activo' => true,
+            'id_servicio'=>$em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_VISADO)
         ]);
         $costo_total = 0;
         /** @var ElementosVisa $item */

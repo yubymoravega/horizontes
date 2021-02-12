@@ -4,6 +4,7 @@ namespace App\Controller\TurismoModule\Visado;
 
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\TurismoModule\Visado\ElementosVisa;
 use App\Form\Contabilidad\Config\UnidadType;
@@ -32,7 +33,10 @@ class ElementosVisaController extends AbstractController
 
         /** @var Cliente $obj_cliente */
         $obj_cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
-        $data_elementos = $em->getRepository(ElementosVisa::class)->findBy(['activo'=>true]);
+        $data_elementos = $em->getRepository(ElementosVisa::class)->findBy([
+            'activo'=>true,
+            'id_servicio'=>$em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_VISADO)
+        ]);
         $rows = [];
         /** @var ElementosVisa $item */
         foreach ($data_elementos as $item){
@@ -71,7 +75,10 @@ class ElementosVisaController extends AbstractController
         $errors = $validator->validate($elemnto);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $elemnto->setActivo(true);
+                $elemnto
+                    ->setActivo(true)
+                    ->setIdServicio($em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_VISADO))
+                ;
                 $em->persist($elemnto);
                 $em->flush();
                 $this->addFlash('success', "Elemento adicionado satisfactoriamente");
@@ -94,7 +101,6 @@ class ElementosVisaController extends AbstractController
         $errors = $validator->validate($elementos);
         if ($form->isSubmitted()  && $form->isValid()) {
             try {
-//                dd('sasa');
                 $em->persist($elementos);
                 $em->flush();
                 $this->addFlash('success', "Elemento actualizado satisfactoriamente");

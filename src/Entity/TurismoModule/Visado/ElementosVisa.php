@@ -2,6 +2,7 @@
 
 namespace App\Entity\TurismoModule\Visado;
 
+use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Repository\TurismoModule\Visado\ElementosVisaRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -43,6 +44,11 @@ class ElementosVisa
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $codigo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Servicios::class)
+     */
+    private $id_servicio;
 
     public function getId(): ?int
     {
@@ -105,6 +111,18 @@ class ElementosVisa
     public function setCodigo(?string $codigo): self
     {
         $this->codigo = $codigo;
+
+        return $this;
+    }
+
+    public function getIdServicio(): ?Servicios
+    {
+        return $this->id_servicio;
+    }
+
+    public function setIdServicio(?Servicios $id_servicio): self
+    {
+        $this->id_servicio = $id_servicio;
 
         return $this;
     }
