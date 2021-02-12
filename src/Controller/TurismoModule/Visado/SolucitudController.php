@@ -101,7 +101,7 @@ class SolucitudController extends AbstractController
                 $data_solicitudes[$key]['montoMostrar'] = $precio_total;
             }
             else{
-                $data_solicitudes[$key]->id = $key;
+                $data_solicitudes[$key]->idCarrito = $key;
                 $data_solicitudes[$key]->nombreMostrar = $data_solicitudes[$key]->nombre .' '. $data_solicitudes[$key]->primer_apellido;
                 $data_solicitudes[$key]->montoMostrar = $precio_total;
             }
@@ -131,8 +131,8 @@ class SolucitudController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Solicitud adicionada al carrito');
-        //aqui
-        return  $this->render('home/categoriaTurismo.html.twig',['tel' => $obj_trabajo_tmp->getIdCliente()->getTelefono()]);
+
+        return  $this->redirectToRoute('categorias/turismo',['tel'=>$obj_trabajo_tmp->getIdCliente()->getTelefono()] );
     }
 
     /**
@@ -143,7 +143,6 @@ class SolucitudController extends AbstractController
         $ruta = $request->request->get('path');
         $id = $request->request->get('idCarrito');
         $id_servicio = $request->request->get('id_servicio');
-//dd($request);
         /** @var UserClientTmp $obj_trabajo_tmp */
         $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
             'id_usuario' => $this->getUser()
@@ -157,9 +156,12 @@ class SolucitudController extends AbstractController
         foreach ($data_solicitudes_existente as $key => $item) {
             if ($id != $item->idCarrito) {
                 $array_result[] = $data_solicitudes_existente[$key];
-                $array_result[count($array_result)-1]->id=count($array_result)-1;
+//                $array_result[count($array_result)-1]->idCarito=count($array_result)-1;
                 $total_servicio += floatval($item->montoMostrar);
             }
+        }
+        foreach ($array_result as $key=>$elemt){
+            $array_result[$key]->idCarrito = $key;
         }
 
         $id_carrito = AuxFunctionsTurismo::getIdCarritoServicio($em, $empleado, $id_servicio);

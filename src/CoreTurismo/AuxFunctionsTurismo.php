@@ -148,4 +148,15 @@ class AuxFunctionsTurismo
         }
         return floatval($cotizacion->getTotal())-$total_pagado;
     }
+
+    public static function asentarCotizacion(EntityManagerInterface $em,Cotizacion $obj_cotizacion){
+        $data_jsons = json_decode($obj_cotizacion->getJson());
+        //para la vuenta por cobrar que hay que crear
+        $total = self::getResto($em,$obj_cotizacion->getId());
+        $id_cliente = $obj_cotizacion->getIdCliente();
+        $tipo_cliente = 0;//persona natural
+        foreach ($data_jsons as $element) {
+
+        }
+    }
 }

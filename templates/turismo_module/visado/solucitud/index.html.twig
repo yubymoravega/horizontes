@@ -33,7 +33,7 @@
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
                 <h2 class="text-reporte text-center mr-0 text-white mt-2" id="normal_div">
-                    Solicitud de Gestión Consular
+                    Solicitud de Paquete Turístico Básico
                 </h2>
             </div>
             {#      CAMPOS OCULTOS PARA OBTENER LOS VALORES      #}
@@ -44,8 +44,9 @@
 
             <div class="card-body">
                 <div class="d-flex align-items-center mt-3 pl-2">
-                    <h3 class="text-light mr-auto" style="font-weight: 300;">Datos de los solicitantes</h3>
-                    <div class="px-2" style="background: dimgray; border-radius: .3rem; vertical-align: auto">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Datos de los beneficiarios</h3>
+                    <div class="px-2" id="div_cliente_origen"
+                         style="background: dimgray; border-radius: .3rem; vertical-align: auto">
                         <label for="owner_client">Cliente origen</label>
                         <input type="checkbox" name="owner_client" id="owner_client" style="margin-left: 20px">
 
@@ -87,12 +88,12 @@
             <div>
                 <table class="table-small-rows table table-hover text-light">
                     <thead class="thead-dark">
-                    <th width="120px">Nombre</th>
-                    <th width="120px">Primer Apellido</th>
-                    <th width="130px">Segundo Apellido</th>
-                    <th width="120px">Teléfono fijo</th>
-                    <th width="120px">Teléfono celular</th>
-                    <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+                    <th width="120px" class="text-left">Nombre</th>
+                    <th width="120px" class="text-left">Primer Apellido</th>
+                    <th width="130px" class="text-left">Segundo Apellido</th>
+                    <th width="120px" class="text-left">Teléfono fijo</th>
+                    <th width="120px" class="text-left">Teléfono celular</th>
+                    <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
                     </thead>
                     <tbody id="rows_solicitudes">
                     </tbody>
@@ -134,7 +135,7 @@
             $('#solicitud_telefono_fijo').prop('disabled', false)
         }
 
-        $('#salir').on('click',function () {
+        $('#salir').on('click', function () {
             window.location.href = "/categorias/turismo/" +{{ telefono }};
         })
         $('#owner_client').on('change', function () {
@@ -162,16 +163,28 @@
         form_solicitud.validate({
             errorClass: 'invalid-label-orange',
             errorPlacement: function (error, element) {
-                error.attr('style', 'font-size: .8rem;')
-                error.insertAfter(element);
+                // colocar mensajes de error a la derecha de cada label para el componente
+                const error_label = element.closest("form").find(element.attr('id') + "-error")
+                if (error_label.length) {
+                    error_label.removeClass('hide')
+                } else {
+                    error.addClass('ml-3')
+                    error.css('position', 'fixed')
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+                }
             },
             rules: {
                 'solicitud[nombre]': "required",
                 'solicitud[primer_apellido]': "required",
+                'solicitud[segundo_apellido]': "required",
             },
             messages: {
                 'solicitud[nombre]': '!Obligatorio',
                 'solicitud[primer_apellido]': '!Obligatorio',
+                'solicitud[segundo_apellido]': '!Obligatorio',
             }
         })
 
@@ -183,30 +196,40 @@
                 const segundo_apellido = $('#solicitud_segundo_apellido').val()
                 const telefono_celular = $('#solicitud_telefono_celular').val()
                 const telefono_fijo = $('#solicitud_telefono_fijo').val()
-
+                $('#div_cliente_origen').css('display', 'none')
                 if (telefono_celular != '' || telefono_fijo != '') {
-                    lista_mercancias.push({
-                        nombre,
-                        primer_apellido,
-                        segundo_apellido,
-                        telefono_celular,
-                        telefono_fijo
-                    })
-                    listado_solicitantes.append(`<tr>
-                        <td class="text-center"> ${nombre}</td>
-                        <td class="text-right"> ${primer_apellido} </td>
-                        <td class="text-right"> ${segundo_apellido} </td>
-                        <td class="text-right"> ${telefono_celular} </td>
-                        <td class="text-right"> ${telefono_fijo}</td>
-                        <td style="width: 45px;"> <button type="button"
+                    let repetido = false
+                    for (let i = 0; i < lista_mercancias.length; i++) {
+                        cl(lista_mercancias[i])
+                        if (lista_mercancias[i]['nombre'] == nombre && lista_mercancias[i]['primer_apellido'] == primer_apellido && lista_mercancias[i]['segundo_apellido'] == segundo_apellido)
+                            repetido = true
+                    }
+                    if (!repetido) {
+                        lista_mercancias.push({
+                            nombre,
+                            primer_apellido,
+                            segundo_apellido,
+                            telefono_celular,
+                            telefono_fijo
+                        })
+                        listado_solicitantes.append(`<tr>
+                        <td class="text-left"> ${nombre}</td>
+                        <td class="text-left"> ${primer_apellido} </td>
+                        <td class="text-left"> ${segundo_apellido} </td>
+                        <td class="text-left"> ${telefono_celular} </td>
+                        <td class="text-left"> ${telefono_fijo}</td>
+                        <td style="width: 45px;" class="text-center"> <button type="button"
                             class="btn btn-outline-danger btn-sm borrar" title="Eliminar" nombre-solicitante="${nombre}">
                             <i class="fa fa-minus-circle"></i>
                         </button>
                         </td
                         ></tr>`
-                    );
-                    resetFormSolicitud()
+                        );
+                        resetFormSolicitud()
 
+                    } else {
+                        alertTemplate('El beneficiario ya está incluido en el listado', 'danger')
+                    }
                 } else {
                     alertTemplate('Debe introducir al menos un número de teléfono como contacto del solicitante', 'danger')
                 }
@@ -223,17 +246,17 @@
 
         $('#btn_solicitar').on('click', function (event) {
             event.preventDefault()
-                if (lista_mercancias.length) {
-                    const listado = JSON.stringify(lista_mercancias)
-                    $('body').append(`
+            if (lista_mercancias.length) {
+                const listado = JSON.stringify(lista_mercancias)
+                $('body').append(`
                     <form action='/turismo/gestion-consular/solucitud/add-carrito'
                          method="post" id='form_add_carrito'>
                         <input type='hidden' name='solicitudes' value='${listado}'/>
                     </form>`)
-                    const fomrulario = $('#form_add_carrito')
-                    fomrulario.submit()
-                    fomrulario.remove()
-                } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+                const fomrulario = $('#form_add_carrito')
+                fomrulario.submit()
+                fomrulario.remove()
+            } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
 
         })
 
@@ -241,6 +264,8 @@
             event.preventDefault();
             lista_mercancias = lista_mercancias.filter(e => e.nombre !== $(this).attr('nombre-solicitante'))
             $(this).closest('tr').remove()
+            if (lista_mercancias.length == 0)
+                $('#div_cliente_origen').css('display', 'block')
         })
 
     </script>
