@@ -82,6 +82,11 @@ class PagosCotizacion
      */
     private $tipoDeTarjeta;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_transaccion;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -239,6 +244,18 @@ class PagosCotizacion
     public function setTipoDeTarjeta(?string $tipoDeTarjeta): self
     {
         $this->tipoDeTarjeta = $tipoDeTarjeta;
+
+        return $this;
+    }
+
+    public function getIdTransaccion(): ?int
+    {
+        return $this->id_transaccion;
+    }
+
+    public function setIdTransaccion(?int $id_transaccion): self
+    {
+        $this->id_transaccion = $id_transaccion;
 
         return $this;
     }
