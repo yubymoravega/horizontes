@@ -1068,6 +1068,8 @@
             } else {
                 $("#messageBox").css({"display": "none"});
 
+                 var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/pasarela-pago/efectivo/save/"+{{id_cotizacion}}+'/'+document.getElementById("cambio").textContent; 
+                 window.location.href = url;
             }
 
 
