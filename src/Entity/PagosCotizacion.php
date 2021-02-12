@@ -252,4 +252,16 @@ class PagosCotizacion
 
         return $this;
     }
+
+    public function getNota(): ?string
+    {
+        return $this->nota;
+    }
+
+    public function setNota(?string $nota): self
+    {
+        $this->nota = $nota;
+
+        return $this;
+    }
 }

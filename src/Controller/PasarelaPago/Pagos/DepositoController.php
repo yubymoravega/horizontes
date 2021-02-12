@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\PagosCotizacion;
+use App\Entity\Cotizacion;
 use \Datetime;
 
 /**
@@ -80,6 +81,10 @@ class DepositoController extends AbstractController
                 $PagosCotizacion->setNota($data['nota']);
             }
 
+            $Cotizacion = $em->getRepository(Cotizacion::class)->find($id_cotizacion);
+            $Cotizacion->setEdit(0);
+            $em->flush($Cotizacion);
+ 
             $em->persist($PagosCotizacion);
             $em->flush();
 
