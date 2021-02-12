@@ -29,7 +29,7 @@ class EfectivoController extends AbstractController
     } 
 
     /**
-     * @Route("/save/{id_cotizacion}/{$cambio}", name="pasarela_pago_pagos_efectivo_save")
+     * @Route("/save/{id_cotizacion}/{cambio}", name="pasarela_pago_pagos_efectivo_save")
      */
     public function pasarela_pago_pagos_efectivo_save(EntityManagerInterface $em, $id_cotizacion,$cambio)
     {
