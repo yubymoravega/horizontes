@@ -177,9 +177,9 @@ function ActualizarCarrito() {
                     let json = JSON.parse(data[i].json);
                     $("#carrito").append('<table id="table_carrito" class="w-100 p-0 m-0"></table>');
                     $("#table_carrito").append('<tr id="tr_' + i + '" class="w-100 m-0 p-0"></tr>');
-                    $("#tr_"+i).append('<td colspan="3" class="text-left font-weight-bold text-white">'+json.nombre_servicio +'</td>');
+                    let arr = json.data
+                    $("#tr_"+i).append('<td colspan="3" class="text-left font-weight-bold text-white">'+json.nombre_servicio +' ('+arr.length+')</td>');
 
-                        let arr = json.data
                         for (let j = 0; j < arr.length; j++) {
                             const asd = JSON.stringify(arr[j])
                             $("#table_carrito").append('<tr id="tr_' + i+'_'+j + '"></tr>');

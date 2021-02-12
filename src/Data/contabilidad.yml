@@ -130,7 +130,7 @@ configuraciones:
       name: "Paquetes Turísticos"
       codigo: "0100"
     - id: 11
-      name: "Trámites Migratorios"
+      name: "Paquete Turístico Básico"
       codigo: "0110"
     - id: 12
       name: "Desarrollo de Software"
