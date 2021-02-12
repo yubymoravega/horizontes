@@ -82,6 +82,11 @@ class PagosCotizacion
      */
     private $tipoDeTarjeta;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nota;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -239,6 +244,18 @@ class PagosCotizacion
     public function setTipoDeTarjeta(?string $tipoDeTarjeta): self
     {
         $this->tipoDeTarjeta = $tipoDeTarjeta;
+
+        return $this;
+    }
+
+    public function getNota(): ?string
+    {
+        return $this->nota;
+    }
+
+    public function setNota(?string $nota): self
+    {
+        $this->nota = $nota;
 
         return $this;
     }
