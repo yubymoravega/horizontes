@@ -90,10 +90,10 @@ class DepositoController extends AbstractController
 
             $this->addFlash(
                 'success',
-                'pago Agregado'
+                'Pago agregado'
             );
 
-            return $this->redirectToRoute('pasarela_pago_pagos', ['id_cotizacion' => $id_cotizacion]);
+            return $this->redirectToRoute('pasarela_pago_pagos_checkout_pagos', ['id_cotizacion' => $id_cotizacion]);
         } 
 
         return $this->render('pasarela_pago/pagos/deposito/index.html.twig', [

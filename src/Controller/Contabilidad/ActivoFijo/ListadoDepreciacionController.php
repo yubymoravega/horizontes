@@ -64,7 +64,7 @@ class ListadoDepreciacionController extends AbstractController
                         'id' => $activo->getId(),
                         'nro_inventario' => $activo->getNroInventario(),
                         'descripcion' => $activo->getDescripcion(),
-                        'depreciacion_mes' => $activo->getValorReal() > 0 ? number_format($valor_a_depreciar, 2) : '',
+                        'depreciacion_mes' => $activo->getValorReal() > 0 ? number_format(($valor_a_depreciar/12), 2) : '',
                         'depreciacion_acumulada' => number_format($activo->getDepreciacionAcumulada(), 2),
                         'valor_real' => number_format($activo->getValorInicial() - $activo->getDepreciacionAcumulada(), 2),
                         'valor_inicial' => number_format($activo->getValorInicial(), 2),

@@ -389,6 +389,7 @@ class InformeRecepcionController extends AbstractController
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $row = AuxFunctions::getMercanciaByCod($em, $codigo, $id_almacen);
+
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
     }
 

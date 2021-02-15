@@ -126,7 +126,7 @@ class CompraController extends AbstractController
 
                 //asentando cuenta que disminuye la reserva para invensiones(646)
                 $cuenta_inversiones = $em->getRepository(Cuenta::class)->findOneBy(['nro_cuenta' => '646', 'activo' => true]);
-                $subcuenta_inversiones = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta' => $cuenta_acreedora, 'nro_subcuenta' => '0010', 'activo' => true]);
+                $subcuenta_inversiones = $em->getRepository(Subcuenta::class)->findOneBy(['id_cuenta' => $cuenta_inversiones, 'nro_subcuenta' => '0010', 'activo' => true]);
                 $asiento_inversiones = AuxFunctions::createAsiento($em, $cuenta_inversiones, $subcuenta_inversiones, null,
                     $obj_activo->getIdUnidad(), null, $cuentas_activo_fijo->getIdCentroCostoGasto(), $cuentas_activo_fijo->getIdElementoGastoGasto(), null, null, null, 0, 0,
                     $obj_activo->getFechaAlta(), $obj_activo->getFechaAlta()->format('Y'), 0, $obj_activo->getValorReal(),

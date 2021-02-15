@@ -18,6 +18,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Expediente;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
+use App\Entity\Contabilidad\Inventario\Producto;
 use App\Form\Contabilidad\Inventario\AjusteSalidaType;
 use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\CentroCostoRepository;
@@ -28,6 +29,7 @@ use App\Repository\Contabilidad\Inventario\ExpedienteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Psr\Container\ContainerInterface;
+use Stripe\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -289,26 +291,38 @@ class AjusteSalidaController extends AbstractController
     }
 
     /**
-     * @Route("/getMercancia/{params}", name="contabilidad_inventario_ajuste_salida_gestionar_getMercancia", methods={"POST"})
+     * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_ajuste_salida_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(Request $request, $params)
+    public function getMercancia(Request $request, $codigo)
     {
-        $arr = explode(',', $params);
-        $codigo = $arr[0];
-        $cuenta = $arr[1];
         $em = $this->getDoctrine()->getManager();
-        if ($codigo == -1 || $codigo == '-1')
+        if ($codigo == -1 || $codigo == '-1'){
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'activo' => true,
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
-                'cuenta' => $cuenta
             ));
-        else
+            if(empty($mercancia_arr)){
+                $mercancia_arr = $em->getRepository(Producto::class)->findBy(array(
+                    'activo' => true,
+                    'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
+                ));
+            }
+        }
+        else{
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
                 'codigo' => $codigo,
             ));
+            if(empty($mercancia_arr)){
+                $mercancia_arr = $em->getRepository(Producto::class)->findBy(array(
+                    'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
+                    'activo' => true,
+                    'codigo' => $codigo,
+                ));
+            }
+        }
+
 
         $row = array();
         foreach ($mercancia_arr as $obj) {

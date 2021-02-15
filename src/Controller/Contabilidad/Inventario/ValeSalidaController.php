@@ -17,6 +17,7 @@ use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
+use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
 use App\Form\Contabilidad\Inventario\ValeSalidaType;
@@ -107,12 +108,19 @@ class ValeSalidaController extends AbstractController
                 'activo' => true,
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
             ));
-        else
+        else{
             $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
                 'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
                 'activo' => true,
                 'codigo' => $codigo
             ));
+            if(empty($mercancia_arr))
+                $mercancia_arr = $em->getRepository(Producto::class)->findBy(array(
+                    'id_amlacen' => $request->getSession()->get('selected_almacen/id'),
+                    'activo' => true,
+                    'codigo' => $codigo
+                ));
+        }
 
         $row = array();
         foreach ($mercancia_arr as $obj) {
