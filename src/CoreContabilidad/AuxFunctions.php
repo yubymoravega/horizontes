@@ -41,6 +41,7 @@ use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
 use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
+use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Contabilidad\Inventario\Transferencia;
 use App\Entity\Contabilidad\Inventario\ValeSalida;
@@ -2874,9 +2875,13 @@ class AuxFunctions
     {
         $mercancia_arr = $em->getRepository(Mercancia::class)->findBy(array(
             'id_amlacen' => $id_almacen,
-//            'activo' => true,
             'codigo' => $codigo
         ));
+        if(empty($mercancia_arr))
+            $mercancia_arr = $em->getRepository(Producto::class)->findBy(array(
+                'id_amlacen' => $id_almacen,
+                'codigo' => $codigo
+            ));
         $cuenta_er = $em->getRepository(Cuenta::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
         $row = array();
@@ -3177,7 +3182,7 @@ class AuxFunctions
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
                                          int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
                                          Factura $id_factura = null, ActivoFijo $id_activo = null, AreaResponsabilidad $id_area_responsabilidad = null,
-                                         RegistroComprobantes $comprobante = null,int $orden)
+                                         RegistroComprobantes $comprobante = null,int $orden=0)
     {
         $new_asiento = new Asiento();
         $new_asiento

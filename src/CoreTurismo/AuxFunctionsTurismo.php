@@ -155,7 +155,16 @@ class AuxFunctionsTurismo
         return floatval($cotizacion->getTotal()) - $total_pagado;
     }
 
-    public static function asentarCotizacion(EntityManagerInterface $em, Cotizacion $obj_cotizacion, User $usuario)
+    /**
+     * @description <p>asienta las operaciones contables del proceso de creacion de obligacion de cobro con el cliente,
+     * es cuando se procede a efectuar el primer pago de la cotizacion</p>
+     * @param EntityManagerInterface $em
+     * @param Cotizacion $obj_cotizacion
+     * @param User $usuario que recepciona el pago
+     * @param int $tipo_pago si el pago es en efectivo(1) o en tarjeta(0) importante poque de ahí asienta en caja o en banco
+     * @param float $valor_pagado
+     */
+    public static function asentarCotizacion(EntityManagerInterface $em, Cotizacion $obj_cotizacion, User $usuario, int $tipo_pago, float $valor_pagado)
     {
         $data_jsons = json_decode($obj_cotizacion->getJson());
         $cliente_er = $em->getRepository(Cliente::class);
@@ -291,14 +300,52 @@ class AuxFunctionsTurismo
         }
 
         // 3ra Operacion: asentando deposito de efectivo
+        if($tipo_pago==1){
+            ///////////////////////////////
+            //   Asentando 103 -A- 135   //
+            ///////////////////////////////
 
-        ///////////////////////////////
-        //   Asentando 103 -A- 135   //
-        ///////////////////////////////
+            //3.1 ----Efectivo en caja
+            $cuenta_efectivo_caja = $cuenta_er->findOneBy(['nro_cuenta' => '103', 'activo' => true]);
+            $subcuenta_efectivo_caja = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cuenta_efectivo_caja]);
+            /*---asentando cuenta por cobrar---*/
+            $efectivo_caja = AuxFunctions::createAsiento($em, $cuenta_efectivo_caja, $subcuenta_efectivo_caja, null, $unidad, null, null
+                , null, null, null, null, 0, 0, $today, $today->format('Y'), 0,$valor_pagado
+                , '', null, null, null, null, 3);
+            $efectivo_caja
+                ->setIdCotizacion($obj_cotizacion);
+            $em->persist($efectivo_caja);
+        }
 
-        ///////////////////////////////
-        //   Asentando 109 -A- 135   //
-        ///////////////////////////////
+        else if($tipo_pago==0){
+            ///////////////////////////////
+            //   Asentando 109 -A- 135   //
+            ///////////////////////////////
+
+            //3.1 ----Efectivo en banco
+            $cuenta_efectivo_caja = $cuenta_er->findOneBy(['nro_cuenta' => '109', 'activo' => true]);
+            $subcuenta_efectivo_caja = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cuenta_efectivo_caja]);
+            /*---asentando cuenta por cobrar---*/
+            $efectivo_caja = AuxFunctions::createAsiento($em, $cuenta_efectivo_caja, $subcuenta_efectivo_caja, null, $unidad, null, null
+                , null, null, null, null, 0, 0, $today, $today->format('Y'), 0,$valor_pagado
+                , '', null, null, null, null, 3);
+            $efectivo_caja
+                ->setIdCotizacion($obj_cotizacion);
+            $em->persist($efectivo_caja);
+
+        }
+
+        //3.2 ----Cuenta por Cobrar
+        $cuenta_por_cobrar = $cuenta_er->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
+        $subcuenta_por_cobrar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_por_cobrar]);
+        /*---asentando cuenta por cobrar---*/
+        $cuenta_cobrar = AuxFunctions::createAsiento($em, $cuenta_por_cobrar, $subcuenta_por_cobrar, null, $unidad, null, null
+            , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), $valor_pagado,0
+            , '', null, null, null, null, 3);
+        $cuenta_cobrar
+            ->setIdCotizacion($obj_cotizacion);
+        $em->persist($cuenta_cobrar);
+
         $em->flush();
         dd('Finalizo');
     }
