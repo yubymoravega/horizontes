@@ -211,42 +211,7 @@ class HomeController extends AbstractController
 
     }
 
-    /**
-     * @Route("/home/pais", name="home/pais")
-     */
-    public function pais(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request)
-    {
-        $dataBase = $this->getDoctrine()->getManager();
-
-        $paises = $this->getDoctrine()->getRepository(pais::class)->findAll();
-        $monedas = $this->getDoctrine()->getRepository(Moneda::class)->findAll(false);
-
-        $titulo = 'Seleccionar Pais';
-        if ($request->get('pais')) {
-
-            $titulo = $this->getDoctrine()->getRepository(pais::class)->find($request->get('pais'))->getNombre();
-            $codePais = $this->getDoctrine()->getRepository(pais::class)->find($request->get('pais'))->getId();
-        }
-
-        $pais = 0;
-        ($request->get('pais')) ? $pais = $request->get('pais') : $pais = 0;
-
-        $dql = "SELECT a.id,b FROM App:MonedaPais a JOIN App:Contabilidad\Config\Moneda b WHERE  a.idPais = '$pais' AND  a.idMoneda = b.id AND  a.status ='1'";
-
-        $query = $em->createQuery($dql);
-
-        $pagination = $paginator->paginate(
-            $query, /* query NOT result */
-            $request->query->getInt('page', 1), /*page number*/
-            25 /*limit per page*/
-        );
-
-        return $this->render(
-            'home/pais.html.twig',
-            ['paises' => $paises, 'titulo' => $titulo, 'monedas' => $monedas, 'pagination' => $pagination]
-        );
-
-    }
+    
 
     /**
      * @Route("/home/moneda/pais/{moneda}/{pais}", name="home/moneda/pais")
