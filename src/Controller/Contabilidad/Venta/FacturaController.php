@@ -71,48 +71,6 @@ class FacturaController extends AbstractController
                           ProductoRepository $productoRepository, MercanciaRepository $mercanciaRepository,
                           AlmacenRepository $almacenRepository, ValidatorInterface $validator)
     {
-//        $id_user = $this->getUser();
-//        $insert = AuxFunctions::addFactServicio($em, 2, $id_user, 3, 4, 1,
-//            [
-//                [
-//                    'codigo_servicio' => '0010',
-//                    'cantidad' => 10,
-//                    'descripcion' => 'Boletos ida y vuelta a cuba las fechas 10-13 de diciembre del 2020',
-//                    'costo' => 50,
-//                    'precio' => 90,
-//                    'impuesto' => 5,
-//                ], [
-//                'codigo_servicio' => '0020',
-//                'cantidad' => 1,
-//                'descripcion' => 'Remesa para Ana',
-//                'costo' => 97,
-//                'precio' => 103,
-//                'impuesto' => 2,
-//            ], [
-//                'codigo_servicio' => '0030',
-//                'cantidad' => 1,
-//                'descripcion' => 'Paquete de cosas para la anita',
-//                'costo' => 50,
-//                'precio' => 90,
-//                'impuesto' => 10,
-//            ],
-//            ]
-//        );
-//
-//        $facturas = $em->getRepository(Factura::class)->findAll();
-//        /** @var Factura $x */
-//        $x = $facturas[count($facturas) - 1];
-//
-//        $facturaRepository = $em->getRepository(Factura::class);
-//        $movimientoVentaRepository = $em->getRepository(MovimientoVenta::class);
-//        $cuentaRepository = $em->getRepository(Cuenta::class);
-//        $subcuentaRepository = $em->getRepository(Subcuenta::class);
-//        $productoRepository = $em->getRepository(Producto::class);
-//        $mercanciaRepository = $em->getRepository(Mercancia::class);
-//        return $this->print($em, $x->getNroFactura(), $facturaRepository,
-//            $movimientoVentaRepository, $cuentaRepository, $subcuentaRepository,
-//            $productoRepository, $mercanciaRepository);
-
         $factura_er = $em->getRepository(Factura::class);
         $cuenta_er = $em->getRepository(Cuenta::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
@@ -174,7 +132,7 @@ class FacturaController extends AbstractController
 
             //asentando la cuenta por cobrar
             $obj_cuenta_factura = $cuenta_er->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
-            $obj_subcuenta_factura = $subcuenta_er->findOneBy(['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true,'id_cuenta'=>$obj_cuenta_factura]);
+            $obj_subcuenta_factura = $subcuenta_er->findOneBy(['nro_subcuenta' => $nro_subcuenta_obligracion_factura, 'activo' => true, 'id_cuenta' => $obj_cuenta_factura]);
             $asiento_deudor_venta = AuxFunctions::createAsiento($em, $obj_cuenta_factura, $obj_subcuenta_factura, null,
                 $unidad, null, null, null, null, null,
                 null, $factura->getTipoCliente(), $factura->getIdCliente(), $fecha_factura,
@@ -328,7 +286,7 @@ class FacturaController extends AbstractController
 
                         $cuenta_inventario = $cuenta_er->findOneBy(['nro_cuenta' => $elemento->getCuenta(), 'activo' => true]);
                         $subcuenta_inventatio_mercancia = $subcuenta_er->findOneBy(
-                            ['nro_subcuenta'=>$elemento->getNroSubcuentaInventario(),'activo'=>true,'id_cuenta'=>$cuenta_inventario]
+                            ['nro_subcuenta' => $elemento->getNroSubcuentaInventario(), 'activo' => true, 'id_cuenta' => $cuenta_inventario]
                         );
 
                         /** Asiento la operacion reduciendo la cuenta de la mercancia para la venta */
@@ -464,8 +422,6 @@ class FacturaController extends AbstractController
         $factura_new->setNroFactura(count($arr_factura) + 1);
         $form_factura->setData($factura_new);
 
-
-//        dd($fecha_start->format('d-m-Y'));
         return $this->render('contabilidad/venta/factura/index.html.twig', [
             'controller_name' => 'FacturaController',
             'form_factura' => $form_factura->createView(),
@@ -716,16 +672,11 @@ class FacturaController extends AbstractController
                         ->setIdElementoGastoAcreedor($mov_venta->getIdElementoGastoAcreedor())
                         ->setIdExpedienteAcreedor($mov_venta->getIdExpedienteAcreedor())
                         ->setMercancia($mov_venta->getMercancia())
-
                         /** Aqui asociamos las cuentas en dependencia del tipo de elemento que componga la factura(mercancia o producto)*/
                         ->setCuenta($mov_venta->getCuenta())
                         ->setNroSubcuentaDeudora($mov_venta->getNroSubcuentaDeudora())
-
                         ->setCuentaAcreedora($mov_venta->getCuentaAcreedora())
-                        ->setSubcuentaAcreedora($mov_venta->getSubcuentaAcreedora())
-
-
-                    ;
+                        ->setSubcuentaAcreedora($mov_venta->getSubcuentaAcreedora());
                     $em->persist($new_movimiento_venta);
 
                     $importe_item = round(($new_movimiento_venta->getCantidad() * $new_movimiento_venta->getCosto()), 2);
@@ -1067,11 +1018,11 @@ class FacturaController extends AbstractController
         if ($x < 100)
             return '0000' . $x;
         if ($x < 1000)
-            return '000'.$x;
-        if ($x<10000)
-            return '00'.$x;
-        if($x<100000)
-            return '0'.$x;
+            return '000' . $x;
+        if ($x < 10000)
+            return '00' . $x;
+        if ($x < 100000)
+            return '0' . $x;
         return $x;
 
     }
@@ -1108,7 +1059,7 @@ class FacturaController extends AbstractController
         $factura['telefono_unidad'] = $unidad->getTelefono();
         $factura['correo_unidad'] = $unidad->getCorreo();
         $factura['correo_unidad'] = $unidad->getCorreo();
-        $factura['nro_factura'] = $this->getStrNroFactura(count($arr_factura)+1);
+        $factura['nro_factura'] = $this->getStrNroFactura(count($arr_factura) + 1);
 
         if ($factura_data['contrato'] == ' --- seleccione --- ')
             $factura['contrato'] = '';

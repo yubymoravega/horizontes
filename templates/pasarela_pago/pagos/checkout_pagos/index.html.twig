@@ -1,12 +1,30 @@
 {% extends 'base.html.twig' %}
 {% block content %}
     {% include 'breadcrumbs.html.twig' %}
+    <div class="row">
+        <div class="col-4 ">
+            <button class="btn btn-outline-warning font-weight-bold" id="detalles_"><i class="fa fa-eye"
+                                                                                       id="btn_detail"></i> Ver detalles
+                de los Pagos
+            </button>
+        </div>
+        <div class="col-4 mt-0"><button class="btn btn-outline-warning font-weight-bold" id="detalles_cot"><i class="fa fa-eye"
+                                                                                                         id="btn_detail_cot"></i> Ver
+                detalles de la Cotización
+            </button>
+        </div>
+        <div class="col-4 mt-0">{% if  resto == 0 %}
+                <button class="mr-auto btn btn-outline-primary font-weight-bold"><i class="fa fa-print"></i> Facturar
+                </button>
+            {% endif %}</div>
 
-    <h1 class="text-confirmar" style="text-align: center; ">Detalles de la cotización</h1>
-    <hr class="divider-white bg-mantis-white mb-0">
 
+    </div>
     <!-- Shop Checkout-->
-    <section class="section novi-background section-20 section-sm-20" style="color:white;">
+    <section class="section novi-background section-20 section-sm-20" style="color:white; display: none"
+             id="detalles_cotizacion">
+        <h1 class="text-confirmar" style="text-align: center; ">Detalles de la cotización</h1>
+        <hr class="divider-white bg-mantis-white mb-0">
         <div class="container-fluid">
             <div class="rd-material-tabs checkout-tabs">
                 <div class="rd-material-tabs__container">
@@ -100,9 +118,10 @@
             </div>
         </div>
     </section>
-    <h1 class="text-confirmar" style="text-align: center; ">Detalles de los pagos</h1>
-    <hr class="divider-white bg-mantis-white mb-0">
-    <section class="section novi-background section-20 section-sm-20" style="color:white;">
+    <section class="section novi-background section-20 section-sm-20" style="color:white; display: none"
+             id="detalles_pago">
+        <h1 class="text-confirmar" style="text-align: center; ">Detalles de los pagos</h1>
+        <hr class="divider-white bg-mantis-white mb-0">
         <div class="container-fluid">
             <div class="rd-material-tabs checkout-tabs">
                 <div class="rd-material-tabs__container">
@@ -148,8 +167,39 @@
     </style>
 {% endblock %}
 
-            {% block javascripts %}
-                {{ parent() }}
-                <script>
-                </script>
-            {% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#detalles_').on('click', function () {
+            if ($('#detalles_pago').css('display') == 'none') {
+                $('#detalles_pago').css('display', 'block')
+                $('#btn_detail').removeClass('fa fa-eye')
+                $('#btn_detail').addClass('fa-eye-slash')
+                $('#detalles_').removeClass('btn btn-outline-warning')
+                $('#detalles_').addClass('btn btn-danger')
+            } else {
+                $('#detalles_pago').css('display', 'none')
+                $('#btn_detail').removeClass('fa-eye-slash')
+                $('#btn_detail').addClass('fa fa-eye')
+                $('#detalles_').removeClass('btn btn-danger')
+                $('#detalles_').addClass('btn btn-outline-warning')
+            }
+        })
+
+        $('#detalles_cot').on('click', function () {
+            if ($('#detalles_cotizacion').css('display') == 'none') {
+                $('#detalles_cotizacion').css('display', 'block')
+                $('#btn_detail_cot').removeClass('fa fa-eye')
+                $('#btn_detail_cot').addClass('fa-eye-slash')
+                $('#detalles_cot').removeClass('btn btn-outline-warning')
+                $('#detalles_cot').addClass('btn btn-danger')
+            } else {
+                $('#detalles_cotizacion').css('display', 'none')
+                $('#btn_detail_cot').removeClass('fa-eye-slash')
+                $('#btn_detail_cot').addClass('fa fa-eye')
+                $('#detalles_cot').removeClass('btn btn-danger')
+                $('#detalles_cot').addClass('btn btn-outline-warning')
+            }
+        })
+    </script>
+{% endblock %}

@@ -67,7 +67,8 @@ class CheckoutPagosController extends AbstractController
             'detalles_pagos'=> $rows,
             'carrito'=>$this->getDataCotizacion($em,$id_cotizacion),
             'total'=>number_format($cotizacion->getTotal(),2),
-            'pagado'=>$total_pagado
+            'pagado'=>$total_pagado,
+            'resto'=>$cotizacion->getTotal()-$total_pagado
         ]);
     }
 
