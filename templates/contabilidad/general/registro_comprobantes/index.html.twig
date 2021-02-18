@@ -85,29 +85,27 @@
         }
 
         $("div.container-fluid table").delegate('tr', 'click', function (e) {
-            // setTimeout(function() {
-            //     $("#observacion_div").fadeOut(0);
-            // },0);
             let arr = e.currentTarget.innerHTML.split('hidden="">');
+            $("div.container-fluid table tr").each(function (element, t) {
+                t.style.backgroundColor = ''
+            })
+            e.currentTarget.style.backgroundColor = 'darkslategrey'
+
             if (arr.length > 1){
                 let sub_arr = arr[1].split('</td>');
                 $('#observacion_p').val(sub_arr[0])
                 $('#observacion_div').show()
-
-                // setTimeout(function() {
-                //     $("#observacion_div").fadeIn(1500);
-                // },0);
-                //
-                // setTimeout(function() {
-                //     $("#observacion_div").fadeOut(20000);
-                // },0);
             }
             else{
-                // $('#observacion_div').hide()
                 $('#observacion_p').val('')
-                console.info('Dio click afuera')
             }
-
         });
     </script>
 {% endblock %}
+{#{% block stylesheets %}#}
+{#    <style>#}
+{#        .select-registro {#}
+{#            background-color: darkslategrey;#}
+{#        }#}
+{#    </style>#}
+{#{%  endblock %}#}

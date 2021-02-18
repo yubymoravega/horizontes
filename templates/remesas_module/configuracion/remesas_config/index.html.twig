@@ -1,0 +1,223 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Remesas | Configuración{% endblock %}
+
+{% block content %}
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <h3 class="text-reporte text-center mr-0 text-white mt-2 font-weight-bold" id="normal_div">
+                    Configuración de Costos y Precios de Venta de Remesas
+                </h3>
+            </div>
+            <div class="card-body">
+                {{ form_start(formulario, {'attr':{'id':'form_solicitud','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0" id="nuevo_pais_div" style="display: none">
+                    <div class="col-11 form-group input-group input-group-sm pa-2 pr-0 mr-0">
+                        {{ form_label(formulario.nuevo_pais) }}
+                        {{ form_widget(formulario.nuevo_pais) }}
+                    </div>
+                    <div class="col-1 mt-4 pt-2 form-group input-group input-group-sm ml-0 pl-0">
+                        <button type="button" class='my-0 btn btn-outline-secondary' style="height: 40px"
+                                onclick="changeStatus(0)"><i class="fa fa-trash-o text-danger fa-2x"></i></button>
+                    </div>
+                </div>
+                <div class="row mt-0 p-0" id="id_pais_div">
+                    <div class="col-12 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.id_pais) }}
+                        {{ form_widget(formulario.id_pais) }}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Costos</h3>
+                    <div class="px-2" id="div_cliente_origen"
+                         style="background: dimgray; border-radius: .3rem; vertical-align: auto">
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+
+                <div class="row mt-1 p-0">
+                    <div class="col-12 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.id_proveedor) }}
+                        {{ form_widget(formulario.costo_precio.id_proveedor) }}
+                    </div>
+                </div>
+                <div class="row mt-1 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.minimo) }}
+                        {{ form_widget(formulario.costo_precio.minimo) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.maximo) }}
+                        {{ form_widget(formulario.costo_precio.maximo) }}
+                    </div>
+                    {#                </div>#}
+                    {#                <div class="row mt-1 p-0">#}
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.costo_fijo) }}
+                        {{ form_widget(formulario.costo_precio.costo_fijo) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.costo_porciento) }}
+                        {{ form_widget(formulario.costo_precio.costo_porciento) }}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Precio de Venta</h3>
+                    <div class="px-2" id="div_cliente_origen"
+                         style="background: dimgray; border-radius: .3rem; vertical-align: auto">
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+                <div class="row mt-1 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.id_moneda) }}
+                        {{ form_widget(formulario.costo_precio.id_moneda) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.venta_fijo) }}
+                        {{ form_widget(formulario.costo_precio.venta_fijo) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.venta_porciento) }}
+                        {{ form_widget(formulario.costo_precio.venta_porciento) }}
+                    </div>
+                    <div class="col-3 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                {{ form_end(formulario) }}
+            </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th width="100px" class="text-left">Moneda</th>
+                    <th width="160px" class="text-left">Proveedor</th>
+                    <th width="90px" class="text-left">Rango</th>
+                    <th width="90px" class="text-right">Costo</th>
+                    <th width="90px" class="text-right">Venta</th>
+                    <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
+                    </thead>
+                    <tbody id="rows_configuraciones">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a class="btn btn-outline-secondary" href="{{ url('turismo_module_configuracion') }}">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmit">Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const listado_configuraciones = $('#rows_configuraciones')
+        $('#remesas_config_id_pais').append('<option value = "0"> -- NUEVO PAIS --</option>')
+        $('#remesas_config_costo_precio_costo_fijo').prop('type', 'number')
+        $('#remesas_config_costo_precio_costo_porciento').prop('type', 'number')
+        $('#remesas_config_costo_precio_venta_fijo').prop('type', 'number')
+        $('#remesas_config_costo_precio_venta_porciento').prop('type', 'number')
+
+        $('#remesas_config_id_pais').on('change', function () {
+            if ($('#remesas_config_id_pais').val() === "0")
+                changeStatus(1)
+            else
+                changeStatus(0)
+
+        })
+
+        function changeStatus(val) {
+            resetForm()
+            if (val == 0) {
+                $('#nuevo_pais_div').css('display', 'none')
+                $('#id_pais_div').css('display', 'block')
+            } else {
+                $('#nuevo_pais_div').css('display', 'flex')
+                $('#id_pais_div').css('display', 'none')
+                $('#remesas_config_id_pais').val('')
+            }
+        }
+
+        $('#remesas_config_costo_precio_costo_fijo').on('keyup', e => $('#remesas_config_costo_precio_costo_porciento').val(''))
+        $('#remesas_config_costo_precio_costo_porciento').on('keyup', e => $('#remesas_config_costo_precio_costo_fijo').val(''))
+        $('#remesas_config_costo_precio_venta_fijo').on('keyup', e => $('#remesas_config_costo_precio_venta_porciento').val(''))
+        $('#remesas_config_costo_precio_venta_porciento').on('keyup', e => $('#remesas_config_costo_precio_venta_fijo').val(''))
+
+        function resetForm() {
+            $('#remesas_config_costo_precio_costo_fijo').val('')
+            $('#remesas_config_costo_precio_costo_porciento').val('')
+            $('#remesas_config_costo_precio_venta_fijo').val('')
+            $('#remesas_config_costo_precio_venta_porciento').val('')
+            $('#remesas_config_costo_precio_minimo').val('')
+            $('#remesas_config_costo_precio_maximo').val('')
+        }
+
+        $('#btnAplicarMercancia').on('click', function () {
+            const moneda = $('#remesas_config_costo_precio_id_moneda').val()
+            const proveedor = $('#remesas_config_costo_precio_id_proveedor').val()
+            const minimo = $('#remesas_config_costo_precio_minimo').val()
+            const maximo = $('#remesas_config_costo_precio_maximo').val()
+            const costo_fijo = $('#remesas_config_costo_precio_costo_fijo').val()
+            const costo_porciento = $('#remesas_config_costo_precio_costo_porciento').val()
+            const precio_fijo = $('#remesas_config_costo_precio_venta_fijo').val()
+            const precio_porciento = $('#remesas_config_costo_precio_venta_porciento').val()
+
+            let repetido = false
+            for (let i = 0; i < listado_configuraciones.length; i++) {
+                if (listado_configuraciones[i]['moneda'] == moneda && listado_configuraciones[i]['proveedor'] == proveedor
+                    && listado_configuraciones[i]['minimo'] == minimo && listado_configuraciones[i]['maximo'] == maximo)
+                    repetido = true
+            }
+            if (!repetido) {
+                listado_configuraciones.push({
+                    moneda,
+                    proveedor,
+                    minimo,
+                    maximo,
+                    costo_fijo,
+                    costo_porciento,
+                    precio_fijo,
+                    precio_porciento
+                })
+                const str_moneda = $('#remesas_config_costo_precio_id_moneda option:selected').text()
+                const str_proveedor = $('#remesas_config_costo_precio_id_proveedor option:selected').text()
+                let costo_tabla = ''
+                if (costo_fijo > 0)
+                    costo_tabla = costo_fijo.fixed(2)
+                else
+                    costo_tabla = costo_porciento.fixed(2) + '%'
+
+                let precio_tabla = ''
+                if (precio_fijo > 0)
+                    precio_tabla = precio_fijo.fixed(2)
+                else
+                    precio_tabla = precio_porciento.fixed(2) + '%'
+
+                listado_configuraciones.append(`<tr>
+                        <td class="text-left"> ${str_moneda}</td>
+                        <td class="text-left"> ${str_proveedor} </td>
+                        <td class="text-left"> ${minimo}-${maximo} </td>
+                        <td class="text-right"> ${costo_tabla} </td>
+                        <td class="text-right"> ${precio_tabla}</td>
+                        <td style="width: 45px;" class="text-center"> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" moneda="${str_moneda}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td
+                        ></tr>`
+                );
+                resetForm()
+            } else {
+                alertTemplate('Ya ha registrado una configuración para los datos introducidos', 'danger')
+            }
+        })
+
+    </script>
+{% endblock %}
