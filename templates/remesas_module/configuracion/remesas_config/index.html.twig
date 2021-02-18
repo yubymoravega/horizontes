@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-1 mt-4 pt-2 form-group input-group input-group-sm ml-0 pl-0">
                         <button type="button" class='my-0 btn btn-outline-secondary' style="height: 40px"
-                                onclick="changeStatus(0)"><i class="fa fa-trash-o text-danger fa-2x"></i></button>
+                                onclick="changeStatus(-1,true)"><i class="fa fa-trash-o text-danger fa-2x"></i></button>
                     </div>
                 </div>
                 <div class="row mt-0 p-0" id="id_pais_div">
@@ -28,6 +28,8 @@
                         {{ form_widget(formulario.id_pais) }}
                     </div>
                 </div>
+                {{ form_end(formulario.id_pais) }}
+                {{ form_start(formulario.costo_precio, {'attr':{'id':'form_elementos','autocomplete':"off"}}) }}
                 <div class="d-flex align-items-center mt-3 pl-2">
                     <h3 class="text-light mr-auto" style="font-weight: 300;">Costos</h3>
                     <div class="px-2" id="div_cliente_origen"
@@ -87,7 +89,7 @@
                         </button>
                     </div>
                 </div>
-                {{ form_end(formulario) }}
+                {{ form_end(formulario.costo_precio) }}
             </div>
             <div>
                 <table class="table-small-rows table table-hover text-light">
@@ -119,23 +121,59 @@
     {{ parent() }}
     <script>
         const listado_configuraciones = $('#rows_configuraciones')
-        $('#remesas_config_id_pais').append('<option value = "0"> -- NUEVO PAIS --</option>')
+
+        $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+        $('#remesas_config_id_pais').append('<option value = "-1"> -- NUEVO PAIS --</option>')
+
+        function eliminarElementoMisterioso() {
+            var combo = document.getElementById('remesas_config_id_pais')
+            for (var i = 0; i < combo.length; i++) {
+                if (combo.options[i].value == '') {
+                    combo.remove(i)
+                    break
+                }
+            }
+        }
+
+        eliminarElementoMisterioso()
+
+        $('#form_elementos').validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'remesas_config[costo_precio][minimo]': "required",
+                'remesas_config[costo_precio][maximo]': "required",
+                'remesas_config[costo_precio][id_proveedor]': "required",
+                'remesas_config[costo_precio][id_moneda]': "required",
+            },
+            messages: {
+                'remesas_config[costo_precio][minimo]': '!Obligatorio',
+                'remesas_config[costo_precio][minimo]': '!Obligatorio',
+                'remesas_config[costo_precio][id_proveedor]': '!Obligatorio',
+                'remesas_config[costo_precio][id_moneda]': '!Obligatorio',
+            }
+        })
+
         $('#remesas_config_costo_precio_costo_fijo').prop('type', 'number')
         $('#remesas_config_costo_precio_costo_porciento').prop('type', 'number')
         $('#remesas_config_costo_precio_venta_fijo').prop('type', 'number')
         $('#remesas_config_costo_precio_venta_porciento').prop('type', 'number')
+        $('#remesas_config_costo_precio_minimo').prop('type', 'number')
+        $('#remesas_config_costo_precio_maximo').prop('type', 'number')
 
         $('#remesas_config_id_pais').on('change', function () {
-            if ($('#remesas_config_id_pais').val() === "0")
+            if ($('#remesas_config_id_pais').val() === "-1")
                 changeStatus(1)
             else
-                changeStatus(0)
-
+                changeStatus(-1)
         })
 
-        function changeStatus(val) {
+        function changeStatus(val, value) {
             resetForm()
-            if (val == 0) {
+            if (val == -1) {
                 $('#nuevo_pais_div').css('display', 'none')
                 $('#id_pais_div').css('display', 'block')
             } else {
@@ -143,6 +181,8 @@
                 $('#id_pais_div').css('display', 'none')
                 $('#remesas_config_id_pais').val('')
             }
+            if (value == true)
+                $('#remesas_config_id_pais').val(0)
         }
 
         $('#remesas_config_costo_precio_costo_fijo').on('keyup', e => $('#remesas_config_costo_precio_costo_porciento').val(''))
@@ -157,50 +197,62 @@
             $('#remesas_config_costo_precio_venta_porciento').val('')
             $('#remesas_config_costo_precio_minimo').val('')
             $('#remesas_config_costo_precio_maximo').val('')
+            $('#remesas_config_costo_precio_id_proveedor').val(0)
+            $('#remesas_config_costo_precio_id_moneda').val(0)
         }
 
         $('#btnAplicarMercancia').on('click', function () {
-            const moneda = $('#remesas_config_costo_precio_id_moneda').val()
-            const proveedor = $('#remesas_config_costo_precio_id_proveedor').val()
-            const minimo = $('#remesas_config_costo_precio_minimo').val()
-            const maximo = $('#remesas_config_costo_precio_maximo').val()
-            const costo_fijo = $('#remesas_config_costo_precio_costo_fijo').val()
-            const costo_porciento = $('#remesas_config_costo_precio_costo_porciento').val()
-            const precio_fijo = $('#remesas_config_costo_precio_venta_fijo').val()
-            const precio_porciento = $('#remesas_config_costo_precio_venta_porciento').val()
+            if($('#form_elementos').valid()){
+                const moneda = $('#remesas_config_costo_precio_id_moneda').val()
+                const proveedor = $('#remesas_config_costo_precio_id_proveedor').val()
+                const minimo = $('#remesas_config_costo_precio_minimo').val()
+                const maximo = $('#remesas_config_costo_precio_maximo').val()
+                const costo_fijo = $('#remesas_config_costo_precio_costo_fijo').val()
+                const costo_porciento = $('#remesas_config_costo_precio_costo_porciento').val()
+                const precio_fijo = $('#remesas_config_costo_precio_venta_fijo').val()
+                const precio_porciento = $('#remesas_config_costo_precio_venta_porciento').val()
 
-            let repetido = false
-            for (let i = 0; i < listado_configuraciones.length; i++) {
-                if (listado_configuraciones[i]['moneda'] == moneda && listado_configuraciones[i]['proveedor'] == proveedor
-                    && listado_configuraciones[i]['minimo'] == minimo && listado_configuraciones[i]['maximo'] == maximo)
-                    repetido = true
-            }
-            if (!repetido) {
-                listado_configuraciones.push({
-                    moneda,
-                    proveedor,
-                    minimo,
-                    maximo,
-                    costo_fijo,
-                    costo_porciento,
-                    precio_fijo,
-                    precio_porciento
-                })
-                const str_moneda = $('#remesas_config_costo_precio_id_moneda option:selected').text()
-                const str_proveedor = $('#remesas_config_costo_precio_id_proveedor option:selected').text()
-                let costo_tabla = ''
-                if (costo_fijo > 0)
-                    costo_tabla = costo_fijo.fixed(2)
-                else
-                    costo_tabla = costo_porciento.fixed(2) + '%'
+                if(costo_fijo == '' && costo_porciento == '')
+                    alertTemplate('Los costos no pueden estar vacios', 'danger')
+                else if (precio_fijo =='' && precio_porciento =='')
+                    alertTemplate('Los precios de venta no pueden estar vacios', 'danger')
+                else{
+                    if(maximo<= minimo)
+                        alertTemplate('El valor máximo no puede ser menor o igual que el mínimo', 'danger')
+                    else{
 
-                let precio_tabla = ''
-                if (precio_fijo > 0)
-                    precio_tabla = precio_fijo.fixed(2)
-                else
-                    precio_tabla = precio_porciento.fixed(2) + '%'
+                        let repetido = false
+                        for (let i = 0; i < listado_configuraciones.length; i++) {
+                            if (listado_configuraciones[i]['moneda'] == moneda && listado_configuraciones[i]['proveedor'] == proveedor
+                                && listado_configuraciones[i]['minimo'] == minimo && listado_configuraciones[i]['maximo'] == maximo)
+                                repetido = true
+                        }
+                        if (!repetido) {
+                            listado_configuraciones.push({
+                                moneda,
+                                proveedor,
+                                minimo,
+                                maximo,
+                                costo_fijo,
+                                costo_porciento,
+                                precio_fijo,
+                                precio_porciento
+                            })
+                            const str_moneda = $('#remesas_config_costo_precio_id_moneda option:selected').text()
+                            const str_proveedor = $('#remesas_config_costo_precio_id_proveedor option:selected').text()
+                            let costo_tabla = ''
+                            if (costo_fijo > 0)
+                                costo_tabla = costo_fijo.fixed(2)
+                            else
+                                costo_tabla = costo_porciento.fixed(2) + '%'
 
-                listado_configuraciones.append(`<tr>
+                            let precio_tabla = ''
+                            if (precio_fijo > 0)
+                                precio_tabla = precio_fijo.fixed(2)
+                            else
+                                precio_tabla = precio_porciento.fixed(2) + '%'
+
+                            listado_configuraciones.append(`<tr>
                         <td class="text-left"> ${str_moneda}</td>
                         <td class="text-left"> ${str_proveedor} </td>
                         <td class="text-left"> ${minimo}-${maximo} </td>
@@ -212,10 +264,13 @@
                         </button>
                         </td
                         ></tr>`
-                );
-                resetForm()
-            } else {
-                alertTemplate('Ya ha registrado una configuración para los datos introducidos', 'danger')
+                            );
+                            resetForm()
+                        } else {
+                            alertTemplate('Ya ha registrado una configuración para los datos introducidos', 'danger')
+                        }
+                    }
+                }
             }
         })
 
