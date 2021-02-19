@@ -16,17 +16,6 @@ class CostoVentaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id_moneda', EntityType::class, [
-                'class' => Moneda::class,
-                'choice_label' => 'nombre',
-                'attr' => ['class' => 'w-100'],
-                'label' => 'Moneda',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.activo = true')
-                        ->orderBy('u.nombre', 'ASC');
-                }
-            ])
             ->add('id_proveedor', EntityType::class, [
                 'class' => Proveedor::class,
                 'choice_label' => 'nombre',

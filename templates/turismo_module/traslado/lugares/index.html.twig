@@ -1,6 +1,6 @@
 {% extends 'turismo_module/index.html.twig' %}
 
-{% block title %}Tipo de Vehiculo{% endblock %}
+{% block title %}Gestión de Origen y Destino{% endblock %}
 
 {% block style %}
     <style>
@@ -10,17 +10,17 @@
     </style>
 {%endblock%}
 
-{% block content%}
-<div class="container-fluid">
+{% block content %}
+    <div class="container-fluid">
 
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Tipo de Vehiculo
+                Origenes/Destinos
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
-                        data-target="#gestionarTvehiculoModal" data-placement="bottom" title="Adicionar"
+                        data-target="#gestionarOrigenDestinoModal" data-placement="bottom" title="Adicionar"
                         onclick="mostrarBtn()">
                     <i class="fa fa-plus"> Adicionar</i>
                 </button>
@@ -29,13 +29,13 @@
         {# end header #}
 
         {# Modal de adicionar#}
-        <div class="modal fade" id="gestionarTvehiculoModal" tabindex="-1" role="dialog" data-backdrop="static"
+        <div class="modal fade" id="gestionarOrigenDestinoModal" tabindex="-1" role="dialog" data-backdrop="static"
              data-keyboard="false"
-             aria-labelledby="gestionarTvehiculo" aria-hidden="true">
+             aria-labelledby="gestionarOrigenDestino" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarTvehiculo">Adicionar Vehiculo</h4>
+                        <h4 class="modal-title text-light" id="gestionarOrigenDestino">Adicionar Lugar</h4>
                         <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -44,13 +44,11 @@
 
                     <div class="modal-body bg-dark-app">
                         <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
-                            <label for="grupo_tipo_vehiculo_nombre" class="font-weight-bold">Nombre</label>
+                            <label for="grupo_lugares_nombre" class="font-weight-bold">Nombre</label>
                             {{ form_widget(form.nombre) }}
-                            <label for="grupo_tipo_vehiculo_cant_ini" class="font-weight-bold">Cantidad inicial de personas</label>
-                            {{ form_widget(form.cantidad_ini_persona) }}
-                            <label for="grupo_tipo_vehiculo_cant_fin" class="font-weight-bold">Cantidad final de personas</label>
-                            {{ form_widget(form.cantidad_fin_persona) }}
-                            <input type="text" id="id_tipo_vehiculo" hidden>
+                            <label for="grupo_tipo_vehiculo_cant_ini" class="font-weight-bold">Estado</label>
+                            {{ form_widget(form.habilitado) }}
+                            <input type="text" id="id_tipo_origen_destino" hidden>
                         </div>
                         <div class="d-flex mt-4">
                             <div class="mr-auto">
@@ -77,33 +75,46 @@
 
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Marca</th>
-            <th scope="col-1">Rango de personas</th>
-            <th scope="col-1" width="150px">Acciones</th>
+            <th scope="col-2">Nombre</th>
+            <th scope="col-1">Estado</th>
+            <th scope="col-1" width="200px">Acciones</th>
             </thead>
             <tbody>
-            {% for item in vehiculos %}
+            {% for item in lugares %}
                 <tr>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400; align-content: center;" width="400px">{{ item.cant_ini }} - {{ item.cant_fin }}</td>
+                    <td style="font-weight:400; align-content: center;" width="400px">
+                        {% if item.estado == 1 %}
+                        {{ 'Habilitado' }}
+                            {% elseif item.estado == 0 %}
+                                {{ 'No Habilitado' }}
+                        {% endif %}
+                    </td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Actualizar"
                                 onclick="onUpdate({
                                         id: '{{ item.id }}',
                                         nombre: '{{ item.nombre }}',
-                                        cant_ini: '{{ item.cant_ini }}',
-                                        cant_fin: '{{ item.cant_fin }}'
+                                        estado: '{{ item.estado }}'
                                         })">
                             <i class="fa fa-edit"></i>
                         </button>
                         <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar el vehículo seleccionado ?',
-                                        url:'{{ path('turismo_module_traslado_tipo_vehiculo_delete',{id: item.id}) }}'
+                                        message:'Está seguro que desea eliminar el lugar seleccionado ?',
+                                        url:'{{ path('turismo_module_traslado_lugares_delete',{id: item.id}) }}'
                                         })">
                             <i class="fa fa-trash"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Cambiar estado"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el lugar seleccionado ?',
+                                        url:'{{ path('turismo_module_traslado_lugares_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-close"></i>
                         </button>
                     </td>
                 </tr>
@@ -114,12 +125,12 @@
     </div>
 
     <div class="navigation mt-5">
-        {{ knp_pagination_render(vehiculos) }}
+        {{ knp_pagination_render(lugares) }}
     </div>
     </div>
 {% endblock %}
 {%block javascripts%}
-{{ parent() }}
+    {{ parent() }}
     <script>
         $(document).ready(function () {
             $('#btnActualizar').hide()
@@ -128,65 +139,58 @@
         const onUpdate = function (config) {
             $('#btnActualizar').show()
             $('#btnAceptar').hide()
-            const {nombre = '', id = '', cant_ini = '', cant_fin = ''} = config
-            $('#gestionarTvehiculoModal').modal('show')
+            const {nombre = '', id = '', estado = ''} = config
+            $('#gestionarOrigenDestinoModal').modal('show')
 
-            $('#tipo_vehiculo_nombre').val(nombre)
-            $('#tipo_vehiculo_cantidad_ini_persona').val(cant_ini)
-            $('#tipo_vehiculo_cantidad_fin_persona').val(cant_fin)
-            $('#id_tipo_vehiculo').val(id)
-            $('#gestionarTvehiculo').html("Modificar " + nombre)
+            $('#lugares_nombre').val(nombre)
+            $('#lugares_habilitado').prop(estado)
+            $('#id_tipo_origen_destino').val(id)
+            $('#gestionarOrigenDestino').html("Modificar " + nombre)
         }
         $('#btnAceptar').on('click', function () {
             let params = {
-                nombre: $('#tipo_vehiculo_nombre').val(),
-                cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),
-                cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),
+                nombre: $('#lugares_nombre').val(),
+                est: $('#lugares_habilitado').prop('checked'),
                 id_cliente: {{ id_cliente }}
             }
             $.ajax({
-                url: '/configuracion-turismo/traslado/tipo-vehiculo/add',
+                url: '/configuracion-turismo/traslado/lugares/add',
                 method: "POST",
                 data: params
             }).then(res => {
-                window.location.replace('/configuracion-turismo/traslado/tipo-vehiculo');
+                window.location.replace('/configuracion-turismo/traslado/lugares');
             })
         })
 
         $('#btnActualizar').on('click', function () {
 
             let params = {
-                nombre: $('#tipo_vehiculo_nombre').val(),
-                cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),
-                cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),
-                id_TipoVehiculo: $('#id_tipo_vehiculo').val(),
+                nombre: $('#lugares_nombre').val(),
+                estado: $('#lugares_habilitado').prop('checked'),
+                id_OrigenDestino: $('#id_tipo_origen_destino').val(),
                 id_cliente: {{ id_cliente }}
             }
             $.ajax({
-                url: '/configuracion-turismo/traslado/tipo-vehiculo/upd',
+                url: '/configuracion-turismo/traslado/lugares/upd',
                 method: "POST",
                 data: params
             }).then(res => {
-                window.location.replace('/configuracion-turismo/traslado/tipo-vehiculo');
+                window.location.replace('/configuracion-turismo/traslado/lugares');
             })
         })
 
-       
 
-        
 
-        $('#gestionarTvehiculoModal').on('show.bs.modal', function (event) {
+
+
+        $('#gestionarOrigenDestinoModal').on('show.bs.modal', function (event) {
             var modal = $(this)
-            modal.find('.modal-title').text('Adicionar vehículo')
+            modal.find('.modal-title').text('Adicionar Lugar de Origen o Destino')
         })
 
         function mostrarBtn() {
             $('#btnActualizar').hide()
             $('#btnAceptar').show()
-
-            $('#id_proveedor').val('')
-            $('#proveedor_nombre').val('')
-            $('#proveedor_codigo').val('')
         }
     </script>
 {%endblock%}

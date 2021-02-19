@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class RemesasConfigController
  * @package App\Controller\RemesasModule\Configuracion
- * @Route("/configuracion-turismo/remesas/config")
+ * @Route("/configuracion-turismo/remesas/config-costos-ventas")
  */
 class RemesasConfigController extends AbstractController
 {

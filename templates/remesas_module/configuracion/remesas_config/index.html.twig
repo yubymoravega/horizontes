@@ -72,19 +72,15 @@
                 </div>
                 <hr color="dimgray" class="my-1 ml-2" size=3>
                 <div class="row mt-1 p-0">
-                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
-                        {{ form_label(formulario.costo_precio.id_moneda) }}
-                        {{ form_widget(formulario.costo_precio.id_moneda) }}
-                    </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-5 mt-0 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.costo_precio.venta_fijo) }}
                         {{ form_widget(formulario.costo_precio.venta_fijo) }}
                     </div>
-                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                    <div class="col-5 mt-0 form-group input-group input-group-sm pa-2 d-block">
                         {{ form_label(formulario.costo_precio.venta_porciento) }}
                         {{ form_widget(formulario.costo_precio.venta_porciento) }}
                     </div>
-                    <div class="col-3 pt-2 pl-1 mt-4">
+                    <div class="col-2 pt-2 pl-1 mt-4">
                         <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
                         </button>
                     </div>
@@ -94,7 +90,6 @@
             <div>
                 <table class="table-small-rows table table-hover text-light">
                     <thead class="thead-dark">
-                    <th width="100px" class="text-left">Moneda</th>
                     <th width="160px" class="text-left">Proveedor</th>
                     <th width="90px" class="text-left">Rango</th>
                     <th width="90px" class="text-right">Costo</th>
@@ -120,7 +115,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const listado_configuraciones = $('#rows_configuraciones')
+        let listado_configuraciones = $('#rows_configuraciones')
 
         $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
         $('#remesas_config_id_pais').append('<option value = "-1"> -- NUEVO PAIS --</option>')
@@ -147,13 +142,11 @@
                 'remesas_config[costo_precio][minimo]': "required",
                 'remesas_config[costo_precio][maximo]': "required",
                 'remesas_config[costo_precio][id_proveedor]': "required",
-                'remesas_config[costo_precio][id_moneda]': "required",
             },
             messages: {
                 'remesas_config[costo_precio][minimo]': '!Obligatorio',
                 'remesas_config[costo_precio][minimo]': '!Obligatorio',
                 'remesas_config[costo_precio][id_proveedor]': '!Obligatorio',
-                'remesas_config[costo_precio][id_moneda]': '!Obligatorio',
             }
         })
 
@@ -198,12 +191,10 @@
             $('#remesas_config_costo_precio_minimo').val('')
             $('#remesas_config_costo_precio_maximo').val('')
             $('#remesas_config_costo_precio_id_proveedor').val(0)
-            $('#remesas_config_costo_precio_id_moneda').val(0)
         }
 
         $('#btnAplicarMercancia').on('click', function () {
-            if($('#form_elementos').valid()){
-                const moneda = $('#remesas_config_costo_precio_id_moneda').val()
+            if ($('#form_elementos').valid()) {
                 const proveedor = $('#remesas_config_costo_precio_id_proveedor').val()
                 const minimo = $('#remesas_config_costo_precio_minimo').val()
                 const maximo = $('#remesas_config_costo_precio_maximo').val()
@@ -212,66 +203,78 @@
                 const precio_fijo = $('#remesas_config_costo_precio_venta_fijo').val()
                 const precio_porciento = $('#remesas_config_costo_precio_venta_porciento').val()
 
-                if(costo_fijo == '' && costo_porciento == '')
+                if (costo_fijo == '' && costo_porciento == '')
                     alertTemplate('Los costos no pueden estar vacios', 'danger')
-                else if (precio_fijo =='' && precio_porciento =='')
+                else if (precio_fijo == '' && precio_porciento == '')
                     alertTemplate('Los precios de venta no pueden estar vacios', 'danger')
-                else{
-                    if(maximo<= minimo)
+                else {
+                    if (parseFloat(maximo) <= parseFloat(minimo))
                         alertTemplate('El valor máximo no puede ser menor o igual que el mínimo', 'danger')
-                    else{
-
+                    else {
                         let repetido = false
+                        let subconjunto = false
                         for (let i = 0; i < listado_configuraciones.length; i++) {
-                            if (listado_configuraciones[i]['moneda'] == moneda && listado_configuraciones[i]['proveedor'] == proveedor
+                            if (listado_configuraciones[i]['proveedor'] == proveedor
                                 && listado_configuraciones[i]['minimo'] == minimo && listado_configuraciones[i]['maximo'] == maximo)
                                 repetido = true
+                            if (listado_configuraciones[i]['proveedor'] == proveedor) {
+                                if (minimo < listado_configuraciones[i]['maximo'])
+                                    subconjunto = true
+                            }
                         }
-                        if (!repetido) {
-                            listado_configuraciones.push({
-                                moneda,
-                                proveedor,
-                                minimo,
-                                maximo,
-                                costo_fijo,
-                                costo_porciento,
-                                precio_fijo,
-                                precio_porciento
-                            })
-                            const str_moneda = $('#remesas_config_costo_precio_id_moneda option:selected').text()
-                            const str_proveedor = $('#remesas_config_costo_precio_id_proveedor option:selected').text()
-                            let costo_tabla = ''
-                            if (costo_fijo > 0)
-                                costo_tabla = costo_fijo.fixed(2)
-                            else
-                                costo_tabla = costo_porciento.fixed(2) + '%'
+                        if (subconjunto) {
+                            alertTemplate('El valor mínimo se encuentra contenido en una regla anterior del proveedor.', 'danger')
+                        } else {
+                            if (!repetido) {
+                                listado_configuraciones.push({
+                                    proveedor,
+                                    minimo,
+                                    maximo,
+                                    costo_fijo,
+                                    costo_porciento,
+                                    precio_fijo,
+                                    precio_porciento
+                                })
+                                const str_proveedor = $('#remesas_config_costo_precio_id_proveedor option:selected').text()
+                                let costo_tabla = ''
+                                if (costo_fijo > 0)
+                                    costo_tabla = costo_fijo.fixed(2)
+                                else
+                                    costo_tabla = costo_porciento.fixed(2) + '%'
 
-                            let precio_tabla = ''
-                            if (precio_fijo > 0)
-                                precio_tabla = precio_fijo.fixed(2)
-                            else
-                                precio_tabla = precio_porciento.fixed(2) + '%'
+                                let precio_tabla = ''
+                                if (precio_fijo > 0)
+                                    precio_tabla = precio_fijo.fixed(2)
+                                else
+                                    precio_tabla = precio_porciento.fixed(2) + '%'
 
-                            listado_configuraciones.append(`<tr>
-                        <td class="text-left"> ${str_moneda}</td>
+                                listado_configuraciones.append(`<tr>
                         <td class="text-left"> ${str_proveedor} </td>
                         <td class="text-left"> ${minimo}-${maximo} </td>
                         <td class="text-right"> ${costo_tabla} </td>
                         <td class="text-right"> ${precio_tabla}</td>
                         <td style="width: 45px;" class="text-center"> <button type="button"
-                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" moneda="${str_moneda}">
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" proveedor="${str_proveedor}">
                             <i class="fa fa-minus-circle"></i>
                         </button>
                         </td
                         ></tr>`
-                            );
-                            resetForm()
-                        } else {
-                            alertTemplate('Ya ha registrado una configuración para los datos introducidos', 'danger')
+                                );
+                                resetForm()
+                            } else {
+                                alertTemplate('Ya ha registrado una configuración para los datos introducidos', 'danger')
+                            }
                         }
                     }
                 }
             }
+        })
+
+        // eliminar la mercancia de la lista
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            listado_configuraciones = listado_configuraciones.filter(e => e.proveedor !== $(this).attr('proveedor'))
+            $(this).closest('tr').remove()
         })
 
     </script>

@@ -43,19 +43,35 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ url('turismo_module_visado_proveedor') }}">Proveedores</a>
-                        <a class="dropdown-item"
-                           href="{{ url ('turismo_module_visado_estado_solicitud') }}">Estados de las Solicitudes</a>
                         <div class="dropdown-divider"></div>
-                        <h6 class="text-center">Gestión Consular</h6>
+                        <h6 class="text-center">Gestión de Transporte</h6>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item"
-                           href="{{ url ('turismo_module_visado_elementos_visa') }}">Costo de Elementos</a>
+                           href="{{ url ('turismo_module_traslado_lugares') }}">Origen/Destino</a>
                         <a class="dropdown-item"
-                           href="{{ url ('turismo_module_visado_config_precio_venta') }}">Precio de Venta</a>
+                           href="{{ url ('turismo_module_traslado_tipo_vehiculo') }}">Tipo de Vehiculo</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_traslado_tipo_traslado') }}">Tipo de traslado</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_traslado_tramo') }}">Gestionar Tramo</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_traslado_precio_venta') }}">Precio de Venta</a>
                     </div>
                 </li>
-                <a class="dropdown-item"
-                   href="{{ url ('remesas_module_configuracion_remesas_config') }}">Remesa</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Remesas
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item"
+                           href="{{ url ('remesas_module_configuracion_remesas_config') }}">Configuración de Costos y Precios de Venta</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('remesas_module_configuracion_monedas_pais') }}">Monedas</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('remesas_module_configuracion_provincias_municipios') }}">Provincias y Municipios</a>
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>
