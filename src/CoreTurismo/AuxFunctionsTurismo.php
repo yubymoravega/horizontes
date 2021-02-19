@@ -152,6 +152,10 @@ class AuxFunctionsTurismo
         foreach ($pagos_cotizacion as $item) {
             $total_pagado += floatval($item->getMonto());
         }
+        if((floatval($cotizacion->getTotal()) - $total_pagado)==0){
+            $cotizacion->setPagado(true);
+            $em->persist($cotizacion);
+        }
         return floatval($cotizacion->getTotal()) - $total_pagado;
     }
 

@@ -22,8 +22,8 @@
         {# list #}
         <table class="table table-hover text-light">
             <thead class="thead-dark">
-                <th scope="col-2" class="text-left">Nombre de la Moneda</th>
-                <th scope="col-1" width="200x" class="text-center">Acciones</th>
+            <th scope="col-2" class="text-left">Nombre de la Moneda</th>
+            <th scope="col-1" width="200x" class="text-center">Acciones</th>
             </thead>
             <tbody>
             {% for item in paises %}
@@ -57,52 +57,32 @@
     <script>
         $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
 
-        let list_cuentas_cliente = []
-        let id_cliente = null;
+        let list_monedas_pais = []
+        let id_pais = null;
 
-        function mostrarBtn() {
-            $('#modal__btn__actualizar').hide()
-            $('#modal__btn__aceptar').show()
-        }
-
-        const onUpdate = function (config) {
-            $('#modal__btn__actualizar').show()
-            $('#modal__btn__aceptar').hide()
-            const {id = '', codigo = '', nombre = '', fax = '', telefonos = '', correos = '', direccion = ''} = config
-            $('#modal__form__id').modal('show')
-            $('#modal__form__label__id').text("Modificar " + nombre)
-            // nombre, codigo, id
-            $('#cliente_contabilidad_nombre').val(nombre)
-            $('#cliente_contabilidad_codigo').val(codigo)
-            $('#cliente_contabilidad_fax').val(fax)
-            $('#cliente_contabilidad_telefonos').val(telefonos)
-            $('#cliente_contabilidad_correos').val(correos)
-            $('#cliente_contabilidad_direccion').val(direccion)
-            $('#id_cliente_contabilidad').val(id)
-        }
 
         const onCuentas = function (config) {
             const {id = ''} = config
-            $('#rows_cuentas').find('tr').remove();
+            $('#rows_monedas').find('tr').remove();
             $('#modal__form__cuentas__id').modal('show')
-            $('#modal__form__cuentas__label__id').text("Cuentas bancarias")
-            $('#id_cliente_contabilidad').val(id)
+            $('#modal__form__cuentas__label__id').text("Monedas del país")
             loadingModal.show()
             $.ajax({
-                url: '/contabilidad/venta/cliente-contabilidad/getCuentasBancarias/' + id,
+                url: '/configuracion-turismo/remesas/monedas-pais/getMonedas/' + id,
                 method: 'POST',
                 dataType: 'json',
                 success: function (result) {
                     if (result.success == true) {
-                        id_cliente = id;
-                        list_cuentas_cliente = result.cuentas
-                        for (var i = 0; i < list_cuentas_cliente.length; i++) {
-                            $('#rows_cuentas').append(`<tr>
-                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nro_cuenta']} </td>
-                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_moneda']}</td>
-                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_banco']}</td>
-                                    <td><button type="button"
-                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${list_cuentas_cliente[i]['nro_cuenta']}">
+                        id_pais = id;
+                        list_monedas_pais = result.data
+                        for (var i = 0; i < list_monedas_pais.length; i++) {
+                            $('#rows_monedas').append(`<tr>
+                                    <td style="font-weight:400;"> ${list_monedas_pais[i]['nombre_moneda']} </td>
+                                    <td style="font-weight:400;" hidden> ${list_monedas_pais[i]['moneda']}</td>
+                                    <td style="font-weight:400;" hidden> ${list_monedas_pais[i]['id_moneda_pais']}</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-danger btn-sm borrar"
+                                        title="Eliminar" id-moneda-pais="${list_monedas_pais[i]['id_moneda_pais']}">
                             <i class="fa fa-minus-circle"></i>
                         </button></td>
                                    </tr>`
@@ -119,53 +99,37 @@
                 }
             })
         }
-        const form_cuentas = $('#form_modal_target_cuentas')
-        form_cuentas.validate({
-            errorClass: 'invalid-label-orange',
-            errorPlacement: function (error, element) {
-                error.attr('style', 'font-size: .8rem;')
-                error.insertAfter(element);
-            },
-            rules: {
-                'cuentas_cliente[nro_cuenta]': "required",
-                'cuentas_cliente[id_moneda]': "required",
-                'cuentas_cliente[id_banco]': "required"
-            },
-            messages: {
-                'cuentas_cliente[nro_cuenta]': 'Obligatorio!',
-                'cuentas_cliente[id_moneda]': 'Obligatorio!',
-                'cuentas_cliente[id_banco]': 'Obligatorio!'
-            }
-        })
-        $('#btnAplicarCuenta').on('click', function () {
-            if (form_cuentas.valid()) {
-                let nro_cuenta = $('#cuentas_cliente_nro_cuenta').val()
-                let moneda = $('#cuentas_cliente_id_moneda').val()
-                let banco = $('#cuentas_cliente_id_banco').val()
-                let nombre_moneda = $('#cuentas_cliente_id_moneda option:selected').text()
-                let nombre_banco = $('#cuentas_cliente_id_banco option:selected').text()
-                list_cuentas_cliente.push({moneda, nro_cuenta, banco})
-                $('#rows_cuentas').append(`<tr>
-                    <td style="font-weight:400;"> ${nro_cuenta}</td>
+
+        $('#btnAplicar').on('click', function () {
+            if ($('#form_modal_target_cuentas').valid()) {
+                let moneda = $('#monedas_pais_id_moneda').val()
+                let nombre_moneda = $('#monedas_pais_id_moneda option:selected').text()
+                if (list_monedas_pais.some(e => e.moneda === moneda)) {
+                    alertTemplate('La moneda seleccionada ya se encuentra en el listado.', 'danger')
+                } else {
+                    list_monedas_pais.push({moneda})
+                    $('#rows_monedas').append(`<tr>
                     <td style="font-weight:400;"> ${nombre_moneda}</td>
-                    <td style="font-weight:400;"> ${nombre_banco}</td>
-                    <td> <button type="button"
-                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${nro_cuenta}">
+                    <td style="font-weight:400;" hidden> ${moneda}</td>
+                    <td class="text-center"> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-moneda-pais="${moneda}">
                         <i class="fa fa-minus-circle"></i>
                     </button>
                     </td></tr>`
-                );
-                $('#cuentas_cliente_nro_cuenta').val('')
-                // }
+                    );
+                    $('#monedas_pais_id_moneda').val(0)
+                }
             }
         })
+
+
         $('#modal__btn__cuenta__aceptar').on('click', function () {
-            if (list_cuentas_cliente.length > 0) {
+            if (list_monedas_pais.length > 0) {
                 loadingModal.show()
                 $.ajax({
                     url: '/contabilidad/venta/cliente-contabilidad/add-cuentas',
                     method: 'POST',
-                    data: {'id_cliente': id_cliente, 'lista': list_cuentas_cliente},
+                    data: {'id_pais': id_pais, 'lista': list_monedas_pais},
                     dataType: 'json',
                     success: function (result) {
                         if (result.success == true) {
@@ -182,7 +146,7 @@
                 })
                 // const formulario_cuentas = $('#form_modal_target_cuentas')
                 // formulario_cuentas.attr('method', `POST`)
-                // formulario_cuentas.attr('params', {'list':list_cuentas_cliente})
+                // formulario_cuentas.attr('params', {'list':list_monedas_pais})
                 // formulario_cuentas.attr('action', `/contabilidad/venta/cliente-contabilidad/add-cuentas`)
                 // formulario_cuentas.submit()
             } else {
@@ -193,7 +157,7 @@
         $(document).ready(function () {
             $('#modal__btn__actualizar').hide()
             // validacion del formulario
-            var validateForm = $('#form_modal_target').validate({
+            var validateForm = $('#form_modal_target_cuentas').validate({
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
                     // colocar mensajes de error a la derecha de cada label para el componente
@@ -209,18 +173,10 @@
                     }
                 },
                 rules: {
-                    'cliente_contabilidad[nombre]': "required",
-                    'cliente_contabilidad[codigo]': "required",
-                    'cliente_contabilidad[telefonos]': "required",
-                    'cliente_contabilidad[correos]': "required",
-                    'cliente_contabilidad[direccion]': "required",
+                    'monedas_pais[id_moneda]': "required",
                 },
                 messages: {
-                    'cliente_contabilidad[nombre]': 'Obligratorio',
-                    'cliente_contabilidad[codigo]': 'Obligratorio',
-                    'cliente_contabilidad[telefonos]': 'Obligratorio',
-                    'cliente_contabilidad[correos]': 'Obligratorio',
-                    'cliente_contabilidad[direccion]': 'Obligratorio',
+                    'monedas_pais[id_moneda]': 'Obligratorio',
                 }
             })
             $('#modal__btn__aceptar').on('click', function () {
@@ -231,10 +187,10 @@
                 if (validateForm.errorList.length === 0) loadingModal.show()
             })
             $('#modal__btn__actualizar').on('click', function () {
-                const id_cliente_contabilidad = $('#id_cliente_contabilidad').val()
+                const id_pais_contabilidad = $('#id_pais_contabilidad').val()
                 const formulario = $('#form_modal_target')
                 formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/venta/cliente-contabilidad/${id_cliente_contabilidad}`)
+                formulario.attr('action', `/contabilidad/venta/cliente-contabilidad/${id_pais_contabilidad}`)
                 formulario.submit()
                 if (validateForm.errorList.length === 0) loadingModal.show()
             })
@@ -244,8 +200,8 @@
             })
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
-                list_cuentas_cliente.find(e => e.nro_cuenta === $(this).attr('id-cuenta-cliente'))
-                list_cuentas_cliente = list_cuentas_cliente.filter(e => e.nro_cuenta !== $(this).attr('id-cuenta-cliente'))
+                list_monedas_pais.find(e => e.nro_cuenta === $(this).attr('id-cuenta-cliente'))
+                list_monedas_pais = list_monedas_pais.filter(e => e.nro_cuenta !== $(this).attr('id-cuenta-cliente'))
                 $(this).closest('tr').remove()
             })
         })
