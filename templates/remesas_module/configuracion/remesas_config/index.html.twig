@@ -116,6 +116,7 @@
     {{ parent() }}
     <script>
         let listado_configuraciones = $('#rows_configuraciones')
+        let listado_configuraciones_rows = []
 
         $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
         $('#remesas_config_id_pais').append('<option value = "-1"> -- NUEVO PAIS --</option>')
@@ -131,6 +132,22 @@
         }
 
         eliminarElementoMisterioso()
+
+        $('#form_solicitud').validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'remesas_config[nuevo_pais]': "required",
+                'remesas_config[id_pais]': "required"
+            },
+            messages: {
+                'remesas_config[nuevo_pais]': '!Obligatorio',
+                'remesas_config[id_pais]': '!Obligatorio'
+            }
+        })
 
         $('#form_elementos').validate({
             errorClass: 'invalid-label-orange',
@@ -213,12 +230,12 @@
                     else {
                         let repetido = false
                         let subconjunto = false
-                        for (let i = 0; i < listado_configuraciones.length; i++) {
-                            if (listado_configuraciones[i]['proveedor'] == proveedor
-                                && listado_configuraciones[i]['minimo'] == minimo && listado_configuraciones[i]['maximo'] == maximo)
+                        for (let i = 0; i < listado_configuraciones_rows.length; i++) {
+                            if (listado_configuraciones_rows[i]['proveedor'] == proveedor
+                                && listado_configuraciones_rows[i]['minimo'] == minimo && listado_configuraciones_rows[i]['maximo'] == maximo)
                                 repetido = true
-                            if (listado_configuraciones[i]['proveedor'] == proveedor) {
-                                if (minimo < listado_configuraciones[i]['maximo'])
+                            if (listado_configuraciones_rows[i]['proveedor'] == proveedor) {
+                                if (minimo < parseFloat(listado_configuraciones_rows[i]['maximo']))
                                     subconjunto = true
                             }
                         }
@@ -226,7 +243,7 @@
                             alertTemplate('El valor mínimo se encuentra contenido en una regla anterior del proveedor.', 'danger')
                         } else {
                             if (!repetido) {
-                                listado_configuraciones.push({
+                                listado_configuraciones_rows.push({
                                     proveedor,
                                     minimo,
                                     maximo,
@@ -254,7 +271,7 @@
                         <td class="text-right"> ${costo_tabla} </td>
                         <td class="text-right"> ${precio_tabla}</td>
                         <td style="width: 45px;" class="text-center"> <button type="button"
-                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" proveedor="${str_proveedor}">
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" proveedor="${proveedor}-${minimo}-${maximo}">
                             <i class="fa fa-minus-circle"></i>
                         </button>
                         </td
@@ -273,8 +290,71 @@
         // eliminar la mercancia de la lista
         $(document).on('click', '.borrar', function (event) {
             event.preventDefault();
-            listado_configuraciones = listado_configuraciones.filter(e => e.proveedor !== $(this).attr('proveedor'))
+            listado_configuraciones_rows = listado_configuraciones_rows.filter(e => (parseInt(e.proveedor)+'-'+parseInt(e.minimo)+'-'+parseInt(e.maximo)) !== $(this).attr('proveedor'))
+            cl(listado_configuraciones_rows)
             $(this).closest('tr').remove()
+        })
+
+        $('#btnSubbmit').on('click', function () {
+            if ($('#form_solicitud').valid()) {
+                if (listado_configuraciones_rows.length >0) {
+                    loadingModal.show()
+                    const id_pais = $('#remesas_config_id_pais').val()
+                    const nuevo_pais = $('#remesas_config_nuevo_pais').val()
+                    const list_send = JSON.stringify(listado_configuraciones_rows)
+                    $('body').append(`
+                    <form action='/configuracion-turismo/remesas/config-costos-ventas/addRegla'
+                         method="post" id='form_add_regla'>
+                        <input type='text' hidden name='nuevo_pais' value='${nuevo_pais}'/>
+                        <input type='text' hidden name='id_pais' value='${id_pais}'/>
+                        <input type='text' hidden name='lista' value='${list_send}'/>
+                    </form>`)
+
+                    const fomrulario = $('#form_add_regla')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                }
+                else{
+                    alertTemplate('Debe configurar al menos un precios de costo y venta del servicio','danger')
+                }
+            }
+        })
+
+        $('#remesas_config_id_pais').on('change',function () {
+            listado_configuraciones_rows= []
+            let pais = $('#remesas_config_id_pais').val()
+            $('#rows_configuraciones').find('tr').remove()
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/remesas/config-costos-ventas/getConfiguraciones/' + pais,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success == true) {
+                        listado_configuraciones_rows = result.data
+                        for (var i = 0; i < listado_configuraciones_rows.length; i++) {
+                            $('#rows_configuraciones').append(`<tr>
+                                <td class="text-left"> ${listado_configuraciones_rows[i]['nombre_proveedor']} </td>
+                                <td class="text-left"> ${listado_configuraciones_rows[i]['minimo']}-${listado_configuraciones_rows[i]['maximo']} </td>
+                                <td class="text-right"> ${listado_configuraciones_rows[i]['costo_porciento_mostrar']} </td>
+                                <td class="text-right"> ${listado_configuraciones_rows[i]['precio_porciento_mostrar']}</td>
+                                <td style="width: 45px;" class="text-center"> <button type="button"
+                                    class="btn btn-outline-danger btn-sm borrar" title="Eliminar" proveedor="${listado_configuraciones_rows[i]['proveedor']}-${listado_configuraciones_rows[i]['minimo']}-${listado_configuraciones_rows[i]['maximo']}">
+                                    <i class="fa fa-minus-circle"></i>
+                                </button>
+                                </td></tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    }
+                    if (result.success == false) {
+                        loadingModal.close()
+                        alertTemplate(result.msg, 'danger')
+                    }
+                },
+                error: function (result) {
+                }
+            })
         })
 
     </script>

@@ -17,10 +17,10 @@
         </div>
         {# end header #}
 
-        {{ include('remesas_module/configuracion/monedas_pais/form_cuentas_modal.html.twig', {title: 'Asociar Monedas'}) }}
+        {{ include('remesas_module/configuracion/monedas_pais/form_monedas_modal.html.twig', {title: 'Asociar Monedas'}) }}
 
         {# list #}
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th scope="col-2" class="text-left">Nombre de la Moneda</th>
             <th scope="col-1" width="200x" class="text-center">Acciones</th>
@@ -30,7 +30,7 @@
                 <tr class="row-group-conta">
                     <td style="font-weight:400;" class="font-weight-bold">{{ item.nombre }}</td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="tooltip"
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Asociar Monedas"
                                 onclick="onCuentas({
                                         id: '{{ item.id }}'
@@ -74,6 +74,7 @@
                 success: function (result) {
                     if (result.success == true) {
                         id_pais = id;
+                        list_monedas_pais = []
                         list_monedas_pais = result.data
                         for (var i = 0; i < list_monedas_pais.length; i++) {
                             $('#rows_monedas').append(`<tr>
@@ -82,7 +83,7 @@
                                     <td style="font-weight:400;" hidden> ${list_monedas_pais[i]['id_moneda_pais']}</td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-outline-danger btn-sm borrar"
-                                        title="Eliminar" id-moneda-pais="${list_monedas_pais[i]['id_moneda_pais']}">
+                                        title="Eliminar" id-moneda-pais="${list_monedas_pais[i]['moneda']}">
                             <i class="fa fa-minus-circle"></i>
                         </button></td>
                                    </tr>`
@@ -126,31 +127,19 @@
         $('#modal__btn__cuenta__aceptar').on('click', function () {
             if (list_monedas_pais.length > 0) {
                 loadingModal.show()
-                $.ajax({
-                    url: '/contabilidad/venta/cliente-contabilidad/add-cuentas',
-                    method: 'POST',
-                    data: {'id_pais': id_pais, 'lista': list_monedas_pais},
-                    dataType: 'json',
-                    success: function (result) {
-                        if (result.success == true) {
+                const list_send = JSON.stringify(list_monedas_pais)
+                $('body').append(`
+                    <form action='/configuracion-turismo/remesas/monedas-pais/updateMonedasPais'
+                         method="post" id='form_print_current'>
+                        <input type='text' hidden name='id_pais' value='${id_pais}'/>
+                        <input type='text' hidden name='lista' value='${list_send}'/>
+                    </form>`)
 
-                            loadingModal.close()
-                        }
-                        if (result.success == false) {
-                            loadingModal.close()
-                            alertTemplate(result.msg, 'danger')
-                        }
-                    },
-                    error: function (result) {
-                    }
-                })
-                // const formulario_cuentas = $('#form_modal_target_cuentas')
-                // formulario_cuentas.attr('method', `POST`)
-                // formulario_cuentas.attr('params', {'list':list_monedas_pais})
-                // formulario_cuentas.attr('action', `/contabilidad/venta/cliente-contabilidad/add-cuentas`)
-                // formulario_cuentas.submit()
+                const fomrulario = $('#form_print_current')
+                fomrulario.submit()
+                fomrulario.remove()
             } else {
-                alertTemplate('Debe introducir al menos una cuenta bancaria', 'danger')
+                alertTemplate('Debe introducir al menos una moneda', 'danger')
             }
         })
 
@@ -179,29 +168,9 @@
                     'monedas_pais[id_moneda]': 'Obligratorio',
                 }
             })
-            $('#modal__btn__aceptar').on('click', function () {
-                const formulario = $('#form_modal_target')
-                formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/venta/cliente-contabilidad/add`)
-                formulario.submit()
-                if (validateForm.errorList.length === 0) loadingModal.show()
-            })
-            $('#modal__btn__actualizar').on('click', function () {
-                const id_pais_contabilidad = $('#id_pais_contabilidad').val()
-                const formulario = $('#form_modal_target')
-                formulario.attr('method', `POST`)
-                formulario.attr('action', `/contabilidad/venta/cliente-contabilidad/${id_pais_contabilidad}`)
-                formulario.submit()
-                if (validateForm.errorList.length === 0) loadingModal.show()
-            })
-            $('#modal__form__id').on('show.bs.modal', function (event) {
-                validateForm.resetForm()
-                $('#modal__form__label__id').text('Adicionar Cliente')
-            })
             $(document).on('click', '.borrar', function (event) {
                 event.preventDefault();
-                list_monedas_pais.find(e => e.nro_cuenta === $(this).attr('id-cuenta-cliente'))
-                list_monedas_pais = list_monedas_pais.filter(e => e.nro_cuenta !== $(this).attr('id-cuenta-cliente'))
+                list_monedas_pais = list_monedas_pais.filter(e => e.moneda !== $(this).attr('id-moneda-pais'))
                 $(this).closest('tr').remove()
             })
         })
