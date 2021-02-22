@@ -64,8 +64,8 @@ class BalanceComprobacionSaldoCuentaSubcuentaController extends AbstractControll
         $mes_debito = 0;
         $acumulado_credito = 0;
         $acumulado_debito = 0;
-        foreach ($list_balance_comprobacion as $item){
-            if($item['index']==1||$item['index']=='1'){
+        foreach ($list_balance_comprobacion as $item) {
+            if ($item['index'] == 1 || $item['index'] == '1') {
                 $mes_debito += $item['debito_mes_value'];
                 $mes_credito += $item['credito_mes_value'];
                 $acumulado_debito += $item['saldo_deudor_value'];
@@ -76,11 +76,11 @@ class BalanceComprobacionSaldoCuentaSubcuentaController extends AbstractControll
             'datos' => $list_balance_comprobacion,
             'unidad_codigo' => $unidad->getCodigo(),
             'unidad_nombre' => $unidad->getNombre(),
-            'mes_debito'=>number_format($mes_debito,2),
-            'mes_credito'=>number_format($mes_credito,2),
-            'acumulado_debito'=>number_format($acumulado_debito,2),
-            'acumulado_credito'=>number_format($acumulado_credito,2),
-            'fecha_impresion'=>Date('d-m-Y')
+            'mes_debito' => number_format($mes_debito, 2),
+            'mes_credito' => number_format($mes_credito, 2),
+            'acumulado_debito' => number_format($acumulado_debito, 2),
+            'acumulado_credito' => number_format($acumulado_credito, 2),
+            'fecha_impresion' => Date('d-m-Y')
         ]);
     }
 
@@ -115,33 +115,38 @@ class BalanceComprobacionSaldoCuentaSubcuentaController extends AbstractControll
                     'id_cuenta' => $asiento->getIdCuenta()->getId(),
                     'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
                     'codigo' => $asiento->getIdCuenta()->getNroCuenta(),
-                    'deudora'=>$saldo_cuenta['deudora'],
+                    'deudora' => $saldo_cuenta['deudora'],
                     'descripcion' => $asiento->getIdCuenta()->getNombre(),
-                    'saldo_deudor' => $asiento->getIdCuenta()->getDeudora()?number_format($saldo_cuenta['saldo'], 2):'',
-                    'saldo_acreedor' => $asiento->getIdCuenta()->getDeudora()?'':number_format($saldo_cuenta['saldo'], 2),
-                    'credito_mes' => $saldo_cuenta['credito']>0?number_format($saldo_cuenta['credito'], 2):'',
-                    'debito_mes' => $saldo_cuenta['debito']>0?number_format($saldo_cuenta['debito'], 2):'',
-                    'saldo_deudor_value' => $asiento->getIdCuenta()->getDeudora()? $saldo_cuenta['saldo']:0,
-                    'saldo_acreedor_value' => $asiento->getIdCuenta()->getDeudora()?0:$saldo_cuenta['saldo'],
+                    'saldo_deudor' => $asiento->getIdCuenta()->getDeudora() ? number_format($saldo_cuenta['saldo'], 2) : '',
+                    'saldo_acreedor' => $asiento->getIdCuenta()->getDeudora() ? '' : number_format($saldo_cuenta['saldo'], 2),
+                    'credito_mes' => $saldo_cuenta['credito'] > 0 ? number_format($saldo_cuenta['credito'], 2) : '',
+                    'debito_mes' => $saldo_cuenta['debito'] > 0 ? number_format($saldo_cuenta['debito'], 2) : '',
+                    'saldo_deudor_value' => $asiento->getIdCuenta()->getDeudora() ? $saldo_cuenta['saldo'] : 0,
+                    'saldo_acreedor_value' => $asiento->getIdCuenta()->getDeudora() ? 0 : $saldo_cuenta['saldo'],
                     'credito_mes_value' => $saldo_cuenta['credito'],
                     'debito_mes_value' => $saldo_cuenta['debito'],
                     'index' => $this->TIPO_CUENTA
                 );
             }
             // generar la Subcuenta
-            $saldo_ = $temp_cuenta->getDeudora()
+            $saldo_ = $asiento->getIdSubcuenta()->getDeudora()
                 ? $debito - $credito
                 : $credito - $debito;
+
+            //ORIINAL
+//            $saldo_ = $temp_cuenta->getDeudora()
+//                ? $debito - $credito
+//                : $credito - $debito;
             $list_balance_comprobacion[] = array(
                 'id_cuenta' => $asiento->getIdCuenta()->getId(),
                 'id_subcuenta' => $asiento->getIdSubcuenta()->getId(),
                 'codigo' => $asiento->getIdSubcuenta()->getNroSubcuenta(),
-                'deudora'=>$asiento->getIdSubcuenta()->getDeudora()?true:false,
+                'deudora' => $asiento->getIdSubcuenta()->getDeudora() ? true : false,
                 'descripcion' => $asiento->getIdSubcuenta()->getDescripcion(),
-                'saldo_deudor' => $asiento->getIdSubcuenta()->getDeudora()?number_format($saldo_, 2):'',
-                'saldo_acreedor' => $asiento->getIdSubcuenta()->getDeudora()?'':number_format($saldo_, 2),
-                'credito_mes' => $credito>0?number_format($credito, 2):'',
-                'debito_mes' => $debito>0?number_format($debito, 2):'',
+                'saldo_deudor' => $asiento->getIdSubcuenta()->getDeudora() ? number_format($saldo_, 2) : '',
+                'saldo_acreedor' => $asiento->getIdSubcuenta()->getDeudora() ? '' : number_format($saldo_, 2),
+                'credito_mes' => $credito > 0 ? number_format($credito, 2) : '',
+                'debito_mes' => $debito > 0 ? number_format($debito, 2) : '',
                 'index' => $this->TIPO_SUBCUENTA
             );
         }
@@ -156,15 +161,15 @@ class BalanceComprobacionSaldoCuentaSubcuentaController extends AbstractControll
 
         foreach ($arr_asiento as $asiento_ar) {
             /** @var Asiento $asiento */
-            $asiento = $asiento_ar['asiento'];
             $asiento_credito = $asiento_ar['credito'];
             $asiento_debito = $asiento_ar['debito'];
+            $asiento = $asiento_ar['asiento'];
             $deudora = true;
             if ($cuenta == $asiento->getIdCuenta()->getId()) {
                 if ($asiento->getIdCuenta()->getDeudora())
                     $sado_ += ($asiento_debito - $asiento_credito);
-                else{
-                    $deudora=false;
+                else {
+                    $deudora = false;
                     $sado_ += ($asiento_credito - $asiento_debito);
                 }
 
@@ -172,6 +177,6 @@ class BalanceComprobacionSaldoCuentaSubcuentaController extends AbstractControll
                 $debito += $asiento_debito;
             }
         }
-        return ['saldo' => $sado_, 'credito' => $credito, 'debito' => $debito, 'deudora'=>$deudora];
+        return ['saldo' => $sado_, 'credito' => $credito, 'debito' => $debito, 'deudora' => $deudora];
     }
 }

@@ -246,30 +246,30 @@ class AuxFunctions
         $host = $config['config']['host'];
         $port = $config['config']['port'];
         $user = $config['config']['user'];
-        $alias = $config['config']['alias']; 
+        $alias = $config['config']['alias'];
         $password = $config['config']['password'];
 
-                // Instantiation and passing `true` enables exceptions
-                $mail = new PHPMailer(true);
+        // Instantiation and passing `true` enables exceptions
+        $mail = new PHPMailer(true);
 
-                try {
-                   //Server settings
-                   //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
-                   $mail->isSMTP();                                            // Send using SMTP
-                   $mail->Host       = $host ;                    // Set the SMTP server to send through
-                   $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-                   $mail->Username   = $user;                     // SMTP username
-                   $mail->Password   = $password;                               // SMTP password
-                   $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-                   $mail->Port       = $port;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
-               
-                   $mail->setFrom( $user, $alias);
-                   $mail->addAddress($destinatario, $alias_destinatario);     // Add a recipient
-                        
-                   // Content
-                   $mail->isHTML(true);                                  // Set email format to HTML
-                   $mail->Subject = $asunto ;
-                   $mail->Body    = "<table cellspacing='0' cellpadding='0' border='0' style='color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <tbody><tr width='100%'> 
+        try {
+            //Server settings
+            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+            $mail->isSMTP();                                            // Send using SMTP
+            $mail->Host = $host;                    // Set the SMTP server to send through
+            $mail->SMTPAuth = true;                                   // Enable SMTP authentication
+            $mail->Username = $user;                     // SMTP username
+            $mail->Password = $password;                               // SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+            $mail->Port = $port;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+
+            $mail->setFrom($user, $alias);
+            $mail->addAddress($destinatario, $alias_destinatario);     // Add a recipient
+
+            // Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = $asunto;
+            $mail->Body = "<table cellspacing='0' cellpadding='0' border='0' style='color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> <tbody><tr width='100%'> 
                    <td valign='top' align='left' style='background:#eef0f1;font:15px/1.25em 'Helvetica Neue',Arial,Helvetica'> 
                    <table style='border:none;padding:0 18px;margin:50px auto;width:500px'> <tbody> <tr width='100%' height='60'> 
 
@@ -300,12 +300,12 @@ class AuxFunctions
             </tr>
            
             </tbody> </table> </td> </tr></tbody> </table>";
-                   $mail->send();
+            $mail->send();
 
-               } catch (Exception $e) {
-                   
-                echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-               }
+        } catch (Exception $e) {
+
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
     }
 
     /**
@@ -1323,7 +1323,7 @@ class AuxFunctions
                 /** @var CentroCosto $cc */
                 $cc = $em->getRepository(CentroCosto::class)->find($arr_analisis[0]);
                 $codigo_cc = $cc->getCodigo();
-                $codigo_ot = $ot?$ot->getCodigo():'';
+                $codigo_ot = $ot ? $ot->getCodigo() : '';
                 $rows[] = array(
                     'nro_doc' => '',
                     'fecha' => '',
@@ -1547,6 +1547,7 @@ class AuxFunctions
     public
     static function getDataAjusteSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento)
     {
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
         $obj_ajuste_salida = $em->getRepository(Ajuste::class)->findOneBy(array(
             'id_documento' => $obj_documento,
             'entrada' => false,
@@ -1561,6 +1562,14 @@ class AuxFunctions
                 'id_documento' => $obj_documento,
                 'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
             ));
+            $producto = false;
+            if (empty($arr_obj_movimiento_mercancia)) {
+                $producto = true;
+                $arr_obj_movimiento_mercancia = $movimiento_producto_er->findBy(array(
+                    'id_documento' => $obj_documento,
+                    'id_tipo_documento' => $em->getRepository(TipoDocumento::class)->find($id_tipo_documento)
+                ));
+            }
             //totalizar importe
             $rep_arr = [];
 
@@ -1649,7 +1658,7 @@ class AuxFunctions
                     'value_3' => '',
                     'mes' => $obj_documento->getFecha()->format('m'),
                     'anno' => $obj_documento->getFecha()->format('Y'),
-                    'debito' => $t_,
+                    'debito' => number_format($t_,2),
                     'credito' => ''
                 );
             }
@@ -1658,8 +1667,13 @@ class AuxFunctions
             foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
 //            $total_general += floatval($obj_movimiento_mercancia->getImporte());
                 /**@var $obj_movimiento_mercancia MovimientoMercancia */
-                $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
-                $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                if (!$producto) {
+                    $nro_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getCuenta();
+                    $sub_cuenta = $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                } else {
+                    $nro_cuenta = $obj_movimiento_mercancia->getIdProducto()->getCuenta();
+                    $sub_cuenta = $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario();
+                }
                 if (!in_array($nro_cuenta . ':' . $sub_cuenta, $cuentas_ir)) {
                     $cuentas_ir[count($cuentas_ir)] = $nro_cuenta . ':' . $sub_cuenta;
                 }
@@ -1669,8 +1683,14 @@ class AuxFunctions
                 $parte = 0;
                 foreach ($arr_obj_movimiento_mercancia as $obj_movimiento_mercancia) {
                     /**@var $obj_movimiento_mercancia MovimientoMercancia */
-                    if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
-                        $parte += floatval($obj_movimiento_mercancia->getImporte());
+                    if (!$producto) {
+                        if ($obj_movimiento_mercancia->getIdMercancia()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario() == $cuenta) {
+                            $parte += floatval($obj_movimiento_mercancia->getImporte());
+                        }
+                    } else {
+                        if ($obj_movimiento_mercancia->getIdProducto()->getCuenta() . ':' . $obj_movimiento_mercancia->getIdProducto()->getNroSubcuentaInventario() == $cuenta) {
+                            $parte += floatval($obj_movimiento_mercancia->getImporte());
+                        }
                     }
                 }
                 $dat = explode(':', $cuenta);
@@ -2877,7 +2897,7 @@ class AuxFunctions
             'id_amlacen' => $id_almacen,
             'codigo' => $codigo
         ));
-        if(empty($mercancia_arr))
+        if (empty($mercancia_arr))
             $mercancia_arr = $em->getRepository(Producto::class)->findBy(array(
                 'id_amlacen' => $id_almacen,
                 'codigo' => $codigo
@@ -3182,7 +3202,7 @@ class AuxFunctions
                                          OrdenTrabajo $obj_orden_trabajo = null, Expediente $obj_expediente = null, Proveedor $obj_proveedor = null, int $tipo_cliente,
                                          int $id_cliente, \DateTime $fecha, int $anno, float $credito, float $debito, string $nro_documento,
                                          Factura $id_factura = null, ActivoFijo $id_activo = null, AreaResponsabilidad $id_area_responsabilidad = null,
-                                         RegistroComprobantes $comprobante = null,int $orden=0)
+                                         RegistroComprobantes $comprobante = null, int $orden = 0)
     {
         $new_asiento = new Asiento();
         $new_asiento
@@ -3208,8 +3228,7 @@ class AuxFunctions
             ->setIdAreaResponsabilidad($id_area_responsabilidad)
             ->setIdComprobante($comprobante)
             ->setIdTipoComprobante($comprobante ? $comprobante->getIdTipoComprobante() : null)
-            ->setOrdenOperacion($orden)
-        ;
+            ->setOrdenOperacion($orden);
         $em->persist($new_asiento);
         return $new_asiento;
     }
@@ -3263,7 +3282,7 @@ class AuxFunctions
             ['id_unidad' => $unidad, 'activo' => true, 'nro_factura' => $nro_factura]
         );
 
-        if($importe <= $obj_factura->getImporte()){
+        if ($importe <= $obj_factura->getImporte()) {
 
             if ($obj_factura) {
                 $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
@@ -3390,7 +3409,8 @@ class AuxFunctions
                 return $nro_consecutivo_real;
             } else
                 return '';
-        }    }
+        }
+    }
 
 
     /**

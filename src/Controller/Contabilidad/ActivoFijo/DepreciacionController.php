@@ -254,7 +254,7 @@ class DepreciacionController extends AbstractController
         if ($mes == $mes_depreciado) return false;
 
         //el mes es el de compra o apertura, no depreciar
-       /* $_apertura = $movimientoActivoFijoRepository->findOneBy([
+        $_apertura = $movimientoActivoFijoRepository->findOneBy([
             'id_unidad' => $unidad,
             'id_activo_fijo' => $activo_fijo->getId(),
             'id_tipo_movimiento' => ActivoFijoController::$APERTURA
@@ -269,7 +269,7 @@ class DepreciacionController extends AbstractController
         $mes_compra = $_compra ? $_compra->getFecha()->format('m') : null;
 
         if ($mes == $mes_apertura || $mes == $mes_compra) return false;
-*/
+
         return true;
 
     }
