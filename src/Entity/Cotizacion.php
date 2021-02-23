@@ -64,8 +64,15 @@ class Cotizacion
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @ORM\GeneratedValue()
      */
     private $id_factura;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * 
+     */
+    private $fechaFactura;
 
     public function getId(): ?int
     {
@@ -188,6 +195,18 @@ class Cotizacion
     public function setIdFactura(?int $id_factura): self
     {
         $this->id_factura = $id_factura;
+
+        return $this;
+    }
+
+    public function getFechaFactura(): ?\DateTimeInterface
+    {
+        return $this->fechaFactura;
+    }
+
+    public function setFechaFactura(?\DateTimeInterface $fechaFactura): self
+    {
+        $this->fechaFactura = $fechaFactura;
 
         return $this;
     }
