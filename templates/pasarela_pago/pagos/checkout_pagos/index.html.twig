@@ -14,8 +14,9 @@
             </button>
         </div>
         <div class="col-4 mt-0">{% if  resto == 0 %}
-                <button class="mr-auto btn btn-outline-primary font-weight-bold"><i class="fa fa-print"></i> Facturar
-                </button>
+                <button id="facturar" class="mr-auto btn btn-outline-primary font-weight-bold"><i class="fa fa-print"></i> Facturar
+                </button>{% else %}
+                 <button id="cobrar" class="mr-auto btn btn-outline-primary font-weight-bold"><i class="fa fa-print"></i> Cobrar</button>
             {% endif %}</div>
 
 
@@ -201,5 +202,13 @@
                 $('#detalles_cot').addClass('btn btn-outline-warning')
             }
         })
+
+        $( "#facturar" ).click(function() {
+
+             var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/factura"; 
+                 window.location.href = url;
+       
+        });
+
     </script>
 {% endblock %}
