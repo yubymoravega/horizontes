@@ -7,12 +7,16 @@ use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Carrito;
 use App\Entity\Cliente;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\InstrumentoCobro;
 use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoComprobante;
+use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
 use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Cotizacion;
 use App\Entity\PagosCotizacion;
 use App\Entity\TurismoModule\Utils\ConfigPrecioVentaServicio;
+use App\Entity\TurismoModule\Utils\CreditosPrecioVenta;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Entity\TurismoModule\Visado\ElementosVisa;
 use App\Entity\User;
@@ -154,7 +158,7 @@ class AuxFunctionsTurismo
         foreach ($pagos_cotizacion as $item) {
             $total_pagado += floatval($item->getMonto());
         }
-        if((floatval($cotizacion->getTotal()) - $total_pagado)==0){
+        if ((floatval($cotizacion->getTotal()) - $total_pagado) == 0) {
             $cotizacion->setPagado(true);
             $em->persist($cotizacion);
         }
@@ -167,10 +171,10 @@ class AuxFunctionsTurismo
      * @param EntityManagerInterface $em
      * @param Cotizacion $obj_cotizacion
      * @param User $usuario que recepciona el pago
-     * @param int $tipo_pago si el pago es en efectivo(1) o en tarjeta(0) importante poque de ahí asienta en caja o en banco
      * @param float $valor_pagado
+     * @param bool $banco
      */
-    public static function asentarCotizacion(EntityManagerInterface $em, Cotizacion $obj_cotizacion, User $usuario, int $tipo_pago, float $valor_pagado,bool $banco = false)
+    public static function asentarCotizacion(EntityManagerInterface $em, Cotizacion $obj_cotizacion, User $usuario, float $valor_pagado, bool $banco = false)
     {
         $data_jsons = json_decode($obj_cotizacion->getJson());
         $cliente_er = $em->getRepository(Cliente::class);
@@ -179,6 +183,7 @@ class AuxFunctionsTurismo
         $cuenta_er = $em->getRepository(Cuenta::class);
         $subcuenta_er = $em->getRepository(Subcuenta::class);
         $elementos_costo_er = $em->getRepository(ElementosVisa::class);
+        $creditos_precio_venta_er = $em->getRepository(CreditosPrecioVenta::class);
         $unidad = AuxFunctions::getUnidad($em, $usuario);
         $today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
         $array_venta_servicios = [];
@@ -190,37 +195,58 @@ class AuxFunctionsTurismo
         $obj_cliente = $cliente_er->find($id_cliente);
         $nombre = $obj_cliente->getNombre();
         $tipo_cliente = 1;//persona natural
+        $tipo_comprobante = $em->getRepository(TipoComprobante::class)->find(2);
+
+        $all_registros = $em->getRepository(RegistroComprobantes::class)->findBy([
+            'anno'=>$today->format('Y'),
+            'id_tipo_comprobante'=>$tipo_comprobante,
+            'id_unidad'=>$unidad
+        ]);
+
+        $new_comprobante = new RegistroComprobantes();
+        $new_comprobante
+            ->setIdUnidad($unidad)
+            ->setFecha($today)
+            ->setAnno($today->format('Y'))
+            ->setCredito($valor_pagado)
+            ->setDebito($valor_pagado)
+            ->setDescripcion('Pagando cotización '.$obj_cotizacion->getNombreCliente())
+            ->setIdUsuario($usuario)
+            ->setTipo(1)
+            ->setIdTipoComprobante($tipo_comprobante)
+            ->setNroConsecutivo(count($all_registros)+1);
+        $em->persist($new_comprobante);
 
         //paga parte de la cotizacion
-        $cuenta_banco = $cuenta_er->findOneBy(['nro_cuenta'=>'109','activo'=>true]);
-        $cuenta_caja = $cuenta_er->findOneBy(['nro_cuenta'=>'103','activo'=>true]);
-        $cuenta_cobro_anticipado = $cuenta_er->findOneBy(['nro_cuenta'=>'430','activo'=>true]);
-        $subcuenta_banco = $subcuenta_er->findOneBy(['nro_subcuenta'=>'0001','activo'=>true,'id_cuenta'=>$cuenta_banco]);
-        $subcuenta_caja = $subcuenta_er->findOneBy(['nro_subcuenta'=>'0001','activo'=>true,'id_cuenta'=>$cuenta_caja]);
-        $subcuenta_cobro_anticipado = $subcuenta_er->findOneBy(['nro_subcuenta'=>'0010','activo'=>true,'id_cuenta'=>$cuenta_cobro_anticipado]);
+        $cuenta_banco = $cuenta_er->findOneBy(['nro_cuenta' => '109', 'activo' => true]);
+        $cuenta_caja = $cuenta_er->findOneBy(['nro_cuenta' => '103', 'activo' => true]);
+        $cuenta_cobro_anticipado = $cuenta_er->findOneBy(['nro_cuenta' => '430', 'activo' => true]);
+        $subcuenta_banco = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cuenta_banco]);
+        $subcuenta_caja = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cuenta_caja]);
+        $subcuenta_cobro_anticipado = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_cobro_anticipado]);
 
-        if($valor_pagado<$total){
+
+        if ($valor_pagado < $total) {
             ///////////////////////////////////////////////////////////////
             //   Asentando Efectivo en Banco/Caja -A- Cobro anticipado   //
             ///////////////////////////////////////////////////////////////
-            if(!$banco){
+            if (!$banco) {
                 ///////////////////////////////
                 //   Asentando 103           //
                 ///////////////////////////////
                 $efectivo_caja = AuxFunctions::createAsiento($em, $cuenta_caja, $subcuenta_caja, null, $unidad, null, null
                     , null, null, null, null, 0, 0, $today, $today->format('Y'), 0,
-                    $valor_pagado, '', null, null, null, null, 3);
+                    $valor_pagado, '', null, null, null, $new_comprobante, 3);
                 $efectivo_caja
                     ->setIdCotizacion($obj_cotizacion);
                 $em->persist($efectivo_caja);
-            }
-            else{
+            } else {
                 ///////////////////////////////
                 //   Asentando 109           //
                 ///////////////////////////////
                 $efectivo_banco = AuxFunctions::createAsiento($em, $cuenta_banco, $subcuenta_banco, null, $unidad, null, null
                     , null, null, null, null, 0, 0, $today, $today->format('Y'), 0,
-                    $valor_pagado, '', null, null, null, null, 3);
+                    $valor_pagado, '', null, null, null, $new_comprobante, 3);
                 $efectivo_banco
                     ->setIdCotizacion($obj_cotizacion);
                 $em->persist($efectivo_banco);
@@ -229,29 +255,30 @@ class AuxFunctionsTurismo
             //   Asentando 430(credito)  //
             ///////////////////////////////
             $cobro_anticipado = AuxFunctions::createAsiento($em, $cuenta_cobro_anticipado, $subcuenta_cobro_anticipado, null, $unidad, null, null
-                , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), $valor_pagado,0
-                , '', null, null, null, null, 3);
+                , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), $valor_pagado, 0
+                , '', null, null, null, $new_comprobante, 3);
             $cobro_anticipado
                 ->setIdCotizacion($obj_cotizacion);
             $em->persist($cobro_anticipado);
-        }
-        elseif ($valor_pagado==$total){
+        } elseif ($valor_pagado == $total) {
             //preguntamos si el cliente tiene cobros anticipados de esa cotizacion
             $cobros_anticipados_cliente = $em->getRepository(Asiento::class)->findBy([
-                'id_cuenta'=>$cuenta_cobro_anticipado,
-                'id_subcuenta'=>$subcuenta_cobro_anticipado,
-                'tipo_cliente'=>$tipo_cliente,
-                'id_cliente'=>$id_cliente,
-                'id_cotizacion'=>$obj_cotizacion
+                'id_cuenta' => $cuenta_cobro_anticipado,
+                'id_subcuenta' => $subcuenta_cobro_anticipado,
+                'tipo_cliente' => $tipo_cliente,
+                'id_cliente' => $id_cliente,
+                'id_cotizacion' => $obj_cotizacion
             ]);
-            if(!empty($cobros_anticipados_cliente)){
-                foreach ($cobros_anticipados_cliente as $asiento_cobro_cliente){
+            //En caso de tener cobros anticipados significa que ya pago el total de la factura, o sea la
+            // suma de todos los cobros anticipados + el cobro en cuestion hacen el totald e la factura
+            if (!empty($cobros_anticipados_cliente)) {
+                foreach ($cobros_anticipados_cliente as $asiento_cobro_cliente) {
                     ///////////////////////////////
                     //   Asentando 430(debito)   //
                     ///////////////////////////////
                     $cobro_anticipado = AuxFunctions::createAsiento($em, $cuenta_cobro_anticipado, $subcuenta_cobro_anticipado, null, $unidad, null, null
                         , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'),
-                        $asiento_cobro_cliente->getDebito(),$asiento_cobro_cliente->getCredito(), '', null, null, null, null, 3);
+                        $asiento_cobro_cliente->getDebito(), $asiento_cobro_cliente->getCredito(), '', null, null, null, $new_comprobante, 3);
                     $cobro_anticipado
                         ->setIdCotizacion($obj_cotizacion);
                     $em->persist($cobro_anticipado);
@@ -265,7 +292,7 @@ class AuxFunctionsTurismo
             /*---asentando cuenta por cobrar---*/
             $cuenta_cobrar = AuxFunctions::createAsiento($em, $cuenta_por_cobrar, $subcuenta_por_cobrar, null, $unidad, null, null
                 , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), 0, $total
-                , '', null, null, null, null, 1);
+                , '', null, null, null, $new_comprobante, 1);
             $cuenta_cobrar
                 ->setIdCotizacion($obj_cotizacion);
             $em->persist($cuenta_cobrar);
@@ -273,13 +300,14 @@ class AuxFunctionsTurismo
             ///////////////////////////////
             //   Asentando 903           //
             ///////////////////////////////
-
             //agrupando informacion para hacer los pagos
             foreach ($data_jsons as $element) {
                 $servicio = json_decode($element);
                 $servicio_obj = $servicio_er->find($servicio->id_servicio);
 
-                if($servicio->id_servicio == AuxFunctionsTurismo::IDENTIFICADOR_VISADO){
+                //------CASO VISADO ------
+                if ($servicio->id_servicio == AuxFunctionsTurismo::IDENTIFICADOR_VISADO) {
+                    $cantidad_solicitudes_servicio = count($servicio->data);
                     $elementos_costos_servicio = $elementos_costo_er->findBy([
                         'id_servicio' => $servicio_obj,
                         'activo' => true
@@ -296,198 +324,103 @@ class AuxFunctionsTurismo
                         ];
                         $total_costo_visado += $item->getCosto();
                     }
-                    $precio_venta_visado_obj = $precio_venta_visado_er->findOneBy(['identificador_servicio'=>AuxFunctionsTurismo::IDENTIFICADOR_VISADO]);
-                    $precio_venta_visado = $total_costo_visado + $precio_venta_visado_obj->getValorFijo()>0?$precio_venta_visado_obj->getValorFijo():($total_costo_visado*$precio_venta_visado_obj->getProciento()/100);
-                    $array_venta_servicios[] = [
-                        'codigo' => $servicio_obj->getCodigo(),
-                        'importe' => $servicio->total,
-                        'costos' => $costo_servicio
-                    ];
-                }
-            }
+                    $precio_venta_visado_obj = $precio_venta_visado_er->findOneBy(['identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_VISADO]);
 
-            $cuenta_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '903', 'activo' => true]);
-            foreach ($array_venta_servicios as $item) {
-                $importe_venta_servicio = floatval($item['importe']);
-                $codigo = $item['codigo'];
-                $subcuenta_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo, 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
-                /*------asentando venta de servicio-----*/
-                $venta_servicio = AuxFunctions::createAsiento($em, $cuenta_venta_servicio, $subcuenta_venta_servicio, null, $unidad, null,
-                    null, null, null, null, null, $tipo_cliente, $id_cliente,
-                    $today, $today->format('Y'), $importe_venta_servicio, 0, '', null, null, null, null, 1);
-                $venta_servicio
-                    ->setIdCotizacion($obj_cotizacion);
-                $em->persist($venta_servicio);
-            }
-        }
-//---------------------------------------------
-        //para la cuenta por cobrar que hay que crear y para la venta
-        $id_cliente = $obj_cotizacion->getIdCliente();
-        /** @var Cliente $obj_cliente */
-        $obj_cliente = $cliente_er->find($id_cliente);
-        $nombre = $obj_cliente->getNombre();
-        $tipo_cliente = 1;//persona natural
+                    $precio_venta_visado = $total_costo_visado + $precio_venta_visado_obj->getValorFijo() > 0 ? $precio_venta_visado_obj->getValorFijo() : ($total_costo_visado * $precio_venta_visado_obj->getProciento() / 100);
+                    ///////////////////////////////
+                    //   Asentando 903           //
+                    ///////////////////////////////
+                    $cuenta_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '903', 'activo' => true]);
+                    $subcuenta_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $servicio_obj->getCodigo(), 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
+                    $asiento_visado = AuxFunctions::createAsiento($em, $cuenta_venta_servicio, $subcuenta_venta_servicio, null, $unidad, null, null
+                        , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'),
+                        ($precio_venta_visado*$cantidad_solicitudes_servicio),0, '', null, null, null, $new_comprobante, 1);
+                    $asiento_visado
+                        ->setIdCotizacion($obj_cotizacion);
+                    $em->persist($asiento_visado);
 
-        //agrupando informacion para hacer los pagos
-        foreach ($data_jsons as $element) {
-            $servicio = json_decode($element);
-            $servicio_obj = $servicio_er->find($servicio->id_servicio);
-            $elementos_costos_servicio = $elementos_costo_er->findBy([
-                'id_servicio' => $servicio_obj,
-                'activo' => true
-            ]);
-            $costo_servicio = [];
-            /** @var ElementosVisa $item */
-            foreach ($elementos_costos_servicio as $item) {
-                $costo_servicio[] = [
-                    'id_proveedor' => $item->getIdProveedor(),
-                    'costo' => $item->getCosto(),
-                    'codigo_elemento' => $item->getCodigo(),
-                    'id_elemento_costo' => $item
-                ];
-            }
-            $array_venta_servicios[] = [
-                'codigo' => $servicio_obj->getCodigo(),
-                'importe' => $servicio->total,
-                'costos' => $costo_servicio
-            ];
-        }
+                    ///////////////////////////////
+                    //   Asentando 526           //
+                    ///////////////////////////////
 
-        ///////////////////////////////
-        //   Asentando 135 -A- 903   //
-        ///////////////////////////////
-
-        // 1ra Operacion: asentando cuentas por cobrar
-        //1.1 ----Cuenta por Cobrar
-        $cuenta_por_cobrar = $cuenta_er->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
-        $subcuenta_por_cobrar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_por_cobrar]);
-        /*---asentando cuenta por cobrar---*/
-        $cuenta_cobrar = AuxFunctions::createAsiento($em, $cuenta_por_cobrar, $subcuenta_por_cobrar, null, $unidad, null, null
-            , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), 0, $total
-            , '', null, null, null, null, 1);
-        $cuenta_cobrar
-            ->setIdCotizacion($obj_cotizacion);
-        $em->persist($cuenta_cobrar);
-
-        //1.2 -----Venta de servicio
-        $cuenta_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '903', 'activo' => true]);
-        foreach ($array_venta_servicios as $item) {
-            $importe_venta_servicio = floatval($item['importe']);
-            $codigo = $item['codigo'];
-            $subcuenta_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo, 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
-            /*------asentando venta de servicio-----*/
-            $venta_servicio = AuxFunctions::createAsiento($em, $cuenta_venta_servicio, $subcuenta_venta_servicio, null, $unidad, null,
-                null, null, null, null, null, $tipo_cliente, $id_cliente,
-                $today, $today->format('Y'), $importe_venta_servicio, 0, '', null, null, null, null, 1);
-            $venta_servicio
-                ->setIdCotizacion($obj_cotizacion);
-            $em->persist($venta_servicio);
-        }
-
-
-        ///////////////////////////////
-        //   Asentando 816 -A- 405   //
-        ///////////////////////////////
-
-        // 2da Operacion: asentando cuentas por pagar
-        //2.1 ------ Costo de Venta del servicio
-        $cuenta_costo_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '816', 'activo' => true]);
-        foreach ($array_venta_servicios as $item) {
-            $codigo = $item['codigo'];
-            $subcuenta_costo_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo, 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
-            foreach ($item['costos'] as $costo) {
-                /*---------Para usar en la cuenta por pagar ---------*/
-                if (!in_array($costo['id_proveedor'], $array_proveedores_deuda)) {
-                    $array_proveedores_deuda[count($array_proveedores_deuda)] = $costo['id_proveedor'];
-                }
-                /*------asentando costo de venta de servicio-----*/
-                $costo_venta_servicio = AuxFunctions::createAsiento($em, $cuenta_costo_venta_servicio, $subcuenta_costo_venta_servicio, null, $unidad, null,
-                    null, null, null, null, null, 0, 0,
-                    $today, $today->format('Y'), 0, floatval($costo['costo']), '', null, null, null, null, 2);
-                $costo_venta_servicio
-                    ->setIdCotizacion($obj_cotizacion)
-                    ->setIdElementoVisa($costo['id_elemento_costo']);
-                $em->persist($costo_venta_servicio);
-            }
-        }
-
-        //2.2 ----- Cuenta por pagar
-        $array_pagar_proveedor = [];
-        foreach ($array_proveedores_deuda as $proveedor) {
-            $deuda_proveedor = 0;
-            foreach ($array_venta_servicios as $item) {
-                foreach ($item['costos'] as $costo) {
-                    if ($costo['id_proveedor'] == $proveedor) {
-                        $deuda_proveedor += floatval($costo['costo']);
+                    //---iteramos por los crecitos del precio de venta del servicio para asentarlo como una obligacion a largo plazo
+                    $cuenta_obligacion_largo_plazo = $cuenta_er->findOneBy(['nro_cuenta' => '526', 'activo' => true]);
+                    $servicios_creditos = $creditos_precio_venta_er->findBy(['id_config_precio_venta'=>$precio_venta_visado_obj,'credito'=>true]);
+                    if(!empty($servicios_creditos)){
+                        /** @var CreditosPrecioVenta $items_creditos */
+                        foreach ($servicios_creditos as $items_creditos){
+                            $servicio_credito_item = $items_creditos->getIdentificadorServicio();
+                            /** @var Servicios $serv */
+                            $serv = $servicio_er->find($servicio_credito_item);
+                            $codigo_servicio = $serv->getCodigo();
+                            $credito_servicio = $items_creditos->getImporte();
+                            $subcuenta_obligacion_largo_plazo = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo_servicio, 'activo' => true, 'id_cuenta' => $cuenta_obligacion_largo_plazo]);
+                            $asiento_credito_servicio = AuxFunctions::createAsiento($em, $cuenta_obligacion_largo_plazo, $subcuenta_obligacion_largo_plazo, null, $unidad,
+                                null, null, null, null, null, null, $tipo_cliente, $id_cliente, $today,
+                                $today->format('Y'),$credito_servicio,0, '', null, null, null, $new_comprobante, 1);
+                            $asiento_credito_servicio
+                                ->setIdCotizacion($obj_cotizacion);
+                            $em->persist($asiento_credito_servicio);
+                        }
                     }
                 }
             }
-            $array_pagar_proveedor[] = [
-                'id_proveedor'=>$proveedor,
-                'monto'=>$deuda_proveedor
-            ];
-        }
-
-        $cuenta_por_pagar = $cuenta_er->findOneBy(['nro_cuenta' => '405', 'activo' => true]);
-        $subcuenta_por_pagar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);//proveedores principales
-        foreach($array_pagar_proveedor as $item){
-            $obj_proveedor = $item['id_proveedor'];
-            $cuenta_por_pagar_proveedor = AuxFunctions::createAsiento($em, $cuenta_por_pagar, $subcuenta_por_pagar, null,
-                $unidad, null,null, null, null, null, $obj_proveedor,
-                0, 0,$today, $today->format('Y'),  floatval($item['monto']),0, '', null,
-                null, null, null, 2);
-            $cuenta_por_pagar_proveedor
-                ->setIdCotizacion($obj_cotizacion);
-            $em->persist($cuenta_por_pagar_proveedor);
-        }
-
-        // 3ra Operacion: asentando deposito de efectivo
-        if($tipo_pago==1){
             ///////////////////////////////
-            //   Asentando 103 -A- 135   //
+            //   Asentando 816 -A- 405   //
             ///////////////////////////////
 
-            //3.1 ----Efectivo en caja
-            $cuenta_efectivo_caja = $cuenta_er->findOneBy(['nro_cuenta' => '103', 'activo' => true]);
-            $subcuenta_efectivo_caja = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cuenta_efectivo_caja]);
-            /*---asentando cuenta por cobrar---*/
-            $efectivo_caja = AuxFunctions::createAsiento($em, $cuenta_efectivo_caja, $subcuenta_efectivo_caja, null, $unidad, null, null
-                , null, null, null, null, 0, 0, $today, $today->format('Y'), 0,$valor_pagado
-                , '', null, null, null, null, 3);
-            $efectivo_caja
-                ->setIdCotizacion($obj_cotizacion);
-            $em->persist($efectivo_caja);
+            // 2da Operacion: asentando cuentas por pagar
+            //2.1 ------ Costo de Venta del servicio
+            $cuenta_costo_venta_servicio = $cuenta_er->findOneBy(['nro_cuenta' => '816', 'activo' => true]);
+            foreach ($array_venta_servicios as $item) {
+                $codigo = $item['codigo'];
+                $subcuenta_costo_venta_servicio = $subcuenta_er->findOneBy(['nro_subcuenta' => $codigo, 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);
+                foreach ($item['costos'] as $costo) {
+                    /*---------Para usar en la cuenta por pagar ---------*/
+                    if (!in_array($costo['id_proveedor'], $array_proveedores_deuda)) {
+                        $array_proveedores_deuda[count($array_proveedores_deuda)] = $costo['id_proveedor'];
+                    }
+                    /*------asentando costo de venta de servicio-----*/
+                    $costo_venta_servicio = AuxFunctions::createAsiento($em, $cuenta_costo_venta_servicio, $subcuenta_costo_venta_servicio, null, $unidad, null,
+                        null, null, null, null, null, 0, 0,
+                        $today, $today->format('Y'), 0, floatval($costo['costo']), '', null, null, null, $new_comprobante, 2);
+                    $costo_venta_servicio
+                        ->setIdCotizacion($obj_cotizacion)
+                        ->setIdElementoVisa($costo['id_elemento_costo']);
+                    $em->persist($costo_venta_servicio);
+                }
+            }
+
+            //2.2 ----- Cuenta por pagar
+            $array_pagar_proveedor = [];
+            foreach ($array_proveedores_deuda as $proveedor) {
+                $deuda_proveedor = 0;
+                foreach ($array_venta_servicios as $item) {
+                    foreach ($item['costos'] as $costo) {
+                        if ($costo['id_proveedor'] == $proveedor) {
+                            $deuda_proveedor += floatval($costo['costo']);
+                        }
+                    }
+                }
+                $array_pagar_proveedor[] = [
+                    'id_proveedor' => $proveedor,
+                    'monto' => $deuda_proveedor
+                ];
+            }
+
+            $cuenta_por_pagar = $cuenta_er->findOneBy(['nro_cuenta' => '405', 'activo' => true]);
+            $subcuenta_por_pagar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_venta_servicio]);//proveedores principales
+            foreach ($array_pagar_proveedor as $item) {
+                $obj_proveedor = $item['id_proveedor'];
+                $cuenta_por_pagar_proveedor = AuxFunctions::createAsiento($em, $cuenta_por_pagar, $subcuenta_por_pagar, null,
+                    $unidad, null, null, null, null, null, $obj_proveedor,
+                    0, 0, $today, $today->format('Y'), floatval($item['monto']), 0, '', null,
+                    null, null, $new_comprobante, 2);
+                $cuenta_por_pagar_proveedor
+                    ->setIdCotizacion($obj_cotizacion);
+                $em->persist($cuenta_por_pagar_proveedor);
+            }
         }
-
-        else if($tipo_pago==0){
-            ///////////////////////////////
-            //   Asentando 109 -A- 135   //
-            ///////////////////////////////
-
-            //3.1 ----Efectivo en banco
-            $cuenta_efectivo_caja = $cuenta_er->findOneBy(['nro_cuenta' => '109', 'activo' => true]);
-            $subcuenta_efectivo_caja = $subcuenta_er->findOneBy(['nro_subcuenta' => '0001', 'activo' => true, 'id_cuenta' => $cuenta_efectivo_caja]);
-            /*---asentando cuenta por cobrar---*/
-            $efectivo_caja = AuxFunctions::createAsiento($em, $cuenta_efectivo_caja, $subcuenta_efectivo_caja, null, $unidad, null, null
-                , null, null, null, null, 0, 0, $today, $today->format('Y'), 0,$valor_pagado
-                , '', null, null, null, null, 3);
-            $efectivo_caja
-                ->setIdCotizacion($obj_cotizacion);
-            $em->persist($efectivo_caja);
-
-        }
-
-        //3.2 ----Cuenta por Cobrar
-        $cuenta_por_cobrar = $cuenta_er->findOneBy(['nro_cuenta' => '135', 'activo' => true]);
-        $subcuenta_por_cobrar = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_por_cobrar]);
-        /*---asentando cuenta por cobrar---*/
-        $cuenta_cobrar = AuxFunctions::createAsiento($em, $cuenta_por_cobrar, $subcuenta_por_cobrar, null, $unidad, null, null
-            , null, null, null, null, $tipo_cliente, $id_cliente, $today, $today->format('Y'), $valor_pagado,0
-            , '', null, null, null, null, 3);
-        $cuenta_cobrar
-            ->setIdCotizacion($obj_cotizacion);
-        $em->persist($cuenta_cobrar);
-
         $em->flush();
         dd('Finalizo');
     }
