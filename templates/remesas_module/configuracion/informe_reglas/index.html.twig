@@ -1,0 +1,50 @@
+{% extends 'turismo_module/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Reglas de Remesas
+            </h4>
+        </div>
+        {# end header #}
+
+        {# list#}
+        <table class="table table-hover text-light table-small-rows">
+            <thead class="thead-dark">
+            <th width="150px" class="text-right">Mínimo</th>
+            <th width="150px" class="text-right">Máximo</th>
+            <th width="150px" class="text-right">Costo</th>
+            <th width="150px" class="text-right">Venta</th>
+            </thead>
+            <tbody>
+            {% for pais in data %}
+                <tr>
+                    <td class="row-group-conta" colspan="4">{{ pais.pais }}</td>
+                </tr>
+                {% for item in pais.datos %}
+                    <tr>
+                        <td class="row-group-subconta" colspan="4">{{ item.proveedor }}</td>
+                    </tr>
+                    {% for new_item in item.elementos %}
+                        <tr>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.minimo }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.maximo }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.costo }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item.venta }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

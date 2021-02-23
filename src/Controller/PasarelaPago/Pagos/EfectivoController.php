@@ -55,6 +55,7 @@ class EfectivoController extends AbstractController
         $PagosCotizacion->setIdTipoDePago(0);
 
         $em->persist($PagosCotizacion);
+        $resto = AuxFunctionsTurismo::getResto($em,$id_cotizacion);
         $em->flush();
 
         $this->addFlash(

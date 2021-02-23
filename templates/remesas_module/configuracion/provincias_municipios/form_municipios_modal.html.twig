@@ -1,0 +1,50 @@
+<div class="modal fade w-100" id="modal__form__municipio__id" tabindex="-1" role="dialog"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-labelledby="modal__form__municipio__label__id" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark">
+                <h4 class="modal-title text-light" id="modal__form__municipio__label__id">{{ title }}</h4>
+                <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-dark-app">
+
+                {# ----------- Body --------- #}
+                {{ form_start(form_municipio,{'attr': {'class': 'text-left','id':'form_modal_target_municipios','method':'POST'}}) }}
+                <div class="row pt-0 mt-0">
+                    <div class="col-9 mt-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_municipio.nombre) }}
+                        {{ form_widget(form_municipio.nombre,{'attr': {'class': 'form- control w-100'}}) }}
+                    </div>
+                    <div class="col-3 mt-4 form-group input-group input-group-sm d-block">
+                        <button class="btn btn-secondary btn-sm" type="button" id="btnAplicarMunicipio">ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                <input type="text" id="id_pais" hidden>
+                {{ form_end(form_municipio) }}
+                <div>
+                    <table class="table-small-rows table table-hover text-light">
+                        <thead class="thead-dark">
+                        <th width="200px" class="text-left">Municipio</th>
+                        <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+                        </thead>
+                        <tbody id="rows_municipios">
+                        </tbody>
+                    </table>
+                </div>
+
+                {# ----------- Footer --------- #}
+                    <div class="d-flex mt-4">
+                        <button class="btn btn-outline-secondary mr-auto" type="button" data-dismiss="modal"
+                                aria-hidden="true">Cancelar
+                        </button>
+                        <button type="button" class="my-0 btn btn-secondary" id="modal__btn__municipio__aceptar" data-dismiss="modal">Aceptar</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

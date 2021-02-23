@@ -86,6 +86,7 @@ class DepositoController extends AbstractController
             $em->flush($Cotizacion);
  
             $em->persist($PagosCotizacion);
+            $resto = AuxFunctionsTurismo::getResto($em,$id_cotizacion);
             $em->flush();
 
             $this->addFlash(

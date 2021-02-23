@@ -1,0 +1,297 @@
+{% extends 'turismo_module/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de Provincias y Municipios
+            </h4>
+        </div>
+        {# end header #}
+                {{ include('remesas_module/configuracion/provincias_municipios/form_provincias_modal.html.twig', {title: 'Asociar Provincias'}) }}
+                {{ include('remesas_module/configuracion/provincias_municipios/form_municipios_modal.html.twig', {title: 'Asociar Municipios'}) }}
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="200px" class="text-left">Nombre del País</th>
+            <th width="300px" class="text-left">Nombre de la Provincia</th>
+            <th scope="col-2" class="text-left">Nombre del Municipio</th>
+            <th width="150x" class="text-center">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in paises %}
+                <tr class="row-group-conta">
+                    <td style="font-weight:400;" class="font-weight-bold" colspan="3">{{ item.nombre }}</td>
+                    <td class="text-center" colspan="2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Asociar Provincias"
+                                onclick="onProvincias({
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% for element in item.provincias %}
+                    <tr>
+                        <td class="row-group-subconta"></td>
+                        <td style="font-weight:400;" colspan="2" class="row-group-subconta"
+                            width="150px">{{ element.nombre }}</td>
+                        <td class="text-center row-group-subconta">
+                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Asociar Provincias"
+                                    onclick="onMunicipios({
+                                            id: '{{ element.id_provincia }}'
+                                            })">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% for municipio in element.municipios %}
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td style="font-weight:400;" class="text-left">{{ municipio.nombre }}</td>
+                            <td class="text-center">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
+        let list_provincias = []
+        let list_municipios = []
+        let id_pais = null;
+        let id_provincia = null;
+
+        const onProvincias = function (config) {
+            const {id = ''} = config
+            $('#rows_provincias').find('tr').remove();
+            $('#modal__form__cuentas__id').modal('show')
+            $('#modal__form__cuentas__label__id').text("Provincias del país")
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/remesas/provincias-municipios/getProvincias/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success == true) {
+                        id_pais = id;
+                        list_provincias = []
+                        list_provincias = result.data
+                        for (var i = 0; i < list_provincias.length; i++) {
+                            $('#rows_provincias').append(`<tr>
+                                    <td style="font-weight:400;"> ${list_provincias[i]['provincia']} </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-danger btn-sm borrarProvincia"
+                                        title="Eliminar" id="${list_provincias[i]['provincia']}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button></td>
+                                   </tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    }
+                    if (result.success == false) {
+                        loadingModal.close()
+                        alertTemplate(result.msg, 'danger')
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        }
+        const onMunicipios = function (config) {
+            const {id = ''} = config
+            $('#rows_municipios').find('tr').remove();
+            $('#modal__form__municipio__id').modal('show')
+            $('#modal__form__municipio__label__id').text("Municipios de la provincia")
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/remesas/provincias-municipios/getMunicipios/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success == true) {
+                        id_provincia = id;
+                        list_municipios = result.data
+                        for (var i = 0; i < list_municipios.length; i++) {
+                            $('#rows_municipios').append(`<tr>
+                                    <td style="font-weight:400;"> ${list_municipios[i]['municipio']} </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-danger btn-sm borrar"
+                                        title="Eliminar" id="${list_municipios[i]['municipio']}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button></td>
+                                   </tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    }
+                    if (result.success == false) {
+                        loadingModal.close()
+                        alertTemplate(result.msg, 'danger')
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        }
+
+        $('#btnAplicar').on('click', function () {
+            if ($('#form_modal_target_provincias').valid()) {
+                let provincia = $('#provincia_nombre').val()
+                if (list_provincias.some(e => e.provincia === provincia)) {
+                    alertTemplate('La provincia ya se encuentra en el listado.', 'danger')
+                } else {
+                    list_provincias.push({provincia})
+                    $('#rows_provincias').append(`<tr>
+                    <td style="font-weight:400;"> ${provincia}</td>
+                    <td class="text-center"> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrarProvincia" title="Eliminar" provincia="${provincia}">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                    </td></tr>`
+                    );
+                    $('#provincia_nombre').val('')
+                }
+            }
+        })
+        $('#btnAplicarMunicipio').on('click', function () {
+            if ($('#form_modal_target_municipios').valid()) {
+                let municipio = $('#municipio_nombre').val()
+                if (list_municipios.some(e => e.municipio === municipio)) {
+                    alertTemplate('El municipio ya se encuentra en el listado.', 'danger')
+                } else {
+                    list_municipios.push({municipio})
+                    $('#rows_municipios').append(`<tr>
+                    <td style="font-weight:400;"> ${municipio}</td>
+                    <td class="text-center"> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" municipio="${municipio}">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                    </td></tr>`
+                    );
+                    $('#municipio_nombre').val('')
+                }
+            }
+        })
+
+
+        $('#modal__btn__cuenta__aceptar').on('click', function () {
+            if (list_provincias.length > 0) {
+                loadingModal.show()
+                const list_send = JSON.stringify(list_provincias)
+                $('body').append(`
+                    <form action='/configuracion-turismo/remesas/provincias-municipios/addProvincia'
+                         method="post" id='form_print_current'>
+                        <input type='text' hidden name='id_pais' value='${id_pais}'/>
+                        <input type='text' hidden name='lista' value='${list_send}'/>
+                    </form>`)
+
+                const fomrulario = $('#form_print_current')
+                fomrulario.submit()
+                fomrulario.remove()
+            } else {
+                alertTemplate('Debe introducir al menos una moneda', 'danger')
+            }
+        })
+
+        $('#modal__btn__municipio__aceptar').on('click', function () {
+            if (list_municipios.length > 0) {
+                loadingModal.show()
+                const list_send = JSON.stringify(list_municipios)
+                $('body').append(`
+                    <form action='/configuracion-turismo/remesas/provincias-municipios/addMunicipio'
+                         method="post" id='form_add_municipio'>
+                        <input type='text' hidden name='id_provincia' value='${id_provincia}'/>
+                        <input type='text' hidden name='lista' value='${list_send}'/>
+                    </form>`)
+
+                const fomrulario = $('#form_add_municipio')
+                fomrulario.submit()
+                fomrulario.remove()
+            } else {
+                alertTemplate('Debe introducir al menos una moneda', 'danger')
+            }
+        })
+
+        $(document).ready(function () {
+            // validacion del formulario
+            var validateForm = $('#form_modal_target_provincias').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'provincia[nombre]': "required",
+                },
+                messages: {
+                    'provincia[nombre]': 'Obligratorio',
+                }
+            })
+            var validateForm = $('#form_modal_target_municipios').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'municipio[nombre]': "required",
+                },
+                messages: {
+                    'municipio[nombre]': 'Obligratorio',
+                }
+            })
+
+
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                list_municipios = list_municipios.filter(e => e.municipio !== $(this).attr('id'))
+                $(this).closest('tr').remove()
+            })
+            $(document).on('click', '.borrarProvincia', function (event) {
+                event.preventDefault();
+                list_provincias = list_provincias.filter(e => e.provincia !== $(this).attr('id'))
+                $(this).closest('tr').remove()
+            })
+        })
+    </script>
+{% endblock %}

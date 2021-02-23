@@ -26,18 +26,32 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Cargo</a>
                     <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_empleado') }}">Empleados</a>
-                    <div class="dropdown-divider"></div>
-                    <h6 class="text-center">Nómina de Pago</h6>
-                    <div class="dropdown-divider"></div>
-                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago_primera_quincena') }}">Primera Quincena</a>
-                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago_segunda_quincena') }}">Segunda Quincena</a>
-                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_nomina_pago_extraordinario') }}">Pago Extraordinario</a>
-                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_pago_navidades') }}">Pago Mes 13</a>
-{#                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_get_empleados') }}">Extraordinaria</a>#}
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_rango_escala_d_g_i_i') }}">Rango de Escala DGII</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_rango_escala_d_g_i_i') }}">Rango
+                        de Escala DGII</a>
                 </div>
             </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Elaboración de Nóminas
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_capital_humano_nomina_pago_primera_quincena') }}">Nómina Primera
+                        Quincena</a>
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_capital_humano_nomina_pago_segunda_quincena') }}">Nómina Segunda
+                        Quincena</a>
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_capital_humano_nomina_pago_extraordinario') }}">Nómina
+                        Extraordinaria</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_pago_navidades') }}">Nómina Mes
+                        13</a>
+                    {#                    <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item" href="{{ url ('contabilidad_capital_humano_get_empleados') }}">Extraordinaria</a>#}
+                </div>
+            </li>
+{#            POR HACER#}
+            <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_pago_navidades') }}">Pago de Nómina</a>
 
 
             <li class="nav-item dropdown">
@@ -46,17 +60,26 @@
                     Informes
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_pro_ciento_nominas') }}">Procientos Aplicables a las Nóminas</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_plantilla_agencia') }}">Plantilla de la
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_pro_ciento_nominas') }}">Procientos
+                        Aplicables a las Nóminas</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_plantilla_agencia') }}">Plantilla
+                        de la
                         Agencia</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_comprobante_operaciones_extraordinaria') }}">Comprobante de Operaciones de Pagos Extraordinarios</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina') }}">Reporte de Nóminas General</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina_epmpleados') }}">Reporte de Nóminas por Empleados</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina_deduciones') }}">Deducciones de Nóminas</a>
-                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina_pago_empleador') }}">Pagos del Empleador</a>
-{#                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Reporte de#}
-{#                        Vacaciones</a>#}
-{#                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_submayor_vacaciones') }}">Submayor de Vacaciones</a>#}
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_capital_humano_comprobante_operaciones_extraordinaria') }}">Comprobante
+                        de Operaciones de Pagos Extraordinarios</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina') }}">Reporte de
+                        Nóminas General</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina_epmpleados') }}">Reporte
+                        de Nóminas por Empleados</a>
+                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_reporte_nomina_deduciones') }}">Deducciones
+                        de Nóminas</a>
+                    <a class="dropdown-item"
+                       href="{{ url ('contabilidad_capital_humano_reporte_nomina_pago_empleador') }}">Pagos del
+                        Empleador</a>
+                    {#                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_cargo') }}">Reporte de#}
+                    {#                        Vacaciones</a>#}
+                    {#                    <a class="dropdown-item" href="{{ url ('contabilidad_capital_humano_submayor_vacaciones') }}">Submayor de Vacaciones</a>#}
                 </div>
             </li>
         </ul>
