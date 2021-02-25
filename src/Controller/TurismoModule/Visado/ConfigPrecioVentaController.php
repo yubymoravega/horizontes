@@ -130,6 +130,7 @@ class ConfigPrecioVentaController extends AbstractController
             ->setIdentificadorServicio(AuxFunctionsTurismo::IDENTIFICADOR_VISADO)
             ->setIdUnidad($unidad)
             ->setProciento($porciento)
+            ->setPrecioVentaTotal(0)
             ->setValorFijo($valor_fijo);
         $em->persist($elemto);
 
@@ -145,11 +146,10 @@ class ConfigPrecioVentaController extends AbstractController
             $em->persist($new_credito_servicio);
         }
 
-        $total = $costo_total + $porciento + $valor_fijo + $valor_servicios;
+        $total = $costo_total + ($costo_total * $porciento/100) + $valor_fijo + $valor_servicios;
         $elemto
             ->setPrecioVentaTotal($total);
         $em->persist($elemto);
-
         $em->flush();
 
         return $this->redirectToRoute('turismo_module_configuracion');
