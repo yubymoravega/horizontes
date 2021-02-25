@@ -328,7 +328,10 @@ class FacturaController extends AbstractController
 
         $filename = "Fecha-".date('d-m-Y')."-Hora-".date('h:i:s-A')."-Factura".".pdf";
       
-       return new PdfResponse($pdf->getOutputFromHtml($html), $filename, 'application/pdf', "inline");
+        return $this->render( "pasarela_pago/factura/pdf.html.twig", 
+            ['factura'=> $cotizacion]); 
+
+       //return new PdfResponse($pdf->getOutputFromHtml($html), $filename, 'application/pdf', "inline");
     }
 
     /**

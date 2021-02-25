@@ -71,7 +71,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-7">
+      <div class="col-7"><br>
         <p>
           <strong>SOLYAG S.R.L  <br> RNC: 1-32-13041-3 </strong>
          
@@ -91,6 +91,14 @@
     <br>
     <br>
     
+  {% for servicio in json %}
+
+  {% set servicio = servicio|jsonDecode() %}
+
+  {% if servicio.id_servicio == 4 %}
+    <h3>Envio de Remesas </h3>
+      {% for remesa in servicio.data %}
+
     <br>
     <table class="table table-striped">
       <thead>
@@ -105,17 +113,28 @@
       </thead>
       <tbody>
           
-<tr>  <td>  <img style="width: 90px;"  src = "https://solyag.online/qr-code/https://solyag.online/factura/pdf/servicio/{{factura.id}}/data.mOrderNo.png" /> </td>
-        <td> <p  class="mayuscula"> data.servicio <br> <br> data.primerNombre data.primerApellido data.segundoApellido</P> 
+<tr>  <td>  <img style="width: 90px;"  src = "https://solyag.online/qr-code/https://solyag.online/factura/pdf/servicio/{{factura.id}}/{{remesa.mOrderNo}}.png" /> </td>
+        <td> <p  class="mayuscula"> {{remesa.primerNombre}} {{remesa.primerApellido}} {{remesa.segundoApellido}}</P> 
         </td>
-         <td class="text-right"> </td>
-          <td class="text-right">$ data.recibir data.recibirMoneda</td>
-           <td class="text-right">$ data.comision  data.montoMoneda</td>
-          <td class="text-right">$  data.monto   data.montoMoneda</td>
-    </tr>  
-    
+         <td class="text-right">{{remesa.mOrderNo}} </td>
+          <td class="text-right">$ {{remesa.recibir}}</td>
+           <td class="text-right">$ remesa.comision  </td>
+          <td class="text-right">$  {{remesa.monto}} </td>
+    </tr> 
       </tbody>
     </table>
+
+       {% endfor %}
+      {% endif %}
+
+      {% if servicio.id_servicio == 11 %}
+
+
+      {% endif %}
+
+    {% endfor %}
+
+   
     <div class="row">
       <div class="col-8">
       </div>
