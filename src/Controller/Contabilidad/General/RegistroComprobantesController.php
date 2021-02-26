@@ -159,6 +159,9 @@ class RegistroComprobantesController extends AbstractController
         } //comprobante de operaciones de activo fijo
         elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_NOMINAS) {
             $row = $this->getDataDetallesNomina($em, $registro_obj->getId(), $obj_unidad->getId());
+        } //pagos servicios
+        elseif ($registro_obj->getTipo() == AuxFunctions::COMMPROBANTE_OPERACONES_PAGO_SERVICIOS) {
+            $row = $this->getDataDetallesDepreciacion($em, $registro_obj->getId(), $obj_unidad->getId());
         }
 
         return $this->render('contabilidad/general/registro_comprobantes/detalle_registro.html.twig', [

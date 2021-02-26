@@ -2,6 +2,7 @@
 
 namespace App\Entity\RemesasModule\Configuracion;
 
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Pais;
 use App\Repository\RemesasModule\Configuracion\ConfiguracionReglasRemesasRepository;
@@ -60,6 +61,11 @@ class ConfiguracionReglasRemesas
      * @ORM\Column(type="float", nullable=true)
      */
     private $porciento_venta;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     */
+    private $id_unidad;
 
     public function getId(): ?int
     {
@@ -158,6 +164,18 @@ class ConfiguracionReglasRemesas
     public function setPorcientoVenta(?float $porciento_venta): self
     {
         $this->porciento_venta = $porciento_venta;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
 
         return $this;
     }

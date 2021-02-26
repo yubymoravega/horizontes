@@ -21,7 +21,7 @@ class PagosController extends AbstractController
     public function index(EntityManagerInterface $em, $id_cotizacion)
     {
 
-        dd(AuxFunctionsTurismo::asentarCotizacion($em,$em->getRepository(Cotizacion::class)->find($id_cotizacion),$this->getUser(),730,true));
+        dd(AuxFunctionsTurismo::asentarCotizacion($em,$em->getRepository(Cotizacion::class)->find($id_cotizacion),$this->getUser(),730,false));
         return $this->render('pasarela_pago/pagos/index.html.twig', [
         'id_cotizacion'=>$id_cotizacion
         ]);

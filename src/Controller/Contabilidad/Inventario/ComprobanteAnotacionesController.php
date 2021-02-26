@@ -95,6 +95,10 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 12) {
                 $datos_devolucion = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_devolucion);
+            }//Servicios
+            elseif ($id_tipo_documento == 13) {
+                $datos_devolucion = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_devolucion);
             }
         }
         return $rows;

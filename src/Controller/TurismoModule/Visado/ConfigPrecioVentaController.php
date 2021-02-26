@@ -139,6 +139,7 @@ class ConfigPrecioVentaController extends AbstractController
             $valor_servicios += floatval($item['importe']);
             $new_credito_servicio = new CreditosPrecioVenta();
             $new_credito_servicio
+                ->setIdUnidad($unidad)
                 ->setIdConfigPrecioVenta($elemto)
                 ->setCredito(true)
                 ->setImporte(floatval($item['importe']))

@@ -2,6 +2,7 @@
 
 namespace App\Entity\TurismoModule\Utils;
 
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Repository\TurismoModule\Utils\CreditosPrecioVentaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -37,6 +38,11 @@ class CreditosPrecioVenta
      * @ORM\Column(type="float")
      */
     private $importe;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     */
+    private $id_unidad;
 
     public function getId(): ?int
     {
@@ -87,6 +93,18 @@ class CreditosPrecioVenta
     public function setImporte(float $importe): self
     {
         $this->importe = $importe;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
 
         return $this;
     }

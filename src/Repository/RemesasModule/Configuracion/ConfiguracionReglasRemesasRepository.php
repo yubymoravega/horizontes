@@ -19,22 +19,25 @@ class ConfiguracionReglasRemesasRepository extends ServiceEntityRepository
         parent::__construct($registry, ConfiguracionReglasRemesas::class);
     }
 
-    // /**
-    //  * @return ConfiguracionReglasRemesas[] Returns an array of ConfiguracionReglasRemesas objects
-    //  */
-    /*
-    public function findByExampleField($value)
+     /**
+      * @return ConfiguracionReglasRemesas[] Returns an array of ConfiguracionReglasRemesas objects
+      **/
+    public function findByMontoPais($pais,$monto,$unidad)
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere('c.minimo <= :val')
+            ->setParameter('val', $monto)
+            ->andWhere('c.maximo >= :val')
+            ->setParameter('val', $monto)
+            ->andWhere('c.id_pais = :pais')
+            ->setParameter('pais', $pais)
+            ->andWhere('c.id_unidad = :unidad')
+            ->setParameter('unidad', $unidad)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?ConfiguracionReglasRemesas

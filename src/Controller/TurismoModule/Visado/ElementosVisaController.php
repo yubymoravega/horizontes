@@ -2,6 +2,7 @@
 
 namespace App\Controller\TurismoModule\Visado;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
 use App\Entity\Contabilidad\Config\Servicios;
@@ -35,7 +36,8 @@ class ElementosVisaController extends AbstractController
         $obj_cliente = AuxFunctionsTurismo::GetDataCliente($em,$this->getUser());
         $data_elementos = $em->getRepository(ElementosVisa::class)->findBy([
             'activo'=>true,
-            'id_servicio'=>$em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_VISADO)
+            'id_servicio'=>$em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_VISADO),
+            'id_unidad'=>AuxFunctions::getUnidad($em,$this->getUser())
         ]);
         $rows = [];
         /** @var ElementosVisa $item */
@@ -76,6 +78,7 @@ class ElementosVisaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $elemnto
+                    ->setIdUnidad(AuxFunctions::getUnidad($em,$this->getUser()))
                     ->setActivo(true)
                     ->setIdServicio($em->getRepository(Servicios::class)->find(AuxFunctionsTurismo::IDENTIFICADOR_VISADO))
                 ;

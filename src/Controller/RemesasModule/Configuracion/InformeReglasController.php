@@ -2,6 +2,7 @@
 
 namespace App\Controller\RemesasModule\Configuracion;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\RemesasModule\Configuracion\ConfiguracionReglasRemesas;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,9 @@ class InformeReglasController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request)
     {
         $data = [];
-        $config_Reglas = $em->getRepository(ConfiguracionReglasRemesas::class)->findAll();
+        $config_Reglas = $em->getRepository(ConfiguracionReglasRemesas::class)->findBy([
+            'id_unidad'=>AuxFunctions::getUnidad($em,$this->getUser())
+        ]);
         $data_to_work = [];
         $uniq_proveedores = [];
         $uniq_paises = [];

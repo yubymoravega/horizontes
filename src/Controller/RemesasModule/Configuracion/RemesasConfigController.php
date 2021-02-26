@@ -2,6 +2,7 @@
 
 namespace App\Controller\RemesasModule\Configuracion;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\Pais;
 use App\Entity\RemesasModule\Configuracion\ConfiguracionReglasRemesas;
@@ -61,12 +62,13 @@ class RemesasConfigController extends AbstractController
             $em->remove($conf);
         }
         $em->flush();
-
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
         $proveedor_er = $em->getRepository(Proveedor::class);
         foreach ($lista as $item) {
             $new_regla = new ConfiguracionReglasRemesas();
             $new_regla
                 ->setIdPais($pais)
+                ->setIdUnidad($unidad)
                 ->setIdProveedor($proveedor_er->find($item->proveedor))
                 ->setMaximo(floatval($item->maximo))
                 ->setMinimo(floatval($item->minimo))

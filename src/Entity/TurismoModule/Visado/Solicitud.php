@@ -2,6 +2,7 @@
 
 namespace App\Entity\TurismoModule\Visado;
 
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Repository\TurismoModule\Visado\SolicitudRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -41,6 +42,11 @@ class Solicitud
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $telefono_celular;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     */
+    private $id_unidad;
 
     public function getId(): ?int
     {
@@ -103,6 +109,18 @@ class Solicitud
     public function setTelefonoCelular(?string $telefono_celular): self
     {
         $this->telefono_celular = $telefono_celular;
+
+        return $this;
+    }
+
+    public function getIdUnidad(): ?Unidad
+    {
+        return $this->id_unidad;
+    }
+
+    public function setIdUnidad(?Unidad $id_unidad): self
+    {
+        $this->id_unidad = $id_unidad;
 
         return $this;
     }

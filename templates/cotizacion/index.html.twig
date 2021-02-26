@@ -9,31 +9,31 @@
             <h1 class="text-reporte">Reporte de Cotizaciones
             </h1>
             <hr class="divider bg-mantis">
-            <form id="payment-form" name='payment-form' action="{{ path('factura/reporte/cotizacion') }}" method="GET">
-                <div class="input-group input-group-sm mb-3">
+{#            <form id="payment-form" name='payment-form' action="{{ path('factura/reporte/cotizacion') }}" method="GET">#}
+{#                <div class="input-group input-group-sm mb-3">#}
 
-                    <div class="input-group-prepend"></div>
-                    <input autocomplete="off" name="from" id='from' type="text" placeholder="Desde" class="form-control"
-                           aria-label="Default" aria-describedby="inputGroup-sizing-sm">
-                    <input autocomplete="off" name="to" id='to' type="text" placeholder="Hasta" class="form-control"
-                           aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+{#                    <div class="input-group-prepend"></div>#}
+{#                    <input autocomplete="off" name="from" id='from' type="text" placeholder="Desde" class="form-control"#}
+{#                           aria-label="Default" aria-describedby="inputGroup-sizing-sm">#}
+{#                    <input autocomplete="off" name="to" id='to' type="text" placeholder="Hasta" class="form-control"#}
+{#                           aria-label="Small" aria-describedby="inputGroup-sizing-sm">#}
 
-                    <div class="input-group-prepend"></div>
+{#                    <div class="input-group-prepend"></div>#}
 
-                    <div class="input-group-prepend"></div>
-                    <select class="custom-select" name='empleado' id="empleado">
-                        <option value="0" selected>Empleado</option>
-                        {% for data in user %}
-                            <option value="{{ data.username }}">{{ data.username }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="input-group-prepend"></div>
-                    <input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text"
-                           class="form-control">
-                    <button class="btn btn-sm btn-outline-dark" type="submit">Filtrar</button>
-                    </span>
-                </div>
-            </form>
+{#                    <div class="input-group-prepend"></div>#}
+{#                    <select class="custom-select" name='empleado' id="empleado">#}
+{#                        <option value="0" selected>Empleado</option>#}
+{#                        {% for data in user %}#}
+{#                            <option value="{{ data.username }}">{{ data.username }}</option>#}
+{#                        {% endfor %}#}
+{#                    </select>#}
+{#                    <div class="input-group-prepend"></div>#}
+{#                    <input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text"#}
+{#                           class="form-control">#}
+{#                    <button class="btn btn-sm btn-outline-dark" type="submit">Filtrar</button>#}
+{#                    </span>#}
+{#                </div>#}
+{#            </form>#}
             <!-- Bootstrap Table-->
             <div class="table-responsive clearfix">
                 <table class="table table-striped tabla-reporte">
