@@ -56,6 +56,11 @@ class Unidad
      */
     private $correo;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Moneda::class)
+     */
+    private $id_moneda;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -141,6 +146,18 @@ class Unidad
     public function setCorreo(?string $correo): self
     {
         $this->correo = $correo;
+
+        return $this;
+    }
+
+    public function getIdMoneda(): ?Moneda
+    {
+        return $this->id_moneda;
+    }
+
+    public function setIdMoneda(?Moneda $id_moneda): self
+    {
+        $this->id_moneda = $id_moneda;
 
         return $this;
     }

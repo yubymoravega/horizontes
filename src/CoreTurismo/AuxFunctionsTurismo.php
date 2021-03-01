@@ -703,7 +703,7 @@ class AuxFunctionsTurismo
      * @param Unidad $obj_unidad
      * @return JsonResponse
      */
-    public static function getIdCostoRemesa(EntityManagerInterface $em, int $id_pais, float $monto, Unidad $obj_unidad)
+    public static function getDataRemesaPagar(EntityManagerInterface $em, int $id_pais, float $monto, Unidad $obj_unidad)
     {
         $regla = $em->getRepository(ConfiguracionReglasRemesas::class)->findByMontoPais($id_pais, $monto, $obj_unidad);
         $id_regla = null;
@@ -718,12 +718,46 @@ class AuxFunctionsTurismo
                 $costo_venta = $menor_comision + ($item->getValorFijoVenta() + ($menor_comision * $item->getPorcientoVenta() / 100));
             }
         }
-        return new JsonResponse([
-            'costo_proveedor' => $menor_comision,
-            'regla' => $id_regla->getId(),
-            'costo_venta' => $costo_venta,
-            'valor_a_entregar' => $monto,
-            'ganancia_agencia' => $costo_venta - $menor_comision
-        ]);
+//        return new JsonResponse([
+//            'costo_proveedor' => $menor_comision,
+//            'regla' => $id_regla->getId(),
+//            'costo_venta' => $costo_venta,
+//            'valor_a_entregar' => $monto,
+//            'ganancia_agencia' => $costo_venta - $menor_comision
+//        ]);
+        return $costo_venta;
+    }
+
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param int $id_pais
+     * @param float $monto
+     * @param Unidad $obj_unidad
+     * @return JsonResponse
+     */
+    public static function getDataRemesaRecibir(EntityManagerInterface $em, int $id_pais, float $monto, Unidad $obj_unidad)
+    {
+        $regla = $em->getRepository(ConfiguracionReglasRemesas::class)->findByMontoPais($id_pais, $monto, $obj_unidad);
+        $id_regla = null;
+        $menor_comision = $monto + $regla[0]->getValorFijoCosto() + ($monto * $regla[0]->getPorcientoCosto() / 100);
+        $costo_venta = $menor_comision + ($regla[0]->getValorFijoVenta() + ($menor_comision * $regla[0]->getPorcientoVenta() / 100));
+        /** @var ConfiguracionReglasRemesas $item */
+        foreach ($regla as $item) {
+            $comision = $monto + $item->getValorFijoCosto() + ($monto * $item->getPorcientoCosto() / 100);
+            if ($menor_comision >= $comision) {
+                $id_regla = $item;
+                $menor_comision = $comision;
+                $costo_venta = $menor_comision + ($item->getValorFijoVenta() + ($menor_comision * $item->getPorcientoVenta() / 100));
+            }
+        }
+//        return new JsonResponse([
+//            'costo_proveedor' => $menor_comision,
+//            'regla' => $id_regla->getId(),
+//            'costo_venta' => $costo_venta,
+//            'valor_a_entregar' => $monto,
+//            'ganancia_agencia' => $costo_venta - $menor_comision
+//        ]);
+        return $costo_venta;
     }
 }

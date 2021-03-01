@@ -1,0 +1,502 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Solicitud de Remesas{% endblock %}
+
+{% block content %}
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <h2 class="text-reporte text-center mr-0 text-white mt-2" id="normal_div">
+                    Solicitud de Remesas
+                </h2>
+            </div>
+            <div class="card-body">
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+                {{ form_start(formulario, {'attr':{'id':'form_solicitud','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0">
+                    <div id="nuevo_beneficiario_div" class="col-4" style="display: none">
+                        <div class="row m-0 p-0 pr-3">
+                            <div class="col-11 form-group input-group input-group-sm pa-2 pl-0 pr-0 mr-0 mt-0">
+                                {{ form_label(formulario.nuevo_beneficiario) }}
+                                {{ form_widget(formulario.nuevo_beneficiario) }}
+                            </div>
+                            <div class="col-1 mt-4 pt-2 form-group input-group input-group-sm ml-0 pl-0">
+                                <button type="button" class='my-0 btn btn-outline-secondary' style="height: 40px"
+                                        onclick="changeStatus(-1,true)"><i class="fa fa-trash-o text-danger fa-2x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="id_beneficiario_div" class="col-4 mt-0 p-0">
+                        <div class="row m-0 p-0">
+                            <div class="col-12 form-group input-group input-group-sm pa-2 d-block mt-0 pr-0">
+                                {{ form_label(formulario.primer_nombre) }}
+                                {{ form_widget(formulario.primer_nombre) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.primer_apellido) }}
+                        {{ form_widget(formulario.primer_apellido) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.segundo_apellido) }}
+                        {{ form_widget(formulario.segundo_apellido) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.nombre_alternativo) }}
+                        {{ form_widget(formulario.nombre_alternativo) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block pl-0">
+                        {{ form_label(formulario.primer_apellido_alternativo) }}
+                        {{ form_widget(formulario.primer_apellido_alternativo) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.segundo_apellido_alternativo) }}
+                        {{ form_widget(formulario.segundo_apellido_alternativo) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.primer_telefono) }}
+                        {{ form_widget(formulario.primer_telefono) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block pl-0">
+                        {{ form_label(formulario.segundo_telefono) }}
+                        {{ form_widget(formulario.segundo_telefono) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.identificacion) }}
+                        {{ form_widget(formulario.identificacion) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.calle) }}
+                        {{ form_widget(formulario.calle) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block pl-0">
+                        {{ form_label(formulario.entre) }}
+                        {{ form_widget(formulario.entre) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.y) }}
+                        {{ form_widget(formulario.y) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pl-3 pr-0 d-block">
+                        {{ form_label(formulario.nro_casa) }}
+                        {{ form_widget(formulario.nro_casa) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-2 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.edificio) }}
+                        {{ form_widget(formulario.edificio) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block pa-0 pl-0">
+                        {{ form_label(formulario.apto) }}
+                        {{ form_widget(formulario.apto) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.reparto) }}
+                        {{ form_widget(formulario.reparto) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pl-2 pr-0 pl-2 d-block">
+                        {{ form_label(formulario.id_pais) }}
+                        {{ form_widget(formulario.id_pais) }}
+                    </div>
+                    <div class="pr-0 col-2 mt-0 form-group input-group input-group-sm pa-2 pl-2 d-block">
+                        {{ form_label(formulario.id_moneda) }}
+                        {{ form_widget(formulario.id_moneda) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0">
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.id_provincia) }}
+                        {{ form_widget(formulario.id_provincia) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 pl-0 d-block">
+                        {{ form_label(formulario.id_municipios) }}
+                        {{ form_widget(formulario.id_municipios) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block pa-0 pl-0">
+                        {{ form_label(formulario.monto_entregar) }}
+                        {{ form_widget(formulario.monto_entregar) }}
+                    </div>
+                    <div class="col-2 mt-0 form-group input-group input-group-sm d-block pa-2 pl-0">
+                        {{ form_label(formulario.monto_recibir) }}
+                        {{ form_widget(formulario.monto_recibir) }}
+                    </div>
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-0 fa fa-plus" type="button" id="btnAplicarMercancia">
+                            Adicionar
+                        </button>
+                    </div>
+                </div>
+                {{ form_end(formulario) }}
+            </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th width="120px" class="text-left">Nombre</th>
+                    <th width="120px" class="text-left">País</th>
+                    <th width="140px" class="text-left">Monto a Pagar</th>
+                    <th width="140px" class="text-left">Monto a Recibir</th>
+                    <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
+                    </thead>
+                    <tbody id="rows_solicitudes">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a class="btn btn-outline-secondary" id="salir">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
+                            data-target="#ModalConfirm" data-placement="bottom">Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        let beneficiarios_array = []
+        let data_baneficiarios = []
+        let list_provincias = []
+        $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+
+        function eliminarElementoMisterioso() {
+            var combo = document.getElementById('beneficiarios_clientes_primer_nombre')
+            for (var i = 0; i < combo.length; i++) {
+                if (combo.options[i].value == '') {
+                    combo.remove(i)
+                    break
+                }
+            }
+        }
+
+        eliminarElementoMisterioso()
+
+        function resetFormSolicitud() {
+            // $('#beneficiarios_clientes_primer_nombre').val(0)
+            $('#beneficiarios_clientes_id_pais').val(0)
+            $('#beneficiarios_clientes_id_moneda').val(0)
+            $('#beneficiarios_clientes_id_provincia').val(0)
+            $('#beneficiarios_clientes_id_municipios').val(0)
+            $('#beneficiarios_clientes_primer_apellido').val('')
+            $('#beneficiarios_clientes_segundo_apellido').val('')
+            $('#beneficiarios_clientes_nombre_alternativo').val('')
+            $('#beneficiarios_clientes_primer_apellido_alternativo').val('')
+            $('#beneficiarios_clientes_segundo_apellido_alternativo').val('')
+            $('#beneficiarios_clientes_primer_telefono').val('')
+            $('#beneficiarios_clientes_segundo_telefono').val('')
+            $('#beneficiarios_clientes_identificacion').val('')
+            $('#beneficiarios_clientes_calle').val('')
+            $('#beneficiarios_clientes_entre').val('')
+            $('#beneficiarios_clientes_y').val('')
+            $('#beneficiarios_clientes_nro_casa').val('')
+            $('#beneficiarios_clientes_edificio').val('')
+            $('#beneficiarios_clientes_apto').val('')
+            $('#beneficiarios_clientes_reparto').val('')
+            $('#monto').val('')
+        }
+
+        function estadoCampos(estado) {
+            $('#beneficiarios_clientes_id_pais').prop('disabled', estado)
+            $('#beneficiarios_clientes_id_moneda').prop('disabled', estado)
+            $('#beneficiarios_clientes_id_provincia').prop('disabled', estado)
+            $('#beneficiarios_clientes_id_municipios').prop('disabled', estado)
+            $('#beneficiarios_clientes_primer_apellido').prop('disabled', estado)
+            $('#beneficiarios_clientes_segundo_apellido').prop('disabled', estado)
+            $('#beneficiarios_clientes_nombre_alternativo').prop('disabled', estado)
+            $('#beneficiarios_clientes_primer_apellido_alternativo').prop('disabled', estado)
+            $('#beneficiarios_clientes_segundo_apellido_alternativo').prop('disabled', estado)
+            $('#beneficiarios_clientes_primer_telefono').prop('disabled', estado)
+            $('#beneficiarios_clientes_segundo_telefono').prop('disabled', estado)
+            $('#beneficiarios_clientes_identificacion').prop('disabled', estado)
+            $('#beneficiarios_clientes_calle').prop('disabled', estado)
+            $('#beneficiarios_clientes_entre').prop('disabled', estado)
+            $('#beneficiarios_clientes_y').prop('disabled', estado)
+            $('#beneficiarios_clientes_nro_casa').prop('disabled', estado)
+            $('#beneficiarios_clientes_edificio').prop('disabled', estado)
+            $('#beneficiarios_clientes_apto').prop('disabled', estado)
+            $('#beneficiarios_clientes_reparto').prop('disabled', estado)
+            $('#beneficiarios_clientes_monto_entregar').prop('disabled', estado)
+            $('#beneficiarios_clientes_monto_recibir').prop('disabled', estado)
+        }
+
+        estadoCampos(true)
+        $('#salir').on('click', function () {
+            window.location.href = "/categorias/" +{{ telefono }};
+        })
+
+        $(document).on('ready', function (event) {
+            const beneficiarios = JSON.parse('{{ beneficiarios|json_encode()|raw }}')
+            const data = JSON.parse('{{ data_baneficiarios|json_encode()|raw }}')
+            beneficiarios_array = beneficiarios
+            data_baneficiarios = data
+            beneficiarios.forEach(function (valor) {
+                    $('#beneficiarios_clientes_primer_nombre').append('<option value = "' + valor.index + '">' + valor.nombre + '</option>')
+                }
+            )
+
+            $('#beneficiarios_clientes_id_pais').on('change', e => loadData())
+
+            $('#beneficiarios_clientes_primer_nombre').append('<option value = "-1">--Nuevo Beneficiario--</option>')
+
+            $('#beneficiarios_clientes_primer_nombre').on('change', function () {
+                resetFormSolicitud()
+                estadoCampos(false)
+                let value_sel = $('#beneficiarios_clientes_primer_nombre').val()
+                if (value_sel == '-1') {
+                    changeStatus(1)
+                    $('#beneficiarios_clientes_id_moneda').find('option').remove()
+                    $('#beneficiarios_clientes_id_moneda').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+                    $('#beneficiarios_clientes_id_moneda').find('option').remove()
+                    $('#beneficiarios_clientes_id_moneda').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+                    $('#beneficiarios_clientes_id_provincia').find('option').remove()
+                    $('#beneficiarios_clientes_id_provincia').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+                    $('#beneficiarios_clientes_id_municipios').find('option').remove()
+                    $('#beneficiarios_clientes_id_municipios').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+
+                } else {
+                    loadingModal.show()
+                    changeStatus(-1)
+                    $('#beneficiarios_clientes_id_pais').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_pais'])
+                    loadData(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_provincia'],data_baneficiarios[(parseFloat(value_sel) - 1)]['id_municipio'])
+                    $('#beneficiarios_clientes_id_provincia').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_provincia'])
+                    $('#beneficiarios_clientes_primer_apellido').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_apellido'])
+                    $('#beneficiarios_clientes_segundo_apellido').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_apellido'])
+                    $('#beneficiarios_clientes_nombre_alternativo').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['nombre_alternativo'])
+                    $('#beneficiarios_clientes_primer_apellido_alternativo').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_apellido_alternativo'])
+                    $('#beneficiarios_clientes_segundo_apellido_alternativo').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_apellido_alternativo'])
+                    $('#beneficiarios_clientes_primer_telefono').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_telefono'])
+                    $('#beneficiarios_clientes_segundo_telefono').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_telefono'])
+                    $('#beneficiarios_clientes_identificacion').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['identificacion'])
+                    $('#beneficiarios_clientes_calle').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['calle'])
+                    $('#beneficiarios_clientes_entre').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['entre'])
+                    $('#beneficiarios_clientes_y').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['y'])
+                    $('#beneficiarios_clientes_nro_casa').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['nro_casa'])
+                    $('#beneficiarios_clientes_edificio').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['edificio'])
+                    $('#beneficiarios_clientes_apto').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['apto'])
+                    $('#beneficiarios_clientes_reparto').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['reparto'])
+                    $('#beneficiarios_clientes_monto_entregar').val('')
+                    $('#beneficiarios_clientes_monto_recibir').val('')
+                }
+            })
+        })
+
+        $('#beneficiarios_clientes_monto_recibir').on('keyup',function (e) {
+            if (e.which == 13) {
+                let id_pais = $('#beneficiarios_clientes_id_pais').val()
+                let id_moneda_pais = $('#beneficiarios_clientes_id_moneda').val()
+                let monto = $('#beneficiarios_clientes_monto_recibir').val()
+                let currency = $('#currency').val()
+                loadingModal.show()
+                $.ajax({
+                    url: '/servicios/remesas/solicitud/getMontoPagar',
+                    method: 'POST',
+                    data: {id_pais: id_pais,id_moneda_pais:id_moneda_pais,monto:monto,currency:currency},
+                    dataType: 'json',
+                    success: function (result) {
+                        $('#beneficiarios_clientes_monto_entregar').val(result.a_pagar)
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        alertTemplate('Error interno', 'danger')
+                        loadingModal.close()
+                    }
+                })
+            }
+        })
+
+
+        function loadData(id_provincia = null,id_municipio = null) {
+            let id_pais = $('#beneficiarios_clientes_id_pais').val()
+            $('#beneficiarios_clientes_id_moneda').find('option').remove()
+            $('#beneficiarios_clientes_id_moneda').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+            $('#beneficiarios_clientes_id_provincia').find('option').remove()
+            $('#beneficiarios_clientes_id_provincia').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+            $('#beneficiarios_clientes_id_municipios').find('option').remove()
+            $('#beneficiarios_clientes_id_municipios').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+            $.ajax({
+                url: '/servicios/remesas/solicitud/getMonedas',
+                method: 'POST',
+                data: {id_pais: id_pais},
+                dataType: 'json',
+                success: function (result) {
+                    list_provincias = result.provincias
+                    $(result.monedas).each(function (pos, valor) {
+                        $('#beneficiarios_clientes_id_moneda').append('<option value = "' + valor.id_moneda_pais + '">' + valor.moneda + '</option>');
+                    })
+                    $(result.provincias).each(function (pos, valor) {
+                        $('#beneficiarios_clientes_id_provincia').append('<option value = "' + valor.id_provincia + '">' + valor.nombre + '</option>');
+                    })
+
+                    if(id_provincia != null){
+                        $('#beneficiarios_clientes_id_municipios').find('option').remove()
+                        $('#beneficiarios_clientes_id_municipios').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+                        list_provincias.forEach(function (valor, pos) {
+                            if ($('#beneficiarios_clientes_id_provincia').val() == valor.id_provincia) {
+                                for (var i = 0; i < valor.municipios.length; i++) {
+                                    $('#beneficiarios_clientes_id_municipios').append('<option value = "' + valor.municipios[i]['id'] + '">' + valor.municipios[i]['nombre'] + '</option>');
+                                }
+                            }
+                        })
+                        if(id_municipio != null)
+                        $('#beneficiarios_clientes_id_municipios').val(id_municipio)
+                    }
+                },
+                error: function (error) {
+                    alertTemplate('Error interno', 'danger')
+                }
+
+            })
+            loadingModal.close()
+        }
+
+        $('#beneficiarios_clientes_id_provincia').on('change', function () {
+            $('#beneficiarios_clientes_id_municipios').find('option').remove()
+            $('#beneficiarios_clientes_id_municipios').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+            list_provincias.forEach(function (valor, pos) {
+                if ($('#beneficiarios_clientes_id_provincia').val() == valor.id_provincia) {
+                    for (var i = 0; i < valor.municipios.length; i++) {
+                        $('#beneficiarios_clientes_id_municipios').append('<option value = "' + valor.municipios[i]['id'] + '">' + valor.municipios[i]['nombre'] + '</option>');
+                    }
+                }
+            })
+        })
+
+        function changeStatus(val, value) {
+            resetFormSolicitud()
+            if (val == -1) {
+                $('#nuevo_beneficiario_div').css('display', 'none')
+                $('#id_beneficiario_div').css('display', 'block')
+            } else {
+                $('#nuevo_beneficiario_div').css('display', 'flex')
+                $('#id_beneficiario_div').css('display', 'none')
+                $('#beneficiarios_clientes_primer_nombre').val('')
+            }
+            if (value == true)
+                $('#beneficiarios_clientes_primer_nombre').val(0)
+        }
+
+
+
+
+        {#form_solicitud.validate({#}
+        {#    errorClass: 'invalid-label-orange',#}
+        {#    errorPlacement: function (error, element) {#}
+        {#        // colocar mensajes de error a la derecha de cada label para el componente#}
+        {#        const error_label = element.closest("form").find(element.attr('id') + "-error")#}
+        {#        if (error_label.length) {#}
+        {#            error_label.removeClass('hide')#}
+        {#        } else {#}
+        {#            error.addClass('ml-3')#}
+        {#            error.css('position', 'fixed')#}
+        {#            $(element)#}
+        {#                .closest("form")#}
+        {#                .find("label[for='" + element.attr("id") + "']")#}
+        {#                .append(error);#}
+        {#        }#}
+        {#    },#}
+        {#    rules: {#}
+        {#        'solicitud[nombre]': "required",#}
+        {#        'solicitud[primer_apellido]': "required",#}
+        {#        'solicitud[segundo_apellido]': "required",#}
+        {#    },#}
+        {#    messages: {#}
+        {#        'solicitud[nombre]': '!Obligatorio',#}
+        {#        'solicitud[primer_apellido]': '!Obligatorio',#}
+        {#        'solicitud[segundo_apellido]': '!Obligatorio',#}
+        {#    }#}
+        {#})#}
+
+
+        {#$('#btnAplicarMercancia').on('click', function () {#}
+        {#    if (form_solicitud.valid()) {#}
+        {#        const nombre = $('#solicitud_nombre').val()#}
+        {#        const primer_apellido = $('#solicitud_primer_apellido').val()#}
+        {#        const segundo_apellido = $('#solicitud_segundo_apellido').val()#}
+        {#        const telefono_celular = $('#solicitud_telefono_celular').val()#}
+        {#        const telefono_fijo = $('#solicitud_telefono_fijo').val()#}
+        {#        $('#div_cliente_origen').css('display', 'none')#}
+        {#        if (telefono_celular != '' || telefono_fijo != '') {#}
+        {#            let repetido = false#}
+        {#            for (let i = 0; i < lista_mercancias.length; i++) {#}
+        {#                if (lista_mercancias[i]['nombre'] == nombre && lista_mercancias[i]['primer_apellido'] == primer_apellido && lista_mercancias[i]['segundo_apellido'] == segundo_apellido)#}
+        {#                    repetido = true#}
+        {#            }#}
+        {#            if (!repetido) {#}
+        {#                lista_mercancias.push({#}
+        {#                    nombre,#}
+        {#                    primer_apellido,#}
+        {#                    segundo_apellido,#}
+        {#                    telefono_celular,#}
+        {#                    telefono_fijo#}
+        {#                })#}
+        {#                listado_solicitantes.append(`<tr>#}
+        {#                <td class="text-left"> ${nombre}</td>#}
+        {#                <td class="text-left"> ${primer_apellido} </td>#}
+        {#                <td class="text-left"> ${segundo_apellido} </td>#}
+        {#                <td class="text-left"> ${telefono_celular} </td>#}
+        {#                <td class="text-left"> ${telefono_fijo}</td>#}
+        {#                <td style="width: 45px;" class="text-center"> <button type="button"#}
+        {#                    class="btn btn-outline-danger btn-sm borrar" title="Eliminar" nombre-solicitante="${nombre}">#}
+        {#                    <i class="fa fa-minus-circle"></i>#}
+        {#                </button>#}
+        {#                </td#}
+        {#               ></tr>`#}
+        {#                );#}
+        {#                resetFormSolicitud()#}
+
+        {#            } else {#}
+        {#                alertTemplate('El beneficiario ya está incluido en el listado', 'danger')#}
+        {#            }#}
+        {#        } else {#}
+        {#            alertTemplate('Debe introducir al menos un número de teléfono como contacto del solicitante', 'danger')#}
+        {#        }#}
+
+        {#    }#}
+        {#})#}
+        {#$('#btnSubbmitInforme').on('click', function (event) {#}
+        {#    #}{#let precio_total = {{ precio_total }}#}
+        {#    #}{#    let#}
+        {#    #}{#cantidad_personas = lista_mercancias.length#}
+        {#    #}{#let total_solicitud = parseFloat(precio_total) * parseFloat(cantidad_personas)#}
+        {#    #}{#$('#parragraph').text('Usted ha configurado un total de ' + cantidad_personas + ' personas, el precio por solicitud es de ' + precio_total.toFixed(2) + ', por lo que el monto total de la solicitud asciende a ' + total_solicitud.toFixed(2) + '. Está seguro que desea continuar?.')#}
+        {#})#}
+
+        {#$('#btn_solicitar').on('click', function (event) {#}
+        {#    event.preventDefault()#}
+        {#    if (lista_mercancias.length) {#}
+        {#        const listado = JSON.stringify(lista_mercancias)#}
+        {#        $('body').append(`#}
+        {#            <form action='/turismo/gestion-consular/solucitud/add-carrito'#}
+        {#                 method="post" id='form_add_carrito'>#}
+        {#                <input type='hidden' name='solicitudes' value='${listado}'/>#}
+        {#            </form>`)#}
+        {#        const fomrulario = $('#form_add_carrito')#}
+        {#        fomrulario.submit()#}
+        {#        fomrulario.remove()#}
+        {#    } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')#}
+
+        {#})#}
+
+        {#$(document).on('click', '.borrar', function (event) {#}
+        {#    event.preventDefault();#}
+        {#    lista_mercancias = lista_mercancias.filter(e => e.nombre !== $(this).attr('nombre-solicitante'))#}
+        {#    $(this).closest('tr').remove()#}
+        {#    if (lista_mercancias.length == 0)#}
+        {#        $('#div_cliente_origen').css('display', 'block')#}
+        {#})#}
+
+    </script>
+{% endblock %}

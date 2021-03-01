@@ -27,6 +27,13 @@
     </div>
 
     <div class="cards-list">
+        <div id="mi_remesa" class="card 1">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/remesas.png') }}"/>
+            </div>
+        </div>
+    </div>
+    <div class="cards-list">
         <div id="remesa" class="card 1">
             <div class="card_image">
                 <img src="{{ asset('images/servicios/remesas.png') }}"/>
@@ -149,8 +156,11 @@
         });
 
         $("#remesa").click(function () {
-
             window.location.href = "/remesas/pais/" +{{ tel }};
+        });
+
+        $("#mi_remesa").click(function () {
+            window.location.href = "/servicios/remesas/solicitud";
         });
 
         $("#turismo").click(function () {

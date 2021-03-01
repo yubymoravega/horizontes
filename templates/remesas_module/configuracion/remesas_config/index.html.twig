@@ -290,14 +290,14 @@
         // eliminar la mercancia de la lista
         $(document).on('click', '.borrar', function (event) {
             event.preventDefault();
-            listado_configuraciones_rows = listado_configuraciones_rows.filter(e => (parseInt(e.proveedor)+'-'+parseInt(e.minimo)+'-'+parseInt(e.maximo)) !== $(this).attr('proveedor'))
+            listado_configuraciones_rows = listado_configuraciones_rows.filter(e => (parseInt(e.proveedor) + '-' + parseInt(e.minimo) + '-' + parseInt(e.maximo)) !== $(this).attr('proveedor'))
             cl(listado_configuraciones_rows)
             $(this).closest('tr').remove()
         })
 
         $('#btnSubbmit').on('click', function () {
             if ($('#form_solicitud').valid()) {
-                if (listado_configuraciones_rows.length >0) {
+                if (listado_configuraciones_rows.length > 0) {
                     loadingModal.show()
                     const id_pais = $('#remesas_config_id_pais').val()
                     const nuevo_pais = $('#remesas_config_nuevo_pais').val()
@@ -313,15 +313,14 @@
                     const fomrulario = $('#form_add_regla')
                     fomrulario.submit()
                     fomrulario.remove()
-                }
-                else{
-                    alertTemplate('Debe configurar al menos un precios de costo y venta del servicio','danger')
+                } else {
+                    alertTemplate('Debe configurar al menos un precios de costo y venta del servicio', 'danger')
                 }
             }
         })
 
-        $('#remesas_config_id_pais').on('change',function () {
-            listado_configuraciones_rows= []
+        $('#remesas_config_id_pais').on('change', function () {
+            listado_configuraciones_rows = []
             let pais = $('#remesas_config_id_pais').val()
             $('#rows_configuraciones').find('tr').remove()
             loadingModal.show()
