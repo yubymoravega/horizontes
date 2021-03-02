@@ -52,6 +52,11 @@ class Tramo
      */
     private $activo;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $traslado;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class Tramo
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getTraslado(): ?int
+    {
+        return $this->traslado;
+    }
+
+    public function setTraslado(int $traslado): self
+    {
+        $this->traslado = $traslado;
 
         return $this;
     }

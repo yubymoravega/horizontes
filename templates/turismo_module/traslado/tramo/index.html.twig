@@ -56,16 +56,27 @@
                                     {{ form_widget(form.destino) }}
                                 </div>
                             </div>
-                            <div class="row mt-1" style="display: none" id="info">
+                            <div class=" mt-2" style="display: none; position: center;" id="info">
                                 <div class="col-6">
+                                    <label>Destino</label>
                                     <input class="w-100 form-control" type="text" disabled id="info_destino">
                                 </div>
-                                <div class="col-6 mt-0 ml-1">
+                                <div class="col-6 mt-0">
+                                    <label>Origen</label>
                                     <input class="w-100 form-control" type="text" disabled id="info_origen">
                                 </div>
                             </div>
-                            {{ form_label(form.ida_vuelta) }}
-                            {{ form_widget(form.ida_vuelta) }}
+                            <div class="row mt-1">
+                                <div class="col-6">
+                                    {{ form_label(form.ida_vuelta) }}
+                                    {{ form_widget(form.ida_vuelta) }}
+                                </div>
+                                <div class="col-6 mt-0">
+                                    {{ form_label(form.traslado) }}
+                                    {{ form_widget(form.traslado) }}
+                                </div>
+
+                            </div>
                             <div class="row mt-1">
                                 <div class="col-8">
                                     {{ form_label(form.vehiculo) }}
@@ -101,32 +112,34 @@
 
         {# list #}
 
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Proveedor</th>
-            <th scope="col-1">Ida/Vuelta</th>
-            <th scope="col-1">Vehículo</th>
+            <th scope="col-2" class="text-left">Proveedor</th>
+            <th scope="col-1" class="text-left">Ida/Vuelta</th>
+            <th scope="col-1" class="text-left">Vehículo</th>
+            <th scope="col-1" class="text-left">Traslado</th>
             <th scope="col-1" class="text-right">Precio</th>
-            <th scope="col-1" width="150px">Acciones</th>
+            <th scope="col-1" width="150px" class="text-center">Acciones</th>
             </thead>
             <tbody>
             {% for element in tramo %}
                 <tr>
-                    <td class="row-group-conta" colspan="5">{{ element.tramo }}</td>
+                    <td class="row-group-conta" colspan="6">{{ element.tramo }}</td>
                 </tr>
                 {% for item in element.data %}
                 <tr>
-                    <td style="font-weight:400;">{{ item.proveedor_nomb }}</td>
-                    <td style="font-weight:400;">
+                    <td style="font-weight:200;">{{ item.proveedor_nomb }}</td>
+                    <td style="font-weight:200;">
                     {% if item.ida_vuelta == 1 %}
-                        {{ 'Vuelta' }}
+                        {{ 'Ida/Retorno' }}
                         {% elseif item.ida_vuelta == 0 %}
                         {{ 'Ida' }}
                     {% endif %}
                     </td>
-                    <td style="font-weight:400;">{{ item.vehiculo_nomb }}</td>
-                    <td style="font-weight:400;" class="text-right">{{ item.precio }}</td>
-                    <td>
+                    <td style="font-weight:200;">{{ item.vehiculo_nomb }}</td>
+                    <td style="font-weight:200;">{{ item.traslado_nomb }}</td>
+                    <td style="font-weight:200;" class="text-right">{{ item.precio_tabla }}</td>
+                    <td class="text-center">
                         <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Actualizar"
                                 onclick="onUpdate({
@@ -136,6 +149,7 @@
                                         destino: '{{ item.destino }}',
                                         ida_vuelta: '{{ item.ida_vuelta }}',
                                         vehiculo: '{{ item.vehiculo }}',
+                                        traslado:'{{ item.traslado }}',
                                         precio: '{{ item.precio }}'
                                         })">
                             <i class="fa fa-edit"></i>
@@ -169,21 +183,32 @@
         $(document).ready(function () {
             $('#tramo_precio').prop('type','number')
             $('#btnActualizar').hide(),
-            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
+            $('select').prepend('<option selected = "false" value = "-1" disabled>' + TEXT_SELECT + '</option>');
         })
         const onUpdate = function (config) {
             $('#btnActualizar').show()
             $('#btnAceptar').hide()
-            const {id = '',proveedor = '', origen = '', destino = '',ida_vuelta ='',vehiculo ='',precio =''} = config
+            const {id = '',proveedor = '', origen = '', destino = '',ida_vuelta ='',vehiculo ='',traslado = '',precio =''} = config
             $('#gestionarTramoModal').modal('show')
 
             $('#tramo_proveedor').val(proveedor)
             $('#tramo_origen').val(origen)
             $('#tramo_destino').val(destino)
-            if(ida_vuelta == true){
-                $('#tramo_ida_vuelta').attr('checked',true)
+            console.log(ida_vuelta)
+            if(ida_vuelta == 1){
+                $('#tramo_ida_vuelta').val(1);
+                $('#info').css('display','flex')
+                TOrigen = $('#tramo_origen option:checked').html()
+                TDestino = $('#tramo_destino option:checked').html()
+                $('#info_destino').val(TDestino)
+                $('#info_origen').val(TOrigen)
+            }
+            else {
+                $('#tramo_ida_vuelta').val(0);
             }
             $('#tramo_vehiculo').val(vehiculo)
+            $('#tramo_traslado').val(traslado)
+            $('#tramo_precio').prop('type','text')
             $('#tramo_precio').val(precio)
             $('#id_tramo').val(id)
             $('#gestionarTramo').html("Modificar Tramo")
@@ -193,24 +218,32 @@
                 proveedor: $('#tramo_proveedor').val(),
                 origen: $('#tramo_origen').val(),
                 destino: $('#tramo_destino').val(),
-                ida_vuelta: $('#tramo_ida_vuelta').prop('checked'),
+                ida_vuelta: $('#tramo_ida_vuelta').val(),
                 vehiculo: $('#tramo_vehiculo').val(),
+                traslado: $('#tramo_traslado').val(),
                 precio: $('#tramo_precio').val(),
                 id_cliente: {{ id_cliente }}
             }
             $.ajax({
-                url: '/turismo/module/traslado/tramo/add',
+                url: '/configuracion-turismo/traslado/tramo/add',
                 method: "POST",
                 data: params
             }).then(res => {
-                window.location.replace('/turismo/module/traslado/tramo');
+                window.location.replace('/configuracion-turismo/traslado/tramo');
             })
         })
 
         $('#tramo_origen').change(function (){
             origen = $('#tramo_origen').val(),
             $('#tramo_destino option').show(),
+            $('#info_origen').val($('#tramo_origen option:checked').html())
             $('#tramo_destino option[value = '+origen+']').hide()
+        })
+        $('#tramo_destino').change(function (){
+            destino = $('#tramo_destino').val(),
+                $('#tramo_origen option').show(),
+                $('#info_destino').val($('#tramo_destino option:checked').html())
+            $('#tramo_origen option[value = '+destino+']').hide()
         })
 
         $('#btnActualizar').on('click', function () {
@@ -222,15 +255,16 @@
                 destino: $('#tramo_destino').val(),
                 ida_vuelta: $('#tramo_ida_vuelta').prop('checked'),
                 vehiculo: $('#tramo_vehiculo').val(),
+                traslado: $('#tramo_traslado').val(),
                 precio: $('#tramo_precio').val(),
                 id_cliente: {{ id_cliente }}
             }
             $.ajax({
-                url: '/turismo/module/traslado/tramo/upd',
+                url: '/configuracion-turismo/traslado/tramo/upd',
                 method: "POST",
                 data: params
             }).then(res => {
-                window.location.replace('/turismo/module/traslado/tramo');
+                window.location.replace('/configuracion-turismo/traslado/tramo');
             })
         })
 
@@ -242,9 +276,11 @@
             $('#info_origen').val('')
         }
         else{
-            $('#info').css('display','block')
-            $('#info_destino').val('ssd')
-            $('#info_origen').val('hghghfg')
+            $('#info').css('display','flex')
+            TOrigen = $('#tramo_origen option:checked').html()
+            TDestino = $('#tramo_destino option:checked').html()
+            $('#info_destino').val(TDestino)
+            $('#info_origen').val(TOrigen)
         }
     })
         
@@ -255,12 +291,19 @@
         })
 
         function mostrarBtn() {
+            $('#info').css('display','none')
+            $('#info_destino').val('')
+            $('#info_origen').val('')
             $('#btnActualizar').hide()
             $('#btnAceptar').show()
-
-            $('#id_proveedor').val('')
-            $('#proveedor_nombre').val('')
-            $('#proveedor_codigo').val('')
+            $('#tramo_precio').prop('type','number')
+            $('#tramo_proveedor').val('')
+            $('#tramo_origen').val('')
+            $('#tramo_destino').val('')
+            $('#tramo_vehiculo').val('')
+            $('#tramo_traslado').val('')
+            $('#tramo_precio').val('')
+            $('#tramo_ida_vuelta').val(-1)
         }
     </script>
 {%endblock%}

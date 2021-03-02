@@ -4,6 +4,7 @@ namespace App\Form\TurismoModule\Traslado;
 
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\TurismoModule\Traslado\Lugares;
+use App\Entity\TurismoModule\Traslado\TipoTraslado;
 use App\Entity\TurismoModule\Traslado\TipoVehiculo;
 use App\Entity\TurismoModule\Traslado\Tramo;
 use Doctrine\ORM\EntityRepository;
@@ -67,6 +68,17 @@ class TramoType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'choice_label' => 'nombre',
                 'label' => 'Vehículo',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true')
+                        ->orderBy('u.nombre', 'ASC');
+                }
+            ])
+            ->add('traslado',EntityType::class,[
+                'class' => TipoTraslado::class,
+                'attr' => ['class' => 'w-100'],
+                'choice_label' => 'nombre',
+                'label' => 'Tipo Traslado',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.activo = true')

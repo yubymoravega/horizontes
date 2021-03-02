@@ -3,6 +3,7 @@
 namespace App\Form\TurismoModule\Traslado;
 
 use App\Entity\TurismoModule\Traslado\TipoVehiculo;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,7 +17,7 @@ class TipoVehiculoType extends AbstractType
             ->add('nombre',TextType::class,[
                 'required' => true,
                 'attr' => ['class' => 'w-100'],
-                'label' => 'Nombre',
+                'label' => 'Marca',
             ])
             ->add('cantidad_ini_persona',TextType::class,[
                 'required' => true,
@@ -28,6 +29,11 @@ class TipoVehiculoType extends AbstractType
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Cantidad final de Personas',
             ])
+            /*->add('picture',FileType::class,[
+                'required' => false,
+                'attr' => ['class' => 'hidden w-100 form-control-file','placeholder'=>'Seleccione una imagen','accept'=>'.jpg,.png,.jpeg,.gif'],
+                'label' => 'Seleccione una imagen',
+            ])*/
 
         ;
     }

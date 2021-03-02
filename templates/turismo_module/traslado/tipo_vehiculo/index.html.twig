@@ -43,14 +43,35 @@
                     {{form_start(form, {'attr':{'autocomplete':"off"}})}}
 
                     <div class="modal-body bg-dark-app">
-                        <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
-                            <label for="grupo_tipo_vehiculo_nombre" class="font-weight-bold">Nombre</label>
-                            {{ form_widget(form.nombre) }}
-                            <label for="grupo_tipo_vehiculo_cant_ini" class="font-weight-bold">Cantidad inicial de personas</label>
-                            {{ form_widget(form.cantidad_ini_persona) }}
-                            <label for="grupo_tipo_vehiculo_cant_fin" class="font-weight-bold">Cantidad final de personas</label>
-                            {{ form_widget(form.cantidad_fin_persona) }}
-                            <input type="text" id="id_tipo_vehiculo" hidden>
+                        <div class="container">
+
+                            <div class="mt-0 form-group input-group input-group-sm pr-0">
+                                <div class="col-6">
+                                    <div class="row">
+                                        <label for="grupo_tipo_vehiculo_nombre" class="font-weight-bold">Tipo de vehículo</label>
+                                        {{ form_widget(form.nombre) }}
+                                    </div>
+                                    <div class="row mt-1">
+                                        <label for="grupo_tipo_vehiculo_cant_ini" class="font-weight-bold">Cantidad inicial de personas</label>
+                                        {{ form_widget(form.cantidad_ini_persona) }}
+                                    </div>
+                                    <div class="row mt-1">
+                                        <label for="grupo_tipo_vehiculo_cant_fin" class="font-weight-bold">Cantidad final de personas</label>
+                                        {{ form_widget(form.cantidad_fin_persona) }}
+                                    </div>
+                                </div>
+                                <div class="col-6 d-block mt-0">
+                                    <label for="grupo_tipo_vehiculo_cant_fin" class="font-weight-bold">Imagen</label>
+                                    <div class="col-6 imgUp w-100 mt-1">
+                                        <div id="1" class="imagePreview" style="width: 200px;"></div>
+                                        <label class="btn btn-dark" style="width: 200px;">
+                                            Subir<input type="file" id="image" name="1" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <input type="text" id="id_tipo_vehiculo" hidden>
+                            </div>
                         </div>
                         <div class="d-flex mt-4">
                             <div class="mr-auto">
@@ -75,18 +96,25 @@
 
         {# list #}
 
-        <table class="table table-hover text-light">
+        <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-2">Marca</th>
-            <th scope="col-1">Rango de personas</th>
-            <th scope="col-1" width="150px">Acciones</th>
+            <th scope="col-2" class="text-left">Tipo de vehículo</th>
+            <th scope="col-1" class="text-left">Rango de personas</th>
+            <th scope="col-1" class="text-left">Imagen</th>
+            <th scope="col-1" class="text-center" width="150px">Acciones</th>
             </thead>
             <tbody>
             {% for item in vehiculos %}
                 <tr>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
                     <td style="font-weight:400; align-content: center;" width="400px">{{ item.cant_ini }} - {{ item.cant_fin }}</td>
-                    <td>
+                    <td style="font-weight:400; align-content: center;" width="400px">
+                        <button class="btn btn-dark fa fa-search" id="btnimagen" onclick="MostrarImagen('imga{{ item.id  }}')"></button>
+                        <div>
+                            <img class="p-2" id="imga{{ item.id  }}" style="width: 150px; " src="{{ "/images/vehiculos/"~item.picture}}">
+                        </div>
+                    </td>
+                    <td class="text-center">
                         <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Actualizar"
                                 onclick="onUpdate({
@@ -120,9 +148,89 @@
 {% endblock %}
 {%block javascripts%}
 {{ parent() }}
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .imagePreview {
+            width: 100%;
+            height: 150px;
+            background-position: center center;
+            background: url('http://cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg');
+            background-color: #fff;
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: inline-block;
+            box-shadow: 0 -3px 6px 2px rgba(0, 0, 0, 0.2);
+        }
+        .btn-dark {
+            display: block;
+            border-radius: 0;
+            box-shadow: 0 4px 6px 2px rgba(0, 0, 0, 0.2);
+            margin-top: -5px;
+        }
+        .imgUp {
+            margin-bottom: 15px;
+        }
+        .del {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            background-color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+        .imgAdd {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #4bd7ef;
+            color: #fff;
+            box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            line-height: 30px;
+            margin-top: 0;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button#btnSubir {
+            color: #fff;
+            border: 1px solid;
+            margin-left: 14%;
+            margin-top: 40%;
+        }
+        button#btnSubir:hover {
+            background-color: #fff;
+            color: #2f2f2f;
+        }
+    </style>
     <script>
         $(document).ready(function () {
             $('#btnActualizar').hide()
+            $('#tipo_vehiculo_cantidad_ini_persona').prop('type','number')
+            $('#tipo_vehiculo_cantidad_fin_persona').prop('type','number')
+            $('img').hide()
+        })
+        $(document).on("change",".uploadFile", function()
+        {
+            var uploadFile = $(this);
+            var files = !!this.files ? this.files : [];
+            if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+
+            if (/^image/.test( files[0].type)){ // only image file
+                var reader = new FileReader(); // instance of the FileReader
+                reader.readAsDataURL(files[0]); // read the local file
+
+                reader.onloadend = function(){ // set image data as background of div
+                    //alert(uploadFile.closest(".upimage").find('.imagePreview').length);
+                    uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url("+this.result+")");
+                }
+            }
+
         })
 
         const onUpdate = function (config) {
@@ -138,12 +246,17 @@
             $('#gestionarTvehiculo').html("Modificar " + nombre)
         }
         $('#btnAceptar').on('click', function () {
+            //alert($('input[name=1]').val())
+            const archivo = $('#image');
+            //console.log(archivo)
             let params = {
                 nombre: $('#tipo_vehiculo_nombre').val(),
                 cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),
                 cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),
+                picture:archivo.files,
                 id_cliente: {{ id_cliente }}
             }
+            //console.log(archivo);
             $.ajax({
                 url: '/configuracion-turismo/traslado/tipo-vehiculo/add',
                 method: "POST",
@@ -171,6 +284,17 @@
             })
         })
 
+        function MostrarImagen(imagen){
+
+            //elemnto = document.getElementById(imagen);
+            //console.log("'#"+imagen+"'");
+            $( "#"+imagen ).fadeToggle( "slow", "linear" );
+            /*$("#"+imagen).toggle(function (){
+                $("#"+imagen).show()
+            },function (){
+                $("#"+imagen).hide()
+            });*/
+        }
        
 
         
@@ -184,9 +308,9 @@
             $('#btnActualizar').hide()
             $('#btnAceptar').show()
 
-            $('#id_proveedor').val('')
-            $('#proveedor_nombre').val('')
-            $('#proveedor_codigo').val('')
+            $('#tipo_vehiculo_nombre').val('')
+            $('#tipo_vehiculo_cantidad_ini_persona').val('')
+            $('#tipo_vehiculo_cantidad_fin_persona').val('')
         }
     </script>
 {%endblock%}

@@ -3,6 +3,9 @@
 namespace App\Form\TurismoModule\Traslado;
 
 use App\Entity\TurismoModule\Traslado\Lugares;
+use App\Entity\TurismoModule\Traslado\Zona;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -23,6 +26,17 @@ class LugaresType extends AbstractType
                 'required' => true,
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Habilitado',
+            ])
+            ->add('zona',EntityType::class,[
+                'class' => Zona::class,
+                'required' => true,
+                'attr' => ['class' => 'w-100'],
+                'choice_label' => 'nombre',
+                'label' => 'Zona',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true');
+                }
             ])
         ;
     }

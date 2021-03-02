@@ -3,6 +3,10 @@
 {% block title %}Solicitud de Remesas{% endblock %}
 
 {% block content %}
+
+    {{ include('remesas_module/solicitud/confirmChange.html.twig') }}
+    {{ include('remesas_module/solicitud/notificacion_solicitud_remesa.html.twig') }}
+
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
             <div class="container">
@@ -123,11 +127,11 @@
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block pa-0 pl-0">
                         {{ form_label(formulario.monto_entregar) }}
-                        {{ form_widget(formulario.monto_entregar) }}
+                        {{ form_widget(formulario.monto_entregar,{'type':'number'}) }}
                     </div>
                     <div class="col-2 mt-0 form-group input-group input-group-sm d-block pa-2 pl-0">
                         {{ form_label(formulario.monto_recibir) }}
-                        {{ form_widget(formulario.monto_recibir) }}
+                        {{ form_widget(formulario.monto_recibir,{'type':'number'}) }}
                     </div>
                     <div class="col-2 pt-2 pl-1 mt-4">
                         <button class="btn btn-secondary btn-sm ml-0 fa fa-plus" type="button" id="btnAplicarMercancia">
@@ -146,7 +150,7 @@
                     <th width="140px" class="text-left">Monto a Recibir</th>
                     <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
                     </thead>
-                    <tbody id="rows_solicitudes">
+                    <tbody id="rows_solicitudes_remesas">
                     </tbody>
                 </table>
             </div>
@@ -170,6 +174,36 @@
         let beneficiarios_array = []
         let data_baneficiarios = []
         let list_provincias = []
+        let str_beneficiario = ''
+        let list_table = []
+        let new_beneficiario
+        let form_solicitud = $('#form_solicitud')
+        let id_banaficiario_
+        let nombre_
+        let id_pais_
+        let pais_
+        let id_moneda_
+        let id_provincia_
+        let id_municipio_
+        let primer_apellido_
+        let segundo_apellido_
+        let nombre_alternativo_
+        let primer_apellido_alternativo_
+        let segundo_apellido_alternativo_
+        let primer_telefono_
+        let segundo_telefono_
+        let identificacion_
+        let calle_
+        let entre_
+        let y_
+        let nro_casa_
+        let edificio_
+        let apto_
+        let reparto_
+        let monto_entregar_
+        let monto_recibir_
+        let id_moneda_select_
+        let actua
         $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
 
         function eliminarElementoMisterioso() {
@@ -205,7 +239,9 @@
             $('#beneficiarios_clientes_edificio').val('')
             $('#beneficiarios_clientes_apto').val('')
             $('#beneficiarios_clientes_reparto').val('')
-            $('#monto').val('')
+            $('#beneficiarios_clientes_monto_entregar').val('')
+            $('#beneficiarios_clientes_monto_recibir').val('')
+            $('#beneficiarios_clientes_nuevo_beneficiario').val('')
         }
 
         function estadoCampos(estado) {
@@ -233,6 +269,7 @@
         }
 
         estadoCampos(true)
+
         $('#salir').on('click', function () {
             window.location.href = "/categorias/" +{{ telefono }};
         })
@@ -252,10 +289,13 @@
             $('#beneficiarios_clientes_primer_nombre').append('<option value = "-1">--Nuevo Beneficiario--</option>')
 
             $('#beneficiarios_clientes_primer_nombre').on('change', function () {
+                loadingModal.show()
                 resetFormSolicitud()
                 estadoCampos(false)
+                $('#beneficiarios_clientes_nuevo_beneficiario').val('')
                 let value_sel = $('#beneficiarios_clientes_primer_nombre').val()
                 if (value_sel == '-1') {
+                    new_beneficiario = true
                     changeStatus(1)
                     $('#beneficiarios_clientes_id_moneda').find('option').remove()
                     $('#beneficiarios_clientes_id_moneda').prepend('<option value = "0" selected disabled>...seleccione...</option>')
@@ -267,10 +307,10 @@
                     $('#beneficiarios_clientes_id_municipios').prepend('<option value = "0" selected disabled>...seleccione...</option>')
 
                 } else {
-                    loadingModal.show()
                     changeStatus(-1)
+                    new_beneficiario = false
                     $('#beneficiarios_clientes_id_pais').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_pais'])
-                    loadData(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_provincia'],data_baneficiarios[(parseFloat(value_sel) - 1)]['id_municipio'])
+                    loadData(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_provincia'], data_baneficiarios[(parseFloat(value_sel) - 1)]['id_municipio'])
                     $('#beneficiarios_clientes_id_provincia').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['id_provincia'])
                     $('#beneficiarios_clientes_primer_apellido').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_apellido'])
                     $('#beneficiarios_clientes_segundo_apellido').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_apellido'])
@@ -289,36 +329,100 @@
                     $('#beneficiarios_clientes_reparto').val(data_baneficiarios[(parseFloat(value_sel) - 1)]['reparto'])
                     $('#beneficiarios_clientes_monto_entregar').val('')
                     $('#beneficiarios_clientes_monto_recibir').val('')
+                    str_beneficiario =
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_apellido'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_apellido'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['nombre_alternativo'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_apellido_alternativo'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_apellido_alternativo'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['primer_telefono'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['segundo_telefono'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['identificacion'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['calle'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['entre'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['y'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['nro_casa'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['edificio'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['apto'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['reparto'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['id_pais'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['id_provincia'] + '-' +
+                        data_baneficiarios[(parseFloat(value_sel) - 1)]['id_municipio']
                 }
+                loadingModal.close()
             })
         })
 
-        $('#beneficiarios_clientes_monto_recibir').on('keyup',function (e) {
+        $('#beneficiarios_clientes_monto_recibir').on('keyup', function (e) {
+            $('#beneficiarios_clientes_monto_entregar').val('')
             if (e.which == 13) {
-                let id_pais = $('#beneficiarios_clientes_id_pais').val()
-                let id_moneda_pais = $('#beneficiarios_clientes_id_moneda').val()
-                let monto = $('#beneficiarios_clientes_monto_recibir').val()
-                let currency = $('#currency').val()
-                loadingModal.show()
-                $.ajax({
-                    url: '/servicios/remesas/solicitud/getMontoPagar',
-                    method: 'POST',
-                    data: {id_pais: id_pais,id_moneda_pais:id_moneda_pais,monto:monto,currency:currency},
-                    dataType: 'json',
-                    success: function (result) {
-                        $('#beneficiarios_clientes_monto_entregar').val(result.a_pagar)
-                        loadingModal.close()
-                    },
-                    error: function (error) {
-                        alertTemplate('Error interno', 'danger')
-                        loadingModal.close()
-                    }
-                })
+                if ($('#beneficiarios_clientes_id_moneda').val() > 0) {
+
+                    let id_pais = $('#beneficiarios_clientes_id_pais').val()
+                    let id_moneda_pais = $('#beneficiarios_clientes_id_moneda').val()
+                    let monto = $('#beneficiarios_clientes_monto_recibir').val()
+                    let currency = $('#currency').val()
+                    loadingModal.show()
+                    $.ajax({
+                        url: '/servicios/remesas/solicitud/getMontoPagar',
+                        method: 'POST',
+                        data: {id_pais: id_pais, id_moneda_pais: id_moneda_pais, monto: monto, currency: currency},
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.a_pagar == 0) {
+                                alertTemplate('No existen reglas configuradas para la cantidad especificada', 'danger')
+                                $('#beneficiarios_clientes_monto_recibir').val('')
+                                $('#beneficiarios_clientes_monto_entregar').val('')
+                            } else
+                                $('#beneficiarios_clientes_monto_entregar').val(result.a_pagar)
+                            loadingModal.close()
+                        },
+                        error: function (error) {
+                            alertTemplate('Error interno', 'danger')
+                            loadingModal.close()
+                        }
+                    })
+                } else {
+                    alertTemplate('Tiene que seleccionar la moneda en que se entregará en el país del beneficiario.', 'danger')
+                }
             }
         })
 
+        $('#beneficiarios_clientes_monto_entregar').on('keyup', function (e) {
+            $('#beneficiarios_clientes_monto_recibir').val('')
+            if (e.which == 13) {
+                if ($('#beneficiarios_clientes_id_moneda').val() > 0) {
+                    let id_pais = $('#beneficiarios_clientes_id_pais').val()
+                    let id_moneda_pais = $('#beneficiarios_clientes_id_moneda').val()
+                    let monto = $('#beneficiarios_clientes_monto_entregar').val()
+                    let currency = $('#currency').val()
+                    loadingModal.show()
+                    $.ajax({
+                        url: '/servicios/remesas/solicitud/getMontoRecibir',
+                        method: 'POST',
+                        data: {id_pais: id_pais, id_moneda_pais: id_moneda_pais, monto: monto, currency: currency},
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.a_recibir == 0) {
+                                alertTemplate('No existen reglas configuradas para la cantidad especificada', 'danger')
+                                $('#beneficiarios_clientes_monto_recibir').val('')
+                                $('#beneficiarios_clientes_monto_entregar').val('')
+                            } else
+                                $('#beneficiarios_clientes_monto_recibir').val(result.a_recibir)
+                            loadingModal.close()
+                        },
+                        error: function (error) {
+                            alertTemplate('Error interno', 'danger')
+                            loadingModal.close()
+                        }
+                    })
+                } else {
+                    alertTemplate('Tiene que seleccionar la moneda en que se entregará en el país del beneficiario.', 'danger')
+                }
+            }
+        })
 
-        function loadData(id_provincia = null,id_municipio = null) {
+        function loadData(id_provincia = null, id_municipio = null) {
             let id_pais = $('#beneficiarios_clientes_id_pais').val()
             $('#beneficiarios_clientes_id_moneda').find('option').remove()
             $('#beneficiarios_clientes_id_moneda').prepend('<option value = "0" selected disabled>...seleccione...</option>')
@@ -340,7 +444,7 @@
                         $('#beneficiarios_clientes_id_provincia').append('<option value = "' + valor.id_provincia + '">' + valor.nombre + '</option>');
                     })
 
-                    if(id_provincia != null){
+                    if (id_provincia != null) {
                         $('#beneficiarios_clientes_id_municipios').find('option').remove()
                         $('#beneficiarios_clientes_id_municipios').prepend('<option value = "0" selected disabled>...seleccione...</option>')
                         list_provincias.forEach(function (valor, pos) {
@@ -350,8 +454,8 @@
                                 }
                             }
                         })
-                        if(id_municipio != null)
-                        $('#beneficiarios_clientes_id_municipios').val(id_municipio)
+                        if (id_municipio != null)
+                            $('#beneficiarios_clientes_id_municipios').val(id_municipio)
                     }
                 },
                 error: function (error) {
@@ -388,84 +492,91 @@
                 $('#beneficiarios_clientes_primer_nombre').val(0)
         }
 
+        $('#btnAplicarMercancia').on('click', function () {
+            if (form_solicitud.valid()) {
+                id_banaficiario_ = $('#beneficiarios_clientes_nuevo_beneficiario').val() ? null : $('#beneficiarios_clientes_primer_nombre').val()
+                nombre_ = $('#beneficiarios_clientes_nuevo_beneficiario').val() ? $('#beneficiarios_clientes_nuevo_beneficiario').val() : $('#beneficiarios_clientes_primer_nombre option:selected').text()
+                id_pais_ = $('#beneficiarios_clientes_id_pais').val()
+                pais_ = $('#beneficiarios_clientes_id_pais option:selected').text()
+                id_moneda_ = $('#beneficiarios_clientes_id_moneda').val()
+                id_provincia_ = $('#beneficiarios_clientes_id_provincia').val()
+                id_municipio_ = $('#beneficiarios_clientes_id_municipios').val()
+                primer_apellido_ = $('#beneficiarios_clientes_primer_apellido').val()
+                segundo_apellido_ = $('#beneficiarios_clientes_segundo_apellido').val()
+                nombre_alternativo_ = $('#beneficiarios_clientes_nombre_alternativo').val()
+                primer_apellido_alternativo_ = $('#beneficiarios_clientes_primer_apellido_alternativo').val()
+                segundo_apellido_alternativo_ = $('#beneficiarios_clientes_segundo_apellido_alternativo').val()
+                primer_telefono_ = $('#beneficiarios_clientes_primer_telefono').val()
+                segundo_telefono_ = $('#beneficiarios_clientes_segundo_telefono').val()
+                identificacion_ = $('#beneficiarios_clientes_identificacion').val()
+                calle_ = $('#beneficiarios_clientes_calle').val()
+                entre_ = $('#beneficiarios_clientes_entre').val()
+                y_ = $('#beneficiarios_clientes_y').val()
+                nro_casa_ = $('#beneficiarios_clientes_nro_casa').val()
+                edificio_ = $('#beneficiarios_clientes_edificio').val()
+                apto_ = $('#beneficiarios_clientes_apto').val()
+                reparto_ = $('#beneficiarios_clientes_reparto').val()
+                monto_entregar_ = $('#beneficiarios_clientes_monto_entregar').val()
+                monto_recibir_ = $('#beneficiarios_clientes_monto_recibir').val()
+                id_moneda_select_ = $('#currency').val()
 
+                const str_to_compare = primer_apellido_ + '-' + segundo_apellido_ + '-' + nombre_alternativo_ + '-' + primer_apellido_alternativo_ + '-' + segundo_apellido_alternativo_ + '-' +
+                    primer_telefono_ + '-' + segundo_telefono_ + '-' + identificacion_ + '-' + calle_ + '-' + entre_ + '-' + y_ + '-' + nro_casa_ + '-' + edificio_ + '-' + apto_ + '-' +
+                    reparto_ + '-' + id_pais_ + '-' + id_provincia_ + '-' +
+                    id_municipio_
 
+                if (str_to_compare === str_beneficiario || new_beneficiario == true) {
+                    LlenarTabla(false,id_banaficiario_,nombre_,id_pais_,id_moneda_,id_provincia_,id_municipio_,primer_apellido_,segundo_apellido_,
+                                         nombre_alternativo_,primer_apellido_alternativo_,segundo_apellido_alternativo_,primer_telefono_,segundo_telefono_,identificacion_,
+                                         calle_,entre_,y_,nro_casa_,edificio_,apto_,reparto_,monto_entregar_,monto_recibir_,id_moneda_select_)
+                } else {
+                    $('#ModalConfirm').modal('show')
+                }
+            }
+        })
 
-        {#form_solicitud.validate({#}
-        {#    errorClass: 'invalid-label-orange',#}
-        {#    errorPlacement: function (error, element) {#}
-        {#        // colocar mensajes de error a la derecha de cada label para el componente#}
-        {#        const error_label = element.closest("form").find(element.attr('id') + "-error")#}
-        {#        if (error_label.length) {#}
-        {#            error_label.removeClass('hide')#}
-        {#        } else {#}
-        {#            error.addClass('ml-3')#}
-        {#            error.css('position', 'fixed')#}
-        {#            $(element)#}
-        {#                .closest("form")#}
-        {#                .find("label[for='" + element.attr("id") + "']")#}
-        {#                .append(error);#}
-        {#        }#}
-        {#    },#}
-        {#    rules: {#}
-        {#        'solicitud[nombre]': "required",#}
-        {#        'solicitud[primer_apellido]': "required",#}
-        {#        'solicitud[segundo_apellido]': "required",#}
-        {#    },#}
-        {#    messages: {#}
-        {#        'solicitud[nombre]': '!Obligatorio',#}
-        {#        'solicitud[primer_apellido]': '!Obligatorio',#}
-        {#        'solicitud[segundo_apellido]': '!Obligatorio',#}
-        {#    }#}
-        {#})#}
+        form_solicitud.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                // colocar mensajes de error a la derecha de cada label para el componente
+                const error_label = element.closest("form").find(element.attr('id') + "-error")
+                if (error_label.length) {
+                    error_label.removeClass('hide')
+                } else {
+                    error.addClass('ml-3 mt-3')
+                    error.css('position', 'fixed')
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+                }
+            },
+            rules: {
+                'beneficiarios_clientes[primer_nombre]': "required",
+                'beneficiarios_clientes[monto_entregar]': "required",
+                'beneficiarios_clientes[monto_recibir]': "required",
+                'beneficiarios_clientes[nuevo_beneficiario]': "required",
+            },
+            messages: {
+                'beneficiarios_clientes[primer_nombre]': '!Obligatorio',
+                'beneficiarios_clientes[monto_entregar]': '!Obligatorio',
+                'beneficiarios_clientes[monto_recibir]': '!Obligatorio',
+                'beneficiarios_clientes[nuevo_beneficiario]': '!Obligatorio',
+            }
+        })
 
+        $('#btn_aceptar').on('click',function () {
+            LlenarTabla(true,id_banaficiario_,nombre_,id_pais_,id_moneda_,id_provincia_,id_municipio_,primer_apellido_,segundo_apellido_,
+                nombre_alternativo_,primer_apellido_alternativo_,segundo_apellido_alternativo_,primer_telefono_,segundo_telefono_,identificacion_,
+                calle_,entre_,y_,nro_casa_,edificio_,apto_,reparto_,monto_entregar_,monto_recibir_,id_moneda_select_)
+        })
 
-        {#$('#btnAplicarMercancia').on('click', function () {#}
-        {#    if (form_solicitud.valid()) {#}
-        {#        const nombre = $('#solicitud_nombre').val()#}
-        {#        const primer_apellido = $('#solicitud_primer_apellido').val()#}
-        {#        const segundo_apellido = $('#solicitud_segundo_apellido').val()#}
-        {#        const telefono_celular = $('#solicitud_telefono_celular').val()#}
-        {#        const telefono_fijo = $('#solicitud_telefono_fijo').val()#}
-        {#        $('#div_cliente_origen').css('display', 'none')#}
-        {#        if (telefono_celular != '' || telefono_fijo != '') {#}
-        {#            let repetido = false#}
-        {#            for (let i = 0; i < lista_mercancias.length; i++) {#}
-        {#                if (lista_mercancias[i]['nombre'] == nombre && lista_mercancias[i]['primer_apellido'] == primer_apellido && lista_mercancias[i]['segundo_apellido'] == segundo_apellido)#}
-        {#                    repetido = true#}
-        {#            }#}
-        {#            if (!repetido) {#}
-        {#                lista_mercancias.push({#}
-        {#                    nombre,#}
-        {#                    primer_apellido,#}
-        {#                    segundo_apellido,#}
-        {#                    telefono_celular,#}
-        {#                    telefono_fijo#}
-        {#                })#}
-        {#                listado_solicitantes.append(`<tr>#}
-        {#                <td class="text-left"> ${nombre}</td>#}
-        {#                <td class="text-left"> ${primer_apellido} </td>#}
-        {#                <td class="text-left"> ${segundo_apellido} </td>#}
-        {#                <td class="text-left"> ${telefono_celular} </td>#}
-        {#                <td class="text-left"> ${telefono_fijo}</td>#}
-        {#                <td style="width: 45px;" class="text-center"> <button type="button"#}
-        {#                    class="btn btn-outline-danger btn-sm borrar" title="Eliminar" nombre-solicitante="${nombre}">#}
-        {#                    <i class="fa fa-minus-circle"></i>#}
-        {#                </button>#}
-        {#                </td#}
-        {#               ></tr>`#}
-        {#                );#}
-        {#                resetFormSolicitud()#}
+        $('#btn_no').on('click',function () {
+            LlenarTabla(false,id_banaficiario_,nombre_,id_pais_,id_moneda_,id_provincia_,id_municipio_,primer_apellido_,segundo_apellido_,
+                nombre_alternativo_,primer_apellido_alternativo_,segundo_apellido_alternativo_,primer_telefono_,segundo_telefono_,identificacion_,
+                calle_,entre_,y_,nro_casa_,edificio_,apto_,reparto_,monto_entregar_,monto_recibir_,id_moneda_select_)
+        })
 
-        {#            } else {#}
-        {#                alertTemplate('El beneficiario ya está incluido en el listado', 'danger')#}
-        {#            }#}
-        {#        } else {#}
-        {#            alertTemplate('Debe introducir al menos un número de teléfono como contacto del solicitante', 'danger')#}
-        {#        }#}
-
-        {#    }#}
-        {#})#}
         {#$('#btnSubbmitInforme').on('click', function (event) {#}
         {#    #}{#let precio_total = {{ precio_total }}#}
         {#    #}{#    let#}
@@ -490,13 +601,58 @@
 
         {#})#}
 
-        {#$(document).on('click', '.borrar', function (event) {#}
-        {#    event.preventDefault();#}
-        {#    lista_mercancias = lista_mercancias.filter(e => e.nombre !== $(this).attr('nombre-solicitante'))#}
-        {#    $(this).closest('tr').remove()#}
-        {#    if (lista_mercancias.length == 0)#}
-        {#        $('#div_cliente_origen').css('display', 'block')#}
-        {#})#}
-
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            list_table = list_table.filter(e => e.nombre_ !== $(this).attr('nombre'))
+            $(this).closest('tr').remove()
+        })
+        function LlenarTabla(actualizar,id_banaficiario_,nombre_,id_pais_,id_moneda_,id_provincia_,id_municipio_,primer_apellido_,segundo_apellido_,
+                             nombre_alternativo_,primer_apellido_alternativo_,segundo_apellido_alternativo_,primer_telefono_,segundo_telefono_,identificacion_,
+                             calle_,entre_,y_,nro_casa_,edificio_,apto_,reparto_,monto_entregar_,monto_recibir_,id_moneda_select_) {
+            list_table.push({
+                actualizar,
+                id_banaficiario_,
+                nombre_,
+                id_pais_,
+                id_moneda_,
+                id_provincia_,
+                id_municipio_,
+                primer_apellido_,
+                segundo_apellido_,
+                nombre_alternativo_,
+                primer_apellido_alternativo_,
+                segundo_apellido_alternativo_,
+                primer_telefono_,
+                segundo_telefono_,
+                identificacion_,
+                calle_,
+                entre_,
+                y_,
+                nro_casa_,
+                edificio_,
+                apto_,
+                reparto_,
+                monto_entregar_,
+                monto_recibir_,
+                id_moneda_select_,
+            })
+            cl(list_table)
+            let valor_entregar = parseFloat(monto_entregar_).toFixed(2)
+            let valor_recibir = parseFloat(monto_recibir_).toFixed(2)
+            $('#rows_solicitudes_remesas').append(`<tr>
+                        <td class="text-left"> ${nombre_}</td>
+                        <td class="text-left"> ${pais_} </td>
+                        <td class="text-right"> ${valor_entregar} </td>
+                        <td class="text-right"> ${valor_recibir} </td>
+                        <td style="width: 45px;" class="text-center"> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" nombre="${nombre_}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td
+                       ></tr>`
+            );
+            $('#beneficiarios_clientes_primer_nombre').val(0)
+            resetFormSolicitud()
+        }
     </script>
 {% endblock %}

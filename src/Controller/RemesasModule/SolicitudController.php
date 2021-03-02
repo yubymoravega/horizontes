@@ -49,28 +49,28 @@ class SolicitudController extends AbstractController
             $data_beneficiarios[] = [
                 'index' => $key,
                 'id_cliente' => $item->getIdCliente()->getId(),
-                'primer_nombre' => $item->getPrimerNombre(),
-                'primer_apellido' => $item->getPrimerApellido(),
-                'segundo_apellido' => $item->getSegundoApellido(),
-                'nombre_alternativo' => $item->getNombreAlternativo(),
-                'primer_apellido_alternativo' => $item->getPrimerApellidoAlternativo(),
-                'segundo_apellido_alternativo' => $item->getSegundoApellidoAlternativo(),
-                'primer_telefono' => $item->getPrimerTelefono(),
-                'segundo_telefono' => $item->getSegundoTelefono(),
-                'identificacion' => $item->getIdentificacion(),
-                'calle' => $item->getCalle(),
-                'entre' => $item->getEntre(),
-                'y' => $item->getY(),
-                'nro_casa' => $item->getNroCasa(),
-                'edificio' => $item->getEdificio(),
-                'apto' => $item->getApto(),
-                'reparto' => $item->getReparto(),
-                'id_pais' => $item->getIdPais()->getId(),
-                'nombre_pais' => $item->getIdPais()->getNombre(),
-                'id_provincia' => $item->getIdProvincia()->getId(),
-                'nombre_provincia' => $item->getIdProvincia()->getNombre(),
-                'id_municipio' => $item->getIdMunicipio()->getId(),
-                'nombre_municipio' => $item->getIdMunicipio()->getNombre(),
+                'primer_nombre' => $item->getPrimerNombre() ? $item->getPrimerNombre() : '',
+                'primer_apellido' => $item->getPrimerApellido() ? $item->getPrimerApellido() : '',
+                'segundo_apellido' => $item->getSegundoApellido() ? $item->getSegundoApellido() : '',
+                'nombre_alternativo' => $item->getNombreAlternativo() ? $item->getNombreAlternativo() : '',
+                'primer_apellido_alternativo' => $item->getPrimerApellidoAlternativo() ? $item->getPrimerApellidoAlternativo() : '',
+                'segundo_apellido_alternativo' => $item->getSegundoApellidoAlternativo() ? $item->getSegundoApellidoAlternativo() : '',
+                'primer_telefono' => $item->getPrimerTelefono() ? $item->getPrimerTelefono() : '',
+                'segundo_telefono' => $item->getSegundoTelefono() ? $item->getSegundoTelefono() : '',
+                'identificacion' => $item->getIdentificacion() ? $item->getIdentificacion() : '',
+                'calle' => $item->getCalle() ? $item->getCalle() : '',
+                'entre' => $item->getEntre() ? $item->getEntre() : '',
+                'y' => $item->getY() ? $item->getY() : '',
+                'nro_casa' => $item->getNroCasa() ? $item->getNroCasa() : '',
+                'edificio' => $item->getEdificio() ? $item->getEdificio() : '',
+                'apto' => $item->getApto() ? $item->getApto() : '',
+                'reparto' => $item->getReparto() ? $item->getReparto() : '',
+                'id_pais' => $item->getIdPais()->getId() ? $item->getIdPais()->getId() : '',
+                'nombre_pais' => $item->getIdPais()->getNombre() ? $item->getIdPais()->getNombre() : '',
+                'id_provincia' => $item->getIdProvincia()->getId() ? $item->getIdProvincia()->getId() : '',
+                'nombre_provincia' => $item->getIdProvincia()->getNombre() ? $item->getIdProvincia()->getNombre() : '',
+                'id_municipio' => $item->getIdMunicipio()->getId() ? $item->getIdMunicipio()->getId() : '',
+                'nombre_municipio' => $item->getIdMunicipio()->getNombre() ? $item->getIdMunicipio()->getNombre() : '',
             ];
         }
         return $this->render('remesas_module/solicitud/index.html.twig', [
@@ -148,17 +148,20 @@ class SolicitudController extends AbstractController
             'id_moneda_origen' => $moneda_er->find($moneda_pais->getIdMoneda()),
             'id_moneda_destino' => $moneda_usd
         ]);
+        if ($moneda_er->find($moneda_pais->getIdMoneda()) == $moneda_usd)
+            $monto_usd = $cantidad;
+        else
+            $monto_usd = $tasa_cambio->getValor() * $cantidad;
 
-        $monto_usd = $tasa_cambio->getValor()*$cantidad;
-        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
-        $costo_venta = AuxFunctionsTurismo::getDataRemesaPagar($em,$id_pais,$monto_usd,$unidad);
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $costo_venta = AuxFunctionsTurismo::getDataRemesaPagar($em, $id_pais, $monto_usd, $unidad);
 
         $precio_venta = floatval($costo_venta);
 
-        if($id_moneda_select == $moneda_usd->getId())
+        if ($id_moneda_select == $moneda_usd->getId())
             return new JsonResponse([
                 'success' => true,
-                'a_pagar' =>$precio_venta
+                'a_pagar' => round($precio_venta, 2)
             ]);
 
         $tasa_cambio = $tasa_cambio_er->findOneBy([
@@ -168,14 +171,72 @@ class SolicitudController extends AbstractController
             'id_moneda_origen' => $moneda_usd,
             'id_moneda_destino' => $moneda_er->find($id_moneda_select)
         ]);
-        $monto_moneda_select = $tasa_cambio->getValor()*$precio_venta;
+        $monto_moneda_select = $tasa_cambio->getValor() * $precio_venta;
 
         return new JsonResponse([
             'success' => true,
-            'a_pagar' =>$monto_moneda_select
+            'a_pagar' => round($monto_moneda_select, 2)
+        ]);
+    }
+
+    /**
+     * @Route("/getMontoRecibir", name="getMontoRecibir")
+     */
+    public function getMontoRecibir(EntityManagerInterface $em, Request $request)
+    {
+        $cantidad = floatval($request->request->get('monto'));
+        $id_moneda_pais = $request->request->get('id_moneda_pais');
+        $id_pais = $request->request->get('id_pais');
+        $id_moneda_select = $request->request->get('currency');
+        $moneda_pais = $em->getRepository(MonedaPais::class)->find($id_moneda_pais);
+        $tasa_cambio_er = $em->getRepository(TasaCambio::class);
+        $moneda_er = $em->getRepository(Moneda::class);
+        $moneda_usd = $moneda_er->findOneBy(['nombre' => 'usd', 'activo' => true]);
+        $year = Date('Y');
+        $month = Date('m');
+        $tasa_cambio = $tasa_cambio_er->findOneBy([
+            'anno' => $year,
+            'mes' => $month,
+            'activo' => true,
+            'id_moneda_origen' => $moneda_er->find($id_moneda_select),
+            'id_moneda_destino' => $moneda_usd
+        ]);
+        if ($moneda_er->find($id_moneda_select) == $moneda_usd)
+            $monto_usd = $cantidad;
+        else
+            $monto_usd = $tasa_cambio->getValor() * $cantidad;
+
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+
+        $costo_venta = AuxFunctionsTurismo::getDataRemesaRecibir($em, $id_pais, $monto_usd, $unidad);
+//        dd($costo_venta);
+        if ($costo_venta == 0)
+            return new JsonResponse([
+                'success' => true,
+                'a_recibir' => round($costo_venta, 2)
+            ]);
+        $precio_venta = floatval($costo_venta);
+
+        if ($moneda_pais->getIdMoneda() == $moneda_usd->getId())
+            return new JsonResponse([
+                'success' => true,
+                'a_recibir' => round($precio_venta, 2)
+            ]);
+
+        $tasa_cambio = $tasa_cambio_er->findOneBy([
+            'anno' => $year,
+            'mes' => $month,
+            'activo' => true,
+            'id_moneda_origen' => $moneda_usd,
+            'id_moneda_destino' => $moneda_er->find($moneda_pais->getIdMoneda())
+        ]);
+        $monto_moneda_select = $tasa_cambio->getValor() * $precio_venta;
+
+        return new JsonResponse([
+            'success' => true,
+            'a_recibir' => round($monto_moneda_select, 2)
         ]);
     }
 
 
 }
-

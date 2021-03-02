@@ -32,6 +32,11 @@ class PrecioVenta
      */
     private $fijo;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +74,18 @@ class PrecioVenta
     public function setFijo(?float $fijo): self
     {
         $this->fijo = $fijo;
+
+        return $this;
+    }
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(bool $activo): self
+    {
+        $this->activo = $activo;
 
         return $this;
     }

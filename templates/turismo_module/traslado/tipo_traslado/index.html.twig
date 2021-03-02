@@ -69,16 +69,16 @@
 
     {# list #}
 
-    <table class="table table-hover text-light">
+    <table class="table-small-rows table table-hover text-light">
         <thead class="thead-dark">
-        <th scope="col-2">Nombre</th>
-        <th scope="col-1" width="150px">Acciones</th>
+        <th scope="col-2"  class="text-left">Nombre</th>
+        <th scope="col-1" width="150px" class="text-center">Acciones</th>
         </thead>
         <tbody>
         {% for item in traslados %}
             <tr>
                 <td style="font-weight:400;">{{ item.nombre }}</td>
-                <td>
+                <td class="text-center">
                     <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                             data-placement="bottom" title="Actualizar"
                             onclick="onUpdate({
@@ -166,10 +166,7 @@
         function mostrarBtn() {
             $('#btnActualizar').hide()
             $('#btnAceptar').show()
-
-            $('#id_proveedor').val('')
-            $('#proveedor_nombre').val('')
-            $('#proveedor_codigo').val('')
+            $('#tipo_traslado_nombre').val('')
         }
     </script>
 {%endblock%}

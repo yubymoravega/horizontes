@@ -6,6 +6,7 @@ use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\TurismoModule\Traslado\Lugares;
+use App\Entity\TurismoModule\Traslado\TipoTraslado;
 use App\Entity\TurismoModule\Traslado\TipoVehiculo;
 use App\Entity\TurismoModule\Traslado\Tramo;
 use App\Form\TurismoModule\Traslado\TramoType;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @package App\Controller\TurismoModule\Traslado
- * @Route("/turismo/module/traslado/tramo")
+ * @Route("/configuracion-turismo/traslado/tramo")
  */
 class TramoController extends AbstractController
 {
@@ -35,6 +36,7 @@ class TramoController extends AbstractController
          $origen_er = $em->getRepository(Lugares::class);
          $tipo_vehiculo_er = $em->getRepository(TipoVehiculo::class);
          $proveedor_er=$em->getRepository(Proveedor::class);
+         $tipo_traslado_er=$em->getRepository(TipoTraslado::class);
 
          $form = $this->createForm(TramoType::class,$tramo);
          //$data = $em->getRepository(Tramo::class)->findBy(['activo'=>true]);
@@ -72,7 +74,10 @@ class TramoController extends AbstractController
                     'ida_vuelta' => $item->getIdaVuelta(),
                     'vehiculo' => $item->getVehiculo(),
                     'vehiculo_nomb'=> $tipo_vehiculo_er->findBy(['id'=> $item->getVehiculo()])[0]->getNombre(),
-                    'precio' => number_format($item->getPrecio(),2)
+                    'traslado' => $item->getTraslado(),
+                    'traslado_nomb'=> $tipo_traslado_er->findBy(['id'=> $item->getTraslado()])[0]->getNombre(),
+                    'precio' => $item->getPrecio(),
+                    'precio_tabla' => number_format($item->getPrecio(),2)
                 );
             }
             $values = explode('-',$element);
@@ -113,13 +118,15 @@ class TramoController extends AbstractController
             $ida_vuelta = false;
         }
         $vehiculo = $request->get('vehiculo');
-        $precio = $request->get('precio');
+        $traslado = $request->get('traslado');
+        $precio = floatval($request->get('precio'));
         $params = array(
             'proveedor' => $proveedor,
             'origen' => $origen,
             'destino' => $destino,
             'ida_vuelta' => $ida_vuelta,
             'vehiculo' => $vehiculo,
+            'traslado'=> $traslado,
             'precio' => $precio,
             'activo' => true
 
@@ -133,6 +140,7 @@ class TramoController extends AbstractController
                 ->setDestino($destino)
                 ->setIdaVuelta($ida_vuelta)
                 ->setVehiculo($vehiculo)
+                ->setTraslado($traslado)
                 ->setPrecio($precio)
                 ->setActivo(true);
             try {
@@ -168,6 +176,7 @@ class TramoController extends AbstractController
             $sentido = true;
         }
         $vehiculo = $request->get('vehiculo');
+        $traslado = $request->get('traslado');
         $precio = $request->get('precio');
 
 
@@ -177,6 +186,7 @@ class TramoController extends AbstractController
             'destino' => $destino,
             'ida_vuelta' => $sentido,
             'vehiculo' => $vehiculo,
+            'traslado'=>$traslado,
             'precio' => $precio,
             'activo' => true
         );
@@ -189,6 +199,7 @@ class TramoController extends AbstractController
             ->setDestino($destino)
             ->setIdaVuelta($sentido)
             ->setVehiculo($vehiculo)
+            ->setTraslado($traslado)
             ->setPrecio($precio);
             try {
                 $em->persist($obj_tramo);

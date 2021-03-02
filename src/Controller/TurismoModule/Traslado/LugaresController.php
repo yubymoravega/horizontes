@@ -6,8 +6,9 @@ use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
 use App\Entity\TurismoModule\Traslado\Lugares;
-use App\Entity\TurismoModule\Traslado\TipoVehiculo;
+use App\Entity\TurismoModule\Traslado\Zona;
 use App\Form\TurismoModule\Traslado\LugaresType;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,7 +40,9 @@ class LugaresController extends AbstractController
             $row [] = array(
                 'id' => $item->getId(),
                 'nombre' => $item->getNombre(),
-                'estado' => $item->getHabilitado()
+                'estado' => $item->getHabilitado(),
+                'zona'=>$item->getZona(),
+                'zona_nom'=>$item->getZona()->getNombre()
             );
         }
 
@@ -64,17 +67,19 @@ class LugaresController extends AbstractController
     public function addLugares(EntityManagerInterface $em, Request $request){
         $entity_repository = $em->getRepository(Lugares::class);
         $nombre = $request->get('nombre');
-        $estado = false;
-        if ($request->get('est') == 'false')
+        //$estado = false;
+        $zona = $em->getRepository(Zona::class)->find($request->get('zona'));
+       /* if ($request->get('est') == 'false')
         {
             $estado = false;
         }
         elseif($request->get('est') == 'true'){
             $estado = true;
-        }
+        }*/
         $params = array(
             'nombre' => $nombre,
-            'habilitado' => $estado,
+            //'habilitado' => $estado,
+            'zona'=>$zona,
             'activo' => true
 
         );
@@ -83,8 +88,9 @@ class LugaresController extends AbstractController
 
             $obj_lugar
                 ->setNombre($nombre)
-                ->setHabilitado($estado)
-                ->setActivo(true);
+                ->setHabilitado(true)
+                ->setActivo(true)
+                ->setZona($zona);
             try {
                 $em->persist($obj_lugar);
                 $em->flush();
@@ -104,6 +110,7 @@ class LugaresController extends AbstractController
     public function UpdateLugar(EntityManagerInterface $em, Request $request){
         $entity_repository = $em->getRepository(Lugares::class);
         $nombre = $request->get('nombre');
+        $zona = $em->getRepository(Zona::class)->find($request->get('zona'));
         $estado = false;
         $id = $request->get('id_OrigenDestino');
 
@@ -119,14 +126,16 @@ class LugaresController extends AbstractController
         $params = array(
             'nombre' => $nombre,
             'habilitado' => $estado,
-            'activo' => true
+            'activo' => true,
+            'zona'=>$zona
         );
         if (!AuxFunctions::isDuplicate($entity_repository, $params, 'upd', $request->get('id_OrigenDestino'))) {
             $obj_lugar = $entity_repository->find($id);
             /**@var $obj_lugar Lugares**/
             $obj_lugar
                 ->setNombre($nombre)
-                ->setHabilitado($estado);
+                //->setHabilitado($estado)
+                ->setZona($zona);
             try {
                 $em->persist($obj_lugar);
                 $em->flush();
@@ -166,5 +175,44 @@ class LugaresController extends AbstractController
         }
         $this->addFlash($success, $msg);
         return $this->redirectToRoute('turismo_module_traslado_lugares');
+    }
+
+    /**
+     * @Route("/change", name="turismo_module_traslado_lugares_change")
+     */
+    public function CambiarEstado(EntityManagerInterface $em, Request $request){
+        $repo = $em->getRepository(Lugares::class);
+        $id = $request->get('id');
+        $obj = $repo->find($id);
+        $msg = 'No se pudo cambiar el estado del lugar seleccionado';
+        $success = 'error';
+        if ($obj->getHabilitado()){
+            $obj->setHabilitado(false);
+            try {
+                $em->persist($obj);
+                $em->flush();
+                $success = 'success';
+                $msg = 'Estado cambiado satisfactoriamente';
+            }catch (FileException $exception){
+                return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
+                $this->addFlash($success, $msg);
+                return new JsonResponse(['success' => false]);
+            }
+        }
+        else{
+            $obj->setHabilitado(true);
+            try {
+                $em->persist($obj);
+                $em->flush();
+                $success = 'success';
+                $msg = 'Estado cambiado satisfactoriamente';
+            }catch (FileException $exception){
+                return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
+                $this->addFlash($success, $msg);
+                return new JsonResponse(['success' => false]);
+            }
+        }
+        $this->addFlash($success, $msg);
+        return new JsonResponse(['success' => true]);
     }
 }

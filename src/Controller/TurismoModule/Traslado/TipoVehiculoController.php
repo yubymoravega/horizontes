@@ -40,7 +40,8 @@ class TipoVehiculoController extends AbstractController
                 'id' => $item->getId(),
                 'nombre' => $item->getNombre(),
                 'cant_ini' => $item->getCantidadIniPersona(),
-                'cant_fin' => $item->getCantidadFinPersona()
+                'cant_fin' => $item->getCantidadFinPersona(),
+                'picture'=>$item->getPicture()
             );
         }
 
@@ -68,10 +69,20 @@ class TipoVehiculoController extends AbstractController
         $nombre = $request->get('nombre');
         $cant_ini = $request->get('cantidad_ini_persona');
         $cant_fin = $request->get('cantidad_fin_persona');
+        $fichero = null;
+        if($request->files->get('picture')){
+            $destino= $this->getParameter('kernel.project_dir')."/public/images/vehiculos/";
+            $archivo = $request->files->get('picture');
+            $fichero = 'img'.uniqid();
+            $archivo->move($destino,$fichero.'.jpg');
+        }
+
+
         $params = array(
             'nombre' => $nombre,
             'cantidad_ini_persona' => $cant_ini,
             'cantidad_fin_persona' => $cant_fin,
+            'picture'=>$fichero.'.jpg',
             'activo' => true
 
         );
@@ -82,6 +93,7 @@ class TipoVehiculoController extends AbstractController
                 ->setNombre($nombre)
                 ->setCantidadIniPersona($cant_ini)
                 ->setCantidadFinPersona($cant_fin)
+                ->setPicture($fichero.'.jpg')
                 ->setActivo(true);
             try {
                 $em->persist($obj_TiVehiculo);

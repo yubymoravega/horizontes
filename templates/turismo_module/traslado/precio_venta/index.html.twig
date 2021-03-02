@@ -11,18 +11,287 @@
 {%endblock%}
 
 {% block content %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container-fluid">
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {# header #}
+    <div class=" align-items-center text-center">
+        <h2 class="text-reporte text-center mr-0 text-white mt-2">
+            Gestionar Precio de Venta
+        </h2>
+    </div>
+    {# end header #}
+    <div class="col-9 text-light container d-flex justify-content-center mb-3">
+            {{ form_start(form) }}
+            <div class="row justify-content-center form-group input-group input-group-sm pa-2 d-inline-flex">
+                <div class="col-4">
+                    <label for="exampleFormControlSelect1">Proveedores</label>
+                    <select class="form-control" id="exampleFormControlSelect1">
+                        {% for proveedor in data %}
+                        <option value="{{ proveedor.proveedor_id }}">{{ proveedor.proveedor_nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    {{ form_label(form.tramo) }}
+                    {{ form_widget(form.tramo) }}
+                    <!--label for="precio_venta_tramo">Tramo</label>
+                    <select class="w-100 form-control" id="precio_venta_tramo"-->
+                    </select>
+                </div>
+                <div class="col-3 mt-1">
+                    <label for="exampleFormControlInput1">Tipo de Traslado</label>
+                    <input type="text" disabled class="w-100 form-control" id="exampleFormControlInput1">
+                </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'D:/XAMPP/htdocs/horizontes/src/Controller/TurismoModule/Traslado/PrecioVentaController.php'|file_link(0) }}">src/Controller/TurismoModule/Traslado/PrecioVentaController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'D:/XAMPP/htdocs/horizontes/templates/turismo_module/traslado/precio_venta/index.html.twig'|file_link(0) }}">templates/turismo_module/traslado/precio_venta/index.html.twig</a></code></li>
-    </ul>
-</div>
+            </div>
+            <div class="row mt-1 justify-content-center form-group input-group input-group-sm pa-2 d-inline-flex">
+                <div class="col-2">
+                    {{ form_label(form.precio_costo) }}
+                    {{ form_widget(form.precio_costo) }}
+                    <!--label for="precio_venta_precio_costo">Precio de Costo</label>
+                    <input type="number" disabled class="w-100 form-control" id="precio_venta_precio_costo"-->
+                </div>
+                <div class="col-2 mt-0">
+                    {{ form_label(form.poerciento) }}
+                    {{ form_widget(form.poerciento) }}
+                    <!--label for="precio_venta_poerciento">Porciento</label>
+                    <input type="number" class="w-100 form-control" id="precio_venta_poerciento"-->
+                </div>
+                <div class="col-2 mt-0">
+                    {{ form_label(form.fijo) }}
+                    {{ form_widget(form.fijo) }}
+                    <!--label for="precio_venta_fijo">Valor Fijo</label>
+                    <input type="number" class="w-100 form-control" id="precio_venta_fijo"-->
+                </div>
+                <div class="col-2 mt-0">
+                    {{ form_label(form.precio_venta) }}
+                    {{ form_widget(form.precio_venta) }}
+                    <input type="text" id="precio_venta_id" hidden>
+                    <!--label for="precio_venta_precio_venta">Precio de Venta</label>
+                    <input type="number" disabled class="w-100 form-control" id="precio_venta_precio_venta"-->
+                </div>
+
+                <div class="col mt-4" style="padding-top: 9px; padding-left: 100px;">
+                    <div class="col-3">
+                        <button id="enviar" class="mt-0 btn btn-outline-primary "><span class="fa fa-plus pr-1"></span>Agregar</button>
+                        <button id="cancelar" class="mt-0 btn btn-outline-danger" style="display: none;"><span class="fa fa-close pr-1"></span>Cancelar</button>
+                    </div>
+                    <div class="col-3">
+                        <button id="actualizar" class="mt-0 btn btn-outline-warning" style="display: none;"><span class="fa fa-refresh pr-1"></span>Actualizar</button>
+                    </div>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        <!--/form-->
+    </div>
+
+    {# list #}
+    <table class="table-small-rows table table-hover text-light">
+        <thead class="thead-dark">
+        <th scope="col-2" class="text-left">Proveedor</th>
+        <th scope="col-1" class="text-left">Origen/Destino</th>
+        <th scope="col-1" class="text-left">Ida/Vuelta</th>
+        <th scope="col-1" class="text-left">Vehículo</th>
+        <th scope="col-1" class="text-left">Traslado</th>
+        <th scope="col-1" class="text-right">Precio de Venta</th>
+        <th scope="col-1" width="150px">Acciones</th>
+        </thead>
+        <tbody>
+        {% for item in precio_venta %}
+            <tr>
+                <td style="font-weight:400;">{{ item.proveedor }}</td>
+                <td style="font-weight:400;">{{ item.tramo }}</td>
+                <td style="font-weight:400;">{{ item.ida_vuelta }}</td>
+                <td style="font-weight:400;">{{ item.vehiculo }}</td>
+                <td style="font-weight:400;">{{ item.traslado }}</td>
+                <td style="font-weight:400;" class="text-right">{{ item.precio_venta }}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-warning btn-sm d-none" data-toggle="tooltip"
+                            data-placement="bottom" title="Actualizar"
+                            onclick="onUpdate({
+                                    id: '{{ item.id }}',
+                                    tramo:'{{ item.tramo_id }}',
+                                    proveedor:'{{ item.proveedor_id }}',
+                                    precio_costo:'{{ item.precio_costo }}',
+                                    porciento: '{{ item.porciento }}',
+                                    fijo: '{{ item.fijo }}',
+                                    traslado:'{{ item.traslado }}'
+                                    })">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                            data-placement="bottom" title="Eliminar"
+                            onclick="onDeleteConfirm({
+                                    message:'Está seguro que desea eliminar el elemento seleccionado ?',
+                                    url:'{{ path('turismo_module_traslado_precio_venta_delete',{id: item.id}) }}'
+                                    })">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {# end list #}
+    </div>
+    <div class="navigation mt-5">
+        {{knp_pagination_render(precio_venta)}}
+    </div>
+    </div>
+{% endblock %}
+{%block javascripts%}
+    {{ parent() }}
+    <script>
+        const TEXT_SELECT = '... seleccione ...';
+        var datos = null;
+        $(document).ready(function () {
+            //$('#tramo_precio').prop('type','number')
+            $('#btnActualizar').hide()
+            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>')
+            $('#precio_venta_precio_costo').prop('type','number')
+            $('#precio_venta_fijo').prop('type','number')
+            $('#precio_venta_poerciento').prop('type','number')
+            $('#precio_venta_precio_venta').prop('type','number')
+        })
+
+        function TraerInfoByProveedor(id_prov,tramo){
+            $.ajax({
+                method:"POST",
+                url:"/configuracion-turismo/traslado/precio-venta/tramo",
+                data:{id:id_prov}
+            }).done(function (resp,dat) {
+                //console.log(resp.data[0].tramo[0].tramos);
+                datos = resp.data;
+                $('#precio_venta_tramo option').remove();
+                //$('#precio_venta_precio_venta').val('');
+                $('#precio_venta_tramo').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
+                $.each(resp.data,function (i,elem) {
+                    //console.log(elem.tramo[0].tramos)
+                    let option = $('<option />', {
+                        text: elem.tramo[0].tramos +' | '+elem.tramo[0].ida_vuelta,
+                        value: elem.tramo[0].id_tramo
+                    });
+                    $('#precio_venta_tramo').append(option);
+                })
+                $('#exampleFormControlSelect1').val(id_prov);
+                $('#precio_venta_tramo').val(tramo);
+                //alert(elem);
+            });
+        }
+
+
+        $('#exampleFormControlSelect1').on('change',function(){
+            $('#exampleFormControlInput1').val('');
+            $('#precio_venta_precio_costo').val(0);
+            $('#precio_venta_poerciento').val(0);
+            $('#precio_venta_fijo').val(0);
+            $('#precio_venta_precio_venta').val(0);
+            $.ajax({
+                method:"POST",
+                url:"/configuracion-turismo/traslado/precio-venta/tramo",
+                data:{id:$('#exampleFormControlSelect1').val()}
+            }).done(function (resp,dat) {
+                //console.log(resp.data[0].tramo[0].tramos);
+                datos = resp.data;
+                $('#precio_venta_tramo option').remove();
+                $('#precio_venta_precio_venta').val('');
+                $('#precio_venta_tramo').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
+                $.each(resp.data,function (i,elem) {
+                    //console.log(elem.tramo[0].tramos)
+                            let option = $('<option />', {
+                                text: elem.tramo[0].tramos +' | '+elem.tramo[0].ida_vuelta,
+                                value: elem.tramo[0].id_tramo
+                            });
+                            $('#precio_venta_tramo').append(option);
+                })
+                //alert(elem);
+            });
+
+        })
+        $('#precio_venta_tramo').on('change',function(){
+            //console.log(datos[0].tramo[0].precio);
+            $('#exampleFormControlInput1').val('');
+            $('#precio_venta_precio_costo').val(0);
+            $.each(datos,function (i,item){
+                if (parseInt(item.tramo[0].id_tramo) == parseInt($('#precio_venta_tramo').val())){
+                    //console.log(parseFloat(item.tramo[0].precio));
+                    //console.log(item.tramo[0].tTraslado);
+                    $('#exampleFormControlInput1').val(item.tramo[0].tTraslado);
+                    $('#precio_venta_precio_costo').val(parseFloat(item.tramo[0].precio));
+                }
+            })
+            $('#precio_venta_precio_venta').val($('#precio_venta_precio_costo').val());
+            CalcularPV();
+
+        })
+
+        $('#precio_venta_poerciento').on('keyup',function (){
+            $('#precio_venta_fijo').val(0);
+            CalcularPV();
+        })
+        $('#precio_venta_fijo').on('keyup',function (){
+            $('#precio_venta_poerciento').val(0);
+            CalcularPV();
+        })
+
+        function CalcularPV() {
+            var c =  parseFloat($('#precio_venta_precio_costo').val());
+            var pc = parseFloat($('#precio_venta_poerciento').val());
+            var vf = parseFloat($('#precio_venta_fijo').val());
+            var result = (c+vf)+(c*(pc/100));
+            $('#precio_venta_precio_venta').val(result);
+        }
+
+        $('#enviar').on('click', function () {
+            let params = {
+                tramo:$('#precio_venta_tramo').val(),
+                porciento:$('#precio_venta_poerciento').val(),
+                fijo:$('#precio_venta_fijo').val(),
+                id_cliente: {{ id_cliente }}
+            }
+            $.ajax({
+                url: '/configuracion-turismo/traslado/precio-venta/add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                //window.location.replace('/configuracion-turismo/traslado/precio-venta');
+            })
+        })
+
+
+
+        const onUpdate = function (config) {
+            $('#actualizar').show()
+            $('#cancelar').show()
+            $('#enviar').hide()
+            const {id = '',proveedor = '', tramo = '', precio_costo = '',porciento ='',fijo ='',traslado = ''} = config
+            TraerInfoByProveedor(proveedor, tramo)
+            $('#precio_venta_id').val(id)
+            $('#exampleFormControlInput1').val(traslado)
+            $('#precio_venta_poerciento').val(porciento)
+            $('#precio_venta_fijo').val(fijo)
+            $('#precio_venta_precio_costo').val(precio_costo)
+            $('#precio_venta').val(id)
+            CalcularPV()
+        }
+
+        $('#actualizar').on('click', function () {
+
+            let params = {
+                tramo:$('#precio_venta_tramo').val(),
+                porciento:$('#precio_venta_poerciento').val(),
+                fijo:$('#precio_venta_fijo').val(),
+                id:$('#precio_venta_id').val(),
+                id_cliente: {{ id_cliente }}
+            }
+            console.log(params)
+            $.ajax({
+                url: '/configuracion-turismo/traslado/precio-venta/upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/configuracion-turismo/traslado/precio-venta');
+            })
+        })
+    </script>
 {% endblock %}
