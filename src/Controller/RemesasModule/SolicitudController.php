@@ -9,6 +9,7 @@ use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\TasaCambio;
 use App\Entity\MonedaPais;
 use App\Entity\Municipios;
+use App\Entity\Pais;
 use App\Entity\Provincias;
 use App\Entity\RemesasModule\Configuracion\BeneficiariosClientes;
 use App\Form\RemesasModule\Configuracion\BeneficiariosClientesType;
@@ -238,5 +239,109 @@ class SolicitudController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/saveBeneficiario", name="saveBeneficiario")
+     */
+    public function saveBeneficiario(EntityManagerInterface $em, Request $request)
+    {
+        $id_benaficiario_ = $request->request->get('id_banaficiario_');
+        $nombre_ = $request->request->get('nombre_');
+        $id_pais_ = $request->request->get('id_pais_');
+        $id_provincia_ = $request->request->get('id_provincia_');
+        $id_municipio_ = $request->request->get('id_municipio_');
+        $primer_apellido_ = $request->request->get('primer_apellido_');
+        $segundo_apellido_ = $request->request->get('segundo_apellido_');
+        $nombre_alternativo_ = $request->request->get('nombre_alternativo_');
+        $primer_apellido_alternativo_ = $request->request->get('primer_apellido_alternativo_');
+        $segundo_apellido_alternativo_ = $request->request->get('segundo_apellido_alternativo_');
+        $primer_telefono_ = $request->request->get('primer_telefono_');
+        $segundo_telefono_ = $request->request->get('segundo_telefono_');
+        $identificacion_ = $request->request->get('identificacion_');
+        $calle_ = $request->request->get('calle_');
+        $entre_ = $request->request->get('entre_');
+        $y_ = $request->request->get('y_');
+        $nro_casa_ = $request->request->get('nro_casa_');
+        $edificio_ = $request->request->get('edificio_');
+        $apto_ = $request->request->get('apto_');
+        $reparto_ = $request->request->get('reparto_');
+
+        $obj_cliente = AuxFunctionsTurismo::GetDataCliente($em, $this->getUser());
+
+        if (!$id_benaficiario_ || $id_benaficiario_ == '') {
+            $beneficiario = new BeneficiariosClientes();
+        } else {
+            $beneficiario = $em->getRepository(BeneficiariosClientes::class)->find($id_benaficiario_);
+        }
+        $beneficiario
+            ->setActivo(true)
+            ->setIdCliente($obj_cliente)
+            ->setCalle($calle_)
+            ->setEntre($entre_)
+            ->setY($y_)
+            ->setNroCasa($nro_casa_)
+            ->setEdificio($edificio_)
+            ->setApto($apto_)
+            ->setReparto($reparto_)
+            ->setIdPais($em->getRepository(Pais::class)->find($id_pais_))
+            ->setIdProvincia($em->getRepository(Provincias::class)->find($id_provincia_))
+            ->setIdMunicipio($em->getRepository(Municipios::class)->find($id_municipio_))
+            ->setPrimerNombre($nombre_)
+            ->setPrimerApellido($primer_apellido_)
+            ->setSegundoApellido($segundo_apellido_)
+            ->setNombreAlternativo($nombre_alternativo_)
+            ->setPrimerApellidoAlternativo($primer_apellido_alternativo_)
+            ->setSegundoApellidoAlternativo($segundo_apellido_alternativo_)
+            ->setPrimerTelefono($primer_telefono_)
+            ->setSegundoTelefono($segundo_telefono_)
+            ->setIdentificacion($identificacion_);
+
+        $em->persist($beneficiario);
+        $em->flush();
+
+
+        $beneficiarios = $em->getRepository(BeneficiariosClientes::class)->findBy([
+            'activo' => true,
+            'id_cliente' => $obj_cliente
+        ]);
+        $data_beneficiarios = [];
+        $beneficiario = [];
+        foreach ($beneficiarios as $key => $item) {
+            $beneficiario[] = [
+                'index' => $key + 1,
+                'nombre' => $item->getPrimerNombre(),
+            ];
+            $data_beneficiarios[] = [
+                'index' => $key,
+                'id_cliente' => $item->getIdCliente()->getId(),
+                'primer_nombre' => $item->getPrimerNombre() ? $item->getPrimerNombre() : '',
+                'primer_apellido' => $item->getPrimerApellido() ? $item->getPrimerApellido() : '',
+                'segundo_apellido' => $item->getSegundoApellido() ? $item->getSegundoApellido() : '',
+                'nombre_alternativo' => $item->getNombreAlternativo() ? $item->getNombreAlternativo() : '',
+                'primer_apellido_alternativo' => $item->getPrimerApellidoAlternativo() ? $item->getPrimerApellidoAlternativo() : '',
+                'segundo_apellido_alternativo' => $item->getSegundoApellidoAlternativo() ? $item->getSegundoApellidoAlternativo() : '',
+                'primer_telefono' => $item->getPrimerTelefono() ? $item->getPrimerTelefono() : '',
+                'segundo_telefono' => $item->getSegundoTelefono() ? $item->getSegundoTelefono() : '',
+                'identificacion' => $item->getIdentificacion() ? $item->getIdentificacion() : '',
+                'calle' => $item->getCalle() ? $item->getCalle() : '',
+                'entre' => $item->getEntre() ? $item->getEntre() : '',
+                'y' => $item->getY() ? $item->getY() : '',
+                'nro_casa' => $item->getNroCasa() ? $item->getNroCasa() : '',
+                'edificio' => $item->getEdificio() ? $item->getEdificio() : '',
+                'apto' => $item->getApto() ? $item->getApto() : '',
+                'reparto' => $item->getReparto() ? $item->getReparto() : '',
+                'id_pais' => $item->getIdPais()->getId() ? $item->getIdPais()->getId() : '',
+                'nombre_pais' => $item->getIdPais()->getNombre() ? $item->getIdPais()->getNombre() : '',
+                'id_provincia' => $item->getIdProvincia()->getId() ? $item->getIdProvincia()->getId() : '',
+                'nombre_provincia' => $item->getIdProvincia()->getNombre() ? $item->getIdProvincia()->getNombre() : '',
+                'id_municipio' => $item->getIdMunicipio()->getId() ? $item->getIdMunicipio()->getId() : '',
+                'nombre_municipio' => $item->getIdMunicipio()->getNombre() ? $item->getIdMunicipio()->getNombre() : '',
+            ];
+        }
+        return new JsonResponse([
+                'success' => true,
+                'data_baneficiarios' => $data_beneficiarios,
+                'beneficiarios' => $beneficiario]
+        );
+    }
 
 }

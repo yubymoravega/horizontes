@@ -8,10 +8,10 @@
             display: none;
         }
     </style>
-{%endblock%}
+{% endblock %}
 
-{% block content%}
-<div class="container-fluid">
+{% block content %}
+    <div class="container-fluid">
 
         {# header #}
         <div class="d-flex align-items-center">
@@ -35,110 +35,124 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-dark">
-                        <h4 class="modal-title text-light" id="gestionarTvehiculo">Adicionar Vehiculo</h4>
+                        <h4 class="modal-title text-light" id="gestionarTvehiculo">Adicionar Vehículo</h4>
                         <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{form_start(form, {'attr':{'autocomplete':"off"}})}}
-
                     <div class="modal-body bg-dark-app">
-                        <div class="container">
+                        <form name='formJpg' method="POST" enctype="multipart/form-data"
+                              action="{{ path('turismo_module_traslado_tipo_vehiculo_add') }}">
+                            <div class="container">
+                                <div class="mt-0 form-group input-group input-group-sm pr-0">
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <label for="tipo_vehiculo_nombre" class="required">Marca</label>
+                                            <input type="text" id="tipo_vehiculo_nombre" name="tipo_vehiculo[nombre]"
+                                                   required="required" class="w-100 form-control">
+                                        </div>
+                                        <div class="row mt-1">
+                                            <label for="tipo_vehiculo_cantidad_ini_persona" class="required">Cantidad
+                                                Inicial de Personas</label>
+                                            <input type="number" id="tipo_vehiculo_cantidad_ini_persona"
+                                                   name="tipo_vehiculo[cantidad_ini_persona]" required="required"
+                                                   class="w-100 form-control">
+                                        </div>
+                                        <div class="row mt-1">
+                                            <label for="tipo_vehiculo_cantidad_fin_persona" class="required">Cantidad
+                                                final de Personas</label>
+                                            <input type="number" id="tipo_vehiculo_cantidad_fin_persona"
+                                                   name="tipo_vehiculo[cantidad_fin_persona]" required="required"
+                                                   class="w-100 form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-6 d-block mt-0">
+                                        <label for="grupo_tipo_vehiculo_cant_fin"
+                                               class="font-weight-bold">Imagen</label>
+                                        <div class="col-6 imgUp w-100 mt-1">
+                                            <div id="1" class="imagePreview" style="width: 200px;"></div>
+                                            <label class="btn btn-dark" style="width: 200px;">
+                                                Subir 1<input type="file" name="1" class="uploadFile img"
+                                                              value="Upload Photo"
+                                                              style="width: 0px;height: 0px;overflow: hidden;">
+                                            </label>
+                                        </div>
+                                    </div>
 
-                            <div class="mt-0 form-group input-group input-group-sm pr-0">
-                                <div class="col-6">
-                                    <div class="row">
-                                        <label for="grupo_tipo_vehiculo_nombre" class="font-weight-bold">Tipo de vehículo</label>
-                                        {{ form_widget(form.nombre) }}
-                                    </div>
-                                    <div class="row mt-1">
-                                        <label for="grupo_tipo_vehiculo_cant_ini" class="font-weight-bold">Cantidad inicial de personas</label>
-                                        {{ form_widget(form.cantidad_ini_persona) }}
-                                    </div>
-                                    <div class="row mt-1">
-                                        <label for="grupo_tipo_vehiculo_cant_fin" class="font-weight-bold">Cantidad final de personas</label>
-                                        {{ form_widget(form.cantidad_fin_persona) }}
-                                    </div>
+                                    <input type="text" id="id_tipo_vehiculo" hidden="">
                                 </div>
-                                <div class="col-6 d-block mt-0">
-                                    <label for="grupo_tipo_vehiculo_cant_fin" class="font-weight-bold">Imagen</label>
-                                    <div class="col-6 imgUp w-100 mt-1">
-                                        <div id="1" class="imagePreview" style="width: 200px;"></div>
-                                        <label class="btn btn-dark" style="width: 200px;">
-                                            Subir<input type="file" id="image" name="1" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
-                                        </label>
-                                    </div>
+                            </div>
+                            <div class="d-flex mt-4">
+                                <div class="mr-auto">
+                                    <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                            aria-label="Cerrar">
+                                        <span aria-hidden="true">Cancelar</span>
+                                    </button>
                                 </div>
-
-                                <input type="text" id="id_tipo_vehiculo" hidden>
+                                <div class="ml-2">
+                                    <button type="submit" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                                </div>
+                                <div class="ml-2">
+                                    <button type="submit" class="my-0 btn btn-warning" id="btnActualizar"
+                                            style="display: none;">Actualizar
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="d-flex mt-4">
-                            <div class="mr-auto">
-                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
-                                        aria-label="Cerrar">
-                                    <span aria-hidden="true">Cancelar</span>
-                                </button>
-                            </div>
-                            <div class="ml-2">
-                                <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
-                            </div>
-                            <div class="ml-2">
-                                <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar
-                                </button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
-                    {{ form_end(form) }}
                 </div>
             </div>
         </div>
+    </div>
 
-        {# list #}
+    {# list #}
 
-        <table class="table-small-rows table table-hover text-light">
-            <thead class="thead-dark">
-            <th scope="col-2" class="text-left">Tipo de vehículo</th>
-            <th scope="col-1" class="text-left">Rango de personas</th>
-            <th scope="col-1" class="text-left">Imagen</th>
-            <th scope="col-1" class="text-center" width="150px">Acciones</th>
-            </thead>
-            <tbody>
-            {% for item in vehiculos %}
-                <tr>
-                    <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400; align-content: center;" width="400px">{{ item.cant_ini }} - {{ item.cant_fin }}</td>
-                    <td style="font-weight:400; align-content: center;" width="400px">
-                        <button class="btn btn-dark fa fa-search" id="btnimagen" onclick="MostrarImagen('imga{{ item.id  }}')"></button>
-                        <div>
-                            <img class="p-2" id="imga{{ item.id  }}" style="width: 150px; " src="{{ "/images/vehiculos/"~item.picture}}">
-                        </div>
-                    </td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Actualizar"
-                                onclick="onUpdate({
-                                        id: '{{ item.id }}',
-                                        nombre: '{{ item.nombre }}',
-                                        cant_ini: '{{ item.cant_ini }}',
-                                        cant_fin: '{{ item.cant_fin }}'
-                                        })">
-                            <i class="fa fa-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
-                                data-placement="bottom" title="Eliminar"
-                                onclick="onDeleteConfirm({
-                                        message:'Está seguro que desea eliminar el vehículo seleccionado ?',
-                                        url:'{{ path('turismo_module_traslado_tipo_vehiculo_delete',{id: item.id}) }}'
-                                        })">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {# end list #}
+    <table class="table-small-rows table table-hover text-light">
+        <thead class="thead-dark">
+        <th scope="col-2" class="text-left">Tipo de vehículo</th>
+        <th scope="col-1" class="text-left">Rango de personas</th>
+        <th scope="col-1" class="text-left">Imagen</th>
+        <th scope="col-1" class="text-center" width="150px">Acciones</th>
+        </thead>
+        <tbody>
+        {% for item in vehiculos %}
+            <tr>
+                <td style="font-weight:400;">{{ item.nombre }}</td>
+                <td style="font-weight:400; align-content: center;" width="400px">{{ item.cant_ini }}
+                    - {{ item.cant_fin }}</td>
+                <td style="font-weight:400; align-content: center;" width="400px">
+                    <button class="btn btn-dark fa fa-search" id="btnimagen"
+                            onclick="MostrarImagen('imga{{ item.id }}')"></button>
+                    <div>
+                        <img class="p-2" id="imga{{ item.id }}" style="width: 150px; "
+                             src="{{ "/images/vehiculos/"~item.picture }}">
+                    </div>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                            data-placement="bottom" title="Actualizar"
+                            onclick="onUpdate({
+                                    id: '{{ item.id }}',
+                                    nombre: '{{ item.nombre }}',
+                                    cant_ini: '{{ item.cant_ini }}',
+                                    cant_fin: '{{ item.cant_fin }}'
+                                    })">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                            data-placement="bottom" title="Eliminar"
+                            onclick="onDeleteConfirm({
+                                    message:'Está seguro que desea eliminar el vehículo seleccionado ?',
+                                    url:'{{ path('turismo_module_traslado_tipo_vehiculo_delete',{id: item.id}) }}'
+                                    })">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {# end list #}
     </div>
 
     <div class="navigation mt-5">
@@ -146,12 +160,13 @@
     </div>
     </div>
 {% endblock %}
-{%block javascripts%}
-{{ parent() }}
+{% block javascripts %}
+    {{ parent() }}
     <style>
         body {
             background-color: #f5f5f5;
         }
+
         .imagePreview {
             width: 100%;
             height: 150px;
@@ -163,15 +178,18 @@
             display: inline-block;
             box-shadow: 0 -3px 6px 2px rgba(0, 0, 0, 0.2);
         }
+
         .btn-dark {
             display: block;
             border-radius: 0;
             box-shadow: 0 4px 6px 2px rgba(0, 0, 0, 0.2);
             margin-top: -5px;
         }
+
         .imgUp {
             margin-bottom: 15px;
         }
+
         .del {
             position: absolute;
             top: 0;
@@ -183,6 +201,7 @@
             background-color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
         }
+
         .imgAdd {
             width: 30px;
             height: 30px;
@@ -203,6 +222,7 @@
             margin-left: 14%;
             margin-top: 40%;
         }
+
         button#btnSubir:hover {
             background-color: #fff;
             color: #2f2f2f;
@@ -211,23 +231,22 @@
     <script>
         $(document).ready(function () {
             $('#btnActualizar').hide()
-            $('#tipo_vehiculo_cantidad_ini_persona').prop('type','number')
-            $('#tipo_vehiculo_cantidad_fin_persona').prop('type','number')
+            $('#tipo_vehiculo_cantidad_ini_persona').prop('type', 'number')
+            $('#tipo_vehiculo_cantidad_fin_persona').prop('type', 'number')
             $('img').hide()
         })
-        $(document).on("change",".uploadFile", function()
-        {
+        $(document).on("change", ".uploadFile", function () {
             var uploadFile = $(this);
             var files = !!this.files ? this.files : [];
             if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
 
-            if (/^image/.test( files[0].type)){ // only image file
+            if (/^image/.test(files[0].type)) { // only image file
                 var reader = new FileReader(); // instance of the FileReader
                 reader.readAsDataURL(files[0]); // read the local file
 
-                reader.onloadend = function(){ // set image data as background of div
+                reader.onloadend = function () { // set image data as background of div
                     //alert(uploadFile.closest(".upimage").find('.imagePreview').length);
-                    uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url("+this.result+")");
+                    uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url(" + this.result + ")");
                 }
             }
 
@@ -245,59 +264,55 @@
             $('#id_tipo_vehiculo').val(id)
             $('#gestionarTvehiculo').html("Modificar " + nombre)
         }
-        $('#btnAceptar').on('click', function () {
-            //alert($('input[name=1]').val())
-            const archivo = $('#image');
-            //console.log(archivo)
-            let params = {
-                nombre: $('#tipo_vehiculo_nombre').val(),
-                cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),
-                cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),
-                picture:archivo.files,
-                id_cliente: {{ id_cliente }}
-            }
-            //console.log(archivo);
-            $.ajax({
-                url: '/configuracion-turismo/traslado/tipo-vehiculo/add',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/configuracion-turismo/traslado/tipo-vehiculo');
-            })
-        })
+        {#$('#btnAceptar').on('click', function () {#}
+        {#    const archivo = $('#image');#}
+        {#    let params = {#}
+        {#        nombre: $('#tipo_vehiculo_nombre').val(),#}
+        {#        cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),#}
+        {#        cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),#}
+        {#        picture:archivo.files,#}
+        {#        id_cliente: {{ id_cliente }}#}
+        {#    }#}
+        {#    //console.log(archivo);#}
+        {#    $.ajax({#}
+        {#        url: '/configuracion-turismo/traslado/tipo-vehiculo/add',#}
+        {#        method: "POST",#}
+        {#        data: params#}
+        {#    }).then(res => {#}
+        {#        window.location.replace('/configuracion-turismo/traslado/tipo-vehiculo');#}
+        {#    })#}
+        {#})#}
 
         $('#btnActualizar').on('click', function () {
 
-            let params = {
-                nombre: $('#tipo_vehiculo_nombre').val(),
-                cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),
-                cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),
-                id_TipoVehiculo: $('#id_tipo_vehiculo').val(),
-                id_cliente: {{ id_cliente }}
-            }
-            $.ajax({
-                url: '/configuracion-turismo/traslado/tipo-vehiculo/upd',
-                method: "POST",
-                data: params
-            }).then(res => {
-                window.location.replace('/configuracion-turismo/traslado/tipo-vehiculo');
-            })
+            {#let params = {#}
+            {#    nombre: $('#tipo_vehiculo_nombre').val(),#}
+            {#    cantidad_ini_persona: $('#tipo_vehiculo_cantidad_ini_persona').val(),#}
+            {#    cantidad_fin_persona: $('#tipo_vehiculo_cantidad_fin_persona').val(),#}
+            {#    id_TipoVehiculo: $('#id_tipo_vehiculo').val(),#}
+            {#    id_cliente: {{ id_cliente }}#}
+            {#}#}
+            {#$.ajax({#}
+            {#    url: '/configuracion-turismo/traslado/tipo-vehiculo/upd',#}
+            {#    method: "POST",#}
+            {#    data: params#}
+            {#}).then(res => {#}
+            {#    window.location.replace('/configuracion-turismo/traslado/tipo-vehiculo');#}
+            {#})#}
         })
 
-        function MostrarImagen(imagen){
+        function MostrarImagen(imagen) {
 
             //elemnto = document.getElementById(imagen);
             //console.log("'#"+imagen+"'");
-            $( "#"+imagen ).fadeToggle( "slow", "linear" );
+            $("#" + imagen).fadeToggle("slow", "linear");
             /*$("#"+imagen).toggle(function (){
                 $("#"+imagen).show()
             },function (){
                 $("#"+imagen).hide()
             });*/
         }
-       
 
-        
 
         $('#gestionarTvehiculoModal').on('show.bs.modal', function (event) {
             var modal = $(this)
@@ -313,4 +328,4 @@
             $('#tipo_vehiculo_cantidad_fin_persona').val('')
         }
     </script>
-{%endblock%}
+{% endblock %}

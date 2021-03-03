@@ -63,6 +63,16 @@ class TasaCambioController extends AbstractController
             try {
                 $tasacambio->setActivo(true);
                 $em->persist($tasacambio);
+
+                $another = new TasaCambio();
+                $another
+                    ->setAnno($tasacambio->getAnno())
+                    ->setMes($tasacambio->getMes())
+                    ->setActivo(true)
+                    ->setIdMonedaDestino($tasacambio->getIdMonedaOrigen())
+                    ->setIdMonedaOrigen($tasacambio->getIdMonedaDestino())
+                    ->setValor(round((1/$tasacambio->getValor()),4));
+                $em->persist($another);
                 $em->flush();
                 $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");
             } catch (FileException $exception) {

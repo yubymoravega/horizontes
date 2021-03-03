@@ -66,17 +66,10 @@ class TipoVehiculoController extends AbstractController
      */
     public function addTipoVehiculo(EntityManagerInterface $em, Request $request){
         $entity_repository = $em->getRepository(TipoVehiculo::class);
-        $nombre = $request->get('nombre');
-        $cant_ini = $request->get('cantidad_ini_persona');
-        $cant_fin = $request->get('cantidad_fin_persona');
+        $nombre = $request->request->get('tipo_vehiculo')['nombre'];
+        $cant_ini = $request->request->get('tipo_vehiculo')['cantidad_ini_persona'];
+        $cant_fin = $request->request->get('tipo_vehiculo')['cantidad_fin_persona'];
         $fichero = null;
-        if($request->files->get('picture')){
-            $destino= $this->getParameter('kernel.project_dir')."/public/images/vehiculos/";
-            $archivo = $request->files->get('picture');
-            $fichero = 'img'.uniqid();
-            $archivo->move($destino,$fichero.'.jpg');
-        }
-
 
         $params = array(
             'nombre' => $nombre,
@@ -89,23 +82,33 @@ class TipoVehiculoController extends AbstractController
         if (!AuxFunctions::isDuplicate($entity_repository, $params, 'add')) {
             $obj_TiVehiculo = new TipoVehiculo();
 
+            $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+            //---Estandea para formar nombre :-cod_unidad-marca-:
+            $name_file = $unidad->getCodigo().'-'.$nombre.'.jpg';
             $obj_TiVehiculo
                 ->setNombre($nombre)
                 ->setCantidadIniPersona($cant_ini)
                 ->setCantidadFinPersona($cant_fin)
-                ->setPicture($fichero.'.jpg')
+                ->setPicture($name_file)
                 ->setActivo(true);
             try {
                 $em->persist($obj_TiVehiculo);
                 $em->flush();
+
+                if($request->files->get('1')){
+                    $destino= $this->getParameter('kernel.project_dir')."/public/images/Turismo/Transfer/TipoVehiculo/";
+                    $archivo = $request->files->get('1');
+                    $archivo->move($destino,$name_file);
+                }
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
             }
             $this->addFlash('success', "Vehículo adicionado satisfactoriamente");
-            return new JsonResponse(['success' => true]);
         }
         $this->addFlash('error', "El vehículo ya se encuentra registrado");
-        return new JsonResponse(['success' => false]);
+
+        return $this->redirectToRoute('turismo_module_traslado_tipo_vehiculo');
+
     }
 
     /**

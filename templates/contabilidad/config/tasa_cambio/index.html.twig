@@ -160,6 +160,8 @@
             $('#modal__form__id').on('show.bs.modal', function (event) {
                 validateForm.resetForm()
                 $('#modal__form__label__id').text('Adicionar Tasa de Cambio')
+                $('#tasa_cambio_anno').val(new Date().getFullYear())
+                $('#tasa_cambio_mes').val(new Date().getMonth()+1)
             })
         })
 
