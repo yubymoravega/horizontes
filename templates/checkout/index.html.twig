@@ -24,7 +24,7 @@
                                                     <i>{{ item.sub_total }}</i></td>
                                             </tr>
                                             {% if item.id_servicio == 11 %}
-                                            {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
                                                 <tr>
                                                     <td class="text-left row-group-subconta">Nombre</td>
                                                     <td class="text-left row-group-subconta">Primer Apellido</td>
@@ -53,40 +53,39 @@
                                             {% elseif item.id_servicio == 4 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta" colspan="3">Cliente</td>
-                                                    <td class="text-left row-group-subconta">Teléfono Celular</td>
-                                                    <td class="text-left row-group-subconta">Monto</td>
+                                                    <td class="text-left row-group-subconta">Beneficiario</td>
+                                                    <td class="text-left row-group-subconta">Datos Contactos</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Dirección</td>
+                                                    <td class="text-right row-group-subconta">Monto a Recibir</td>
                                                     <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
                                                 {% for new_item in item.data %}
-                                                        <td class="text-left" colspan="3">  <a data-toggle="collapse" href="#coll2" role="button"
-                                                   aria-expanded="false" aria-controls="coll2">
-                                                    <span style="color:white;"> <b> {{ new_item.nombreCliente }} </b></span> </br>
-                                                </a>  
-
-                                                <div class="collapse" id="coll{{ new_item.orden }}" style="margin-top: 20px;">
-
-                                                    <ul style="list-style-type:disc">
-                                                            <li><b> Beneficiario:</b> {{ new_item.primerNombre }}  {{ new_item.primerApellido }} {{ new_item.segundoApellido }}</li>
-                            
-                                                        <li><b> Contactos:</b> {{ new_item.telefono }} - {{ new_item.telefonoCasa }} </li>
-                                                        <li><b> Identificacion:</b> {{ new_item.identificacion }} </li>
-                                                        <li><b> Direccion:</b> 
-                                                            No: {{ new_item.no }}
-                                                            y {{ new_item.y }},
-                                                            Edificio: {{ new_item.edificio }}
-                                                            Apto: {{ new_item.apto }}, Reparto:{{ new_item.apto }} </li>
-                                                            <li>
-                                                             Municipio: {{ new_item.municipio }}, Provincia: {{ new_item.provincia }} </li>
-                                                    </ul>
-
-                                                </div>     
+                                                    <tr>
+                                                        <td class="text-left">{{ new_item.nombre_ }} {{ new_item.primer_apellido_ }} {{ new_item.segundo_apellido_ }}</td>
+                                                        <td class="text-left">{{ new_item.primer_telefono_ }} {{ new_item.segundo_telefono_ }}</td>
+                                                        <td class="text-left" colspan="2">{{ new_item.calle_ }}
+                                                            {% if  new_item.entre_ != '' %}
+                                                                e/ {{ new_item.entre_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.y_ != '' %}
+                                                                & {{ new_item.y_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.nro_casa_ != '' %}
+                                                                # {{ new_item.nro_casa_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.edificio_ != '' %}
+                                                                Edif: {{ new_item.efificio_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.apto_ != '' %}
+                                                                Apto: {{ new_item.apto_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.reparto_ != '' %}
+                                                                Reparto: {{ new_item.reparto_ }}
+                                                            {% endif %}
                                                         </td>
-
-                                                        <td class="text-left">{{ new_item.idCliente }}</td>
-                                                        <td class="text-left">${{ new_item.monto }}</td>
-                                                       
-                                                        
+                                                        <td class="text-right">
+                                                            {{ new_item.monto_recibir_ }} {{ new_item.nombre_moneda_recibir }}
+                                                        </td>
                                                         <td class="text-right">
                                                             <button type="button" class="btn btn-danger btn-sm ml-1"
                                                                     data-toggle="tooltip"
@@ -189,9 +188,9 @@
 
     <style>
 
-    .table td, .table th {
-  padding: .75rem !important;
-}
+        .table td, .table th {
+            padding: .75rem !important;
+        }
     </style>
 
 {% endblock %}
@@ -263,9 +262,10 @@
                 window.location.href = "/cotizacion";
             });
         }
+
         function cobrar() {
 
-             $('#confirm__modal_pago').modal('show');
+            $('#confirm__modal_pago').modal('show');
             $("#confirm__modal__btn_pago").click(function () {
                 window.location.href = "/cotizacion/pago/";
             });
