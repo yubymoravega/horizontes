@@ -59,7 +59,7 @@ class TramoType extends AbstractType
             ])
             ->add('ida_vuelta', ChoiceType::class, [
                 'choices' => ['Ida-Retorno' => 1, 'Ida' => 0],
-                'label' => 'Vuelta',
+                'label' => 'Cantidad de vias',
                 'required' => true,
                 'attr' => ['class' => 'w-100'],
             ])
@@ -88,7 +88,7 @@ class TramoType extends AbstractType
             ->add('precio',TextType::class,[
                 'required' => true,
                 'attr' => ['class' => 'w-100'],
-                'label' => 'Precio',
+                'label' => 'Costo',
             ])
         ;
     }

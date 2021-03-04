@@ -47,7 +47,7 @@
                                 <div class="mt-0 form-group input-group input-group-sm pr-0">
                                     <div class="col-6">
                                         <div class="row">
-                                            <label for="tipo_vehiculo_nombre" class="required">Marca</label>
+                                            <label for="tipo_vehiculo_nombre" class="required">Tipo de Vehiculo</label>
                                             <input type="text" id="tipo_vehiculo_nombre" name="tipo_vehiculo[nombre]"
                                                    required="required" class="w-100 form-control">
                                         </div>
@@ -64,11 +64,11 @@
                                             <input type="number" id="tipo_vehiculo_cantidad_fin_persona"
                                                    name="tipo_vehiculo[cantidad_fin_persona]" required="required"
                                                    class="w-100 form-control">
+                                            <input type="text" id="id_tipo_vehiculo" name="id_tipo_vehiculo" hidden>
                                         </div>
                                     </div>
                                     <div class="col-6 d-block mt-0">
-                                        <label for="grupo_tipo_vehiculo_cant_fin"
-                                               class="font-weight-bold">Imagen</label>
+                                        <label for="grupo_tipo_vehiculo_cant_fin">Imagen</label>
                                         <div class="col-6 imgUp w-100 mt-1">
                                             <div id="1" class="imagePreview" style="width: 200px;"></div>
                                             <label class="btn btn-dark" style="width: 200px;">
@@ -78,8 +78,6 @@
                                             </label>
                                         </div>
                                     </div>
-
-                                    <input type="text" id="id_tipo_vehiculo" hidden="">
                                 </div>
                             </div>
                             <div class="d-flex mt-4">
@@ -90,10 +88,10 @@
                                     </button>
                                 </div>
                                 <div class="ml-2">
-                                    <button type="submit" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                                    <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
                                 </div>
                                 <div class="ml-2">
-                                    <button type="submit" class="my-0 btn btn-warning" id="btnActualizar"
+                                    <button type="button" class="my-0 btn btn-warning" id="btnActualizar"
                                             style="display: none;">Actualizar
                                     </button>
                                 </div>
@@ -121,13 +119,20 @@
                 <td style="font-weight:400; align-content: center;" width="400px">{{ item.cant_ini }}
                     - {{ item.cant_fin }}</td>
                 <td style="font-weight:400; align-content: center;" width="400px">
-                    <button class="btn btn-dark fa fa-search" id="btnimagen"
-                            onclick="MostrarImagen('imga{{ item.id }}')"></button>
-                    <div>
-                        <img class="p-2" id="imga{{ item.id }}" style="width: 150px; "
-                             src="{{ "/images/vehiculos/"~item.picture }}">
-                    </div>
+
+                    <button type="button" class="btn btn-outline-warning" data-container="body" data-toggle="popover"
+                            data-trigger="click" title="Imagen"
+                            data-placement="right" data-img="
+                            {{ asset('images/Turismo/Transfer/TipoVehiculo/')~item.picture }}
+                    ">
+                        <span class="fa fa-image"></span>
+                    </button>
+
+
                 </td>
+
+
+
                 <td class="text-center">
                     <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                             data-placement="bottom" title="Actualizar"
@@ -233,7 +238,12 @@
             $('#btnActualizar').hide()
             $('#tipo_vehiculo_cantidad_ini_persona').prop('type', 'number')
             $('#tipo_vehiculo_cantidad_fin_persona').prop('type', 'number')
-            $('img').hide()
+            $('[data-toggle="popover"]').popover({
+                html:true,
+                content: function () {
+                    return '<img class="img-fluid" src="'+$(this).data('img') + '" />';
+                },
+            })
         })
         $(document).on("change", ".uploadFile", function () {
             var uploadFile = $(this);
@@ -264,6 +274,27 @@
             $('#id_tipo_vehiculo').val(id)
             $('#gestionarTvehiculo').html("Modificar " + nombre)
         }
+
+        $('#btnAceptar').on('click', function (){
+            if ($('#tipo_vehiculo_cantidad_ini_persona').val() > $('#tipo_vehiculo_cantidad_fin_persona').val()){
+                alert('La cantidad inicial de personas es mayor a las cantidad final')
+            }
+            else {
+                $('form').submit()
+            }
+        })
+
+        $('#btnActualizar').on('click', function (){
+
+            if ($('#tipo_vehiculo_cantidad_ini_persona').val() > $('#tipo_vehiculo_cantidad_fin_persona').val()){
+                alert('La cantidad inicial de personas es mayor a las cantidad final')
+            }
+            else {
+                $('form').prop('action','/configuracion-turismo/traslado/tipo-vehiculo/upd')
+                $('form').submit()
+            }
+        })
+
         {#$('#btnAceptar').on('click', function () {#}
         {#    const archivo = $('#image');#}
         {#    let params = {#}

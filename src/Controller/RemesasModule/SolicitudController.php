@@ -4,14 +4,18 @@ namespace App\Controller\RemesasModule;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
+use App\Entity\Carrito;
 use App\Entity\Cliente;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\TasaCambio;
 use App\Entity\MonedaPais;
 use App\Entity\Municipios;
 use App\Entity\Pais;
 use App\Entity\Provincias;
 use App\Entity\RemesasModule\Configuracion\BeneficiariosClientes;
+use App\Entity\TurismoModule\Utils\ConfigPrecioVentaServicio;
+use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Form\RemesasModule\Configuracion\BeneficiariosClientesType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -342,6 +346,76 @@ class SolicitudController extends AbstractController
                 'data_baneficiarios' => $data_beneficiarios,
                 'beneficiarios' => $beneficiario]
         );
+    }
+
+    /**
+     * @Route("/add-carrito", name="add_carrito_remesa")
+     */
+    public function addCarrito(EntityManagerInterface $em, Request $request)
+    {
+        $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_REMESA;
+        $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+
+        /** @var UserClientTmp $obj_trabajo_tmp */
+        $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
+            'id_usuario' => $this->getUser()
+        ]);
+
+        $empleado = $obj_trabajo_tmp->getIdUsuario()->getUsername();
+
+        $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
+            'id_unidad' => $unidad,
+            'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_REMESA
+        ]);
+
+        $data_new_solicitudes = json_decode($request->request->get('solicitudes'), true);
+        $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);
+
+        $data_solicitudes = array_merge($data_new_solicitudes, $data_solicitudes_existente);
+
+        $precio_total = 0;
+        foreach ($data_solicitudes as $key=>$item){
+            if(gettype($data_solicitudes[$key])=='array'){
+                $data_solicitudes[$key]['idCarrito'] = $key;
+                $data_solicitudes[$key]['nombreMostrar'] = $data_solicitudes[$key]['nombre_'] .' '. $data_solicitudes[$key]['primer_apellido_'];
+                $data_solicitudes[$key]['montoMostrar'] = $data_solicitudes[$key]['monto_entregar_'];
+                $precio_total += floatval($data_solicitudes[$key]['monto_entregar_']);
+            }
+            else{
+                $data_solicitudes[$key]->idCarrito = $key;
+                $data_solicitudes[$key]->nombreMostrar = $data_solicitudes[$key]->nombre_ .' '. $data_solicitudes[$key]->primer_apellido_;
+                $data_solicitudes[$key]->montoMostrar = $data_solicitudes[$key]->monto_entregar_;
+                $precio_total += floatval($data_solicitudes[$key]->monto_entregar_);
+
+            }
+        }
+        //-- CONSTRUYO EL JSON PARA ADICIONAR AL CARRITO
+        $json = array(
+            'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),
+            'id_cliente' => $obj_trabajo_tmp->getIdCliente()->getId(),
+            'id_servicio' => $id_servicio,
+            'nombre_servicio' => $em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
+            'precio_servicio' => $precio_total,
+            'total' => $precio_total,
+            'data' => $data_solicitudes,
+        );
+
+
+        if (!empty($data_solicitudes_existente)) {
+            $new_element_carrito = $em->getRepository(Carrito::class)->find(AuxFunctionsTurismo::getIdCarritoServicio($em, $empleado, $id_servicio));
+        } else {
+            $new_element_carrito = new Carrito();
+        }
+        $new_element_carrito
+            ->setEmpleado($empleado)
+            ->setJson(json_encode($json));
+
+        $em->persist($new_element_carrito);
+        $em->flush();
+
+        $this->addFlash('success', 'Solicitud adicionada al carrito');
+
+        return  $this->redirectToRoute('categorias',['tel'=>$obj_trabajo_tmp->getIdCliente()->getTelefono()] );
     }
 
 }

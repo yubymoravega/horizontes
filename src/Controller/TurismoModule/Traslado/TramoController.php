@@ -111,10 +111,10 @@ class TramoController extends AbstractController
         $origen = $request->get('origen');
         $destino = $request->get('destino');
         $ida_vuelta = false;
-        if($request->get('ida_vuelta') == 'true'){
+        if($request->get('ida_vuelta') == 1){
             $ida_vuelta = true;
         }
-        elseif($request->get('ida_vuelta') == 'false'){
+        elseif($request->get('ida_vuelta') == 0){
             $ida_vuelta = false;
         }
         $vehiculo = $request->get('vehiculo');
@@ -167,11 +167,11 @@ class TramoController extends AbstractController
         $sentido = false;
         $id = $request->get('id');
 
-        if ($request->get('ida_vuelta') == 'false')
+        if ($request->get('ida_vuelta') == 0)
         {
             $sentido = false;
         }
-        elseif ($request->get('ida_vuelta') == 'true')
+        elseif ($request->get('ida_vuelta') == 1)
         {
             $sentido = true;
         }

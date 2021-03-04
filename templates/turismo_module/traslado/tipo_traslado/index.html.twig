@@ -42,7 +42,7 @@
                 {{form_start(form, {'attr':{'autocomplete':"off"}})}}
                 <div class="modal-body bg-dark-app">
                     <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
-                        <label for="grupo_tipo_traslado_nombre" class="font-weight-bold">Nombre</label>
+                       {{ form_label(form.nombre) }}
                         {{ form_widget(form.nombre) }}
                         <input type="text" id="id_tipo_traslado" hidden>
                     </div>
@@ -130,6 +130,7 @@
                 nombre: $('#tipo_traslado_nombre').val(),
                 id_cliente: {{ id_cliente }}
             }
+            loadingModal.show()
             $.ajax({
                 url: '/configuracion-turismo/traslado/tipo-traslado/add',
                 method: "POST",
@@ -145,6 +146,7 @@
                 id_TipoTraslado: $('#id_tipo_traslado').val(),
                 id_cliente: {{ id_cliente }}
             }
+            loadingModal.show()
             $.ajax({
                 url: '/configuracion-turismo/traslado/tipo-traslado/upd',
                 method: "POST",

@@ -70,21 +70,22 @@ class TipoVehiculoController extends AbstractController
         $cant_ini = $request->request->get('tipo_vehiculo')['cantidad_ini_persona'];
         $cant_fin = $request->request->get('tipo_vehiculo')['cantidad_fin_persona'];
         $fichero = null;
-
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        //---Estandea para formar nombre :-cod_unidad-marca-:
+        $name_file = $unidad->getCodigo().'-'.$nombre.'.jpg';
+        $fichero = $name_file;
         $params = array(
             'nombre' => $nombre,
             'cantidad_ini_persona' => $cant_ini,
             'cantidad_fin_persona' => $cant_fin,
-            'picture'=>$fichero.'.jpg',
+            'picture'=>$fichero,
             'activo' => true
 
         );
         if (!AuxFunctions::isDuplicate($entity_repository, $params, 'add')) {
             $obj_TiVehiculo = new TipoVehiculo();
 
-            $unidad = AuxFunctions::getUnidad($em,$this->getUser());
-            //---Estandea para formar nombre :-cod_unidad-marca-:
-            $name_file = $unidad->getCodigo().'-'.$nombre.'.jpg';
+
             $obj_TiVehiculo
                 ->setNombre($nombre)
                 ->setCantidadIniPersona($cant_ini)
@@ -108,7 +109,6 @@ class TipoVehiculoController extends AbstractController
         $this->addFlash('error', "El vehículo ya se encuentra registrado");
 
         return $this->redirectToRoute('turismo_module_traslado_tipo_vehiculo');
-
     }
 
     /**
@@ -116,33 +116,60 @@ class TipoVehiculoController extends AbstractController
      */
     public function UpdateTipoVehiculo(EntityManagerInterface $em, Request $request){
         $entity_repository = $em->getRepository(TipoVehiculo::class);
-        $nombre = $request->get('nombre');
-        $id = $request->get('id_TipoVehiculo');
+        $nombre =$request->request->get('tipo_vehiculo')['nombre'];
+        $cant_ini = $request->request->get('tipo_vehiculo')['cantidad_ini_persona'];
+        $cant_fin = $request->request->get('tipo_vehiculo')['cantidad_fin_persona'];
+        $id = $request->get('id_tipo_vehiculo');
+
+        $fichero = null;
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        //---Estandea para formar nombre :-cod_unidad-marca-:
+        $name_file = $unidad->getCodigo().'-'.$nombre.'.jpg';
+        $fichero = $name_file;
 
         $params = array(
             'nombre' => $nombre,
-            'cantidad_ini_persona' => $request->get('cantidad_ini_persona'),
-            'cantidad_fin_persona' => $request->get('cantidad_fin_persona'),
+            'cantidad_ini_persona' => $cant_ini,
+            'cantidad_fin_persona' => $cant_fin,
+            'picture' => $name_file,
             'activo' => true
         );
-        if (!AuxFunctions::isDuplicate($entity_repository, $params, 'upd', $request->get('id_TipoVehiculo'))) {
+        //if (!AuxFunctions::isDuplicate($entity_repository, $params, 'upd', $request->get('id_TipoVehiculo'))) {
             $obj_tipoVehiculo = $entity_repository->find($id);
             /**@var $obj_tipoVehiculo TipoVehiculo**/
-            $obj_tipoVehiculo
-                ->setNombre($nombre)
-                ->setCantidadIniPersona($request->get('cantidad_ini_persona'))
-                ->setCantidadFinPersona($request->get('cantidad_fin_persona'));
+            /*$unidad = AuxFunctions::getUnidad($em,$this->getUser());
+            //---Estandea para formar nombre :-cod_unidad-marca-:
+            $name_file = $unidad->getCodigo().'-'.$nombre.'.jpg';*/
+            if ($request->files->get('1')){
+                $obj_tipoVehiculo
+                    ->setNombre($nombre)
+                    ->setCantidadIniPersona($cant_ini)
+                    ->setCantidadFinPersona($cant_fin)
+                    ->setPicture($name_file);
+            }
+            else{
+                $obj_tipoVehiculo
+                    ->setNombre($nombre)
+                    ->setCantidadIniPersona($cant_ini)
+                    ->setCantidadFinPersona($cant_fin);
+            }
             try {
                 $em->persist($obj_tipoVehiculo);
                 $em->flush();
+
+                if($request->files->get('1')){
+                    $destino= $this->getParameter('kernel.project_dir')."/public/images/Turismo/Transfer/TipoVehiculo/";
+                    $archivo = $request->files->get('1');
+                    $archivo->move($destino,$name_file);
+                }
             } catch (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
             }
             $this->addFlash('success', "Tipo de vehículo actualizado satisfactoriamente");
-            return new JsonResponse(['success' => true]);
-        }
-        $this->addFlash('error', "El vehículo ya se encuentra registrado");
-        return new JsonResponse(['success' => false]);
+            return $this->redirectToRoute('turismo_module_traslado_tipo_vehiculo');
+        //}
+        //$this->addFlash('error', "El vehículo ya se encuentra registrado");
+        //return $this->redirectToRoute('turismo_module_traslado_tipo_vehiculo');
     }
 
     /**

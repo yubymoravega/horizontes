@@ -59,15 +59,15 @@
                                                     <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
                                                 {% for new_item in item.data %}
-                                                        <td class="text-left" colspan="3">  <a data-toggle="collapse" href="#coll{{ new_item.orden }}" role="button"
-                                                   aria-expanded="false" aria-controls="coll{{ new_item.orden }}">
+                                                        <td class="text-left" colspan="3">  <a data-toggle="collapse" href="#coll2" role="button"
+                                                   aria-expanded="false" aria-controls="coll2">
                                                     <span style="color:white;"> <b> {{ new_item.nombreCliente }} </b></span> </br>
                                                 </a>  
 
                                                 <div class="collapse" id="coll{{ new_item.orden }}" style="margin-top: 20px;">
 
                                                     <ul style="list-style-type:disc">
-                                                        <li><b> Beneficiario:</b> {{ new_item.primerNombre }}  {{ new_item.primerApellido }} {{ new_item.segundoApellido }}</li>
+                                                            <li><b> Beneficiario:</b> {{ new_item.primerNombre }}  {{ new_item.primerApellido }} {{ new_item.segundoApellido }}</li>
                             
                                                         <li><b> Contactos:</b> {{ new_item.telefono }} - {{ new_item.telefonoCasa }} </li>
                                                         <li><b> Identificacion:</b> {{ new_item.identificacion }} </li>

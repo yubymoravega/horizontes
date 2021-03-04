@@ -4,27 +4,27 @@ namespace App\Controller\TurismoModule\Traslado;
 
 
 use App\CoreTurismo\CrudController;
-use App\Entity\TurismoModule\Traslado\Zona;
-use App\Form\TurismoModule\Traslado\ZonaType;
+use App\Entity\TurismoModule\Traslado\Aeropuerto;
+use App\Form\TurismoModule\Traslado\AeropuertoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class ZonaController
- *  @package App\Controller\TurismoModule\Traslado
- * @Route("/configuracion-turismo/traslado/zona")
+ * Class AeropuertoController
+ * @package App\Controller\TurismoModule\Traslado
+ * @Route("/configuracion-turismo/traslado/aeropuerto")
  */
-class ZonaController extends CrudController
+class AeropuertoController extends CrudController
 {
 
     public function __construct()
     {
-        $this->setTitle('Zona');
+        $this->setTitle('Aeropuerto');
         $this->setLabel('nombre');
-        $this->setClassTypeName(ZonaType::class);
-        $this->setClassEntity(Zona::class);
+        $this->setClassTypeName(AeropuertoType::class);
+        $this->setClassEntity(Aeropuerto::class);
         $this->setMessages([
             'add' => 'Datos guardados satisfactoriamente',
             'edit' => 'Datos actualizados satisfactoriamente',
@@ -32,14 +32,14 @@ class ZonaController extends CrudController
             'not_exist' => 'El ' . $this->getTitle() . ' no pudo ser editado, no existe',
         ]);
         $this->setPaths([
-            'index' => 'zona',
-            'edit' => 'zona_edit',
+            'index' => 'aeropuerto',
+            'edit' => 'aeropuerto_edit',
             'delete' => 'aeropuerto_delete',
         ]);
     }
 
     /**
-     * @Route("/", name="zona",  methods={"GET", "POST"})
+     * @Route("/", name="aeropuerto", methods={"GET", "POST"})
      */
     public function index(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
     {
@@ -47,7 +47,7 @@ class ZonaController extends CrudController
     }
 
     /**
-     * @Route("/{id}/edit", name="zona_edit", methods={"GET", "POST"})
+     * @Route("/{id}/edit",name="aeropuerto_edit", methods={"GET", "POST"})
      */
     public function Update(EntityManagerInterface $em, Request $request, ValidatorInterface $validator, $id)
     {
@@ -55,10 +55,9 @@ class ZonaController extends CrudController
     }
 
     /**
-     * @Route("/{id}", name="zona_delete", methods={"DELETE"})
+     * @Route("/{id}",name="aeropuerto_delete", methods={"DELETE"})
      */
-    public function Delete(EntityManagerInterface $em, Request $request, $id)
-    {
+    public function Delete(EntityManagerInterface $em, Request $request, $id){
         return parent::Delete($em,$request, $id);
     }
 }

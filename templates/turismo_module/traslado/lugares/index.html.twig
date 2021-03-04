@@ -88,12 +88,12 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body bg-dark-app">
+                    <div class="modal-body">
                         <div>
-                          <p class="text-light">¿Quiere cambiar el estado del elemento seleccionado?</p>
+                            <p id="msg">¿Quiere desabilitar el elemento seleccionado?</p>
                             <input type="text" id="id_fila" hidden>
                         </div>
-                        <div class="d-flex mt-4">
+                        <div class="modal-footer pb-0">
                             <div class="mr-auto">
                                 <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
                                         aria-label="Cerrar">
@@ -132,13 +132,22 @@
                     </td>
                     <td style="font-weight:400; align-content: center;" width="400px">{{ item.zona_nom }}</td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-outline-info btn-sm" data-toggle="modal"
+                        {% if item.estado == 1 %}
+                        {{ '<button type="button" class="btn btn-outline-info btn-sm" data-toggle="modal"' }}
+                        {% elseif item.estado == 0 %}
+                            {{ '<button type="button" class="btn btn-info btn-sm" data-toggle="modal"' }}
+                        {% endif %}
                                 data-target="#cambiarEstadoModal" data-toggle="tooltip"
                                 data-placement="bottom" title="Cambiar estado"
                                 onclick="onCambio({
-                                        id:'{{ item.id }}'
+                                        id:'{{ item.id }}',
+                                        estado:'{{ item.estado }}'
                                         })">
-                            <i class="fa fa-refresh"></i>
+                            {% if item.estado == 1 %}
+                                {{ '<i class="fa fa-chevron-circle-left"></i>' }}
+                            {% elseif item.estado == 0 %}
+                                {{ '<i class="fa fa-chevron-circle-right"></i>' }}
+                            {% endif %}
                         </button>
                         <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
                                 data-placement="bottom" title="Actualizar"
@@ -155,7 +164,7 @@
                                         message:'Está seguro que desea eliminar el lugar seleccionado ?',
                                         url:'{{ path('turismo_module_traslado_lugares_delete',{id: item.id}) }}'
                                         })">
-                            <i class="fa fa-trash"></i>
+                                <i class="fa fa-trash"></i>
                         </button>
 
                     </td>
@@ -186,7 +195,6 @@
             $('#gestionarOrigenDestinoModal').modal('show')
 
             $('#lugares_nombre').val(nombre)
-            //$('#lugares_habilitado').prop(estado)
             $('#id_aeropuerto').val(id)
             $('#lugares_zona').val(zona)
             $('#gestionarOrigenDestino').html("Modificar " + nombre)
@@ -196,6 +204,7 @@
             let param = {
                 id: $('#id_fila').val()
             }
+            loadingModal.show()
             $.ajax({
                 url:'/configuracion-turismo/traslado/lugares/change',
                 method: "POST",
@@ -208,18 +217,14 @@
 
         const onCambio = function(config){
             $('#myModal').modal('toggle')
-            const {id = ''}=config
+            const {id = '', estado = ''}=config
             $('#id_fila').val(id)
-            /*let param = {
-                id: id
+            if (estado == 1){
+                $('#msg').text('¿Quiere desabilitar el elemento seleccionado?')
             }
-            $.ajax({
-                url:'/configuracion-turismo/traslado/lugares/change',
-                method: "POST",
-                data:param
-            }).then(res => {
-                window.location.replace('/configuracion-turismo/traslado/lugares');
-            })*/
+            else{
+                $('#msg').text('¿Quiere habilitar el elemento seleccionado?')
+            }
         }
 
         $('#btnAceptar').on('click', function () {
@@ -229,6 +234,7 @@
                 zona:$('#lugares_zona').val(),
                 id_cliente: {{ id_cliente }}
             }
+            loadingModal.show()
             $.ajax({
                 url: '/configuracion-turismo/traslado/lugares/add',
                 method: "POST",
@@ -246,6 +252,7 @@
                 id_OrigenDestino: $('#id_aeropuerto').val(),
                 id_cliente: {{ id_cliente }}
             }
+            loadingModal.show()
             $.ajax({
                 url: '/configuracion-turismo/traslado/lugares/upd',
                 method: "POST",

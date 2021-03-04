@@ -46,39 +46,42 @@
                         <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
                             {{ form_label(form.proveedor) }}
                             {{ form_widget(form.proveedor) }}
-                            <div class="row mt-1">
-                                <div class="col-6">
+                            <div class="row mt-1 input-group-sm">
+                                <div class="col-6 input-group-sm">
                                     {{ form_label(form.origen) }}
                                     {{ form_widget(form.origen) }}
                                 </div>
-                                <div class="col-6 mt-0">
+                                <div class="col-6 mt-0 input-group-sm">
                                     {{ form_label(form.destino) }}
                                     {{ form_widget(form.destino) }}
                                 </div>
                             </div>
-                            <div class=" mt-2" style="display: none; position: center;" id="info">
-                                <div class="col-6">
-                                    <label>Destino</label>
-                                    <input class="w-100 form-control" type="text" disabled id="info_destino">
-                                </div>
-                                <div class="col-6 mt-0">
-                                    <label>Origen</label>
-                                    <input class="w-100 form-control" type="text" disabled id="info_origen">
+                            <div class="mt-2 input-group-sm" style="display: none; position: center;" id="info">
+                                <div class="row ml-1 text-light">Retorno</div>
+                                <div class="row mt-1">
+                                    <div class="col-6">
+                                        <label>Origen</label>
+                                        <input class="w-100 form-control" type="text" disabled id="info_destino">
+                                    </div>
+                                    <div class="col-6 mt-0">
+                                        <label>Destino</label>
+                                        <input class="w-100 form-control" type="text" disabled id="info_origen">
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mt-1">
-                                <div class="col-6">
+                                <div class="col-6 input-group-sm">
                                     {{ form_label(form.ida_vuelta) }}
                                     {{ form_widget(form.ida_vuelta) }}
                                 </div>
-                                <div class="col-6 mt-0">
+                                <div class="col-6 mt-0 input-group-sm">
                                     {{ form_label(form.traslado) }}
                                     {{ form_widget(form.traslado) }}
                                 </div>
 
                             </div>
                             <div class="row mt-1">
-                                <div class="col-8">
+                                <div class="col-8 input-group-sm">
                                     {{ form_label(form.vehiculo) }}
                                     {{ form_widget(form.vehiculo) }}
                                 </div>
@@ -194,7 +197,6 @@
             $('#tramo_proveedor').val(proveedor)
             $('#tramo_origen').val(origen)
             $('#tramo_destino').val(destino)
-            console.log(ida_vuelta)
             if(ida_vuelta == 1){
                 $('#tramo_ida_vuelta').val(1);
                 $('#info').css('display','flex')
@@ -224,6 +226,7 @@
                 precio: $('#tramo_precio').val(),
                 id_cliente: {{ id_cliente }}
             }
+            loadingModal.show()
             $.ajax({
                 url: '/configuracion-turismo/traslado/tramo/add',
                 method: "POST",
@@ -253,12 +256,13 @@
                 proveedor: $('#tramo_proveedor').val(),
                 origen: $('#tramo_origen').val(),
                 destino: $('#tramo_destino').val(),
-                ida_vuelta: $('#tramo_ida_vuelta').prop('checked'),
+                ida_vuelta: $('#tramo_ida_vuelta').val(),
                 vehiculo: $('#tramo_vehiculo').val(),
                 traslado: $('#tramo_traslado').val(),
                 precio: $('#tramo_precio').val(),
                 id_cliente: {{ id_cliente }}
             }
+            loadingModal.show()
             $.ajax({
                 url: '/configuracion-turismo/traslado/tramo/upd',
                 method: "POST",
@@ -276,7 +280,7 @@
             $('#info_origen').val('')
         }
         else{
-            $('#info').css('display','flex')
+            $('#info').css('display','block')
             TOrigen = $('#tramo_origen option:checked').html()
             TDestino = $('#tramo_destino option:checked').html()
             $('#info_destino').val(TDestino)

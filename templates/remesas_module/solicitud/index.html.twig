@@ -147,8 +147,8 @@
                     <thead class="thead-dark">
                     <th width="120px" class="text-left">Nombre</th>
                     <th width="120px" class="text-left">País</th>
-                    <th width="140px" class="text-left">Monto a Pagar</th>
-                    <th width="140px" class="text-left">Monto a Recibir</th>
+                    <th width="140px" class="text-right">Monto a Pagar</th>
+                    <th width="140px" class="text-right">Monto a Recibir</th>
                     <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
                     </thead>
                     <tbody id="rows_solicitudes_remesas">
@@ -160,7 +160,7 @@
                     <a class="btn btn-outline-secondary" id="salir">Salir</a>
                 </div>
                 <div class="ml-2">
-                    <button class='my-0 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
+                    <button class='mb-4 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
                             data-target="#ModalConfirmSubmit" data-placement="bottom">Aceptar
                     </button>
                 </div>
@@ -204,6 +204,7 @@
         let monto_entregar_
         let monto_recibir_
         let id_moneda_select_
+        let nombre_moneda_recibir
         let actua
         $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
 
@@ -500,6 +501,7 @@
                 id_pais_ = $('#beneficiarios_clientes_id_pais').val()
                 pais_ = $('#beneficiarios_clientes_id_pais option:selected').text()
                 id_moneda_ = $('#beneficiarios_clientes_id_moneda').val()
+                nombre_moneda_recibir = $('#beneficiarios_clientes_id_moneda option:selected').text()
                 id_provincia_ = $('#beneficiarios_clientes_id_provincia').val()
                 id_municipio_ = $('#beneficiarios_clientes_id_municipios').val()
                 primer_apellido_ = $('#beneficiarios_clientes_primer_apellido').val()
@@ -521,7 +523,7 @@
                 monto_recibir_ = $('#beneficiarios_clientes_monto_recibir').val()
                 id_moneda_select_ = $('#currency').val()
 
-                if(id_banaficiario_==null && new_beneficiario == true){
+                if (id_banaficiario_ == null && new_beneficiario == true) {
                     saveBeneficiario()
                 }
                 const str_to_compare = primer_apellido_ + '-' + segundo_apellido_ + '-' + nombre_alternativo_ + '-' + primer_apellido_alternativo_ + '-' + segundo_apellido_alternativo_ + '-' +
@@ -532,7 +534,7 @@
                 if (str_to_compare === str_beneficiario || new_beneficiario == true) {
                     LlenarTabla(false, id_banaficiario_, nombre_, id_pais_, id_moneda_, id_provincia_, id_municipio_, primer_apellido_, segundo_apellido_,
                         nombre_alternativo_, primer_apellido_alternativo_, segundo_apellido_alternativo_, primer_telefono_, segundo_telefono_, identificacion_,
-                        calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_)
+                        calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_, nombre_moneda_recibir)
                 } else {
                     $('#ModalConfirm').modal('show')
                 }
@@ -548,7 +550,6 @@
                     error_label.removeClass('hide')
                 } else {
                     error.addClass('ml-3 mt-3')
-                    error.css('position', 'fixed')
                     $(element)
                         .closest("form")
                         .find("label[for='" + element.attr("id") + "']")
@@ -578,24 +579,49 @@
             saveBeneficiario()
             LlenarTabla(true, id_banaficiario_, nombre_, id_pais_, id_moneda_, id_provincia_, id_municipio_, primer_apellido_, segundo_apellido_,
                 nombre_alternativo_, primer_apellido_alternativo_, segundo_apellido_alternativo_, primer_telefono_, segundo_telefono_, identificacion_,
-                calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_)
+                calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_, nombre_moneda_recibir)
         })
 
         $('#btn_no').on('click', function () {
             LlenarTabla(false, id_banaficiario_, nombre_, id_pais_, id_moneda_, id_provincia_, id_municipio_, primer_apellido_, segundo_apellido_,
                 nombre_alternativo_, primer_apellido_alternativo_, segundo_apellido_alternativo_, primer_telefono_, segundo_telefono_, identificacion_,
-                calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_)
+                calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_, nombre_moneda_recibir)
         })
 
         $('#btnSubbmitInforme').on('click', function (event) {
             let total_pagar = 0;
             let total_recibir = 0;
             if (list_table.length > 0) {
+                let monedas_listado = []
+                let flag = false
                 for (let i = 0; i < list_table.length; i++) {
+                    flag = false
+                    for (let j = 0; j < monedas_listado.length; j++) {
+                        if (list_table[i]['nombre_moneda_recibir'] == monedas_listado[j])
+                            flag = true
+                    }
+                    if (flag == false)
+                        monedas_listado.push(list_table[i]['nombre_moneda_recibir'])
                     total_pagar += parseFloat(list_table[i]['monto_entregar_']);
-                    total_recibir += parseFloat(list_table[i]['monto_recibir_']);
                 }
-                $('#parragraph_sumbit').text('Usted ha configurado un total de ' + list_table.length + ' remesas, el precio total a pagar es de ' + total_pagar.toFixed(2) + ', y se entregará a los beneficiarios un total de ' + total_recibir.toFixed(2) + '. ¿Está seguro que desea continuar?.')
+                cl(monedas_listado)
+
+                let total_por_moneda = 0;
+                let str_recibir = ''
+                for (let j = 0; j < monedas_listado.length; j++) {
+                    total_por_moneda = 0;
+                    for (let i = 0; i < list_table.length; i++) {
+                        if (list_table[i]['nombre_moneda_recibir'] == monedas_listado[j])
+                            total_por_moneda += parseFloat(list_table[i]['monto_recibir_'])
+                    }
+                    cl(total_por_moneda)
+                    str_recibir += (total_por_moneda.toFixed(2)+' '+monedas_listado[j]+', ')
+                }
+
+
+                $('#parragraph_sumbit').text('Usted ha configurado un total de ' + list_table.length + ' remesas, el precio total a' +
+                    ' pagar es de ' + total_pagar.toFixed(2) + ' ' + $('#currency option:selected').text() + ', y se entregará a los beneficiarios un total ' +
+                    'de ' + str_recibir + '. ¿Está seguro que desea continuar?.')
             } else {
                 $('#parragraph_sumbit').text('Usted no tiene remesas configuradas, debe configurar al menos una remesa para agregarla al carrito.')
 
@@ -604,17 +630,17 @@
 
         $('#btn_aceptar_sumbit').on('click', function (event) {
             event.preventDefault()
-            if (lista_mercancias.length) {
-                const listado = JSON.stringify(lista_mercancias)
+            if (list_table.length) {
+                const listado = JSON.stringify(list_table)
                 $('body').append(`
-                    <form action='/turismo/gestion-consular/solucitud/add-carrito'
+                    <form action='/servicios/remesas/solicitud/add-carrito'
                          method="post" id='form_add_carrito'>
                         <input type='hidden' name='solicitudes' value='${listado}'/>
                     </form>`)
                 const fomrulario = $('#form_add_carrito')
                 fomrulario.submit()
                 fomrulario.remove()
-            } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+            } else alertTemplate('Debe existir alguna remesa para facturar', 'danger')
         })
 
         $(document).on('click', '.borrar', function (event) {
@@ -625,7 +651,7 @@
 
         function LlenarTabla(actualizar, id_banaficiario_, nombre_, id_pais_, id_moneda_, id_provincia_, id_municipio_, primer_apellido_, segundo_apellido_,
                              nombre_alternativo_, primer_apellido_alternativo_, segundo_apellido_alternativo_, primer_telefono_, segundo_telefono_, identificacion_,
-                             calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_) {
+                             calle_, entre_, y_, nro_casa_, edificio_, apto_, reparto_, monto_entregar_, monto_recibir_, id_moneda_select_, nombre_moneda_recibir) {
             list_table.push({
                 actualizar,
                 id_banaficiario_,
@@ -652,6 +678,7 @@
                 monto_entregar_,
                 monto_recibir_,
                 id_moneda_select_,
+                nombre_moneda_recibir
             })
             cl(list_table)
             let valor_entregar = parseFloat(monto_entregar_).toFixed(2)
@@ -675,27 +702,27 @@
         function saveBeneficiario() {
             loadingModal.show()
             let data = {
-                id_banaficiario_:id_banaficiario_,
-                nombre_:nombre_,
-                id_pais_:id_pais_,
-                id_moneda_:id_moneda_,
-                id_provincia_:id_provincia_,
-                id_municipio_:id_municipio_,
-                primer_apellido_:primer_apellido_,
-                segundo_apellido_:segundo_apellido_,
-                nombre_alternativo_:nombre_alternativo_,
-                primer_apellido_alternativo_:primer_apellido_alternativo_,
-                segundo_apellido_alternativo_:segundo_apellido_alternativo_,
-                primer_telefono_:primer_telefono_,
-                segundo_telefono_:segundo_telefono_,
-                identificacion_:identificacion_,
-                calle_:calle_,
-                entre_:entre_,
-                y_:y_,
-                nro_casa_:nro_casa_,
-                edificio_:edificio_,
-                apto_:apto_,
-                reparto_:reparto_,
+                id_banaficiario_: id_banaficiario_,
+                nombre_: nombre_,
+                id_pais_: id_pais_,
+                id_moneda_: id_moneda_,
+                id_provincia_: id_provincia_,
+                id_municipio_: id_municipio_,
+                primer_apellido_: primer_apellido_,
+                segundo_apellido_: segundo_apellido_,
+                nombre_alternativo_: nombre_alternativo_,
+                primer_apellido_alternativo_: primer_apellido_alternativo_,
+                segundo_apellido_alternativo_: segundo_apellido_alternativo_,
+                primer_telefono_: primer_telefono_,
+                segundo_telefono_: segundo_telefono_,
+                identificacion_: identificacion_,
+                calle_: calle_,
+                entre_: entre_,
+                y_: y_,
+                nro_casa_: nro_casa_,
+                edificio_: edificio_,
+                apto_: apto_,
+                reparto_: reparto_,
             }
             $.ajax({
                 url: '/servicios/remesas/solicitud/saveBeneficiario',
@@ -705,7 +732,6 @@
                 success: function (result) {
                     $('#beneficiarios_clientes_primer_nombre').find('option').remove()
                     $('#beneficiarios_clientes_primer_nombre').prepend('<option value = "0" selected disabled>...seleccione...</option>')
-
                     beneficiarios_array = result.beneficiarios
                     data_baneficiarios = result.data_baneficiarios
                     result.beneficiarios.forEach(function (valor) {
@@ -713,6 +739,7 @@
                         }
                     )
                     $('#beneficiarios_clientes_primer_nombre').append('<option value = "-1">--Nuevo Beneficiario--</option>')
+                    changeStatus(-1, true)
                     loadingModal.close()
                 },
                 error: function (error) {
