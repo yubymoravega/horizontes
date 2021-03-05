@@ -206,6 +206,7 @@
         let id_moneda_select_
         let nombre_moneda_recibir
         let actua
+        let id_regla
         $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
 
         function eliminarElementoMisterioso() {
@@ -373,10 +374,13 @@
                         success: function (result) {
                             if (result.a_pagar == 0) {
                                 alertTemplate('No existen reglas configuradas para la cantidad especificada', 'danger')
+                                loadingModal.close()
                                 $('#beneficiarios_clientes_monto_recibir').val('')
                                 $('#beneficiarios_clientes_monto_entregar').val('')
-                            } else
+                            } else{
                                 $('#beneficiarios_clientes_monto_entregar').val(result.a_pagar)
+                                id_regla = result.id_regla
+                            }
                             loadingModal.close()
                         },
                         error: function (error) {
@@ -409,8 +413,11 @@
                                 alertTemplate('No existen reglas configuradas para la cantidad especificada', 'danger')
                                 $('#beneficiarios_clientes_monto_recibir').val('')
                                 $('#beneficiarios_clientes_monto_entregar').val('')
-                            } else
+                                loadingModal.close()
+                            } else{
+                                id_regla = result.id_regla
                                 $('#beneficiarios_clientes_monto_recibir').val(result.a_recibir)
+                            }
                             loadingModal.close()
                         },
                         error: function (error) {
@@ -632,10 +639,12 @@
             event.preventDefault()
             if (list_table.length) {
                 const listado = JSON.stringify(list_table)
+                const moneda = $('#currency').val()
                 $('body').append(`
                     <form action='/servicios/remesas/solicitud/add-carrito'
                          method="post" id='form_add_carrito'>
                         <input type='hidden' name='solicitudes' value='${listado}'/>
+                        <input type='hidden' name='moneda' value='${moneda}'/>
                     </form>`)
                 const fomrulario = $('#form_add_carrito')
                 fomrulario.submit()
@@ -678,7 +687,8 @@
                 monto_entregar_,
                 monto_recibir_,
                 id_moneda_select_,
-                nombre_moneda_recibir
+                nombre_moneda_recibir,
+                id_regla
             })
             cl(list_table)
             let valor_entregar = parseFloat(monto_entregar_).toFixed(2)
@@ -723,6 +733,7 @@
                 edificio_: edificio_,
                 apto_: apto_,
                 reparto_: reparto_,
+                id_regla:id_regla
             }
             $.ajax({
                 url: '/servicios/remesas/solicitud/saveBeneficiario',

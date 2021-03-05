@@ -23,7 +23,7 @@ class Cotizacion
     private $edit;
 
     /**
-     * @ORM\Column(type="string", length=10000)
+     * @ORM\Column(type="json")
      */
     private $json;
 
@@ -79,12 +79,12 @@ class Cotizacion
         return $this->id;
     }
 
-    public function getJson(): ?string
+    public function getJson(): ?array
     {
         return $this->json;
     }
 
-    public function setJson(string $json): self
+    public function setJson(?array $json): self
     {
         $this->json = $json;
 

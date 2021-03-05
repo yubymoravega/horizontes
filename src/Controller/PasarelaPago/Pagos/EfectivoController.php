@@ -52,7 +52,7 @@ class EfectivoController extends AbstractController
         $PagosCotizacion->setIdCotizacion($id_cotizacion);
         $PagosCotizacion->setIdMoneda(1);
         $PagosCotizacion->setCambio($cambio);
-        $PagosCotizacion->setIdTipoDePago(0);
+        $PagosCotizacion->setIdTipoDePago(1);
 
         $em->persist($PagosCotizacion);
         $resto = AuxFunctionsTurismo::getResto($em,$id_cotizacion);

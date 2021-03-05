@@ -34,9 +34,9 @@ class CotizacionController extends AbstractController
         $total = 0;
         foreach ($solicitudes_carrito as $item) {
             $data[] = $item->getJson();
-            $json = json_decode($item->getJson());
-            $id_cliente = $json->id_cliente;
-            $total += floatval($json->total);
+            $json = $item->getJson();
+            $id_cliente = $json['id_cliente'];
+            $total += floatval($json['total']);
             $em->remove($item);
         }
 
@@ -51,7 +51,7 @@ class CotizacionController extends AbstractController
                 ->setDatetime(new DateTime('NOW'))
                 ->setEdit(true)
                 ->setEmpleado($nombre_empleado)
-                ->setJson(json_encode($data))
+                ->setJson($data)
                 ->setNombreCliente($obj_cliente->getNombre())
                 ->setPagado(false)
                 ->setTotal($total);
@@ -164,21 +164,21 @@ class CotizacionController extends AbstractController
         $data = [];
         $total = 0;
 
-        $json = json_decode($cotizacion->getJson());
+        $json = $cotizacion->getJson();
 
         foreach ($json as $key => $item) {
-            $json_array = json_decode($item);
-            $json_array_data = $json_array->data;
+            $json_array = $item;
+            $json_array_data = $json_array['data'];
             $data[] = [
                 'id' => $key,
-                'servicio' => $json_array->nombre_servicio,
-                'sub_total' => number_format($json_array->total, 2),
-                'precio_servicio' => number_format($json_array->precio_servicio, 2),
-                'id_cliente' => $json_array->id_cliente,
-                'id_servicio' => $json_array->id_servicio,
+                'servicio' => $json_array['nombre_servicio'],
+                'sub_total' => number_format($json_array['total'], 2),
+                'precio_servicio' => number_format($json_array['precio_servicio'], 2),
+                'id_cliente' => $json_array['id_cliente'],
+                'id_servicio' => $json_array['id_servicio'],
                 'data' => $json_array_data
             ];
-            $total += floatval($json_array->total);
+            $total += floatval($json_array['total']);
         }
         return $this->render('cotizacion/detalles_cotizacion.html.twig', [
             'carrito' => $data,

@@ -8,8 +8,10 @@ use App\Entity\Carrito;
 use App\Entity\Cliente;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\InstrumentoCobro;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TasaCambio;
 use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
@@ -44,6 +46,8 @@ class AuxFunctionsTurismo
     public const IDENTIFICADOR_VISADO = 11;
     public const IDENTIFICADOR_TRANSFER = 2;
     public const IDENTIFICADOR_REMESA = 4;
+
+    public const MONEDA_USD = 'usd';
 
     /**
      * @desc Esta Funcion Actualiza los registros donde se especifica con que cliente esta trabajando el usuario en el subsistema de turismo.
@@ -99,9 +103,9 @@ class AuxFunctionsTurismo
         if (!empty($carrito_array)) {
             /** @var Carrito $item */
             foreach ($carrito_array as $item) {
-                $json = json_decode($item->getJson());
-                if ($json->id_servicio == $id_servicio)
-                    return $json->data;
+                $json = $item->getJson();
+                if ($json['id_servicio'] == $id_servicio)
+                    return $json['data'];
             }
         }
         return $data;
@@ -119,8 +123,8 @@ class AuxFunctionsTurismo
         if (!empty($carrito_array)) {
             /** @var Carrito $item */
             foreach ($carrito_array as $item) {
-                $json = json_decode($item->getJson());
-                if ($json->id_servicio == $id_servicio)
+                $json = $item->getJson();
+                if ($json['id_servicio'] == $id_servicio)
                     return $item->getId();
             }
         }
@@ -137,9 +141,9 @@ class AuxFunctionsTurismo
         $carrito = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
         if (!empty($carrito)) {
             /** @var Carrito $obj_carrito */
-            $json = json_decode($carrito[0]->getJson());
-            if (isset($json->id_cliente))
-                return $json->id_cliente;
+            $json = $carrito[0]->getJson();
+            if (isset($json['id_cliente']))
+                return $json['id_cliente'];
             else
                 if (isset($json->data[0]->idCliente))
                     return $json->data[0]->idCliente;
@@ -158,8 +162,8 @@ class AuxFunctionsTurismo
         $pagos_cotizacion = $em->getRepository(PagosCotizacion::class)->findBy(['idCotizacion' => $id_cotizacion]);
         /** @var PagosCotizacion $item */
         $total_pagado = 0;
-        foreach ($pagos_cotizacion as $item) {
-            $total_pagado += floatval($item->getMonto());
+        foreach ($pagos_cotizacion as $key => $item) {
+            $total_pagado += $item->getMonto();
         }
         if ((floatval($cotizacion->getTotal()) - $total_pagado) == 0) {
             $cotizacion->setPagado(true);
@@ -179,7 +183,7 @@ class AuxFunctionsTurismo
      */
     public static function asentarCotizacion(EntityManagerInterface $em, Cotizacion $obj_cotizacion, User $usuario, float $valor_pagado, bool $banco = false)
     {
-        $data_jsons = json_decode($obj_cotizacion->getJson());
+        $data_jsons = $obj_cotizacion->getJson();
 
         $cliente_er = $em->getRepository(Cliente::class);
         $servicio_er = $em->getRepository(Servicios::class);
@@ -701,7 +705,7 @@ class AuxFunctionsTurismo
      * @param int $id_pais
      * @param float $monto
      * @param Unidad $obj_unidad
-     * @return JsonResponse
+     * @return array|int
      */
     public static function getDataRemesaPagar(EntityManagerInterface $em, int $id_pais, float $monto, Unidad $obj_unidad)
     {
@@ -721,7 +725,7 @@ class AuxFunctionsTurismo
                 $costo_venta = $menor_comision + ($item->getValorFijoVenta() + ($menor_comision * $item->getPorcientoVenta() / 100));
             }
         }
-        return $costo_venta;
+        return ['costo' => $costo_venta, 'id_regla' => $id_regla->getId()];
     }
 
     /**
@@ -729,7 +733,7 @@ class AuxFunctionsTurismo
      * @param int $id_pais
      * @param float $monto
      * @param Unidad $obj_unidad
-     * @return JsonResponse
+     * @return array|int
      */
     public static function getDataRemesaRecibir(EntityManagerInterface $em, int $id_pais, float $monto, Unidad $obj_unidad)
     {
@@ -749,6 +753,116 @@ class AuxFunctionsTurismo
                 $costo_venta = $menor_comision - ($item->getValorFijoVenta() - ($menor_comision * $item->getPorcientoVenta() / 100));
             }
         }
-        return $costo_venta;
+        return ['costo' => $costo_venta, 'id_regla' => $id_regla->getId()];
     }
+
+    public static function getTasaCambio(EntityManagerInterface $em, int $id_moneda_origen, int $id_moneda_destino)
+    {
+        if ($id_moneda_origen == $id_moneda_destino) {
+            return ['tasa_cambio_origen' => 1, 'tasa_cambio_destino' => 1];
+        }
+        $tasa_cambio_er = $em->getRepository(TasaCambio::class);
+        $moneda_er = $em->getRepository(Moneda::class);
+        $mes = Date('m');
+        $anno = Date('Y');
+        $moneda_usd = $moneda_er->findOneBy(['nombre' => self::MONEDA_USD, 'activo' => true]);
+        $tasa_cambio_origen = 1;
+        $tasa_cambio_destino = 1;
+        if ($id_moneda_origen != $moneda_usd->getId()) {
+            $tasa_cambio_origen_obj = $tasa_cambio_er->findOneBy([
+                'mes' => $mes,
+                'anno' => $anno,
+                'id_moneda_origen' => $moneda_er->find($id_moneda_origen),
+                'id_moneda_destino' => $moneda_usd
+            ]);
+            $tasa_cambio_origen = !$tasa_cambio_origen_obj ? 0 : $tasa_cambio_origen_obj->getValor();
+        }
+        if ($id_moneda_destino != $moneda_usd->getId()) {
+            $tasa_cambio_destino_obj = $tasa_cambio_er->findOneBy([
+                'mes' => $mes,
+                'anno' => $anno,
+                'id_moneda_origen' => $moneda_usd,
+                'id_moneda_destino' => $moneda_er->find($id_moneda_destino)
+            ]);
+            $tasa_cambio_destino = !$tasa_cambio_destino_obj ? 0 : $tasa_cambio_destino_obj->getValor();
+        }
+
+        return ['tasa_cambio_origen' => $tasa_cambio_origen, 'tasa_cambio_destino' => $tasa_cambio_destino];
+    }
+
+    public static function updateMonedaCarrito(EntityManagerInterface $em, int $id_moneda_destino, string $empleado)
+    {
+
+        $carrito = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
+        if (!empty($carrito)) {
+            $tasa_cambios = self::getTasaCambio($em, intval($carrito[0]->getJson()['id_moneda']), $id_moneda_destino);
+            if (!empty($tasa_cambios)) {
+                $tasa_cambio_origen = $tasa_cambios['tasa_cambio_origen'];
+                $tasa_cambio_destino = $tasa_cambios['tasa_cambio_destino'];
+                foreach ($carrito as $item) {
+                    $json = $item->getJson();
+                    $new_data = [];
+                    $data_solicitudes = $json['data'];
+                    foreach ($data_solicitudes as $element) {
+                        switch ($json['id_servicio']) {
+                            case self::IDENTIFICADOR_REMESA:
+                                $new_data[] = [
+                                    'actualizar' => $element['actualizar'],
+                                    'id_banaficiario_' => $element['id_banaficiario_'],
+                                    'nombre_' => $element['nombre_'],
+                                    'id_pais_' => $element['id_pais_'],
+                                    'id_moneda_' => $element['id_moneda_'],
+                                    'id_provincia_' => $element['id_provincia_'],
+                                    'id_municipio_' => $element['id_municipio_'],
+                                    'primer_apellido_' => $element['primer_apellido_'],
+                                    'segundo_apellido_' => $element['segundo_apellido_'],
+                                    'nombre_alternativo_' => $element['nombre_alternativo_'],
+                                    'primer_apellido_alternativo_' => $element['primer_apellido_alternativo_'],
+                                    'segundo_apellido_alternativo_' => $element['segundo_apellido_alternativo_'],
+                                    'primer_telefono_' => $element['primer_telefono_'],
+                                    'segundo_telefono_' => $element['segundo_telefono_'],
+                                    'identificacion_' => $element['identificacion_'],
+                                    'calle_' => $element['calle_'],
+                                    'entre_' => $element['entre_'],
+                                    'y_' => $element['y_'],
+                                    'nro_casa_' => $element['nro_casa_'],
+                                    'edificio_' => $element['edificio_'],
+                                    'apto_' => $element['apto_'],
+                                    'reparto_' => $element['reparto_'],
+                                    'monto_entregar_' => floatval($element['monto_entregar_'])*$tasa_cambio_origen * $tasa_cambio_destino,
+                                    'monto_recibir_' => $element['monto_recibir_'],
+                                    'id_moneda_select_' => $id_moneda_destino,
+                                    'nombre_moneda_recibir' => $element['nombre_moneda_recibir'],
+                                    'id_regla' => $element['id_regla'],
+                                    'idCarrito' => $element['idCarrito'],
+                                    'nombreMostrar' => $element['nombreMostrar'],
+                                    'montoMostrar' => floatval($element['montoMostrar'])*$tasa_cambio_origen * $tasa_cambio_destino
+                                ];
+                                break;
+                            case self::IDENTIFICADOR_VISADO:
+                                $new_data = ['a' => 2];
+                                break;
+                            case self::IDENTIFICADOR_TRANSFER:
+                                $new_data = ['a' => 1];
+                                break;
+                        }
+                    }
+                    $update_json = array(
+                        'id_empleado' => $json['id_empleado'],
+                        'id_cliente' => $json['id_cliente'],
+                        'id_servicio' => $json['id_servicio'],
+                        'nombre_servicio' => $json['nombre_servicio'],
+                        'precio_servicio' => floatval($json['precio_servicio']) * $tasa_cambio_origen * $tasa_cambio_destino,
+                        'id_moneda' => $id_moneda_destino,
+                        'total' => floatval($json['total']) * $tasa_cambio_origen * $tasa_cambio_destino,
+                        'data' => $new_data,
+                    );
+                    $item->setJson($update_json);
+                    $em->persist($item);
+                }
+                $em->flush();
+            }
+        }
+    }
+
 }

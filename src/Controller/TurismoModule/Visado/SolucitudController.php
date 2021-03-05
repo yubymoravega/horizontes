@@ -71,7 +71,7 @@ class SolucitudController extends AbstractController
     {
         $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_VISADO;
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
-
+        $moneda = $request->request->get('moneda');
         /** @var UserClientTmp $obj_trabajo_tmp */
         $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
             'id_usuario' => $this->getUser()
@@ -113,10 +113,10 @@ class SolucitudController extends AbstractController
             'id_servicio' => $id_servicio,
             'nombre_servicio' => $em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
             'precio_servicio' => $precio_total,
+            'id_moneda' => $moneda,
             'total' => $precio_total * count($data_solicitudes),
             'data' => $data_solicitudes,
         );
-
 
         if (!empty($data_solicitudes_existente)) {
             $new_element_carrito = $em->getRepository(Carrito::class)->find(AuxFunctionsTurismo::getIdCarritoServicio($em, $empleado, $id_servicio));
@@ -125,7 +125,7 @@ class SolucitudController extends AbstractController
         }
         $new_element_carrito
             ->setEmpleado($empleado)
-            ->setJson(json_encode($json));
+            ->setJson($json);
 
         $em->persist($new_element_carrito);
         $em->flush();
@@ -154,20 +154,20 @@ class SolucitudController extends AbstractController
 
         $total_servicio = 0;
         foreach ($data_solicitudes_existente as $key => $item) {
-            if ($id != $item->idCarrito) {
+            if ($id != $item['idCarrito']) {
                 $array_result[] = $data_solicitudes_existente[$key];
 //                $array_result[count($array_result)-1]->idCarito=count($array_result)-1;
-                $total_servicio += floatval($item->montoMostrar);
+                $total_servicio += floatval($item['montoMostrar']);
             }
         }
         foreach ($array_result as $key=>$elemt){
-            $array_result[$key]->idCarrito = $key;
+            $array_result[$key]['idCarrito'] = $key;
         }
 
         $id_carrito = AuxFunctionsTurismo::getIdCarritoServicio($em, $empleado, $id_servicio);
         $obj_carrito = $em->getRepository(Carrito::class)->find($id_carrito);
-        $json = json_decode($obj_carrito->getJson());
-        $precio_servicio = floatval($json->precio_servicio);
+        $json = $obj_carrito->getJson();
+        $precio_servicio = floatval($json['precio_servicio']);
 
         $json_updated = array(
             'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),
@@ -180,7 +180,7 @@ class SolucitudController extends AbstractController
         );
 
         if(!empty($array_result)){
-            $obj_carrito->setJson(json_encode($json_updated));
+            $obj_carrito->setJson($json_updated);
             $em->persist($obj_carrito);
         }
         else{

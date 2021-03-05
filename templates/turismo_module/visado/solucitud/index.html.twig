@@ -243,10 +243,12 @@
             event.preventDefault()
             if (lista_mercancias.length) {
                 const listado = JSON.stringify(lista_mercancias)
+                const moneda = $('#currency').val()
                 $('body').append(`
                     <form action='/turismo/gestion-consular/solucitud/add-carrito'
                          method="post" id='form_add_carrito'>
                         <input type='hidden' name='solicitudes' value='${listado}'/>
+                        <input type='hidden' name='moneda' value='${moneda}'/>
                     </form>`)
                 const fomrulario = $('#form_add_carrito')
                 fomrulario.submit()

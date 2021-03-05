@@ -159,14 +159,23 @@ class SolicitudController extends AbstractController
             $monto_usd = $tasa_cambio->getValor() * $cantidad;
 
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
-        $costo_venta = AuxFunctionsTurismo::getDataRemesaPagar($em, $id_pais, $monto_usd, $unidad);
+        $data = AuxFunctionsTurismo::getDataRemesaPagar($em, $id_pais, $monto_usd, $unidad);
+        $costo_venta=!empty($data)?floatval($data['costo']):0;
+        $id_regla = !empty($data)?floatval($data['id_regla']):'';
+
+        if ($costo_venta == 0)
+            return new JsonResponse([
+                'success' => true,
+                'a_pagar' => round($costo_venta, 2)
+            ]);
 
         $precio_venta = floatval($costo_venta);
 
         if ($id_moneda_select == $moneda_usd->getId())
             return new JsonResponse([
                 'success' => true,
-                'a_pagar' => round($precio_venta, 2)
+                'a_pagar' => round($precio_venta, 2),
+                'id_regla'=>$id_regla
             ]);
 
         $tasa_cambio = $tasa_cambio_er->findOneBy([
@@ -180,7 +189,8 @@ class SolicitudController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'a_pagar' => round($monto_moneda_select, 2)
+            'a_pagar' => round($monto_moneda_select, 2),
+            'id_regla'=>$id_regla
         ]);
     }
 
@@ -213,8 +223,11 @@ class SolicitudController extends AbstractController
 
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
 
-        $costo_venta = AuxFunctionsTurismo::getDataRemesaRecibir($em, $id_pais, $monto_usd, $unidad);
-//        dd($costo_venta);
+        $data = AuxFunctionsTurismo::getDataRemesaRecibir($em, $id_pais, $monto_usd, $unidad);
+        $costo_venta=!empty($data)?floatval($data['costo']):0;
+        $id_regla = !empty($data)?floatval($data['id_regla']):'';
+
+
         if ($costo_venta == 0)
             return new JsonResponse([
                 'success' => true,
@@ -225,7 +238,8 @@ class SolicitudController extends AbstractController
         if ($moneda_pais->getIdMoneda() == $moneda_usd->getId())
             return new JsonResponse([
                 'success' => true,
-                'a_recibir' => round($precio_venta, 2)
+                'a_recibir' => round($precio_venta, 2),
+                'id_regla'=>$id_regla
             ]);
 
         $tasa_cambio = $tasa_cambio_er->findOneBy([
@@ -239,7 +253,8 @@ class SolicitudController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'a_recibir' => round($monto_moneda_select, 2)
+            'a_recibir' => round($monto_moneda_select, 2),
+            'id_regla'=>$id_regla
         ]);
     }
 
@@ -355,6 +370,7 @@ class SolicitudController extends AbstractController
     {
         $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_REMESA;
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $moneda = $request->request->get('moneda');
 
         /** @var UserClientTmp $obj_trabajo_tmp */
         $obj_trabajo_tmp = $em->getRepository(UserClientTmp::class)->findOneBy([
@@ -365,14 +381,13 @@ class SolicitudController extends AbstractController
 
         $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
             'id_unidad' => $unidad,
-            'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_REMESA
+            'identificador_servicio' => $id_servicio
         ]);
 
         $data_new_solicitudes = json_decode($request->request->get('solicitudes'), true);
         $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);
 
         $data_solicitudes = array_merge($data_new_solicitudes, $data_solicitudes_existente);
-
         $precio_total = 0;
         foreach ($data_solicitudes as $key=>$item){
             if(gettype($data_solicitudes[$key])=='array'){
@@ -394,6 +409,7 @@ class SolicitudController extends AbstractController
             'id_empleado' => $obj_trabajo_tmp->getIdUsuario()->getId(),
             'id_cliente' => $obj_trabajo_tmp->getIdCliente()->getId(),
             'id_servicio' => $id_servicio,
+            'id_moneda' => $moneda,
             'nombre_servicio' => $em->getRepository(Servicios::class)->find($id_servicio)->getNombre(),
             'precio_servicio' => $precio_total,
             'total' => $precio_total,
@@ -408,7 +424,7 @@ class SolicitudController extends AbstractController
         }
         $new_element_carrito
             ->setEmpleado($empleado)
-            ->setJson(json_encode($json));
+            ->setJson($json);
 
         $em->persist($new_element_carrito);
         $em->flush();

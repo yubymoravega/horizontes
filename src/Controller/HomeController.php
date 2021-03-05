@@ -126,14 +126,16 @@ class HomeController extends AbstractController
 
         while($contador < $con){
             /** @var Servicios $element_servicio */
-            $decode = json_decode($data[$contador]->getJson());
-            $element_servicio = $servicio_er->find($decode->id_servicio);
+            $decode = $data[$contador]->getJson();
+//            if($contador == 1)
+//                dd($data[$contador]->getJson());
+            $element_servicio = $servicio_er->find($decode['id_servicio']);
                 $json[$contador] = array(
-                    'servicio'=>$decode->id_servicio,
+                    'servicio'=>$decode['id_servicio'],
                     'id' => $data[$contador]->getId(),
                     'json' => $data[$contador]->getJson(),
                     'moneda' => 'USD',
-                    'total' => number_format($decode->total, 2,),
+                    'total' => number_format($decode['total'], 2,),
                     'servicio_nombre'=>$element_servicio?$element_servicio->getNombre():'-sin definir servicio-'
                 );
             $contador++;
@@ -375,7 +377,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/home/moneda/select/{code}", name="home/moneda/select/")
      */
-    public function monedaMenuSelect($code, Request $request)
+    public function monedaMenuSelect($code, Request $request,EntityManagerInterface $em)
     {
         $dataBase = $this->getDoctrine()->getManager();
 
@@ -386,6 +388,9 @@ class HomeController extends AbstractController
             $data = $dataBase->getRepository(User::class)->find($user->getId());
 
             $data->setIdMoneda($code);
+
+            /**--ACTUALIZAR PRODUCTOS DEL CARRITO PARA CONVERTIRLOS POR LA TASA DE CAMBIO CORRESPONDIENTE--**/
+            AuxFunctionsTurismo::updateMonedaCarrito($em,$code,$user->getUsername());
 
             $dataBase->flush($data);
 

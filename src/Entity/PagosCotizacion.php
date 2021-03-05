@@ -28,7 +28,7 @@ class PagosCotizacion
     private $idEmpleado;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="float")
      */
     private $monto;
 
@@ -121,12 +121,12 @@ class PagosCotizacion
         return $this;
     }
 
-    public function getMonto(): ?int
+    public function getMonto(): ?float
     {
         return $this->monto;
     }
 
-    public function setMonto(int $monto): self
+    public function setMonto(float $monto): self
     {
         $this->monto = $monto;
 
