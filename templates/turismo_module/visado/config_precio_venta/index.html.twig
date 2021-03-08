@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Turismo | Gestión Consular{% endblock %}
+
+{% block content %}
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <h2 class="text-reporte text-center mr-0 text-white mt-2" id="normal_div">
+                    Configuración del Precio de Venta del Servicio
+                </h2>
+            </div>
+
+            <div class="card-body">
+                {{ form_start(formulario, {'attr':{'id':'form_precioVenta','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                        <label for="costo_servicio">Costo del servicio</label>
+                        <input type="text" disabled name="costo_servicio" id="costo_servicio"
+                               value="{{ costo_servicio_text }}" class="w-100 form-control">
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.prociento) }}
+                        {{ form_widget(formulario.prociento) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.valor_fijo) }}
+                        {{ form_widget(formulario.valor_fijo) }}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Creditos de la venta del Servicio</h3>
+                    <div class="px-2" style="background: dimgray; border-radius: .3rem;">
+                        <span class="pr-1">Precio de Venta Total : </span>
+                        <span id="importe-total">{{ precio_venta_total }}</span>
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+                <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
+                    <div class="col-7 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.credito.identificador_servicio) }}
+                        {{ form_widget(formulario.credito.identificador_servicio) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.credito.importe) }}
+                        {{ form_widget(formulario.credito.importe) }}
+                    </div>
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarCredito">ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                {{ form_end(formulario) }}
+            </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th width="120px" class="text-left">Servicio</th>
+                    <th width="120px" class="text-right">Importe</th>
+                    <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+                    </thead>
+                    <tbody id="rows_creditos">
+                    <script>
+                        let list_servicios = []
+                    </script>
+                    {% if creditos %}
+                        {% for item in creditos %}
+                            <script>
+                                list_servicios.push([{{ item.importe }},{{ item.servicio }}])
+                            </script>
+                            <tr>
+                                <td style="font-weight:400;">{{ item.servicio_nombre }}</td>
+                                <td style="font-weight:400;" class="text-right">{{ item.importe_text }}</td>
+                                <td hidden style="font-weight:400;" class="text-center">{{ item.importe }}</td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar"
+                                            servicio="{{ item.servicio }}">
+                                        <i class="fa fa-minus-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a href="{{ url('turismo_module_configuracion') }}"
+                       class="btn btn-outline-secondary">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitInforme">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        let list_servicios_creditos = []
+        const form = $('#form_precioVenta')
+
+        $('#btnSubbmitInforme').on('click', function (event) {
+            event.preventDefault()
+            // if (list_servicios_creditos.length) {
+            const listado = JSON.stringify(list_servicios_creditos)
+            form.append(`<input type="text" hidden name="mercancias" value='${listado}' />`)
+            form.attr('method', `POST`)
+            form.attr('action', `/configuracion-turismo/gestion-consular/config-precio-venta/save`)
+            // loadingModal.show()
+            form.submit()
+            // } else
+            //     alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+        })
+
+        $('#btnAplicarCredito').on('click', function () {
+            if ($('#config_precio_venta_servicio_credito_importe').val() != '' &&
+                $('#config_precio_venta_servicio_credito_identificador_servicio option:selected').text() != '') {
+                let importe = $('#config_precio_venta_servicio_credito_importe').val()
+                let servicio = $('#config_precio_venta_servicio_credito_identificador_servicio').val()
+                let nombre_servicio = $('#config_precio_venta_servicio_credito_identificador_servicio option:selected').text()
+                //validar que el servicio no se repita
+                if (list_servicios_creditos.some(e => e.servicio === servicio)) {
+                    alertTemplate('El servicio : <b>' + nombre_servicio + '</b> ya esta configurado.', 'danger')
+                } else {
+                    list_servicios_creditos.push({servicio, importe})
+                    $('#rows_creditos').append(`<tr>
+                    <td style="font-weight:400;"> ${nombre_servicio}</td>
+                    <td style="font-weight:400;" class="text-right"> ${importe}</td>
+                    <td class="text-center"> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" servicio="${servicio}">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                    </td></tr>`
+                    );
+                    $('#config_precio_venta_servicio_credito_importe').val('')
+                    $('#config_precio_venta_servicio_credito_identificador_servicio').val(0)
+                    incrementarPrecioVenta()
+                }
+            } else {
+                alertTemplate('Debe llenar los datos del formulario.', 'danger')
+            }
+        })
+
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            const servicio_eliminado = list_servicios_creditos.filter(e => e.servicio === $(this).attr('servicio'))
+            console.info(servicio_eliminado)
+            let valor = parseFloat($("#importe-total").text()) - parseFloat(servicio_eliminado[0].importe)
+            $("#importe-total").text(valor.toFixed(2))
+            list_servicios_creditos = list_servicios_creditos.filter(e => e.servicio !== $(this).attr('servicio'))
+            $(this).closest('tr').remove()
+        })
+
+        $(document).ready(function () {
+            $('#config_precio_venta_servicio_prociento').prop('type', 'number')
+            $('#config_precio_venta_servicio_prociento').val( {{ prociento }})
+            $('#config_precio_venta_servicio_valor_fijo').prop('type', 'number')
+            $('#config_precio_venta_servicio_valor_fijo').val( {{ valor_fijo }})
+            $('#config_precio_venta_servicio_credito_importe').prop('type', 'number')
+            if (list_servicios.length > 0)
+                for (let i = 0; i < list_servicios.length; i++) {
+                    console.info(list_servicios[i])
+                    let servicio_tmp = ""+list_servicios[i][1]+""
+                    let importe_tmp = ""+list_servicios[i][0]+""
+                    list_servicios_creditos.push({'servicio':servicio_tmp, 'importe': importe_tmp})
+                }
+                console.info(list_servicios_creditos)
+        })
+        $('#config_precio_venta_servicio_prociento').on('keyup', function () {
+            $('#config_precio_venta_servicio_valor_fijo').val('')
+            incrementarPrecioVenta()
+        })
+        $('#config_precio_venta_servicio_valor_fijo').on('keyup', function () {
+            $('#config_precio_venta_servicio_prociento').val('')
+            incrementarPrecioVenta()
+        })
+
+        function incrementarPrecioVenta() {
+            let costo = {{ costo_servicio_value }}
+                let
+            porciento = $('#config_precio_venta_servicio_prociento').val()
+            let valor_fijo = $('#config_precio_venta_servicio_valor_fijo').val()
+            let precio_venta = 0
+            if (porciento > 0)
+                precio_venta = costo + ((costo * porciento) / 100)
+            else if (valor_fijo > 0)
+                precio_venta = costo + parseFloat(valor_fijo)
+            else
+                precio_venta = costo
+            if (list_servicios_creditos.length > 0)
+                for (let i = 0; i < list_servicios_creditos.length; i++) {
+                    precio_venta = precio_venta + parseFloat(list_servicios_creditos[i]['importe'])
+                }
+            $('#importe-total').text(precio_venta.toFixed(2))
+        }
+    </script>
+{% endblock %}

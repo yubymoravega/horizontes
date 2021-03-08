@@ -642,3 +642,7 @@ svg.iconCarritoDelete{
     color: white;
     font-weight: 100;
 }
+
+.bi {
+    cursor: pointer !important;
+}

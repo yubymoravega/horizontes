@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\ActivoFijo;
 
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Repository\Contabilidad\ActivoFijo\DespreciacionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,12 +19,6 @@ class Depreciacion
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ActivoFijo::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $id_activo_fijo;
-
-    /**
      * @ORM\Column(type="date")
      */
     private $fecha;
@@ -34,30 +29,24 @@ class Depreciacion
     private $anno;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
-    private $mes;
+    private $fundamentacion;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $unidad;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $importe_depreciacion;
+    private $total;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIdActivoFijo(): ?ActivoFijo
-    {
-        return $this->id_activo_fijo;
-    }
-
-    public function setIdActivoFijo(?ActivoFijo $id_activo_fijo): self
-    {
-        $this->id_activo_fijo = $id_activo_fijo;
-
-        return $this;
     }
 
     public function getFecha(): ?\DateTimeInterface
@@ -68,18 +57,6 @@ class Depreciacion
     public function setFecha(\DateTimeInterface $fecha): self
     {
         $this->fecha = $fecha;
-
-        return $this;
-    }
-
-    public function getImporteDepreciacion(): ?float
-    {
-        return $this->importe_depreciacion;
-    }
-
-    public function setImporteDepreciacion(float $importe_depreciacion): self
-    {
-        $this->importe_depreciacion = $importe_depreciacion;
 
         return $this;
     }
@@ -96,16 +73,39 @@ class Depreciacion
         return $this;
     }
 
-    public function getMes(): ?int
+    public function getFundamentacion(): ?string
     {
-        return $this->mes;
+        return $this->fundamentacion;
     }
 
-    public function setMes(int $mes): self
+    public function setFundamentacion(string $fundamentacion): self
     {
-        $this->mes = $mes;
+        $this->fundamentacion = $fundamentacion;
 
         return $this;
     }
 
+    public function getUnidad(): ?Unidad
+    {
+        return $this->unidad;
+    }
+
+    public function setUnidad(?Unidad $unidad): self
+    {
+        $this->unidad = $unidad;
+
+        return $this;
+    }
+
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    public function setTotal(float $total): self
+    {
+        $this->total = $total;
+
+        return $this;
+    }
 }

@@ -53,7 +53,7 @@ class ActivoFijoCuentas
     private $id_area_responsabilidad_activo;
 
     /**
-     * @ORM\ManyToOne(targetEntity=\App\Entity\COntabilidad\Config\Cuenta::class)
+     * @ORM\ManyToOne(targetEntity=\App\Entity\Contabilidad\Config\Cuenta::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_cuenta_depreciacion;
@@ -87,6 +87,16 @@ class ActivoFijoCuentas
      * @ORM\JoinColumn(nullable=false)
      */
     private $id_elemento_gasto_gasto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Cuenta::class)
+     */
+    private $id_cuenta_acreedora;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Subcuenta::class)
+     */
+    private $id_subcuenta_acreedora;
 
     public function getId(): ?int
     {
@@ -153,12 +163,12 @@ class ActivoFijoCuentas
         return $this;
     }
 
-    public function getIdCuentaDepreciacion(): ?\App\Entity\COntabilidad\Config\Cuenta
+    public function getIdCuentaDepreciacion(): ?\App\Entity\Contabilidad\Config\Cuenta
     {
         return $this->id_cuenta_depreciacion;
     }
 
-    public function setIdCuentaDepreciacion(?\App\Entity\COntabilidad\Config\Cuenta $id_cuenta_depreciacion): self
+    public function setIdCuentaDepreciacion(?\App\Entity\Contabilidad\Config\Cuenta $id_cuenta_depreciacion): self
     {
         $this->id_cuenta_depreciacion = $id_cuenta_depreciacion;
 
@@ -221,6 +231,30 @@ class ActivoFijoCuentas
     public function setIdElementoGastoGasto(?ElementoGasto $id_elemento_gasto_gasto): self
     {
         $this->id_elemento_gasto_gasto = $id_elemento_gasto_gasto;
+
+        return $this;
+    }
+
+    public function getIdCuentaAcreedora(): ?Cuenta
+    {
+        return $this->id_cuenta_acreedora;
+    }
+
+    public function setIdCuentaAcreedora(?Cuenta $id_cuenta_acreedora): self
+    {
+        $this->id_cuenta_acreedora = $id_cuenta_acreedora;
+
+        return $this;
+    }
+
+    public function getIdSubcuentaAcreedora(): ?Subcuenta
+    {
+        return $this->id_subcuenta_acreedora;
+    }
+
+    public function setIdSubcuentaAcreedora(?Subcuenta $id_subcuenta_acreedora): self
+    {
+        $this->id_subcuenta_acreedora = $id_subcuenta_acreedora;
 
         return $this;
     }

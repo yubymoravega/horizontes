@@ -1,0 +1,178 @@
+{% extends 'turismo_module/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de Monedas por Paises
+            </h4>
+        </div>
+        {# end header #}
+
+        {{ include('remesas_module/configuracion/monedas_pais/form_monedas_modal.html.twig', {title: 'Asociar Monedas'}) }}
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-2" class="text-left">Nombre de la Moneda</th>
+            <th scope="col-1" width="200x" class="text-center">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in paises %}
+                <tr class="row-group-conta">
+                    <td style="font-weight:400;" class="font-weight-bold">{{ item.nombre }}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Asociar Monedas"
+                                onclick="onCuentas({
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% for element in item.monedas %}
+                    <tr>
+                        <td style="font-weight:400;" colspan="2">{{ element.nombre }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('select').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+
+        let list_monedas_pais = []
+        let id_pais = null;
+
+
+        const onCuentas = function (config) {
+            const {id = ''} = config
+            $('#rows_monedas').find('tr').remove();
+            $('#modal__form__cuentas__id').modal('show')
+            $('#modal__form__cuentas__label__id').text("Monedas del país")
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/remesas/monedas-pais/getMonedas/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success == true) {
+                        id_pais = id;
+                        list_monedas_pais = []
+                        list_monedas_pais = result.data
+                        for (var i = 0; i < list_monedas_pais.length; i++) {
+                            $('#rows_monedas').append(`<tr>
+                                    <td style="font-weight:400;"> ${list_monedas_pais[i]['nombre_moneda']} </td>
+                                    <td style="font-weight:400;" hidden> ${list_monedas_pais[i]['moneda']}</td>
+                                    <td style="font-weight:400;" hidden> ${list_monedas_pais[i]['id_moneda_pais']}</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-outline-danger btn-sm borrar"
+                                        title="Eliminar" id-moneda-pais="${list_monedas_pais[i]['moneda']}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button></td>
+                                   </tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    }
+                    if (result.success == false) {
+                        loadingModal.close()
+                        alertTemplate(result.msg, 'danger')
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        }
+
+        $('#btnAplicar').on('click', function () {
+            if ($('#form_modal_target_cuentas').valid()) {
+                let moneda = $('#monedas_pais_id_moneda').val()
+                let nombre_moneda = $('#monedas_pais_id_moneda option:selected').text()
+                if (list_monedas_pais.some(e => e.moneda === moneda)) {
+                    alertTemplate('La moneda seleccionada ya se encuentra en el listado.', 'danger')
+                } else {
+                    list_monedas_pais.push({moneda})
+                    $('#rows_monedas').append(`<tr>
+                    <td style="font-weight:400;"> ${nombre_moneda}</td>
+                    <td style="font-weight:400;" hidden> ${moneda}</td>
+                    <td class="text-center"> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-moneda-pais="${moneda}">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                    </td></tr>`
+                    );
+                    $('#monedas_pais_id_moneda').val(0)
+                }
+            }
+        })
+
+
+        $('#modal__btn__cuenta__aceptar').on('click', function () {
+            if (list_monedas_pais.length > 0) {
+                loadingModal.show()
+                const list_send = JSON.stringify(list_monedas_pais)
+                $('body').append(`
+                    <form action='/configuracion-turismo/remesas/monedas-pais/updateMonedasPais'
+                         method="post" id='form_print_current'>
+                        <input type='text' hidden name='id_pais' value='${id_pais}'/>
+                        <input type='text' hidden name='lista' value='${list_send}'/>
+                    </form>`)
+
+                const fomrulario = $('#form_print_current')
+                fomrulario.submit()
+                fomrulario.remove()
+            } else {
+                alertTemplate('Debe introducir al menos una moneda', 'danger')
+            }
+        })
+
+        $(document).ready(function () {
+            $('#modal__btn__actualizar').hide()
+            // validacion del formulario
+            var validateForm = $('#form_modal_target_cuentas').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'monedas_pais[id_moneda]': "required",
+                },
+                messages: {
+                    'monedas_pais[id_moneda]': 'Obligratorio',
+                }
+            })
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                list_monedas_pais = list_monedas_pais.filter(e => e.moneda !== $(this).attr('id-moneda-pais'))
+                $(this).closest('tr').remove()
+            })
+        })
+    </script>
+{% endblock %}

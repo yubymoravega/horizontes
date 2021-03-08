@@ -1,0 +1,269 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Turismo | Gestión Consular{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="ModalConfirm" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="ModalConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="confirm_title">!Notificación</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="confirm_body">
+                    <p id="parragraph"></p>
+                </div>
+                <div class="modal-footer">
+                    <button name="btn_generar" class="btn btn-outline-secondary text-uppercase mt-2 font-weight-bold"
+                            id="btn_solicitar">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <h2 class="text-reporte text-center mr-0 text-white mt-2" id="normal_div">
+                    Solicitud de Paquete Turístico Básico
+                </h2>
+            </div>
+            {#      CAMPOS OCULTOS PARA OBTENER LOS VALORES      #}
+            <input type="hidden" id="nombre" value="{{ nombre }}">
+            <input type="hidden" id="apellidos" value="{{ apellidos }}">
+            <input type="hidden" id="telefono" value="{{ telefono }}">
+            <input type="hidden" id="id" value="{{ id_cliente }}">
+
+            <div class="card-body">
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Datos de los beneficiarios</h3>
+                    <div class="px-2" id="div_cliente_origen"
+                         style="background: dimgray; border-radius: .3rem; vertical-align: auto">
+                        <label for="owner_client">Cliente origen</label>
+                        <input type="checkbox" name="owner_client" id="owner_client" style="margin-left: 20px">
+
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+
+                {{ form_start(formulario, {'attr':{'id':'form_solicitud','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
+                    <div class="col-4 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.nombre) }}
+                        {{ form_widget(formulario.nombre) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.primer_apellido) }}
+                        {{ form_widget(formulario.primer_apellido) }}
+                    </div>
+                    <div class="col-4 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.segundo_apellido) }}
+                        {{ form_widget(formulario.segundo_apellido) }}
+                    </div>
+                </div>
+                <div class="row mt-0 p-0" id="cuenta_subcuenta_select">
+                    <div class="col-5 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.telefono_celular) }}
+                        {{ form_widget(formulario.telefono_celular) }}
+                    </div>
+                    <div class="col-5 mt-0 form-group input-group input-group-sm d-block p-0">
+                        {{ form_label(formulario.telefono_fijo) }}
+                        {{ form_widget(formulario.telefono_fijo) }}
+                    </div>
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                {{ form_end(formulario) }}
+            </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th width="120px" class="text-left">Nombre</th>
+                    <th width="120px" class="text-left">Primer Apellido</th>
+                    <th width="130px" class="text-left">Segundo Apellido</th>
+                    <th width="120px" class="text-left">Teléfono fijo</th>
+                    <th width="120px" class="text-left">Teléfono celular</th>
+                    <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
+                    </thead>
+                    <tbody id="rows_solicitudes">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a class="btn btn-outline-secondary" id="salir">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmitInforme" data-toggle="modal"
+                            data-target="#ModalConfirm" data-placement="bottom">Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        let lista_mercancias = []
+        let importe_total = 0
+        const form_solicitud = $('#form_solicitud')
+        const listado_solicitantes = $('#rows_solicitudes')
+
+        function resetFormSolicitud() {
+            $('#solicitud_nombre').val('')
+            $('#solicitud_primer_apellido').val('')
+            $('#solicitud_segundo_apellido').val('')
+            $('#solicitud_telefono_celular').val('')
+            $('#solicitud_telefono_fijo').val('')
+            $('#owner_client').prop('checked', false)
+            $('#solicitud_nombre').prop('disabled', false)
+            $('#solicitud_primer_apellido').prop('disabled', false)
+            $('#solicitud_segundo_apellido').prop('disabled', false)
+            $('#solicitud_telefono_celular').prop('disabled', false)
+            $('#solicitud_telefono_fijo').prop('disabled', false)
+        }
+
+        $('#salir').on('click', function () {
+            window.location.href = "/categorias/turismo/" +{{ telefono }};
+        })
+        $('#owner_client').on('change', function () {
+            if ($(this).is(':checked')) {
+                let nombre = $('#nombre').val()
+                let apellidos = $('#apellidos').val().split(' ');
+                let primer_apellido = apellidos[0]
+                let segundo_apellido = apellidos[1]
+                $('#solicitud_nombre').val(nombre)
+                $('#solicitud_primer_apellido').val(primer_apellido)
+                $('#solicitud_segundo_apellido').val(segundo_apellido)
+                $('#solicitud_telefono_celular').val($('#telefono').val())
+                $('#solicitud_telefono_fijo').val('')
+
+                $('#solicitud_nombre').prop('disabled', true)
+                $('#solicitud_primer_apellido').prop('disabled', true)
+                $('#solicitud_segundo_apellido').prop('disabled', true)
+                $('#solicitud_telefono_celular').prop('disabled', true)
+                $('#solicitud_telefono_fijo').prop('disabled', true)
+            } else {
+                resetFormSolicitud()
+            }
+        })
+
+        form_solicitud.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                // colocar mensajes de error a la derecha de cada label para el componente
+                const error_label = element.closest("form").find(element.attr('id') + "-error")
+                if (error_label.length) {
+                    error_label.removeClass('hide')
+                } else {
+                    error.addClass('ml-3')
+                    error.css('position', 'fixed')
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+                }
+            },
+            rules: {
+                'solicitud[nombre]': "required",
+                'solicitud[primer_apellido]': "required",
+                'solicitud[segundo_apellido]': "required",
+            },
+            messages: {
+                'solicitud[nombre]': '!Obligatorio',
+                'solicitud[primer_apellido]': '!Obligatorio',
+                'solicitud[segundo_apellido]': '!Obligatorio',
+            }
+        })
+
+
+        $('#btnAplicarMercancia').on('click', function () {
+            if (form_solicitud.valid()) {
+                const nombre = $('#solicitud_nombre').val()
+                const primer_apellido = $('#solicitud_primer_apellido').val()
+                const segundo_apellido = $('#solicitud_segundo_apellido').val()
+                const telefono_celular = $('#solicitud_telefono_celular').val()
+                const telefono_fijo = $('#solicitud_telefono_fijo').val()
+                $('#div_cliente_origen').css('display', 'none')
+                if (telefono_celular != '' || telefono_fijo != '') {
+                    let repetido = false
+                    for (let i = 0; i < lista_mercancias.length; i++) {
+                        if (lista_mercancias[i]['nombre'] == nombre && lista_mercancias[i]['primer_apellido'] == primer_apellido && lista_mercancias[i]['segundo_apellido'] == segundo_apellido)
+                            repetido = true
+                    }
+                    if (!repetido) {
+                        lista_mercancias.push({
+                            nombre,
+                            primer_apellido,
+                            segundo_apellido,
+                            telefono_celular,
+                            telefono_fijo
+                        })
+                        listado_solicitantes.append(`<tr>
+                        <td class="text-left"> ${nombre}</td>
+                        <td class="text-left"> ${primer_apellido} </td>
+                        <td class="text-left"> ${segundo_apellido} </td>
+                        <td class="text-left"> ${telefono_celular} </td>
+                        <td class="text-left"> ${telefono_fijo}</td>
+                        <td style="width: 45px;" class="text-center"> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" nombre-solicitante="${nombre}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td
+                        ></tr>`
+                        );
+                        resetFormSolicitud()
+
+                    } else {
+                        alertTemplate('El beneficiario ya está incluido en el listado', 'danger')
+                    }
+                } else {
+                    alertTemplate('Debe introducir al menos un número de teléfono como contacto del solicitante', 'danger')
+                }
+
+            }
+        })
+        $('#btnSubbmitInforme').on('click', function (event) {
+            let precio_total = {{ precio_total }}
+                let
+            cantidad_personas = lista_mercancias.length
+            let total_solicitud = parseFloat(precio_total) * parseFloat(cantidad_personas)
+            $('#parragraph').text('Usted ha configurado un total de ' + cantidad_personas + ' personas, el precio por solicitud es de ' + precio_total.toFixed(2) + ', por lo que el monto total de la solicitud asciende a ' + total_solicitud.toFixed(2) + '. Está seguro que desea continuar?.')
+        })
+
+        $('#btn_solicitar').on('click', function (event) {
+            event.preventDefault()
+            if (lista_mercancias.length) {
+                const listado = JSON.stringify(lista_mercancias)
+                const moneda = $('#currency').val()
+                $('body').append(`
+                    <form action='/turismo/gestion-consular/solucitud/add-carrito'
+                         method="post" id='form_add_carrito'>
+                        <input type='hidden' name='solicitudes' value='${listado}'/>
+                        <input type='hidden' name='moneda' value='${moneda}'/>
+                    </form>`)
+                const fomrulario = $('#form_add_carrito')
+                fomrulario.submit()
+                fomrulario.remove()
+            } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+
+        })
+
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            lista_mercancias = lista_mercancias.filter(e => e.nombre !== $(this).attr('nombre-solicitante'))
+            $(this).closest('tr').remove()
+            if (lista_mercancias.length == 0)
+                $('#div_cliente_origen').css('display', 'block')
+        })
+
+    </script>
+{% endblock %}

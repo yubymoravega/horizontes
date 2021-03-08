@@ -1,0 +1,184 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Nómina {% endblock %}
+{% block body %}
+    <div>
+        {% for item in datos %}
+            <div style="page-break-before: always;"></div>
+            <table border="1px pa-5" width="800px" class="mt-3">
+                <tr>
+                    <td class="text-left font-weight-bold">{{ unidad }}</td>
+                    <td class="text-right font-weight-bold">RNC-{{ unidad_codigo }}</td>
+                </tr>
+                <tr class="p-3 m-3">
+                    <td colspan="2" class="p-3 m-3 text-center font-weight-bold">Recibo de pago nómina
+                        {% if quincena == 3 %}Pago Extraordinario {% elseif quincena == 2 %}2da Quincena {% else %}1ra Quincena{% endif %}
+                        {{ mes }} {{ anno }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Nombre:</strong> {{ item.empleado }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Salario mensual:</strong> {{ item.sueldo_mes }}</td>
+                </tr>
+                <tr>
+                    <td class="bg-gray font-weight-bold text-uppercase text-left ml-3">Concepto</td>
+                    <td class="bg-gray font-weight-bold text-uppercase text-right mr-3">Total</td>
+                </tr>
+                <tr>
+                    <td>Salario Quincena</td>
+                    <td class="text-right">{{ item.sueldo_bruto }}</td>
+                </tr>
+                {% if item.comision != '0.00' %}
+                    <tr>
+                        <td>Comisiones</td>
+                        <td class="text-right">{{ item.comision }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if item.vacaciones != '0.00' %}
+                    <tr>
+                        <td>Vacaciones</td>
+                        <td class="text-right">{{ item.vacaciones }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if item.horas_extra != '0.00' %}
+                    <tr>
+                        <td>Horas Extra</td>
+                        <td class="text-right">{{ item.horas_extra }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if item.otros != '0.00' %}
+                    <tr>
+                        <td>Otros</td>
+                        <td class="text-right">{{ item.otros }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td>Total Ingresos</td>
+                    <td class="text-right">{{ item.total_ingresos }}</td>
+                </tr>
+                <tr>
+                    <td>Total Deducido</td>
+                    <td class="text-right">{{ item.total_deducido }}</td>
+                </tr>
+                <tr>
+                    <td>Sueldo Neto a Pagar</td>
+                    <td class="text-right">{{ item.sueldo_neto_pagar }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="font-weight-bold">Recibido conforme por</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="font-weight-bold">Nombre:</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="font-weight-bold">Firma:</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="text-right"><strong>Fecha:</strong> {{ fecha_impresion }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+
+        {#        {% for item in datos %}#}
+        {#            <div style="page-break-before: always;"></div>#}
+        {#            <p>#}
+        {#            <table border="0" width="960px" class="mt-1 mb-2">#}
+        {#                <tbody>#}
+        {#                <tr>#}
+        {#                    <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">{{ title }}#}
+        {#                        <br>Mes: {{ mes }}#}
+        {#                        Año: {{ anno }} {% if quincena == 3 %}Pago Extraordinario {% else %}Quincena: {{ quincena }}{% endif %}#}
+        {#                    </td>#}
+        {#                </tr>#}
+        {#                <tr>#}
+        {#                    <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>#}
+        {#                    <td class="text-right"><strong>Fecha de Impresión: </strong> {{ fecha_impresion }}</td>#}
+        {#                </tr>#}
+        {#                </tbody>#}
+        {#            </table>#}
+        {#            <table border="0" width="960px" class="text-center">#}
+        {#                <thead class="bg-dark font-weight-bold text-white">#}
+        {#                <th width="100px">Sueldo Bruto</th>#}
+        {#                <th class="text-center" width="400px">Comisiones</th>#}
+        {#                <th width="260px" class="text-center">Vacaciones</th>#}
+        {#                <th width="260px" class="text-center">Horas Extra</th>#}
+        {#                <th width="260px" class="text-center">Otros</th>#}
+        {#                <th width="260px" class="text-center">Total Ingresos</th>#}
+        {#                <th width="260px" class="text-center">Total Deducido</th>#}
+        {#                <th width="260px" class="text-center">Sueldo Neto a Pagar</th>#}
+        {#                <th width="260px" class="text-center">Firma</th>#}
+        {#                </thead>#}
+
+        {#                <tbody>#}
+
+        {#                {% if item.empleado != 'TOTAL' %}#}
+        {#                    <tr style="background-color: lightgrey !important;">#}
+
+        {#                        <td style="font-weight:400; text-align: left" colspan="9" class="pl-0 pr-0">{{ item.empleado }}#}
+        {#                            ({{ item.identificacion }})#}
+        {#                        </td>#}
+        {#                    </tr>#}
+        {#                    <tr>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.comision }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.vacaciones }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.horas_extra }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.otros }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.total_ingresos }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.total_deducido }}</td>#}
+        {#                        <td style="font-weight:400;" class="text-right">{{ item.sueldo_neto_pagar }}</td>#}
+        {#                        <td style="font-weight:400; border-bottom: 1px" class="text-right"></td>#}
+        {#                    </tr>#}
+        {#                    #}{#                {% else %}#}
+        {#                    #}{#                    <tr class="bg-dark font-weight-bold text-white">#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.comision }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.vacaciones }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.horas_extra }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.otros }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.total_ingresos }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.total_deducido }}</td>#}
+        {#                    #}{#                        <td style="font-weight:400;" class="text-right">{{ item.sueldo_neto_pagar }}</td>#}
+        {#                    #}{#                                                <td style="font-weight:400; border-bottom: 1px" class="text-right"></td>#}
+        {#                    #}{#                    </tr>#}
+        {#                {% endif %}#}
+
+        {#                </tbody>#}
+        {#            </table>#}
+        {#        {% endfor %}#}
+        {#      #}
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            $('#paginator').hide()
+            window.print()
+            $('#btn_print').show()
+            $('#paginator').show()
+        }
+    </script>
+{% endblock %}
+{% block stylesheets %}
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+{#    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">#}
+    <style>
+        table {
+            padding: 20px;
+        }
+
+        td, tr {
+            border: 0;
+        }
+    </style>
+{% endblock %}

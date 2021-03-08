@@ -112,6 +112,11 @@ class ClienteBeneficiario
      */
     private $municipio;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_pais;
+
     public function __toString()
     {
         return $this->ClienteBeneficiario;
@@ -346,6 +351,18 @@ class ClienteBeneficiario
     public function setMunicipio(?string $municipio): self
     {
         $this->municipio = $municipio;
+
+        return $this;
+    }
+
+    public function getIdPais(): ?int
+    {
+        return $this->id_pais;
+    }
+
+    public function setIdPais(int $id_pais): self
+    {
+        $this->id_pais = $id_pais;
 
         return $this;
     }

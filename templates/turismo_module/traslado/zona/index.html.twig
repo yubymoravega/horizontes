@@ -1,0 +1,174 @@
+{% extends 'turismo_module/index.html.twig' %}
+
+{% block title %}Gestión de Zonas{% endblock %}
+
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{%endblock%}
+
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Gestión de Zonas
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarZonaModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarZonaModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarZona" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarZona">Adicionar Aeropuerto</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{form_start(form, {'attr':{'autocomplete':"off"}})}}
+
+                    <div class="modal-body bg-dark-app">
+                        <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
+                            {{ form_label(form.nombre) }}
+                            {{ form_widget(form.nombre) }}
+                            <input type="text" id="id_zona" hidden>
+                        </div>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                        aria-label="Cerrar">
+                                    <span aria-hidden="true">Cancelar</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-2" class="text-left">Nombre</th>
+            <th scope="col-1" width="200px" class="text-center">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in zona %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        nombre: '{{ item.nombre }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar la zona seleccionada ?',
+                                        url:'{{ path('turismo_module_traslado_zona_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+
+    <div class="navigation mt-5">
+        {{ knp_pagination_render(zona) }}
+    </div>
+    </div>
+{% endblock %}
+{%block javascripts%}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+            const {nombre = '', id = ''} = config
+            $('#gestionarZonaModal').modal('show')
+
+            $('#zona_nombre').val(nombre)
+            $('#id_zona').val(id)
+            $('#gestionarZona').html("Modificar " + nombre)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let params = {
+                nombre: $('#zona_nombre').val(),
+                id_cliente: {{ id_cliente }}
+            }
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/traslado/zona/add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/configuracion-turismo/traslado/zona');
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let params = {
+                nombre: $('#zona_nombre').val(),
+                id: $('#id_zona').val(),
+                id_cliente: {{ id_cliente }}
+            }
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/traslado/zona/upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/configuracion-turismo/traslado/zona');
+            })
+        })
+
+        $('#gestionarZonaModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar Zona')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#zona_nombre').val('')
+            $('#btnAceptar').show()
+        }
+    </script>
+{% endblock %}

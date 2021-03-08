@@ -4,9 +4,15 @@ namespace App\Controller;
 
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\Servicios;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use App\Entity\User;
 use App\Entity\Carrito;
+use App\Entity\Pais;
+use App\Entity\MonedaPais;
+use App\Entity\TasaDeCambio;
+use App\Form\Contabilidad\Config\MonedaType;
+use App\Entity\Contabilidad\Config\Moneda;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,13 +25,27 @@ use Doctrine\ORM\Query;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Entity\SolicitudTurismo;
+use App\CoreTurismo\AuxFunctionsTurismo;
+use App\Entity\Cliente; 
 
 class HomeController extends AbstractController
 {
+
+      // 2. Expose the EntityManager in the class level
+      private $entityManager;
+
+      public function __construct(EntityManagerInterface $entityManager,HttpClientInterface $client)
+     {
+         // 3. Update the value of the private entityManager variable through injection
+         $this->entityManager = $entityManager;
+         $this->client = $client;
+     }
+ 
+
     /**
      * @Route("/home", name="home")
      */
-    public function home()
+    public function home( EntityManagerInterface $em)
     {
         //Código del módulo de CONTABILIDAD, NO BORRAR
         $user = $this->getUser();
@@ -39,16 +59,46 @@ class HomeController extends AbstractController
             $em->flush();
         }
         //Fin del código
-        return $this->render('home/index.html.twig');
+        $respuesta = AuxFunctionsTurismo::isClienteOrigen($em,$user->getUsername());
+        
+        if($respuesta){
+
+         $cliente = $em->getRepository(Cliente::class)->find($respuesta);
+
+            $this->addFlash(
+                'error',
+                'Tiene datos en el Carrito!'
+            );
+
+            return $this->redirectToRoute('categorias', ['tel' => $cliente->getTelefono()]);
+
+        }else{
+            return $this->render('home/index.html.twig');
+        }
+
+        
     }
 
-    /**
-     * @Route("/categorias", name="categorias")
+     /**
+     * @Route("/categorias/{tel}", name="categorias")
      */
-    public function categorias()
+    public function categorias($tel)
     {
-        return $this->render('home/categoria.html.twig');
-    }
+        $user =  $this->getUser();
+//        if($user->getRoles()['rol'] == "ROLE_5918"){
+//            return $this->redirectToRoute('turismo/solicitud',['cliente' => $tel]);
+//        }
+
+        return $this->render('home/categoria.html.twig',['tel' => $tel]);
+    } 
+
+     /**
+     * @Route("/categorias/turismo/{tel}", name="categorias/turismo")
+     */
+    public function categoriasTurismo($tel)
+    {
+        return $this->render('home/categoriaTurismo.html.twig',['tel' => $tel]);
+    } 
 
     /**
      * @Route("/servicios", name="servicios")
@@ -61,27 +111,38 @@ class HomeController extends AbstractController
     /**
      * @Route("/carrito", name="carrito")
      */
-    public function carrito()
+    public function carrito(EntityManagerInterface $em)
     {
         $dataBase = $this->getDoctrine()->getManager();
-        $user = $this->getUser();
-
+        $user =  $this->getUser();
+        
         $data = $dataBase->getRepository(Carrito::class)->findBY(['empleado' => $user->getUsername()]);
         $json = null;
-        $con = count($data);
+        $con = count( $data);
         $contador = 0;
+        $decode = null;
 
-        while ($contador < $con) {
+        $servicio_er = $em->getRepository(Servicios::class);
 
-            $json[$contador] = array(
-                'id' => $data[$contador]->getId(),
-                'json' => $data[$contador]->getJson(),
-            );
+        while($contador < $con){
+            /** @var Servicios $element_servicio */
+            $decode = $data[$contador]->getJson();
+//            if($contador == 1)
+//                dd($data[$contador]->getJson());
+            $element_servicio = $servicio_er->find($decode['id_servicio']);
+                $json[$contador] = array(
+                    'servicio'=>$decode['id_servicio'],
+                    'id' => $data[$contador]->getId(),
+                    'json' => $data[$contador]->getJson(),
+                    'moneda' => 'USD',
+                    'total' => number_format($decode['total'], 2,),
+                    'servicio_nombre'=>$element_servicio?$element_servicio->getNombre():'-sin definir servicio-'
+                );
             $contador++;
         }
-
+ 
         return new Response(json_encode($json));
-    }
+    } 
 
     /**
      * @Route("/home/moneda", name="home/moneda")
@@ -152,42 +213,7 @@ class HomeController extends AbstractController
 
     }
 
-    /**
-     * @Route("/home/pais", name="home/pais")
-     */
-    public function pais(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request)
-    {
-        $dataBase = $this->getDoctrine()->getManager();
-
-        $paises = $this->getDoctrine()->getRepository(pais::class)->findAll();
-        $monedas = $this->getDoctrine()->getRepository(Moneda::class)->findAll(false);
-
-        $titulo = 'Seleccionar Pais';
-        if ($request->get('pais')) {
-
-            $titulo = $this->getDoctrine()->getRepository(pais::class)->find($request->get('pais'))->getNombre();
-            $codePais = $this->getDoctrine()->getRepository(pais::class)->find($request->get('pais'))->getId();
-        }
-
-        $pais = 0;
-        ($request->get('pais')) ? $pais = $request->get('pais') : $pais = 0;
-
-        $dql = "SELECT a.id,b FROM App:MonedaPais a JOIN App:Contabilidad\Config\Moneda b WHERE  a.idPais = '$pais' AND  a.idMoneda = b.id AND  a.status ='1'";
-
-        $query = $em->createQuery($dql);
-
-        $pagination = $paginator->paginate(
-            $query, /* query NOT result */
-            $request->query->getInt('page', 1), /*page number*/
-            25 /*limit per page*/
-        );
-
-        return $this->render(
-            'home/pais.html.twig',
-            ['paises' => $paises, 'titulo' => $titulo, 'monedas' => $monedas, 'pagination' => $pagination]
-        );
-
-    }
+    
 
     /**
      * @Route("/home/moneda/pais/{moneda}/{pais}", name="home/moneda/pais")
@@ -302,7 +328,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/home/moneda/tasa/sugerida/", name="home/moneda/tasa/sugerida")
      */
-    public function tasaSugerida(Request $request)
+    public function tasaSugerida(Request $request) 
     {
         $dataBase = $this->getDoctrine()->getManager();
         $moneda = $dataBase->getRepository(Moneda::class)->findall();
@@ -351,7 +377,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/home/moneda/select/{code}", name="home/moneda/select/")
      */
-    public function monedaMenuSelect($code, Request $request)
+    public function monedaMenuSelect($code, Request $request,EntityManagerInterface $em)
     {
         $dataBase = $this->getDoctrine()->getManager();
 
@@ -362,6 +388,9 @@ class HomeController extends AbstractController
             $data = $dataBase->getRepository(User::class)->find($user->getId());
 
             $data->setIdMoneda($code);
+
+            /**--ACTUALIZAR PRODUCTOS DEL CARRITO PARA CONVERTIRLOS POR LA TASA DE CAMBIO CORRESPONDIENTE--**/
+            AuxFunctionsTurismo::updateMonedaCarrito($em,$code,$user->getUsername(),$user);
 
             $dataBase->flush($data);
 

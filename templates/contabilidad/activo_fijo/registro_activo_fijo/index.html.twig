@@ -14,10 +14,29 @@
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
                 Registro de Activos Fijos
             </h4>
-            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom" title="Imprimir Registro de Activos"
+            <form id="sear_form" method="get" class="d-flex">
+                <input placeholder="Nro. Inventario" type="text" name="search" id="search" class="mr-2 form-control"
+                       value="{{ search }}" style="width: 250px;">
+            </form>
+            {% if search %}
+                <a type="button" class="btn btn-secondary btn-sm mr-5" data-placement="bottom"
+                   href="{{ url('contabilidad_activo_fijo_registro_activo_fijo') }}">
+                    mostrar todos
+                </a>
+            {% else %}
+                <button type="button" class="btn btn-primary btn-sm mr-5" data-placement="bottom"
+                        title="Filtrar"
+                        id="btn_search">
+                    <i class="fa fa-search"></i>Buscar
+                </button>
+
+            {% endif %}
+            <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
+                    title="Imprimir Registro de Activos"
                     onclick="Print('{{ path('contabilidad_activo_fijo_registro_print') }}')">
                 <i class="fa fa-print"></i>
             </button>
+
         </div>
         {# end header #}
 
@@ -28,7 +47,7 @@
             <th width="150px">Nro. Inv</th>
             <th scope="col-1">Descripción</th>
             <th width="150px">Grupo de Activo</th>
-            <th width="150px">Cuenta/Subcuenta</th>
+            <th width="150px">Area de Responsabilidad</th>
             <th width="100px">Imprimir</th>
             </thead>
             <tbody>
@@ -38,11 +57,14 @@
                 </tr>
                 {% for new_item in item.datos %}
                     <tr>
-                        <td style="font-weight:400;" class="text-center">{{ new_item.nro_inventario }}</td>
+                        <td style="font-weight:400;" class="pl-4">{{ new_item.nro_inventario }}</td>
                         <td style="font-weight:400;">{{ new_item.descripcion }}</td>
                         <td style="font-weight:400;" class="text-center">{{ new_item.grupo_activo }}</td>
-                        <td style="font-weight:400;" class="text-center">{{ new_item.cuenta_subcuenta }}</td>
-                        <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning" title="Imprimir Ficha" onclick="Print_Activo({{ new_item.id }})"></i></td>
+                        <td style="font-weight:400;" class="text-center">{{ new_item.area }}</td>
+                        <td style="font-weight:400;" class="text-center"><i class="fa-print btn-sm btn-warning"
+                                                                            title="Imprimir Ficha"
+                                                                            onclick="Print_Activo({{ new_item.id }})"></i>
+                        </td>
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -59,9 +81,50 @@
         function Print(url) {
             window.open(url, 'blank_')
         }
+
         function Print_Activo(id) {
             let url = '/contabilidad/activo-fijo/registro/print-ficha/' + id
             window.open(url, 'blank_')
         }
+
+        $(document).ready(function () {
+
+            const validateForm = $('#sear_form').validate({
+                rules: {
+                    'search': "required"
+                },
+                messages: {
+                    'search': "",
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass("is-invalid");
+                    $(element).popover({
+                        content: 'valor requerido!',
+                        placement: 'bottom',
+                        trigger: 'manual'
+                    })
+                        .popover('show')
+                        .on('shown.bs.popover', function () {
+                            setTimeout(function (time) {
+                                $(element).popover('hide')
+                                    .removeClass('is-invalid')
+                            }, 3000)
+                        })
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass("is-invalid");
+                }
+            })
+
+
+            $('#btn_search').on('click', function (event) {
+                const formulario = $('#sear_form')
+                const search = $('#search').val()
+                formulario.attr('action', `/contabilidad/activo-fijo/registro/search/` + search)
+                formulario.submit()
+                if (validateForm.errorList.length === 0) loadingModal.show()
+
+            })
+        })
     </script>
 {% endblock %}

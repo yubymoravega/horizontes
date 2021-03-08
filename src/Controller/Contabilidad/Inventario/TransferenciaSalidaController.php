@@ -5,7 +5,9 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Moneda;
+use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Transferencia;
@@ -87,7 +89,6 @@ class TransferenciaSalidaController extends AbstractController
             $transferencia_salida = $request->get('transferencia_salida');
 
             /**  datos de TransferenciaEntradaType **/
-//            dd($transferencia_salida);
             $cuenta_inventario = AuxFunctions::getNro($transferencia_salida['nro_cuenta_inventario']);
             $subcuenta_inventario = AuxFunctions::getNro($transferencia_salida['nro_subcuenta_inventario']);
             $id_unidad_origen = isset($transferencia_salida['id_unidad']) ? $transferencia_salida['id_unidad'] : '';
@@ -115,17 +116,28 @@ class TransferenciaSalidaController extends AbstractController
                 }
                 $consecutivo = $contador + 1;
 
+                $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
+                $obj_unidad = $em->getRepository(Unidad::class)->find($id_unidad);
+                $obj_moneda = $em->getRepository(Moneda::class)->find($transferencia_salida['documento']['id_moneda']);
+
                 //2-adicionar en documento
-                $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $id_almacen]);
+                if (empty($arr_documentos)) {
+                    $today = $request->getSession()->get('date_system');
+                    $obj_date = \DateTime::createFromFormat('d/m/Y', $today);
+                } else {
+                    $today = AuxFunctions::getDateToClose($em, $id_almacen);
+                    $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
+                }
                 $documento = new Documento();
                 $documento
                     ->setActivo(true)
                     ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
                     ->setAnno($year_)
                     ->setIdTipoDocumento($obj_tipo_documento)
-                    ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                    ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
-                    ->setIdMoneda($em->getRepository(Moneda::class)->find($transferencia_salida['documento']['id_moneda']));
+                    ->setIdAlmacen($obj_almacen)
+                    ->setIdUnidad($obj_unidad)
+                    ->setIdMoneda($obj_moneda);
 
                 $em->persist($documento);
 
@@ -144,6 +156,17 @@ class TransferenciaSalidaController extends AbstractController
                     ->setActivo(true)
                     ->setEntrada(false);
                 $em->persist($transferencia_salida);
+
+                /*** Asentando la Operacion**/
+                $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy([
+                    'nro_cuenta' => $cuenta_inventario,
+                    'activo' => true
+                ]);
+                $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                    'id_cuenta' => $obj_cuenta,
+                    'nro_subcuenta' => $subcuenta_inventario,
+                    'activo' => true
+                ]);
 
                 /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                  * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
@@ -172,7 +195,7 @@ class TransferenciaSalidaController extends AbstractController
                             ->setEntrada(false)
                             ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
                             ->setCantidad($cantidad_mercancia)
-                            ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                            ->setFecha($obj_date)
                             ->setIdDocumento($documento)
                             ->setIdTipoDocumento($obj_tipo_documento)
                             ->setIdUsuario($this->getUser());
@@ -198,12 +221,30 @@ class TransferenciaSalidaController extends AbstractController
                             ->setExistencia($obj_mercancia->getExistencia());
 
                         $em->persist($movimiento_mercancia);
+
+                        /*** Asiento la operacion**/
+                        $cuenta_mercancia = $em->getRepository(Cuenta::class)->findOneBy(
+                            ['nro_cuenta' => $obj_mercancia->getCuenta(), 'activo' => true]
+                        );
+                        $subcuenta_mercancia = $em->getRepository(Subcuenta::class)->findOneBy(
+                            ['nro_subcuenta' => $obj_mercancia->getNroSubcuentaInventario(), 'activo' => true, 'id_cuenta' => $cuenta_mercancia]
+                        );
+                        $asiento_ = AuxFunctions::createAsiento($em, $cuenta_mercancia, $subcuenta_mercancia,
+                            $documento, $obj_unidad, $obj_almacen, null, null, null,
+                            null, null, 0, 0, $obj_date, $obj_date->format('Y'),
+                            $importe_mercancia, 0, 'TS-' . $consecutivo);
                     }
                 }
                 //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
                 $documento
                     ->setImporteTotal($importe_total);
                 $em->persist($documento);
+
+                ///-----asiento la operacion
+                $asiento = AuxFunctions::createAsiento($em, $obj_cuenta, $obj_subcuenta, $documento, $obj_unidad, $obj_almacen,
+                    null, null, null, null, null
+                    , 0, 0, $obj_date, $obj_date->format('Y'), 0, $importe_total, 'TS-' . $consecutivo);
+
 
                 try {
                     $em->flush();
@@ -225,10 +266,10 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/getMercancia/{codigo}", name="contabilidad_inventario_transferencia_salida_gestionar_getMercancia", methods={"POST"})
      */
-    public function getMercancia(EntityManagerInterface $em,Request $request, $codigo)
+    public function getMercancia(EntityManagerInterface $em, Request $request, $codigo)
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $row = AuxFunctions::getMercanciaByCod($em,$codigo,$id_almacen);
+        $row = AuxFunctions::getMercanciaByCod($em, $codigo, $id_almacen);
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
 
     }
@@ -277,7 +318,7 @@ class TransferenciaSalidaController extends AbstractController
                 if ($item->getId() != $obj_almacen->getId())
                     $rows_almcen [] = array(
                         'id' => $item->getId(),
-                        'nombre' => $item->getCodigo().' - '.$item->getDescripcion()
+                        'nombre' => $item->getCodigo() . ' - ' . $item->getDescripcion()
                     );
             }
         }
@@ -299,14 +340,22 @@ class TransferenciaSalidaController extends AbstractController
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
 
-        $obj_transferencia_salida = $em->getRepository(Transferencia::class)->findOneBy([
+        $arr_transferencia_salida = $em->getRepository(Transferencia::class)->findBy([
             'nro_concecutivo' => $nro,
             'entrada' => false,
             'anno' => Date('Y')
         ]);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+
         $msg = 'No se pudo eliminar el transferencia seleccionada';
         $success = 'error';
-        if ($obj_transferencia_salida) {
+        if (!empty($arr_transferencia_salida)) {
+            /** @var Transferencia $inf */
+            foreach ($arr_transferencia_salida as $inf) {
+                if ($inf->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen) {
+                    $obj_transferencia_salida = $inf;
+                }
+            }
             /**@var $obj_transferencia_salida Transferencia** */
 //            $obligacion_er = $em->getRepository(ObligacionPago::class);
 
@@ -387,14 +436,14 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/print_report/{nro}", name="contabilidad_inventario_transferencia_salida_print",methods={"GET"})
      */
-    public function print(EntityManagerInterface $em,Request $request, $nro)
+    public function print(EntityManagerInterface $em, Request $request, $nro)
     {
         $transferencia_entrada_er = $em->getRepository(Transferencia::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $tipo_documento_er = $em->getRepository(TipoDocumento::class);
 
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $fecha = AuxFunctions::getDateToClose($em,$id_almacen);
+        $fecha = AuxFunctions::getDateToClose($em, $id_almacen);
         $today = \DateTime::createFromFormat('Y-m-d', $fecha);
         $year_ = $today->format('Y');
 
@@ -402,7 +451,7 @@ class TransferenciaSalidaController extends AbstractController
             'activo' => true,
             'nro_concecutivo' => $nro,
             'entrada' => false,
-            'anno'=>$year_
+            'anno' => $year_
         ));
 
         /** @var Transferencia $element */
@@ -422,10 +471,10 @@ class TransferenciaSalidaController extends AbstractController
         $fecha_transferencia = '';
         if ($transferencia_obj && $obj_tipo_documento) {
             /** @var  $transferencia_obj Transferencia */
-            $almacen = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getCodigo().' - '. $transferencia_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
+            $almacen = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdDocumento()->getIdAlmacen()->getDescripcion();
             $fecha_transferencia = $transferencia_obj->getIdDocumento()->getFecha()->format('d/m/Y');
-            $unidad_origen = $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo().' - '.$transferencia_obj->getIdUnidad()->getNombre() : '';
-            $almacen_origen = $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo().' - '.$transferencia_obj->getIdAlmacen()->getDescripcion() : '';
+            $unidad_origen = $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo() . ' - ' . $transferencia_obj->getIdUnidad()->getNombre() : '';
+            $almacen_origen = $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdAlmacen()->getDescripcion() : '';
             $nro_solicitud = $transferencia_obj->getNroConcecutivo();
             $arr_movimiento_mercancia = $movimiento_mercancia_er->findBy(array(
                 'id_tipo_documento' => $obj_tipo_documento->getId(),
@@ -436,7 +485,7 @@ class TransferenciaSalidaController extends AbstractController
             if (!empty($arr_movimiento_mercancia)) {
                 /** @var  $mov_mercancia MovimientoMercancia */
 
-                $unidad = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getCodigo().' - '.$transferencia_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getNombre();
+                $unidad = $transferencia_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getCodigo() . ' - ' . $transferencia_obj->getIdDocumento()->getIdAlmacen()->getIdUnidad()->getNombre();
                 foreach ($arr_movimiento_mercancia as $obj) {
                     /**@var $obj MovimientoMercancia* */
                     $rows[] = array(
@@ -476,23 +525,23 @@ class TransferenciaSalidaController extends AbstractController
     /**
      * @Route("/print_report_current/", name="contabilidad_inventario_transferencia_salida_print_report_current",methods={"GET","POST"})
      */
-    public function printCurrent(EntityManagerInterface $em,Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
+    public function printCurrent(EntityManagerInterface $em, Request $request, AlmacenRepository $almacenRepository, UnidadMedidaRepository $unidadRepository)
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
-        $fecha_contable = AuxFunctions::getDateToClose($em,$id_almacen);
-        $arr_fecha_contable = explode('-',$fecha_contable);
+        $fecha_contable = AuxFunctions::getDateToClose($em, $id_almacen);
+        $arr_fecha_contable = explode('-', $fecha_contable);
         $datos = $request->get('datos');
         $mercancias = json_decode($request->get('mercancias'));
         $nro = $request->get('nro');
         $obj_unidad = $almacenRepository->findOneBy(['id' => $request->getSession()->get('selected_almacen/id')])->getIdUnidad();
         /** @var Unidad $obj_unidad */
-        $unidad = $obj_unidad->getCodigo().' - '.$obj_unidad->getNombre();
+        $unidad = $obj_unidad->getCodigo() . ' - ' . $obj_unidad->getNombre();
         $rows = [];
         foreach ($mercancias as $obj) {
             array_push($rows, [
                 "id" => 0,
                 "codigo" => $obj->codigo,
-                "um" => $unidadRepository->findOneBy(['id'=>$obj->um])->getAbreviatura(),
+                "um" => $unidadRepository->findOneBy(['id' => $obj->um])->getAbreviatura(),
                 "descripcion" => $obj->descripcion,
                 "existencia" => $obj->nueva_existencia,
                 "cantidad" => $obj->cant,
@@ -509,7 +558,7 @@ class TransferenciaSalidaController extends AbstractController
                 'unidad' => $unidad,
                 'unidad_origen' => $datos["unidad_origen"] == ' -- seleccione -- ' ? '' : $datos["unidad_origen"],
                 'almacen_origen' => $datos["almacen_origen"] == ' -- seleccione -- ' ? '' : $datos["almacen_origen"],
-                'fecha_transferencia' => $arr_fecha_contable[2].'/'.$arr_fecha_contable[1].'/'.$arr_fecha_contable[0],
+                'fecha_transferencia' => $arr_fecha_contable[2] . '/' . $arr_fecha_contable[1] . '/' . $arr_fecha_contable[0],
                 'nro_solicitud' => $nro
             ),
             'mercancias' => $rows,
@@ -571,8 +620,8 @@ class TransferenciaSalidaController extends AbstractController
             'id' => $transferencia_obj->getId(),
             'nro_cuenta_inventario' => $transferencia_obj->getNroCuentaInventario() . ' - ' . $cuentainv_obj->getNombre(),
             'nro_subcuenta_cuenta_inventario' => $transferencia_obj->getNroSubcuentaInventario() . ' - ' . $subcuentas->findOneBy(['id_cuenta' => $cuentainv_obj, 'nro_subcuenta' => $transferencia_obj->getNroSubcuentaInventario()])->getDescripcion(),
-            'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo().' - '.$transferencia_obj->getIdUnidad()->getNombre() : '',
-            'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo().' - '.$transferencia_obj->getIdAlmacen()->getDescripcion() : '',
+            'unidad' => $transferencia_obj->getIdUnidad() ? $transferencia_obj->getIdUnidad()->getCodigo() . ' - ' . $transferencia_obj->getIdUnidad()->getNombre() : '',
+            'almacen' => $transferencia_obj->getIdAlmacen() ? $transferencia_obj->getIdAlmacen()->getCodigo() . ' - ' . $transferencia_obj->getIdAlmacen()->getDescripcion() : '',
             'id_moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getId(),
             'moneda' => $transferencia_obj->getIdDocumento()->getIdMoneda()->getNombre(),
             'importe_total' => $importe_total,

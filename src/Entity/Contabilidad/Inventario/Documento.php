@@ -65,6 +65,11 @@ class Documento
      */
     private $anno;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Documento::class)
+     */
+    private $id_documento_cancelado;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -162,6 +167,18 @@ class Documento
     public function setAnno(?int $anno): self
     {
         $this->anno = $anno;
+
+        return $this;
+    }
+
+    public function getIdDocumentoCancelado(): ?self
+    {
+        return $this->id_documento_cancelado;
+    }
+
+    public function setIdDocumentoCancelado(?self $id_documento_cancelado): self
+    {
+        $this->id_documento_cancelado = $id_documento_cancelado;
 
         return $this;
     }

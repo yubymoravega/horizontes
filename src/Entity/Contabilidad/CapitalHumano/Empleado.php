@@ -6,9 +6,12 @@ use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\User;
 use App\Repository\Contabilidad\CapitalHumano\EmpleadoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=EmpleadoRepository::class)
+ * @UniqueEntity("correo", message="contabilidad.RRHH.correo_unico")
+ * @UniqueEntity("nombre", message="contabilidad.RRHH.correo_unico")
  */
 class Empleado
 {
@@ -28,11 +31,6 @@ class Empleado
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $correo;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $salario_x_hora;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -60,16 +58,6 @@ class Empleado
     private $telefono;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $acumulado_tiempo_vacaciones;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $acumulado_dinero_vacaciones;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Unidad::class)
      * @ORM\JoinColumn(nullable=false)
      */
@@ -94,6 +82,21 @@ class Empleado
      * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"})
      */
     private $id_usuario;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $identificacion;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $sueldo_bruto_mensual;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $salario_x_hora;
 
     public function getId(): ?int
     {
@@ -120,18 +123,6 @@ class Empleado
     public function setCorreo(?string $correo): self
     {
         $this->correo = $correo;
-
-        return $this;
-    }
-
-    public function getSalarioXHora(): ?float
-    {
-        return $this->salario_x_hora;
-    }
-
-    public function setSalarioXHora(?float $salario_x_hora): self
-    {
-        $this->salario_x_hora = $salario_x_hora;
 
         return $this;
     }
@@ -196,30 +187,6 @@ class Empleado
         return $this;
     }
 
-    public function getAcumuladoTiempoVacaciones(): ?float
-    {
-        return $this->acumulado_tiempo_vacaciones;
-    }
-
-    public function setAcumuladoTiempoVacaciones(?float $acumulado_tiempo_vacaciones): self
-    {
-        $this->acumulado_tiempo_vacaciones = $acumulado_tiempo_vacaciones;
-
-        return $this;
-    }
-
-    public function getAcumuladoDineroVacaciones(): ?float
-    {
-        return $this->acumulado_dinero_vacaciones;
-    }
-
-    public function setAcumuladoDineroVacaciones(?float $acumulado_dinero_vacaciones): self
-    {
-        $this->acumulado_dinero_vacaciones = $acumulado_dinero_vacaciones;
-
-        return $this;
-    }
-
     public function getIdUnidad(): ?Unidad
     {
         return $this->id_unidad;
@@ -276,6 +243,42 @@ class Empleado
     public function setIdUsuario(?User $id_usuario): self
     {
         $this->id_usuario = $id_usuario;
+
+        return $this;
+    }
+
+    public function getIdentificacion(): ?string
+    {
+        return $this->identificacion;
+    }
+
+    public function setIdentificacion(string $identificacion): self
+    {
+        $this->identificacion = $identificacion;
+
+        return $this;
+    }
+
+    public function getSueldoBrutoMensual(): ?float
+    {
+        return $this->sueldo_bruto_mensual;
+    }
+
+    public function setSueldoBrutoMensual(float $sueldo_bruto_mensual): self
+    {
+        $this->sueldo_bruto_mensual = $sueldo_bruto_mensual;
+
+        return $this;
+    }
+
+    public function getSalarioXHora(): ?float
+    {
+        return $this->salario_x_hora;
+    }
+
+    public function setSalarioXHora(?float $salario_x_hora): self
+    {
+        $this->salario_x_hora = $salario_x_hora;
 
         return $this;
     }

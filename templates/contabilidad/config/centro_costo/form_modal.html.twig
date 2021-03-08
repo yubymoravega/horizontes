@@ -9,10 +9,6 @@
         <label for="centro_costo_nombre" class="font-weight-bold">Nombre</label>
         {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
-    <div class="form-group input-group input-group-sm d-block">
-        <label for="almacen_id_unidad" class="font-weight-bold">Unidad</label>
-        {{ form_widget(form.id_unidad,{'attr': {'class': 'form-control w-100'}}) }}
-    </div>
     <input type="text" id="id_centro_costo" hidden>
     {{ form_end(form) }}
 {% endblock %}

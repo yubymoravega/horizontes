@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% set total = null %}
+	{% include 'breadcrumbs.html.twig' %}
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<section class="section novi-background section-98 section-sm-50">
+		<h1 class="text-reporte">Agencias
+		</h1>
+		<hr class="divider bg-mantis">
+
+		<div class="container">
+<div class="row">
+			{% for data in pagination %}
+					<div class="col-sm-6 col-md-4 col-lg-3">
+						<div
+							class="product product-grid">
+							<!-- Product Image-->
+							<div class="product-image"><img class="img-fluid product-image-area" src="{{ asset('images/servicios/telecomunicaciones.png') }}" alt=""><!-- Product Thumnails-->
+								<!-- Product Label-->
+                                {% set con = 0 %}
+									<span class="product-label label-custom label-lg-custom label-rounded-custom label-danger">
+                                    
+                                    {% for tv in tvs %}
+
+                                        {% if tv.IdUnidad == data.id %}
+                                      
+                                        {% set con = con + 1 %}
+
+                                        {% endif %}
+
+                                     {% endfor %}
+                                    
+                                     {{con}}</span>
+							</div><!-- Product Title--><h5 class="product-title offset-top-20">
+								<a href="shop-single-product-no-sidebar.html">{{data.nombre}}</a>
+							</h5>
+							<div class="product-price font-weight-bold"></div>
+							<div class="product-block-hover"><!-- Product Add To cart--><a class="btn btn-sm btn-info btn-icon btn-icon-right product-btn offset-top-20">
+									<span class="icon mdi novi-icon mdi-plus-circle"></span>Agregar Dispositivo</a>
+							</div>
+						</div>
+					</div>
+			{% endfor %}
+            	</div>
+		</div>
+	</section>
+
+
+	<style>
+		.product-list:before,
+		.product-grid:before {
+			position: absolute;
+			top: 0;
+			left: -15px;
+			right: -15px;
+			bottom: -15px;
+			z-index: -1;
+			border: 1px solid transparent;
+			border-radius: 3px;
+			content: '';
+			background: #212529;
+		}
+	</style>
+
+{% endblock %}
+
+{% block javascripts %}
+	{{parent()}}
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+	<script></script>
+{% endblock %}

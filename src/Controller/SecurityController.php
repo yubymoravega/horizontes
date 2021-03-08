@@ -107,7 +107,7 @@ class SecurityController extends AbstractController
 
                 AuxFunctions::sendEmail('Intento Violacion de seguridad', $user, $alias, 'Intento de acceso al sitio por: ' . $correo);
             }
-            AuxFunctions::sendEmail($asunto, $correo, $nombre, $msg);
+            AuxFunctions::sendEmail($asunto, $correo, $nombre, $msg); 
         } catch (\Exception $exception) {
             return new JsonResponse(['success' => false, 'error' => $exception]);
         }

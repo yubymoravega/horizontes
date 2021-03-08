@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{{ asset('css/tarjetas.css') }}"  />
+
+
+<div class="confirm">
+
+<img id='diclinada'  class="imagen-resultado" src="{{ asset('images/iconos/diclinada.svg') }}" > 
+
+
+<h1 id='mensaje' style="text-align: center; color:red;  ">No hay Balance</h1>
+
+     <a   class='boton-agregar-tarjeta'  id='home' style='display: none !important;' href="{{ path('home')}}">
+       Finalizar
+    </a>
+
+    <script>  window.close();</script>
+
+{% endblock %}

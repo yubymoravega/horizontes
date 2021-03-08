@@ -2,6 +2,7 @@
 
 namespace App\Controller\Contabilidad\General;
 
+use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Cliente;
 use App\Entity\Contabilidad\Config\Almacen;
@@ -11,6 +12,7 @@ use App\Entity\Contabilidad\Config\TipoComprobante;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Contabilidad\RegistroComprobantes;
+use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Contabilidad\General\FacturasComprobante;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\ComprobanteCierre;
@@ -22,6 +24,7 @@ use App\Entity\Contabilidad\Inventario\OrdenTrabajo;
 use App\Entity\Contabilidad\Inventario\Producto;
 use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\Factura;
+use App\Entity\Contabilidad\Venta\MovimientoServicio;
 use App\Entity\Contabilidad\Venta\MovimientoVenta;
 use App\Form\Contabilidad\General\ComprobanteVentaType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,8 +46,9 @@ class ComprobanteVentaController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request)
     {
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $year_ = AuxFunctions::getCurrentYear($em, $unidad);
         $facturas = $em->getRepository(Factura::class)->findBy([
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $unidad,
             'contabilizada' => false
         ]);
@@ -73,49 +77,52 @@ class ComprobanteVentaController extends AbstractController
     {
         /** @var Unidad $unidad */
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+        $year_ = AuxFunctions::getCurrentYear($em, $unidad);
+        //hacer que las traiga todas, incluyendo las eliminadas y todo
         $facturas = $em->getRepository(Factura::class)->findBy([
             'contabilizada' => true,
-            'activo' => true,
-            'anno' => Date('Y'),
-            'id_unidad' => $unidad
+            'anno' => $year_,
+            'id_unidad' => $unidad,
+            'activo' => false
         ]);
+
         $facturas_contabiliazadas = $em->getRepository(FacturasComprobante::class)->findBy([
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $unidad
         ]);
         $arr_facturas = [];
         $data = [];
         $arr_ids = [];
         /** @var FacturasComprobante $d */
-        foreach ($facturas_contabiliazadas as $d){
-            $arr_ids[count($arr_ids)]= $d->getIdFactura()->getId();
+        foreach ($facturas_contabiliazadas as $d) {
+            $arr_ids[count($arr_ids)] = $d->getIdFactura()->getId();
         }
         foreach ($facturas as $fac) {
             if (!in_array($fac->getId(), $arr_ids))
                 $arr_facturas[] = $fac;
         }
         $movimiento_venta_er = $em->getRepository(MovimientoVenta::class);
+        $movimiento_venta_servicio_er = $em->getRepository(MovimientoServicio::class);
         /** @var Factura $factura */
         $total_debito = 0;
-        $total_credito = 0;
         $cliente_extero = $em->getRepository(ClienteContabilidad::class);
         $cliente_interno = $em->getRepository(Unidad::class);
         $persona_natural = $em->getRepository(Cliente::class);
         foreach ($arr_facturas as $factura) {
+            $total_impuesto = 0;
             $row = [];
             $total_debito += $factura->getImporte();
             $mes = $factura->getFechaFactura()->format('m');
             $anno = $factura->getFechaFactura()->format('Y');
             $nro_doc = 'FACT-' . $factura->getNroFactura();
             /** Addiciono la factura con la cuenta de obligacion */
-            if ($factura->getTipoCliente() == 1) {
+            if ($factura->getTipoCliente() == ClientesAdapter::PERSONA) {
                 $cliente = $persona_natural->find($factura->getIdCliente())->getNombre();
-            } elseif ($factura->getTipoCliente() == 2) {
+            } elseif ($factura->getTipoCliente() == ClientesAdapter::UNIDAD_SISTEMA) {
                 $cliente = $cliente_interno->find($factura->getIdCliente())->getCodigo();
-            } elseif ($factura->getTipoCliente() == 3) {
+            } elseif ($factura->getTipoCliente() == ClientesAdapter::CLIENTE_CONTABILIDAD) {
                 $cliente = $cliente_extero->find($factura->getIdCliente())->getCodigo();
             }
-
             $row[] = array(
                 'nro_doc' => $nro_doc,
                 'fecha' => $factura->getFechaFactura()->format('d/m/Y'),
@@ -132,13 +139,15 @@ class ComprobanteVentaController extends AbstractController
                 'debito' => number_format($factura->getImporte(), 2),
                 'credito' => ''
             );
-            $arr_movimientos = $movimiento_venta_er->findBy(['id_factura' => $factura]);
+            if (!$factura->getServicio())
+                $arr_movimientos = $movimiento_venta_er->findBy(['id_factura' => $factura]);
+            else
+                $arr_movimientos = $movimiento_venta_servicio_er->findBy(['id_factura' => $factura]);
+
             $str_criterio = [];
             /** @var MovimientoVenta $movimiento_venta */
             foreach ($arr_movimientos as $movimiento_venta) {
-                $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora() . '-' .
-                    $movimiento_venta->getIdCentroCostoAcreedor() . '-' . $movimiento_venta->getIdOrdenTrabajoAcreedor() . '' .
-                    $movimiento_venta->getIdElementoGastoAcreedor() . '-' . $movimiento_venta->getIdExpedienteAcreedor();
+                $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora();
                 if (!in_array($srt_movimiento, $str_criterio))
                     $str_criterio[count($str_criterio)] = $srt_movimiento;
             }
@@ -146,10 +155,9 @@ class ComprobanteVentaController extends AbstractController
             foreach ($str_criterio as $criterio) {
                 $credito = 0;
                 foreach ($arr_movimientos as $movimiento_venta) {
-                    $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora() . '-' .
-                        $movimiento_venta->getIdCentroCostoAcreedor() . '-' . $movimiento_venta->getIdOrdenTrabajoAcreedor() . '' .
-                        $movimiento_venta->getIdElementoGastoAcreedor() . '-' . $movimiento_venta->getIdExpedienteAcreedor();
+                    $srt_movimiento = $movimiento_venta->getCuentaAcreedora() . '-' . $movimiento_venta->getSubcuentaAcreedora();
                     if ($criterio == $srt_movimiento) {
+                        $total_impuesto += ($factura->getServicio() ? $movimiento_venta->getImpuesto() : $movimiento_venta->getDescuentoRecarga());
                         $credito += ($movimiento_venta->getCantidad() * $movimiento_venta->getPrecio());
                     }
                 }
@@ -173,6 +181,23 @@ class ComprobanteVentaController extends AbstractController
                     'credito' => number_format($credito, 2)
                 );
             }
+            if ($total_impuesto > 0)
+                $row[] = array(
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => '440',
+                    'nro_subcuenta' => '0001',
+                    'analisis_1' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes' => $mes,
+                    'anno' => $anno,
+                    'debito' => '',
+                    'credito' => number_format($total_impuesto, 2)
+                );
             $row[] = array(
                 'nro_doc' => '',
                 'fecha' => '',
@@ -186,18 +211,66 @@ class ComprobanteVentaController extends AbstractController
                 'analisis_3' => '',
                 'mes' => '',
                 'anno' => '',
-                'debito' => number_format($total, 2),
-                'credito' => number_format($total, 2)
+                'debito' => number_format(($total + $total_impuesto), 2),
+                'credito' => number_format(($total + $total_impuesto), 2)
             );
-            $data [] = array(
-                'nro_doc' => $nro_doc,
-                'datos' => $row
-            );
+            if ($factura->getIdFacturaCancela() == null) {
+                $data [] = array(
+                    'nro_doc' => $nro_doc,
+                    'datos' => $row
+                );
+            } else {
+                $fecha = $row[0]['fecha'];
+                $reverse = array_reverse($row);
+                $new_row = [];
+                $index = 0;
+                foreach ($reverse as $key => $item) {
+                    if ($key > 0) {
+                        $new_row[] = [
+                            'nro_doc' => $index == 0 ? $nro_doc : '',
+                            'fecha' => $index == 0 ? $fecha : '',
+                            'nro_cuenta' => $item['nro_cuenta'],
+                            'nro_subcuenta' => $item['nro_subcuenta'],
+                            'analisis_1' => $item['analisis_1'],
+                            'value_1' => $item['value_1'],
+                            'value_2' => $item['value_2'],
+                            'value_3' => $item['value_3'],
+                            'analisis_2' => $item['analisis_2'],
+                            'analisis_3' => $item['analisis_3'],
+                            'mes' => $item['mes'],
+                            'anno' => $item['anno'],
+                            'debito' => $item['credito'],
+                            'credito' => $item['debito']
+                        ];
+                        $index++;
+                    }
+                }
+                $new_row[] = [
+                    'nro_doc' => '',
+                    'fecha' => '',
+                    'nro_cuenta' => '',
+                    'nro_subcuenta' => '',
+                    'analisis_1' => '',
+                    'value_1' => '',
+                    'value_2' => '',
+                    'value_3' => '',
+                    'analisis_2' => '',
+                    'analisis_3' => '',
+                    'mes' => '',
+                    'anno' => '',
+                    'debito' => $row[0]['debito'],
+                    'credito' => $row[0]['debito'],
+                ];
+                $data [] = array(
+                    'nro_doc' => $nro_doc,
+                    'datos' => $new_row
+                );
+            }
         }
 
         return $this->render('contabilidad/general/comprobante_venta/comprobante.html.twig', [
             'unidad' => $unidad->getCodigo() . ' - ' . $unidad->getNombre(),
-            'fecha' => Date('d-m-Y'),
+            'fecha' => AuxFunctions::getCurrentDate($em, $unidad)->format('d-m-Y'),
             'datos' => $data,
             'total_debito' => number_format($total_debito, 2),
             'total_credito' => number_format($total_debito, 2),
@@ -360,9 +433,9 @@ class ComprobanteVentaController extends AbstractController
 
         /** @var Unidad $obj_unidad */
         $obj_unidad = AuxFunctions::getUnidad($em, $this->getUser());
-        $fecha = Date('Y-m-d');
-        $arr_fecha = explode('-', $fecha);
-        $year_ = intval($arr_fecha[0]);
+        $fecha = AuxFunctions::getCurrentDate($em, $obj_unidad);
+//        $arr_fecha = explode('-', $fecha);
+        $year_ = AuxFunctions::getCurrentYear($em, $obj_unidad);
 
         $arr_registros = $em->getRepository(RegistroComprobantes::class)->findBy(array(
             'id_unidad' => $obj_unidad,
@@ -374,9 +447,9 @@ class ComprobanteVentaController extends AbstractController
         $new_registro
             ->setDescripcion($observacion)
             ->setIdUsuario($this->getUser())
-            ->setFecha(\DateTime::createFromFormat('Y-m-d', $fecha))
+            ->setFecha($fecha)
             ->setAnno($year_)
-            ->setTipo(2)
+            ->setTipo(AuxFunctions::COMMPROBANTE_OPERACONES_VENTA)
             ->setCredito(floatval($credito))
             ->setDebito(floatval($debito))
             ->setIdTipoComprobante($em->getRepository(TipoComprobante::class)->find(2))
@@ -387,29 +460,51 @@ class ComprobanteVentaController extends AbstractController
         $facturas = $em->getRepository(Factura::class)->findBy([
             'contabilizada' => true,
             'activo' => true,
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $obj_unidad
         ]);
         $facturas_comprobante = $em->getRepository(FacturasComprobante::class)->findBy([
-            'anno' => Date('Y'),
+            'anno' => $year_,
             'id_unidad' => $obj_unidad
         ]);
         $fact = [];
+
         /** @var FacturasComprobante $d */
-        foreach ($facturas_comprobante as $d){
-            $fact[count($fact)]= $d->getIdFactura()->getId();
+        foreach ($facturas_comprobante as $d) {
+            $fact[count($fact)] = $d->getIdFactura()->getId();
         }
+        /**
+         * actualizando datos de asiento
+         */
+        $asiento_er = $em->getRepository(Asiento::class);
+
         foreach ($facturas as $fac) {
-            if (!in_array($fac->getId(), $fact)){
+            if (!in_array($fac->getId(), $fact)) {
                 $fact_comp = new FacturasComprobante();
                 $fact_comp
                     ->setIdFactura($fac)
                     ->setIdUnidad($obj_unidad)
-                    ->setAnno(Date('Y'))
+                    ->setAnno($year_)
                     ->setIdComprobante($new_registro);
                 $em->persist($fact_comp);
             }
+
+            //actualizo los asientos
+            $arr_asiento = $asiento_er->findBy([
+                'id_documento' => null,
+                'id_factura' => $fac
+            ]);
+            if (!empty($arr_asiento))
+                foreach ($arr_asiento as $obj_asiento) {
+                    if ($obj_asiento) {
+                        $obj_asiento
+                            ->setIdComprobante($new_registro)
+                            ->setIdTipoComprobante($new_registro->getIdTipoComprobante());
+                        $em->persist($obj_asiento);
+                    }
+                }
         }
+
         $em->flush();
         return $this->render('contabilidad/general/comprobante_venta/success.html.twig', [
             'controller_name' => 'ComprobanteOperacionesController',

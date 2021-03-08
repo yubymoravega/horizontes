@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\Config;
 
+use App\Entity\Contabilidad\Config\CategoriaCliente;
 use App\Entity\Contabilidad\Config\Unidad;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityRepository;

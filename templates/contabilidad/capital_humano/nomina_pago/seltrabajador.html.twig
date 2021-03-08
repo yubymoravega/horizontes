@@ -1,0 +1,61 @@
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="seleccionarEmpleado" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="seleccionarEmpleadoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="seleccionarEmpleadoLabel">{{ title }}</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app">
+                    <form action="" method="post" autocomplete="off">
+                        <div class="form-group input-group input-group-sm">
+                            <select name="empleados_select" id="empleados_select" class="form-control">
+                                {% for item in empleados %}
+                                    <option value="{{ item.id }}">{{ item.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <a href="{{ url('capital_humano') }}" class="btn btn-outline-secondary" type="button"
+                                   aria-label="Cerrar">
+                                    <span aria-hidden="true">Salir</span>
+                                </a>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-secondary" id="btnAceptar">Aceptar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#seleccionarEmpleado').modal('show')
+        })
+        $('#btnAceptar').on('click',function(){
+            let data = $('#empleados_select').val() + '-3'
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + data);
+
+        })
+    </script>
+{% endblock %}

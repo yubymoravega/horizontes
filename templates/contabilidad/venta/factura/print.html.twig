@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>factura</title>
+    <title>Factura de Venta</title>
     <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
     <style>
@@ -40,30 +40,42 @@
 <body>
 <div class="container-fluid mt-3" style="width: 1000px;">
     <div class="row">
-        <h5 class="col-9"><img style="margin-left: -10px;" width="90" height="80" src={{ asset('images/print_logo_factura.png') }} alt=""><br>{{ factura.codigo_unidad }}
+        <h5 class="col-9"><img style="margin-left: -10px;" width="90" height="80"
+                               src={{ asset('images/print_logo_factura.png') }} alt=""><br>{{ factura.codigo_unidad }}
             <br>{{ factura.nombre_unidad }}</h5>
         <div class="col-3">
-            <p class="m-0"><h1 class="text-uppercase font-weight-bold text-primary" >factura</h1></p>
+            {% if cancelada == false %}
+                <p class="m-0"><h1 class="text-uppercase font-weight-bold text-primary">factura</h1></p>
+            {% else %}
+                <p class="m-0"><h1 class="text-uppercase font-weight-bold text-danger">factura cancelada</h1></p>
+            {% endif %}
         </div>
     </div>
     <div class="row">
         <h3 class="col-9">
         </h3>
         <div class="col-3">
+            {% if factura.ncf != '' %}
             <p class="m-0"><span class="font-weight-bold text-uppercase">ncf: </span> {{ factura.ncf }}</p>
+            {% else %}
+            <p class="m-0"><span class="font-weight-bold text-uppercase">Nro. Factura: </span>{{ factura.codigo_unidad }}-{{ factura.nro_factura }}</p>
+            {% endif %}
             <p class="m-0"><span class="font-weight-bold text-uppercase">Fecha :</span> {{ factura.fecha_factura }}</p>
         </div>
     </div>
     <div class="row">
         <div class="col-9">
             <p class="m-0"> {{ factura.direccion_unidad }}</p>
-            <p class="m-0"><span class="text-capitalize font-weight-bold">télefono: </span> {{ factura.telefono_unidad }}</p>
-            <p class="m-0"><span class="text-capitalize font-weight-bold">correo electrónico: </span> {{ factura.correo_unidad }}</p>
+            <p class="m-0"><span
+                        class="text-capitalize font-weight-bold">télefono: </span> {{ factura.telefono_unidad }}</p>
+            <p class="m-0"><span
+                        class="text-capitalize font-weight-bold">correo electrónico: </span> {{ factura.correo_unidad }}
+            </p>
         </div>
     </div>
     <div class="mt-4 row">
         <div class="col-12">
-            <p class="m-0"> <span class="text-uppercase font-weight-bold">para: </span>{{ factura.cliente }}</p>
+            <p class="m-0"><span class="text-uppercase font-weight-bold">para: </span>{{ factura.cliente }}</p>
             <p class="m-0">{{ factura.direccion_cliente }}</p>
             <p class="m-0">{{ factura.telefono_cliente }}</p>
         </div>
@@ -99,17 +111,17 @@
         <div class="mt-5">
             <table width="300px" class="ml-auto">
                 <tr style="height: 2px;">
-                    <td class="pt-2  text-right font-weight-bold text-uppercase"  width="30">subtotal :</td>
+                    <td class="pt-2  text-right font-weight-bold text-uppercase" width="30">subtotal :</td>
                     <td class="pt-2 text-right font-weight-bold px-2" width="35"
                         class="text-right">{{ subtotal|number_format(2) }}</td>
                 </tr>
                 <tr style="height: 2px;">
-                    <td class="pt-2  text-right font-weight-bold text-uppercase"  width="30">impuesto :</td>
+                    <td class="pt-2  text-right font-weight-bold text-uppercase" width="30">impuesto :</td>
                     <td class="pt-2 text-right font-weight-bold px-2" width="35"
                         class="text-right">{{ impuesto_total|number_format(2) }}</td>
                 </tr>
                 <tr style="height: 2px;">
-                    <td class="pt-2  text-right font-weight-bold text-uppercase"    width="30">total :</td>
+                    <td class="pt-2  text-right font-weight-bold text-uppercase" width="30">total :</td>
                     <td class="pt-2 text-right font-weight-bold px-2" width="35"
                         class="text-right">{{ importe_total|number_format(2) }}</td>
                 </tr>
@@ -119,7 +131,9 @@
     <div class="text-center"><h3 class="text-uppercase">¡gracias por su confianza!</h3></div>
     <div class="row">
 
-        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto" onclick="imprimir()"> Imprimir</button>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto"
+                onclick="imprimir()"> Imprimir
+        </button>
     </div>
 </div>
 

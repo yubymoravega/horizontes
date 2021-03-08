@@ -195,8 +195,8 @@ class CrudController extends AbstractController
             }
         }
 
-        //list
-        $arr_list = $em->getRepository($this->class_entity)->findAll();
+        //list {MODIFIQUE LA PETIDION DE findAll() a findBy() PARA FILTRAR POR LOS ACTIVOS}
+        $arr_list = $em->getRepository($this->class_entity)->findBy(['activo'=>true]);
         return $this->render('contabilidad/config/CRUD/index_crud_name.html.twig', [
             'title' => $this->title,
             'label' => $this->label,

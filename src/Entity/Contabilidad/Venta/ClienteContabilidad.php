@@ -2,6 +2,7 @@
 
 namespace App\Entity\Contabilidad\Venta;
 
+use App\Entity\Contabilidad\Config\CategoriaCliente;
 use App\Repository\Contabilidad\Venta\ClienteContabilidadRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;

@@ -1,0 +1,63 @@
+{% extends 'contabilidad/reportes/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Plantilla de la Agencia
+            </h4>
+            <div>
+                <button type="button" class="btn btn-warning btn-sm" data-placement="bottom"
+                        title="Imprimir Registro de Activos"
+                        onclick="Print('{{ path('contabilidad_reportes_capital_humano_plantilla_imprimir') }}')">
+                    <i class="fa fa-print"></i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+
+        {# list #}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-1">Nombre</th>
+            <th width="280px">Correo</th>
+            <th width="350px">Cargo</th>
+            <th width="300px">Rol</th>
+            <th width="190px">Salario básico</th>
+            <th width="220px">Teléfono</th>
+            </thead>
+            <tbody>
+            {% for item in empleados %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;">{{ item.correo }}</td>
+                    <td style="font-weight:400;">{{ item.cargo_nombre }}</td>
+                    <td style="font-weight:400;">{{ item.rol }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>
+                    <td style="font-weight:400;">{{ item.telefono }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+    </script>
+{% endblock %}

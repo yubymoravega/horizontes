@@ -19,6 +19,20 @@ class EntradaMercanciaRepository extends ServiceEntityRepository
         parent::__construct($registry, MovimientoMercancia::class);
     }
 
+    /*public function movimientosInMoth($moth, $alamcen)
+    {
+        return $this->getEntityManager()
+            ->createQuery('
+        SELECT COUNT(a)
+        FROM App\Entity\Contabilidad\Inventario\MovimientoMercancia a
+        WHERE a.id_almacen = :alamcen AND DATE_SUB(a.fecha, ) BETWEEN
+')
+            ->setParameters([
+                'alamcen' => $alamcen,
+                'fecha'
+            ]);
+    }*/
+
     // /**
     //  * @return MovimientoMercancia[] Returns an array of MovimientoMercancia objects
     //  */

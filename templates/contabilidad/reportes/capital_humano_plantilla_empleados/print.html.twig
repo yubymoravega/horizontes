@@ -1,0 +1,58 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Plantilla de la Unidad {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">Plantilla de la Unidad
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td class="text-right"><strong>Fecha impresión: </strong> {{ fecha_impresion }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0" width="960px" class="text-center">
+            <thead class="bg-dark font-weight-bold text-white">
+            <th scope="col-1">Nombre</th>
+            <th width="280px">Correo</th>
+            <th width="350px">Cargo</th>
+            <th width="300px">Rol</th>
+            <th width="220px">Sueldo Bruto</th>
+            <th width="220px">Teléfono</th>
+            </thead>
+            <tbody>
+            {% for item in empleados %}
+                {% if item.index == 0 %}
+                    <tr>
+                {% else %}
+                    <tr style="background-color: lightgrey !important;">
+                {% endif %}
+                <td style="font-weight:400;" class="text-left">{{ item.nombre }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.correo }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.cargo_nombre }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.rol }}</td>
+                <td style="font-weight:400;" class="text-right">{{ item.sueldo_bruto }}</td>
+                <td style="font-weight:400;" class="text-left">{{ item.telefono }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
+{% endblock %}

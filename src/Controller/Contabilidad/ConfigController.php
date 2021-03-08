@@ -51,7 +51,7 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * @Route("/init",name="register-dev-rootuser")
+     * @Route("/0",name="register-dev-rootuser")
      */
     public function UserRoot(EntityManagerInterface $em, UserPasswordEncoderInterface $passEncoder)
     {
@@ -65,7 +65,6 @@ class ConfigController extends AbstractController
             $cargo = new Cargo();
             $cargo
                 ->setNombre('Administrador del Sistema')
-                ->setSalarioBase(1000)
                 ->setActivo(true);
             $em->persist($cargo);
             $unidad = new Unidad();
@@ -76,13 +75,13 @@ class ConfigController extends AbstractController
             $empleado = new Empleado();
             $empleado
                 ->setNombre($user->getUsername())
+                ->setIdentificacion('89102815009')
                 ->setIdUnidad($unidad)
                 ->setIdUsuario($user)
                 ->setActivo(true)
                 ->setRol('ROLE_ADMIN')
                 ->setDireccionParticular('Calle A')
                 ->setIdCargo($cargo)
-                ->setSalarioXHora(100)
                 ->setCorreo('admin@solyag.com')
                 ->setTelefono('555555555')
                 ->setBaja(false)

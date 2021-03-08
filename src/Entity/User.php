@@ -33,6 +33,16 @@ class User implements UserInterface
      */
     private $status;
 
+      /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $idMoneda;
+
+      /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $idAgencia;
+
 
     /**
      * @var string The hashed password
@@ -69,7 +79,7 @@ class User implements UserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        //$roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
@@ -121,6 +131,30 @@ class User implements UserInterface
     public function setStatus(bool $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getIdMoneda(): string
+    {
+        return (string) $this->idMoneda;
+    }
+
+    public function setIdMoneda(string $idMoneda): self
+    {
+        $this->idMoneda = $idMoneda;
+
+        return $this;
+    }
+
+    public function getIdAgencia(): string
+    {
+        return (string) $this->idAgencia;
+    }
+
+    public function setIdAgencia(string $idAgencia): self
+    {
+        $this->idAgencia = $idAgencia;
 
         return $this;
     }

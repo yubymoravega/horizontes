@@ -404,14 +404,21 @@ class ValeSalidaProductoController extends AbstractController
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
         $year_ = Date('Y');
-        $obj_vale = $em->getRepository(ValeSalida::class)->findOneBy(array(
+        $arr_vale = $em->getRepository(ValeSalida::class)->findBy(array(
             'nro_consecutivo' => $nro,
             'producto' => true,
             'anno' => $year_
         ));
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
         $msg = 'No se pudo eliminar el vale de salida seleccionado';
         $success = 'error';
-        if ($obj_vale) {
+        if (!empty($arr_vale)) {
+            /** @var ValeSalida $inf */
+            foreach ($arr_vale as $inf) {
+                if ($inf->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen) {
+                    $obj_vale = $inf;
+                }
+            }
             /**@var $obj_vale ValeSalida** */
             $obj_vale->setActivo(false);
             $obj_documento = $obj_vale->getIdDocumento();

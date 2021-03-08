@@ -1,0 +1,123 @@
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="seleccionarProducto" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="seleccionarProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="seleccionarProductoLabel">Visualizar nómina</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app">
+                    <form method="post" autocomplete="off">
+                        <div>
+                            <form action="" method="post" class="d-flex mt-2">
+                                <div class="row form-group input-group">
+                                    <div class="w100 row m-0 p-0">
+                                        <div class="col-12">
+                                            <label for="anno" class="w-100 text-white">Año:</label>
+                                            <input type="number" id="anno" class="mr-0 form-control w-100" name="anno">
+                                        </div>
+                                    </div>
+                                    <div class="w100 row m-0 p-0">
+                                        <div class="col-12">
+                                            <label for="mes" class="text-white">Mes:</label>
+                                            <select class="mr-0 form-control w-100" name="mes"
+                                                    id="mes"
+                                                    style="width: 250px; height: 38px;">
+                                                <option value="1">Enero</option>
+                                                <option value="2">Febrero</option>
+                                                <option value="3">Marzo</option>
+                                                <option value="4">Abril</option>
+                                                <option value="5">Mayo</option>
+                                                <option value="6">Junio</option>
+                                                <option value="7">Julio</option>
+                                                <option value="8">Agosto</option>
+                                                <option value="9">Septiembre</option>
+                                                <option value="10">Ocutbre</option>
+                                                <option value="11">Noviembre</option>
+                                                <option value="12">Diciembre</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row p-0 m-0">
+                                        <div class="col-12">
+                                            <label for="quincena" class="text-white">Quincena:</label>
+                                            <select class="mr-0 form-control w-100" name="quincena"
+                                                    id="quincena"
+                                                    style="width: 250px; height: 38px;">
+                                                <option value="1">1ra Quincena</option>
+                                                <option value="2">2da Quincena</option>
+                                                <option value="3">Extraordinaria</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </form>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <a class="btn btn-outline-secondary text-white" type="button"
+                               aria-label="Cerrar" data-dismiss="modal">
+                                <span aria-hidden="true">Salir</span>
+                            </a>
+                        </div>
+                        <div class="ml-2">
+                            <button class="my-0 btn btn-secondary" onclick="Print_Nomina()"
+                                    id="btnAceptarPrintSubmayor" data-dismiss="modal">
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Print_Nomina() {
+            let anno = $('#anno').val();
+            if (anno == '')
+                alertTemplate('El año es no puede estar vacio.', 'danger')
+            else {
+                if (anno > 2020) {
+                    let quincena = $('#quincena').val()
+                    let mes = $('#mes').val()
+                    let anno = $('#anno').val()
+                    let tipo = 2
+                    $('body').append(`
+                    <form action='/contabilidad/capital-humano/reporte-nomina/print'
+                         method="post" id='form_print' target='_blank'>
+                        <input type='text' hidden name='anno' value='${anno}'/>
+                        <input type='text' hidden name='mes' value='${mes}'/>
+                        <input type='hidden' name='quincena' value='${quincena}'/>
+                        <input type='hidden' name='tipo' value='${tipo}'/>
+                    </form>`)
+                    const fomrulario = $('#form_print')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else
+                    alertTemplate('El año de partida es 2021.', 'danger')
+            }
+        }
+
+        $(document).ready(function () {
+            $('#seleccionarProducto').modal('show')
+        })
+    </script>
+{% endblock %}

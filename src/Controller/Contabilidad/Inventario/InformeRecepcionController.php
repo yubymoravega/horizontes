@@ -15,6 +15,7 @@ use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Config\UnidadMedida;
+use App\Entity\Contabilidad\General\Asiento;
 use App\Entity\Contabilidad\General\ObligacionPago;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
@@ -29,6 +30,7 @@ use App\Repository\Contabilidad\Config\AlmacenRepository;
 use App\Repository\Contabilidad\Config\UnidadMedidaRepository;
 use App\Repository\Contabilidad\Config\UnidadRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -95,12 +97,12 @@ class InformeRecepcionController extends AbstractController
         $arr_obj_eliminado = $informe_recepcion_er->findBy(array(
             'anno' => $year_,
             'activo' => false,
-            'producto' => false
+            'producto' => false,
         ));
         $arr_eliminados = [];
         foreach ($arr_obj_eliminado as $key => $eliminado) {
             /**@var $eliminado InformeRecepcion** */
-            $arr_eliminados[$key] = $eliminado->getNroConcecutivo();
+            //$arr_eliminados[$key] = $eliminado->getNroConcecutivo();
         }
         return new JsonResponse(['nros' => $nro, 'eliminados' => $arr_eliminados, 'success' => true]);
     }
@@ -137,6 +139,7 @@ class InformeRecepcionController extends AbstractController
                 $obj_tipo_documento = $tipo_documento_er->find(1);
                 /**  datos de InformeRecepcionType **/
                 $proveedor = $informe_recepcion['cod_proveedor'];
+                $nombre_proveedor = $informe_recepcion['nombre_proveedor'];
                 $cuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_cuenta_acreedora']);
                 $subcuenta_acreedora = AuxFunctions::getNro($informe_recepcion['nro_subcuenta_acreedora']);
                 $fecha_factura = $informe_recepcion['fecha_factura'];
@@ -160,7 +163,9 @@ class InformeRecepcionController extends AbstractController
                     $contador = 0;
                     foreach ($informes_recepcion_arr as $obj) {
                         /**@var $obj InformeRecepcion* */
-                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen && $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto() != true)
+                        if ($obj->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen &&
+                            $obj->getIdDocumento()->getIdUnidad()->getId() == $id_unidad && $obj->getProducto() != true &&
+                            !$obj->getIdDocumento()->getIdDocumentoCancelado())
                             $contador++;
                     }
                     $consecutivo = $contador + 1;
@@ -171,6 +176,14 @@ class InformeRecepcionController extends AbstractController
                         'codigo' => $proveedor,
                         'activo' => true
                     ));
+                    if(!$proveedor_obj){
+                        $proveedor_obj = new Proveedor();
+                        $proveedor_obj
+                            ->setActivo(true)
+                            ->setCodigo($proveedor)
+                            ->setNombre($nombre_proveedor);
+                        $em->persist($proveedor_obj);
+                    }
                     $cuenta_acreedora_obj = $cuenta_er->findOneBy(array(
                         'nro_cuenta' => $cuenta_acreedora,
                         'activo' => true
@@ -198,7 +211,7 @@ class InformeRecepcionController extends AbstractController
                     } else {
                         return new JsonResponse(['error' => true, 'success' => false, 'message' => 'No existe la subcuenta acreedora o el proveedor.']);
                     }
-
+                    $obj_almacen = $em->getRepository(Almacen::class)->find($id_almacen);
                     //2-adicionar en documento
                     $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $id_almacen]);
                     if (empty($arr_documentos)){
@@ -209,15 +222,15 @@ class InformeRecepcionController extends AbstractController
                         $today = AuxFunctions::getDateToClose($em, $id_almacen);
                         $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
                     }
-
+                    $unidad = $em->getRepository(Unidad::class)->find($id_unidad);
                     $documento = new Documento();
                     $documento
                         ->setActivo(true)
                         ->setAnno($year_)
                         ->setIdTipoDocumento($obj_tipo_documento)
                         ->setFecha($obj_date)
-                        ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
-                        ->setIdUnidad($em->getRepository(Unidad::class)->find($id_unidad))
+                        ->setIdAlmacen($obj_almacen)
+                        ->setIdUnidad($unidad)
                         ->setIdMoneda($em->getRepository(Moneda::class)->find($informe_recepcion['documento']['id_moneda']));
                     $em->persist($documento);
 
@@ -230,13 +243,24 @@ class InformeRecepcionController extends AbstractController
                         ->setIdDocumento($documento)
                         ->setIdProveedor($proveedor_obj)
                         ->setNroConcecutivo($consecutivo)
-                        ->setNroCuentaAcreedora($cuenta_acreedora)
+                        ->setNroCuentaAcreedora($cuenta_acreedora)//esta es la tipa
                         ->setNroCuentaInventario('')
                         ->setNroSubcuentaInventario('')
                         ->setActivo(true)
                         ->setProduco(false)
-                        ->setNroSubcuentaAcreedora($subcuenta_acreedora);
+                        ->setNroSubcuentaAcreedora($subcuenta_acreedora);//esta es la tipa
                     $em->persist($informe_recepcion);
+
+                    /*** Asentando la Operacion**/
+                    $obj_cuenta = $em->getRepository(Cuenta::class)->findOneBy([
+                        'nro_cuenta'=>$cuenta_acreedora,
+                        'activo'=>true
+                    ]);
+                    $obj_subcuenta = $em->getRepository(Subcuenta::class)->findOneBy([
+                        'id_cuenta'=>$obj_cuenta,
+                        'nro_subcuenta'=>$subcuenta_acreedora,
+                        'activo'=>true
+                    ]);
 
                     /**5-adicionar o actualizar la mercancia variando la existencia y el precio que sera por precio promedio
                      * (este se calculara sumanto la existencia de la mercancia + la cantidad la cantidad adicionada y /
@@ -267,9 +291,9 @@ class InformeRecepcionController extends AbstractController
                                 ->setActivo(true)
                                 ->setImporte(floatval($importe_mercancia))
                                 ->setEntrada(true)
-                                ->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen))
+                                ->setIdAlmacen($obj_almacen)
                                 ->setCantidad($cantidad_mercancia)
-                                ->setFecha(\DateTime::createFromFormat('Y-m-d', $today))
+                                ->setFecha($obj_date)
                                 ->setIdDocumento($documento)
                                 ->setIdTipoDocumento($obj_tipo_documento)
                                 ->setIdUsuario($this->getUser());
@@ -287,7 +311,7 @@ class InformeRecepcionController extends AbstractController
                                     ->setActivo(true)
                                     ->setDescripcion($descripcion)
                                     ->setExistencia($cantidad_mercancia)
-                                    ->setIdAmlacen($em->getRepository(Almacen::class)->find($id_almacen))
+                                    ->setIdAmlacen($obj_almacen)
                                     ->setCodigo($codigo_mercancia)
                                     ->setCuenta($cuenta_inventario)
                                     ->setNroCuentaAcreedora($cuenta_acreedora)
@@ -314,14 +338,32 @@ class InformeRecepcionController extends AbstractController
                                     ->setIdMercancia($obj_mercancia)
                                     ->setExistencia($obj_mercancia->getExistencia());
                             }
+                            ///////----ADICIONANDO ASIENTO DE LA CUENTA DE INVENTARIO
+                            $cuenta_inv = $movimiento_mercancia->getIdMercancia()->getCuenta();
+                            $subcuenta_inv = $movimiento_mercancia->getIdMercancia()->getNroSubcuentaInventario();
+                            $obj_cuenta_inv = $cuenta_er->findOneBy([
+                                'nro_cuenta'=>$cuenta_inv,
+                                'activo'=>true
+                            ]);
+                            $obj_subcuenta_inv = $sub_cuenta_er->findOneBy([
+                                'nro_subcuenta'=>$subcuenta_inv,
+                                'activo'=>true,
+                                'id_cuenta'=>$obj_cuenta_inv
+                            ]);
+                            $asiento_inv = AuxFunctions::createAsiento($em,$obj_cuenta_inv, $obj_subcuenta_inv,$documento,$unidad,$obj_almacen,
+                                null,null,null,null,$proveedor_obj
+                                ,0,0,$obj_date,$obj_date->format('Y'),0,$importe_mercancia,'IRM-'.$consecutivo);
+
                             $em->persist($movimiento_mercancia);
                         }
                     }
-
                     //--actualizo el importe total del documento, que no es mas que la sumatoria del importe de todas las mercancias...
                     $documento
                         ->setImporteTotal($importe_total);
                     $em->persist($documento);
+
+                    $asiento = AuxFunctions::createAsiento($em,$obj_cuenta,$obj_subcuenta,$documento,$unidad,$obj_almacen,null,null,null,null,$proveedor_obj
+                        ,0,0,$obj_date,$obj_date->format('Y'),$importe_total,0,'IRM-'.$consecutivo);
 
                     try {
                         $em->flush();
@@ -347,6 +389,7 @@ class InformeRecepcionController extends AbstractController
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $row = AuxFunctions::getMercanciaByCod($em, $codigo, $id_almacen);
+
         return new JsonResponse(['mercancias' => $row, 'success' => true]);
     }
 
@@ -389,15 +432,23 @@ class InformeRecepcionController extends AbstractController
         // if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
         $em = $this->getDoctrine()->getManager();
         $year_ = Date('Y');
-        $obj_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findOneBy(array(
+        $arr_informe_recepcion = $em->getRepository(InformeRecepcion::class)->findBy(array(
             'activo' => true,
             'nro_concecutivo' => $nro,
             'producto' => false,
             'anno' => $year_
         ));
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+
         $msg = 'No se pudo eliminar el informe de recepción seleccionado';
         $success = 'error';
-        if ($obj_informe_recepcion) {
+        if (!empty($arr_informe_recepcion)) {
+            /** @var InformeRecepcion $inf */
+            foreach ($arr_informe_recepcion as $inf){
+                if($inf->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen){
+                    $obj_informe_recepcion = $inf;
+                }
+            }
             /**@var $obj_informe_recepcion InformeRecepcion** */
             $obligacion_er = $em->getRepository(ObligacionPago::class);
 
@@ -419,6 +470,44 @@ class InformeRecepcionController extends AbstractController
             //voy a documento y lo elimino
             $obj_documento->setActivo(false);
 
+            //2-adicionar en documento
+            $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $obj_documento->getIdAlmacen()]);
+            if (empty($arr_documentos)) {
+                $today = $request->getSession()->get('date_system');
+                $obj_date = \DateTime::createFromFormat('d/m/Y', $today);
+            } else {
+                $today = AuxFunctions::getDateToClose($em, $obj_documento->getIdAlmacen()->getId());
+                $obj_date = \DateTime::createFromFormat('Y-m-d', $today);
+            }
+            /** DUPLICANDO EL DOCUMENTO Y EL INFORME DE RECEPCION */
+            $new_documento_cancelacion = new Documento();
+            $new_documento_cancelacion
+                ->setActivo(false)
+                ->setFecha($obj_date)
+                ->setIdAlmacen($obj_documento->getIdAlmacen())
+                ->setIdUnidad($obj_documento->getIdUnidad())
+                ->setIdTipoDocumento($obj_documento->getIdTipoDocumento())
+                ->setIdDocumentoCancelado($obj_documento)
+                ->setIdMoneda($obj_documento->getIdMoneda())
+                ->setImporteTotal($obj_documento->getImporteTotal())
+            ;
+            $em->persist($new_documento_cancelacion);
+
+            $new_informe_cancelado = new InformeRecepcion();
+            $new_informe_cancelado
+                ->setActivo(false)
+                ->setIdDocumento($new_documento_cancelacion)
+                ->setAnno($obj_informe_recepcion->getAnno())
+                ->setIdProveedor($obj_informe_recepcion->getIdProveedor())
+                ->setFechaFactura($obj_informe_recepcion->getFechaFactura())
+                ->setNroSubcuentaInventario($obj_informe_recepcion->getNroSubcuentaInventario())
+                ->setNroCuentaInventario($obj_informe_recepcion->getNroCuentaInventario())
+                ->setProduco($obj_informe_recepcion->getProducto())
+                ->setNroCuentaAcreedora($obj_informe_recepcion->getNroCuentaAcreedora())
+                ->setNroSubcuentaAcreedora($obj_informe_recepcion->getNroSubcuentaAcreedora())
+                ->setNroConcecutivo($obj_informe_recepcion->getNroConcecutivo())
+                ->setCodigoFactura($obj_informe_recepcion->getCodigoFactura());
+            $em->persist($new_informe_cancelado);
 
             //eliminar la entrada de la tabla de movimiento_mercancia
             $arr_movimientos_mercancia = $em->getRepository(MovimientoMercancia::class)->findBy(array(
@@ -430,6 +519,7 @@ class InformeRecepcionController extends AbstractController
             if (!empty($arr_movimientos_mercancia)) {
                 foreach ($arr_movimientos_mercancia as $obj_movimiento_mercancia) {
                     /**@var $obj_movimiento_mercancia MovimientoMercancia* */
+                    //////////-------- ACTUALIZANDO EXISTENCIA E IMPORTE ----------------
                     $obj_movimiento_mercancia
                         ->setActivo(false);
                     $em->persist($obj_movimiento_mercancia);
@@ -444,16 +534,53 @@ class InformeRecepcionController extends AbstractController
                         $obj_mercancia->setActivo(false);
                     }
                     $em->persist($obj_mercancia);
+
+                    /**
+                     * Duplicar los movimientos de mercancias, poniendolos en activo = false e id_movimiento_cancelado = al movimiento original
+                     */
+                    $new_movimiento_cancelado = new MovimientoMercancia();
+                    $new_movimiento_cancelado
+                        ->setIdDocumento($new_documento_cancelacion)
+                        ->setActivo(false)
+                        ->setIdTipoDocumento($obj_movimiento_mercancia->getIdTipoDocumento())
+                        ->setIdAlmacen($obj_movimiento_mercancia->getIdAlmacen())
+                        ->setIdElementoGasto($obj_movimiento_mercancia->getIdElementoGasto())
+                        ->setIdOrdenTrabajo($obj_movimiento_mercancia->getIdOrdenTrabajo())
+                        ->setIdExpediente($obj_movimiento_mercancia->getIdExpediente())
+                        ->setIdCentroCosto($obj_movimiento_mercancia->getIdCentroCosto())
+                        ->setFecha($new_documento_cancelacion->getFecha())
+                        ->setNroSubcuentaDeudora($obj_movimiento_mercancia->getNroSubcuentaDeudora())
+                        ->setCantidad($obj_movimiento_mercancia->getCantidad())
+                        ->setCuenta($obj_movimiento_mercancia->getCuenta())
+                        ->setImporte($obj_movimiento_mercancia->getImporte())
+                        ->setIdUsuario($this->getUser())
+                        ->setEntrada($obj_movimiento_mercancia->getEntrada())
+                        ->setIdMercancia($obj_movimiento_mercancia->getIdMercancia())
+                        ->setExistencia($obj_movimiento_mercancia->getExistencia())
+                        ->setIdMovimientoCancelado($obj_movimiento_mercancia);
+                    $em->persist($new_movimiento_cancelado);
                 }
             }
             try {
                 $em->persist($obj_informe_recepcion);
-//                    $em->persist($obj_obligacion);
                 $em->persist($obj_documento);
+                /**
+                 * Busco las cuentas que se tocaron en ese documento y las duplico en el sentido inverso(debito y credito)
+                 * de esta manera se anula la obligracion
+                 */
+                $asientos = $em->getRepository(Asiento::class)->findBy([
+                    'id_documento'=>$obj_documento
+                ]);
+                /** @var Asiento $asiento */
+                foreach ($asientos as $asiento){
+                    $new_asiento = AuxFunctions::createAsiento($em,$asiento->getIdCuenta(),$asiento->getIdSubcuenta(),
+                        $asiento->getIdDocumento(),$asiento->getIdUnidad(),$asiento->getIdAlmacen(),$asiento->getIdCentroCosto(),
+                        $asiento->getIdElementoGasto(),$asiento->getIdOrdenTrabajo(),$asiento->getIdExpediente(),$asiento->getIdProveedor(),$asiento->getTipoCliente(),
+                        $asiento->getIdCliente(),$asiento->getFecha(),$asiento->getAnno(),$asiento->getDebito(),$asiento->getCredito(),$asiento->getNroDocumento());
+                }
                 $em->flush();
                 $success = 'success';
                 $msg = 'Informe de recepción eliminado satisfactoriamente';
-
             } catch
             (FileException $exception) {
                 return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
@@ -582,8 +709,11 @@ class InformeRecepcionController extends AbstractController
         $rows = [];
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $arr_documentos = $em->getRepository(Documento::class)->findBy(['id_almacen' => $id_almacen]);
-        if (empty($arr_documentos))
+        if (empty($arr_documentos)){
             $fecha_contable = $request->getSession()->get('date_system');
+            $arr = explode('/', $fecha_contable);
+            $fecha_contable = $arr[2].'-'.$arr[1].'-'.$arr[0];
+        }
         else
             $fecha_contable = AuxFunctions::getDateToClose($em, $id_almacen);
         $arr_fecha_contable = explode('-', $fecha_contable);
@@ -638,6 +768,7 @@ class InformeRecepcionController extends AbstractController
             'producto' => false,
             'anno' => $today->format('Y')
         ));
+
         /** @var InformeRecepcion $element */
         foreach ($informe_arr as $element) {
             if ($element->getIdDocumento()->getIdAlmacen()->getId() == $id_almacen)
@@ -647,9 +778,9 @@ class InformeRecepcionController extends AbstractController
         if (!$informe_obj) {
             return new JsonResponse(['informe' => [], 'success' => true, 'msg' => 'El nro de informe no existe.']);
         }
-        /**@var $informe_obj InformeRecepcion* */
-        if ($informe_obj->getActivo() == false)
-            return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El informe ha sido eliminado.']);
+//        /**@var $informe_obj InformeRecepcion* */
+//        if ($informe_obj->getActivo() == false)
+//            return new JsonResponse(['informe' => [], 'success' => false, 'msg' => 'El informe ha sido eliminado.']);
 
         $importe_total = 0;
         $rows_movimientos = [];
@@ -676,6 +807,7 @@ class InformeRecepcionController extends AbstractController
 
         $rows = array(
             'id' => $informe_obj->getId(),
+            'cancelado'=>$informe_obj->getActivo()?false:true,
             'nro_cuenta_acreedora' => $informe_obj->getNroCuentaAcreedora() . ' - ' . $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaAcreedora())->getNombre(),
             'nro_subcuenta_acreedora' => $informe_obj->getNroSubcuentaAcreedora() . ' - ' . $this->getSubcuenta($subcuenta_er, $informe_obj->getNroSubcuentaAcreedora(), $this->getCuenta($cuenta_er, $informe_obj->getNroCuentaAcreedora()))->getDescripcion(),
             'cod_proveedor' => $informe_obj->getIdProveedor()->getCodigo(),

@@ -1,0 +1,163 @@
+{% extends 'turismo_module/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Elementos y Costos que Componen la Visa
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#modal__form__id" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        {{ include('turismo_module/visado/elementos_visa/form_modal.html.twig',{title:'add'}) }}
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-1" >Código</th>
+            <th scope="col-3" >Descripción</th>
+            <th scope="col-3">Proveedor</th>
+            <th scope="col-1">Costo</th>
+            <th scope="col-1" width="150px">Acciones</th>
+            </thead>
+            <tbody>
+            {% for item in elementos %}
+                <tr>
+                    <td style="font-weight:400;" >{{ item.codigo }}</td>
+                    <td style="font-weight:400;" >{{ item.descripcion }}</td>
+                    <td style="font-weight:400;" >{{ item.proveedor }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.costo_str }}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onUpdate({
+                                        codigo: '{{ item.codigo }}',
+                                        id_proveedor: '{{ item.id_proveedor }}',
+                                        proveedor:'{{ item.proveedor }}',
+                                        descripcion:'{{ item.descripcion }}' ,
+                                        costo:'{{ item.costo }}' ,
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm ml-1" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el elemento {{ item.descripcion }} ?',
+                                        url:'{{ path('turismo_visdo_elementos_delete',{id: item.id}) }}',
+                                        _token: '{{ csrf_token('delete' ~ item.id) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+
+        const TEXT_SELECT = '... seleccione ...';
+
+        function mostrarBtn() {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+        }
+
+        const onUpdate = function (config) {
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {codigo = '', id_proveedor='', proveedor = '', descripcion = '', costo = '', id = ''} = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Modificar " + descripcion)
+
+            $('#elementos_visa_codigo').val(codigo)
+            $('#elementos_visa_costo').val(costo)
+            $('#elementos_visa_id_proveedor').val(id_proveedor)
+            $('#elementos_visa_descripcion').val(descripcion)
+            $('#id_elemento').val(id)
+        }
+
+        $(document).ready(function () {
+            // init
+            $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
+            $('#modal__btn__actualizar').hide()
+
+            // validacion del formulario
+            var validateForm = $('#form_modal_target').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    // colocar mensajes de error a la derecha de cada label para el componente
+                    const error_label = element.closest("form").find(element.attr('id') + "-error")
+                    if (error_label.length) {
+                        error_label.removeClass('hide')
+                    } else {
+                        error.addClass('ml-3')
+                        $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                    }
+                },
+                rules: {
+                    'elementos_visa[codigo]': "required",
+                    'elementos_visa[costo]': "required",
+                    'elementos_visa[id_proveedor]': "required",
+                    'elementos_visa[descripcion]': "required"
+                },
+                messages: {
+                    'elementos_visa[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'elementos_visa[costo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'elementos_visa[id_proveedor]': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                    'elementos_visa[descripcion]': CONTAB_MSG.REQUIRED_NOT_BLANK
+                }
+            })
+            $('#modal__btn__aceptar').on('click', function () {
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/configuracion-turismo/gestion-consular/elementos-visa/add`)
+                formulario.submit()
+                //if (validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+            $('#modal__btn__actualizar').on('click', function () {
+                const id_elemento = $('#id_elemento').val()
+                const formulario = $('#form_modal_target')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `/configuracion-turismo/gestion-consular/elementos-visa/upd/${id_elemento}`)
+                formulario.submit()
+                //if (validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+            $('#modal__form__id').on('show.bs.modal', function (event) {
+                validateForm.resetForm()
+                $('#modal__form__label__id').text('Adicionar Elemento')
+            })
+        })
+
+    </script>
+{% endblock %}
+

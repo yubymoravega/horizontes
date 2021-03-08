@@ -6,6 +6,7 @@ use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\CentroCosto;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\ElementoGasto;
+use App\Entity\Contabilidad\Config\InstrumentoCobro;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\Unidad;
 use App\Entity\Contabilidad\Inventario\Expediente;
@@ -98,6 +99,11 @@ class OperacionesComprobanteOperaciones
      * @ORM\ManyToOne(targetEntity=Unidad::class)
      */
     private $id_unidad;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=InstrumentoCobro::class)
+     */
+    private $id_instrumento_cobro;
 
     public function getId(): ?int
     {
@@ -268,6 +274,18 @@ class OperacionesComprobanteOperaciones
     public function setIdUnidad(?Unidad $id_unidad): self
     {
         $this->id_unidad = $id_unidad;
+
+        return $this;
+    }
+
+    public function getIdInstrumentoCobro(): ?InstrumentoCobro
+    {
+        return $this->id_instrumento_cobro;
+    }
+
+    public function setIdInstrumentoCobro(?InstrumentoCobro $id_instrumento_cobro): self
+    {
+        $this->id_instrumento_cobro = $id_instrumento_cobro;
 
         return $this;
     }

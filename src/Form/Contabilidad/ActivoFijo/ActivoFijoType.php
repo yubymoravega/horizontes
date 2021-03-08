@@ -5,6 +5,7 @@ namespace App\Form\Contabilidad\ActivoFijo;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,8 +17,10 @@ class ActivoFijoType extends AbstractType
     {
         $builder
             ->add('nro_inventario', TextType::class,[
-                'label'=>'Nro. Inventario'
+                'label'=>'Nro. Inventario',
+                'disabled'=>true
             ])
+            ->add('type', HiddenType::class)
             ->add('fecha_alta',DateType::class, array(
                 'input'=>'datetime',
                 'widget'=>'single_text',
@@ -42,7 +45,8 @@ class ActivoFijoType extends AbstractType
                 'required'=>false
             ])
             ->add('valor_real',TextType::class,[
-                'label'=>'Valor Real'
+                'label'=>'Valor Real',
+                'disabled'=>true
             ])
             ->add('annos_vida_util',TextType::class,[
                 'label'=>'Años de Vida Util'
@@ -78,9 +82,6 @@ class ActivoFijoType extends AbstractType
             ->add('combustible',TextType::class,[
                 'label'=>'Tipo de Combustible',
                 'required'=>false
-            ])
-            ->add('id_area_responsabilidad', ChoiceType::class,[
-                'label'=>'Area de Responsabilidad'
             ])
             ->add('id_grupo_activo', ChoiceType::class,[
                 'label'=>'Grupo de Activo'

@@ -18,7 +18,7 @@ class Carrito
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=1500)
+     * @ORM\Column(type="json")
      */
     private $json;
 
@@ -33,18 +33,6 @@ class Carrito
         return $this->id;
     }
 
-    public function getJson(): ?string
-    {
-        return $this->json;
-    }
-
-    public function setJson(string $json): self
-    {
-        $this->json = $json;
-
-        return $this;
-    }
-
     public function getEmpleado(): ?string
     {
         return $this->empleado;
@@ -53,6 +41,18 @@ class Carrito
     public function setEmpleado(string $empleado): self
     {
         $this->empleado = $empleado;
+
+        return $this;
+    }
+
+    public function getJson(): ?array
+    {
+        return $this->json;
+    }
+
+    public function setJson(?array $json): self
+    {
+        $this->json = $json;
 
         return $this;
     }

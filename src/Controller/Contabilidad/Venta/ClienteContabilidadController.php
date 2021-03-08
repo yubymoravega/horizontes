@@ -2,6 +2,8 @@
 
 namespace App\Controller\Contabilidad\Venta;
 
+use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\Config\Banco;
 use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Venta\ClienteContabilidad;
 use App\Entity\Contabilidad\Venta\CuentasCliente;
@@ -40,7 +42,7 @@ class ClienteContabilidadController extends AbstractController
                 'fax' => $item->getFax(),
                 'telefonos' => $item->getTelefonos(),
                 'correos' => $item->getCorreos(),
-                'direccion' => $item->getDireccion()
+                'direccion' => $item->getDireccion(),
             );
         }
         $paginator = $pagination->paginate(
@@ -98,6 +100,7 @@ class ClienteContabilidadController extends AbstractController
         $id_cliente = $request->get('id_cliente');
         $cliente_er = $em->getRepository(ClienteContabilidad::class);
         $moneda_er = $em->getRepository(Moneda::class);
+        $banco_er = $em->getRepository(Banco::class);
         /** @var ClienteContabilidad $cliente */
         $cuentas_cliente_arr = $em->getRepository(CuentasCliente::class)->findBy(array(
             'id_cliente' => $id_cliente
@@ -108,6 +111,7 @@ class ClienteContabilidadController extends AbstractController
                 $new_cuenta_cliente
                     ->setNroCuenta($item['nro_cuenta'])
                     ->setIdMoneda($moneda_er->find($item['moneda']))
+                    ->setIdBanco($banco_er->find(($item['banco'])))
                     ->setIdCliente($cliente_er->find($id_cliente))
                     ->setActivo(true);
                 $em->persist($new_cuenta_cliente);
@@ -222,7 +226,9 @@ class ClienteContabilidadController extends AbstractController
                 $row[] = array(
                     'nro_cuenta' => $obj->getNroCuenta(),
                     'moneda' => $obj->getIdMoneda()->getId(),
-                    'nombre_moneda' => $obj->getIdMoneda()->getNombre()
+                    'nombre_moneda' => $obj->getIdMoneda()->getNombre(),
+                    'banco' => $obj->getIdBanco()->getId(),
+                    'nombre_banco' => $obj->getIdBanco()->getNombre()
                 );
             }
         }

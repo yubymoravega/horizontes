@@ -1,0 +1,1078 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <section class="section-lg-50 novi-background " id='seccion-principal'>
+
+        <div class="card-header text-center">
+            <img class="imagen-efectivo" src="{{ asset('images/iconos/money.svg') }}">
+            <h2>Pagos con efectivo USD</h2>
+        </div>
+        <hr class="divider bg-mantis">
+        <div class="container d-flex justify-content-center">
+            <form id="form" method="POST">
+                <div class="row">
+                    <div class="col-6 col-md-6">
+                        <h3 style="color:white; text-align: center; font-weight: 100;">Desglose</h3>
+                        <hr class="divider-white bg-mantis-white">
+                        <div class="row">
+                            <div class="col-6 col-md-6">
+                                <h5 style="color:white; text-align: center;">Billetes</h5>
+                                <div class="col">
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$100</div>
+                                        </div>
+                                        <input type="text" class="form-control" id="i-100" name="i-100"
+                                               placeholder="Billetes">
+                                        <button type="button" class="btn btn-dark btn-icon btn-icon-right" id="b-100">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$50</div>
+                                        </div>
+                                        <input id="i-50" name="i-50" type="text" class="form-control"
+                                               placeholder="Billetes">
+                                        <button id="b-50" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$20</div>
+                                        </div>
+                                        <input name="i-20" id="i-20" type="text" class="form-control"
+                                               placeholder="Billetes">
+                                        <button id="b-20" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$10</div>
+                                        </div>
+                                        <input name="i-10" id="i-10" type="text" class="form-control"
+                                               placeholder="Billetes">
+                                        <button id="b-10" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$5</div>
+                                        </div>
+                                        <input name="i-5" id="i-5" type="text" class="form-control"
+                                               placeholder="Billetes">
+                                        <button id="b-5" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$2</div>
+                                        </div>
+                                        <input name="i-2" id="i-2" type="text" class="form-control"
+                                               placeholder="Billetes">
+                                        <button id="b-2" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$1</div>
+                                        </div>
+                                        <input name="i-1" id="i-1" type="text" class="form-control"
+                                               placeholder="Billetes">
+                                        <button id="b-1" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-6">
+                                <h5 style="color:white; text-align: center;">Monedas</h5>
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">¢1</div>
+                                        </div>
+                                        <input name="ic-1" id="ic-1" type="text" class="form-control"
+                                               placeholder="Centavos">
+                                        <button id="bc-1" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">¢5</div>
+                                        </div>
+                                        <input name="ic-5" id="ic-5" type="text" class="form-control"
+                                               placeholder="Centavos">
+                                        <button id="bc-5" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">¢10</div>
+                                        </div>
+                                        <input name="ic-10" id="ic-10" type="text" class="form-control"
+                                               placeholder="Centavos">
+                                        <button id="bc-10" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">¢25</div>
+                                        </div>
+                                        <input name="ic-25" id="ic-25" type="text" class="form-control"
+                                               placeholder="Centavos">
+                                        <button id="bc-25" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">¢50</div>
+                                        </div>
+                                        <input name="ic-50" id="ic-50" type="text" class="form-control"
+                                               placeholder="Centavos">
+                                        <button id="bc-50" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"  style="width: 60px !important;">
+                                            <div class="input-group-text w-100">$1</div>
+                                        </div>
+                                        <input name="ic-100" id="ic-100" type="text" class="form-control"
+                                               placeholder="Centavos">
+                                        <button id="bc-100" type="button" class="btn btn-dark btn-icon btn-icon-right">
+                                            <span class="novi-icon fa fa-plus-square"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-6 clase">
+                        <h3 style="color:white; text-align: center; font-weight: 100;">Cambio</h3>
+                        <hr
+                                class="divider-white bg-mantis-white">
+                        <!-- Bootstrap Table-->
+                        <div id="messageBox" style="display: none;  text-align: center;" class="alert alert-danger"
+                             role="alert"></div>
+                        <div class="col-3 d-flex justify-content-center container">
+
+                            <table class="table table-striped tabla-reporte">
+                                <tbody>
+                                <tr>
+                                    <th>Detalle</th>
+                                    <th>Monto</th>
+                                </tr>
+                                <tr>
+                                    <td>Efectivo</td>
+                                    <td>
+                                        $<span id='monto'>0.00</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Factura</td>
+                                    <td>
+                                        $<span id="pago">{{ resto_cotizacion }}</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>Cambio</td>
+                                    <td>
+                                        $<span id='cambio'>0.00</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col d-flex justify-content-center container">
+                            <button id="procesar" type="button" class="btn btn-dark">Procesar</button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+
+        var pago = 0;
+        var decimal = 0;
+        document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+        document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+        $("#i-100").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#i-50").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#i-20").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#i-10").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#i-5").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#i-2").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#i-1").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#b-100").click(function () {
+            $('#i-100').val(Number($('#i-100').val()) + 1);
+            document.getElementById("monto").textContent = Number(100) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#b-50").click(function () {
+            $('#i-50').val(Number($('#i-50').val()) + 1);
+            document.getElementById("monto").textContent = Number(50) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+        $("#b-20").click(function () {
+            $('#i-20').val(Number($('#i-20').val()) + 1);
+            document.getElementById("monto").textContent = Number(20) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+        $("#b-10").click(function () {
+            $('#i-10').val(Number($('#i-10').val()) + 1);
+            document.getElementById("monto").textContent = Number(10) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+        $("#b-5").click(function () {
+            $('#i-5').val(Number($('#i-5').val()) + 1);
+            document.getElementById("monto").textContent = Number(5) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#b-2").click(function () {
+            $('#i-2').val(Number($('#i-2').val()) + 1);
+            document.getElementById("monto").textContent = Number(2) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+
+        $("#b-1").click(function () {
+            $('#i-1').val(Number($('#i-1').val()) + 1);
+            document.getElementById("monto").textContent = Number(1) + Number(document.getElementById("monto").textContent);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#bc-1").click(function () {
+            $('#ic-1').val(Number($('#ic-1').val()) + 1);
+            decimal = 0;
+            pago = 0;
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#bc-5").click(function () {
+            $('#ic-5').val(Number($('#ic-5').val()) + 1);
+            decimal = 0;
+            pago = 0;
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#bc-10").click(function () {
+            $('#ic-10').val(Number($('#ic-10').val()) + 1);
+            decimal = 0;
+            pago = 0;
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#bc-25").click(function () {
+            $('#ic-25').val(Number($('#ic-25').val()) + 1);
+            decimal = 0;
+            pago = 0;
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#bc-50").click(function () {
+            $('#ic-50').val(Number($('#ic-50').val()) + 1);
+            decimal = 0;
+            pago = 0;
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#bc-100").click(function () {
+            $('#ic-100').val(Number($('#ic-100').val()) + 1);
+            decimal = 0;
+            pago = 0;
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#ic-1").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#ic-5").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#ic-10").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#ic-25").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#ic-50").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+        $("#ic-100").change(function () {
+            pago = 0;
+            pago = Number($('#i-100').val()) * 100;
+            pago = Number(pago) + (Number($('#i-50').val()) * 50);
+            pago = Number(pago) + (Number($('#i-20').val()) * 20);
+            pago = Number(pago) + (Number($('#i-10').val()) * 10);
+            pago = Number(pago) + (Number($('#i-5').val()) * 5);
+            pago = Number(pago) + (Number($('#i-2').val()) * 2);
+            pago = Number(pago) + (Number($('#i-1').val()) * 1);
+            decimal = Number($('#ic-1').val()) * 1;
+            decimal = Number(decimal) + Number($('#ic-5').val()) * 5;
+            decimal = Number(decimal) + Number($('#ic-10').val()) * 10;
+            decimal = Number(decimal) + Number($('#ic-25').val()) * 25;
+            decimal = Number(decimal) + Number($('#ic-50').val()) * 50;
+            pago = Number(pago) + Number($('#ic-100').val());
+            document.getElementById("monto").textContent = Number(pago) + (decimal / 100);
+            document.getElementById("monto").textContent = Math.round(document.getElementById("monto").textContent * 100) / 100;
+            document.getElementById("monto").textContent = parseFloat(document.getElementById("monto").textContent).toFixed(2);
+            document.getElementById("cambio").textContent = document.getElementById("monto").textContent - document.getElementById("pago").textContent;
+            document.getElementById("cambio").textContent = parseFloat(document.getElementById("cambio").textContent).toFixed(2);
+            if (document.getElementById("cambio").textContent < 0) {
+
+                $("#cambio").css({"color": "red"});
+
+            } else {
+
+                $("#cambio").css({"color": "white"});
+            }
+
+        });
+
+
+        $('#i-100').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#i-50').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#i-20').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#i-10').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#i-5').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#i-2').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#i-1').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#ic-1').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#ic-5').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#ic-10').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#ic-25').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#ic-50').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+        $('#ic-100').on('input', function () {
+            this.value = this.value.replace(/[^0-9-.]/g, '');
+        });
+
+        if (document.getElementById("cambio").textContent < 0) {
+
+            $("#cambio").css({"color": "red"});
+
+        } else {
+
+            $("#cambio").css({"color": "white"});
+        }
+
+        $("#procesar").click(function () {
+
+            if (document.getElementById("cambio").textContent < 0) {
+                $("#messageBox").text("Cambio debe ser mayor o igual que $0.00");
+
+                $("#messageBox").css({"display": ""});
+            } else {
+                $("#messageBox").css({"display": "none"});
+
+                 var url = window.location.protocol+"//"+location.hostname+":"+window.location.port+"/pasarela-pago/efectivo/save/"+{{id_cotizacion}}+'/'+document.getElementById("cambio").textContent; 
+                 window.location.href = url;
+            }
+
+
+        });
+    </script>
+{% endblock %}

@@ -1,28 +1,85 @@
-<li>
+<li id="reportes">
+    <a href="#">
+        <span>Reportes</span>
+    </a>
+    <ul class="rd-navbar-dropdown">
+        <li id="id-reportes">
+            {#			<a >#}
+            <a href="{{ url ('paymentreport') }}">
+                <span class="text-middle">► Tarjetas</span>
+            </a>
+            {#			</a>#}
+        </li>
+        <li>
+            {#			<a>#}
+            <a href="{{ url ('paymentreport.buscar') }}">
+                <span class="text-middle">► Facturas Stripe</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url ('cotizacion') }}">
+                <span class="text-middle">► Cotizaciones</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url ('turismo/reporte/solicitud/') }}">
+                <span class="text-middle">► Turismo</span>
+            </a>
+        </li>
+    </ul>
+</li>
 
-	<a href="#">
-		<span>Reportes</span>
-	</a>
-	<ul class="rd-navbar-dropdown">
 
-		<li>
-			<a href="{{ url ('config') }}">
-				<a href="{{ url ('paymentreport') }}">
-					<span>Tarjetas</span>
-				</a>
+<li id="servicios">
+    <a href="#">
+        <span> Configuración</span>
+    </a>
+    <ul class="rd-navbar-dropdown">
 
-			</a>
-		</li>
-		<li>
-			<a href="{{ url ('config') }}">
-				<a href="{{ url ('paymentreport.buscar') }}">
-					<span>Facturas</span>
-				</a>
-
-			</a>
-		</li>
-
-	</ul>
-
+        <li>
+            <a href="{{ url ('turismo/configuracion/') }}">
+                <span class="text-middle">► Turismo</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url ('turismo_module_configuracion') }}">
+                <span class="text-middle">► Servicios Turísticos</span>
+            </a>
+        </li>
+    </ul>
 
 </li>
+
+<a href="{{ url ('turismo_module_configuracion') }}" class="text-white text-uppercase p-3">
+    <span> Configuración</span>
+</a>
+
+<li id="admin">
+    <a href="#">
+        <span> Publicidad</span>
+    </a>
+    <ul class="rd-navbar-dropdown">
+
+        <li>
+            {#			<a>#}
+            <a href="{{ url ('publicidad') }}">
+                <span class="text-middle">► Home</span>
+            </a>
+            {#			</a>#}
+
+            {#			<a >#}
+            <a href="{{ url ('publicidad/img/agencias') }}">
+                <span class="text-middle">► IMG AGENCIAS</span>
+            </a>
+
+            {#			</a>#}
+        </li>
+
+    </ul>
+
+</li>
+
+
+
+
+

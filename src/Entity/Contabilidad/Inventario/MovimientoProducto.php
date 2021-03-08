@@ -116,6 +116,11 @@ class MovimientoProducto
      */
     private $id_factura;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=MovimientoProducto::class)
+     */
+    private $id_movimiento_cancelado;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -333,6 +338,18 @@ class MovimientoProducto
     public function setIdFactura(?Factura $id_factura): self
     {
         $this->id_factura = $id_factura;
+
+        return $this;
+    }
+
+    public function getIdMovimientoCancelado(): ?self
+    {
+        return $this->id_movimiento_cancelado;
+    }
+
+    public function setIdMovimientoCancelado(?self $id_movimiento_cancelado): self
+    {
+        $this->id_movimiento_cancelado = $id_movimiento_cancelado;
 
         return $this;
     }

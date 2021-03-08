@@ -1,0 +1,360 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Remesas | Configuración{% endblock %}
+
+{% block content %}
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-1" style="width: 50rem;">
+            <div class="container">
+                <h3 class="text-reporte text-center mr-0 text-white mt-2 font-weight-bold" id="normal_div">
+                    Configuración de Costos y Precios de Venta de Remesas
+                </h3>
+            </div>
+            <div class="card-body">
+                {{ form_start(formulario, {'attr':{'id':'form_solicitud','autocomplete':"off"}}) }}
+                <div class="row mt-0 p-0" id="nuevo_pais_div" style="display: none">
+                    <div class="col-11 form-group input-group input-group-sm pa-2 pr-0 mr-0">
+                        {{ form_label(formulario.nuevo_pais) }}
+                        {{ form_widget(formulario.nuevo_pais) }}
+                    </div>
+                    <div class="col-1 mt-4 pt-2 form-group input-group input-group-sm ml-0 pl-0">
+                        <button type="button" class='my-0 btn btn-outline-secondary' style="height: 40px"
+                                onclick="changeStatus(-1,true)"><i class="fa fa-trash-o text-danger fa-2x"></i></button>
+                    </div>
+                </div>
+                <div class="row mt-0 p-0" id="id_pais_div">
+                    <div class="col-12 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.id_pais) }}
+                        {{ form_widget(formulario.id_pais) }}
+                    </div>
+                </div>
+                {{ form_end(formulario.id_pais) }}
+                {{ form_start(formulario.costo_precio, {'attr':{'id':'form_elementos','autocomplete':"off"}}) }}
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Costos</h3>
+                    <div class="px-2" id="div_cliente_origen"
+                         style="background: dimgray; border-radius: .3rem; vertical-align: auto">
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+
+                <div class="row mt-1 p-0">
+                    <div class="col-12 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.id_proveedor) }}
+                        {{ form_widget(formulario.costo_precio.id_proveedor) }}
+                    </div>
+                </div>
+                <div class="row mt-1 p-0">
+                    <div class="col-3 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.minimo) }}
+                        {{ form_widget(formulario.costo_precio.minimo) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.maximo) }}
+                        {{ form_widget(formulario.costo_precio.maximo) }}
+                    </div>
+                    {#                </div>#}
+                    {#                <div class="row mt-1 p-0">#}
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.costo_fijo) }}
+                        {{ form_widget(formulario.costo_precio.costo_fijo) }}
+                    </div>
+                    <div class="col-3 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.costo_porciento) }}
+                        {{ form_widget(formulario.costo_precio.costo_porciento) }}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mt-3 pl-2">
+                    <h3 class="text-light mr-auto" style="font-weight: 300;">Precio de Venta</h3>
+                    <div class="px-2" id="div_cliente_origen"
+                         style="background: dimgray; border-radius: .3rem; vertical-align: auto">
+                    </div>
+                </div>
+                <hr color="dimgray" class="my-1 ml-2" size=3>
+                <div class="row mt-1 p-0">
+                    <div class="col-5 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.venta_fijo) }}
+                        {{ form_widget(formulario.costo_precio.venta_fijo) }}
+                    </div>
+                    <div class="col-5 mt-0 form-group input-group input-group-sm pa-2 d-block">
+                        {{ form_label(formulario.costo_precio.venta_porciento) }}
+                        {{ form_widget(formulario.costo_precio.venta_porciento) }}
+                    </div>
+                    <div class="col-2 pt-2 pl-1 mt-4">
+                        <button class="btn btn-secondary btn-sm ml-4" type="button" id="btnAplicarMercancia">ADICIONAR
+                        </button>
+                    </div>
+                </div>
+                {{ form_end(formulario.costo_precio) }}
+            </div>
+            <div>
+                <table class="table-small-rows table table-hover text-light">
+                    <thead class="thead-dark">
+                    <th width="160px" class="text-left">Proveedor</th>
+                    <th width="90px" class="text-left">Rango</th>
+                    <th width="90px" class="text-right">Costo</th>
+                    <th width="90px" class="text-right">Venta</th>
+                    <th width="60px" class="text-center"><i class="fa fa-minus-circle text-danger"></i></th>
+                    </thead>
+                    <tbody id="rows_configuraciones">
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-2">
+                <div class="mr-auto">
+                    <a class="btn btn-outline-secondary" href="{{ url('turismo_module_configuracion') }}">Salir</a>
+                </div>
+                <div class="ml-2">
+                    <button class='my-0 btn btn-secondary' id="btnSubbmit">Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        let listado_configuraciones = $('#rows_configuraciones')
+        let listado_configuraciones_rows = []
+
+        $('select').prepend('<option value = "0" selected disabled>...seleccione...</option>')
+        $('#remesas_config_id_pais').append('<option value = "-1"> -- NUEVO PAIS --</option>')
+
+        function eliminarElementoMisterioso() {
+            var combo = document.getElementById('remesas_config_id_pais')
+            for (var i = 0; i < combo.length; i++) {
+                if (combo.options[i].value == '') {
+                    combo.remove(i)
+                    break
+                }
+            }
+        }
+
+        eliminarElementoMisterioso()
+
+        $('#form_solicitud').validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'remesas_config[nuevo_pais]': "required",
+                'remesas_config[id_pais]': "required"
+            },
+            messages: {
+                'remesas_config[nuevo_pais]': '!Obligatorio',
+                'remesas_config[id_pais]': '!Obligatorio'
+            }
+        })
+
+        $('#form_elementos').validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'remesas_config[costo_precio][minimo]': "required",
+                'remesas_config[costo_precio][maximo]': "required",
+                'remesas_config[costo_precio][id_proveedor]': "required",
+            },
+            messages: {
+                'remesas_config[costo_precio][minimo]': '!Obligatorio',
+                'remesas_config[costo_precio][minimo]': '!Obligatorio',
+                'remesas_config[costo_precio][id_proveedor]': '!Obligatorio',
+            }
+        })
+
+        $('#remesas_config_costo_precio_costo_fijo').prop('type', 'number')
+        $('#remesas_config_costo_precio_costo_porciento').prop('type', 'number')
+        $('#remesas_config_costo_precio_venta_fijo').prop('type', 'number')
+        $('#remesas_config_costo_precio_venta_porciento').prop('type', 'number')
+        $('#remesas_config_costo_precio_minimo').prop('type', 'number')
+        $('#remesas_config_costo_precio_maximo').prop('type', 'number')
+
+        $('#remesas_config_id_pais').on('change', function () {
+            if ($('#remesas_config_id_pais').val() === "-1")
+                changeStatus(1)
+            else
+                changeStatus(-1)
+        })
+
+        function changeStatus(val, value) {
+            resetForm()
+            if (val == -1) {
+                $('#nuevo_pais_div').css('display', 'none')
+                $('#id_pais_div').css('display', 'block')
+            } else {
+                $('#nuevo_pais_div').css('display', 'flex')
+                $('#id_pais_div').css('display', 'none')
+                $('#remesas_config_id_pais').val('')
+            }
+            if (value == true)
+                $('#remesas_config_id_pais').val(0)
+        }
+
+        $('#remesas_config_costo_precio_costo_fijo').on('keyup', e => $('#remesas_config_costo_precio_costo_porciento').val(''))
+        $('#remesas_config_costo_precio_costo_porciento').on('keyup', e => $('#remesas_config_costo_precio_costo_fijo').val(''))
+        $('#remesas_config_costo_precio_venta_fijo').on('keyup', e => $('#remesas_config_costo_precio_venta_porciento').val(''))
+        $('#remesas_config_costo_precio_venta_porciento').on('keyup', e => $('#remesas_config_costo_precio_venta_fijo').val(''))
+
+        function resetForm() {
+            $('#remesas_config_costo_precio_costo_fijo').val('')
+            $('#remesas_config_costo_precio_costo_porciento').val('')
+            $('#remesas_config_costo_precio_venta_fijo').val('')
+            $('#remesas_config_costo_precio_venta_porciento').val('')
+            $('#remesas_config_costo_precio_minimo').val('')
+            $('#remesas_config_costo_precio_maximo').val('')
+            $('#remesas_config_costo_precio_id_proveedor').val(0)
+        }
+
+        $('#btnAplicarMercancia').on('click', function () {
+            if ($('#form_elementos').valid()) {
+                const proveedor = $('#remesas_config_costo_precio_id_proveedor').val()
+                const minimo = $('#remesas_config_costo_precio_minimo').val()
+                const maximo = $('#remesas_config_costo_precio_maximo').val()
+                const costo_fijo = $('#remesas_config_costo_precio_costo_fijo').val()
+                const costo_porciento = $('#remesas_config_costo_precio_costo_porciento').val()
+                const precio_fijo = $('#remesas_config_costo_precio_venta_fijo').val()
+                const precio_porciento = $('#remesas_config_costo_precio_venta_porciento').val()
+
+                if (costo_fijo == '' && costo_porciento == '')
+                    alertTemplate('Los costos no pueden estar vacios', 'danger')
+                else if (precio_fijo == '' && precio_porciento == '')
+                    alertTemplate('Los precios de venta no pueden estar vacios', 'danger')
+                else {
+                    if (parseFloat(maximo) <= parseFloat(minimo))
+                        alertTemplate('El valor máximo no puede ser menor o igual que el mínimo', 'danger')
+                    else {
+                        let repetido = false
+                        let subconjunto = false
+                        for (let i = 0; i < listado_configuraciones_rows.length; i++) {
+                            if (listado_configuraciones_rows[i]['proveedor'] == proveedor
+                                && listado_configuraciones_rows[i]['minimo'] == minimo && listado_configuraciones_rows[i]['maximo'] == maximo)
+                                repetido = true
+                            if (listado_configuraciones_rows[i]['proveedor'] == proveedor) {
+                                if (minimo < parseFloat(listado_configuraciones_rows[i]['maximo']))
+                                    subconjunto = true
+                            }
+                        }
+                        if (subconjunto) {
+                            alertTemplate('El valor mínimo se encuentra contenido en una regla anterior del proveedor.', 'danger')
+                        } else {
+                            if (!repetido) {
+                                listado_configuraciones_rows.push({
+                                    proveedor,
+                                    minimo,
+                                    maximo,
+                                    costo_fijo,
+                                    costo_porciento,
+                                    precio_fijo,
+                                    precio_porciento
+                                })
+                                const str_proveedor = $('#remesas_config_costo_precio_id_proveedor option:selected').text()
+                                let costo_tabla = ''
+                                if (costo_fijo > 0)
+                                    costo_tabla = costo_fijo.fixed(2)
+                                else
+                                    costo_tabla = costo_porciento.fixed(2) + '%'
+
+                                let precio_tabla = ''
+                                if (precio_fijo > 0)
+                                    precio_tabla = precio_fijo.fixed(2)
+                                else
+                                    precio_tabla = precio_porciento.fixed(2) + '%'
+
+                                listado_configuraciones.append(`<tr>
+                        <td class="text-left"> ${str_proveedor} </td>
+                        <td class="text-left"> ${minimo}-${maximo} </td>
+                        <td class="text-right"> ${costo_tabla} </td>
+                        <td class="text-right"> ${precio_tabla}</td>
+                        <td style="width: 45px;" class="text-center"> <button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" proveedor="${proveedor}-${minimo}-${maximo}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                        </td
+                        ></tr>`
+                                );
+                                resetForm()
+                            } else {
+                                alertTemplate('Ya ha registrado una configuración para los datos introducidos', 'danger')
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        // eliminar la mercancia de la lista
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            listado_configuraciones_rows = listado_configuraciones_rows.filter(e => (parseInt(e.proveedor) + '-' + parseInt(e.minimo) + '-' + parseInt(e.maximo)) !== $(this).attr('proveedor'))
+            cl(listado_configuraciones_rows)
+            $(this).closest('tr').remove()
+        })
+
+        $('#btnSubbmit').on('click', function () {
+            if ($('#form_solicitud').valid()) {
+                if (listado_configuraciones_rows.length > 0) {
+                    loadingModal.show()
+                    const id_pais = $('#remesas_config_id_pais').val()
+                    const nuevo_pais = $('#remesas_config_nuevo_pais').val()
+                    const list_send = JSON.stringify(listado_configuraciones_rows)
+                    $('body').append(`
+                    <form action='/configuracion-turismo/remesas/config-costos-ventas/addRegla'
+                         method="post" id='form_add_regla'>
+                        <input type='text' hidden name='nuevo_pais' value='${nuevo_pais}'/>
+                        <input type='text' hidden name='id_pais' value='${id_pais}'/>
+                        <input type='text' hidden name='lista' value='${list_send}'/>
+                    </form>`)
+
+                    const fomrulario = $('#form_add_regla')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                } else {
+                    alertTemplate('Debe configurar al menos un precios de costo y venta del servicio', 'danger')
+                }
+            }
+        })
+
+        $('#remesas_config_id_pais').on('change', function () {
+            listado_configuraciones_rows = []
+            let pais = $('#remesas_config_id_pais').val()
+            $('#rows_configuraciones').find('tr').remove()
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/remesas/config-costos-ventas/getConfiguraciones/' + pais,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success == true) {
+                        listado_configuraciones_rows = result.data
+                        for (var i = 0; i < listado_configuraciones_rows.length; i++) {
+                            $('#rows_configuraciones').append(`<tr>
+                                <td class="text-left"> ${listado_configuraciones_rows[i]['nombre_proveedor']} </td>
+                                <td class="text-left"> ${listado_configuraciones_rows[i]['minimo']}-${listado_configuraciones_rows[i]['maximo']} </td>
+                                <td class="text-right"> ${listado_configuraciones_rows[i]['costo_porciento_mostrar']} </td>
+                                <td class="text-right"> ${listado_configuraciones_rows[i]['precio_porciento_mostrar']}</td>
+                                <td style="width: 45px;" class="text-center"> <button type="button"
+                                    class="btn btn-outline-danger btn-sm borrar" title="Eliminar" proveedor="${listado_configuraciones_rows[i]['proveedor']}-${listado_configuraciones_rows[i]['minimo']}-${listado_configuraciones_rows[i]['maximo']}">
+                                    <i class="fa fa-minus-circle"></i>
+                                </button>
+                                </td></tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    }
+                    if (result.success == false) {
+                        loadingModal.close()
+                        alertTemplate(result.msg, 'danger')
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        })
+
+    </script>
+{% endblock %}

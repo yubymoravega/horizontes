@@ -42,11 +42,116 @@ class TurismoController extends AbstractController
       }
   
 
+      /**
+     * @Route("/turismo/reporte/solicitud/agencia", name="turismo/reporte/solicitud/agencia/")
+     */
+    public function reporteSolicitudAgencia(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request) 
+    {
+
+        $dql = "SELECT a FROM App:SolicitudTurismo a WHERE a.empleado = '5918' ";
+
+        if ($request->get('to') && $request->get('from')) {
+
+            $to = str_replace('/', "-", $request->get('to'));
+            $to = $to[6] . $to[7] . $to[8] . $to[9] . '-' . $to[0] . $to[1] . '-' . $to[3] . $to[4];
+
+            $from = str_replace('/', "-", $request->get('from'));
+            $from = $from[6] . $from[7] . $from[8] . $from[9] . '-' . $from[0] . $from[1] . '-' . $from[3] . $from[4];
+
+            $dql .= "AND a.fechaSolicitud between '$from' AND '$to'";
+
+            if ($request->get('estado')) {
+
+                if ($request->get('estado') == 'Pendiente') {
+                    $dql .= " AND  a.stado = 'Pendiente'";
+                } elseif($request->get('estado') == 'En Proceso') {
+                    $dql .= " AND  a.stado = 'En Proceso'";
+                }elseif($request->get('estado') == 'Finalizada') {
+                    $dql .= " AND  a.stado = 'Finalizada'";
+                }
+            }
+
+            if ($request->get('empleado')) {
+
+                $dql .= " AND  a.empleado = '" . $request->get('empleado') . "'";
+            }
+
+            if ($request->get('telefono')) {
+
+                $dql .= " AND  a.idCliente  ='" . $request->get('telefono') . "'";
+            }
+        } elseif ($request->get('estado')) {
+
+            if ($request->get('estado') == 'Pendiente') {
+                $dql .= " AND  a.stado = 'Pendiente'";
+            } elseif($request->get('estado') == 'En Proceso') {
+                $dql .= " AND  a.stado = 'En Proceso'";
+            }elseif($request->get('estado') == 'Finalizada') {
+                $dql .= " AND  a.stado = 'Finalizada'";
+            }
+
+            if ($request->get('empleado')) {
+
+                ($request->get('estado') == "Todos") ? $dql .=" AND " : $dql .=" AND ";
+
+                $dql .= "  a.empleado  ='" . $request->get('empleado') . "'";
+            }
+
+            if ($request->get('telefono')) {
+
+                ($request->get('estado') == "Todos") ? $dql .=" AND " : $dql .=" AND ";
+
+                $dql .= " a.idCliente  ='" . $request->get('telefono') . "'";
+            }
+        } elseif ($request->get('empleado')) {
+
+            $dql .= " AND  a.empleado = '" . $request->get('empleado') . "'";
+
+            if ($request->get('telefono')) {
+
+                $dql .= " AND  a.idCliente  ='" . $request->get('telefono') . "'";
+            }
+        } else {
+
+            if ($request->get('telefono')) {
+
+                $dql .= " AND  a.idCliente ='" . $request->get('telefono') . "'";
+            }
+        }
+
+        if (!$request->get('estado')) {
+
+            $dql .= " AND a.stado = 'Pendiente'";
+        }
+
+        $dql .= " ORDER BY a.fechaSolicitud DESC";
+
+        $query = $em->createQuery($dql);
+
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            25 /*limit per page*/
+        );
+
+        $user = $this->getDoctrine()->getRepository(User::class)->findAll();
+
+        //return new Response(var_dump($pagination));
+
+        return $this->render(
+            'turismo/reporteSolicitud.html.twig',
+            ['pagination' => $pagination, 'user' => $user]
+        );
+    }
+
+
     /**
      * @Route("/turismo/reporte/solicitud/", name="turismo/reporte/solicitud/")
      */
     public function reporteSolicitud(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request) 
     {
+
+        $user =  $this->getUser();
 
         $dql = "SELECT a FROM App:SolicitudTurismo a ";
 
@@ -65,8 +170,15 @@ class TurismoController extends AbstractController
 
                 if ($request->get('estado') == 'Pendiente') {
                     $dql .= " AND  a.stado = 'Pendiente'";
-                } else {
-                    $dql .= " AND  a.stado != 'Pendiente'";
+                } elseif($request->get('estado') == 'En Proceso') {
+                    $dql .= " AND  a.stado = 'En Proceso'";
+                }elseif($request->get('estado') == 'Finalizada') {
+                    $dql .= " AND  a.stado = 'Finalizada'";
+                }elseif($request->get('estado') == 'Cotizado') {
+                    $dql .= " AND  a.stado = 'Cotizado'";
+                }
+                elseif($request->get('estado') == 'Por Cotizar') {
+                    $dql .= " AND  a.stado = 'Por Cotizar'";
                 }
             }
 
@@ -83,18 +195,28 @@ class TurismoController extends AbstractController
 
             if ($request->get('estado') == 'Pendiente') {
                 $dql .= " WHERE  a.stado = 'Pendiente'";
-            } else {
-                $dql .= " WHERE  a.stado != 'Pendiente'";
+            } elseif($request->get('estado') == 'En Proceso') {
+                $dql .= " WHERE  a.stado = 'En Proceso'";
+            }elseif($request->get('estado') == 'Finalizada') {
+                $dql .= " WHERE  a.stado = 'Finalizada'";
+            }elseif($request->get('estado') == 'Cotizado') {
+                $dql .= " WHERE  a.stado = 'Cotizado'";
+            }elseif($request->get('estado') == 'Por Cotizar') {
+                $dql .= " WHERE  a.stado = 'Por Cotizar'";
             }
 
             if ($request->get('empleado')) {
 
-                $dql .= " WHERE  a.empleado  ='" . $request->get('empleado') . "'";
+                ($request->get('estado') == "Todos") ? $dql .=" WHERE " : $dql .=" AND ";
+
+                $dql .= "  a.empleado  ='" . $request->get('empleado') . "'";
             }
 
             if ($request->get('telefono')) {
 
-                $dql .= " WHERE  a.idCliente  ='" . $request->get('telefono') . "'";
+                ($request->get('estado') == "Todos") ? $dql .=" WHERE " : $dql .=" AND ";
+
+                $dql .= " a.idCliente  ='" . $request->get('telefono') . "'";
             }
         } elseif ($request->get('empleado')) {
 
@@ -112,7 +234,13 @@ class TurismoController extends AbstractController
             }
         }
 
+        if (!$request->get('estado')) {
+
+            $dql .= " WHERE a.stado = 'Pendiente'";
+        }
+
         $dql .= " ORDER BY a.fechaSolicitud DESC";
+
         $query = $em->createQuery($dql);
 
         $pagination = $paginator->paginate(
@@ -139,10 +267,9 @@ class TurismoController extends AbstractController
 
         $solicitud = new SolicitudTurismo();
         $user =  $this->getUser();
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
         
-
         $dataBase = $this->getDoctrine()->getManager();
 
         $formulario = $this->createForm(
@@ -194,7 +321,7 @@ class TurismoController extends AbstractController
             $mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
             $mail->Username   = 'info@solyag.com';                     // SMTP username
-            $mail->Password   = 'solyag*info';                               // SMTP password
+            $mail->Password   = 'Solyag*2020';                               // SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
             $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
         
@@ -258,7 +385,7 @@ class TurismoController extends AbstractController
     {
         $dataBase = $this->getDoctrine()->getManager();
 
-        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id]);
+        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id],[ 'fecha' =>'ASC']);
         $solicitud = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
 
         $vueloOrigen = $dataBase->getRepository(VueloOrigen::class)->findAll();
@@ -272,8 +399,8 @@ class TurismoController extends AbstractController
         $renteLugarRecogida = $dataBase->getRepository(RentRecogida::class)->findAll();
 
         $user =  $this->getUser();
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
+        $date = new DateTime('NOW');
         
         $formulario = $this->createForm(
             SolicitudTurismoType::class,
@@ -327,6 +454,7 @@ class TurismoController extends AbstractController
         } else {
 
             $vueloAdultos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -340,6 +468,7 @@ class TurismoController extends AbstractController
             );
 
             $vueloNinos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -353,6 +482,7 @@ class TurismoController extends AbstractController
             );
 
             $hotelAdultos = array(
+              '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -366,6 +496,7 @@ class TurismoController extends AbstractController
             );
 
             $hotelNinos = array(
+              '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -379,6 +510,7 @@ class TurismoController extends AbstractController
             );
 
             $transferAdultos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -392,6 +524,7 @@ class TurismoController extends AbstractController
             );
 
             $transferNinos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -405,6 +538,7 @@ class TurismoController extends AbstractController
             );
 
             $tourNinos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -418,6 +552,7 @@ class TurismoController extends AbstractController
             );
 
             $tourAdultos = array(
+                '-' => '-',
                 1 => 1,
                 2 => 2,
                 3 => 3,
@@ -452,12 +587,10 @@ class TurismoController extends AbstractController
     {
         $dataBase = $this->getDoctrine()->getManager();
         $solicitud = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
-        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id]);
+        $comentario = $dataBase->getRepository(SolicitudTurismoComentario::class)->findBy(["idSolicitudTurismo"=>$id] ,[ 'fecha' =>'DESC']);
         $cliente = $dataBase->getRepository(Cliente::class)->findBy(["telefono"=>$solicitud->getIdCliente()]);
         
-
         return $this->render('turismo/detalles.html.twig',['comentarios' => $comentario,'solicitud' => $solicitud,'cliente' => $cliente[0]]);
-        
     }
 
     /**
@@ -469,9 +602,9 @@ class TurismoController extends AbstractController
         $newComenatario = new SolicitudTurismoComentario();
        
         $user =  $this->getUser();
-        $date = new DateTime('NOW');
         date_default_timezone_set('America/Santo_Domingo');
-
+        $date = new DateTime('NOW');
+        
         $newComenatario->setIdSolicitudTurismo($id);
         $newComenatario->setFecha($date); 
         $newComenatario->setEmpleado($user->getUsername()); 
@@ -1326,9 +1459,9 @@ class TurismoController extends AbstractController
     }
 
     /**
-     * @Route("turismo/status/{id}", name="turismo/status/")
+     * @Route("turismo/status/{id}/{status}", name="turismo/status/")
      */
-    public function status($id)
+    public function status($id,$status)
     {
         $dataBase = $this->getDoctrine()->getManager();
        
@@ -1336,18 +1469,49 @@ class TurismoController extends AbstractController
 
         $user =  $this->getUser();
 
-        $data->setStado("Atendida");
+        $data->setStado($status);
         $data->setEmpleadoStatus($user->getUsername());
 
         $dataBase->flush($data);
 
         $this->addFlash(
             'success',
-            'Solicitud Atendida'
+            'Cambio de estatus'
         );
 
      
-      
-        return $this->redirectToRoute('turismo/reporte/solicitud/');
+      return new Response(200);
+        //return $this->redirectToRoute('turismo/reporte/solicitud/');
+    }
+
+      /**
+     * @Route("turismo/urgente/{id}", name="turismo/urgente/")
+     */
+    public function urgente($id)
+    {
+        $dataBase = $this->getDoctrine()->getManager();
+       
+        $data = $dataBase->getRepository(SolicitudTurismo::class)->find($id);
+        $user =  $this->getUser();
+
+        if( $data->getUrgente() == '1'){
+          
+        $data->setUrgente('0');
+        $data->setEmpleadoStatus($user->getUsername());
+        $dataBase->flush($data);
+
+        }else{
+            $data->setUrgente('1');
+            $data->setEmpleadoStatus($user->getUsername());
+            $dataBase->flush($data);   
+        }
+
+        $this->addFlash(
+            'success',
+            'Urgente!'
+        );
+
+      return new Response(200);
+        //return $this->redirectToRoute('turismo/reporte/solicitud/');
     }
 }

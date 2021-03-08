@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+{% block title %} Turismo | Gestión Consular {% endblock %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block navBar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal">| Paquete de Gestión Consular
+            |</a>
+        <button class="navbar-toggler order-md-2" type="button" data-toggle="collapse"
+                data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Configuración
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url('turismo_module_visado_proveedor') }}">Proveedores</a>
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_estado_solicitud') }}">Estados de las Solicitudes</a>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="text-center">Gestión Consular</h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"
+                        href="{{ url ('turismo_module_visado_elementos_visa') }}">Costo de Elementos</a>
+                        <a class="dropdown-item"
+                        href="{{ url ('turismo_module_visado_config_precio_venta') }}">Precio de Venta</a>
+                    </div>
+                </li>
+                <a style="font-weight: 300;font-family: inherit !important;" class="dropdown-item"
+                   href="{{ url ('turismo_module_visado_solucitud') }}">Solicitud</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Informes
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item"
+                           href="{{ url ('turismo_module_visado_registro_solicitudes') }}">Registro de Solicitudes</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <span id="go_back" class="text-light pl-1 order-md-1 ml-2"
+              style="cursor: pointer;border-radius: 10px; border: gray solid 2px;">
+             <a class="btn">
+                <span href="#" class="novi-icon mdi mdi-arrow-left">Tursimo</span>
+            </a>
+        </span>
+
+        <button type="button" class="btn btn-outline-warning" data-container="body" data-toggle="popover"
+                data-trigger="focus" title="<i class='fa fa-user'></i> Datos del Cliente"
+                data-placement="bottom" data-content="
+                <ul>
+                    <li><strong>Nombre:</strong> {{ nombre }}</li>
+                    <li><strong>Apellidos:</strong> {{ apellidos }}</li>
+                    <li><strong>Teléfono:</strong> {{ telefono }}</li>
+                    <li><strong>Email:</strong> {{ correo }}</li>
+                    <li><strong>Dirección:</strong> {{ direccion }}</li>
+                </ul>">
+            <strong>Cliente: </strong>{{ nombre }} {{ apellidos }}
+        </button>
+
+    </nav>
+    <!-- Modal -->
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="popover"]').popover({ html : true });
+        });
+
+        $('#go_back').on('click', function () {
+            window.location.href = "/categorias/turismo/" +{{ telefono }};
+        })
+    </script>
+{% endblock %}

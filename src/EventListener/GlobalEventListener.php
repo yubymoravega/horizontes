@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -32,12 +33,32 @@ class GlobalEventListener
      * @param RequestEvent $event
      * @return string
      */
-    public function onCloseAlmacen(RequestEvent $event)
+    public function onRequestListener(RequestEvent $event)
     {
+
         // para peticiones que no sean AJAX
         if (!$event->getRequest()->isXmlHttpRequest()) {
 
             $uri = $event->getRequest()->getRequestUri();
+
+            /**                 -------------------------------------                         */
+            /**                 --- Filtro de Unidad Seleccionada ---                         */
+            /**                 -------------------------------------                         */
+
+            $is_reportes = strpos($uri, 'contabilidad/reportes');
+            if ($is_reportes) {
+                $selected__unidad = $event->getRequest()->get('unidad_choices');
+                if (!is_null($selected__unidad))
+                    $event->getRequest()->getSession()->set('selected__unidad', $selected__unidad['__selected__unidad']);
+            } else {
+                $event->getRequest()->getSession()->set('selected__unidad', null);
+            }
+
+            /**                 ----------------------------                                  */
+            /**                 --- Seleccion de Alamcén ---                                  */
+            /**                 ----------------------------                                  */
+
+
             $is_inventario = strpos($uri, 'contabilidad/inventario');
             $almacen_id = $event->getRequest()->getSession()->get('selected_almacen/id');
             $id_usuario = $this->security->getUser();
@@ -59,7 +80,8 @@ class GlobalEventListener
 
                                 $event->getRequest()->getSession()->set('selected_almacen/id', null);
                                 $event->getRequest()->getSession()->set('selected_almacen/name', null);
-                            } catch (FileException $e) {
+                            } catch
+                            (FileException $e) {
                                 return $e->getMessage();
                             }
                         }

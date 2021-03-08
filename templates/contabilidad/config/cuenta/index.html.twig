@@ -35,14 +35,14 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="row" style="width: 160px">Nro. cuenta</th>
-            <th scope="row">Nombre</th>
-            <th scope="row" style="width: 100px">Naturaleza</th>
-            <th scope="row" style="width: 100px">Obligación Aceedora</th>
-            <th scope="row" style="width: 100px">Obligación Deudora</th>
-            <th scope="row" style="width: 130px">Tipo de cuenta</th>
-            <th scope="row" style="width: 130px">Criterios de análisis</th>
-            <th scope="row" style="width: 200px">Acciones</th>
+            <th scope="row" style="width: 160px" class="text-left">Nro. cuenta</th>
+            <th scope="row" class="text-left">Nombre</th>
+            <th scope="row" style="width: 100px" class="text-left">Naturaleza</th>
+            <th scope="row" style="width: 100px" class="text-left">Obligación Aceedora</th>
+            <th scope="row" style="width: 100px" class="text-left">Obligación Deudora</th>
+            <th scope="row" style="width: 130px" class="text-left">Tipo de cuenta</th>
+            <th scope="row" style="width: 130px" class="text-left">Criterios de análisis</th>
+            <th scope="row" style="width: 200px" class="text-left">Acciones</th>
             </thead>
             <tbody>
             {% for item in cuentas %}
@@ -120,7 +120,6 @@
                 errorClass: 'invalid-label-orange',
                 errorPlacement: function (error, element) {
                     // colocar mensajes de error a la derecha de cada label para el componente
-                    console.log(error)
                     const error_label = element.closest("form").find(element.attr('id') + "-error")
                     if (error_label.length) {
                         error_label.removeClass('hide')

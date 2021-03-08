@@ -1,0 +1,971 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<!-- Section Input Groups-->
+	<section class="section novi-background section-20" id='seccion-principal'>
+		<div class="container">
+
+			<div class="container card">
+				<img class="imagen-cliente" src="{{ asset('images/iconos/user.svg') }}">
+				<div class="card-header text-center">
+					<h1>Solicitud Turismo</h1>
+                    <hr class="divider-white bg-mantis-white">
+				</div>
+				
+				<div class="row justify-content-md-center no-margin">
+					<div class="col col-lg-2"></div>
+					<div class="col-md-auto">
+						<div id="messageBox" style="margin: 25px; display: none;" class="alert alert-danger" role="alert"></div>
+					</div>
+					<div class="col col-lg-2"></div>
+				</div>
+
+				{{ form_start(formulario,{'attr': { 'id': 'form_add_Solicitud'}}) }}
+				
+				<h3 style="padding-top: 25px; text-align: center; color:white;">Vuelo</h3>
+                 
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+					<div class="col">
+						Adultos
+						<select id="solicitud_turismo_vueloCantidadAdultos" name="solicitud_turismo[vueloCantidadAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in vueloAdultos %}
+
+						{% if origen ==  solicitud.vueloCantidadAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
+						
+						<div class="col">
+						Niños
+						<select id="solicitud_turismo_vueloCantidadNinos" name="solicitud_turismo[vueloCantidadNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in vueloNinos %}
+
+						{% if origen ==  solicitud.vueloCantidadNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
+						
+						<div class="col">
+						Origen
+						<select id="solicitud_turismo_vueloOrigen" name="solicitud_turismo[vueloOrigen]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in vueloOrigen %}
+
+						{% if origen.nombre ==  solicitud.vueloOrigen %}
+						<option selected value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% else %}
+   						<option value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
+						<span class="input-group-append"></div>
+					</div>
+					
+  
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">
+						Destino
+						<select id="solicitud_turismo_VueloDestino" name="solicitud_turismo[VueloDestino]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in vueloDestino %}
+
+						{% if destino.nombre ==  solicitud.vueloDestino %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+
+						<div class="col">	
+							Fecha{{ form_widget(formulario.vueloIda, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Origen'}}) }}
+						</div>
+
+                        <div class="col">	
+								Retorno{{ form_widget(formulario.vueloVuelta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Retorno'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+
+                        	<div class="col">	
+								Comentario{{ form_widget(formulario.vueloComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+							</div>
+							
+			
+
+            <h3 style="padding-top: 25px; text-align: center; color:white;">Hotel</h3>
+             <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+
+						<div class="col">
+						Cantidad Adultos
+						<select id="solicitud_turismo_hotelAdultos" name="solicitud_turismo[hotelAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in hotelAdultos %}
+
+						{% if origen ==  solicitud.hotelAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div> 
+							
+
+					<div class="col">
+						Cantidad Niños
+						<select id="solicitud_turismo_hotelNinos" name="solicitud_turismo[hotelNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in hotelNinos %}
+
+						{% if origen ==  solicitud.hotelNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
+
+						<div class="col">
+						Destino
+						<select id="solicitud_turismo_hotelDestino" name="solicitud_turismo[hotelDestino]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in hotelDestino %}
+
+						{% if destino.nombre ==  solicitud.vueloDestino %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+						
+							<div class="col">
+						Nombre Hotel
+						<select id="solicitud_turismo_hotelNombre" name="solicitud_turismo[hotelNombre]" class="fomulario form-control" placeholder="Nombre Hotel">
+						{% for origen in hotelOrigen %}
+
+						{% if origen.nombre ==  solicitud.hotelNombre %}
+						<option selected value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% else %}
+   						<option value="{{origen.nombre}}">{{origen.nombre}}</option>
+						{% endif %}
+
+								
+  							  {% endfor %}
+						
+						</select>
+						</div>
+						
+					
+						<span class="input-group-append"></div>
+					</div>
+					
+  
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+							<div class="col">
+						Categoria
+						{{ form_widget(formulario.hotelCategoria, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'hotelCategoria'}}) }}
+						</div>
+
+						<div class="col">
+								Plan Hotel{{ form_widget(formulario.hotelPlan, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Hotel Plan'}}) }}
+                           
+							</div>
+
+						<div class="col">	
+							Fecha Desde{{ form_widget(formulario.hotelDesde, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Desde'}}) }}
+						</div>
+
+                        <div class="col">	
+								Fecha Hasta{{ form_widget(formulario.hotelHasta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Hasta'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+
+                        	<div class="col">	
+								Comentario{{ form_widget(formulario.hotelComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+						</div>
+
+                        <h3 style="padding-top: 25px; text-align: center; color:white;">Tranfer</h3>
+                         <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+					<div class="col">
+						Cantidad Adultos
+						<select id="solicitud_turismo_tramferAdultos" name="solicitud_turismo[tramferAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in transferAdultos %}
+
+						{% if origen ==  solicitud.tramferAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+
+					<div class="col">
+						Niños
+						<select id="solicitud_turismo_tramferNinos" name="solicitud_turismo[tramferNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in transferNinos %}
+
+						{% if origen ==  solicitud.tramferNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+
+					<div class="col">
+					Fecha {{ form_widget(formulario.tranferLlegada, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha'}}) }}
+					</div>	
+						
+						<div class="col">
+						Fecha Salida{{ form_widget(formulario.tramferSalida, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
+						</div>
+						
+					
+						<span class="input-group-append"></div>
+					</div>
+					
+  
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">
+						Lugar
+						<select id="solicitud_turismo_tramferLugar" name="solicitud_turismo[tramferLugar]" class="fomulario form-control" placeholder="Lugar">
+						{% for destino in transferOrigen %}
+
+						{% if destino.nombre ==  solicitud.tramferLugar %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+
+							<div class="col">
+						Ida & Vuelta
+						<select id="solicitud_turismo_tramferIdaVuelta" name="solicitud_turismo[tramferIdaVuelta]" class="fomulario form-control" placeholder="Lugar">
+						
+						{% if solicitud.tramferIdaVuelta ==  "Solo Ida" %}
+						<option selected value="{{solicitud.tramferIdaVuelta}}">{{solicitud.tramferIdaVuelta}}</option>
+						<option  value="Ida & Vuelta">Ida & Vuelta</option>
+						<option selected value="-">-</option>
+						{% elseif solicitud.tramferIdaVuelta == "-" %}
+						<option selected value="-">-</option>
+						<option  value="Ida & Vuelta">Ida & Vuelta</option>
+   						<option  value="Solo Ida">Solo Ida</option>
+						
+						{% else %}
+						<option selected value="-">-</option>
+						<option selected value="Ida & Vuelta">Ida & Vuelta</option>
+   						<option  value="Solo Ida">Solo Ida</option>
+
+						{% endif %}
+
+						</select>
+						</div>
+
+						<div class="col">
+						Destino
+						<select id="solicitud_turismo_tramferDestino" name="solicitud_turismo[tramferDestino]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in transferDestino %}
+
+						{% if destino.nombre ==  solicitud.tramferDestino %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+
+						<div class="col">	
+							Tipo Vehiculo{{ form_widget(formulario.tramferVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
+						</div>
+
+							<span class="input-group-append"></div>
+
+                        	
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+					
+
+                        <div class="col">	
+								Comentario{{ form_widget(formulario.tramferComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+							</div>
+							<span class="input-group-append"></div>
+
+                        	
+						</div>
+
+                             <h3 style="padding-top: 25px; text-align: center; color:white;">Tour</h3>
+                              <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+					<div class="col">
+						Cantidad Adultos
+						<select id="solicitud_turismo_tourAdultos" name="solicitud_turismo[tourAdultos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in tourAdultos %}
+
+						{% if origen ==  solicitud.tourAdultos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>	
+
+					<div class="col">
+						Niños
+						<select id="solicitud_turismo_tourNinos" name="solicitud_turismo[tourNinos]" class="fomulario form-control" placeholder="Origen">
+						{% for origen in tourNinos %}
+
+						{% if origen ==  solicitud.tourNinos %}
+						<option selected value="{{origen}}">{{origen}}</option>
+						{% else %}
+   						<option value="{{origen}}">{{origen}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>		
+
+					<div class="col">
+						Tour Nombre
+						<select id="solicitud_turismo_tourNombre" name="solicitud_turismo[tourNombre]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in tourNombre %}
+
+						{% if destino.nombre ==  solicitud.tourNombre %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+						
+						<div class="col">
+						Fecha Salida{{ form_widget(formulario.tourFecha, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Salida'}}) }}
+						</div>
+						
+						<span class="input-group-append"></div>
+					</div>
+					
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">	
+							Comentario{{ form_widget(formulario.tourComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+						</div>
+
+                        	
+						</div>
+
+                         <h3 style="padding-top: 25px; text-align: center; color:white;">Rent Car</h3>
+                          <hr class="divider-white bg-mantis-white">
+                 
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+						
+						<div class="col">
+					Cantidad De Personas {{ form_widget(formulario.rentCantidadPersonas, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Cantidad De Personas'}}) }}
+					</div>	
+
+					<div class="col">
+					Tipo Vehiculo {{ form_widget(formulario.RentTipoVehiculo, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Tipo Vehiculo'}}) }}
+					</div>	
+						
+						<div class="col">
+						Lugar Recogida
+						<select id="solicitud_turismo_rentLugarRecogida" name="solicitud_turismo[rentLugarRecogida]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in renteLugarRecogida %}
+
+						{% if destino.nombre ==  solicitud.rentLugarRecogida %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+						
+						<div class="col">
+						Lugar Entrega
+						<select id="solicitud_turismo_rentLugarEntrega" name="solicitud_turismo[rentLugarEntrega]" class="fomulario form-control" placeholder="Destino">
+						{% for destino in rentLugarEntrega %}
+
+						{% if destino.nombre ==  solicitud.rentLugarEntrega %}
+						<option selected value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% else %}
+   						<option value="{{destino.nombre}}">{{destino.nombre}}</option>
+						{% endif %}
+
+  							  {% endfor %}
+						
+						</select>
+						</div>
+
+
+						<span class="input-group-append"></div>
+					</div>
+					
+					<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						<div class="col">
+							Fecha Desde	{{ form_widget(formulario.rentFechaDesde, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Desde'}}) }}
+                           
+							</div>
+
+						<div class="col">	
+							Fecha Hasta{{ form_widget(formulario.rentFechaHasta, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Fecha Hasta'}}) }}
+						</div>
+
+                        	
+						</div>
+
+						</div>
+
+							<div class="form-group">
+						<div class="input-group input-group-sm">
+						
+						
+                        	<div class="col">	
+							Comentario{{ form_widget(formulario.rentComentario, {'attr': {'class': 'form-control','class': 'fomulario','placeholder': 'Comentario'}}) }}
+						</div>
+	
+						</div>
+							
+	
+						</div>
+
+						</div>
+
+			</div>
+
+	                <div class=" row justify-content-md-center group offset-top-34 row-continuar"><button class="btn btn-sm btn-outline-dark" type="submit">Procesar</button> </div>
+								{{ form_end(formulario, {'render_rest': false}) }}
+							<div></section>
+
+
+<hr style="background-color: white; margin-top: 0px;">
+    <section class="section novi-background section-20 ">
+        <div class="container">
+       
+          <h1 style="color: white;text-align: center;">Comentarios</h1>
+          <hr class="divider divider-md bg-mantis">
+         
+          <div class="row justify-content-sm-center offset-top-66">
+            <div class="col-md-12 col-lg-12">
+            <!-- Contenedor Principal -->
+            {% for comentario in comentarios %}
+	<div class="comments-container">
+		<ul id="comments-list" class="comments-list">
+			<li>
+				<div class="comment-main-level">
+					<!-- Avatar -->
+					<div class="comment-avatar"><img src="{{ asset('images/user.svg') }}" alt=""></div>
+					<!-- Contenedor del Comentario -->
+					<div class="comment-box">
+						<div class="comment-head">
+							<h6 class="comment-name ">{{comentario.empleado}}</h6>
+							<span style="color:#3d651c;">{{comentario.fecha |date("m/d/Y h:i:s A") }}</span>
+							
+						</div>
+						<div class="comment-content">
+						{{comentario.comentario}}
+						</div>
+					</div>
+				</div>
+				
+			</li>
+		</ul>
+	</div>  {% endfor %}
+            </div>
+          </div>
+        </div>
+      </section>
+
+<div style="display: flex;justify-content: center;margin: 40px;"> 
+ <button id='inicio' data-toggle="modal" data-target="#modalComentario" class="btn btn-default btn-icon btn-icon-right"><span class="icon novi-icon fa fa-commenting-o"></span><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Comentario</font></font></button>        
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalComentario" tabindex="-1" role="dialog" aria-labelledby="modalComentario" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" >{{ app.user.username }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+     <div class="form-group">
+    <label  id="comentarioAlert" for="textarea">Comentario</label>
+    <textarea class="form-control" id="textarea" rows="3"></textarea>
+  </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="guardar" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+
+
+/**
+ * Oscuro: #283035
+ * Azul: #03658c
+ * Detalle: #c7cacb
+ * Fondo: #dee1e3
+ ----------------------------------*/
+ * {
+ 	margin: 0;
+ 	padding: 0;
+ 	-webkit-box-sizing: border-box;
+ 	-moz-box-sizing: border-box;
+ 	box-sizing: border-box;
+ }
+
+ a {
+ 	color: #03658c;
+ 	text-decoration: none;
+ }
+
+ul {
+	list-style-type: none;
+}
+
+body {
+	font-family: 'Roboto', Arial, Helvetica, Sans-serif, Verdana;
+	background: #dee1e3;
+}
+
+/** ====================
+ * Lista de Comentarios
+ =======================*/
+.comments-container {
+	margin: 60px auto 15px;
+	width: 768px;
+}
+
+.comments-container h1 {
+	font-size: 36px;
+	color: #283035;
+	font-weight: 400;
+}
+
+.comments-container h1 a {
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.comments-list {
+	margin-top: 30px;
+	position: relative;
+}
+
+
+
+
+
+.reply-list:before, .reply-list:after {display: none;}
+.reply-list li:before {
+	content: '';
+	width: 60px;
+	height: 2px;
+	background: #c7cacb;
+	position: absolute;
+	top: 25px;
+	left: -55px;
+}
+
+
+.comments-list li {
+	margin-bottom: 15px;
+	display: block;
+	position: relative;
+}
+
+.comments-list li:after {
+	content: '';
+	display: block;
+	clear: both;
+	height: 0;
+	width: 0;
+}
+
+.reply-list {
+	padding-left: 88px;
+	clear: both;
+	margin-top: 15px;
+}
+/**
+ * Avatar
+ ---------------------------*/
+.comments-list .comment-avatar {
+	width: 65px;
+	height: 65px;
+	position: relative;
+	z-index: 99;
+	float: left;
+
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	overflow: hidden;
+}
+
+.comments-list .comment-avatar img {
+	width: 100%;
+	height: 100%;
+}
+
+.reply-list .comment-avatar {
+	width: 50px;
+	height: 50px;
+}
+
+.comment-main-level:after {
+	content: '';
+	width: 0;
+	height: 0;
+	display: block;
+	clear: both;
+}
+/**
+ * Caja del Comentario
+ ---------------------------*/
+.comments-list .comment-box {
+	width: 680px;
+	float: right;
+	position: relative;
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.15);
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0,0.15);
+	box-shadow: 0 1px 1px rgba(0,0,0,0.15);
+}
+
+.comments-list .comment-box:before, .comments-list .comment-box:after {
+	content: '';
+	height: 0;
+	width: 0;
+	position: absolute;
+	display: block;
+	border-width: 10px 12px 10px 0;
+	border-style: solid;
+	border-color: transparent #FCFCFC;
+	top: 8px;
+	left: -11px;
+}
+
+.comments-list .comment-box:before {
+	border-width: 11px 13px 11px 0;
+	border-color: transparent rgba(0,0,0,0.05);
+	left: -12px;
+}
+
+.reply-list .comment-box {
+	width: 610px;
+}
+.comment-box .comment-head {
+	background: #FCFCFC;
+	padding: 10px 12px;
+	border-bottom: 1px solid #E5E5E5;
+	overflow: hidden;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
+}
+
+.comment-box .comment-head i {
+	float: right;
+	margin-left: 14px;
+	position: relative;
+	top: 2px;
+	color: #A6A6A6;
+	cursor: pointer;
+	-webkit-transition: color 0.3s ease;
+	-o-transition: color 0.3s ease;
+	transition: color 0.3s ease;
+}
+
+.comment-box .comment-head i:hover {
+	color: #03658c;
+}
+
+.comment-box .comment-name {
+	color: #283035;
+	font-size: 14px;
+	font-weight: 700;
+	float: left;
+	margin-right: 10px;
+}
+
+.comment-box .comment-name a {
+	color: #283035;
+}
+
+.comment-box .comment-head span {
+	float: left;
+	color: #999;
+	font-size: 13px;
+	position: relative;
+	top: 1px;
+}
+
+.comment-box .comment-content {
+	background: #FFF;
+	padding: 12px;
+	font-size: 15px;
+	color: #595959;
+	-webkit-border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	border-radius: 0 0 4px 4px;
+}
+
+.comment-box .comment-name.by-author, .comment-box .comment-name.by-author a {color: #03658c;}
+.comment-box .comment-name.by-author:after {
+	content: 'autor';
+	background: #03658c;
+	color: #FFF;
+	font-size: 12px;
+	padding: 3px 5px;
+	font-weight: 700;
+	margin-left: 10px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+/** =====================
+ * Responsive
+ ========================*/
+@media only screen and (max-width: 766px) {
+	.comments-container {
+		width: 480px;
+	}
+
+	.comments-list .comment-box {
+		width: 390px;
+	}
+
+	.reply-list .comment-box {
+		width: 320px;
+	}
+}
+
+.fomulario{
+
+margin-right: 25px;
+
+}
+
+.no-margin{margin: 0px;}
+
+form#form_add_beneficiario {
+    padding-right: 15%;
+    padding-left: 15%;
+}
+
+</style>
+						{% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> 
+<script>
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_vueloIda = $("#solicitud_turismo_vueloIda").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_vueloVuelta.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_vueloVuelta = $("#solicitud_turismo_vueloVuelta").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_vueloIda.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_hotelDesde = $("#solicitud_turismo_hotelDesde").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_hotelHasta.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_hotelHasta = $("#solicitud_turismo_hotelHasta").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_hotelDesde.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_tranferLlegada = $("#solicitud_turismo_tranferLlegada").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_tramferSalida.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_tramferSalida = $("#solicitud_turismo_tramferSalida").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_tranferLlegada.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+
+$(function () {
+var dateFormat = "mm/dd/yy",
+solicitud_turismo_rentFechaDesde = $("#solicitud_turismo_rentFechaDesde").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_rentFechaHasta.datepicker("option", "minDate", getDate(this));
+}),
+solicitud_turismo_rentFechaHasta = $("#solicitud_turismo_rentFechaHasta").datepicker({defaultDate: "+1w", changeMonth: true, numberOfMonths: 1}).on("change", function () {
+solicitud_turismo_rentFechaDesde.datepicker("option", "maxDate", getDate(this));
+});
+
+function getDate(element) {
+var date;
+try {
+date = $.datepicker.parseDate(dateFormat, element.value);
+} catch (error) {
+date = null;
+}
+
+return date;
+}
+});
+
+ $( function() {
+    $( "#solicitud_turismo_tourFecha" ).datepicker();
+  } );
+
+
+$( "#guardar" ).click(function() {
+ 
+if ($("#textarea").val().length > 1){
+
+	  $('#modalComentario').modal('toggle');
+
+ $.ajax({
+            type: 'GET',
+            data: {'code' : '200'},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/turismo/comentario/"+ {{solicitud.id}}+"/"+$("#textarea").val(),
+            dataType: 'json',
+            success: function (data) { 
+               // window.location.href = window.location.pathname;
+        
+            }}); 
+}else{
+
+    $("#comentarioAlert").text('Escribe un comentario de al menos 2 letras');
+    $("#comentarioAlert").css({'color':'red'});
+}
+
+
+});
+
+ </script>
+
+{% endblock %}
+

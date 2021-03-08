@@ -1,134 +1,189 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-	{% include 'breadcrumbs.html.twig' %}
-	<!-- Classic Breadcrumbs-->
+    {% include 'breadcrumbs.html.twig' %}
+    <!-- Classic Breadcrumbs-->
 
-	<div class="cards-list">
+    <div class="cards-list">
 
-		<div class="card 1">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio">Telecomunicaciones</p>
-			</div>
-		</div>
+        <div class="card 1">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/telecomunicaciones.png') }}"/>
+            </div>
 
-		<div class="card 2">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title title-white">
-				<p class="texto-servicio">Multi Servicios</p>
-			</div>
-		</div>
+        </div>
 
-		<div class="card 3">
-			<div class="card_image">
-				<img src=""/>
-			</div>
-			<div class="card_title">
-				<p class="texto-servicio">Turismo</p>
-			</div>
-		</div>
+        <div class="card 2">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/multiservicio.png') }}"/>
+            </div>
 
-	</div>
+        </div>
 
+        <div id="turismo" class="card 3">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/turismo.png') }}"/>
+            </div>
+        </div>
+    </div>
 
-	<style>
+    <div class="cards-list">
+        <div id="mi_remesa" class="card 1">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/remesas.png') }}"/>
+            </div>
+        </div>
+    </div>
+    <div class="cards-list">
+        <div id="remesa" class="card 1">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/remesas.png') }}"/>
+            </div>
+        </div>
+        <div class="card 2">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/paqueteria.png') }}"/>
+            </div>
+        </div>
+        <div id="inpospak" class="card 3">
+            <div class="card_image">
+                <img src="{{ asset('images/servicios/inpospak.png') }}"/>
+            </div>
+        </div>
+{#        <div class="cards-list">#}
+{#            <div id="turismo_new" class="card 3">#}
+{#                <div class="card_image">#}
+{#                    <img src="{{ asset('images/servicios/turismo.png') }}"/>#}
+{#                    <label for="" class="text-center font-weight-bold" style="color: red !important;">Módulo de Trurismo#}
+{#                        V2.0</label>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+    </div>
 
-		p.texto-servicio {
-			font-size: 23px;
-			font-weight: 100;
-		}
-		.cards-list {
-			z-index: 0;
-			width: 100%;
-			display: flex;
-			justify-content: space-around;
-			flex-wrap: wrap;
-		}
+    <style>
 
-		.card {
-			margin: 30px auto !important;
-			width: 300px;
-			height: 300px;
-			border-radius: 40px;
-			box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
-			cursor: pointer;
-			transition: 0.4s;
-		}
+        p.texto-servicio {
+            font-size: 23px;
+            font-weight: 100;
+        }
 
-		.card .card_image {
-			width: inherit;
-			height: inherit;
-			border-radius: 40px;
-		}
+        .cards-list {
+            z-index: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
 
-		.card .card_image img {
-			width: inherit;
-			height: inherit;
-			border-radius: 40px;
-			object-fit: cover;
-		}
+        .card {
+            margin: 30px auto !important;
+            width: 300px;
+            height: 300px;
+            border-radius: 40px;
+            box-shadow: 5px 5px 30px 7px rgba(0, 0, 0, 0.25), -5px -5px 30px 7px rgba(0, 0, 0, 0.22);
+            cursor: pointer;
+            transition: 0.4s;
+        }
 
-		.card .card_title {
-			text-align: center;
-			border-radius: 0 0 40px 40px;
-			font-family: sans-serif;
-			font-weight: bold;
-			font-size: 30px;
-			margin-top: -80px;
-			height: 40px;
-		}
+        .card .card_image {
+            width: inherit;
+            height: inherit;
+            border-radius: 40px;
+        }
 
-		.card:hover {
-			transform: scale(0.9, 0.9);
-			box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
-		}
+        .card .card_image img {
+            width: inherit;
+            height: inherit;
+            border-radius: 40px;
+            object-fit: cover;
+        }
 
-		.title-white {
-			color: white;
-		}
+        .card .card_title {
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 30px;
+            margin-top: -80px;
+            height: 40px;
+        }
 
-		.title-black {
-			color: black;
-		}
+        .card:hover {
+            transform: scale(0.9, 0.9);
+            box-shadow: 5px 5px 30px 15px rgba(0, 0, 0, 0.25), -5px -5px 30px 15px rgba(0, 0, 0, 0.22);
+        }
 
-		@media all and(max-width: 500px) {
-			.card-list {
-				/* On small screens, we are no longer using row direction but column */
-				flex-direction: column;
-			}
-		}
-	</style>
+        .title-white {
+            color: white;
+        }
+
+        .title-black {
+            color: black;
+        }
+
+        @media all and(max-width: 500px) {
+            .card-list {
+                /* On small screens, we are no longer using row direction but column */
+                flex-direction: column;
+            }
+        }
+    </style>
 
 {% endblock %}
 
 {% block javascripts %}
-	{{parent()}}
+    {{ parent() }}
+    <script>
+        $("#form-telefono").validate({
 
-	<script>
-		$("#form-telefono").validate({
+            errorLabelContainer: "#messageBox",
+            wrapper: "li",
+            rules: {
+                required: true,
+                minlength: 8
+            },
+            messages: {
+                tel: {
+                    required: "Telefono Requerido",
+                    minlength: "Minimo 8 Caracteres"
+                }
+            }
 
-errorLabelContainer: "#messageBox",
-wrapper: "li",
-rules: {
-required: true,
-minlength: 8
-},
-messages: {
-tel: {
-required: "Telefono Requerido",
-minlength: "Minimo 8 Caracteres"
-}
-}
+        });
 
-});
+        $('#tel').on('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
 
-$('#tel').on('input', function () {
-this.value = this.value.replace(/[^0-9]/g, '');
-});
-	</script>
+        $("#remesa").click(function () {
+            window.location.href = "/remesas/pais/" +{{ tel }};
+        });
+
+        $("#mi_remesa").click(function () {
+            window.location.href = "/servicios/remesas/solicitud";
+        });
+
+        $("#turismo").click(function () {
+
+            window.location.href = "/categorias/turismo/" +{{ tel }};
+        });
+
+        $("#inpospak").click(function () {
+
+            // window.location.href = "/mia_cargo/facturas/"+{{ tel }};
+        });
+
+        $("#turismo_new").click(function () {
+            let telefono = 55816826
+            $('body').append(`
+                    <form action='/turismo/'
+                         method="post" id='form_turismo_dashboard'>
+                        <input type='text' hidden name='telefono' value='${telefono}'/>
+                    </form>`)
+            const fomrulario = $('#form_turismo_dashboard')
+            fomrulario.submit()
+            fomrulario.remove()
+        });
+    </script>
 
 {% endblock %}

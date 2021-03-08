@@ -20,15 +20,15 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th width="150px">Código</th>
-            <th width="150px">Abreviatura</th>
-            <th scope="col-2">Descripción</th>
+            <th width="150px" class="text-left">Código</th>
+            <th width="150px" class="text-left">Abreviatura</th>
+            <th scope="col-2" class="text-left">Descripción</th>
             </thead>
             <tbody>
             {% for item in tipo_movimiento %}
                 <tr>
-                    <td style="font-weight:400;" class="text-center">{{ item.numero }}</td>
-                    <td style="font-weight:400;" class="text-center">{{ item.abreviatura }}</td>
+                    <td style="font-weight:400;">{{ item.numero }}</td>
+                    <td style="font-weight:400;">{{ item.abreviatura }}</td>
                     <td style="font-weight:400;">{{ item.descripcion }}</td>
                 </tr>
             {% endfor %}

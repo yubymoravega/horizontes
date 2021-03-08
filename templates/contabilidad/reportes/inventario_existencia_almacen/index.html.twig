@@ -1,0 +1,83 @@
+{% extends 'contabilidad/reportes/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        {# header #}
+        {#        {{ include('utils/unidadAlmacenChoices.html.twig') }}#}
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Listado de existencia en almacén
+            </h4>
+            <div>
+                <i class="btn fa-print btn-warning ml-3" title="Imprimir listado de existencia"
+                   onclick="Print('{{ path('contabilidad_reportes_inventario_existencia_almacen_print') }}')"></i>
+            </div>
+        </div>
+        {# end header #}
+
+        {# list#}
+        <table class="table table-hover text-light table-small-rows">
+            <thead class="thead-dark">
+            <th width="130px">Códico</th>
+            <th scope="col-1">Descripción</th>
+            <th width="100px">UM</th>
+            <th width="160px">Existencia</th>
+            <th width="150px">Precio</th>
+            <th width="150px">Importe</th>
+            </thead>
+            <tbody>
+            {% for item in mercancias %}
+                <tr>
+                    <td class="row-group-conta" colspan="6">{{ item.almacen }}</td>
+                    {#                        <td class="row-group-subconta text-right">{{ item.total }}</td>#}
+                </tr>
+                <tr>
+                    <td class="row-group-subconta" colspan="5">{{ item.data.cuenta }}</td>
+                    <td class="row-group-subconta text-right">{{ item.data.total }}</td>
+                </tr>
+                {% for new_item in item.data.existencia %}
+                    <tr>
+                        <td class="" colspan="5">{{ new_item.subcuenta }}</td>
+                        <td class="text-right font-weight-bold">{{ new_item.total }}</td>
+                    </tr>
+                    {% for new_item_2 in new_item.existencia_subcuenta %}
+                        <tr>
+                            <td style="font-weight:400;">{{ new_item_2.codigo }}</td>
+                            <td style="font-weight:400;">{{ new_item_2.descripcion }}</td>
+                            <td style="font-weight:400;">{{ new_item_2.unidad_medida }}</td>
+                            <td style="font-weight:400;" class="text-center">{{ new_item_2.existencia }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item_2.precio }}</td>
+                            <td style="font-weight:400;" class="text-right">{{ new_item_2.importe }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function () {
+            $('#form_cuentas').on('change', function (event) {
+                loadingModal.show()
+                const cuenta = $(this).val()
+                $('#mercancia_formulario_id').attr('action', `/contabilidad/inventario/existencia-almacen/${cuenta}`)
+                $('#mercancia_formulario_id').submit()
+            })
+        })
+
+        function Print(url) {
+            console.info(url)
+            window.open(url, 'blank_')
+        }
+    </script>
+{% endblock %}

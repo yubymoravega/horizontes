@@ -24,6 +24,10 @@ configuraciones:
       name: "VENTA"
     - id: 11
       name: "DEVOLUCION VENTA"
+    - id: 12
+      name: "APERTURA"
+    - id: 13
+      name: "APERTURA PRODUCTO"
 
   modulo:
     - id: 1
@@ -47,6 +51,97 @@ configuraciones:
       name: "COMPROBANTE DE OPERACIONES"
       abreviatura: "00"
 
+  categorias:
+    - id: 1
+      name: "Facturas de Crédito Fiscal"
+      prefijo: "B01"
+    - id: 2
+      name: "Facturas de Consumo"
+      prefijo: "B02"
+    - id: 3
+      name: "Notas de Débito"
+      prefijo: "B03"
+    - id: 4
+      name: "Notas de Crédito"
+      prefijo: "B04"
+    - id: 5
+      name: "Comprobantes de Compras"
+      prefijo: "B11"
+    - id: 6
+      name: "Registro Único de Ingresos"
+      prefijo: "B12"
+    - id: 7
+      name: "Comprobante para Gastos Menores"
+      prefijo: "B13"
+    - id: 8
+      name: "Comprobante para Regímenes Especiales"
+      prefijo: "B14"
+    - id: 9
+      name: "Comprobantes Gubernamentales"
+      prefijo: "B15"
+    - id: 10
+      name: "Comprobantes para Exportaciones"
+      prefijo: "B16"
+    - id: 11
+      name: "Comprobantes de Pagos al Exterior"
+      prefijo: "B17"
+
+  termino_pago:
+    - id: 1
+      name: "Contra servicio"
+    - id: 2
+      name: "A 7 días"
+    - id: 3
+      name: "A 15 días"
+    - id: 4
+      name: "A 30 días"
+    - id: 5
+      name: "A 45 días"
+
+  servicios:
+    - id: 1
+      name: "Recarga Cubacell"
+      codigo: "0010"
+    - id: 2
+      name: "Recarga Nauta"
+      codigo: "0020"
+    - id: 3
+      name: "Larga Distancia"
+      codigo: "0030"
+    - id: 4
+      name: "Envio de Remesas"
+      codigo: "0040"
+    - id: 5
+      name: "Boletos Aéreos"
+      codigo: "0050"
+    - id: 6
+      name: "Renta de Hoteles"
+      codigo: "0060"
+    - id: 7
+      name: "Renta de Autos"
+      codigo: "0070"
+    - id: 8
+      name: "Excursiones"
+      codigo: "0080"
+    - id: 9
+      name: "Envio de paquetes"
+      codigo: "0090"
+    - id: 10
+      name: "Paquetes Turísticos"
+      codigo: "0100"
+    - id: 11
+      name: "Paquete Turístico Básico"
+      codigo: "0110"
+    - id: 12
+      name: "Desarrollo de Software"
+      codigo: "0120"
+    - id: 13
+      name: "Diseño"
+      codigo: "0130"
+    - id: 14
+      name: "Marketing y redes Sociales"
+      codigo: "0140"
+
   tipo_movimiento:
     - id: 1
       name: "APERTURA"
@@ -61,7 +156,7 @@ configuraciones:
       name: "TRASLADOS ENVIADOS"
       abreviatura: "TE"
     - id: 5
-      name: "TRASLADOS RECIVIDOS"
+      name: "TRASLADOS RECIBIDOS"
       abreviatura: "TR"
     - id: 6
       name: "BAJAS DE ACTIVOS"
@@ -69,3 +164,33 @@ configuraciones:
     - id: 7
       name: "VENTA DE ACTIVOS"
       abreviatura: "VA"
+
+  procientos:
+    - id: 1
+      denominacion: 1
+      criterio: "ARS"
+      porciento: 3.04
+    - id: 2
+      denominacion: 1
+      criterio: "AFP"
+      porciento: 2.87
+    - id: 3
+      denominacion: 1
+      criterio: "COOPERATIVA"
+      porciento: 2.5
+    - id: 4
+      denominacion: 2
+      criterio: "AFP"
+      porciento: 7.10
+    - id: 5
+      denominacion: 2
+      criterio: "SFS"
+      porciento: 7.09
+    - id: 6
+      denominacion: 2
+      criterio: "SRL"
+      porciento: 1.1
+    - id: 7
+      denominacion: 2
+      criterio: "Infotep"
+      porciento: 1

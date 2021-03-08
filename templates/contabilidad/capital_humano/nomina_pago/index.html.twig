@@ -1,0 +1,227 @@
+{% extends 'contabilidad/capital_humano/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="modal fade" id="seleccionarEmpleado" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="seleccionarEmpleadoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="seleccionarEmpleadoLabel">{{ title }}</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app">
+                    <form action="" method="post" autocomplete="off">
+                        <div class="form-group input-group input-group-sm">
+                            <select name="empleados_select" id="empleados_select" class="form-control">
+                                {% for item in empleados_pago %}
+                                    <option value="{{ item.id }}">{{ item.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button"
+                                   aria-label="Cerrar" data-dismiss="modal" >
+                                    <span aria-hidden="true">Salir</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-secondary" id="btnAceptarPagoExtraordinario">
+                                    Aceptar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                {{ title }}
+            </h4>
+            <div>
+                {% if adicionar %}
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                            data-target="#seleccionarEmpleado" data-placement="bottom"
+                            title="Adicionar Pago"
+                            onclick="pagoExtraordinario()">
+                        <i class="fa fa-plus"></i> <strong>Adicionar Pago</strong>
+                    </button>
+                {% endif %}
+                {% if return_pago %}
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-toggle="modal"
+                            data-target="#modal__form__id" data-placement="bottom"
+                            title="Revertir último pago de empleados"
+                            onclick="mostrarBtn({{ quincena }},1)">
+                        <i class="fa fa-download"></i> <strong>Revertir último Pago</strong>
+                    </button>
+                {% elseif aceptar_pago %}
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                            data-target="#modal__form__id" data-placement="bottom"
+                            title="Aceptar pago de empleados"
+                            onclick="mostrarBtn({{ quincena }},0)">
+                        <i class="fa fa-upload"></i> <strong>Aceptar Pago</strong>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+        {# end header #}
+
+
+        {# Modal aceptar y revertir pago#}
+        {{ include('contabilidad/capital_humano/nomina_pago/modal_pago.html.twig', {title:'Observación'}) }}
+
+        {# list #}
+        <table class="table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="25px">#</th>
+            <th scope="col-1">Nombre</th>
+            <th width="200px" class="text-center">Total Ingresos</th>
+            <th width="200px" class="text-center">Ingresos Cotisables TSS</th>
+            <th width="200px" class="text-center">Total Deducido</th>
+            <th width="200px" class="text-center">Impuesto Sobre la Renta</th>
+            <th width="200px" class="text-center">Sueldo Neto</th>
+            <th width="200px" class="text-center">Total de Pagos Empleador</th>
+            <th width="100px">Pagar</th>
+            </thead>
+            <tbody>
+            {% for item in empleados %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nro }}</td>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.total_ingreso }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.total_ingreso_cotizable }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.total_deducido }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.impuesto_sobre_renta }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.sueldo_neto_pagar }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.pago_empleador }}</td>
+                    <td>
+                        {% if item.pagado == false %}
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Pagar"
+                                    onclick="Pagar({{ item.id }},{{ quincena }})">
+                                <i class="fa fa-dollar"></i> Pagar
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Revisar"
+                                    onclick="Revisar({{ item.id_nomina }})">
+                                <i class="fa fa-eye"></i> Revisar
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                    data-placement="bottom" title="Cancelar"
+                                    onclick="Cancelar({{ item.id }},{{ quincena }})">
+                                <i class="fa fa-trash"></i> Cancelar
+                            </button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        loadingModal.close()
+
+        function Print(url) {
+            window.open(url, 'blank_')
+        }
+
+        function Pagar(id, quincena) {
+            let data = id + '-' + quincena
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + data);
+        }
+
+        function Revisar(id_nomina) {
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/revisar/' + id_nomina);
+        }
+
+        function mostrarBtn(quincena, option) {
+            $('#modal__btn__actualizar').hide()
+            $('#modal__btn__aceptar').show()
+            $('#quincena').val(quincena)
+            $('#option').val(option)
+        }
+
+        $('#btnAceptarPagoExtraordinario').on('click',function(){
+            let data = $('#empleados_select').val() + '-3'
+            window.location.replace('/contabilidad/capital-humano/nomina-pago/pagar/' + data);
+        })
+
+        $('#modal__btn__aceptar').on('click', function () {
+            let quincena = $('#quincena').val();
+            let option = $('#option').val();
+            let observacion = $('#observacion').val();
+            if (option == 1) {
+                //revertir pago
+                RevertirPago(quincena, observacion)
+            } else {
+                //aceptar pago
+                AceptarPago(quincena, observacion)
+            }
+        })
+
+        function AceptarPago(quincena, observacion) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/nomina-pago/aceptar-pago'
+                         method="post" id='form_aprobar_pago'>
+                        <input type='text' hidden name='quincena' value='${quincena}'/>
+                        <input type='text' hidden name='observacion' value='${observacion}'/>
+
+                    </form>`)
+
+            const fomrulario = $('#form_aprobar_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+
+        function RevertirPago(quincena, observacion) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/nomina-pago/revertir-pago'
+                         method="post" id='form_revertir_pago'>
+                        <input type='text' hidden name='quincena' value='${quincena}'/>
+                        <input type='text' hidden name='observacion' value='${observacion}'/>
+
+                    </form>`)
+
+            const fomrulario = $('#form_revertir_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+
+        function Cancelar(id, quincena) {
+            loadingModal.show()
+            $('body').append(`
+                    <form action='/contabilidad/capital-humano/nomina-pago/cancelar-nomina'
+                         method="post" id='form_cancelar_pago'>
+                        <input type='text' hidden name='quincena' value='${quincena}'/>
+                        <input type='text' hidden name='id' value='${id}'/>
+                    </form>`)
+
+            const fomrulario = $('#form_cancelar_pago')
+            fomrulario.submit()
+            fomrulario.remove()
+        }
+    </script>
+{% endblock %}

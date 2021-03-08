@@ -5,8 +5,12 @@ namespace App\Controller\Contabilidad;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\CapitalHumano\Empleado;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\PeriodoSistema;
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\AlmacenOcupado;
+use App\Entity\Contabilidad\Inventario\Apertura;
 use App\Entity\Contabilidad\Inventario\Cierre;
+use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\Mercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoMercancia;
 use App\Entity\Contabilidad\Inventario\MovimientoProducto;
@@ -25,13 +29,25 @@ class InventarioController extends AbstractController
     /**
      * @Route("/contabilidad/inventario", name="inventario")
      */
-    public function index()
+    public function index(EntityManagerInterface $em, Request $request)
     {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
 
         return $this->render('contabilidad/inventario/index.html.twig', [
             'controller_name' => 'Dashboard',
             'config' => array(
-                ['title' => 'Ejemplo', 'descrip' => 'Descripcion de prueba....'],)
+                ['title' => 'Ejemplo', 'descrip' => 'Descripcion de prueba....'],),
+            'apertura'=>empty($documentos_apertura)?true:false
         ]);
     }
 
@@ -70,6 +86,7 @@ class InventarioController extends AbstractController
                 );
             }
         }
+
         //verifico si cerro el ultimo dia, o sea si tiene operaciones por liquidar
         return $this->render('contabilidad/inventario/selalmacen.html.twig', [
             'controller_name' => 'Dashboard',
@@ -86,18 +103,47 @@ class InventarioController extends AbstractController
         $session = $request->getSession();
         $almacen_id = $request->get('almacenes_select');
 
+        $periodo = $em->getRepository(PeriodoSistema::class)->findOneBy([
+            'id_almacen' => $almacen_id, 'cerrado' => false
+        ]);
+
+        if (!$periodo) {
+            $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+            $anno = AuxFunctions::getDateToCloseDate($em, $almacen_id)->format('Y');
+            $mes = AuxFunctions::getDateToCloseDate($em, $almacen_id)->format('m');
+
+            $periodo = new PeriodoSistema();
+            $periodo->setFecha(\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
+            $periodo->setAnno($anno);
+            $periodo->setIdAlmacen($em->getRepository(Almacen::class)->find($almacen_id));
+            $periodo->setCerrado(0);
+            $periodo->setIdUnidad($unidad);
+            $periodo->setIdUsuario($this->getUser());
+            $periodo->setMes($mes);
+            $periodo->setTipo(AuxFunctions::TIPO_PERIODO_INVENTARIO);
+
+            $em->persist($periodo);
+            $em->flush();
+        }
+        $mes = $periodo->getMes() > 9 ? $periodo->getMes() : "0" . $periodo->getMes();
+
         $session->set('selected_almacen/id', $almacen_id);
         $fecha_sistema = AuxFunctions::getDateToClose($em, $almacen_id);
         $arr_part_fecha = explode('-', $fecha_sistema);
         $fecha = $arr_part_fecha[2] . '/' . $arr_part_fecha[1] . '/' . $arr_part_fecha[0];
         $session->set('date_system', $fecha);
-        $session->set('min_date', '2020-10-01');
-        $session->set('max_date', Date('Y-m-d'));
+        $session->set('min_date', $fecha_sistema);
 
+        $real_today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+        if ($real_today->format('Y') == $periodo->getAnno() &&
+            $real_today->format('m') == $periodo->getMes())
+            $session->set('max_date', $real_today->format('Y-m-d'));
+        else
+            $session->set('max_date', $periodo->getAnno() . '-' . $mes . '-' . AuxFunctions::getUltimoDiaMes($periodo->getMes()));
 
         $id_usuario = $this->getUser();
         $almacen_obj = $em->getRepository(Almacen::class)->find($almacen_id);
-        $name_almacen = $almacen_obj->getCodigo().' - '.$almacen_obj->getDescripcion();
+        $name_almacen = $almacen_obj->getCodigo() . ' - ' . $almacen_obj->getDescripcion();
         $session->set('selected_almacen/name', $name_almacen);
         if ($almacen_obj && $id_usuario) {
             //buscar nuevamente que ningun usuario este usando el almacen
@@ -172,6 +218,12 @@ class InventarioController extends AbstractController
             'id_almacen' => $almacen_obj,
             'abierto' => true,
         ));
+
+        $periodo = $em->getRepository(PeriodoSistema::class)->findOneBy([
+            'id_almacen' => $id_almacen, 'cerrado' => false
+        ]);
+        $mes = $periodo->getMes() > 9 ? $periodo->getMes() : "0" . $periodo->getMes();
+
         $fecha_seleccionada = $request->get('fecha_cierre');
 
         /**@var Cierre $obj_cierre_abierto */
@@ -185,13 +237,20 @@ class InventarioController extends AbstractController
             'id_almacen' => $almacen_obj
         ));
 
-        if(empty($movimientos_mercancias_arr) && !$obj_cierre_abierto){
+        if (empty($movimientos_mercancias_arr) && !$obj_cierre_abierto) {
             $arr_split_fecha = explode('-', $fecha_seleccionada);
             $session = $request->getSession();
             $fecha = $arr_split_fecha[2] . '/' . $arr_split_fecha[1] . '/' . $arr_split_fecha[0];
             $session->set('date_system', $fecha);
             $session->set('min_date', $fecha_seleccionada);
-            $session->set('max_date', Date('Y-m-d'));
+
+            $real_today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+            if ($real_today->format('Y') == $periodo->getAnno() &&
+                $real_today->format('m') == $periodo->getMes())
+                $session->set('max_date', $real_today->format('Y-m-d'));
+            else
+                $session->set('max_date', $periodo->getAnno() . '-' . $mes . '-' . AuxFunctions::getUltimoDiaMes($periodo->getMes()));
+
             $this->addFlash('success', 'Fecha cambiada satisfactoriamente');
             return $this->redirectToRoute('inventario');
         }
@@ -239,7 +298,13 @@ class InventarioController extends AbstractController
             $fecha = $arr_split_fecha[2] . '/' . $arr_split_fecha[1] . '/' . $arr_split_fecha[0];
             $session->set('date_system', $fecha);
             $session->set('min_date', $fecha_seleccionada);
-            $session->set('max_date', Date('Y-m-d'));
+
+            $real_today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+            if ($real_today->format('Y') == $periodo->getAnno() &&
+                $real_today->format('m') == $periodo->getMes())
+                $session->set('max_date', $real_today->format('Y-m-d'));
+            else
+                $session->set('max_date', $periodo->getAnno() . '-' . $mes . '-' . AuxFunctions::getUltimoDiaMes($periodo->getMes()));
 
             $this->addFlash('success', 'Fecha cambiada satisfactoriamente');
             return $this->redirectToRoute('inventario');

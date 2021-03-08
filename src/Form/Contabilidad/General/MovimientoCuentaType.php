@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\General;
 
+use App\Controller\Contabilidad\Venta\IVenta\ClientesAdapter;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;
@@ -54,11 +55,16 @@ class MovimientoCuentaType extends AbstractType
                 'label' => 'Unidad',
                 'choice_label' => 'unidad',
             ))
-            ->add('cliente', ChoiceType::class, array(
+            ->add('tipo_cliente', ChoiceType::class, [
                 'attr' => ['class' => 'w-100'],
+                'label' => 'Tipo cliente',
+                'choices' => ClientesAdapter::getTypeClientes()
+            ])
+            ->add('id_cliente', ChoiceType::class, [
+                'attr' => ['class' => 'w-100'],
+                'choice_value' => 'id',
                 'label' => 'Cliente',
-                'choice_label' => 'cliente',
-            ))
+            ])
             ->add('proveedor', ChoiceType::class, array(
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Proveedor',

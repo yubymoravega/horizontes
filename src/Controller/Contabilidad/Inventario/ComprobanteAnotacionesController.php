@@ -88,8 +88,16 @@ class ComprobanteAnotacionesController extends AbstractController
             elseif ($id_tipo_documento == 8) {
                 $rows = array_merge($rows, []);
             }//devolucion
-            elseif ($id_tipo_documento == 90) {
+            elseif ($id_tipo_documento == 9) {
                 $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_devolucion);
+            }//Apertura
+            elseif ($id_tipo_documento == 12) {
+                $datos_devolucion = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                $rows = array_merge($rows, $datos_devolucion);
+            }//Servicios
+            elseif ($id_tipo_documento == 13) {
+                $datos_devolucion = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
                 $rows = array_merge($rows, $datos_devolucion);
             }
         }
@@ -106,33 +114,82 @@ class ComprobanteAnotacionesController extends AbstractController
 
         //1. Recorro todos los documentos del almacen
         $arr_obj_documentos = $documento_er->findBy(array(
-            'id_almacen' => $id_almacen,
-            'activo' => true
+            'id_almacen' => $id_almacen
         ));
+
         foreach ($arr_obj_documentos as $obj_documento) {
             $cod_almacen = $obj_documento->getIdAlmacen()->getCodigo();
             /**@var $obj_documento Documento* */
             $id_tipo_documento = $obj_documento->getIdTipoDocumento()->getId();
             //informe recepcion mercancia
             if ($id_tipo_documento == 1) {
-                $datos_informe = AuxFunctions::getDataInformeRecepcion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_informe);
+                if(!$obj_documento->getIdDocumentoCancelado()){
+                    $datos_informe = AuxFunctions::getDataInformeRecepcion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_informe);
+                }
             } //informe recepcion producto
             elseif ($id_tipo_documento == 2) {
-                $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_informe);
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_informe);
+                }
             } //Ajuste de entrada
             elseif ($id_tipo_documento == 3) {
-                $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_ajuste_entreada);
-            }//transferencia de entrada
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_ajuste_entreada);
+                }
+            } //Ajuste de salida
+            elseif ($id_tipo_documento == 4) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_ajuste_salida = AuxFunctions::getDataAjusteSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_ajuste_salida);
+                }
+            } //transferencia de entrada
             elseif ($id_tipo_documento == 5) {
-                $datos_transferencia_entrada = AuxFunctions::getDataTransferenciaEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_transferencia_entrada);
-            } //devolucion
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_transferencia_entrada = AuxFunctions::getDataTransferenciaEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_transferencia_entrada);
+                }
+            } //transferencia de salida
+            elseif ($id_tipo_documento == 6) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_transferencia = AuxFunctions::getDataTransferenciaSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_transferencia);
+                }
+            } //vale salida de mercancia
+            elseif ($id_tipo_documento == 7) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_vale = AuxFunctions::getDataValeSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_vale);
+                }
+            } //vale salida de producto
+            elseif ($id_tipo_documento == 8) {
+                //  $rows = array_merge($rows, []);
+            }//devolucion
             elseif ($id_tipo_documento == 9) {
-                $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_devolucion);
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_devolucion = AuxFunctions::getDataDevolucion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_devolucion);
+                }
+            }//Factura
+            elseif ($id_tipo_documento == 10) {
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_venta = AuxFunctions::getDataVentaCancelada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
+                }
+            }//Apertura mercancia
+            elseif ($id_tipo_documento == 12) {
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_venta = AuxFunctions::getDataApertura($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
+                }
+            }//Apertura Producto
+            elseif ($id_tipo_documento == 13) {
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_venta = AuxFunctions::getDataAperturaProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
+                }
             }
         }
         return $rows;
@@ -149,31 +206,60 @@ class ComprobanteAnotacionesController extends AbstractController
         //1. Recorro todos los documentos del almacen
         $arr_obj_documentos = $documento_er->findBy(array(
             'id_almacen' => $id_almacen,
-            'activo' => true
         ));
         foreach ($arr_obj_documentos as $obj_documento) {
             $cod_almacen = $obj_documento->getIdAlmacen()->getCodigo();
             /**@var $obj_documento Documento* */
             $id_tipo_documento = $obj_documento->getIdTipoDocumento()->getId();
-            //Ajuste de salida
-            if ($id_tipo_documento == 4) {
-                $datos_ajuste_salida = AuxFunctions::getDataAjusteSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_ajuste_salida);
+            //informe recepcion mercancia
+            if ($id_tipo_documento == 1) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_informe = AuxFunctions::getDataInformeRecepcion($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_informe);
+                }
+            } //informe recepcion producto
+            elseif ($id_tipo_documento == 2) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_informe = AuxFunctions::getDataInformeRecepcionProducto($em, $cod_almacen, $obj_documento, $movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_informe);
+                }
+            } //Ajuste de entrada
+            elseif ($id_tipo_documento == 3) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_ajuste_entreada = AuxFunctions::getDataAjusteEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_ajuste_entreada);
+                }
+            } //Ajuste de salida
+            elseif ($id_tipo_documento == 4) {
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_ajuste_salida = AuxFunctions::getDataAjusteSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_ajuste_salida);
+                }
+            } //transferencia de entrada
+            elseif ($id_tipo_documento == 5) {
+                if ($obj_documento->getIdDocumentoCancelado()) {
+                    $datos_transferencia_entrada = AuxFunctions::getDataTransferenciaEntrada($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_transferencia_entrada);
+                }
             } //transferencia de salida
             elseif ($id_tipo_documento == 6) {
-                $datos_transferencia = AuxFunctions::getDataTransferenciaSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_transferencia);
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_transferencia = AuxFunctions::getDataTransferenciaSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_transferencia);
+                }
             } //vale salida de mercancia
             elseif ($id_tipo_documento == 7) {
-                $datos_vale = AuxFunctions::getDataValeSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_vale);
-            } //vale salida de producto
-            elseif ($id_tipo_documento == 8) {
-                $rows = array_merge($rows, []);
-            } //Factura
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_vale = AuxFunctions::getDataValeSalida($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_vale);
+                }
+
+            }//Factura
             elseif ($id_tipo_documento == 10) {
-                $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er,$movimiento_producto_er, $id_tipo_documento);
-                $rows = array_merge($rows, $datos_venta);
+                if(!$obj_documento->getIdDocumentoCancelado()) {
+                    $datos_venta = AuxFunctions::getDataVenta($em, $cod_almacen, $obj_documento, $movimiento_mercancia_er, $movimiento_producto_er, $id_tipo_documento);
+                    $rows = array_merge($rows, $datos_venta);
+                }
             }
         }
         return $rows;
@@ -247,7 +333,7 @@ class ComprobanteAnotacionesController extends AbstractController
         $paginator = $pagination->paginate(
             $rows,
             $request->query->getInt('page', $request->get("page") || 1), /*page number*/
-            15, /*limit per page*/
+            30, /*limit per page*/
             ['align' => 'center', 'style' => 'bottom',]
         );
         //dd($total);

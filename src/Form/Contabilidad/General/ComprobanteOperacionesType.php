@@ -2,6 +2,7 @@
 
 namespace App\Form\Contabilidad\General;
 
+use App\Entity\Contabilidad\Config\InstrumentoCobro;
 use App\Entity\Contabilidad\Config\TipoComprobante;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -30,12 +31,25 @@ class ComprobanteOperacionesType extends AbstractType
                         ->where('u.activo = true');
                 }
             ])
+            ->add('id_instrumento_cobro', EntityType::class, [
+                'attr' => ['class' => 'w-100'],
+                'label' => 'Instrumento de Cobro',
+                'class' => InstrumentoCobro::class,
+                'choice_value' => 'id',
+                'choice_label' => function (InstrumentoCobro $eg) {
+                    return $eg->getNombre();
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.activo = true');
+                }
+            ])
 //            ->add('nro_comprobante', NumberType::class, [
 //                'attr' => ['class' => 'w-100'],
 //            ])
             ->add('documento', TextType::class,[
                 'attr' => ['class' => 'w-100'],
-                'label' => 'Documento',
+                'label' => 'Número de Documento',
             ])
             ->add('explicacion', TextareaType::class,[
                 'attr' => ['class' => 'w-100'],

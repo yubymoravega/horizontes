@@ -6,6 +6,7 @@ use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\Subcuenta;
 use App\Entity\Contabilidad\Config\TipoMovimiento;
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Inventario\Proveedor;
 use App\Entity\User;
 use App\Repository\Contabilidad\ActivoFijo\MovimientoActivoFijoRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -87,6 +88,46 @@ class MovimientoActivoFijo
      * @ORM\Column(type="boolean")
      */
     private $activo;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_tipo_cliente;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_cliente;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Unidad::class)
+     */
+    private $id_unidad_destino_origen;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Proveedor::class)
+     */
+    private $id_proveedor;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $cancelado;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=MovimientoActivoFijo::class)
+     */
+    private $id_movimiento_cancelado;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $fecha_factura;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $nro_factura;
 
     public function getId(): ?int
     {
@@ -233,6 +274,102 @@ class MovimientoActivoFijo
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getIdTipoCliente(): ?int
+    {
+        return $this->id_tipo_cliente;
+    }
+
+    public function setIdTipoCliente(?int $id_tipo_cliente): self
+    {
+        $this->id_tipo_cliente = $id_tipo_cliente;
+
+        return $this;
+    }
+
+    public function getIdCliente(): ?int
+    {
+        return $this->id_cliente;
+    }
+
+    public function setIdCliente(?int $id_cliente): self
+    {
+        $this->id_cliente = $id_cliente;
+
+        return $this;
+    }
+
+    public function getIdUnidadDestinoOrigen(): ?Unidad
+    {
+        return $this->id_unidad_destino_origen;
+    }
+
+    public function setIdUnidadDestinoOrigen(?Unidad $id_unidad_destino_origen): self
+    {
+        $this->id_unidad_destino_origen = $id_unidad_destino_origen;
+
+        return $this;
+    }
+
+    public function getIdProveedor(): ?Proveedor
+    {
+        return $this->id_proveedor;
+    }
+
+    public function setIdProveedor(?Proveedor $id_proveedor): self
+    {
+        $this->id_proveedor = $id_proveedor;
+
+        return $this;
+    }
+
+    public function getCancelado(): ?bool
+    {
+        return $this->cancelado;
+    }
+
+    public function setCancelado(?bool $cancelado): self
+    {
+        $this->cancelado = $cancelado;
+
+        return $this;
+    }
+
+    public function getIdMovimientoCancelado(): ?self
+    {
+        return $this->id_movimiento_cancelado;
+    }
+
+    public function setIdMovimientoCancelado(?self $id_movimiento_cancelado): self
+    {
+        $this->id_movimiento_cancelado = $id_movimiento_cancelado;
+
+        return $this;
+    }
+
+    public function getFechaFactura(): ?\DateTimeInterface
+    {
+        return $this->fecha_factura;
+    }
+
+    public function setFechaFactura(?\DateTimeInterface $fecha_factura): self
+    {
+        $this->fecha_factura = $fecha_factura;
+
+        return $this;
+    }
+
+    public function getNroFactura(): ?string
+    {
+        return $this->nro_factura;
+    }
+
+    public function setNroFactura(?string $nro_factura): self
+    {
+        $this->nro_factura = $nro_factura;
 
         return $this;
     }

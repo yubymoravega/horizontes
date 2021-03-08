@@ -1,0 +1,532 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+{% include 'breadcrumbs.html.twig' %}
+<!-- Section Input Groups-->
+<section class="section novi-background section-20" id="seccion-principal">
+	<div class="container">
+
+		<div class="container card">
+			<img class="imagen-cliente" src="/images/iconos/user.svg">
+			<div class="card-header text-center">
+				<h1>Datos de la Orden</h1>
+				<hr class="divider-white bg-mantis-white">
+			</div>
+
+			<div class="row justify-content-md-center no-margin">
+				<div class="col col-lg-2"></div>
+				<div class="col-md-auto">
+					<div id="messageBox" style="margin: 25px; display: none;" class="alert alert-danger" role="alert"></div>
+				</div>
+				<div class="col col-lg-2"></div>
+			</div>
+
+			<form name="cliente_beneficiario" method="post" id="form_add_beneficiario" novalidate="novalidate">
+
+				<h4 style="color:white;">Beneficiario</h4>
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+				
+					<div class="col"> 
+						Nombre<input value="{{beneficiario.primerNombre}}" type="text" id="cliente_beneficiario_primerNombre" name="cliente_beneficiario[primerNombre]" required="required" maxlength="255" class="fomulario form-control" placeholder=" Nombre">
+					</div>
+
+					<div class="col">	
+						Apellido<input value="{{beneficiario.primerApellido}}" type="text" id="cliente_beneficiario_primerApellido" name="cliente_beneficiario[primerApellido]" required="required" maxlength="255" class="fomulario form-control" placeholder="Apellido">
+					</div>
+					
+					<div class="col">	
+						Segundo Apellido<input value="{{beneficiario.segundoApellido}}" type="text" id="cliente_beneficiario_segundoApellido" name="cliente_beneficiario[segundoApellido]" maxlength="255" class="fomulario form-control" placeholder="Segundo Apellido">
+					</div>
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<h4 style="color:white;">
+					Alternativo</h4>
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+
+				<div class="col">	
+						Nombre<input value="{{beneficiario.alternativoNombre}}" type="text" id="cliente_beneficiario_alternativoNombre" name="cliente_beneficiario[alternativoNombre]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Nombre Alternativo">
+				</div>
+
+				<div class="col">
+						Primer Apellido<input value="{{beneficiario.alternativoApellido}}" type="text" id="cliente_beneficiario_alternativoApellido" name="cliente_beneficiario[alternativoApellido]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Primer Apellido">
+				</div>	
+					
+				<div class="col">	
+					Segundo Apellido<input value="{{beneficiario.alternativoSegundoApellido}}" type="text" id="cliente_beneficiario_alternativoSegundoApellido" name="cliente_beneficiario[alternativoSegundoApellido]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Segundo Apellido">
+				</div>	
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<h4 style="color:white;">Contactos</h4>
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+
+					<div class="col">
+						Celular<input value="{{beneficiario.telefono}}" type="text" id="cliente_beneficiario_telefono" name="cliente_beneficiario[telefono]" required="required" maxlength="255" class="fomulario form-control" placeholder="Celular">
+					</div>
+					
+					<div class="col">
+						Telefono Adicional<input value="{{beneficiario.telefonoCasa}}" type="text" id="cliente_beneficiario_telefonoCasa" name="cliente_beneficiario[telefonoCasa]" maxlength="255" class="fomulario form-control" placeholder="Telefono Adicional">
+					</div>
+
+					<div class="col">
+						Identificacion<input value="{{beneficiario.identificacion}}" type="text" id="cliente_beneficiario_identificacion" name="cliente_beneficiario[identificacion]" maxlength="255" class="fomulario form-control" placeholder="Identificacion">
+					</div>
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<h4 style="color:white;">Remitente</h4>
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+				
+				{% if beneficiario.remitenteNombre %}
+
+					<div class="col"> 
+						Nombre<input value="{{beneficiario.remitenteNombre}}" type="text" id="remitenteNombre" name="remitenteNombre"  maxlength="255" class="fomulario form-control" placeholder="Nombre">
+					</div>
+				{% else %}
+
+				<div class="col"> 
+						Nombre<input  type="text" id="remitenteNombre" name="remitenteNombre"  maxlength="255" class="fomulario form-control" placeholder="Nombre">
+					</div>
+ 
+				{% endif %}
+
+				{% if beneficiario.remitenteApellido %}
+
+					<div class="col">	
+						Apellido<input type="text" value="{{beneficiario.remitenteApellido}}" id="remitenteApellido" name="remitenteApellido" maxlength="255" class="fomulario form-control" placeholder="Apellido">
+					</div>
+				{% else %}
+
+				<div class="col">	
+						Apellido<input type="text"  id="remitenteApellido" name="remitenteApellido" maxlength="255" class="fomulario form-control" placeholder="Apellido">
+					</div>
+ 
+				{% endif %}
+				
+				{% if beneficiario.comentario %}
+	
+					<div class="col">	
+						Comentario<input  type="text" value="{{beneficiario.comentario}}" id="comentario" name="Comentario" maxlength="255" class="fomulario form-control" placeholder="Comentario">
+					</div>
+				{% else %}
+
+					<div class="col">	
+						Comentario<input  type="text"  id="comentario" name="Comentario" maxlength="255" class="fomulario form-control" placeholder="Comentario">
+					</div>
+ 
+				{% endif %}
+				
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<h4 style="color:white;">Dirección</h4>
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+					
+					<div class="col">
+						Calle<input value="{{beneficiario.calle}}" type="text" id="cliente_beneficiario_calle" name="cliente_beneficiario[calle]" required="required" maxlength="255" class="fomulario form-control" placeholder="Calle">
+					</div>
+				
+					<div class="col">
+					Entre<input value="{{beneficiario.entre}}" type="text" id="cliente_beneficiario_entre" name="cliente_beneficiario[entre]" maxlength="255" class="fomulario form-control" placeholder="Entre">
+					</div>
+					
+					<div class="col">	
+						Y<input value="{{beneficiario.y}}" type="text" id="cliente_beneficiario_y" name="cliente_beneficiario[y]" maxlength="255" class="fomulario form-control" placeholder="Y">
+					</div>
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+
+					<div class="col">
+						No<input value="{{beneficiario.no}}" type="text" id="cliente_beneficiario_no" name="cliente_beneficiario[no]" required="required" maxlength="255" class="fomulario form-control" placeholder="No">
+					</div>
+
+					<div class="col">
+						Edificio<input value="{{beneficiario.edificio}}" type="text" id="cliente_beneficiario_edificio" name="cliente_beneficiario[edificio]" maxlength="255" class="fomulario form-control" placeholder="Edificio">
+					</div>
+					
+					<div class="col">
+						Apartamento<input value="{{beneficiario.apto}}" type="text" id="cliente_beneficiario_apto" name="cliente_beneficiario[apto]" maxlength="255" class="fomulario form-control" placeholder="Apartamento">
+					</div>
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+
+					<div class="col">
+						Reparto<input value="{{beneficiario.reparto}}" type="text" id="cliente_beneficiario_reparto" name="cliente_beneficiario[reparto]" maxlength="255" class="fomulario form-control" placeholder="Reparto">
+					</div>
+
+					<div class="col">
+						Provincias<select id="cliente_beneficiario_provincias" name="provincias" class="fomulario form-control valid" aria-invalid="false" style="height: 40px; font-size: 15px;">
+
+							<option value="0">Provincias</option>
+							<option value="21">PINAR DEL RIO</option>
+							<option value="22">ARTEMISA</option>
+							<option value="23">LA HABANA</option>
+							<option value="24">MAYABEQUE</option>
+							<option value="25">MATANZAS</option>
+							<option value="26">VILLA CLARA</option>
+							<option value="27">CIENFUEGOS</option>
+							<option value="28">SANCTI SPIRITUS</option>
+							<option value="29">CIEGO DE AVILA</option>
+							<option value="30">CAMAGUEY</option>
+							<option value="31">LAS TUNAS</option>
+							<option value="32">HOLGUIN</option>
+							<option value="33">GRANMA</option>
+							<option value="34">SANTIAGO DE CUBA</option>
+							<option value="35">GUANTANAMO</option>
+
+						</select>
+					</div>	
+
+					<div class="col">
+					Municipios<select id="cliente_beneficiario_municipios" name="municipios" class="fomulario form-control error" aria-invalid="true" style="height: 40px; font-size: 15px;">
+
+							<option value="0">Municipios</option>
+						</select>
+					</div>	
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+                <div class="form-group">
+					<div class="input-group input-group-sm">
+
+					<div class="row">
+  			<div class="col-3"></div>
+ 		    <div class="col-3">A Pagar<input value="{{beneficiario.monto}}" type="text" id="total" name="pagar" required="required" maxlength="255" class="fomulario form-control" placeholder="A Pagar"></div>
+			<div class="col-3">Recibir<input type="text" id="monto" name="recibir" maxlength="255" class="fomulario form-control" placeholder="Recibir"></div>
+			<div class="col-3"></div>
+					</div>				
+					</div>
+				</div>
+
+			</form>
+		</div>
+		<div class="row justify-content-md-center group offset-top-34 row-continuar">
+			<button id="editBeneficiario" class="btn btn-sm btn-outline-dark" >Editar Orden</button>
+		</div>
+	
+		<div></div>
+	</div>
+</section>
+
+<style>
+
+.fomulario{
+
+margin-right: 25px;
+
+}
+
+.no-margin{margin: 0px;}
+
+form#form_add_beneficiario {
+    padding-right: 15%;
+    padding-left: 15%;
+}
+
+</style>
+						{% endblock %}
+
+{% block javascripts %} 
+{{parent()}}
+
+<script>
+
+let codeProvincia = "{{beneficiario.provincia}}";
+let codeMunicipio = "{{beneficiario.municipio}}";
+
+
+
+$( document ).ready(function() {
+
+	total();
+
+	let provinciaNombre = $( "#cliente_beneficiario_provincias  option:selected" ).text();
+
+	if(provinciaNombre == "LA HABANA"){
+
+	}
+
+$("#cliente_beneficiario_provincias option:contains("+codeProvincia+")").attr('selected', true);
+
+   
+   let code = $('#cliente_beneficiario_provincias').find('option:selected').val() 
+   let municipio = codeMunicipio;
+$.ajax({
+            type: 'POST',
+            data: {'code' : code},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas.municipios",
+            dataType: 'html',
+            success: function (data) {
+
+			
+     $('#cliente_beneficiario_municipios')
+    .find('option')
+    .remove()
+    .end()
+    .append('<option value="0">Municipios</option>')
+    .val('0');
+
+				data = JSON.parse(data);
+					
+			for(let i = 0; i < data.length; i++) {
+
+				if(municipio != data[i].code){
+
+					 $('#cliente_beneficiario_municipios').append("<option value="+ "'" +data[i].code+"'"+">"+data[i].nombre+"</option>");
+			
+				}else{
+						 $('#cliente_beneficiario_municipios').append("<option selected value="+ "'" +data[i].code+"'"+">"+data[i].nombre+"</option>");
+				}
+          
+                         }    
+
+                         $("#cliente_beneficiario_municipios option:contains("+codeMunicipio+")").attr('selected', true);      
+            }
+        });
+
+});
+
+
+$( "#cliente_beneficiario_provincias" ).change(function() {
+
+let code = $('#cliente_beneficiario_provincias').find('option:selected').val() 
+
+$.ajax({
+            type: 'POST',
+            data: {'code' : code},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas.municipios",
+            dataType: 'html',
+            success: function (data) {
+
+     $('#cliente_beneficiario_municipios')
+    .find('option')
+    .remove()
+    .end()
+    .append('<option value="0">Municipios</option>')
+    .val('0');
+
+				data = JSON.parse(data);
+							
+			for(let i = 0; i < data.length; i++) {
+           $('#cliente_beneficiario_municipios').append("<option value="+ "'" +data[i].code+"'"+">"+data[i].nombre+"</option>");
+                         }          
+            }
+        });
+
+});
+
+
+$.validator.addMethod("valueNotEquals", function(value, element, arg){
+  return arg !== value;
+ }, "");
+
+ let validator = $("#form_add_beneficiario").validate({
+   errorLabelContainer: "#messageBox",
+    wrapper: "li",
+    rules: {
+      'cliente_beneficiario[primerNombre]': {
+      required: true, minlength: 3},
+	   'cliente_beneficiario[primerApellido]': {
+      required: true, minlength: 3},
+	  'cliente_beneficiario[telefono]': {
+      required: true, minlength: 8},
+
+	  'cliente_beneficiario[calle]': {
+      required: true, minlength: 3},
+     
+      'pagar': {
+      required: true, min: 18},
+
+       'recibir': {
+      required: true, min: 10},
+
+	   'cliente_beneficiario[no]': {
+      required: true, minlength: 1},
+
+	  'provincias': {valueNotEquals: "0"},	
+	  'municipios': {valueNotEquals: "0"},	
+
+    },
+    messages: { 
+      'cliente_beneficiario[primerNombre]': {required: "Primer Nombre Requerido", minlength: "Primer Nombre Minimo 3 Caracteres" },
+	  'cliente_beneficiario[primerApellido]': {required: "Primer Apellido Requerido", minlength: "Primer Apellido Minimo 3 Caracteres" },
+	  'cliente_beneficiario[telefono]': {required: "Telefono Requerido", minlength: "Telefono Minimo 8 Caracteres" },
+	  'cliente_beneficiario[calle]': {required: "Calle Requerida", minlength: "Calle Minimo 3 Caracteres" },
+	  'cliente_beneficiario[no]': {required: "No. Requerido", minlength: "No Minimo 1 Caracteres" },
+      'pagar': {required: "Total. Requerido", min: "Minimo $18" },
+      'recibir': {required: "Monto. Requerido", min: "Minimo $10" },
+	  'provincias': {valueNotEquals: "Elije una Provincia."},
+	  'municipios': {valueNotEquals: "Elije una Municipio."}
+	  },
+ 
+ });
+
+ $('#cliente_beneficiario_no').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});  
+
+ $('#cliente_beneficiario_telefono').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});  
+
+ $('#cliente_beneficiario_telefonoCasa').on('input', function () { 
+    this.value = this.value.replace(/[^0-9]/g,'');
+});  
+
+
+$( "#cliente_beneficiario_provincias" ).change(function() {
+				
+			monto();
+
+            });
+
+			$( "#monto" ).change(function() {
+				
+			monto();
+
+            });
+
+
+			$( "#total" ).change(function() {
+
+				total();
+
+            });
+
+			function monto(){
+
+					if($( "#monto" ).val() <= 100){
+								
+				if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
+
+					$( "#total" ).val(Number($( "#monto" ).val()) + Number(5));
+				
+					}else{ 
+									
+					$( "#total" ).val(Number($( "#monto" ).val()) + Number(8));
+				
+				}}else{ 
+				
+					if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
+
+					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.05 ));
+				
+					}else{ 
+									
+					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.08 ));
+
+				}}
+
+			}
+
+			function total(){
+
+					if($( "#total" ).val() <= 100){
+								
+				if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
+
+					$( "#monto" ).val(Number($( "#total" ).val()) - Number(5));
+				
+					}else{ 
+									
+					$( "#monto" ).val(Number($( "#total" ).val()) - Number(8));
+				
+				}}else{ 
+				
+					if($("#cliente_beneficiario_provincias option:selected").text() == 'LA HABANA'){
+
+					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.05 ));
+				
+					}else{ 
+									
+					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.08 ));
+
+				}}
+
+			}
+$( "#editBeneficiario" ).click(function() {
+ 
+let respuestaForm =  validator.form();
+
+if(respuestaForm){
+
+	let idCotizacion = {{id}};
+
+	let array = {};
+
+	array['id'] = {{beneficiario.id}};
+	array['primerNombre'] = ($( "#cliente_beneficiario_primerNombre" ).val() == "") ? null : $( "#cliente_beneficiario_primerNombre" ).val();
+	array['primerApellido'] = ($( "#cliente_beneficiario_primerApellido" ).val() == "") ? null : $( "#cliente_beneficiario_primerApellido" ).val();
+	array['segundoApellido'] = ($( "#cliente_beneficiario_segundoApellido" ).val() == "") ? null : $( "#cliente_beneficiario_segundoApellido" ).val();
+	array['identificacion'] = ($( "#cliente_beneficiario_identificacion" ).val() == "") ? null :$( "#cliente_beneficiario_identificacion" ).val();
+	array['telefono'] = ($( "#cliente_beneficiario_telefono" ).val() == "") ? null : $( "#cliente_beneficiario_telefono" ).val();
+	array['telefonoCasa'] = ($( "#cliente_beneficiario_telefonoCasa" ).val() == "") ? null : $( "#cliente_beneficiario_telefonoCasa" ).val();
+	array['alternativoNombre'] = ($( "#cliente_beneficiario_alternativoNombre" ).val() == "") ? null : $( "#cliente_beneficiario_alternativoNombre" ).val();
+	array['alternativoApellido'] = ($( "#cliente_beneficiario_alternativoApellido" ).val() == "") ? null : $( "#cliente_beneficiario_alternativoApellido" ).val() ;
+	array['alternativoSegundoApellido'] = ($( "#cliente_beneficiario_alternativoSegundoApellido" ).val() == "" ) ? null : $( "#cliente_beneficiario_alternativoSegundoApellido" ).val() ;
+	array['calle'] = ($( "#cliente_beneficiario_calle" ).val() == "") ? null : $( "#cliente_beneficiario_calle" ).val() ;
+	array['no'] = ($( "#cliente_beneficiario_no" ).val() == "") ? null : $( "#cliente_beneficiario_no" ).val();
+	array['entre'] = ($( "#cliente_beneficiario_entre" ).val() == "") ? null : $( "#cliente_beneficiario_entre" ).val() ;
+	array['y'] = ($( "#cliente_beneficiario_y" ).val() == "") ? null :  $( "#cliente_beneficiario_y" ).val();
+	array['apto'] = ($( "#cliente_beneficiario_apto" ).val() == "") ? null : $( "#cliente_beneficiario_apto" ).val();
+	array['edificio'] = ($( "#cliente_beneficiario_edificio" ).val() == "") ? null : $( "#cliente_beneficiario_edificio" ).val() ;
+	array['reparto'] = ($( "#cliente_beneficiario_reparto" ).val() == "") ? null : $( "#cliente_beneficiario_reparto" ).val();
+	array['provincia'] = $( "#cliente_beneficiario_provincias  option:selected" ).text();
+	array['municipio'] = $( "#cliente_beneficiario_municipios  option:selected" ).text();
+	array['idCliente'] = "{{beneficiario.idCliente}}";
+	array['fecha'] = "{{beneficiario.fecha}}";
+	array['empleado'] = "{{beneficiario.empleado}}";
+	array['monto'] = $( "#total" ).val();
+	array['recibir'] = $( "#monto" ).val();
+	array['servicio'] = 'Remesa';
+	array['orden'] = "{{beneficiario.orden}}";
+	array['nombreCliente'] = "{{beneficiario.nombreCliente}}";
+	array['remitenteNombre'] = ($( "#remitenteNombre" ).val() == "") ? null : $( "#remitenteNombre").val() ;
+	array['remitenteApellido'] = ($( "#remitenteApellido" ).val() == "") ? null : $( "#remitenteNombre").val() ;
+	array['comentario'] = ($( "#comentario" ).val() == "") ? null : $( "#comentario" ).val() ;
+
+  let jsonString = JSON.stringify(array);
+ // jsonString = jsonString.replace(/\"/g, "");
+
+  $.ajax({
+            type: 'POST',
+            data: {'json' : jsonString},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/checkout/cotizacion/save/"+{{id}}+"/"+"{{beneficiario.orden}}",
+            dataType: 'json',
+            success: function (data) {
+				
+				 window.location.href = "/checkout/cotizacion/"+{{id}};
+            }
+        });
+
+
+}
+
+});
+
+			
+
+
+ </script>
+
+{% endblock %}
+

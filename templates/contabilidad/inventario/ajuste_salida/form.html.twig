@@ -191,9 +191,9 @@
                     <a href="{{ url('inventario') }}"
                        class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                 </div>
-                <div class="ml-2">
-                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
-                </div>
+                {#                <div class="ml-2">#}
+                {#                    <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>#}
+                {#                </div>#}
                 <div class="ml-2">
                     <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
                     </button>
@@ -276,21 +276,20 @@
 
             $('#ajuste_salida_id_elemento_gasto, #ajuste_salida_id_centro_costo').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
 
-            $("#select_nros").blur(function(){
-                if(flag == false){
+            $("#select_nros").blur(function () {
+                if (flag == false) {
                     //no dio enter
                     $(this).val(consecutivo)
                     $('#ajuste_salida').resetForm()
                     $('#form_mercancia').resetForm()
                     $('#btnSubbmitAjuste').show()
                     $('#btnImprimir').show()
-                    $('#btnCancelar').hide()
+                    // $('#btnCancelar').hide()
                     $('#ajuste_salida_observacion').val('')
                     $('#rows_mercancias').find('tr').remove()
                     list_mercancia = []
                     loadingData()
-                }
-                else{
+                } else {
                     flag = false;
                 }
             });
@@ -318,23 +317,23 @@
                     if ($('#select_nros').val() == consecutivo) {// si es el consecutivo
                         $('#btnSubbmitAjuste').show()
                         $('#btnImprimir').show()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         loadingData()
                     } else if ($('#select_nros').val() > consecutivo) {// si es mayor
                         $('#btnSubbmitAjuste').hide()
                         $('#btnImprimir').hide()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         //$('#ajuste_salida select').find('option').remove()
                         alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
                     } else if ($('#select_nros').val() == '') {// si no hay numero
                         $('#btnSubbmitAjuste').hide()
                         $('#btnImprimir').hide()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
                     } else {// si es un Numero valido para cargar
                         $('#btnImprimir').show()
                         $('#btnSubbmitAjuste').hide()
-                        $('#btnCancelar').show()
+                        // $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
                 }
@@ -464,55 +463,47 @@
 
             $('#btnSearchMercancia').on('click', function () {
                 $('#rows_table').find('tr').remove();
-                let codigo = $('#ajuste_salida_mercancia_codigo').val()
-                let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val()
-                if (!!cuent) {
-                    let nro = cuenta.split(' - ')[0];
-                    loadingModal.show("cargando mercancia...")
-                    $.ajax({
-                        url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + nro,
-                        method: 'POST',
-                        dataType: 'json',
-                        success: function (result) {
-
-                            $(result.mercancias).each(function (pos, valor) {
-                                $('#rows_table').append('<tr>' +
-                                    '<td style="font-weight:400;"> ' +
-                                    '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
-                                    '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
-                                    '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
-                                );
-                            })
-                        },
-                        error: function () {
-                            $('#ajuste_salida_mercancia_descripcion').val('')
-                            $('#ajuste_salida_mercancia_existencia').val('')
-                            $('#ajuste_salida_mercancia_precio').val('')
-                            $('#true_precio_mercancia').val('')
-                            $('#ajuste_salida_mercancia_id_unidad_medida').val('')
-                            $('#ajuste_salida_documento_importe_mercancia').val('')
-                            $('#ajuste_salida_mercancia_existencia_decremento').val('')
-                            $('#ajuste_salida_documento_cantidad_mercancia').val('')
-                            $('#resto_importe').val('')
-                            importe_real = 0
-                        }
-                    })
-                } else {
-                    alertTemplate('El campo código y cuenta no deben estar vacios.', 'danger')
-                }
+                let codigo = $('#ajuste_salida_mercancia_codigo').val() != '' ? $('#ajuste_salida_mercancia_codigo').val() : -1
+                loadingModal.show("cargando mercancia...")
+                $.ajax({
+                    url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        loadingModal.close()
+                        $(result.mercancias).each(function (pos, valor) {
+                            $('#rows_table').append('<tr>' +
+                                '<td style="font-weight:400;"> ' +
+                                '<input type="checkbox" style="margin-left: auto;" id="' + valor.codigo + '">' +
+                                '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.codigo + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.descripcion + '</td>' +
+                                '<td style="font-weight:400;"> ' + valor.precio_compra + '</td> </tr>'
+                            );
+                        })
+                    },
+                    error: function () {
+                        $('#ajuste_salida_mercancia_descripcion').val('')
+                        $('#ajuste_salida_mercancia_existencia').val('')
+                        $('#ajuste_salida_mercancia_precio').val('')
+                        $('#true_precio_mercancia').val('')
+                        $('#ajuste_salida_mercancia_id_unidad_medida').val('')
+                        $('#ajuste_salida_documento_importe_mercancia').val('')
+                        $('#ajuste_salida_mercancia_existencia_decremento').val('')
+                        $('#ajuste_salida_documento_cantidad_mercancia').val('')
+                        $('#resto_importe').val('')
+                        importe_real = 0
+                    }
+                })
             })
             let importe_real = 0
             $('#ajuste_salida_mercancia_codigo').on('keyup', function (e) {
                 if (e.which == 13) {
                     let codigo = $('#ajuste_salida_mercancia_codigo').val()
-                    let cuenta = $('#ajuste_salida_nro_cuenta_deudora').val()
-                    if (!!cuenta && !!codigo) {
-                        let nro = cuenta.split(' - ')[0];
+                    if (!!codigo) {
                         loadingModal.show("cargando mercancia...")
                         $.ajax({
-                            url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo + ',' + nro,
+                            url: '/contabilidad/inventario/ajuste-salida/getMercancia/' + codigo,
                             method: 'POST',
                             dataType: 'json',
                             success: function (result) {
@@ -544,7 +535,7 @@
                 }
             })
 
-            function resetMercancias(){
+            function resetMercancias() {
 
                 $('#ajuste_salida_mercancia_descripcion').val('')
                 $('#ajuste_salida_mercancia_existencia').val('')

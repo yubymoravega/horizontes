@@ -2,9 +2,12 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
+use App\Entity\Contabilidad\Config\Unidad;
 use App\Form\Contabilidad\Config\AlmacenType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +26,10 @@ class AlmacenController extends AbstractController
     public function index(EntityManagerInterface $em)
     {
         $form = $this->createForm(AlmacenType::class);
-        $almacen = $em->getRepository(Almacen::class)->findAll();
+        $almacen = $em->getRepository(Almacen::class)->findBy([
+            'id_unidad'=>AuxFunctions::getUnidad($em,$this->getUser()),
+            'activo'=>true
+        ]);
         $row = [];
         foreach ($almacen as $item) {
             /**@var $item Almacen** */
@@ -55,7 +61,9 @@ class AlmacenController extends AbstractController
         $errors = $validator->validate($alamcen);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $alamcen->setActivo(true);
+                $alamcen
+                    ->setIdUnidad(AuxFunctions::getUnidad($em,$this->getUser()))
+                    ->setActivo(true);
                 $em->persist($alamcen);
                 $em->flush();
                 $this->addFlash('success', "Alamacén adicionado satisfactoriamente");
@@ -111,5 +119,25 @@ class AlmacenController extends AbstractController
 
         }
         return $this->redirectToRoute('contabilidad_config_almacen');
+    }
+
+    /**
+     * @Route("/load-almacenes/{unidad}", name="contabilidad_config_alamcen_load_almacenes")
+     */
+    public function loadAlmacenes(EntityManagerInterface $em, Request $request,$unidad)
+    {
+        // load unidades por el usuario en AuxFuncions::getUnidades()
+        $almacenes = $em->getRepository(Almacen::class)->findBy([
+            'id_unidad'=>$em->getRepository(Unidad::class)->find($unidad),
+            'activo'=>true
+        ]);
+        $row = [];
+        foreach ($almacenes as $item) {
+            array_push($row, [
+                'id' => $item->getId(),
+                'nombre' => $item->getCodigo().' - '.$item->getDescripcion()
+            ]);
+        }
+        return new JsonResponse(['data' => $row]);
     }
 }

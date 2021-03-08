@@ -1,0 +1,203 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+	{% include 'breadcrumbs.html.twig' %}
+	<!-- Section Input Groups-->
+	<section class="section novi-background section-20" id='seccion-principal'>
+		<div class="container card">
+			<div class="card-header text-center">
+				<h1>Subir Imágenes Agencias
+				</h1>
+				<h4 style="color: white;">
+					Imagen de la Agencia.
+				</h4>
+			</div>
+			<br>
+            
+            <div class="container">
+				<form name='formJpg' method="POST" enctype="multipart/form-data" action="{{ path('publicidad/save') }}">
+					<div class="row justify-content-md-center">
+						<div class="form-group">
+							<select name="unidad" class="form-control select-filter">
+                             {% for unidad in unidades %}
+                              <option value="{{unidad.id}}">{{unidad.nombre}}</option>
+                             {% endfor %}
+								<option selected value="0">Agencias</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="row justify-content-md-center">
+						<div class="col-sm-3 col-sm-3 imgUp">
+							<div id="1" class="imagePreview"></div>
+							<label class="btn btn-dark">
+								Subir 1<input type="file" name="1" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+							</label>
+						</div>
+					</div>
+				</form>
+			</div>
+			<!-- container -->
+		</div>
+	</section>
+
+	<style>
+		body {
+			background-color: #f5f5f5;
+		}
+		.imagePreview {
+			width: 100%;
+			height: 180px;
+			background-position: center center;
+			background: url('http://cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg');
+			background-color: #fff;
+			background-size: cover;
+			background-repeat: no-repeat;
+			display: inline-block;
+			box-shadow: 0 -3px 6px 2px rgba(0, 0, 0, 0.2);
+		}
+		.btn-dark {
+			display: block;
+			border-radius: 0;
+			box-shadow: 0 4px 6px 2px rgba(0, 0, 0, 0.2);
+			margin-top: -5px;
+		}
+		.imgUp {
+			margin-bottom: 15px;
+		}
+		.del {
+			position: absolute;
+			top: 0;
+			right: 15px;
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			line-height: 30px;
+			background-color: rgba(255, 255, 255, 0.6);
+			cursor: pointer;
+		}
+		.imgAdd {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			background-color: #4bd7ef;
+			color: #fff;
+			box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+			text-align: center;
+			line-height: 30px;
+			margin-top: 0;
+			cursor: pointer;
+			font-size: 15px;
+		}
+
+		button#btnSubir {
+			color: #fff;
+			border: 1px solid;
+			margin-left: 14%;
+			margin-top: 40%;
+		}
+		button#btnSubir:hover {
+			background-color: #fff;
+			color: #2f2f2f;
+		}
+
+        /* The container must be positioned relative: */
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
+
+.custom-select select {
+  display: none; /*hide original SELECT element: */
+}
+
+.select-selected {
+  background-color: DodgerBlue;
+}
+
+/* Style the arrow inside the select element: */
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+
+/* style the items (options), including the selected item: */
+.select-items div,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+
+/* Style items (options): */
+.select-items {
+  position: absolute;
+  background-color: DodgerBlue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+/* Hide the items when the select box is closed: */
+.select-hide {
+  display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+
+	</style>
+
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+
+		$(document).ready(function () {
+$("#1").css("background-image", "url('     {{ asset('images/imgHome/1.jpg') }}?fecha=     {{ 'now'|date('m/d/Y h:i a') }}')");
+
+});
+
+$(function () {
+$(document).on("change", ".uploadFile", function () {
+var uploadFile = $(this);
+var files = !!this.files ? this.files : [];
+if (! files.length || !window.FileReader) 
+return;
+
+
+
+// no file selected, or no FileReader support
+
+if (/^image/.test(files[0].type)) { // only image file
+var reader = new FileReader(); // instance of the FileReader
+reader.readAsDataURL(files[0]); // read the local file
+
+reader.onloadend = function () {
+// set image data as background of div
+// alert(uploadFile.closest(".upimage").find('.imagePreview').length);
+uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url(" + this.result + ")");
+}
+}
+
+});
+});
+	</script>
+
+{% endblock %}

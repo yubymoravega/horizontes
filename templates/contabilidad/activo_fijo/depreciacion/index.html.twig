@@ -1,20 +1,131 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello DepreciacionController!{% endblock %}
-
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'F:/sistemas/TIM/app/src/Controller/Contabilidad/ActivoFijo/DepreciacionController.php'|file_link(0) }}">src/Controller/Contabilidad/ActivoFijo/DepreciacionController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'F:/sistemas/TIM/app/templates/contabilidad/activo_fijo/depreciacion/index.html.twig'|file_link(0) }}">templates/contabilidad/activo_fijo/depreciacion/index.html.twig</a></code></li>
-    </ul>
-</div>
+{% extends 'contabilidad/activo_fijo/index.html.twig' %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
 {% endblock %}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Depreciar Activos Fijos
+            </h4>
+            <button type="button" class="btn btn-danger font-weight-bold text-uppercase" data-placement="bottom"
+                    data-toggle="modal" data-target="#modal_dev__id"
+                    title="Depreciar"
+                    onclick="Depreciar()">Depreciar
+            </button>
+        </div>
+        {# end header #}
+
+        {# Modal #}
+        <div class="modal fade" id="modal_dev__id" tabindex="-1" role="dialog"
+             data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="modal_dev_label__id" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="modal_dev_label__id">Depreciación</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body bg-dark-app">
+                        <form method="post" class="text-left" id="form_id" autocomplete="off"
+                              novalidate="novalidate">
+                            <div class="form-group input-group input-group-sm d-block">
+                                <label for="almacen_codigo" class="font-weight-bold">Fundamentación</label>
+                                <input type="text" id="almacen_codigo" name="fundamentacion" maxlength="255"
+                                       class="form-control w-100 form-control">
+                            </div>
+                        </form>
+                        <div class="d-flex mt-4">
+                            <button class="btn btn-outline-secondary mr-auto" type="button" data-dismiss="modal"
+                                    aria-hidden="true">Cancelar
+                            </button>
+                            <button type="button" class="my-0 btn btn-secondary" id="btn__aceptar">Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="150px">Nro. Inv</th>
+            <th scope="col-1">Descripción</th>
+            <th width="180px">Valor Inicial</th>
+            <th width="180px">Depreciación del Mes</th>
+            <th width="200px">Depreciación Acumulada</th>
+            <th width="150px">Valor Real</th>
+            <th width="200px">Tasa deDepreciación</th>
+            </thead>
+            <tbody>
+            {% for item in datos %}
+                <tr>
+                    <td class="row-group-subconta" colspan="8">{{ item.area_responsabilidad }}</td>
+                </tr>
+                {% for new_item in item.datos %}
+                    <tr>
+                        <td style="font-weight:400;" class="text-left">{{ new_item.nro_inventario }}</td>
+                        <td style="font-weight:400;">{{ new_item.descripcion }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.valor_inicial }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.depreciacion_mes }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.depreciacion_acumulada }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.valor_real }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ new_item.tasa_depreciacion }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function Depreciar() {
+            // window.open(url, 'blank_')
+            $('#modal_dev__id').show()
+
+        }
+
+        $(document).ready(function () {
+
+            // validacion del formulario
+            var validateForm = $('#form_id').validate({
+                errorClass: 'invalid-label-orange',
+                errorPlacement: function (error, element) {
+                    error.attr('style', 'font-size: .8rem;')
+                    error.insertAfter(element);
+                },
+                rules: {
+                    'fundamentacion': "required",
+                },
+                messages: {
+                    'fundamentacion': CONTAB_MSG.REQUIRED_NOT_BLANK,
+                }
+            })
+
+            $('#btn__aceptar').on('click', function () {
+                const formulario = $('#form_id')
+                formulario.attr('method', `POST`)
+                formulario.attr('action', `{{ url('contabilidad_activo_fijo_depreciar') }}`)
+                formulario.submit()
+                if (validateForm.errorList.length === 0) loadingModal.show()
+            })
+
+        })
+    </script>
+{% endblock %}
+

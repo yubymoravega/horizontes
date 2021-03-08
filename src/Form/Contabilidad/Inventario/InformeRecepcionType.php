@@ -47,7 +47,7 @@ class InformeRecepcionType extends AbstractType
             ->add('nombre_proveedor', TextType::class, [
                 'required' => true,
                 'label'=>'Proveedor',
-                'attr' => ['class' => 'w-100','disabled'=>true],
+                'attr' => ['class' => 'w-100'],
             ])
             ->add('fecha_factura', DateType::class, array(
                 'input' => 'datetime',

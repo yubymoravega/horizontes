@@ -1,0 +1,210 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {% include 'breadcrumbs.html.twig' %}
+    <div class="row">
+        <div class="col-10 ">
+            <button class="btn btn-outline-warning font-weight-bold" id="detalles_">
+                <i class="fa fa-eye" id="btn_detail"></i>
+                Ver detalles de los Pagos
+            </button>
+            <button class="btn btn-outline-warning font-weight-bold ml-3" id="detalles_cot">
+                <i class="fa fa-eye" id="btn_detail_cot"></i> Ver detalles de la Cotización
+            </button>
+        </div>
+        <div class="col-2 mt-0">
+            {% if  resto == 0 %}
+                <button id="facturar" class=" btn btn-secondary font-weight-bold"><i
+                            class="fa fa-edit"></i> Facturar
+                </button>
+            {% else %}
+                <button id="cobrar" class="btn btn-secondary font-weight-bold"><i
+                            class="fa fa-cc-mastercard"></i> <i class="fa fa-dollar"></i> Cobrar
+                </button>
+            {% endif %}</div>
+
+
+    </div>
+    <!-- Shop Checkout-->
+    <section class="section novi-background section-20 section-sm-20" style="color:white; display: none"
+             id="detalles_cotizacion">
+        <h1 class="text-confirmar" style="text-align: center; ">Detalles de la cotización</h1>
+        <hr class="divider-white bg-mantis-white mb-0">
+        <div class="container-fluid">
+            <div class="rd-material-tabs checkout-tabs">
+                <div class="rd-material-tabs__container">
+                    <div>
+                        <div class="row justify-content-sm-center">
+                            <div class="col-md-12 col-xl-12">
+                                <div class="table-responsive">
+                                    <table class="table" style="color:white;">
+                                        <tbody>
+                                        {% for item in carrito %}
+                                            <tr>
+                                                <td class="row-group-conta" colspan="5">Servicio:
+                                                    <i>{{ item.servicio }}</i></td>
+                                                <td class="row-group-conta text-right">Subtotal:
+                                                    <i>{{ item.sub_total }}</i></td>
+                                            </tr>
+                                            {% if item.id_servicio == 11 %}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
+                                                <tr>
+                                                    <td class="text-left row-group-subconta" colspan="2">Nombre</td>
+                                                    <td class="text-left row-group-subconta">Primer Apellido</td>
+                                                    <td class="text-left row-group-subconta">Segundo Apellido</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Celular</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Fijo</td>
+                                                </tr>
+                                                {% for new_item in item.data %}
+                                                    <tr>
+                                                        <td class="text-left" colspan="2">{{ new_item.nombre }}</td>
+                                                        <td class="text-left">{{ new_item.primer_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.segundo_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_celular }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_fijo }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% elseif item.id_servicio == 4 %}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
+                                                <tr>
+                                                    <td class="text-left row-group-subconta" colspan="2">Beneficiario
+                                                    </td>
+                                                    <td class="text-left row-group-subconta">Datos Contactos</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Dirección</td>
+                                                    <td class="text-right row-group-subconta">Monto a Recibir</td>
+                                                </tr>
+                                                {% for new_item in item.data %}
+                                                    <tr>
+                                                        <td class="text-left"
+                                                            colspan="2">{{ new_item.nombre_ }} {{ new_item.primer_apellido_ }} {{ new_item.segundo_apellido_ }}</td>
+                                                        <td class="text-left">{{ new_item.primer_telefono_ }} {{ new_item.segundo_telefono_ }}</td>
+                                                        <td class="text-left" colspan="2">{{ new_item.calle_ }}
+                                                            {% if  new_item.entre_ != '' %}
+                                                                e/ {{ new_item.entre_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.y_ != '' %}
+                                                                & {{ new_item.y_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.nro_casa_ != '' %}
+                                                                # {{ new_item.nro_casa_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.edificio_ != '' %}
+                                                                Edif: {{ new_item.efificio_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.apto_ != '' %}
+                                                                Apto: {{ new_item.apto_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.reparto_ != '' %}
+                                                                Reparto: {{ new_item.reparto_ }}
+                                                            {% endif %}
+                                                        </td>
+                                                        <td class="text-right">
+                                                            {{ new_item.monto_recibir_ }} {{ new_item.nombre_moneda_recibir }}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section novi-background section-20 section-sm-20" style="color:white; display: none"
+             id="detalles_pago">
+        <h1 class="text-confirmar" style="text-align: center; ">Detalles de los pagos</h1>
+        <hr class="divider-white bg-mantis-white mb-0">
+        <div class="container-fluid">
+            <div class="rd-material-tabs checkout-tabs">
+                <div class="rd-material-tabs__container">
+
+                    <div>
+                        <div class="row justify-content-sm-center">
+                            <div class="col-md-12 col-xl-12">
+                                <div class="table-responsive">
+                                    <table class="table" style="color:white;">
+                                        <thead class="thead-dark">
+                                        <th scope="col-1" class="text-left">Empleado</th>
+                                        <th scope="col-1" class="text-left">Tipo de Pago</th>
+                                        <th scope="col-1" class="text-left">Pagado</th>
+                                        <th scope="col-1" class="text-left">Acumulado</th>
+                                        <th scope="col-1" class="text-left">Resto</th>
+                                        <th scope="col-1" class="text-left">Nota</th>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in detalles_pagos %}
+                                            <tr>
+                                                <td style="font-weight:400;">{{ item.empleado }}</td>
+                                                <td style="font-weight:400;">{{ item.tipo_pago }}</td>
+                                                <td style="font-weight:400;">{{ item.monto_pagado }}</td>
+                                                <td style="font-weight:400;">{{ item.acumulado }}</td>
+                                                <td style="font-weight:400;">{{ item.resto }}</td>
+                                                <td style="font-weight:400;">{{ item.nota }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <style>
+        .table td, .table th {
+            padding: .75rem !important;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#detalles_').on('click', function () {
+            if ($('#detalles_pago').css('display') == 'none') {
+                $('#detalles_pago').css('display', 'block')
+                $('#btn_detail').removeClass('fa fa-eye')
+                $('#btn_detail').addClass('fa-eye-slash')
+                $('#detalles_').removeClass('btn btn-outline-warning')
+                $('#detalles_').addClass('btn btn-danger')
+            } else {
+                $('#detalles_pago').css('display', 'none')
+                $('#btn_detail').removeClass('fa-eye-slash')
+                $('#btn_detail').addClass('fa fa-eye')
+                $('#detalles_').removeClass('btn btn-danger')
+                $('#detalles_').addClass('btn btn-outline-warning')
+            }
+        })
+
+        $('#detalles_cot').on('click', function () {
+            if ($('#detalles_cotizacion').css('display') == 'none') {
+                $('#detalles_cotizacion').css('display', 'block')
+                $('#btn_detail_cot').removeClass('fa fa-eye')
+                $('#btn_detail_cot').addClass('fa-eye-slash')
+                $('#detalles_cot').removeClass('btn btn-outline-warning')
+                $('#detalles_cot').addClass('btn btn-danger')
+            } else {
+                $('#detalles_cotizacion').css('display', 'none')
+                $('#btn_detail_cot').removeClass('fa-eye-slash')
+                $('#btn_detail_cot').addClass('fa fa-eye')
+                $('#detalles_cot').removeClass('btn btn-danger')
+                $('#detalles_cot').addClass('btn btn-outline-warning')
+            }
+        })
+
+        $('#cobrar').on('click', function () {
+            window.location.href = "/pasarela-pago/" +{{ id_cotizacion }};
+        })
+        $("#facturar").click(function () {
+            var url = window.location.protocol + "//" + location.hostname + ":" + window.location.port + "/factura";
+            window.location.href = url;
+        });
+
+    </script>
+{% endblock %}

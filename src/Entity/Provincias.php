@@ -27,6 +27,11 @@ class Provincias
      */
     private $nombre;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $id_pais;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -52,6 +57,18 @@ class Provincias
     public function setNombre(string $nombre): self
     {
         $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    public function getIdPais(): ?int
+    {
+        return $this->id_pais;
+    }
+
+    public function setIdPais(?int $id_pais): self
+    {
+        $this->id_pais = $id_pais;
 
         return $this;
     }

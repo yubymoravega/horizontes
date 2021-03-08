@@ -8,9 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ClientesAdapter
 {
-    public static $PERSONA = 1;
-    public static $UNIDAD_SISTEMA = 2;
-    public static $CLIENTE_CONTABILIDAD = 3;
+    public const PERSONA = 1;
+    public const UNIDAD_SISTEMA = 2;
+    public const CLIENTE_CONTABILIDAD = 3;
     protected EntityManagerInterface $em;
     protected string $tipo;
 
@@ -44,11 +44,11 @@ class ClientesAdapter
     public static function getClienteFactory(EntityManagerInterface $em, $type)
     {
         switch ($type) {
-            case self::$PERSONA:
+            case self::PERSONA:
                 return new PersonaCliente($em);
-            case self::$UNIDAD_SISTEMA:
+            case self::UNIDAD_SISTEMA:
                 return new UnidadSystemaCliente($em);
-            case self::$CLIENTE_CONTABILIDAD:
+            case self::CLIENTE_CONTABILIDAD:
                 return new ContabilidadCliente($em);
             default:
                 return null;
@@ -58,9 +58,9 @@ class ClientesAdapter
     public static function getTypeClientes()
     {
         return [
-            'Persona Natural' => self::$PERSONA,
-            'Cliente Inerno' => self::$UNIDAD_SISTEMA,
-            'Cliente Externo' => self::$CLIENTE_CONTABILIDAD
+            'Persona Natural' => self::PERSONA,
+            'Cliente Interno' => self::UNIDAD_SISTEMA,
+            'Cliente Externo' => self::CLIENTE_CONTABILIDAD
         ];
     }
 }

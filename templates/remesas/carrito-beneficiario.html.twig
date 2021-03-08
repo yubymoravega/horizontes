@@ -9,7 +9,7 @@
 		<div class="container card">
 			<img class="imagen-cliente" src="/images/iconos/user.svg">
 			<div class="card-header text-center">
-				<h1>Datos del Beneficiario</h1>
+				<h1>Datos de la Orden</h1>
 				<hr class="divider-white bg-mantis-white">
 			</div>
 
@@ -23,49 +23,126 @@
 
 			<form name="cliente_beneficiario" method="post" id="form_add_beneficiario" novalidate="novalidate">
 
-				<h5 style="color:white;">Beneficiario</h5>
+				<h4 style="color:white;">Beneficiario</h4>
 				<div class="form-group">
 					<div class="input-group input-group-sm">
+				
+					<div class="col"> 
+						Nombre<input value="{{beneficiario.primerNombre}}" type="text" id="cliente_beneficiario_primerNombre" name="cliente_beneficiario[primerNombre]" required="required" maxlength="255" class="fomulario form-control" placeholder=" Nombre">
+					</div>
 
-						<input value="{{beneficiario.primerNombre}}" type="text" id="cliente_beneficiario_primerNombre" name="cliente_beneficiario[primerNombre]" required="required" maxlength="255" class="fomulario form-control" placeholder=" Nombre">
-						<input value="{{beneficiario.primerApellido}}" type="text" id="cliente_beneficiario_primerApellido" name="cliente_beneficiario[primerApellido]" required="required" maxlength="255" class="fomulario form-control" placeholder="Apellido">
-						<input value="{{beneficiario.segundoApellido}}" type="text" id="cliente_beneficiario_segundoApellido" name="cliente_beneficiario[segundoApellido]" maxlength="255" class="fomulario form-control" placeholder="Segundo Apellido">
+					<div class="col">	
+						Apellido<input value="{{beneficiario.primerApellido}}" type="text" id="cliente_beneficiario_primerApellido" name="cliente_beneficiario[primerApellido]" required="required" maxlength="255" class="fomulario form-control" placeholder="Apellido">
+					</div>
+					
+					<div class="col">	
+						Segundo Apellido<input value="{{beneficiario.segundoApellido}}" type="text" id="cliente_beneficiario_segundoApellido" name="cliente_beneficiario[segundoApellido]" maxlength="255" class="fomulario form-control" placeholder="Segundo Apellido">
+					</div>
 						<span class="input-group-append"></span>
 					</div>
 				</div>
 
-				<h5 style="color:white;">
-					Alternativo</h5>
+				<h4 style="color:white;">
+					Alternativo</h4>
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 
-						<input value="{{beneficiario.alternativoNombre}}" type="text" id="cliente_beneficiario_alternativoNombre" name="cliente_beneficiario[alternativoNombre]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Nombre Alternativo">
-						<input value="{{beneficiario.alternativoApellido}}" type="text" id="cliente_beneficiario_alternativoApellido" name="cliente_beneficiario[alternativoApellido]" maxlength="255" class="fomulario form-control" placeholder=" Alternativo Primer Apellido ">
-						<input value="{{beneficiario.alternativoSegundoApellido}}" type="text" id="cliente_beneficiario_alternativoSegundoApellido" name="cliente_beneficiario[alternativoSegundoApellido]" maxlength="255" class="fomulario form-control" placeholder=" Alternativo Segundo Apellido ">
+				<div class="col">	
+						Nombre<input value="{{beneficiario.alternativoNombre}}" type="text" id="cliente_beneficiario_alternativoNombre" name="cliente_beneficiario[alternativoNombre]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Nombre Alternativo">
+				</div>
+
+				<div class="col">
+						Primer Apellido<input value="{{beneficiario.alternativoApellido}}" type="text" id="cliente_beneficiario_alternativoApellido" name="cliente_beneficiario[alternativoApellido]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Primer Apellido">
+				</div>	
+					
+				<div class="col">	
+					Segundo Apellido<input value="{{beneficiario.alternativoSegundoApellido}}" type="text" id="cliente_beneficiario_alternativoSegundoApellido" name="cliente_beneficiario[alternativoSegundoApellido]" maxlength="255" class="fomulario form-control" placeholder="Alternativo Segundo Apellido">
+				</div>	
 						<span class="input-group-append"></span>
 					</div>
 				</div>
 
-				<h5 style="color:white;">Contactos</h5>
+				<h4 style="color:white;">Contactos</h4>
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 
-						<input value="{{beneficiario.telefono}}" type="text" id="cliente_beneficiario_telefono" name="cliente_beneficiario[telefono]" required="required" maxlength="255" class="fomulario form-control" placeholder="Celular">
-						<input value="{{beneficiario.telefonoCasa}}" type="text" id="cliente_beneficiario_telefonoCasa" name="cliente_beneficiario[telefonoCasa]" maxlength="255" class="fomulario form-control" placeholder="Telefono Adicional">
-						<input value="{{beneficiario.identificacion}}" type="text" id="cliente_beneficiario_identificacion" name="cliente_beneficiario[identificacion]" maxlength="255" class="fomulario form-control" placeholder="Identificacion">
+					<div class="col">
+						Celular<input value="{{beneficiario.telefono}}" type="text" id="cliente_beneficiario_telefono" name="cliente_beneficiario[telefono]" required="required" maxlength="255" class="fomulario form-control" placeholder="Celular">
+					</div>
+					
+					<div class="col">
+						Telefono Adicional<input value="{{beneficiario.telefonoCasa}}" type="text" id="cliente_beneficiario_telefonoCasa" name="cliente_beneficiario[telefonoCasa]" maxlength="255" class="fomulario form-control" placeholder="Telefono Adicional">
+					</div>
 
+					<div class="col">
+						Identificacion<input value="{{beneficiario.identificacion}}" type="text" id="cliente_beneficiario_identificacion" name="cliente_beneficiario[identificacion]" maxlength="255" class="fomulario form-control" placeholder="Identificacion">
+					</div>
 						<span class="input-group-append"></span>
 					</div>
 				</div>
 
-				<h5 style="color:white;">Dirección</h5>
+				<h4 style="color:white;">Remitente</h4>
 				<div class="form-group">
 					<div class="input-group input-group-sm">
+				
+				{% if beneficiario.remitenteNombre %}
 
-						<input value="{{beneficiario.calle}}" type="text" id="cliente_beneficiario_calle" name="cliente_beneficiario[calle]" required="required" maxlength="255" class="fomulario form-control" placeholder="Calle">
-						<input value="{{beneficiario.entre}}" type="text" id="cliente_beneficiario_entre" name="cliente_beneficiario[entre]" maxlength="255" class="fomulario form-control" placeholder="Entre">
-						<input value="{{beneficiario.y}}" type="text" id="cliente_beneficiario_y" name="cliente_beneficiario[y]" maxlength="255" class="fomulario form-control" placeholder="Y">
+					<div class="col"> 
+						Nombre<input value="{{beneficiario.remitenteNombre}}" type="text" id="remitenteNombre" name="remitenteNombre"  maxlength="255" class="fomulario form-control" placeholder="Nombre">
+					</div>
+				{% else %}
 
+				<div class="col"> 
+						Nombre<input  type="text" id="remitenteNombre" name="remitenteNombre"  maxlength="255" class="fomulario form-control" placeholder="Nombre">
+					</div>
+ 
+				{% endif %}
+
+				{% if beneficiario.remitenteApellido %}
+
+					<div class="col">	
+						Apellido<input type="text" value="{{beneficiario.remitenteApellido}}" id="remitenteApellido" name="remitenteApellido" maxlength="255" class="fomulario form-control" placeholder="Apellido">
+					</div>
+				{% else %}
+
+				<div class="col">	
+						Apellido<input type="text"  id="remitenteApellido" name="remitenteApellido" maxlength="255" class="fomulario form-control" placeholder="Apellido">
+					</div>
+ 
+				{% endif %}
+				
+				{% if beneficiario.comentario %}
+	
+					<div class="col">	
+						Comentario<input  type="text" value="{{beneficiario.comentario}}" id="comentario" name="Comentario" maxlength="255" class="fomulario form-control" placeholder="Comentario">
+					</div>
+				{% else %}
+
+					<div class="col">	
+						Comentario<input  type="text"  id="comentario" name="Comentario" maxlength="255" class="fomulario form-control" placeholder="Comentario">
+					</div>
+ 
+				{% endif %}
+				
+						<span class="input-group-append"></span>
+					</div>
+				</div>
+
+				<h4 style="color:white;">Dirección</h4>
+				<div class="form-group">
+					<div class="input-group input-group-sm">
+					
+					<div class="col">
+						Calle<input value="{{beneficiario.calle}}" type="text" id="cliente_beneficiario_calle" name="cliente_beneficiario[calle]" required="required" maxlength="255" class="fomulario form-control" placeholder="Calle">
+					</div>
+				
+					<div class="col">
+					Entre<input value="{{beneficiario.entre}}" type="text" id="cliente_beneficiario_entre" name="cliente_beneficiario[entre]" maxlength="255" class="fomulario form-control" placeholder="Entre">
+					</div>
+					
+					<div class="col">	
+						Y<input value="{{beneficiario.y}}" type="text" id="cliente_beneficiario_y" name="cliente_beneficiario[y]" maxlength="255" class="fomulario form-control" placeholder="Y">
+					</div>
 						<span class="input-group-append"></span>
 					</div>
 				</div>
@@ -73,9 +150,17 @@
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 
-						<input value="{{beneficiario.no}}" type="text" id="cliente_beneficiario_no" name="cliente_beneficiario[no]" required="required" maxlength="255" class="fomulario form-control" placeholder="No">
-						<input value="{{beneficiario.edificio}}" type="text" id="cliente_beneficiario_edificio" name="cliente_beneficiario[edificio]" maxlength="255" class="fomulario form-control" placeholder="Edificio">
-						<input value="{{beneficiario.apto}}" type="text" id="cliente_beneficiario_apto" name="cliente_beneficiario[apto]" maxlength="255" class="fomulario form-control" placeholder="Apartamento">
+					<div class="col">
+						No<input value="{{beneficiario.no}}" type="text" id="cliente_beneficiario_no" name="cliente_beneficiario[no]" required="required" maxlength="255" class="fomulario form-control" placeholder="No">
+					</div>
+
+					<div class="col">
+						Edificio<input value="{{beneficiario.edificio}}" type="text" id="cliente_beneficiario_edificio" name="cliente_beneficiario[edificio]" maxlength="255" class="fomulario form-control" placeholder="Edificio">
+					</div>
+					
+					<div class="col">
+						Apartamento<input value="{{beneficiario.apto}}" type="text" id="cliente_beneficiario_apto" name="cliente_beneficiario[apto]" maxlength="255" class="fomulario form-control" placeholder="Apartamento">
+					</div>
 						<span class="input-group-append"></span>
 					</div>
 				</div>
@@ -83,9 +168,12 @@
 				<div class="form-group">
 					<div class="input-group input-group-sm">
 
-						<input value="{{beneficiario.reparto}}" type="text" id="cliente_beneficiario_reparto" name="cliente_beneficiario[reparto]" maxlength="255" class="fomulario form-control" placeholder="Reparto">
+					<div class="col">
+						Reparto<input value="{{beneficiario.reparto}}" type="text" id="cliente_beneficiario_reparto" name="cliente_beneficiario[reparto]" maxlength="255" class="fomulario form-control" placeholder="Reparto">
+					</div>
 
-						<select id="cliente_beneficiario_provincias" name="provincias" class="fomulario form-control valid" aria-invalid="false">
+					<div class="col">
+						Provincias<select id="cliente_beneficiario_provincias" name="provincias" class="fomulario form-control valid" aria-invalid="false" style="height: 40px; font-size: 15px;">
 
 							<option value="0">Provincias</option>
 							<option value="21">PINAR DEL RIO</option>
@@ -105,11 +193,14 @@
 							<option value="35">GUANTANAMO</option>
 
 						</select>
+					</div>	
 
-						<select id="cliente_beneficiario_municipios" name="municipios" class="fomulario form-control error" aria-invalid="true">
+					<div class="col">
+					Municipios<select id="cliente_beneficiario_municipios" name="municipios" class="fomulario form-control error" aria-invalid="true" style="height: 40px; font-size: 15px;">
 
 							<option value="0">Municipios</option>
 						</select>
+					</div>	
 						<span class="input-group-append"></span>
 					</div>
 				</div>
@@ -117,16 +208,35 @@
                 <div class="form-group">
 					<div class="input-group input-group-sm">
 
-						<input value="{{beneficiario.monto}}" type="text" id="total" name="pagar" required="required" maxlength="255" class="fomulario form-control" placeholder="A Pagar">
-						<input type="text" id="monto" name="recibir" maxlength="255" class="fomulario form-control" placeholder="Recibir">
-						
+					<div class="row" >
+ 		    <div class="col-4" style="margin-top: 28px;">{{moneda.nombre}} A Pagar<input value="{{beneficiario.monto}}" type="text" id="total" name="pagar" required="required" maxlength="255" class="fomulario form-control" placeholder="A Pagar"></div>
+			<div class="col-4">Recibir<input type="text" id="monto" name="recibir" maxlength="255" class="fomulario form-control" placeholder="Recibir"></div>
+			<div class="col-4">
+			 Moneda
+    <select style="height: 42px;" class="form-control" id="monedasRecibir">
+      <option Selected value="0">Moneda</option>
+     {% for data in monedaPais %}
+
+		{% if data.code == beneficiario.recibirMoneda  %}
+    <option Selected value="{{data.code}}">{{data.nombre}}</option>
+	{% else %}
+	<option value="{{data.code}}">{{data.nombre}}</option>
+   {% endif %}
+
+         
+    {% endfor %}
+    </select>
+  </div>
+			
+			</div>
+					</div>				
 					</div>
 				</div>
 
 			</form>
 		</div>
 		<div class="row justify-content-md-center group offset-top-34 row-continuar">
-			<button id="editBeneficiario" class="btn btn-sm btn-outline-dark" >Editar Beneficiario</button>
+			<button id="editBeneficiario" class="btn btn-sm btn-outline-dark" >Editar Orden</button>
 		</div>
 	
 		<div></div>
@@ -163,13 +273,8 @@ let codeMunicipio = {{beneficiario.municipio}};
 
 $( document ).ready(function() {
 
-	total();
-
 	let provinciaNombre = $( "#cliente_beneficiario_provincias  option:selected" ).text();
-
-	if(provinciaNombre == "LA HABANA"){
-
-	}
+	$('#monto').val("{{beneficiario.recibir}}");
 
    $('#cliente_beneficiario_provincias option[value="'+codeProvincia+'"]').attr("selected",true);
    let code = $('#cliente_beneficiario_provincias').find('option:selected').val() 
@@ -219,7 +324,6 @@ $.ajax({
             dataType: 'html',
             success: function (data) {
 
-			
      $('#cliente_beneficiario_municipios')
     .find('option')
     .remove()
@@ -256,11 +360,11 @@ $.validator.addMethod("valueNotEquals", function(value, element, arg){
 	  'cliente_beneficiario[calle]': {
       required: true, minlength: 3},
      
-      'total': {
-      required: true, minlength: 2},
-      
+      'pagar': {
+      required: true, min: 18},
+
        'recibir': {
-      required: true, minlength: 2},
+      required: true, min: 10},
 
 	   'cliente_beneficiario[no]': {
       required: true, minlength: 1},
@@ -275,8 +379,8 @@ $.validator.addMethod("valueNotEquals", function(value, element, arg){
 	  'cliente_beneficiario[telefono]': {required: "Telefono Requerido", minlength: "Telefono Minimo 8 Caracteres" },
 	  'cliente_beneficiario[calle]': {required: "Calle Requerida", minlength: "Calle Minimo 3 Caracteres" },
 	  'cliente_beneficiario[no]': {required: "No. Requerido", minlength: "No Minimo 1 Caracteres" },
-      'total': {required: "Total. Requerido", minlength: "No Minimo 2 Caracteres" },
-      'recibir': {required: "Monto. Requerido", minlength: "No Minimo 2 Caracteres" },
+      'pagar': {required: "Total. Requerido", min: "Minimo $18" },
+      'recibir': {required: "Monto. Requerido", min: "Minimo $10" },
 	  'provincias': {valueNotEquals: "Elije una Provincia."},
 	  'municipios': {valueNotEquals: "Elije una Municipio."}
 	  },
@@ -296,71 +400,13 @@ $.validator.addMethod("valueNotEquals", function(value, element, arg){
 });  
 
 
-$( "#monto" ).change(function() {
-				
-				if($( "#monto" ).val() <= 100){
-								
-				if($("#provincia").text() == 'LA HABANA'){
-
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(5));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) + Number(8));
-				
-				}}else{ 
-				
-					if($("#provincia").text() == 'LA HABANA'){
-
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#total" ).val(Number($( "#monto" ).val()) +(Number($( "#monto" ).val()) *0.08 ));
-
-				}}
-
-            });
-
-
-			$( "#total" ).change(function() {
-
-				total();
-
-            });
-
-			function total(){
-
-					if($( "#total" ).val() <= 100){
-								
-				if($("#provincia").text() == 'LA HABANA'){
-
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(5));
-				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - Number(8));
-				
-				}}else{ 
-				
-					if($("#provincia").text() == 'LA HABANA'){
-
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.05 ));
-				
-					}else{ 
-									
-					$( "#monto" ).val(Number($( "#total" ).val()) - (Number($( "#total" ).val()) *0.08 ));
-
-				}}
-
-			}
 $( "#editBeneficiario" ).click(function() {
  
 let respuestaForm =  validator.form();
 
 if(respuestaForm){
 
-	let idCarrito = {{id}};
+	let idCarrito = {{id}}; 
 
 	let array = {};
 
@@ -387,8 +433,16 @@ if(respuestaForm){
 	array['fecha'] = "{{beneficiario.fecha}}";
 	array['empleado'] = "{{beneficiario.empleado}}";
 	array['monto'] = $( "#total" ).val();
+	array['recibir'] = $( "#monto" ).val();
 	array['servicio'] = 'Remesa';
 	array['orden'] = "{{beneficiario.orden}}";
+	array['nombreCliente'] = "{{beneficiario.nombreCliente}}";
+	array['remitenteNombre'] = ($( "#remitenteNombre" ).val() == "") ? null : $( "#remitenteNombre").val() ;
+	array['remitenteApellido'] = ($( "#remitenteApellido" ).val() == "") ? null : $( "#remitenteNombre").val() ;
+	array['comentario'] = ($( "#comentario" ).val() == "") ? null : $( "#comentario" ).val() ;
+	array['pais'] = "{{beneficiario.pais}}";
+	array['montoMoneda'] ="{{moneda.id}}";
+	array['recibirMoneda'] =$('#monedasRecibir').val();
 
   let jsonString = JSON.stringify(array);
 
@@ -399,16 +453,67 @@ if(respuestaForm){
             dataType: 'html',
             success: function (data) {
 				
-				 window.location.href = "/remesas.beneficiarios/"+"{{beneficiario.idCliente}}";
+				 window.location.href = "/remesas.beneficiarios/"+"{{beneficiario.idCliente}}"+"/"+"{{beneficiario.pais}}";
             }
         });
-
-
 }
 
 });
 
-			
+
+	$( "#monedasRecibir" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{beneficiario.pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
+            });
+
+					$( "#monto" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/recibir/"
+			+$('#monedasRecibir').val()+"/"+$('#monto').val()+"/"+{{beneficiario.pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#total').val(data);
+            }
+        });
+	}
+            });
+
+				$( "#total" ).change(function() {
+				
+				if($('#monedasRecibir').val() == "0")
+				{}else{
+
+					$.ajax({
+            type: 'POST',
+            data: {'code' : 200},
+            url: window.location.protocol+"//"+location.hostname+":"+window.location.port+"/remesas/tasaMoneda/"
+			+$('#monedasRecibir').val()+"/"+$('#total').val()+"/"+{{beneficiario.pais}},
+            dataType: 'html',
+            success: function (data) {
+				$('#monto').val(data);
+            }
+        });
+	}
+            });
 
 
  </script>

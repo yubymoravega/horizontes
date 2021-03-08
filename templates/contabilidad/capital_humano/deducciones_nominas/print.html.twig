@@ -1,0 +1,85 @@
+{% extends('contabilidad/inventario/print_base.html.twig') %}
+{% block title %} Imprimir Deducciones {% endblock %}
+{% block body %}
+    <div class="container-fluid mt-3 d-flex flex-column" style="height: 1000px;">
+        <table border="0" width="960px" class="mt-1 mb-2">
+            <tbody>
+            <tr>
+                <td colspan="7" height="70px" class="font-weight-bold text-center text-uppercase">{{ title }}
+                    <br>Mes: {{ mes }}
+                    Año: {{ anno }} {% if quincena == 3 %}Pago Extraordinario {% else %}Quincena: {{ quincena }}{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6"><strong>Unidad: </strong> {{ unidad }}</td>
+                <td class="text-right"><strong>Fecha de Impresión: </strong> {{ fecha_impresion }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table border="0" width="960px" class="text-center">
+            <thead class="bg-dark font-weight-bold text-white">
+            <th width="260px" class="text-center">Total Ingresos</th>
+            <th width="260px" class="text-center">Ingresos Cotizabeles a TSS</th>
+            <th width="260px" class="text-center">I/S/R</th>
+            <th width="260px" class="text-center">ARS</th>
+            <th width="260px" class="text-center">AFP</th>
+            <th width="260px" class="text-center">Cooperativa</th>
+            <th width="260px" class="text-center">Plan Médico Complementario</th>
+            <th width="260px" class="text-center">Restaurant</th>
+            <th width="260px" class="text-center">Total Deducido</th>
+            <th width="260px" class="text-center">Sueldo Neto a Pagar</th>
+            </thead>
+
+            <tbody>
+            {% for item in datos %}
+                {% if item.empleado != 'TOTAL' %}
+                    <tr style="background-color: lightgrey !important;">
+                        <td style="font-weight:400; text-align: left" colspan="10" class="pl-0 pr-0">{{ item.empleado }}
+                            ({{ item.identificacion }})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:400;" class="text-right">{{ item.total_ingresos }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.ingresos_cotizables }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.isr }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.ars }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.afp }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.cooperativa }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.plan_medico_complementario }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.restaurant }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.total_deducido }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.sueldo_neto_pagar }}</td>
+                    </tr>
+                {% else %}
+                    <tr class="bg-dark font-weight-bold text-white">
+                        <td style="font-weight:400;" class="text-right">{{ item.total_ingresos }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.ingresos_cotizables }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.isr }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.ars }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.afp }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.cooperativa }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.plan_medico_complementario }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.restaurant }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.total_deducido }}</td>
+                        <td style="font-weight:400;" class="text-right">{{ item.sueldo_neto_pagar }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <button id="btn_print" class="w-25 font-weight-bold text-uppercase btn btn-secondary ml-auto mt-5"
+                onclick="imprimir()"> Imprimir
+        </button>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function imprimir() {
+            $('#btn_print').hide()
+            window.print()
+            $('#btn_print').show()
+        }
+    </script>
+{% endblock %}

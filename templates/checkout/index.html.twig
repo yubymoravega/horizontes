@@ -1,0 +1,277 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    {% include 'breadcrumbs.html.twig' %}
+
+    <h1 class="text-confirmar" style="text-align: center; ">Checkout</h1>
+    <hr class="divider-white bg-mantis-white mb-0">
+
+    <!-- Shop Checkout-->
+    <section class="section novi-background section-20 section-sm-20" style="color:white;">
+        <div class="container-fluid">
+            <div class="rd-material-tabs checkout-tabs">
+                <div class="rd-material-tabs__container">
+                    <div>
+                        <div class="row justify-content-sm-center">
+                            <div class="col-md-12 col-xl-12">
+                                <div class="table-responsive">
+                                    <table class="table" style="color:white;">
+                                        <tbody>
+                                        {% for item in carrito %}
+                                            <tr>
+                                                <td class="row-group-conta" colspan="5">Servicio:
+                                                    <i>{{ item.servicio }}</i></td>
+                                                <td class="row-group-conta text-right">Subtotal:
+                                                    <i>{{ item.sub_total }}</i></td>
+                                            </tr>
+                                            {% if item.id_servicio == 11 %}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
+                                                <tr>
+                                                    <td class="text-left row-group-subconta">Nombre</td>
+                                                    <td class="text-left row-group-subconta">Primer Apellido</td>
+                                                    <td class="text-left row-group-subconta">Segundo Apellido</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Celular</td>
+                                                    <td class="text-left row-group-subconta">Teléfono Fijo</td>
+                                                    <td class="text-right row-group-subconta">Eliminar</td>
+                                                </tr>
+                                                {% for new_item in item.data %}
+                                                    <tr>
+                                                        <td class="text-left">{{ new_item.nombre }}</td>
+                                                        <td class="text-left">{{ new_item.primer_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.segundo_apellido }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_celular }}</td>
+                                                        <td class="text-left">{{ new_item.telefono_fijo }}</td>
+                                                        <td class="text-right">
+                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom" title="Eliminar"
+                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% elseif item.id_servicio == 4 %}
+                                                {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
+                                                <tr>
+                                                    <td class="text-left row-group-subconta">Beneficiario</td>
+                                                    <td class="text-left row-group-subconta">Datos Contactos</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Dirección</td>
+                                                    <td class="text-right row-group-subconta">Monto a Recibir</td>
+                                                    <td class="text-right row-group-subconta">Eliminar</td>
+                                                </tr>
+                                                {% for new_item in item.data %}
+                                                    <tr>
+                                                        <td class="text-left">{{ new_item.nombre_ }} {{ new_item.primer_apellido_ }} {{ new_item.segundo_apellido_ }}</td>
+                                                        <td class="text-left">{{ new_item.primer_telefono_ }} {{ new_item.segundo_telefono_ }}</td>
+                                                        <td class="text-left" colspan="2">{{ new_item.calle_ }}
+                                                            {% if  new_item.entre_ != '' %}
+                                                                e/ {{ new_item.entre_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.y_ != '' %}
+                                                                & {{ new_item.y_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.nro_casa_ != '' %}
+                                                                # {{ new_item.nro_casa_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.edificio_ != '' %}
+                                                                Edif: {{ new_item.efificio_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.apto_ != '' %}
+                                                                Apto: {{ new_item.apto_ }}
+                                                            {% endif %}
+                                                            {% if  new_item.reparto_ != '' %}
+                                                                Reparto: {{ new_item.reparto_ }}
+                                                            {% endif %}
+                                                        </td>
+                                                        <td class="text-right">
+                                                            {{ new_item.monto_recibir_ }} {{ new_item.nombre_moneda_recibir }}
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="bottom" title="Eliminar"
+                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="offset-top-10 text-right">
+                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp;
+                                        &nbsp; ${{ total }}</p>
+                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuesto: &nbsp; &nbsp;
+                                        &nbsp; $0.00 </p>
+                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp;
+                                        &nbsp; ${{ total }}</p>
+                                    <a onclick="cotizacion()"
+                                       class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
+                                       data-index-to="1" href="#">
+                                        <span class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></span>Cotizacion</a>
+
+                                    <a onclick="cobrar()"
+                                       class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
+                                       data-index-to="1" href="#">
+                                        <span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="modal fade" id="confirm__modal_cotizacion" data-backdrop="static" data-keyboard="false"
+         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="confirm__modal__title"><i
+                                class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></i>
+                        Cotizacion</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="confirm__modal__body">
+                    Seguro que decea hacer una cotizacion?
+                </div>
+                <form id="form__confirm__modal" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input id="_token__confirm__modal" type="hidden" name="_token" value="123...">
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar
+                    </button>
+                    <button type="button" class="my-0 btn btn-dark" id="confirm__modal__btn_contizacion">Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirm__modal_pago" data-backdrop="static" data-keyboard="false"
+         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="confirm__modal__title"><i
+                                class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></i>
+                        Pago</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="confirm__modal__body">
+                    Seguro que decea procesar el pago?
+                </div>
+                <form id="form__confirm__modal" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input id="_token__confirm__modal" type="hidden" name="_token" value="123...">
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar
+                    </button>
+                    <button type="button" class="my-0 btn btn-dark" id="confirm__modal__btn_pago">Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <style>
+
+        .table td, .table th {
+            padding: .75rem !important;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+
+        function deleteElementCarrito(idCarrito, id_servicio) {
+            $('#confirm__modal').modal('show')
+            $('#confirm__modal__body').text('Está seguro que desea eliminar el servicio?')
+            $('#_token__confirm__modal').val($('#__token').val())
+            $("#confirm__modal__btn_ok").click(function () {
+                const path = window.location.pathname
+                $('body').append(`
+                    <form action='/turismo/gestion-consular/solucitud/delete-carrito'
+                         method="post" id='form_delet_element_servicio_carrito'>
+                        <input type='hidden' name='idCarrito' value='${idCarrito}'/>
+                        <input type='hidden' name='id_servicio' value='${id_servicio}'/>
+                        <input type='hidden' name='path' value='${path}'/>
+                    </form>`)
+                const fomrulario = $('#form_delet_element_servicio_carrito')
+                fomrulario.submit()
+                fomrulario.remove()
+            });
+        }
+
+
+        function editarIten(id) {
+            window.location.href = "/remesas.json.editar/" + id;
+        };
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function eliminarIten(id) {
+
+            $('#confirm__modal').modal('show');
+
+            $("#confirm__modal__btn_ok").click(function () {
+
+                $.ajax({
+                    type: 'POST',
+                    data: {'code': '200'},
+                    url: window.location.protocol + "//" + location.hostname + ":" + window.location.port + "/remesas.json.borrar/" + id,
+                    dataType: 'html',
+                    success: async function (data) {
+
+                        $('#confirm__modal').modal('hide');
+                        $('#alert-good').html('<div class=" text-center alert alert-success alert-dismissible fade show" role="alert"> Remesa Borrada Del Carrito<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button></div>');
+                        $('.alert').alert();
+
+                        //await sleep(1000);
+
+                        window.location.href = "/checkout";
+
+                    }
+                });
+
+            });
+        };
+
+        function cotizacion() {
+            $('#confirm__modal_cotizacion').modal('show');
+            $("#confirm__modal__btn_contizacion").click(function () {
+                window.location.href = "/cotizacion";
+            });
+        }
+
+        function cobrar() {
+
+            $('#confirm__modal_pago').modal('show');
+            $("#confirm__modal__btn_pago").click(function () {
+                window.location.href = "/cotizacion/pago/";
+            });
+
+        }
+
+    </script>
+
+{% endblock %}

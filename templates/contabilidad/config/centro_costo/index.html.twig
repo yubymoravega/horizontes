@@ -29,22 +29,19 @@
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th scope="col-1">Código</th>
-            <th scope="col-6">Nombre</th>
-            <th scope="col-3">Unidad</th>
-            <th scope="col-1" width="150px">Acciones</th>
+            <th scope="col-1" class="text-left">Código</th>
+            <th scope="col-6" class="text-left">Nombre</th>
+            <th scope="col-1" width="150px" class="text-left">Acciones</th>
             </thead>
             <tbody>
             {% for item in centro_costo %}
                 <tr>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
-                    <td style="font-weight:400;">{{ item.unidad }}</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Editar"
                                 onclick="onUpdate({
-                                        id_unidad: '{{ item.id_unidad }}',
                                         codigo:'{{ item.codigo }}',
                                         nombre:'{{ item.nombre }}' ,
                                         id: '{{ item.id }}'
@@ -83,7 +80,7 @@
             $('#modal__btn__actualizar').show()
             $('#modal__btn__aceptar').hide()
 
-            const {id = '', codigo = '', nombre = '',id_unidad = ''} = config
+            const {id = '', codigo = '', nombre = ''} = config
 
             $('#modal__form__id').modal('show')
             $('#modal__form__label__id').text("Modificar " + nombre)
@@ -91,7 +88,6 @@
             // nombre, codigo, id
             $('#centro_costo_nombre').val(nombre)
             $('#centro_costo_codigo').val(codigo)
-            $('#centro_costo_id_unidad').val(id_unidad)
             $('#id_centro_costo').val(id)
         }
 
@@ -118,12 +114,10 @@
                 rules: {
                     'centro_costo[nombre]': "required",
                     'centro_costo[codigo]': "required",
-                    'centro_costo[id_unidad]': "required",
                 },
                 messages: {
                     'centro_costo[nombre]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                     'centro_costo[codigo]': CONTAB_MSG.REQUIRED_NOT_BLANK,
-                    'centro_costo[id_unidad]': CONTAB_MSG.REQUIRED_NOT_BLANK,
                 }
             })
 

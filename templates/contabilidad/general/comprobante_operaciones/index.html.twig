@@ -1,22 +1,60 @@
 {% extends 'base.html.twig' %}
 {% block content %}
-
+    {# Modal de Cuentas#}
+    <div class="modal fade" id="listarMercanciasModal" tabindex="-1" role="dialog" data-backdrop="static"
+         data-keyboard="false"
+         aria-labelledby="listarMercanciasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 960px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h4 class="modal-title text-light" id="listarMercanciasModalLabel">Obligaciones de pago</h4>
+                    <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark-app" style="height: 600px;">
+                    <div style="height: 500px; overflow-y: auto;">
+                        <table class="table-small-rows table table-hover text-light" id="my_table">
+                            <thead class="thead-dark">
+                            <th style="width: 10px">Sel.</th>
+                            <th style="width: 120px">Factura</th>
+                            <th style="width: 150px">Fecha</th>
+                            <th style="width: 150px">Antiguedad(días)</th>
+                            <th style="width: 200px">Importe Factura</th>
+                            <th style="width: 120px">Resto</th>
+                            <th style="width: 200px">A Pagar</th>
+                            </thead>
+                            <tbody id="rows_table">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex mt-4">
+                        <div class="mr-auto">
+                            <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                <span aria-hidden="true">Cancelar</span>
+                            </button>
+                        </div>
+                        <div class="ml-2">
+                            <button type="button" class="my-0 btn btn-secondary" id="btnAceptar"
+                                    onclick="SeleccionarObligacion()"
+                                    data-dismiss="modal">Pagar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container d-flex justify-content-center">
         <div class="card mt-1" style="width: 50rem;">
-
             <div class="container">
                 <div class="row mt-0 p-0">
                     <div class="col-10">
                         <h1 class="text-reporte text-right mr-0">Comprobante de Operaciones</h1>
                     </div>
-                    <div class="col-2 mt-0 px-0 d-flex align-items-center">
-{#                        <span class="h5 text-light m-0 mr-2">#</span>#}
-                        {#<input type="number" id="select_nros" value="{{ nro_factura }}" class="w-25">#}
-{#                        {{ form_widget(form_comprobante.nro_comprobante) }}#}
-                    </div>
                 </div>
             </div>
-
             {# --------- Datos de la venta --------------#}
             <div class="card-body">
                 {{ form_start(form_comprobante,{'attr': {'class': 'text-left','id':'form_comprobante','method':'POST'}}) }}
@@ -26,7 +64,11 @@
                         {{ form_label(form_comprobante.tipo_comprobante) }}
                         {{ form_widget(form_comprobante.tipo_comprobante) }}
                     </div>
-                    <div class="col-8 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
+                        {{ form_label(form_comprobante.id_instrumento_cobro) }}
+                        {{ form_widget(form_comprobante.id_instrumento_cobro) }}
+                    </div>
+                    <div class="col-4 mt-0 pl-3 pr-0 form-group input-group input-group-sm d-block">
                         {{ form_label(form_comprobante.documento) }}
                         {{ form_widget(form_comprobante.documento) }}
                     </div>
@@ -73,21 +115,48 @@
                         {{ form_label(form_cuentas_comprobantes.almacen) }}
                         {{ form_widget(form_cuentas_comprobantes.almacen,{'attr': {'class': 'form-control w-100'}}) }}
                     </div>
-                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                    <div class="col-4 form-group mt-0 input-group input-group-sm">
                         {{ form_label(form_cuentas_comprobantes.unidad) }}
                         {{ form_widget(form_cuentas_comprobantes.unidad,{'attr': {'class': 'form-control w-100'}}) }}
                     </div>
-                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
+                    <div class="col-3 form-group mt-0 input-group input-group-sm">
                         {{ form_label(form_cuentas_comprobantes.tipo_cliente) }}
                         {{ form_widget(form_cuentas_comprobantes.tipo_cliente,{'attr': {'class': 'form-control w-100'}}) }}
                     </div>
-                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
-                        {{ form_label(form_cuentas_comprobantes.cliente) }}
-                        {{ form_widget(form_cuentas_comprobantes.cliente,{'attr': {'class': 'form-control w-100'}}) }}
+                    <div class="col-4 form-group mt-0 pr-0 input-group input-group-sm">
+                        <label for="" id="cliente_id_label">Cliente</label>
+                        <div class="row m-0 p-0">
+                            <div class="col-11 p-0">
+                                {{ form_widget(form_cuentas_comprobantes.cliente,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="col-1 mt-0 p-0">
+                                <button style="height: 50px !important;" class="btn btn-secondary btn-sm" type="button" id="btnSearchCliente"
+                                        onclick="buscarFacturas()">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4 form-group mt-0 input-group input-group-sm col-2">
-                        {{ form_label(form_cuentas_comprobantes.proveedor) }}
-                        {{ form_widget(form_cuentas_comprobantes.proveedor,{'attr': {'class': 'form-control w-100'}}) }}
+                    <div class="col-4 form-group mt-0 pr-0 ml-4 input-group input-group-sm">
+                        <label for="" id="proveedor_id_label">Proveedor</label>
+                        <div class="row m-0 p-0">
+                            <div class="col-11 p-0">
+                                {{ form_widget(form_cuentas_comprobantes.proveedor,{'attr': {'class': 'form-control w-100'}}) }}
+                            </div>
+                            <div class="col-1 mt-0 p-0">
+                                <button style="height: 50px !important;" class="btn btn-secondary btn-sm" type="button" id="btnSearchProveedor"
+                                        onclick="buscarDeudas()">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-3 form-group mt-0 input-group input-group-sm">
+                        {{ form_widget(form_cuentas_comprobantes.id_factura,{'attr': {'class': 'form-control w-100'}}) }}
+                    </div>
+                    <div class="col-3 form-group mt-0 input-group input-group-sm">
+                        {{ form_widget(form_cuentas_comprobantes.id_informe_recepcion,{'attr': {'class': 'form-control w-100'}}) }}
                     </div>
                 </div>
                 <div class="row mt-0 p-0" id="row-id-acreedora">
@@ -148,11 +217,6 @@
                     <a href="{{ url('general') }}"
                        class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                 </div>
-{#                <div class="ml-2">#}
-{#                    <button type="button" class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Vale()">#}
-{#                        imprimir#}
-{#                    </button>#}
-{#                </div>#}
                 <div class="ml-2">
                     <button type="button" class='my-0 btn btn-secondary' id="btnSubmitComprobante">Aceptar Comprobante
                     </button>
@@ -166,250 +230,309 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-            $('#total_credito').text(0)
-            $('#total_debito').text(0)
-            let form_cuentas_comprobante = $('#form_cuentas_comprobante')
-            let form_comprobante = $('#form_comprobante')
-            /** variables  */
-            let criterios = [];
-            let lista_cuentas_comprobante = []
-            let debito_total = 0;
-            let credito_total = 0;
-            let cbx_cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta')
-            let cbx_centro_costo = $('#cuentas_comprobante_operaciones_centro_costo')
-            let cbx_orden_trabajo = $('#cuentas_comprobante_operaciones_orden_trabajo')
-            let cbx_elemento_gasto = $('#cuentas_comprobante_operaciones_elemento_gasto')
-            let cbx_expediente = $('#cuentas_comprobante_operaciones_expediente')
-            let cbx_almacen = $('#cuentas_comprobante_operaciones_almacen')
-            let cbx_unidad = $('#cuentas_comprobante_operaciones_unidad')
-            let cbx_cliente = $('#cuentas_comprobante_operaciones_cliente')
-            let cbx_tipo_cliente = $('#cuentas_comprobante_operaciones_tipo_cliente')
-            let cbx_proveedor = $('#cuentas_comprobante_operaciones_proveedor')
-            $('#cuentas_comprobante_operaciones_nro_cuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-            $('#cuentas_comprobante_operaciones_tipo_cliente').prepend('<option selected = "false" value = "0"> -- seleccione -- </option>');
-            $('#comprobante_operaciones_tipo_comprobante').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        $('#total_credito').text(0)
+        $('#total_debito').text(0)
+        let form_cuentas_comprobante = $('#form_cuentas_comprobante')
+        let form_comprobante = $('#form_comprobante')
+        /** variables  */
+        let criterios = [];
+        let obligaciones = [];
+        let pagos_cobros = [];
+        let lista_cuentas_comprobante = []
+        let debito_total = 0;
+        let total_entrada = 0;
+        let credito_total = 0;
+        let cbx_cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta')
+        let cbx_centro_costo = $('#cuentas_comprobante_operaciones_centro_costo')
+        let cbx_orden_trabajo = $('#cuentas_comprobante_operaciones_orden_trabajo')
+        let cbx_elemento_gasto = $('#cuentas_comprobante_operaciones_elemento_gasto')
+        let cbx_expediente = $('#cuentas_comprobante_operaciones_expediente')
+        let cbx_almacen = $('#cuentas_comprobante_operaciones_almacen')
+        let cbx_unidad = $('#cuentas_comprobante_operaciones_unidad')
+        let cbx_cliente = $('#cuentas_comprobante_operaciones_cliente')
+        let cbx_tipo_cliente = $('#cuentas_comprobante_operaciones_tipo_cliente')
+        let cbx_proveedor = $('#cuentas_comprobante_operaciones_proveedor')
+        let btn_cliente = $('#btnSearchCliente')
+        let btn_proveedor = $('#btnSearchProveedor')
+        $('#cuentas_comprobante_operaciones_nro_cuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+        $('#cuentas_comprobante_operaciones_tipo_cliente').prepend('<option selected = "false" value = "0"> -- seleccione -- </option>');
+        $('#comprobante_operaciones_tipo_comprobante').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
 
-            cbx_cuenta.on('change', function () {
-                miniLoadin.show({msg: 'Cargando criterios de análisis...', target: '#row-id-acreedora'})
-                $('#cuentas_comprobante_operaciones_nro_subcuenta').find('option').remove()
-                $('#cuentas_comprobante_operaciones_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
-                $.ajax({
-                    url: '/contabilidad/config/cuenta/get-criterios-subcuentas/' + $(this).val(),
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        if (result.success) {
-                            // hiddenParents()
-                            criterios = result.data
-                            result.data.forEach(data => {
-                                switch (data) {
-                                    case "CCT":
-                                        cbx_centro_costo.parent().show()
-                                        break
-                                    case "EG":
-                                        cbx_elemento_gasto.parent().show()
-                                        break
-                                    case "EXP":
-                                        cbx_expediente.parent().show()
-                                        break
-                                    case "OT":
-                                        cbx_orden_trabajo.parent().show()
-                                        break
-                                    case "ALM":
-                                        cbx_almacen.parent().show()
-                                        break
-                                    case "UNID":
-                                        cbx_unidad.parent().show()
-                                        break
-                                    case "CLIPRO":
-                                        cbx_proveedor.parent().show()
-                                        cbx_cliente.parent().show()
-                                        cbx_tipo_cliente.parent().show()
-                                        break
-                                }
-                            })
-                            result.subcuentas.forEach(
-                                el => $('#cuentas_comprobante_operaciones_nro_subcuenta').append(`<option value = "${el.nro}">${el.descripcion} </option>`)
-                            )
-                            miniLoadin.close()
-                        }
-                    }
-                })
-            })
-
-            function hiddenParents() {
-                cbx_centro_costo.parent().hide()
-                cbx_orden_trabajo.parent().hide()
-                cbx_elemento_gasto.parent().hide()
-                cbx_expediente.parent().hide()
-                cbx_almacen.parent().hide()
-                cbx_unidad.parent().hide()
-                cbx_cliente.parent().hide()
-                cbx_tipo_cliente.parent().hide()
-                cbx_proveedor.parent().hide()
-
-                $('#cuentas_comprobante_operaciones_centro_costo').val(0)
-                $('#cuentas_comprobante_operaciones_orden_trabajo').val(0)
-                $('#cuentas_comprobante_operaciones_elemento_gasto').val(0)
-                $('#cuentas_comprobante_operaciones_expediente').val(0)
-                $('#cuentas_comprobante_operaciones_almacen').val(0)
-                $('#cuentas_comprobante_operaciones_unidad').val(0)
-                $('#cuentas_comprobante_operaciones_tipo_cliente').val(0)
-                $('#cuentas_comprobante_operaciones_cliente').val(0)
-                $('#cuentas_comprobante_operaciones_proveedor').val(0)
-            }
-
-            hiddenParents()
-
-            form_comprobante.validate({
-                errorClass: 'invalid-label-orange',
-                errorPlacement: function (error, element) {
-                    error.attr('style', 'font-size: .8rem;')
-                    error.insertAfter(element);
-                },
-                rules: {
-                    'comprobante_operaciones[tipo_comprobante]': "required",
-                    'comprobante_operaciones[documento]': "required",
-                    'comprobante_operaciones[explicacion]': "required",
-                },
-                messages: {
-                    'comprobante_operaciones[tipo_comprobante]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'comprobante_operaciones[documento]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'comprobante_operaciones[explicacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                }
-            })
-            form_cuentas_comprobante.validate({
-                errorClass: 'invalid-label-orange',
-                errorPlacement: function (error, element) {
-                    error.attr('style', 'font-size: .8rem;')
-                    error.insertAfter(element);
-                },
-                rules: {
-                    'cuentas_comprobante_operaciones[nro_cuenta]': "required",
-                    'cuentas_comprobante_operaciones[nro_subcuenta]': "required",
-                    'cuentas_comprobante_operaciones[centro_costo]': "required",
-                    'cuentas_comprobante_operaciones[orden_trabajo]': "required",
-                    'cuentas_comprobante_operaciones[elemento_gasto]': "required",
-                    'cuentas_comprobante_operaciones[expediente]': "required",
-                    'cuentas_comprobante_operaciones[debito]': "required",
-                    'cuentas_comprobante_operaciones[credito]': "required",
-                },
-                messages: {
-                    'cuentas_comprobante_operaciones[debito]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[credito]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[nro_cuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[nro_subcuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[orden_trabajo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                    'cuentas_comprobante_operaciones[expediente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
-                }
-            })
-            cbx_tipo_cliente.on('change', function () {
-                cbx_cliente.find('option').remove()
-                loadingModal.show()
-                $.ajax({
-                    url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
-                    method: 'POST',
-                    dataType: 'json',
-                    success: function (result) {
-                        if (result.success) {
-                            result.clientes.forEach(
-                                el => cbx_cliente.append(`<option value = "${el.id}">${el.nombre} </option>`)
-                            )
-                            cbx_cliente
-                        } else {
-
-                        }
-                        loadingModal.close()
-                    },
-                    error: function () {
-                    }
-                })
-            })
-            $('#btnAplicarMercancia').on('click', function () {
-                let debito = $('#cuentas_comprobante_operaciones_debito').val()
-                let credito = $('#cuentas_comprobante_operaciones_credito').val()
-                if (form_cuentas_comprobante.valid() && (debito > 0 || credito > 0)) {
-                    let cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta option:selected').val()
-                    let text_cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta option:selected').text()
-                    let subcuenta = $('#cuentas_comprobante_operaciones_nro_subcuenta option:selected').val()
-
-                    let array_cuenta = text_cuenta.split(' - ');
-
-                    let centro_costo = $('#cuentas_comprobante_operaciones_centro_costo option:selected').val()
-                    let orden_tabajo = $('#cuentas_comprobante_operaciones_orden_trabajo option:selected').val()
-                    let elemento_gasto = $('#cuentas_comprobante_operaciones_elemento_gasto option:selected').val()
-                    let expediente = $('#cuentas_comprobante_operaciones_expediente option:selected').val()
-                    let almacen = $('#cuentas_comprobante_operaciones_almacen option:selected').val()
-                    let unidad = $('#cuentas_comprobante_operaciones_unidad option:selected').val()
-                    let tipo_cliente = $('#cuentas_comprobante_operaciones_tipo_cliente option:selected').val()
-                    let cliente = $('#cuentas_comprobante_operaciones_cliente option:selected').val()
-                    let proveedor = $('#cuentas_comprobante_operaciones_proveedor option:selected').val()
-                    let index = lista_cuentas_comprobante.length
-                    /***Listado de elementos adicionados en la tabla */
-                    lista_cuentas_comprobante.push({
-                        index,
-                        cuenta,
-                        subcuenta,
-                        centro_costo,
-                        orden_tabajo,
-                        elemento_gasto,
-                        expediente,
-                        almacen,
-                        unidad,
-                        cliente,
-                        tipo_cliente,
-                        proveedor,
-                        debito,
-                        credito
-                    })
-                    let arr = [];
-                    let values_criterios = [];
-                    if (criterios.length > 0) {
-                        criterios.forEach(data => {
+        cbx_cliente.on('change', function () {
+            cbx_proveedor.val(0)
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
+        })
+        cbx_proveedor.on('change', function () {
+            cbx_cliente.val(0)
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
+            cbx_tipo_cliente.val(0)
+            cbx_cliente.find('option').remove()
+        })
+        cbx_cuenta.on('change', function () {
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
+            $('#cuentas_comprobante_operaciones_debito').prop('disabled', false)
+            $('#cuentas_comprobante_operaciones_credito').prop('disabled', false)
+            $('#cuentas_comprobante_operaciones_debito').val('')
+            $('#cuentas_comprobante_operaciones_credito').val('')
+            miniLoadin.show({msg: 'Cargando criterios de análisis...', target: '#row-id-acreedora'})
+            $('#cuentas_comprobante_operaciones_nro_subcuenta').find('option').remove()
+            $('#cuentas_comprobante_operaciones_nro_subcuenta').prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            $.ajax({
+                url: '/contabilidad/config/cuenta/get-criterios-subcuentas/' + $(this).val(),
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        hiddenParents()
+                        criterios = result.data
+                        result.data.forEach(data => {
                             switch (data) {
                                 case "CCT":
-                                    arr = $('#cuentas_comprobante_operaciones_centro_costo option:selected').text().split(' - ')
-                                    values_criterios[values_criterios.length] = arr[0]
+                                    cbx_centro_costo.parent().show()
                                     break
                                 case "EG":
-                                    arr = $('#cuentas_comprobante_operaciones_elemento_gasto option:selected').text().split(' - ')
-                                    values_criterios[values_criterios.length] = arr[0]
+                                    cbx_elemento_gasto.parent().show()
                                     break
                                 case "EXP":
-                                    arr = $('#cuentas_comprobante_operaciones_expediente option:selected').text().split(' - ')
-                                    values_criterios[values_criterios.length] = arr[0]
+                                    cbx_expediente.parent().show()
                                     break
                                 case "OT":
-                                    arr = $('#cuentas_comprobante_operaciones_orden_trabajo option:selected').text().split(' - ')
-                                    values_criterios[values_criterios.length] = arr[0]
+                                    cbx_orden_trabajo.parent().show()
                                     break
                                 case "ALM":
-                                    arr = $('#cuentas_comprobante_operaciones_almacen option:selected').text().split(' - ')
-                                    values_criterios[values_criterios.length] = arr[0]
+                                    cbx_almacen.parent().show()
                                     break
                                 case "UNID":
-                                    arr = $('#cuentas_comprobante_operaciones_unidad option:selected').text().split(' - ')
-                                    values_criterios[values_criterios.length] = arr[0]
+                                    cbx_unidad.parent().show()
                                     break
                                 case "CLIPRO":
-                                    if ($('#cuentas_comprobante_operaciones_cliente option:selected').val() > 0) {
-                                        arr = $('#cuentas_comprobante_operaciones_cliente option:selected').text().split(' - ')
-                                        values_criterios[values_criterios.length] = arr.length > 1 ? arr[0] : $('#cuentas_comprobante_operaciones_cliente option:selected').text()
-                                    } else {
-                                        if ($('#cuentas_comprobante_operaciones_proveedor option:selected').val() > 0) {
-                                            arr = $('#cuentas_comprobante_operaciones_proveedor option:selected').text().split(' - ')
-                                            values_criterios[values_criterios.length] = arr[0]
-                                        }
-                                    }
+                                    $('#cuentas_comprobante_operaciones_debito').prop('disabled', true)
+                                    $('#cuentas_comprobante_operaciones_credito').prop('disabled', true)
+                                    btn_proveedor.parent().show()
+                                    $('#cliente_id_label').parent().show()
+                                    $('#proveedor_id_label').parent().show()
+                                    btn_cliente.parent().show()
+                                    cbx_proveedor.parent().show()
+                                    cbx_cliente.parent().show()
+                                    cbx_tipo_cliente.parent().show()
                                     break
                             }
                         })
+                        result.subcuentas.forEach(
+                            el => $('#cuentas_comprobante_operaciones_nro_subcuenta').append(`<option value = "${el.nro}">${el.descripcion} </option>`)
+                        )
+                        miniLoadin.close()
                     }
-                    let debito_mostrar = Number.parseFloat(debito).toFixed(2)
-                    let credito_mostrar = Number.parseFloat(credito).toFixed(2)
-                    $('#rows_operaciones').append(`<tr>
+                }
+            })
+        })
+        cbx_tipo_cliente.on('change', function () {
+            $('#cuentas_comprobante_operaciones_debito').val(0)
+            $('#cuentas_comprobante_operaciones_credito').val(0)
+            cbx_cliente.find('option').remove()
+            cbx_cliente.prepend('<option selected = "false" value = "0" disabled> -- seleccione -- </option>');
+            cbx_proveedor.val(0)
+            loadingModal.show()
+            $.ajax({
+                url: '/contabilidad/venta/factura/get-clientes/' + $(this).val(),
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        result.clientes.forEach(
+                            el => cbx_cliente.append(`<option value = "${el.id}">${el.nombre} </option>`)
+                        )
+                        cbx_cliente
+                    } else {
+
+                    }
+                    loadingModal.close()
+                },
+                error: function () {
+                }
+            })
+        })
+
+        function hiddenParents() {
+            cbx_centro_costo.parent().hide()
+            cbx_orden_trabajo.parent().hide()
+            cbx_elemento_gasto.parent().hide()
+            cbx_expediente.parent().hide()
+            cbx_almacen.parent().hide()
+            cbx_unidad.parent().hide()
+            cbx_cliente.parent().hide()
+            cbx_tipo_cliente.parent().hide()
+            cbx_proveedor.parent().hide()
+            btn_proveedor.parent().hide()
+            btn_cliente.parent().hide()
+            $('#cliente_id_label').parent().hide()
+            $('#proveedor_id_label').parent().hide()
+            $('#cuentas_comprobante_operaciones_id_factura').hide()
+
+            $('#cuentas_comprobante_operaciones_id_informe_recepcion').hide()
+            $('#cuentas_comprobante_operaciones_centro_costo').val(0)
+            $('#cuentas_comprobante_operaciones_orden_trabajo').val(0)
+            $('#cuentas_comprobante_operaciones_elemento_gasto').val(0)
+            $('#cuentas_comprobante_operaciones_expediente').val(0)
+            $('#cuentas_comprobante_operaciones_almacen').val(0)
+            $('#cuentas_comprobante_operaciones_unidad').val(0)
+            $('#cuentas_comprobante_operaciones_tipo_cliente').val(0)
+            $('#cuentas_comprobante_operaciones_cliente').val(0)
+            $('#cuentas_comprobante_operaciones_proveedor').val(0)
+        }
+
+        hiddenParents()
+
+        $('#listarMercanciasModal').on('show.bs.modal', function () {
+            $("#rows_table input[type='number']").on('keyup', function () {
+                total_entrada = 0;
+                for (var i = 0; i < obligaciones.length; i++) {
+                    let id = '#' + obligaciones[i]['id']
+                    if ($(id + '_input').val() != '') {
+                        total_entrada = Number.parseFloat(total_entrada) + Number.parseFloat($(id + '_input').val())
+                        $(id).attr('checked', true);
+                    } else {
+                        $(id).attr('checked', false);
+                    }
+                }
+                $('#total_input').val(total_entrada)
+            })
+        })
+
+        form_comprobante.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'comprobante_operaciones[tipo_comprobante]': "required",
+                'comprobante_operaciones[documento]': "required",
+                'comprobante_operaciones[id_instrumento_cobro]': "required",
+                'comprobante_operaciones[explicacion]': "required",
+            },
+            messages: {
+                'comprobante_operaciones[tipo_comprobante]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[id_instrumento_cobro]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[documento]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'comprobante_operaciones[explicacion]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+            }
+        })
+        form_cuentas_comprobante.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'cuentas_comprobante_operaciones[nro_cuenta]': "required",
+                'cuentas_comprobante_operaciones[nro_subcuenta]': "required",
+                'cuentas_comprobante_operaciones[centro_costo]': "required",
+                'cuentas_comprobante_operaciones[orden_trabajo]': "required",
+                'cuentas_comprobante_operaciones[elemento_gasto]': "required",
+                'cuentas_comprobante_operaciones[expediente]': "required"
+            },
+            messages: {
+                'cuentas_comprobante_operaciones[nro_cuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'cuentas_comprobante_operaciones[nro_subcuenta]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'cuentas_comprobante_operaciones[centro_costo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'cuentas_comprobante_operaciones[orden_trabajo]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'cuentas_comprobante_operaciones[elemento_gasto]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+                'cuentas_comprobante_operaciones[expediente]': CONTAB_MSG.REQUIRED_OBLIGATORIO,
+            }
+        })
+
+        $('#btnAplicarMercancia').on('click', function () {
+            let debito = $('#cuentas_comprobante_operaciones_debito').val()==''?0:$('#cuentas_comprobante_operaciones_debito').val()
+            let credito = $('#cuentas_comprobante_operaciones_credito').val()==''?0:$('#cuentas_comprobante_operaciones_credito').val()
+            if (form_cuentas_comprobante.valid() && (debito > 0 || credito > 0)) {
+                let cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta option:selected').val()
+                let text_cuenta = $('#cuentas_comprobante_operaciones_nro_cuenta option:selected').text()
+                let subcuenta = $('#cuentas_comprobante_operaciones_nro_subcuenta option:selected').val()
+
+                let array_cuenta = text_cuenta.split(' - ');
+
+                let centro_costo = $('#cuentas_comprobante_operaciones_centro_costo option:selected').val()
+                let orden_tabajo = $('#cuentas_comprobante_operaciones_orden_trabajo option:selected').val()
+                let elemento_gasto = $('#cuentas_comprobante_operaciones_elemento_gasto option:selected').val()
+                let expediente = $('#cuentas_comprobante_operaciones_expediente option:selected').val()
+                let almacen = $('#cuentas_comprobante_operaciones_almacen option:selected').val()
+                let unidad = $('#cuentas_comprobante_operaciones_unidad option:selected').val()
+                let tipo_cliente = $('#cuentas_comprobante_operaciones_tipo_cliente option:selected').val()
+                let cliente = $('#cuentas_comprobante_operaciones_cliente option:selected').val()
+                let proveedor = $('#cuentas_comprobante_operaciones_proveedor option:selected').val()
+
+                let id_factura = $('#cuentas_comprobante_operaciones_id_factura').val()
+                let id_informe_recepcion = $('#cuentas_comprobante_operaciones_id_informe_recepcion').val()
+                let index = lista_cuentas_comprobante.length
+                /***Listado de elementos adicionados en la tabla */
+                lista_cuentas_comprobante.push({
+                    index,
+                    cuenta,
+                    subcuenta,
+                    centro_costo,
+                    orden_tabajo,
+                    elemento_gasto,
+                    expediente,
+                    almacen,
+                    unidad,
+                    cliente,
+                    tipo_cliente,
+                    proveedor,
+                    debito,
+                    credito,
+                    id_informe_recepcion,
+                    id_factura
+                })
+                let arr = [];
+                let values_criterios = [];
+                if (criterios.length > 0) {
+                    criterios.forEach(data => {
+                        switch (data) {
+                            case "CCT":
+                                arr = $('#cuentas_comprobante_operaciones_centro_costo option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "EG":
+                                arr = $('#cuentas_comprobante_operaciones_elemento_gasto option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "EXP":
+                                arr = $('#cuentas_comprobante_operaciones_expediente option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "OT":
+                                arr = $('#cuentas_comprobante_operaciones_orden_trabajo option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "ALM":
+                                arr = $('#cuentas_comprobante_operaciones_almacen option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "UNID":
+                                arr = $('#cuentas_comprobante_operaciones_unidad option:selected').text().split(' - ')
+                                values_criterios[values_criterios.length] = arr[0]
+                                break
+                            case "CLIPRO":
+                                if ($('#cuentas_comprobante_operaciones_cliente option:selected').val() > 0) {
+                                    arr = $('#cuentas_comprobante_operaciones_cliente option:selected').text().split(' - ')
+                                    values_criterios[values_criterios.length] = arr.length > 1 ? arr[0] : $('#cuentas_comprobante_operaciones_cliente option:selected').text()
+                                } else {
+                                    if ($('#cuentas_comprobante_operaciones_proveedor option:selected').val() > 0) {
+                                        arr = $('#cuentas_comprobante_operaciones_proveedor option:selected').text().split(' - ')
+                                        values_criterios[values_criterios.length] = arr[0]
+                                    }
+                                }
+                                break
+                        }
+                    })
+                }
+                let debito_mostrar = Number.parseFloat(debito).toFixed(2)
+                let credito_mostrar = Number.parseFloat(credito).toFixed(2)
+                $('#rows_operaciones').append(`<tr>
                         <td style="font-weight:400; width: 85px;"> ${array_cuenta[0]}</td>
                         <td style="font-weight:400; width: 85px;"> ${subcuenta}</td>
                         <td style="font-weight:400; width: 85px;" > ${values_criterios.length > 0 ? values_criterios[0] : ''}</td>
@@ -426,40 +549,182 @@
                         </button>
                         </td>
                         `
-                    );
-                    debito_total += Number.parseFloat(debito)
-                    credito_total += Number.parseFloat(credito)
-                    $("#total_debito").text(debito_total.toFixed(2))
-                    $("#total_credito").text(credito_total.toFixed(2))
-                    $('#form_cuentas_comprobante')[0].reset()
-                    hiddenParents()
-                }
-            })
-            $(document).on('click', '.borrar', function (event) {
-                event.preventDefault();
-                const lista = lista_cuentas_comprobante.find(e => e.index == $(this).attr('index'))
-                debito_total -= Number.parseFloat(lista.debito)
-                credito_total -= Number.parseFloat(lista.credito)
+                );
+                debito_total += Number.parseFloat(debito)
+                credito_total += Number.parseFloat(credito)
                 $("#total_debito").text(debito_total.toFixed(2))
                 $("#total_credito").text(credito_total.toFixed(2))
-                lista_cuentas_comprobante = lista_cuentas_comprobante.filter(e => e.index != $(this).attr('index'))
-                $(this).closest('tr').remove()
-            })
-            $('#btnSubmitComprobante').click(function (event) {
-                event.preventDefault()
-                if ($('#form_comprobante').valid()) {
-                    if (debito_total == credito_total) {
-                        if (lista_cuentas_comprobante.length>0) {
-                            const operaciones = JSON.stringify(lista_cuentas_comprobante)
-                            $('#form_comprobante').append(`<input type="text" hidden name="operaciones" value='${operaciones}' />`)
-                            $('#form_comprobante').append(`<input type="text" hidden name="debito_total" value='${debito_total}' />`)
-                            $('#form_comprobante').append(`<input type="text" hidden name="credito_total" value='${credito_total}' />`)
-                            loadingModal.show()
-                            $('#form_comprobante').submit()
-                        } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
-                    } else
-                        alertTemplate('El total de débitos y créditos tienen que ser iguales', 'danger')
+                $('#form_cuentas_comprobante')[0].reset()
+                hiddenParents()
+            }
+        })
+        $(document).on('click', '.borrar', function (event) {
+            event.preventDefault();
+            const lista = lista_cuentas_comprobante.find(e => e.index == $(this).attr('index'))
+            debito_total -= Number.parseFloat(lista.debito)
+            credito_total -= Number.parseFloat(lista.credito)
+            $("#total_debito").text(debito_total.toFixed(2))
+            $("#total_credito").text(credito_total.toFixed(2))
+            lista_cuentas_comprobante = lista_cuentas_comprobante.filter(e => e.index != $(this).attr('index'))
+            $(this).closest('tr').remove()
+        })
+        $('#btnSubmitComprobante').click(function (event) {
+            event.preventDefault()
+            if ($('#form_comprobante').valid()) {
+                if (debito_total == credito_total) {
+                    if (lista_cuentas_comprobante.length > 0) {
+                        const operaciones = JSON.stringify(lista_cuentas_comprobante)
+                        const cobros_pagos = JSON.stringify(pagos_cobros)
+                        $('#form_comprobante').append(`<input type="text" hidden name="operaciones" value='${operaciones}' />`)
+                        $('#form_comprobante').append(`<input type="text" hidden name="pagos_cobros" value='${cobros_pagos}' />`)
+                        $('#form_comprobante').append(`<input type="text" hidden name="debito_total" value='${debito_total}' />`)
+                        $('#form_comprobante').append(`<input type="text" hidden name="credito_total" value='${credito_total}' />`)
+                        loadingModal.show()
+                        $('#form_comprobante').submit()
+                    } else alertTemplate('Debe existir alguna mercancía o producto para facturar', 'danger')
+                } else
+                    alertTemplate('El total de débitos y créditos tienen que ser iguales', 'danger')
+            }
+        })
+
+        function buscarDeudas() {
+            if (cbx_proveedor.val() == '')
+                alertTemplate('Tiene que seleccionar el proveedor.', 'danger')
+            else {
+                loadingModal.show()
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ path('contabilidad_general_get_deudas') }}',
+                    data: {
+                        proveedor: cbx_proveedor.val()
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            $('#rows_table').find('tr').remove();
+                            if (result.data.length > 0) {
+                                $('#listarMercanciasModalLabel').text('Cuentas por Pagar')
+                                obligaciones = result.data
+                                $(result.data).each(function (pos, valor) {
+                                    $('#rows_table').append('<tr>' +
+                                        '<td style="font-weight:400;"> ' +
+                                        '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
+                                        '<td style="font-weight:400;" class="text-center" hidden><input type="number" id="' + valor.id + '_id" value="' + valor.id + '"></td>' +
+                                        '<td style="font-weight:400;" class="text-center" hidden><input type="text" id="' + valor.id + '_type" value="'+valor.tipo+'"></td>' +
+                                        '</td>' +
+                                        '<td style="font-weight:400;" class="text-center" hidden> ' + valor.id + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.documento + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.fecha + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.antiguedad + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.importe_mostrar + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.importe + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> <input type="number" id="' + valor.id + '_input" ></td>' +
+                                        '</tr>'
+                                    );
+                                })
+                                $('#rows_table').append('<tr>' +
+                                    '<td style="font-weight:400;" colspan="6" class="text-center text-uppercase">TOTAL</td>' +
+                                    '<td style="font-weight:400;" class="text-center"> <input type="number" readonly="readonly" id="total_input" value="' + 0 + '"></td>' +
+                                    '</tr>'
+                                );
+                                $('#listarMercanciasModal').modal('show')
+                            } else {
+                                $('#listarMercanciasModal').modal('hide')
+                                alertTemplate('La empresa no tiene deudas con el proveedor seleccionado.', 'danger')
+                            }
+                        }
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        loadingModal.close()
+                        alertTemplate('Error interno, verifique el código', 'danger')
+                    }
+                })
+            }
+        }
+
+        function buscarFacturas() {
+            if (cbx_cliente.val() == '')
+                alertTemplate('Tiene que seleccionar el cliente.', 'danger')
+            else {
+                loadingModal.show()
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ path('contabilidad_general_get_facturas') }}',
+                    data: {
+                        tipo_cliente: cbx_tipo_cliente.val(),
+                        cliente: cbx_cliente.val()
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            $('#rows_table').find('tr').remove();
+                            if (result.data.length > 0) {
+                                $('#listarMercanciasModalLabel').text('Cuentas por Cobrar')
+                                obligaciones = result.data
+                                $(result.data).each(function (pos, valor) {
+                                    $('#rows_table').append('<tr>' +
+                                        '<td style="font-weight:400;"> ' +
+                                        '<input type="checkbox" style="margin-left: auto;" id="' + valor.id + '">' +
+                                        '<td style="font-weight:400;" class="text-center" hidden><input type="number" id="' + valor.id + '_id" value="' + valor.id + '"></td>' +
+                                        '<td style="font-weight:400;" class="text-center" hidden><input type="text" id="' + valor.id + '_type" value="FACT"></td>' +
+                                        '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.documento + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.fecha + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.antiguedad + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.importe_mostrar + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> ' + valor.importe + '</td>' +
+                                        '<td style="font-weight:400;" class="text-center"> <input type="number" id="' + valor.id + '_input" ></td>' +
+                                        '</tr>'
+                                    );
+                                })
+                                $('#rows_table').append('<tr>' +
+                                    '<td style="font-weight:400;" colspan="6" class="text-center text-uppercase">TOTAL</td>' +
+                                    '<td style="font-weight:400;" class="text-center"> <input type="number" readonly="readonly" id="total_input" value="' + 0 + '"></td>' +
+                                    '</tr>'
+                                );
+                                $('#listarMercanciasModal').modal('show')
+                            } else {
+                                $('#listarMercanciasModal').modal('hide')
+                                alertTemplate('El cliente seleccionado no tiene deudas con la empresa', 'danger')
+                            }
+                        }
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        loadingModal.close()
+                        alertTemplate('Error interno, verifique el código', 'danger')
+                    }
+                })
+            }
+        }
+
+        function SeleccionarObligacion() {
+            let total = 0;
+            let type = '';
+            let str = '';
+            for (var i = 0; i < obligaciones.length; i++) {
+                let id = '#' + obligaciones[i]['id']
+                str += ($(id + '_id').val() + ',')
+                if ($(id).prop('checked') == true) {
+                    type = $(id + '_type').val()
+                    pagos_cobros.push({
+                        'id_factura': $(id + '_id').val(),
+                        'type': $(id + '_type').val(),
+                        'importe': $(id + '_input').val()
+                    })
+                    total = Number.parseFloat(total) + Number.parseFloat($(id + '_input').val())
                 }
-            })
+            }
+            if (type == 'FACT') {
+                $('#cuentas_comprobante_operaciones_id_factura').val(str)
+                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val('')
+                $('#cuentas_comprobante_operaciones_debito').val(0)
+                $('#cuentas_comprobante_operaciones_credito').val(Number.parseFloat(total).toFixed(2))
+            } else {
+                $('#cuentas_comprobante_operaciones_debito').val(Number.parseFloat(total).toFixed(2))
+                $('#cuentas_comprobante_operaciones_credito').val(0)
+                $('#cuentas_comprobante_operaciones_id_factura').val('')
+                $('#cuentas_comprobante_operaciones_id_informe_recepcion').val(str)
+            }
+        }
     </script>
 {% endblock %}

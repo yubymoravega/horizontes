@@ -2,22 +2,22 @@
 {% block modalbody %}
     {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST'}}) }}
     <div class="row pt-0 mt-0">
-        <div class="col-3 form-group input-group input-group-sm d-block">
+        <div class="col-12 form-group input-group input-group-sm d-block">
             {{ form_label(form.codigo) }}
             {{ form_widget(form.codigo,{'attr': {'class': 'form- control w-100'}}) }}
         </div>
-        <div class="col-9 mt-0 form-group input-group input-group-sm d-block">
+        <div class="col-12 mt-0 form-group input-group input-group-sm d-block">
             {{ form_label(form.nombre) }}
             {{ form_widget(form.nombre,{'attr': {'class': 'form- control w-100'}}) }}
 
         </div>
     </div>
     <div class="row pt-0 mt-0">
-        <div class="col-4 form-group input-group input-group-sm d-block">
+        <div class="col-6 form-group input-group input-group-sm d-block">
             {{ form_label(form.fax) }}
             {{ form_widget(form.fax,{'attr': {'class': 'form- control w-100'}}) }}
         </div>
-        <div class="col-8 mt-0 form-group input-group input-group-sm d-block">
+        <div class="col-6 mt-0 form-group input-group input-group-sm d-block">
             {{ form_label(form.telefonos) }}
             {{ form_widget(form.telefonos,{'attr': {'class': 'form- control w-100'}}) }}
         </div>

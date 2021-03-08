@@ -41,13 +41,15 @@
                     <!-- RD Navbar Panel-->
                     <div class="rd-navbar-panel">
                         <!-- RD Navbar Toggle-->
-                        <button class="rd-navbar-toggle" style="display: block !important;" data-rd-navbar-toggle=".rd-navbar, .rd-navbar-nav-wrap">
+                        <button class="rd-navbar-toggle" style="display: block !important;"
+                                data-rd-navbar-toggle=".rd-navbar, .rd-navbar-nav-wrap">
                             <span></span></button>
                         <!--Navbar Brand-->
-                        <div class="rd-navbar-brand" style="left: 30%;"><a href="/"><img style='margin-left: -15px;'
-                                                                                         width='150' height='57'
-                                                                                         src="{{ asset('images/logo-viajes-horizontes.png') }}"
-                                                                                         alt=''/></a></div>
+                        <div class="rd-navbar-brand" style="left: 30%;"><a href="/"><img
+                                        style='margin-left: -15px; margin-top: -10px;'
+                                        width='165' height='70'
+                                        src="{{ asset('images/solyag-logo-nuevo.png') }}"
+                                        alt=''/></a></div>
                     </div>
                     <div class="rd-navbar-menu-wrap">
                         <div class="rd-navbar-nav-wrap">
@@ -55,7 +57,7 @@
                                 <!--Navbar Brand Mobile-->
                                 <div class="rd-navbar-mobile-brand"><a href="/"><img
                                                 style='margin-top: -5px;margin-left: -15px;' width='138' height='40'
-                                                src="{{ asset('images/logo-viajes-horizontes.png') }}"
+                                                src="{{ asset('images/solyag-logo-nuevo.png') }}"
                                                 alt=''/></a>
                                 </div>
                                 <div class="form-search-wrap">
@@ -74,7 +76,8 @@
                                 </div>
                                 <!-- RD Navbar Nav-->
                                 <ul class="rd-navbar-nav">
-                                   {# ------------ reporteCliente ------------------- #}
+
+                                    {# ------------ reporteCliente ------------------- #}
                                     {% include 'layout/reportecliente.html.twig' %}
 
                                     {# ------------ contabilidad ------------------- #}
@@ -82,7 +85,7 @@
 
                                     {# ------------ info_security ------------------- #}
                                     {% include 'layout/info_security.html.twig' %}
-                                   
+
                                 </ul>
                             </div>
                         </div>
@@ -107,7 +110,8 @@
                                data-rd-navbar-toggle=".rd-navbar-usuario-dropdown"
                                href="#"><span></span><br>
                                 <p class="p-text">Usuario</p></a>
-                            <a class="rd-navbar-cart mdi icon-notification fas" id="icon-notification" data-count="0" href="#"><span></span> <br>
+                            <a class="rd-navbar-cart mdi icon-notification fas" id="icon-notification" data-count="0"
+                               href="#"><span></span> <br>
                                 <p class="p-text">Atender</p></a>
                             <a class="rd-navbar-cart mdi icon-ventas " href="#"><span></span><br>
                                 <p class="p-text">Ventas</p></a>
@@ -115,23 +119,35 @@
                                data-rd-navbar-toggle=".rd-navbar-cart-dropdown"
                                href="#"><span></span><br>
                                 <p class="p-text">Factura</p></a>
+
+                            <select id='currency' class="currency rd-navbar-cart">
+
+                            </select>
+
                             <a class="rd-navbar-cart mdi icon-texto" href="#"><span class="span-text"
                                                                                     style="width: 115px;"></span><br>
                                 <p style="margin-top: -3px;" class="p-text">Valor Total</p></a>
 
                             <div class="rd-navbar-cart-dropdown">
                                 <ul id='carrito' class="rd-navbar-list-products">
-                                   
-                                   
+
+
                                 </ul>
                                 <div class="rd-navbar-cart-total">
-                                    <h6 class="rd-navbar-cart-total-title">total</h6><span
-                                            id='totalCarrito' class="rd-navbar-cart-total-price">00</span>
+                                    <h6 class="font-weight-bold text-white">Total<span
+                                                id='totalCarrito' class="rd-navbar-cart-total-price">00</span></h6>
                                 </div>
-                                <div class="text-center"><a
-                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
-                                            href="shop-cart.html"><span class="icon novi-icon mdi mdi-lock"></span>Go
-                                        to
+{#                                <div class="text-center mt-1"><a#}
+{#                                            class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"#}
+{#                                            href="{{ url ('checkout') }}"><span#}
+{#                                                class="icon novi-icon mdi mdi-lock"></span>Ir#}
+{#                                        a#}
+{#                                        checkout</a></div>#}
+                                <div class="text-center mt-1"><a
+                                            class="btn btn-rect btn-sm btn-outline-primary btn-icon btn-icon-left"
+                                            href="{{ url ('checkout_services') }}"><span
+                                                class="icon novi-icon mdi mdi-lock-open"></span>Ir
+                                        a
                                         checkout</a></div>
                             </div>
 
@@ -143,13 +159,14 @@
                                     </div>
                                     <div class="col-10">
                                         <h6 class="rd-navbar-cart-total-title">{{ app.session.get('_security.last_username') }}</h6>
+                                        <h5 class="rd-navbar-cart-total-title" id="monedaSys"></h5>
                                     </div>
                                 </div>
                                 <div class="text-center"><a
                                             class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"
                                             href="/index.php/logout" style="width: 100%"><span
-                                                class="icon novi-icon mdi mdi-exit-to-app"></span>Cerrar
-                                        Seción</a></div>
+                                                class="icon novi-icon mdi mdi-exit-to-app"></span>Cerrar Sesión</a>
+                                </div>
                                 <br/>
                                 <div class="text-center">
                                     <button class="btn btn-rect btn-sm btn-primary btn-icon btn-icon-left"

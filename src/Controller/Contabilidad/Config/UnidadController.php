@@ -2,11 +2,19 @@
 
 namespace App\Controller\Contabilidad\Config;
 
+use App\CoreContabilidad\AuxFunctions;
+use App\Entity\Contabilidad\Config\Banco;
+use App\Entity\Contabilidad\Config\CuentasUnidad;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Unidad;
+use App\Entity\Contabilidad\Venta\ClienteContabilidad;
+use App\Entity\Contabilidad\Venta\CuentasCliente;
 use App\Form\Contabilidad\Config\UnidadType;
+use App\Form\Contabilidad\Venta\CuentasClienteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -24,6 +32,7 @@ class UnidadController extends AbstractController
     public function index(EntityManagerInterface $em)
     {
         $form = $this->createForm(UnidadType::class);
+        $form_cuentas = $this->createForm(CuentasClienteType::class);
 
         $unidad_arr = $em->getRepository(Unidad::class)->findByActivo(true);
         $row = [];
@@ -37,12 +46,13 @@ class UnidadController extends AbstractController
                 'telefono' => $item->getTelefono(),
                 'direccion' => $item->getDireccion(),
                 'id_padre' => $item->getIdPadre() ? $item->getIdPadre()->getId() : '',
-                'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : ''
+                'padre_nombre' => $item->getIdPadre() ? $item->getIdPadre()->getNombre() : '',
             );
         }
         return $this->render('contabilidad/config/unidad/index.html.twig', [
             'controller_name' => 'UnidadController',
             'unidades' => $row,
+            'form_cuentas' => $form_cuentas->createView(),
             'form' => $form->createView()
         ]);
     }
@@ -168,5 +178,104 @@ class UnidadController extends AbstractController
                 return true;
         }
         return false;
+    }
+
+    /**
+     * @Route("/add-cuentas", name="contabilidad_config_unidad_add_cuentas", methods={"POST"})
+     */
+    public function addCuentas(EntityManagerInterface $em, Request $request, ValidatorInterface $validator)
+    {
+        $lista = $request->get('lista');
+        $unidad = $request->get('id_unidad');
+        $moneda_er = $em->getRepository(Moneda::class);
+        $banco_er = $em->getRepository(Banco::class);
+        $unidad_er = $em->getRepository(Unidad::class);
+        $cuenta_unidad_er = $em->getRepository(CuentasUnidad::class);
+
+        /** @var ClienteContabilidad $cliente */
+        $cuentas_unidad_arr = $cuenta_unidad_er->findBy(array(
+            'id_unidad' => $unidad
+        ));
+        if (empty($cuentas_unidad_arr)) {
+            foreach ($lista as $item) {
+                $new_cuenta_unidad = new CuentasUnidad();
+                $new_cuenta_unidad
+                    ->setNroCuenta($item['nro_cuenta'])
+                    ->setIdMoneda($moneda_er->find($item['moneda']))
+                    ->setIdBanco($banco_er->find(($item['banco'])))
+                    ->setIdUnidad($unidad_er->find($unidad))
+                    ->setActivo(true);
+                $em->persist($new_cuenta_unidad);
+            }
+        } else {
+            foreach ($lista as $item) {
+                $moneda = $moneda_er->find($item['moneda']);
+                $nro = $item['nro_cuenta'];
+                /**@var $obj CuentasUnidad**/
+                $flag = false;
+                foreach ($cuentas_unidad_arr as $obj){
+                    if($obj->getIdMoneda() == $moneda && $obj->getNroCuenta() == $nro)
+                        $flag = true;
+                }
+                if(!$flag){
+                    $new_cuenta_unidad = new CuentasUnidad();
+                    $new_cuenta_unidad
+                        ->setNroCuenta($item['nro_cuenta'])
+                        ->setIdMoneda($moneda_er->find($item['moneda']))
+                        ->setIdUnidad($unidad_er->find($unidad))
+                        ->setActivo(true);
+                    $em->persist($new_cuenta_unidad);
+                }
+            }
+
+            //Elimino las cuentas que el usuario quito
+            foreach ($cuentas_unidad_arr as $obj){
+                $delete_flag = true;
+                foreach ($lista as $item){
+                    $moneda = $moneda_er->find($item['moneda']);
+                    $nro = $item['nro_cuenta'];
+                    if($obj->getIdMoneda() == $moneda && $obj->getNroCuenta() == $nro){
+                        $delete_flag = false;
+                        break;
+                    }
+                }
+                if($delete_flag){
+                    $obj->setActivo(false);
+                    $em->persist($obj);
+                }
+            }
+        }
+        try {
+            $em->flush();
+        } catch (FileException $exception) {
+            return new \Exception('La petición ha retornado un error, contacte a su proveedro de software: ' . $exception->getMessage());
+        }
+        return new JsonResponse(['success' => true, 'msg' => 'Datos actualizados satisfactoriamente.']);
+    }
+
+    /**
+     * @Route("/getCuentasBancarias/{id}", name="contabilidad_config_unidad_getcuentas",methods={"POST"})
+     */
+    public function getCuentasBancarias(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $cuentas_unidad_array_obj = $em->getRepository(CuentasUnidad::class)->findBy(array(
+            'id_unidad' => $id,
+            'activo' => true
+        ));
+        $row = [];
+        if (!empty($cuentas_unidad_array_obj)) {
+            /**@var $obj CuentasUnidad* */
+            foreach ($cuentas_unidad_array_obj as $obj) {
+                $row[] = array(
+                    'nro_cuenta' => $obj->getNroCuenta(),
+                    'moneda' => $obj->getIdMoneda()->getId(),
+                    'nombre_moneda' => $obj->getIdMoneda()->getNombre(),
+                    'banco' => $obj->getIdBanco()->getId(),
+                    'nombre_banco' => $obj->getIdBanco()->getNombre()
+                );
+            }
+        }
+        return new JsonResponse(['cuentas' => $row, 'success' => true, 'msg' => 'Datos cargados']);
     }
 }

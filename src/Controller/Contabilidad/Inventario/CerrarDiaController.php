@@ -5,7 +5,9 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\Cuenta;
+use App\Entity\Contabilidad\Config\PeriodoSistema;
 use App\Entity\Contabilidad\Config\Subcuenta;
+use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Cierre;
 use App\Entity\Contabilidad\Inventario\CuadreDiario;
 use App\Entity\Contabilidad\Inventario\Documento;
@@ -35,6 +37,17 @@ class CerrarDiaController extends AbstractController
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
         $cierre_er = $em->getRepository(Cierre::class);
         $today = AuxFunctions::getDateToClose($em, $id_almacen);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$almacen_obj,
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$almacen_obj,
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
         if ($today != false) {
             /** @var Cierre $obj_cierre_abierto */
             $obj_cierre_abierto = $cierre_er->findOneBy(array(
@@ -50,18 +63,21 @@ class CerrarDiaController extends AbstractController
                     'fecha_minima' => $arr[0] . '-' . $arr[1] . '-' . $arr[2],
                     'fecha_maxima' => Date('Y-m-d'),
                     'error' => true,
+                    'apertura'=>empty($documentos_apertura)?true:false
                 ]);
             } else
                 return $this->render('contabilidad/inventario/cerrar_dia/dia_cerrado.html.twig', [
                     'controller_name' => 'CerrarDiaController',
                     'message' => 'El Almacén ya se encuentra cerrado.',
-                    'ocultar' => false
+                    'ocultar' => false,
+                    'apertura'=>empty($documentos_apertura)?true:false
                 ]);
         } else
             return $this->render('contabilidad/inventario/cerrar_dia/dia_cerrado.html.twig', [
                 'controller_name' => 'CerrarDiaController',
                 'message' => 'No puede cerrar el almacén con una fecha mayor a la actual.',
-                'ocultar' => true
+                'ocultar' => true,
+                'apertura'=>empty($documentos_apertura)?true:false
             ]);
     }
 
@@ -72,9 +88,11 @@ class CerrarDiaController extends AbstractController
     {
         $id_almacen = $request->getSession()->get('selected_almacen/id');
         $almacen_obj = $em->getRepository(Almacen::class)->find($id_almacen);
-        $year_ = Date('Y');
-        $month = Date('m');
         $user = $this->getUser();
+        $obj_unidad = AuxFunctions::getUnidad($em,$user);
+        $current_date = AuxFunctions::getDateToCloseDate($em,$id_almacen);
+        $year_ = $current_date?$current_date->format('Y'):Date('Y');
+        $month = $current_date?$current_date->format('m'):Date('m');
 
         $movimiento_mercancias_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
@@ -82,14 +100,12 @@ class CerrarDiaController extends AbstractController
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
 
-
         $obj_cierre_abierto = $cierre_er->findOneBy(array(
             'id_almacen' => $almacen_obj,
             'abierto' => true,
         ));
 
         $fecha_inicio = AuxFunctions::getDateToClose($em, $id_almacen);
-//        $fecha_seleccionada = $request->get('fecha_cierre');
 
         /**@var Cierre $obj_cierre_abierto */
         $today = $obj_cierre_abierto ? $obj_cierre_abierto->getFecha()->format('Y-m-d') : $fecha_inicio;
@@ -103,8 +119,6 @@ class CerrarDiaController extends AbstractController
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
-
-
         $debitos = 0;
         $creditos = 0;
         /** @var MovimientoMercancia $obj_mercancia */
@@ -120,6 +134,7 @@ class CerrarDiaController extends AbstractController
             'activo' => true,
             'id_almacen' => $almacen_obj
         ));
+//        dd($movimientos_productos_arr,$today);
         /** @var MovimientoProducto $obj_producto */
         foreach ($movimientos_productos_arr as $obj_producto) {
             if ($obj_producto->getEntrada())
@@ -183,13 +198,14 @@ class CerrarDiaController extends AbstractController
                     ->setDebito($debitos);
                 $em->persist($obj_cierre_abierto);
             }
-            // habro el proximo dia
+            // abro el proximo dia
             $new_cierre = new Cierre();
             $nuevo_saldo = $saldo_apertura + $debitos - $creditos;
+            $next_day_fecha = \DateTime::createFromFormat('Y-m-d', date('Y-m-d', $next_day));
             $new_cierre
                 ->setAnno($year_)
                 ->setIdAlmacen($almacen_obj)
-                ->setFecha(\DateTime::createFromFormat('Y-m-d', date('Y-m-d', $next_day)))
+                ->setFecha($next_day_fecha)
                 ->setMes($month)
                 ->setAbierto(true)
                 ->setSaldo($nuevo_saldo)
@@ -198,6 +214,30 @@ class CerrarDiaController extends AbstractController
                 ->setIdUsuario($user)
                 ->setDebito(0);
             $em->persist($new_cierre);
+
+            // validar si es el ultimo dia del mes cerrar el perido
+            $periodo = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'id_almacen' => $id_almacen, 'cerrado' => false
+            ]);
+
+            if ($periodo->getMes() != $next_day_fecha->format('m')) {
+                $periodo->setCerrado(true);
+                // nuevo periodo
+                $new_periodo = new PeriodoSistema();
+                $new_periodo->setFecha(\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
+                $new_periodo->setIdAlmacen($almacen_obj);
+                $new_periodo->setCerrado(false);
+                $new_periodo->setIdUnidad($periodo->getIdUnidad());
+                $new_periodo->setIdUsuario($this->getUser());
+                $new_periodo->setTipo(AuxFunctions::TIPO_PERIODO_INVENTARIO);
+
+                $new_periodo->setMes($next_day_fecha->format('m'));
+                $new_periodo->setAnno($next_day_fecha->format('Y'));
+
+                $em->persist($periodo);
+                $em->persist($new_periodo);
+            }
+
         } else {
             //hubo diferencia
             return $this->render('contabilidad/inventario/cerrar_dia/index.html.twig', [
@@ -216,17 +256,29 @@ class CerrarDiaController extends AbstractController
         ));
         $flag = $this->getDataCuadreDiario($em, $request, $obj_cierre_to_cuadre);
         if ($flag) {
+            $periodo = $em->getRepository(PeriodoSistema::class)->findOneBy([
+                'id_almacen' => $id_almacen, 'cerrado' => false
+            ]);
+            $mes = $periodo->getMes() > 9 ? $periodo->getMes() : "0" . $periodo->getMes();
+
             $session = $request->getSession();
             $fecha_sistema = AuxFunctions::getDateToClose($em, $id_almacen);
+//            dd($fecha_sistema);
             $arr_part_fecha = explode('-', $fecha_sistema);
             $fecha = $arr_part_fecha[2] . '/' . $arr_part_fecha[1] . '/' . $arr_part_fecha[0];
+
+            $real_today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+            if ($real_today->format('Y') == $next_day_fecha->format('Y') &&
+                $real_today->format('m') == $next_day_fecha->format('m'))
+                $session->set('max_date', $real_today->format('Y-m-d'));
+            else
+                $session->set('max_date', $periodo->getAnno() . '-' . $mes . '-' . AuxFunctions::getUltimoDiaMes($periodo->getMes()));
             $session->set('date_system', $fecha);
             $session->set('min_date', $fecha_sistema);
-            $session->set('max_date', Date('Y-m-d'));
+
             return $this->PrintCuadreDiario($em, $request, $obj_cierre_to_cuadre);
         } else {
             $this->addFlash('error', 'No se puede realizar el cierre por problemas en las operaciones, contacte a su proveedor de sotware');
-//            $this->addFlash('error', 'Ocurrió un error inesperado, consulte a su administrador de software');
             return $this->redirectToRoute('inventario');
         }
     }
@@ -514,31 +566,180 @@ class CerrarDiaController extends AbstractController
      */
     public function getDataCuadreDiario(EntityManagerInterface $em, Request $request, $objCierre)
     {
-        if($this->getDataCuadreDiarioMercancia($em, $request, $objCierre) && $this->getDataCuadreDiarioProducto($em, $request, $objCierre))
+        if ($this->getDataCuadreDiarioMercancia($em, $request, $objCierre) && $this->getDataCuadreDiarioProducto($em, $request, $objCierre))
             return true;
         return false;
     }
 
+    /**
+     * @Route("/cierre-periodo", name="contabilidad_inventario_cerrar_periodo")
+     */
+    public function cierrePeriodo(EntityManagerInterface $em, Request $request)
+    {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
 
-    public function isEqual(EntityManagerInterface $em, Request $request,Cuenta $obj_cuenta,Subcuenta $obj_subcuenta,$movimientos_mercancias_arr)
+        $periodo = $em->getRepository(PeriodoSistema::class)->findOneBy([
+            'id_unidad' => AuxFunctions::getUnidad($em, $this->getUser()),
+            'tipo' => AuxFunctions::TIPO_PERIODO_INVENTARIO,
+            'id_almacen' => $id_almacen,
+            'cerrado' => false
+        ]);
+
+        if (!$periodo) {
+
+            $unidad = AuxFunctions::getUnidad($em, $this->getUser());
+            $anno = AuxFunctions::getDateToCloseDate($em, $id_almacen)->format('Y');
+            $mes = AuxFunctions::getDateToCloseDate($em, $id_almacen)->format('m');
+
+            $periodo = new PeriodoSistema();
+            $periodo->setFecha(\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
+            $periodo->setAnno($anno);
+            $periodo->setIdAlmacen($em->getRepository(Almacen::class)->find($id_almacen));
+            $periodo->setCerrado(0);
+            $periodo->setIdUnidad($unidad);
+            $periodo->setIdUsuario($this->getUser());
+            $periodo->setMes($mes);
+            $periodo->setTipo(AuxFunctions::TIPO_PERIODO_INVENTARIO);
+
+            $em->persist($periodo);
+            $em->flush();
+        }
+
+        $mes = $periodo->getMes();
+
+        return $this->render('contabilidad/inventario/cerrar_dia/cierre_periodo.html.twig', [
+            'periodo' => $periodo->getId(),
+            'mes' => $mes,
+            'text' => AuxFunctions::getNombreMes($mes) . ' de ' . $periodo->getAnno(),
+        ]);
+    }
+
+    /**
+     * @Route("/on-close-periodo/{id}", name="contabilidad_inventario_on_cerrar_periodo")
+     */
+    public function onClosePeriodo(EntityManagerInterface $em, PeriodoSistema $periodoSistema, Request $request)
+    {
+        $moviemnto_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $moviemnto_producto_er = $em->getRepository(MovimientoProducto::class);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $obj_alamcen = $em->getRepository(Almacen::class)->find($id_almacen);
+        $real_today = \DateTime::createFromFormat('Y-m-d', Date('Y-m-d'));
+        $obj_cierre_abierto = $em->getRepository(Cierre::class)->findOneBy(array(
+            'id_almacen' => $id_almacen,
+            'abierto' => true,
+        ));
+
+        //1. validar que no existan movimientos abiertos en algún día del mes a cerrar
+        $mes_cerrar = $periodoSistema->getMes();
+        $movimientos_mer = $moviemnto_mercancia_er->findBy(['id_almacen' => $id_almacen]);
+        $movimientos_prod = $moviemnto_producto_er->findBy(['id_almacen' => $id_almacen]);
+        $is_movimiento = false;
+
+        foreach ($movimientos_mer as $movimiento) {
+//            if ($movimiento->getFecha()->format('m') == $mes_cerrar) {
+            if ($movimiento->getFecha() == $obj_cierre_abierto->getFecha()) {
+                $is_movimiento = true;
+                break;
+            }
+        }
+
+        foreach ($movimientos_prod as $movimiento) {
+            if ($movimiento->getFecha() == $obj_cierre_abierto->getFecha()) {
+                $is_movimiento = true;
+                break;
+            }
+        }
+        // 1.1 no cerrar un mes por delante de la fecha actual
+        if ($real_today->format('Y') <= $periodoSistema->getAnno() &&
+            $real_today->format('m') < $periodoSistema->getMes()) {
+            $this->addFlash('error', 'No se pudo realizar el cierre del periodo mensual de un mes adelantado');
+            return $this->redirectToRoute('inventario');
+        }
+
+        if (!$is_movimiento) {
+            // 2. cerrar el día del mes q esta abierto y abrir el 1er dia del mes siguiente
+
+            $anno = $periodoSistema->getAnno();
+            if ($mes_cerrar == 12) {
+                $mes_cerrar = 1;
+                $anno++;
+            } else $mes_cerrar++;
+
+            $obj_cierre_abierto->setAbierto(false);
+
+            $cierre_next_mes = new Cierre();
+            $cierre_next_mes
+                ->setFecha(\DateTime::createFromFormat('Y-m-d', "$anno-$mes_cerrar-1"))
+                ->setAnno($anno)
+                ->setMes($mes_cerrar)
+                ->setIdAlmacen($obj_alamcen)
+                ->setAbierto(true)
+                ->setCredito(0)
+                ->setDebito(0)
+                ->setDiario(1)
+                ->setIdUsuario($this->getUser())
+                ->setSaldo($obj_cierre_abierto->getSaldo());
+
+            $em->persist($cierre_next_mes);
+
+            //3. cerrar el periodo
+            $periodoSistema->setCerrado(true);
+
+            // nuevo periodo
+            $periodo = new PeriodoSistema();
+            $periodo->setFecha(\DateTime::createFromFormat('Y-m-d', Date('Y-m-d')));
+            $periodo->setIdAlmacen($obj_alamcen);
+            $periodo->setCerrado(false);
+            $periodo->setIdUnidad($periodoSistema->getIdUnidad());
+            $periodo->setIdUsuario($this->getUser());
+            $periodo->setTipo(AuxFunctions::TIPO_PERIODO_INVENTARIO);
+
+            $periodo->setMes($mes_cerrar);
+            $periodo->setAnno($anno);
+
+            $em->persist($periodo);
+            $em->flush();
+
+            $session = $request->getSession();
+            $session->set('date_system', $cierre_next_mes->getFecha()->format('d/m/Y'));
+            $session->set('min_date', $cierre_next_mes->getFecha()->format('Y-m-d'));
+
+            $mes = $cierre_next_mes->getMes() > 9 ? $cierre_next_mes->getMes() : "0" . $cierre_next_mes->getMes();
+            if ($real_today->format('Y') == $cierre_next_mes->getFecha()->format('Y') &&
+                $real_today->format('m') == $cierre_next_mes->getFecha()->format('m'))
+                $session->set('max_date', $real_today->format('Y-m-d'));
+            else
+                $session->set('max_date', $cierre_next_mes->getAnno() . '-' . $mes . '-' . AuxFunctions::getUltimoDiaMes($mes));
+
+
+        } else {
+            $this->addFlash('error', 'No se pudo realizar el cierre del periodo mensual, existen operanciones pendientes: realice el cierre diario');
+            return $this->redirectToRoute('inventario');
+        }
+//        dd('close almacen' . $is_movimiento);
+        $this->addFlash('success', "Periodo mensual cerrado, se abrio el periodo correspondiente al mes $mes_cerrar de $anno");
+        return $this->redirectToRoute('inventario');
+    }
+
+    public function isEqual(EntityManagerInterface $em, Request $request, Cuenta $obj_cuenta, Subcuenta $obj_subcuenta, $movimientos_mercancias_arr)
     {
         //EXISTENCIA EN ALMACEN
         $arr_mercancia = $em->getRepository(Mercancia::class)->findBy(array(
-            'cuenta'=>$obj_cuenta->getNroCuenta(),
-            'nro_subcuenta_inventario'=>$obj_subcuenta->getNroSubcuenta()
+            'cuenta' => $obj_cuenta->getNroCuenta(),
+            'nro_subcuenta_inventario' => $obj_subcuenta->getNroSubcuenta()
         ));
         $importe_mercancias = 0;
         /** @var Mercancia $d */
-        foreach ($arr_mercancia as $d){
+        foreach ($arr_mercancia as $d) {
             $importe_mercancias += $d->getImporte();
         }
 
         $arr_producto = $em->getRepository(Producto::class)->findBy(array(
-            'cuenta'=>$obj_cuenta->getNroCuenta(),
-            'nro_subcuenta_inventario'=>$obj_subcuenta->getNroSubcuenta(),
+            'cuenta' => $obj_cuenta->getNroCuenta(),
+            'nro_subcuenta_inventario' => $obj_subcuenta->getNroSubcuenta(),
         ));
         /** @var Producto $d */
-        foreach ($arr_producto as $d){
+        foreach ($arr_producto as $d) {
             $importe_mercancias += $d->getImporte();
         }
 
@@ -567,10 +768,10 @@ class CerrarDiaController extends AbstractController
                 'analisis' => $cuadre->getStrAnalisis(),
                 'descripcion' => $cuadre->getIdCuenta()->getNombre(),
                 'desglose' => array(
-                    'entrada' => number_format($cuadre->getDebito(),2),
-                    'salida' => number_format($cuadre->getCredito(),2),
-                    'saldo_final' => number_format(($cuadre->getSaldo() + $cuadre->getDebito() - $cuadre->getCredito()),2),
-                    'saldo_inicial' => number_format($cuadre->getSaldo(),2)
+                    'entrada' => number_format($cuadre->getDebito(), 2),
+                    'salida' => number_format($cuadre->getCredito(), 2),
+                    'saldo_final' => number_format(($cuadre->getSaldo() + $cuadre->getDebito() - $cuadre->getCredito()), 2),
+                    'saldo_inicial' => number_format($cuadre->getSaldo(), 2)
                 )
             );
             $total_entrada += $cuadre->getDebito();
@@ -582,8 +783,8 @@ class CerrarDiaController extends AbstractController
             'almacen' => $objCierre->getIdAlmacen()->getCodigo() . ' : ' . $objCierre->getIdAlmacen()->getDescripcion(),
             'unidad' => $objCierre->getIdAlmacen()->getIdUnidad()->getCodigo() . ': ' . $objCierre->getIdAlmacen()->getIdUnidad()->getNombre(),
             'fecha' => $objCierre->getFecha()->format('d/m/Y'),
-            'total_entrada' => number_format($total_entrada,2),
-            'total_salida' => number_format($total_salida,2),
+            'total_entrada' => number_format($total_entrada, 2),
+            'total_salida' => number_format($total_salida, 2),
         ]);
     }
 

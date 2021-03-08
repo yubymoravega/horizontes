@@ -30,6 +30,7 @@ class ActivoFijoCuentasType extends AbstractType
             ->add('id_subcuenta_depreciacion',ChoiceType::class,[
                 'label'=>'Subcuenta de Depresiación'
             ])
+            //cuentas nominales deudoras
             ->add('id_cuenta_gasto',ChoiceType::class,[
                 'label'=>'Cuenta de Gasto'
             ])

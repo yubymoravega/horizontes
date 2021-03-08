@@ -18,6 +18,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
@@ -103,6 +104,14 @@ class CuentasComprobanteOperacionesType extends AbstractType
                 'label' => 'Subcuenta',
                 'choice_label' => 'subcuenta',
             ))
+            ->add('id_factura',TextType::class, [
+                'attr' => ['class' => 'w-100'],
+                'disabled' => true
+            ])
+            ->add('id_informe_recepcion',TextType::class, [
+                'attr' => ['class' => 'w-100'],
+                'disabled' => true
+            ])
             ->add('expediente', EntityType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Expediente',
@@ -173,10 +182,12 @@ class CuentasComprobanteOperacionesType extends AbstractType
             ->add('debito', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Débito',
+                'required'=>false
             ])
             ->add('credito', NumberType::class, [
                 'attr' => ['class' => 'w-100'],
                 'label' => 'Crédito',
+                'required'=>false
             ]);
     }
 

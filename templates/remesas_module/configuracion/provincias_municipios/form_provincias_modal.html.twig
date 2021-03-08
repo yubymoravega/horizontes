@@ -1,0 +1,26 @@
+{% extends 'utils/modal_form_cuentas.html.twig' %}
+{% block modalbody %}
+    {{ form_start(form_provincia,{'attr': {'class': 'text-left','id':'form_modal_target_provincias','method':'POST'}}) }}
+    <div class="row pt-0 mt-0">
+        <div class="col-9 mt-0 form-group input-group input-group-sm d-block">
+            {{ form_label(form_provincia.nombre) }}
+            {{ form_widget(form_provincia.nombre,{'attr': {'class': 'form- control w-100'}}) }}
+        </div>
+        <div class="col-3 mt-4 form-group input-group input-group-sm d-block">
+            <button class="btn btn-secondary btn-sm" type="button" id="btnAplicar">ADICIONAR
+            </button>
+        </div>
+    </div>
+    <input type="text" id="id_pais" hidden>
+    {{ form_end(form_provincia) }}
+    <div>
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th width="200px" class="text-left">Provincias</th>
+            <th width="60px"><i class="fa fa-minus-circle text-danger"></i></th>
+            </thead>
+            <tbody id="rows_provincias">
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -133,9 +133,9 @@
                         <a href="{{ url('inventario') }}"
                            class="btn btn-outline-secondary" id="btn_salir">Salir</a>
                     </div>
-                    <div class="ml-2">
-                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>
-                    </div>
+{#                    <div class="ml-2">#}
+{#                        <button class='my-0 btn btn-secondary' id="btnCancelar" onclick="cancelar()">cancelar</button>#}
+{#                    </div>#}
                     <div class="ml-2">
                         <button class='my-0 btn btn-secondary' id="btnImprimir" onclick="Print_Ajuste()">imprimir
                         </button>
@@ -253,23 +253,23 @@
                     if ($('#select_nros').val() == consecutivo) {
                         $('#btnSubbmitTransferencia').show()
                         $('#btnImprimir').show()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         loadingData()
                     } else if ($('#select_nros').val() > consecutivo) {
                         $('#btnSubbmitTransferencia').hide()
                         $('#btnImprimir').hide()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         $('#transferencia_entrada select').find('option').remove()
                         alertTemplate('El mayor número permitido es ' + consecutivo, 'danger')
                     } else if ($('#select_nros').val() == '') {
                         $('#btnSubbmitTransferencia').hide()
                         $('#btnImprimir').hide()
-                        $('#btnCancelar').hide()
+                        // $('#btnCancelar').hide()
                         alertTemplate('Debe introducir el número del documento a vizualizar.', 'danger')
                     } else {
                         $('#btnImprimir').show()
                         $('#btnSubbmitTransferencia').hide()
-                        $('#btnCancelar').show()
+                        // $('#btnCancelar').show()
                         llenarFormulario($('#select_nros').val())
                     }
                 }

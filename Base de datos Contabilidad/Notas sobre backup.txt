@@ -1,0 +1,2 @@
+Notas:
+ 1-En el backup estan los datos primarios que necesita el sistema, solamnte etsan los datos en la parte de Contabilidad/Configuracion, o sea la contabilidad esta limpia, para poder hacer pruebas utilizando ese mismo backup.

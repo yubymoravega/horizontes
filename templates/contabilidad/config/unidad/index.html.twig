@@ -12,7 +12,7 @@
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
-                Organigrama de la empresa
+                Unidades de la Empresa
             </h4>
             <div>
                 <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
@@ -26,16 +26,17 @@
 
         {# Modal de adicionar#}
         {{ include('contabilidad/config/unidad/form_modal.html.twig',{title:'add'}) }}
+        {{ include('contabilidad/config/unidad/form_cuentas_modal.html.twig', {title: 'Cuentas bancarias'}) }}
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
-            <th width="80">Código</th>
-            <th scope="col-3" >Nombre</th>
-            <th scope="col-3">Subordinada a</th>
-            <th scope="col-1">Teléfono</th>
-            <th scope="col-1">Correo</th>
-            <th scope="col-2">Direccion</th>
-            <th scope="col-1" width="150px">Acciones</th>
+            <th width="150" class="text-left">Código</th>
+            <th scope="col-3" class="text-left">Nombre</th>
+            <th scope="col-3" class="text-left">Subordinada a</th>
+            <th scope="col-1" class="text-left">Teléfono</th>
+            <th scope="col-1" class="text-left">Correo</th>
+            <th scope="col-2" class="text-left">Direccion</th>
+            <th scope="col-1" width="150px" class="text-left">Acciones</th>
             </thead>
             <tbody>
             {% for item in unidades %}
@@ -47,6 +48,13 @@
                     <td style="font-weight:400;" >{{ item.correo }}</td>
                     <td style="font-weight:400;">{{ item.direccion }}</td>
                     <td>
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Asociar Cuentas"
+                                onclick="onCuentas({
+                                        id: '{{ item.id }}'
+                                        })">
+                            <i class="fa fa-bank"></i>
+                        </button>
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({
@@ -83,7 +91,8 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-
+        let list_cuentas_cliente = []
+        let id_unidad = null;
         const TEXT_SELECT = '... seleccione ...';
 
         function mostrarBtn() {
@@ -114,6 +123,13 @@
             // init
             $('select').prepend('<option selected = "false" value = "0" disabled>' + TEXT_SELECT + '</option>');
             $('#modal__btn__actualizar').hide()
+
+            $(document).on('click', '.borrar', function (event) {
+                event.preventDefault();
+                list_cuentas_cliente.find(e => e.nro_cuenta === $(this).attr('id-cuenta-cliente'))
+                list_cuentas_cliente = list_cuentas_cliente.filter(e => e.nro_cuenta !== $(this).attr('id-cuenta-cliente'))
+                $(this).closest('tr').remove()
+            })
 
             // validacion del formulario
             var validateForm = $('#form_modal_target').validate({
@@ -168,6 +184,110 @@
                 validateForm.resetForm()
                 $('#modal__form__label__id').text('Adicionar Unidad')
             })
+        })
+
+        const onCuentas = function (config) {
+            const {id = ''} = config
+            $('#rows_cuentas').find('tr').remove();
+            $('#modal__form__cuentas__id').modal('show')
+            $('#modal__form__cuentas__label__id').text("Cuentas bancarias")
+            $('#id_cliente_contabilidad').val(id)
+            loadingModal.show()
+            $.ajax({
+                url: '/contabilidad/config/unidad/getCuentasBancarias/' + id,
+                method: 'POST',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success == true) {
+                        id_unidad = id;
+                        list_cuentas_cliente = result.cuentas
+                        for (var i = 0; i < list_cuentas_cliente.length; i++) {
+                            $('#rows_cuentas').append(`<tr>
+                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nro_cuenta']} </td>
+                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_moneda']}</td>
+                                    <td style="font-weight:400;"> ${list_cuentas_cliente[i]['nombre_banco']}</td>
+                                    <td><button type="button"
+                            class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${list_cuentas_cliente[i]['nro_cuenta']}">
+                            <i class="fa fa-minus-circle"></i>
+                        </button></td>
+                                   </tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    }
+                    if (result.success == false) {
+                        loadingModal.close()
+                        alertTemplate(result.msg, 'danger')
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        }
+        const form_cuentas = $('#form_modal_target_cuentas')
+        form_cuentas.validate({
+            errorClass: 'invalid-label-orange',
+            errorPlacement: function (error, element) {
+                error.attr('style', 'font-size: .8rem;')
+                error.insertAfter(element);
+            },
+            rules: {
+                'cuentas_cliente[nro_cuenta]': "required",
+                'cuentas_cliente[id_moneda]': "required",
+                'cuentas_cliente[id_banco]': "required"
+            },
+            messages: {
+                'cuentas_cliente[nro_cuenta]': 'Obligatorio!',
+                'cuentas_cliente[id_moneda]': 'Obligatorio!',
+                'cuentas_cliente[id_banco]': 'Obligatorio!'
+            }
+        })
+        $('#btnAplicarCuenta').on('click', function () {
+            if (form_cuentas.valid()) {
+                let nro_cuenta = $('#cuentas_cliente_nro_cuenta').val()
+                let moneda = $('#cuentas_cliente_id_moneda').val()
+                let banco = $('#cuentas_cliente_id_banco').val()
+                let nombre_moneda = $('#cuentas_cliente_id_moneda option:selected').text()
+                let nombre_banco = $('#cuentas_cliente_id_banco option:selected').text()
+                list_cuentas_cliente.push({moneda, nro_cuenta,banco})
+                $('#rows_cuentas').append(`<tr>
+                    <td style="font-weight:400;"> ${nro_cuenta}</td>
+                    <td style="font-weight:400;"> ${nombre_moneda}</td>
+                    <td style="font-weight:400;"> ${nombre_banco}</td>
+                    <td> <button type="button"
+                        class="btn btn-outline-danger btn-sm borrar" title="Eliminar" id-cuenta-cliente="${nro_cuenta}">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                    </td></tr>`
+                );
+                $('#cuentas_cliente_nro_cuenta').val('')
+                // }
+            }
+        })
+        $('#modal__btn__cuenta__aceptar').on('click',function(){
+            if(list_cuentas_cliente.length>0){
+                loadingModal.show()
+                $.ajax({
+                    url: '/contabilidad/config/unidad/add-cuentas',
+                    method: 'POST',
+                    data: {'id_unidad':id_unidad,'lista':list_cuentas_cliente},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success == true) {
+                            loadingModal.close()
+                        }
+                        if (result.success == false) {
+                            loadingModal.close()
+                            alertTemplate(result.msg, 'danger')
+                        }
+                    },
+                    error: function (result) {
+                    }
+                })
+            }
+            else{
+                alertTemplate('Debe introducir al menos una cuenta bancaria','danger')
+            }
         })
 
     </script>

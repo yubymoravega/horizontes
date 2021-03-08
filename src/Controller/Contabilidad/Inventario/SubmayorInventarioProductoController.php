@@ -5,6 +5,8 @@ namespace App\Controller\Contabilidad\Inventario;
 use App\Entity\Contabilidad\Config\Almacen;
 use App\Entity\Contabilidad\Config\TipoDocumento;
 use App\Entity\Contabilidad\Inventario\Ajuste;
+use App\Entity\Contabilidad\Inventario\Apertura;
+use App\Entity\Contabilidad\Inventario\Devolucion;
 use App\Entity\Contabilidad\Inventario\Documento;
 use App\Entity\Contabilidad\Inventario\InformeRecepcion;
 use App\Entity\Contabilidad\Inventario\Mercancia;
@@ -33,8 +35,21 @@ class SubmayorInventarioProductoController extends AbstractController
      */
     public function index(EntityManagerInterface $em, Request $request)
     {
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+            'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+            'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(12)
+        ]);
+
+        if(empty($documentos_apertura)){
+            $documentos_apertura = $em->getRepository(Documento::class)->findBy([
+                'id_almacen'=>$em->getRepository(Almacen::class)->find($id_almacen),
+                'id_tipo_documento'=>$em->getRepository(TipoDocumento::class)->find(13)
+            ]);
+        }
         return $this->render('contabilidad/inventario/submayor_inventario_producto/index.html.twig', [
             'controller_name' => 'SubmayorInventarioProductoController',
+            'apertura'=>empty($documentos_apertura)?true:false
         ]);
     }
 
@@ -46,7 +61,7 @@ class SubmayorInventarioProductoController extends AbstractController
         $descripcion = '';
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
-        $id_almacen = $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
         $msg = 'Producto encontrado con éxito';
         $obj_mercancia = $mercancia_er->findOneBy(array(
             'codigo' => $codigo,
@@ -93,7 +108,7 @@ class SubmayorInventarioProductoController extends AbstractController
         $result_producto = $query_producto->getResult();
         $values = array_merge($result_producto, $result_mercancia);
         $rows = [];
-        foreach ($values as $key=>$d) {
+        foreach ($values as $key => $d) {
             $rows[$key] = $d->getCodigo() . ' - ' . $d->getDescripcion();
         }
         return new JsonResponse(['success' => true, 'data' => array_unique($rows)]);
@@ -102,16 +117,19 @@ class SubmayorInventarioProductoController extends AbstractController
     /**
      * @Route("/print/{cod}", name="contabilidad_inventario_submayor_print",methods={"GET"})
      */
+
     public function print(EntityManagerInterface $em, $cod, Request $request)
     {
         $mercancia_er = $em->getRepository(Mercancia::class);
         $producto_er = $em->getRepository(Producto::class);
         $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
         $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
+        $almacen_er = $em->getRepository(Almacen::class);
         $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $obj_almacen = $almacen_er->find($id_almacen);
         $rows = [];
-        $codigo_unidad = $em->getRepository(Almacen::class)->find($id_almacen)->getIdUnidad()->getCodigo();
-        $nombre_unidad = $em->getRepository(Almacen::class)->find($id_almacen)->getIdUnidad()->getNombre();
+        $codigo_unidad = $obj_almacen->getIdUnidad()->getCodigo();
+        $nombre_unidad = $obj_almacen->getIdUnidad()->getNombre();
         $nombre_almacen = $request->getSession()->get('selected_almacen/name');
 
         $obj_mercancia_arr = $mercancia_er->findBy(array(
@@ -133,50 +151,295 @@ class SubmayorInventarioProductoController extends AbstractController
 
                 $arr_movimientos_producto = $movimiento_producto_er->findBy(array(
                     'id_producto' => $obj_producto,
-                    'activo' => true
-//                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
                 ));
-                foreach ($arr_movimientos_producto as $obj_mivimiento) {
-                    /**@var $obj_mivimiento MovimientoProducto* */
-                    $rows [] = array(
-                        'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
-                        'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
-                        'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
-                        'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(),2) : '',
-                        'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
-                        'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(),2),
-                        'cant_existencia' => $obj_mivimiento->getExistencia(),
-                        'importe_existencia' => number_format(round(($obj_mivimiento->getExistencia() * ($obj_mivimiento->getImporte() / $obj_mivimiento->getCantidad())), 2),2)
-                    );
+                $existencia_anterior = 0;
+                $saldo_anterior = 0;
+                /**@var $obj_mivimiento MovimientoProducto* */
+                foreach ($arr_movimientos_producto as $key => $obj_mivimiento) {
+                    $obj_documento = $obj_mivimiento->getIdDocumento();
+                    if (!$obj_documento->getIdDocumentoCancelado()) {
+                        $saldo_anterior = $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                        $existencia_anterior = $obj_mivimiento->getEntrada() ? $existencia_anterior + $obj_mivimiento->getCantidad() : $existencia_anterior - $obj_mivimiento->getCantidad();
+                    } else {
+                        $saldo_anterior = !$obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                        $existencia_anterior = !$obj_mivimiento->getEntrada() ? $existencia_anterior + $obj_mivimiento->getCantidad() : $existencia_anterior - $obj_mivimiento->getCantidad();
+                    }
+
+                    if (!$obj_documento->getIdDocumentoCancelado()) {
+                        $rows [] = array(
+                            'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                            'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                            'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                            'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                            'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                            'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                            'cant_existencia' => $existencia_anterior,
+                            'importe_existencia' => number_format($saldo_anterior, 2)
+                        );
+                    } else {
+                        $rows [] = array(
+                            'fecha' => $obj_documento->getFecha()->format('d/m/Y'),
+                            'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                            'cant_entrada' => !$obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                            'importe_entrada' => !$obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                            'cant_salida' => !$obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                            'importe_salida' => !$obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                            'cant_existencia' => $existencia_anterior,
+                            'importe_existencia' => number_format($saldo_anterior, 2)
+                        );
+                    }
+
+                }
+            }
+        }
+        else {
+            $descripcion_producto = $obj_mercancia_arr[0]->getDescripcion();
+            $um_producto = $obj_mercancia_arr[0]->getIdUnidadMedida()->getAbreviatura();
+            foreach ($obj_mercancia_arr as $obj_mercancia) {
+                /**@var $obj_mercancia Mercancia* */
+                $arr_movimientos_mercancia = $movimiento_mercancia_er->findBy(array(
+                    'id_mercancia' => $obj_mercancia
+                ));
+                $existencia_anterior = 0;
+                $saldo_anterior = 0;
+                /**@var $obj_mivimiento MovimientoMercancia* */
+                foreach ($arr_movimientos_mercancia as $key => $obj_mivimiento) {
+                    /** @var Documento $obj_documento */
+                    $obj_documento = $obj_mivimiento->getIdDocumento();
+                    if (!$obj_documento->getIdDocumentoCancelado()) {
+                        $saldo_anterior = $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                        $existencia_anterior = $obj_mivimiento->getEntrada() ? $existencia_anterior + $obj_mivimiento->getCantidad() : $existencia_anterior - $obj_mivimiento->getCantidad();
+                    } else {
+                        $saldo_anterior = !$obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                        $existencia_anterior = !$obj_mivimiento->getEntrada() ? $existencia_anterior + $obj_mivimiento->getCantidad() : $existencia_anterior - $obj_mivimiento->getCantidad();
+                    }
+
+                    if (!$obj_documento->getIdDocumentoCancelado()) {
+                        $rows [] = array(
+                            'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                            'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                            'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                            'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                            'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                            'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                            'cant_existencia' => $existencia_anterior,
+                            'importe_existencia' => number_format($saldo_anterior, 2)
+                        );
+                    } else {
+                        $rows [] = array(
+                            'fecha' => $obj_documento->getFecha()->format('d/m/Y'),
+                            'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                            'cant_entrada' => !$obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                            'importe_entrada' => !$obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                            'cant_salida' => !$obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                            'importe_salida' => !$obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                            'cant_existencia' => $existencia_anterior,
+                            'importe_existencia' => number_format($saldo_anterior, 2)
+                        );
+                    }
+                }
+            }
+        }
+        return $this->render('contabilidad/inventario/submayor_inventario_producto/print.html.twig', [
+            'datos' => array(
+                'codigo_producto' => $cod,
+                'descripcion_producto' => $descripcion_producto,
+                'um_producto' => strtoupper($um_producto),
+                'codigo_unidad' => $codigo_unidad,
+                'nombre_unidad' => $nombre_unidad,
+                'nombre_almacen' => $nombre_almacen,
+                'cant_movimientos' => count($rows)
+            ),
+            'movimientos' => $rows,
+        ]);
+    }
+
+    public function printOriginal1(EntityManagerInterface $em, $cod, Request $request)
+    {
+        $mercancia_er = $em->getRepository(Mercancia::class);
+        $producto_er = $em->getRepository(Producto::class);
+        $movimiento_mercancia_er = $em->getRepository(MovimientoMercancia::class);
+        $movimiento_producto_er = $em->getRepository(MovimientoProducto::class);
+        $almacen_er = $em->getRepository(Almacen::class);
+        $id_almacen = $request->getSession()->get('selected_almacen/id');
+        $obj_almacen = $almacen_er->find($id_almacen);
+        $rows = [];
+        $codigo_unidad = $obj_almacen->getIdUnidad()->getCodigo();
+        $nombre_unidad = $obj_almacen->getIdUnidad()->getNombre();
+        $nombre_almacen = $request->getSession()->get('selected_almacen/name');
+
+        $obj_mercancia_arr = $mercancia_er->findBy(array(
+            'codigo' => $cod,
+            'id_amlacen' => $id_almacen
+        ));
+        if (empty($obj_mercancia_arr)) {
+            $obj_producto = $producto_er->findOneBy(array(
+                'codigo' => $cod,
+                'id_amlacen' => $id_almacen
+            ));
+            if (!$obj_producto)
+                $msg = "No se encontró ningun producto con el código introducido";
+            else {
+                //imprimo el producto
+                /**@var $obj_producto Producto* */
+                $descripcion_producto = $obj_producto->getDescripcion();
+                $um_producto = $obj_producto->getIdUnidadMedida()->getAbreviatura();
+
+                $arr_movimientos_producto = $movimiento_producto_er->findBy(array(
+                    'id_producto' => $obj_producto,
+                ));
+                $existencia_anterior = 0;
+                $saldo_anterior = 0;
+                foreach ($arr_movimientos_producto as $key => $obj_mivimiento) {
+                    /**@var $obj_mivimiento MovimientoMercancia* */
+                    if ($obj_mivimiento->getActivo()) {
+                        if ($key == 0) {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                                'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                                'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                                'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => $obj_mivimiento->getCantidad(),
+                                'importe_existencia' => $obj_mivimiento->getEntrada() ? number_format(($saldo_anterior + $obj_mivimiento->getImporte()), 2) : number_format(($saldo_anterior - $obj_mivimiento->getImporte()), 2)
+                            );
+                        } else {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                                'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                                'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                                'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => $obj_mivimiento->getEntrada() ? ($existencia_anterior + $obj_mivimiento->getCantidad()) : ($existencia_anterior - $obj_mivimiento->getCantidad()),
+                                'importe_existencia' => $obj_mivimiento->getEntrada() ? number_format(($saldo_anterior + $obj_mivimiento->getImporte()), 2) : number_format(($saldo_anterior - $obj_mivimiento->getImporte()), 2)
+                            );
+                        }
+                    } else {
+                        if ($key == 0) {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getCantidad(),
+                                'importe_entrada' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_salida' => $obj_mivimiento->getCantidad(),
+                                'importe_salida' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => '0',
+                                'importe_existencia' => '0.00'
+                            );
+                        } else {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getCantidad(),
+                                'importe_entrada' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_salida' => $obj_mivimiento->getCantidad(),
+                                'importe_salida' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => $existencia_anterior,
+                                'importe_existencia' => number_format($saldo_anterior, 2)
+                            );
+                        }
+                    }
+                    if ($key == 0) {
+                        if (!$obj_mivimiento->getActivo()) {
+                            $saldo_anterior = 0;
+                            $existencia_anterior = 0;
+                        } else {
+                            $saldo_anterior = $obj_mivimiento->getImporte();
+                            $existencia_anterior = $obj_mivimiento->getCantidad();
+                        }
+                    } else {
+                        if (!$obj_mivimiento->getActivo()) {
+//                            $saldo_anterior = $arr_movimientos_producto[$key - 1]->getImporte();
+//                            $existencia_anterior = $arr_movimientos_producto[$key - 1]->getCantidad();
+                        } else {
+                            $saldo_anterior = $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                            $existencia_anterior = $obj_mivimiento->getEntrada() ? $existencia_anterior + $obj_mivimiento->getCantidad() : $existencia_anterior - $obj_mivimiento->getCantidad();
+                        }
+                    }
+
                 }
             }
         } else {
-            //imprimo la mercancia
             $descripcion_producto = $obj_mercancia_arr[0]->getDescripcion();
             $um_producto = $obj_mercancia_arr[0]->getIdUnidadMedida()->getAbreviatura();
-            foreach ($obj_mercancia_arr as $obj_mercancia){
+            foreach ($obj_mercancia_arr as $obj_mercancia) {
                 /**@var $obj_mercancia Mercancia* */
-
                 $arr_movimientos_mercancia = $movimiento_mercancia_er->findBy(array(
-                    'id_mercancia' => $obj_mercancia,
-                    'activo' => true
-//                'fecha' => \DateTime::createFromFormat('Y-m-d', '2020-10-07')
+                    'id_mercancia' => $obj_mercancia
                 ));
                 $existencia_anterior = 0;
                 $saldo_anterior = 0;
                 foreach ($arr_movimientos_mercancia as $key => $obj_mivimiento) {
                     /**@var $obj_mivimiento MovimientoMercancia* */
-                    $rows [] = array(
-                        'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
-                        'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
-                        'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
-                        'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
-                        'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
-                        'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
-                        'cant_existencia' => $obj_mivimiento->getExistencia(),
-                        'importe_existencia' => $obj_mivimiento->getEntrada() ? number_format(($saldo_anterior + $obj_mivimiento->getImporte()),2) : number_format(($saldo_anterior - $obj_mivimiento->getImporte()),2)
-                    );
-                    $saldo_anterior = $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                    if ($obj_mivimiento->getActivo()) {
+                        if ($key == 0) {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                                'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                                'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                                'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => $obj_mivimiento->getCantidad(),
+                                'importe_existencia' => $obj_mivimiento->getEntrada() ? number_format(($saldo_anterior + $obj_mivimiento->getImporte()), 2) : number_format(($saldo_anterior - $obj_mivimiento->getImporte()), 2)
+                            );
+                        } else {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getEntrada() ? $obj_mivimiento->getCantidad() : '',
+                                'importe_entrada' => $obj_mivimiento->getEntrada() ? number_format($obj_mivimiento->getImporte(), 2) : '',
+                                'cant_salida' => $obj_mivimiento->getEntrada() ? '' : $obj_mivimiento->getCantidad(),
+                                'importe_salida' => $obj_mivimiento->getEntrada() ? '' : number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => $obj_mivimiento->getEntrada() ? ($existencia_anterior + $obj_mivimiento->getCantidad()) : ($existencia_anterior - $obj_mivimiento->getCantidad()),
+                                'importe_existencia' => $obj_mivimiento->getEntrada() ? number_format(($saldo_anterior + $obj_mivimiento->getImporte()), 2) : number_format(($saldo_anterior - $obj_mivimiento->getImporte()), 2)
+                            );
+                        }
+                    } else {
+                        if ($key == 0) {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getCantidad(),
+                                'importe_entrada' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_salida' => $obj_mivimiento->getCantidad(),
+                                'importe_salida' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => '0',
+                                'importe_existencia' => '0.00'
+                            );
+                        } else {
+                            $rows [] = array(
+                                'fecha' => $obj_mivimiento->getIdDocumento()->getFecha()->format('d/m/Y'),
+                                'nro_documento' => $this->getPrefijo($obj_mivimiento->getIdTipoDocumento()->getId()) . '-' . $this->getNroConsecutivo($em, $obj_mivimiento->getIdDocumento()->getId(), $obj_mivimiento->getIdTipoDocumento()->getId()),
+                                'cant_entrada' => $obj_mivimiento->getCantidad(),
+                                'importe_entrada' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_salida' => $obj_mivimiento->getCantidad(),
+                                'importe_salida' => number_format($obj_mivimiento->getImporte(), 2),
+                                'cant_existencia' => $existencia_anterior,
+                                'importe_existencia' => number_format($saldo_anterior, 2)
+                            );
+                        }
+                    }
+                    if ($key == 0) {
+                        if (!$obj_mivimiento->getActivo()) {
+                            $saldo_anterior = 0;
+                            $existencia_anterior = 0;
+                        } else {
+                            $saldo_anterior = $obj_mivimiento->getImporte();
+                            $existencia_anterior = $obj_mivimiento->getCantidad();
+                        }
+                    } else {
+                        if (!$obj_mivimiento->getActivo()) {
+//                            $saldo_anterior = $arr_movimientos_mercancia[$key - 1]->getImporte();
+//                            $existencia_anterior = $arr_movimientos_mercancia[$key - 1]->getCantidad();
+                        } else {
+                            $saldo_anterior = $obj_mivimiento->getEntrada() ? $saldo_anterior + $obj_mivimiento->getImporte() : $saldo_anterior - $obj_mivimiento->getImporte();
+                            $existencia_anterior = $obj_mivimiento->getEntrada() ? $existencia_anterior + $obj_mivimiento->getCantidad() : $existencia_anterior - $obj_mivimiento->getCantidad();
+                        }
+                    }
+
                 }
             }
         }
@@ -223,10 +486,19 @@ class SubmayorInventarioProductoController extends AbstractController
                 $prefijo = 'VSP';
                 break;
             case 9:
-                $prefijo = 'DEV';
+                $prefijo = 'D';
                 break;
             case 10:
                 $prefijo = 'FACT';
+                break;
+            case 11:
+                $prefijo = 'DV';
+                break;
+            case 12:
+                $prefijo = 'AP';
+                break;
+            case 13:
+                $prefijo = 'APP';
                 break;
         }
         return $prefijo;
@@ -259,6 +531,12 @@ class SubmayorInventarioProductoController extends AbstractController
                 'id_documento' => $id_documento
             ));
             return $vale_salida ? $vale_salida->getNroConsecutivo() : '-';
+        } elseif ($id_tipo_documento == 9) {
+            //devolucion
+            $devolucion = $em->getRepository(Devolucion::class)->findOneBy(array(
+                'id_documento' => $id_documento
+            ));
+            return $devolucion ? $devolucion->getNroConcecutivo() : '-';
         } elseif ($id_tipo_documento == 10) {
             //Factura
             /** @var FacturaDocumento $factura_documento */
@@ -266,6 +544,20 @@ class SubmayorInventarioProductoController extends AbstractController
                 'id_documento' => $id_documento
             ));
             return $factura_documento ? $factura_documento->getIdFactura()->getNroFactura() : '-';
+        }elseif ($id_tipo_documento == 12) {
+            //Factura
+            /** @var Apertura $factura_documento */
+            $factura_documento = $em->getRepository(Apertura::class)->findOneBy(array(
+                'id_documento' => $id_documento
+            ));
+            return $factura_documento ? $factura_documento->getNroConcecutivo() : '-';
+        }elseif ($id_tipo_documento == 13) {
+            //Factura
+            /** @var Apertura $factura_documento */
+            $factura_documento = $em->getRepository(Apertura::class)->findOneBy(array(
+                'id_documento' => $id_documento
+            ));
+            return $factura_documento ? $factura_documento->getNroConcecutivo() : '-';
         }
         return 0;
     }
@@ -300,7 +592,6 @@ class SubmayorInventarioProductoController extends AbstractController
         }
         return 0;
     }
-
 
     public function printOriginal(EntityManagerInterface $em, $cod, Request $request)
     {
