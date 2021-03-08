@@ -390,7 +390,7 @@ class HomeController extends AbstractController
             $data->setIdMoneda($code);
 
             /**--ACTUALIZAR PRODUCTOS DEL CARRITO PARA CONVERTIRLOS POR LA TASA DE CAMBIO CORRESPONDIENTE--**/
-            AuxFunctionsTurismo::updateMonedaCarrito($em,$code,$user->getUsername());
+            AuxFunctionsTurismo::updateMonedaCarrito($em,$code,$user->getUsername(),$user);
 
             $dataBase->flush($data);
 

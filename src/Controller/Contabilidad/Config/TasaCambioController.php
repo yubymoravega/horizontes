@@ -71,7 +71,7 @@ class TasaCambioController extends AbstractController
                     ->setActivo(true)
                     ->setIdMonedaDestino($tasacambio->getIdMonedaOrigen())
                     ->setIdMonedaOrigen($tasacambio->getIdMonedaDestino())
-                    ->setValor(round((1/$tasacambio->getValor()),4));
+                    ->setValor((1/$tasacambio->getValor()));
                 $em->persist($another);
                 $em->flush();
                 $this->addFlash('success', "Centro de Costo adicionado satisfactoriamente");

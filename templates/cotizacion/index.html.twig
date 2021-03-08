@@ -41,7 +41,7 @@
                     <tr>
                         <th>Fecha</th>
                         <th>Cliente</th>
-                        <th class="th-monto">Total</th>
+                        <th class="text-right">Total</th>
                         <th>Empleado</th>
 
                         <th>Acciones</th>
@@ -51,7 +51,8 @@
                         <tr {% if loop.index is odd %}class="color"{% endif %}>
                             <td>{{ data.datetime | date('d-M-y') }} </br> {{ data.datetime | date('h:i a') }}</td>
                             <td>{{ data.nombreCliente }}</td>
-                            <td>{{ data.total }} </td> {% set total = total + data.total %}
+                            <td class="text-right">{{ data.total }} </td>
+                                {% set total = total + data.total %}
                             <td>{{ data.empleado }}</td>
 
                             <td>

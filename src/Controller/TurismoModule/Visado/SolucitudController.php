@@ -6,10 +6,13 @@ use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Carrito;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\Config\Moneda;
 use App\Entity\Contabilidad\Config\Servicios;
+use App\Entity\Contabilidad\Config\TasaCambio;
 use App\Entity\TurismoModule\Utils\ConfigPrecioVentaServicio;
 use App\Entity\TurismoModule\Utils\UserClientTmp;
 use App\Entity\TurismoModule\Visado\ElementosVisa;
+use App\Entity\User;
 use App\Form\TurismoModule\Visado\SolicitudType;
 use ContainerT8tBbGS\getReporteEfectivoRepositoryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +36,7 @@ class SolucitudController extends AbstractController
         $elementos = $em->getRepository(ElementosVisa::class)->findBy(['activo' => true]);
         $costo_bisado = 0;
 
+        $user_obj = $em->getRepository(User::class)->find($this->getUser());
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
 
         $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
@@ -40,9 +44,20 @@ class SolucitudController extends AbstractController
             'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_VISADO
         ]);
 
+        /**---Para actualizar el precio de venta segun la moneda de la seleccion del select---**/
+        $moneda_usd = $em->getRepository(Moneda::class)->findOneBy(['nombre'=>AuxFunctionsTurismo::MONEDA_USD,'activo'=>true]);
+//        $coeficientes = AuxFunctionsTurismo::getTasaCambio($em,$moneda_usd->getId(),intval($user_obj->getIdMoneda()));
+        $tasa_Cambio = $em->getRepository(TasaCambio::class)->findOneBy([
+            'mes'=>Date('m'),
+            'anno'=>Date('Y'),
+            'id_moneda_origen'=>$moneda_usd,
+            'id_moneda_destino'=>intval($user_obj->getIdMoneda())
+        ]);
         $precio_total = 0;
         if ($configuraciones) {
-            $precio_total = $configuraciones->getPrecioVentaTotal();
+            $precio_total = $configuraciones->getPrecioVentaTotal() * ($tasa_Cambio ? (floatval($tasa_Cambio->getValor())) : 1);
+
+//            $precio_total = $configuraciones->getPrecioVentaTotal()*floatval($coeficientes['tasa_cambio_origen'])*floatval($coeficientes['tasa_cambio_destino']);
         }
 
 
@@ -70,6 +85,8 @@ class SolucitudController extends AbstractController
     public function addCarrito(EntityManagerInterface $em, Request $request)
     {
         $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_VISADO;
+        $user_obj = $em->getRepository(User::class)->find($this->getUser());
+
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $moneda = $request->request->get('moneda');
         /** @var UserClientTmp $obj_trabajo_tmp */
@@ -84,9 +101,17 @@ class SolucitudController extends AbstractController
             'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_VISADO
         ]);
 
+        /**---Para actualizar el precio de venta segun la moneda de la seleccion del select---**/
+        $moneda_usd = $em->getRepository(Moneda::class)->findOneBy(['nombre'=>AuxFunctionsTurismo::MONEDA_USD,'activo'=>true]);
+        $tasa_Cambio = $em->getRepository(TasaCambio::class)->findOneBy([
+            'mes'=>Date('m'),
+            'anno'=>Date('Y'),
+            'id_moneda_origen'=>$moneda_usd,
+            'id_moneda_destino'=>intval($user_obj->getIdMoneda())
+        ]);
         $precio_total = 0;
         if ($configuraciones) {
-            $precio_total = $configuraciones->getPrecioVentaTotal();
+            $precio_total = $configuraciones->getPrecioVentaTotal() * ($tasa_Cambio ? (floatval($tasa_Cambio->getValor())) : 1);
         }
 
         $data_new_solicitudes = json_decode($request->request->get('solicitudes'), true);

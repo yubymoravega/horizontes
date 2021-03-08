@@ -32,9 +32,9 @@
             <th scope="col-2" class="text-left">Año</th>
             <th scope="col-1" class="text-left">Mes</th>
             <th scope="col-3" class="text-left">Moneda Origen</th>
-            <th scope="col-3" class="text-left">Moneda Destino</th>
-            <th scope="col-2" class="text-left">Valor</th>
-            <th scope="col-1" width="150px" class="text-left">Acciones</th>
+            <th scope="col-2" class="text-right">Valor</th>
+            <th scope="col-3" class="text-right">Moneda Destino</th>
+            <th scope="col-1" width="150px" class="text-center">Acciones</th>
             </thead>
             <tbody>
             {% for item in tasa_cambio %}
@@ -42,9 +42,9 @@
                     <td style="font-weight:400;">{{ item.anno }}</td>
                     <td style="font-weight:400;">{{ item.nombre_mes }}</td>
                     <td style="font-weight:400;">{{ item.nombre_moneda_origen }}</td>
-                    <td style="font-weight:400;">{{ item.nombre_moneda_destino }}</td>
-                    <td style="font-weight:400;">{{ item.valor }}</td>
-                    <td>
+                    <td style="font-weight:400;" class="text-right">{{ item.valor }}</td>
+                    <td style="font-weight:400;" class="text-right">{{ item.nombre_moneda_destino }}</td>
+                    <td class="text-center">
                         <button type="button" class="btn btn-warning btn-sm px-1" data-toggle="tooltip"
                                 data-placement="bottom" title="Eliminar"
                                 onclick="onUpdate({

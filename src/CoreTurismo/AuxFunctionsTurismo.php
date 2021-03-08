@@ -790,9 +790,8 @@ class AuxFunctionsTurismo
         return ['tasa_cambio_origen' => $tasa_cambio_origen, 'tasa_cambio_destino' => $tasa_cambio_destino];
     }
 
-    public static function updateMonedaCarrito(EntityManagerInterface $em, int $id_moneda_destino, string $empleado)
+    public static function updateMonedaCarrito(EntityManagerInterface $em, int $id_moneda_destino, string $empleado, User $user_obj)
     {
-
         $carrito = $em->getRepository(Carrito::class)->findBy(['empleado' => $empleado]);
         if (!empty($carrito)) {
             $tasa_cambios = self::getTasaCambio($em, intval($carrito[0]->getJson()['id_moneda']), $id_moneda_destino);
@@ -804,6 +803,7 @@ class AuxFunctionsTurismo
                     $new_data = [];
                     $data_solicitudes = $json['data'];
                     foreach ($data_solicitudes as $element) {
+                        $precio_total = 0;
                         switch ($json['id_servicio']) {
                             case self::IDENTIFICADOR_REMESA:
                                 $new_data[] = [
@@ -829,18 +829,51 @@ class AuxFunctionsTurismo
                                     'edificio_' => $element['edificio_'],
                                     'apto_' => $element['apto_'],
                                     'reparto_' => $element['reparto_'],
-                                    'monto_entregar_' => floatval($element['monto_entregar_'])*$tasa_cambio_origen * $tasa_cambio_destino,
+                                    'monto_entregar_' => floatval($element['monto_entregar_']) * $tasa_cambio_origen * $tasa_cambio_destino,
                                     'monto_recibir_' => $element['monto_recibir_'],
                                     'id_moneda_select_' => $id_moneda_destino,
                                     'nombre_moneda_recibir' => $element['nombre_moneda_recibir'],
                                     'id_regla' => $element['id_regla'],
                                     'idCarrito' => $element['idCarrito'],
                                     'nombreMostrar' => $element['nombreMostrar'],
-                                    'montoMostrar' => floatval($element['montoMostrar'])*$tasa_cambio_origen * $tasa_cambio_destino
+                                    'montoMostrar' => floatval($element['montoMostrar']) * $tasa_cambio_origen * $tasa_cambio_destino
                                 ];
+                                $precio_total += (floatval($element['montoMostrar']) * $tasa_cambio_origen * $tasa_cambio_destino);
                                 break;
                             case self::IDENTIFICADOR_VISADO:
-                                $new_data = ['a' => 2];
+                                /**
+                                 * Dado que el precio de venta de la solicitud de visado esta dado en USD(que ademas es la base de mi vonversion)
+                                 * entonces obtengo ese precio y lo convierto directamente a la moneda final(multiplicando una sola vez)
+                                 */
+                                $unidad = AuxFunctions::getUnidad($em, $user_obj);
+
+                                $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
+                                    'id_unidad' => $unidad,
+                                    'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_VISADO
+                                ]);
+
+                                /**---Para actualizar el precio de venta segun la moneda de la seleccion del select---**/
+                                $moneda_usd = $em->getRepository(Moneda::class)->findOneBy(['nombre' => AuxFunctionsTurismo::MONEDA_USD, 'activo' => true]);
+                                $tasa_Cambio = $em->getRepository(TasaCambio::class)->findOneBy([
+                                    'mes' => Date('m'),
+                                    'anno' => Date('Y'),
+                                    'id_moneda_origen' => $moneda_usd,
+                                    'id_moneda_destino' => intval($user_obj->getIdMoneda())
+                                ]);
+                                if ($configuraciones) {
+                                    $precio_total = $configuraciones->getPrecioVentaTotal() * ($tasa_Cambio ? (floatval($tasa_Cambio->getValor())) : 1);
+                                }
+
+                                $new_data [] = [
+                                    'nombre' => $element['nombre'],
+                                    'primer_apellido' => $element['primer_apellido'],
+                                    'segundo_apellido' => $element['segundo_apellido'],
+                                    'telefono_celular' => $element['telefono_celular'],
+                                    'telefono_fijo' => $element['telefono_fijo'],
+                                    'idCarrito' => $element['idCarrito'],
+                                    'nombreMostrar' => $element['nombreMostrar'],
+                                    'montoMostrar' => $precio_total,
+                                ];
                                 break;
                             case self::IDENTIFICADOR_TRANSFER:
                                 $new_data = ['a' => 1];
@@ -852,13 +885,139 @@ class AuxFunctionsTurismo
                         'id_cliente' => $json['id_cliente'],
                         'id_servicio' => $json['id_servicio'],
                         'nombre_servicio' => $json['nombre_servicio'],
-                        'precio_servicio' => floatval($json['precio_servicio']) * $tasa_cambio_origen * $tasa_cambio_destino,
+                        'precio_servicio' => $json['id_servicio'] != self::IDENTIFICADOR_VISADO ? (floatval($json['total']) * $tasa_cambio_origen * $tasa_cambio_destino) : $precio_total,
                         'id_moneda' => $id_moneda_destino,
-                        'total' => floatval($json['total']) * $tasa_cambio_origen * $tasa_cambio_destino,
+                        'total' => $json['id_servicio'] != self::IDENTIFICADOR_VISADO ? ($precio_total) : $precio_total * count($new_data),
                         'data' => $new_data,
                     );
-                    $item->setJson($update_json);
-                    $em->persist($item);
+
+                    $empleado = $item->getEmpleado();
+                    $new_element_carrito = new Carrito();
+                    $new_element_carrito
+                        ->setEmpleado($empleado)
+                        ->setJson($update_json);
+                    $em->remove($item);
+                    $em->persist($new_element_carrito);
+                }
+                $em->flush();
+            }
+        }
+    }
+
+
+    public static function updateMonedaCotizacion(EntityManagerInterface $em, int $id_moneda_destino, int $empleado)
+    {
+        $usuario = $em->getRepository(User::class)->find($empleado);
+        $cotizacion = $em->getRepository(Cotizacion::class)->findBy(['empleado' => $usuario->getUsername(), 'pagado' => false]);
+        if (!empty($cotizacion)) {
+            $tasa_cambios = self::getTasaCambio($em, intval($cotizacion[0]->getIdMoneda()), $id_moneda_destino);
+            if (!empty($tasa_cambios)) {
+                $tasa_cambio_origen = $tasa_cambios['tasa_cambio_origen'];
+                $tasa_cambio_destino = $tasa_cambios['tasa_cambio_destino'];
+                foreach ($cotizacion as $item) {
+                    $jsons_cotizacion = $item->getJson();
+                    $update_json = [];
+                    foreach ($jsons_cotizacion as $json) {
+                        $new_data = [];
+                        $data_solicitudes = $json['data'];
+                        foreach ($data_solicitudes as $element) {
+                            $precio_total = 0;
+                            switch ($json['id_servicio']) {
+                                case self::IDENTIFICADOR_REMESA:
+                                    $new_data[] = [
+                                        'actualizar' => $element['actualizar'],
+                                        'id_banaficiario_' => $element['id_banaficiario_'],
+                                        'nombre_' => $element['nombre_'],
+                                        'id_pais_' => $element['id_pais_'],
+                                        'id_moneda_' => $element['id_moneda_'],
+                                        'id_provincia_' => $element['id_provincia_'],
+                                        'id_municipio_' => $element['id_municipio_'],
+                                        'primer_apellido_' => $element['primer_apellido_'],
+                                        'segundo_apellido_' => $element['segundo_apellido_'],
+                                        'nombre_alternativo_' => $element['nombre_alternativo_'],
+                                        'primer_apellido_alternativo_' => $element['primer_apellido_alternativo_'],
+                                        'segundo_apellido_alternativo_' => $element['segundo_apellido_alternativo_'],
+                                        'primer_telefono_' => $element['primer_telefono_'],
+                                        'segundo_telefono_' => $element['segundo_telefono_'],
+                                        'identificacion_' => $element['identificacion_'],
+                                        'calle_' => $element['calle_'],
+                                        'entre_' => $element['entre_'],
+                                        'y_' => $element['y_'],
+                                        'nro_casa_' => $element['nro_casa_'],
+                                        'edificio_' => $element['edificio_'],
+                                        'apto_' => $element['apto_'],
+                                        'reparto_' => $element['reparto_'],
+                                        'monto_entregar_' => floatval($element['monto_entregar_']) * $tasa_cambio_origen * $tasa_cambio_destino,
+                                        'monto_recibir_' => $element['monto_recibir_'],
+                                        'id_moneda_select_' => $id_moneda_destino,
+                                        'nombre_moneda_recibir' => $element['nombre_moneda_recibir'],
+                                        'id_regla' => $element['id_regla'],
+                                        'idCarrito' => $element['idCarrito'],
+                                        'nombreMostrar' => $element['nombreMostrar'],
+                                        'montoMostrar' => floatval($element['montoMostrar']) * $tasa_cambio_origen * $tasa_cambio_destino
+                                    ];
+                                    $precio_total += (floatval($element['montoMostrar']) * $tasa_cambio_origen * $tasa_cambio_destino);
+                                    break;
+                                case self::IDENTIFICADOR_VISADO:
+                                    /**
+                                     * Dado que el precio de venta de la solicitud de visado esta dado en USD(que ademas es la base de mi vonversion)
+                                     * entonces obtengo ese precio y lo convierto directamente a la moneda final(multiplicando una sola vez)
+                                     */
+                                    $unidad = AuxFunctions::getUnidad($em, $usuario);
+
+                                    $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
+                                        'id_unidad' => $unidad,
+                                        'identificador_servicio' => AuxFunctionsTurismo::IDENTIFICADOR_VISADO
+                                    ]);
+
+                                    /**---Para actualizar el precio de venta segun la moneda de la seleccion del select---**/
+                                    $moneda_usd = $em->getRepository(Moneda::class)->findOneBy(['nombre' => AuxFunctionsTurismo::MONEDA_USD, 'activo' => true]);
+                                    $tasa_Cambio = $em->getRepository(TasaCambio::class)->findOneBy([
+                                        'mes' => Date('m'),
+                                        'anno' => Date('Y'),
+                                        'id_moneda_origen' => $moneda_usd,
+                                        'id_moneda_destino' => intval($id_moneda_destino)
+                                    ]);
+                                    if ($configuraciones) {
+                                        $precio_total = $configuraciones->getPrecioVentaTotal() * ($tasa_Cambio ? (floatval($tasa_Cambio->getValor())) : 1);
+                                    }
+
+                                    $new_data [] = [
+                                        'nombre' => $element['nombre'],
+                                        'primer_apellido' => $element['primer_apellido'],
+                                        'segundo_apellido' => $element['segundo_apellido'],
+                                        'telefono_celular' => $element['telefono_celular'],
+                                        'telefono_fijo' => $element['telefono_fijo'],
+                                        'idCarrito' => $element['idCarrito'],
+                                        'nombreMostrar' => $element['nombreMostrar'],
+                                        'montoMostrar' => $precio_total,
+                                    ];
+                                    break;
+                                case self::IDENTIFICADOR_TRANSFER:
+                                    $new_data = ['a' => 1];
+                                    break;
+                            }
+                        }
+
+                        $update_json[] = array(
+                            'id_empleado' => $json['id_empleado'],
+                            'id_cliente' => $json['id_cliente'],
+                            'id_servicio' => $json['id_servicio'],
+                            'nombre_servicio' => $json['nombre_servicio'],
+                            'precio_servicio' => $json['id_servicio'] != self::IDENTIFICADOR_VISADO ? (floatval($json['total']) * $tasa_cambio_origen * $tasa_cambio_destino) : $precio_total,
+                            'id_moneda' => $id_moneda_destino,
+                            'total' => $json['id_servicio'] != self::IDENTIFICADOR_VISADO ? ($precio_total) : $precio_total * count($new_data),
+                            'data' => $new_data,
+                        );
+                        $total_cotizacion = 0;
+                        foreach ($update_json as $js){
+                            $total_cotizacion += floatval($js['total']);
+                        }
+                        $item
+                            ->setTotal(round($total_cotizacion,2))
+                            ->setJson($update_json);
+                        $em->persist($item);
+                    }
                 }
                 $em->flush();
             }

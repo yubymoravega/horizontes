@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Carrito;
 use App\Entity\Cliente;
 use App\Entity\Cotizacion;
@@ -43,11 +44,13 @@ class CotizacionController extends AbstractController
         /** @var Cliente $obj_cliente */
         $obj_cliente = $em->getRepository(Cliente::class)->find(intval($id_cliente));
 
+        $obj_usuario = $em->getRepository(User::class)->find($this->getUser());
+
         if (!empty($data)) {
             $new_cotizacion = new Cotizacion();
             $new_cotizacion
                 ->setIdCliente($id_cliente)
-                ->setIdMoneda(1)
+                ->setIdMoneda($obj_usuario->getIdMoneda())
                 ->setDatetime(new DateTime('NOW'))
                 ->setEdit(true)
                 ->setEmpleado($nombre_empleado)
@@ -58,6 +61,9 @@ class CotizacionController extends AbstractController
             $em->persist($new_cotizacion);
             $em->flush();
         }
+
+        $obj_usuario = $em->getRepository(User::class)->find($this->getUser());
+        AuxFunctionsTurismo::updateMonedaCotizacion($em,intval($obj_usuario->getIdMoneda()),$obj_usuario->getId());
 
         $query = $this->getQueryCotizaciones($em, $request);
 
@@ -85,7 +91,7 @@ class CotizacionController extends AbstractController
         /** @var Cotizacion $item */
         $item = $cotizacion_er->findOneBy(['id'=>intval($id_cotizacion)]);
 
-        $data_jsons = json_decode($item->getJson());
+        $data_jsons = $item->getJson();
         foreach ($data_jsons as $element) {
             $new_carrito = new Carrito();
             $new_carrito
@@ -202,7 +208,7 @@ class CotizacionController extends AbstractController
         $total = 0;
         foreach ($solicitudes_carrito as $item) {
             $data[] = $item->getJson();
-            $json = json_decode($item->getJson());
+            $json = $item->getJson();
             $id_cliente = $json->id_cliente;
             $total += floatval($json->total);
             $em->remove($item);
@@ -210,12 +216,12 @@ class CotizacionController extends AbstractController
 
         /** @var Cliente $obj_cliente */
         $obj_cliente = $em->getRepository(Cliente::class)->find(intval($id_cliente));
-
+        $obj_usuario = $em->getRepository(User::class)->find($this->getUser());
         if (!empty($data)) {
             $new_cotizacion = new Cotizacion();
             $new_cotizacion
                 ->setIdCliente($id_cliente)
-                ->setIdMoneda(1)
+                ->setIdMoneda($obj_usuario->getIdMoneda())
                 ->setDatetime(new DateTime('NOW'))
                 ->setEdit(true)
                 ->setEmpleado($nombre_empleado)

@@ -226,8 +226,6 @@ class SolicitudController extends AbstractController
         $data = AuxFunctionsTurismo::getDataRemesaRecibir($em, $id_pais, $monto_usd, $unidad);
         $costo_venta=!empty($data)?floatval($data['costo']):0;
         $id_regla = !empty($data)?floatval($data['id_regla']):'';
-
-
         if ($costo_venta == 0)
             return new JsonResponse([
                 'success' => true,
@@ -378,11 +376,6 @@ class SolicitudController extends AbstractController
         ]);
 
         $empleado = $obj_trabajo_tmp->getIdUsuario()->getUsername();
-
-        $configuraciones = $em->getRepository(ConfigPrecioVentaServicio::class)->findOneBy([
-            'id_unidad' => $unidad,
-            'identificador_servicio' => $id_servicio
-        ]);
 
         $data_new_solicitudes = json_decode($request->request->get('solicitudes'), true);
         $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);

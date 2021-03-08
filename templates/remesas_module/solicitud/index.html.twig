@@ -501,6 +501,11 @@
                 $('#beneficiarios_clientes_primer_nombre').val(0)
         }
 
+        $('#beneficiarios_clientes_id_moneda').on('change',function () {
+            $('#beneficiarios_clientes_monto_entregar').val('')
+            $('#beneficiarios_clientes_monto_recibir').val('')
+        })
+
         $('#btnAplicarMercancia').on('click', function () {
             if (form_solicitud.valid()) {
                 id_banaficiario_ = $('#beneficiarios_clientes_nuevo_beneficiario').val() ? null : $('#beneficiarios_clientes_primer_nombre').val()

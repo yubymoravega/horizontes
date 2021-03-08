@@ -15,35 +15,16 @@
             <a href="{{ url ('paymentreport.buscar') }}">
                 <span class="text-middle">► Facturas Stripe</span>
             </a>
-            {#			</a>#}
         </li>
-{#        <li>#}
-{#            #}{#			<a>#}
-{#        #}
-{#                <span class="text-middle">► Facturas</span>#}
-{#                #}{#				</a>#}
-{#            </a>#}
-{#        </li>#}
-{#        <li>#}
-{#            #}{#			<a>#}
-{#            <a href="{{ url ('efectivo/banco/reporte') }}">#}
-{#                <span class="text-middle">► Bancos</span>#}
-{#            </a>#}
-{#            #}{#			</a>#}
-{#        </li>#}
         <li>
-            {#			<a>#}
             <a href="{{ url ('cotizacion') }}">
                 <span class="text-middle">► Cotizaciones</span>
             </a>
-            {#			</a>#}
         </li>
         <li>
-            {#			<a>#}
             <a href="{{ url ('turismo/reporte/solicitud/') }}">
                 <span class="text-middle">► Turismo</span>
             </a>
-            {#			</a>#}
         </li>
     </ul>
 </li>
@@ -54,7 +35,7 @@
         <span> Configuración</span>
     </a>
     <ul class="rd-navbar-dropdown">
-       
+
         <li>
             <a href="{{ url ('turismo/configuracion/') }}">
                 <span class="text-middle">► Turismo</span>
@@ -68,6 +49,10 @@
     </ul>
 
 </li>
+
+<a href="{{ url ('turismo_module_configuracion') }}" class="text-white text-uppercase p-3">
+    <span> Configuración</span>
+</a>
 
 <li id="admin">
     <a href="#">
