@@ -229,14 +229,14 @@ class SolicitudController extends AbstractController
         if ($costo_venta == 0)
             return new JsonResponse([
                 'success' => true,
-                'a_recibir' => round($costo_venta, 2)
+                'a_recibir' => intval($costo_venta)
             ]);
         $precio_venta = floatval($costo_venta);
 
         if ($moneda_pais->getIdMoneda() == $moneda_usd->getId())
             return new JsonResponse([
                 'success' => true,
-                'a_recibir' => round($precio_venta, 2),
+                'a_recibir' => intval($precio_venta),
                 'id_regla'=>$id_regla
             ]);
 
@@ -251,7 +251,7 @@ class SolicitudController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'a_recibir' => round($monto_moneda_select, 2),
+            'a_recibir' => intval($monto_moneda_select),
             'id_regla'=>$id_regla
         ]);
     }

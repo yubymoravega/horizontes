@@ -167,6 +167,10 @@ class CotizacionController extends AbstractController
             return $this->redirectToRoute('cotizacion');
         }
 
+        $obj_usuario = $em->getRepository(User::class)->find($this->getUser());
+        AuxFunctionsTurismo::updateMonedaCotizacion($em,intval($obj_usuario->getIdMoneda()),$obj_usuario->getId());
+
+
         $data = [];
         $total = 0;
 
@@ -209,8 +213,8 @@ class CotizacionController extends AbstractController
         foreach ($solicitudes_carrito as $item) {
             $data[] = $item->getJson();
             $json = $item->getJson();
-            $id_cliente = $json->id_cliente;
-            $total += floatval($json->total);
+            $id_cliente = $json['id_cliente'];
+            $total += floatval($json['total']);
             $em->remove($item);
         }
 
@@ -225,7 +229,7 @@ class CotizacionController extends AbstractController
                 ->setDatetime(new DateTime('NOW'))
                 ->setEdit(true)
                 ->setEmpleado($nombre_empleado)
-                ->setJson(json_encode($data))
+                ->setJson($data)
                 ->setNombreCliente($obj_cliente->getNombre())
                 ->setPagado(false)
                 ->setTotal($total);

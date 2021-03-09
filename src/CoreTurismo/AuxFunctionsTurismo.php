@@ -725,7 +725,7 @@ class AuxFunctionsTurismo
                 $costo_venta = $menor_comision + ($item->getValorFijoVenta() + ($menor_comision * $item->getPorcientoVenta() / 100));
             }
         }
-        return ['costo' => $costo_venta, 'id_regla' => $id_regla->getId()];
+        return ['costo' => intval($costo_venta), 'id_regla' => $id_regla->getId()];
     }
 
     /**
@@ -753,11 +753,12 @@ class AuxFunctionsTurismo
                 $costo_venta = $menor_comision - ($item->getValorFijoVenta() - ($menor_comision * $item->getPorcientoVenta() / 100));
             }
         }
-        return ['costo' => $costo_venta, 'id_regla' => $id_regla->getId()];
+        return ['costo' => intval($costo_venta), 'id_regla' => $id_regla->getId()];
     }
 
     public static function getTasaCambio(EntityManagerInterface $em, int $id_moneda_origen, int $id_moneda_destino)
     {
+//        dd($id_moneda_origen,$id_moneda_destino);
         if ($id_moneda_origen == $id_moneda_destino) {
             return ['tasa_cambio_origen' => 1, 'tasa_cambio_destino' => 1];
         }
@@ -1015,7 +1016,9 @@ class AuxFunctionsTurismo
                         }
                         $item
                             ->setTotal(round($total_cotizacion,2))
-                            ->setJson($update_json);
+                            ->setJson($update_json)
+                            ->setIdMoneda($id_moneda_destino)
+                        ;
                         $em->persist($item);
                     }
                 }
