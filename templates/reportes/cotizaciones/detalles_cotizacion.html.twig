@@ -2,10 +2,8 @@
 {% block content %}
     {% include 'breadcrumbs.html.twig' %}
 
-    <h1 class="text-confirmar" style="text-align: center; ">Checkout</h1>
+    <h1 class="text-confirmar" style="text-align: center; ">Detalles de la cotización</h1>
     <hr class="divider-white bg-mantis-white mb-0">
-
-    {% include 'plazos_pagos_cotizacion.html.twig' %}
 
     <!-- Shop Checkout-->
     <section class="section novi-background section-20 section-sm-20" style="color:white;">
@@ -28,42 +26,32 @@
                                             {% if item.id_servicio == 11 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta">Nombre</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Nombre</td>
                                                     <td class="text-left row-group-subconta">Primer Apellido</td>
                                                     <td class="text-left row-group-subconta">Segundo Apellido</td>
                                                     <td class="text-left row-group-subconta">Teléfono Celular</td>
                                                     <td class="text-left row-group-subconta">Teléfono Fijo</td>
-                                                    <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
                                                 {% for new_item in item.data %}
                                                     <tr>
-                                                        <td class="text-left">{{ new_item.nombre }}</td>
+                                                        <td class="text-left" colspan="2">{{ new_item.nombre }}</td>
                                                         <td class="text-left">{{ new_item.primer_apellido }}</td>
                                                         <td class="text-left">{{ new_item.segundo_apellido }}</td>
                                                         <td class="text-left">{{ new_item.telefono_celular }}</td>
                                                         <td class="text-left">{{ new_item.telefono_fijo }}</td>
-                                                        <td class="text-right">
-                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="bottom" title="Eliminar"
-                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                             {% elseif item.id_servicio == 4 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para las remesas #}
                                                 <tr>
-                                                    <td class="text-left row-group-subconta">Beneficiario</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Beneficiario</td>
                                                     <td class="text-left row-group-subconta">Datos Contactos</td>
                                                     <td class="text-left row-group-subconta" colspan="2">Dirección</td>
                                                     <td class="text-right row-group-subconta">Monto a Recibir</td>
-                                                    <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
                                                 {% for new_item in item.data %}
                                                     <tr>
-                                                        <td class="text-left">{{ new_item.nombre_ }} {{ new_item.primer_apellido_ }} {{ new_item.segundo_apellido_ }}</td>
+                                                        <td class="text-left" colspan="2">{{ new_item.nombre_ }} {{ new_item.primer_apellido_ }} {{ new_item.segundo_apellido_ }}</td>
                                                         <td class="text-left">{{ new_item.primer_telefono_ }} {{ new_item.segundo_telefono_ }}</td>
                                                         <td class="text-left" colspan="2">{{ new_item.calle_ }}
                                                             {% if  new_item.entre_ != '' %}
@@ -88,14 +76,6 @@
                                                         <td class="text-right">
                                                             {{ new_item.monto_recibir_ }} {{ new_item.nombre_moneda_recibir }}
                                                         </td>
-                                                        <td class="text-right">
-                                                            <button type="button" class="btn btn-danger btn-sm ml-1"
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="bottom" title="Eliminar"
-                                                                    onclick='deleteElementCarrito({{ new_item.idCarrito }},{{ item.id_servicio }})'>
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                             {% endif %}
@@ -110,15 +90,19 @@
                                         &nbsp; $0.00 </p>
                                     <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp;
                                         &nbsp; ${{ total }}</p>
-                                    <a onclick="cotizacion()"
+                                    {% if editable %}
+                                    <a onclick="montarCarrito({{ id_cotizacion }})"
                                        class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
                                        data-index-to="1" href="#">
-                                        <span class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></span>Cotizacion</a>
-
-                                    <a onclick="cobrar()"
+                                        <span class="fa fa-shopping-cart fa-2x"></span>
+                                    </a>
+                                    {% endif %}
+                                    <a onclick="cobrar({{ id_cotizacion }})"
                                        class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
                                        data-index-to="1" href="#">
-                                        <span class="novi-icon icon mdi mdi-chevron-double-right"></span>Cobrar</a>
+                                        <i class="fa fa-cc-mastercard fa-2x"></i> <i
+                                                class="fa fa-dollar fa-2x"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -128,21 +112,27 @@
         </div>
     </section>
 
+    <style>
+
+        .table td, .table th {
+            padding: .75rem !important;
+        }
+    </style>
 
     <div class="modal fade" id="confirm__modal_cotizacion" data-backdrop="static" data-keyboard="false"
          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-dark">
-                    <h5 class="modal-title text-light" id="confirm__modal__title"><i
-                                class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></i>
+                    <h5 class="modal-title text-light" id="confirm__modal__title">
+                        <i class="novi-icon icon icon-xxs mdi mdi-alert text-warning"></i>
                         Cotizacion</h5>
                     <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" id="confirm__modal__body">
-                    Seguro que decea hacer una cotizacion?
+                    Seguro que desea enviar la cotización de nuevo al carrito?
                 </div>
                 <form id="form__confirm__modal" method="post">
                     <input type="hidden" name="_method" value="DELETE">
@@ -158,43 +148,6 @@
         </div>
     </div>
 
-    <div class="modal fade" id="confirm__modal_pago" data-backdrop="static" data-keyboard="false"
-         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-dark">
-                    <h5 class="modal-title text-light" id="confirm__modal__title"><i
-                                class="novi-icon icon icon-xxs mdi mdi-clock text-carrot"></i>
-                        Pago</h5>
-                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="confirm__modal__body">
-                    Seguro que decea procesar el pago?
-                </div>
-                <form id="form__confirm__modal" method="post">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <input id="_token__confirm__modal" type="hidden" name="_token" value="123...">
-                </form>
-                <div class="modal-footer">
-                    <button type="button" class="my-0 mr-auto btn btn-outline-secondary" data-dismiss="modal">Cancelar
-                    </button>
-                    <button type="button" class="my-0 btn btn-dark" id="confirm__modal__btn_pago">Aceptar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <style>
-
-        .table td, .table th {
-            padding: .75rem !important;
-        }
-    </style>
-
 {% endblock %}
 
 
@@ -202,77 +155,15 @@
     {{ parent() }}
 
     <script>
-
-        function deleteElementCarrito(idCarrito, id_servicio) {
-            $('#confirm__modal').modal('show')
-            $('#confirm__modal__body').text('Está seguro que desea eliminar el servicio?')
-            $('#_token__confirm__modal').val($('#__token').val())
-            $("#confirm__modal__btn_ok").click(function () {
-                const path = window.location.pathname
-                $('body').append(`
-                    <form action='/turismo/gestion-consular/solucitud/delete-carrito'
-                         method="post" id='form_delet_element_servicio_carrito'>
-                        <input type='hidden' name='idCarrito' value='${idCarrito}'/>
-                        <input type='hidden' name='id_servicio' value='${id_servicio}'/>
-                        <input type='hidden' name='path' value='${path}'/>
-                    </form>`)
-                const fomrulario = $('#form_delet_element_servicio_carrito')
-                fomrulario.submit()
-                fomrulario.remove()
+        function montarCarrito(id_cotizacion) {
+            $('#confirm__modal_cotizacion').modal('show');
+            $("#confirm__modal__btn_contizacion").click(function () {
+                window.location.href = "/cotizacion/revert/"+id_cotizacion;
             });
         }
 
-
-        function editarIten(id) {
-            window.location.href = "/remesas.json.editar/" + id;
-        };
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        function eliminarIten(id) {
-
-            $('#confirm__modal').modal('show');
-
-            $("#confirm__modal__btn_ok").click(function () {
-
-                $.ajax({
-                    type: 'POST',
-                    data: {'code': '200'},
-                    url: window.location.protocol + "//" + location.hostname + ":" + window.location.port + "/remesas.json.borrar/" + id,
-                    dataType: 'html',
-                    success: async function (data) {
-
-                        $('#confirm__modal').modal('hide');
-                        $('#alert-good').html('<div class=" text-center alert alert-success alert-dismissible fade show" role="alert"> Remesa Borrada Del Carrito<button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button></div>');
-                        $('.alert').alert();
-
-                        //await sleep(1000);
-
-                        window.location.href = "/checkout";
-
-                    }
-                });
-
-            });
-        };
-
-        function cotizacion(){
-        //aqui
-            // $('#confirm__modal_cotizacion').modal('show');
-            // $("#confirm__modal__btn_contizacion").click(function () {
-            //     window.location.href = "/cotizacion";
-            // });
-        }
-
-        function cobrar() {
-
-            $('#confirm__modal_pago').modal('show');
-            $("#confirm__modal__btn_pago").click(function () {
-                window.location.href = "/cotizacion/pago/";
-            });
-
+        function cobrar(id_cotizacion) {
+            window.location.href = "/pasarela-pago/"+id_cotizacion;
         }
 
     </script>

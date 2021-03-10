@@ -1,0 +1,14 @@
+{% extends 'utils/modal_form.html.twig' %}
+{% block modalbody %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
+    <div class="form-group input-group input-group-sm d-block">
+        {{ form_label(form.minimo_pagar_valor_fjo) }}
+        {{ form_widget(form.minimo_pagar_valor_fjo,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        {{ form_label(form.minimo_pagar_porciento) }}
+        {{ form_widget(form.minimo_pagar_porciento,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <input type="text" id="id_cotizacion" name="checkout[id_cotizacion]" hidden>
+    {{ form_end(form) }}
+{% endblock %}

@@ -17,13 +17,18 @@
         </div>
         {# end header #}
 
+        {# Modal de adicionar#}
+        {{ include('contabilidad/config/servicios/form.html.twig',{title:'add'}) }}
+        {# list #}
 
         {# list #}
         <table class="table-small-rows table table-hover text-light">
             <thead class="thead-dark">
             <th width="80px">#</th>
             <th width="120px" class="text-left">Código</th>
-            <th scope="col-1" class="text-left">Nombre</th>
+            <th width="500px" class="text-left">Nombre</th>
+            <th width="80px" class="text-center">Configurar</th>
+            <th width="300px" class="text-right">Mínimo a Pagar</th>
             </thead>
             <tbody>
             {% for item in servicios %}
@@ -31,10 +36,67 @@
                     <td style="font-weight:400;" class="text-center">{{ item.numero }}</td>
                     <td style="font-weight:400;">{{ item.codigo }}</td>
                     <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400;" class="text-center">
+                        <button type="button" class="btn btn-warning btn-sm" onclick="onUpdate({
+                                codigo:'{{ item.codigo }}' ,
+                                nombre:'{{ item.nombre }}' ,
+                                id: '{{ item.numero }}'
+                                })">
+                            <i class="fa fa-cogs"></i>
+                        </button>
+                    </td>
+
+                    <td style="font-weight:400;"
+                        class="text-right">{{ item.valor }}{% if item.porciento %}%{% endif %}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         {# end list #}
     </div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const onUpdate = function (config) {
+            $('#modal__btn__actualizar').show()
+            $('#modal__btn__aceptar').hide()
+
+            const {codigo = '', nombre = '', id = ''} = config
+
+            $('#modal__form__id').modal('show')
+            $('#modal__form__label__id').text("Configurar: " + nombre)
+
+            $('#id_servicio').val(id)
+        }
+
+        $(document).ready(function () {
+            $('#modal__btn__aceptar').hide()
+            $('#servicios_minimo_pagar_valor_fjo').prop('type', 'number')
+            $('#servicios_minimo_pagar_porciento').prop('type', 'number')
+
+            $('#servicios_minimo_pagar_valor_fjo').on('keyup', function () {
+                $('#servicios_minimo_pagar_porciento').val('')
+            })
+            $('#servicios_minimo_pagar_porciento').on('keyup', function () {
+                $('#servicios_minimo_pagar_valor_fjo').val('')
+            })
+
+            $('#modal__btn__actualizar').on('click', function () {
+                if ($('#servicios_minimo_pagar_valor_fjo').val() != '' ||
+                    $('#servicios_minimo_pagar_porciento').val() != '') {
+                    const id_servicio = $('#id_servicio').val()
+                    const formulario = $('#form_modal_target')
+                    formulario.attr('method', `POST`)
+                    formulario.attr('action', `/contabilidad/config/servicios/config`)
+                    formulario.submit()
+                }
+                else{
+                    alertTemplate('Debe introducir el valor mínimo a cobrar', 'danger')
+                }
+            })
+        })
+    </script>
 {% endblock %}

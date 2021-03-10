@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %} Reportes {% endblock %}
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block navBar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nabvar-navegation">
+        <a style="cursor: pointer" class="navbar-brand text-white" data-toggle="modal" href="{{ url('reportes_reportes') }}">| Reportes |</a>
+        <button class="navbar-toggler order-md-2" type="button" data-toggle="collapse"
+                data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <a class="dropdown-item" href="{{ url ('paymentreport') }}">Tarjetas</a>
+                <a class="dropdown-item" href="{{ url('paymentreport.buscar') }}">Facturas STRIPE</a>
+                <a class="dropdown-item" href="{{ url('cotizacion') }}">Cotizaciones</a>
+                <a class="dropdown-item" href="{{ url('turismo/reporte/solicitud/') }}">Turismo</a>
+            </ul>
+        </div>
+    </nav>
+    <!-- Modal -->
+{% endblock %}

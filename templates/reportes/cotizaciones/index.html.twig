@@ -1,0 +1,179 @@
+{% extends 'reportes/reportes/index.html.twig' %}
+
+{% block content %}
+    {% set total = null %}
+    {#    {% include 'breadcrumbs.html.twig' %}#}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <section class="section novi-background section-66 section-sm-bottom-110 p-0">
+        <div class="container-fluid">
+            <h1 class="text-reporte">Reporte de Cotizaciones
+            </h1>
+            <hr class="divider bg-mantis">
+            <form id="payment-form" name='payment-form' method="GET">
+                <div class="input-group input-group-sm mb-3">
+                    <input autocomplete="off" name="from" id='from' type="date" placeholder="Desde" class="form-control"
+                           aria-label="Default" aria-describedby="inputGroup-sizing-sm">
+                    <input autocomplete="off" name="to" id='to' type="date" placeholder="Hasta" class="form-control"
+                           aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                    <select class="custom-select" name='empleado' id="empleado">
+                        <option value="0" selected>Empleado</option>
+                        {% for data in user %}
+                            <option value="{{ data.username }}">{{ data.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <input autocomplete="off" name='telefono' id='telefono' placeholder="Telefono" type="text"
+                           class="form-control">
+                    <button class="btn btn-sm btn-outline-dark" type="button" onclick="Filtrar()">Filtrar</button>
+                    </span>
+                </div>
+            </form>
+            <!-- Bootstrap Table-->
+            <div class="table-responsive clearfix">
+                <table class="table table-striped tabla-reporte">
+                    <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th class="text-right">Total</th>
+                        <th>Empleado</th>
+                        <th>Detalles</th>
+                    </tr>
+                    {# table body #}
+                    </thead>
+                    <tbody id="rows_mercancias">
+                    {% for data in pagination %}
+                        <tr {% if loop.index is odd %}class="color"{% endif %}>
+                            <td><i class="fa fa-calendar"></i> {{ data.datetime }} <i
+                                        class="fa fa-clock-o"></i> {{ data.datetime_ }}</td>
+                            <td>{{ data.nombreCliente }}</td>
+                            <td class="text-right">{{ data.total_mostrar }} </td>
+                            {% set total = total + data.total %}
+                            <td>{{ data.empleado }}</td>
+
+                            <td>
+                                <button type="button" onClick="editar('{{ data.id }}');"
+                                        class="btn btn-warning btn-sm px-1"><i class="fa fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <hr style="background-color: white; margin-top: 0px;">
+                {# display navigation #}
+                <div class="count contador">Transacciones: {{ total_general }}</div>
+            </div>
+        </div>
+    </section>
+    <div id="dialog" class="modal" title="Facturas Stripe">
+        <p>
+            <b>Auth:</b> <span id="Auth"></span>
+        </p>
+
+        <p>
+            <b>Estado:</b> <span id="Estado"></span>
+        </p>
+
+    </div>
+    <style>
+        .input-group.input-group-sm .form-control {
+            height: 31px !important;
+        }
+
+        input#from {
+            margin-right: 10px;
+        }
+
+        input#to {
+
+            margin-right: 10px;
+        }
+
+        select#estado {
+            margin-right: 10px;
+        }
+
+
+        select#empleado {
+            margin-right: 10px;
+        }
+
+        input#telefono {
+            margin-right: 10px;
+        }
+
+        .input-group .form-control {
+            height: auto;
+            color: #ffffff;
+            background: #2f2f2f !important;
+            border: 1px solid #ffffff80 !important;
+        }
+
+        .custom-select {
+            color: #ffffff;
+            background: #2f2f2f !important;
+            border: 1px solid #ffffff80 !important;
+        }
+
+        .input-group .form-control {
+            height: auto;
+            color: #ffffff !important;
+            background: #ffffff;
+        }</style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        function editar(id) {
+            var url = "detalles-cotizacion/" + id;
+            window.open(url, '_self')
+        };
+
+        $('#telefono').on('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        function Filtrar() {
+            let from = $('#from').val()
+            let to = $('#to').val()
+            let empleado = $('#empleado').val()
+            let telefono = $('#telefono').val()
+            loadingModal.show()
+            $.ajax({
+                url: '/reportes/cotizaciones/filtrar',
+                method: "POST",
+                data: {from: from, to: to, empleado: empleado, telefono: telefono},
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        $('#rows_mercancias').find('tr').remove()
+                        let cotizaciones = result.pagination
+                        for (var i = 0; i < cotizaciones.length; i++) {
+                            $('#rows_mercancias').append(`<tr>
+                                    <td><i class="fa fa-calendar"></i> ${cotizaciones[i]['datetime']}
+                                    <i
+                                        class="fa fa-clock-o"></i> ${cotizaciones[i]['datetime_']}</td>
+                                        <td>${cotizaciones[i]['nombreCliente']}</td>
+                                        <td class="text-right">${cotizaciones[i]['total_mostrar']}</td>
+                                        <td>${cotizaciones[i]['empleado']}</td>
+                                        <td>
+                                            <button type="button" onClick="editar('${cotizaciones[i]['id']}');"
+                                                    class="btn btn-warning btn-sm px-1"><i class="fa fa-eye"></i>
+                                            </button>
+                                        </td>
+                                   </tr>`
+                            );
+                        }
+                        loadingModal.close()
+                    } else {
+                        loadingModal.close()
+                    }
+                },
+                error: function () {
+                }
+            })
+        }
+    </script>
+{% endblock %}

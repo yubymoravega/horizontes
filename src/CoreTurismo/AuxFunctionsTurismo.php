@@ -234,7 +234,7 @@ class AuxFunctionsTurismo
         $subcuenta_cobro_anticipado = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_cobro_anticipado]);
 
 
-        if ($valor_pagado < $total) {
+    if ($valor_pagado < $total) {
             ///////////////////////////////////////////////////////////////
             //   Asentando Efectivo en Banco/Caja -A- Cobro anticipado   //
             ///////////////////////////////////////////////////////////////
@@ -725,7 +725,7 @@ class AuxFunctionsTurismo
                 $costo_venta = $menor_comision + ($item->getValorFijoVenta() + ($menor_comision * $item->getPorcientoVenta() / 100));
             }
         }
-        return ['costo' => intval($costo_venta), 'id_regla' => $id_regla->getId()];
+        return ['costo' => floatval($costo_venta), 'id_regla' => $id_regla->getId()];
     }
 
     /**
@@ -904,7 +904,6 @@ class AuxFunctionsTurismo
             }
         }
     }
-
 
     public static function updateMonedaCotizacion(EntityManagerInterface $em, int $id_moneda_destino, int $empleado)
     {
