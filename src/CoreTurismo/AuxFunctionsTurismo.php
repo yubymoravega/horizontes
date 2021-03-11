@@ -6,6 +6,8 @@ namespace App\CoreTurismo;
 use App\CoreContabilidad\AuxFunctions;
 use App\Entity\Carrito;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\CapitalHumano\Empleado;
+use App\Entity\Contabilidad\Config\ConfigServicios;
 use App\Entity\Contabilidad\Config\Cuenta;
 use App\Entity\Contabilidad\Config\InstrumentoCobro;
 use App\Entity\Contabilidad\Config\Moneda;
@@ -234,7 +236,7 @@ class AuxFunctionsTurismo
         $subcuenta_cobro_anticipado = $subcuenta_er->findOneBy(['nro_subcuenta' => '0010', 'activo' => true, 'id_cuenta' => $cuenta_cobro_anticipado]);
 
 
-    if ($valor_pagado < $total) {
+        if ($valor_pagado < $total) {
             ///////////////////////////////////////////////////////////////
             //   Asentando Efectivo en Banco/Caja -A- Cobro anticipado   //
             ///////////////////////////////////////////////////////////////
@@ -1010,20 +1012,35 @@ class AuxFunctionsTurismo
                             'data' => $new_data,
                         );
                         $total_cotizacion = 0;
-                        foreach ($update_json as $js){
+                        foreach ($update_json as $js) {
                             $total_cotizacion += floatval($js['total']);
                         }
                         $item
-                            ->setTotal(round($total_cotizacion,2))
+                            ->setTotal(round($total_cotizacion, 2))
                             ->setJson($update_json)
-                            ->setIdMoneda($id_moneda_destino)
-                        ;
+                            ->setIdMoneda($id_moneda_destino);
                         $em->persist($item);
                     }
                 }
                 $em->flush();
             }
         }
+    }
+
+    public static function getMinimoPagarJson(EntityManagerInterface $em, array $json)
+    {
+        $config_servicios_er = $em->getRepository(ConfigServicios::class);
+        $id_usuario = $json[0]['id_empleado'];
+        $unidad = $em->getRepository(Empleado::class)->findOneBy(['id_usuario'=>$id_usuario])->getIdUnidad();
+        $minimo = 0;
+        foreach ($json as $item) {
+            $id_servicio = $item['id_servicio'];
+            $total_servicio = $item['total'];
+            $configuracion = $config_servicios_er->findOneBy(['id_servicio' => $id_servicio, 'id_unidad' => $unidad]);
+            if ($configuracion)
+                $minimo += $configuracion->getPorciento() ? ($total_servicio * $configuracion->getMinimo() /100 ) : $configuracion->getMinimo();
+        }
+        return $minimo;
     }
 
 }

@@ -1,14 +1,31 @@
-{% extends 'utils/modal_form.html.twig' %}
-{% block modalbody %}
-    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
-    <div class="form-group input-group input-group-sm d-block">
-        {{ form_label(form.minimo_pagar_valor_fjo) }}
-        {{ form_widget(form.minimo_pagar_valor_fjo,{'attr': {'class': 'form-control w-100'}}) }}
+<h1 class="text-confirmar" style="text-align: center; ">Plazos de Pago</h1>
+<hr class="divider-white bg-mantis-white mb-0">
+
+{{ form_start(form,{'attr': {'class': 'text-left mt-2 text-center container','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
+<div class="row">
+    <div class="col-3 form-group input-group input-group-sm d-block">
+        {{ form_label(form.fecha_maxima_pago) }}
+        {{ form_widget(form.fecha_maxima_pago,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
-    <div class="form-group input-group input-group-sm d-block">
-        {{ form_label(form.minimo_pagar_porciento) }}
-        {{ form_widget(form.minimo_pagar_porciento,{'attr': {'class': 'form-control w-100'}}) }}
+    <div class="col-4 p-0 m-0 form-group input-group input-group-sm d-block">
+        {{ form_label(form.plazos) }}
+        {{ form_widget(form.plazos,{'attr': {'class': 'form-control w-100'}}) }}
     </div>
-    <input type="text" id="id_cotizacion" name="checkout[id_cotizacion]" hidden>
-    {{ form_end(form) }}
-{% endblock %}
+    <div class="col-2 form-group input-group input-group-sm d-block">
+        {{ form_widget(form.aceptar,{'attr': {'class': 'btn btn-secondary w-100'}}) }}
+    </div>
+    <div class="col-2 form-group input-group input-group-sm d-block">
+        {{ form_widget(form.imprimir,{'attr': {'class': 'btn btn-warning w-100'}}) }}
+    </div>
+</div>
+<div id="table-plazos" class="container">
+    <table class="table-small-rows table table-hover text-light">
+        <thead class="thead-dark">
+        <th>Fecha</th>
+        <th class="text-right">Cuota</th>
+        </thead>
+        <tbody id="body-table-plazos">
+        </tbody>
+    </table>
+</div>
+{{ form_end(form) }}

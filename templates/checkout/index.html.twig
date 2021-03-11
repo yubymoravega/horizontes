@@ -5,8 +5,6 @@
     <h1 class="text-confirmar" style="text-align: center; ">Checkout</h1>
     <hr class="divider-white bg-mantis-white mb-0">
 
-    {% include 'plazos_pagos_cotizacion.html.twig' %}
-
     <!-- Shop Checkout-->
     <section class="section novi-background section-20 section-sm-20" style="color:white;">
         <div class="container-fluid">
@@ -110,6 +108,14 @@
                                         &nbsp; $0.00 </p>
                                     <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp;
                                         &nbsp; ${{ total }}</p>
+
+
+                                </div>
+                                {# ------------ componente de los plazos de pago ------------------- #}
+                                {% include 'checkout/plazos_pagos_cotizacion.html.twig' %}
+                                {# ------------ componente de los plazos de pago ------------------- #}
+
+                                <div class="offset-top-10 text-right">
                                     <a onclick="cotizacion()"
                                        class="btn btn-dark btn-icon btn-icon-right offset-top-41 checkout-step-btn"
                                        data-index-to="1" href="#">
@@ -129,6 +135,7 @@
     </section>
 
 
+
     <div class="modal fade" id="confirm__modal_cotizacion" data-backdrop="static" data-keyboard="false"
          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -142,7 +149,7 @@
                     </button>
                 </div>
                 <div class="modal-body" id="confirm__modal__body">
-                    Seguro que decea hacer una cotizacion?
+                    <p class="m-0 p-0" id="mssage__confirm">Seguro que decea hacer una cotizacion?</p>
                 </div>
                 <form id="form__confirm__modal" method="post">
                     <input type="hidden" name="_method" value="DELETE">
@@ -200,8 +207,8 @@
 
 {% block javascripts %}
     {{ parent() }}
-
     <script>
+        let list_pagos = []
 
         function deleteElementCarrito(idCarrito, id_servicio) {
             $('#confirm__modal').modal('show')
@@ -258,22 +265,126 @@
             });
         };
 
-        function cotizacion(){
-        //aqui
-            // $('#confirm__modal_cotizacion').modal('show');
-            // $("#confirm__modal__btn_contizacion").click(function () {
-            //     window.location.href = "/cotizacion";
-            // });
+        function cotizacion() {
+            if(list_pagos.length>0){
+                $('#confirm__modal_cotizacion').modal('show');
+                $("#confirm__modal__btn_contizacion").on('click',function () {
+                    let fecha_maxima = $('#planificacion_pagos_fecha_maxima_pago').val()
+                    let palzos = $('#planificacion_pagos_plazos').val()
+                    const list_json = JSON.stringify(list_pagos)
+                    cl(list_pagos)
+                    cl(list_json)
+                    $('body').append(`
+                    <form action='/checkout-services/cotizacion'
+                         method="post" id='form_cotizacion' target='_self'>
+                        <input type='text' hidden name='fecha_maxima' value='${fecha_maxima}'/>
+                        <input type='text' hidden name='palzos' value='${palzos}'/>
+                        <input type='hidden' hidden name='list_pagos' value="${list_pagos}" />
+                        <input type='hidden' hidden name='list_json' value="${list_json}" />
+                    </form>`)
+                    const fomrulario = $('#form_cotizacion')
+                    // fomrulario.submit()
+                    // fomrulario.remove()
+                });
+            }
+            else
+                alertTemplate('Debe seleccionar los plazoz de pago, si va  apagar en el momento de click en COBRAR.','danger')
         }
 
         function cobrar() {
-
             $('#confirm__modal_pago').modal('show');
             $("#confirm__modal__btn_pago").click(function () {
-                window.location.href = "/cotizacion/pago/";
+                // window.location.href = "/cotizacion/pago/";
             });
-
         }
+
+        //    --------- javascript de los plazos de pago
+        $('#planificacion_pagos_fecha_maxima_pago').on('change', function () {
+            $('#body-table-plazos').find('tr').remove()
+        })
+        $('#planificacion_pagos_plazos').on('change', function () {
+            $('#body-table-plazos').find('tr').remove()
+        })
+
+        $('#planificacion_pagos_aceptar').on('click', function () {
+            list_pagos = []
+            let fecha = $('#planificacion_pagos_fecha_maxima_pago').val()
+            let tipo = $('#planificacion_pagos_plazos').val()
+            let today = moment(new Date())
+            var fecha1 = moment(fecha);
+
+            let cantidad_tiempo = 0
+            let tiempo_sumar = 0;
+            let clasificador = '';
+            if (tipo == 1) {
+                cantidad_tiempo = fecha1.diff(today, 'days')
+                clasificador = 'days';
+                tiempo_sumar = 1;
+            }
+            if (tipo == 2) {
+                cantidad_tiempo = fecha1.diff(today, 'weeks')
+                clasificador = 'days';
+                tiempo_sumar = 7;
+            }
+            if (tipo == 3) {
+                cantidad_tiempo = fecha1.diff(today, 'weeks') / 2
+                clasificador = 'days';
+                tiempo_sumar = 15;
+            }
+            if (tipo == 4) {
+                cantidad_tiempo = fecha1.diff(today, 'months')
+                clasificador = 'months';
+                tiempo_sumar = 1;
+            }
+            if (cantidad_tiempo == 0 && tipo == 4) {
+                alertTemplate('El tiempo para el plazo no supera el mes, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
+            }
+            else {
+                let total = {{ total }};
+                let minimo = {{ minimo_pagar }};
+                let cuota = ((total - minimo) / (cantidad_tiempo - 1)).toFixed(2)
+                let fecha_pago = moment()
+                $('#body-table-plazos').find('tr').remove()
+                let cuota_asignada = 0;
+
+                if (cantidad_tiempo == 1) {
+                    fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                    list_pagos.push({
+                        fecha_pago,
+                        total
+                    })
+                    $('#body-table-plazos').append(`<tr>
+                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
+                            <td class="text-right"> ${total} </td>
+                        </tr>`
+                    );
+                } else
+                    for (let i = 0; i < cantidad_tiempo; i++) {
+                        fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                        if (i == cantidad_tiempo - 1) {
+                            cuota = (parseFloat(total) - parseFloat(cuota_asignada)).toFixed(2)
+                        } else if (i > 0) {
+                            cuota_asignada += parseFloat(cuota)
+                        }
+                        if (i == 0 && minimo > 0) {
+                            list_pagos.push({fecha_pago, minimo})
+                            cuota_asignada += parseFloat(minimo)
+                            $('#body-table-plazos').append(`<tr>
+                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
+                            <td class="text-right"> ${minimo.toFixed(2)} </td>
+                        </tr>`
+                            );
+                        } else {
+                            list_pagos.push({fecha_pago,cuota})
+                            $('#body-table-plazos').append(`<tr>
+                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
+                            <td class="text-right"> ${cuota} </td>
+                        </tr>`
+                            );
+                        }
+                    }
+            }
+        })
 
     </script>
 

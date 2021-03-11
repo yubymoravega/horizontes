@@ -3,8 +3,10 @@
 namespace App\Form\Cotizacion;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,6 +30,9 @@ class PlanificacionPagosType extends AbstractType
                 ],
                 'label' => 'Plazos de Pago',
             ])
+            ->add('aceptar', ButtonType::class)
+            ->add('imprimir', ButtonType::class)
+            ->add('id_cotizacion', HiddenType::class)
         ;
     }
 
