@@ -1,0 +1,331 @@
+{% extends 'turismo_module/index.html.twig' %}
+
+{% block title %}Solicitud Turismo{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('images/favicon.ico') }}" type="text/css" rel="icon"/>
+    <link href="{{ asset('css/carousel.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ asset('css/style.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ asset('css/custom.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ asset('css/style-sunset.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ asset('css/bootstrap.min.css') }}" type="text/css" rel="stylesheet"/>
+    <link href="{{ asset('//fonts.googleapis.com/css?family=Montserrat:400,700%7CLato:300,300italic,400,700,900%7CYesteryear') }}"
+          type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/contabilidad_styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/tarjetas.css') }}"/>
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet"/>
+    <style>
+        .nav-tabs .nav-item .nav-link.active{
+            color: #0d0a0a;
+        }
+        .nav-tabs .nav-item .nav-link{
+            color: #ffffff;
+        }
+    </style>
+    <link href="{{ asset('datetime/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('datetime/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
+    <link href="{{ asset('datetime/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
+    <link href="{{ asset('switch/css/bootstrap4-toggle.min.css') }}" rel="stylesheet">
+{%endblock%}
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Solicitud Turismo
+            </h4>
+        </div>
+        {# end header #}
+        <div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="vuelo-tab" data-toggle="tab" href="#vuelo" role="tab" aria-controls="vuelo" aria-selected="true"><span>Datos de Vuelo</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="hotel-tab" data-toggle="tab" href="#hotel" role="tab" aria-controls="hotel" aria-selected="false"><span>Datos de Hotel</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tranfer-tab" data-toggle="tab" href="#tranfer" role="tab" aria-controls="tranfer" aria-selected="false">Datos del tranfer</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tour-tab" data-toggle="tab" href="#tour" role="tab" aria-controls="tour" aria-selected="false">Datos de Tour</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="renta-tab" data-toggle="tab" href="#renta" role="tab" aria-controls="renta" aria-selected="false">Datos de la Renta de autos</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="vuelo" role="tabpanel" aria-labelledby="vuelo-tab">
+                    {# header #}
+                    <div class=" align-items-center text-center">
+                        <h2 class="text-reporte text-center mr-0 text-white mt-2">
+                            Solicitud de Vuelo
+                        </h2>
+                    </div>
+                    {# end header #}
+                    <div class="col-9 text-light container d-flex justify-content-center mb-3">
+                        {{ form_start(form_vuelo) }}
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex">
+                            <div class="col-4 input-group-sm">
+                                {{ form_label(form_vuelo.cant_adulto) }}
+                                {{ form_widget(form_vuelo.cant_adulto) }}
+                            </div>
+                            <div class="col-4 input-group-sm mt-0">
+                                {{ form_label(form_vuelo.cant_nino) }}
+                                {{ form_widget(form_vuelo.cant_nino) }}
+                            </div>
+                            <div class="col-4 input-group-sm mt-0">
+                                {{ form_label(form_vuelo.origen) }}
+                                {{ form_widget(form_vuelo.origen) }}
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col-4 input-group-sm mt-0">
+                                {{ form_label(form_vuelo.destino) }}
+                                {{ form_widget(form_vuelo.destino) }}
+                            </div>
+                            <div class="col-4 input-group-sm mt-0">
+                                <label for="fecha_vuelo">Fecha de Vuelo</label>
+                                {# { form_widget(form_vuelo.fecha) }#}
+                                <input type="text" class=" w-100 form-control" id="fecha_vuelo">
+                            </div>
+                            <div class="col-4 input-group-sm mt-4" style="padding-top: 10px;">
+                                <label for="retorno">Ida/Retorno</label>
+                                {# { form_widget(form_vuelo.fecha) }#}
+                                <input id="retorno" type="checkbox" checked data-toggle="toggle" data-on="Ida" data-off="Ida/Retorno" data-size="sm" data-onstyle="outline-warning">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col input-group-sm">
+                                {{ form_label(form_vuelo.comentario) }}
+                                {{ form_widget(form_vuelo.comentario) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form_vuelo) }}
+                </div>
+                <div class="tab-pane fade" id="hotel" role="tabpanel" aria-labelledby="hotel-tab">
+                    {# header #}
+                    <div class=" align-items-center text-center">
+                        <h2 class="text-reporte text-center mr-0 text-white mt-2">
+                            Solicitud de Hotel
+                        </h2>
+                    </div>
+                    {# end header #}
+                    <div class="col-9 text-light container d-flex justify-content-center mb-3">
+                        {{ form_start(form_hotel) }}
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex">
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_hotel.hotel) }}
+                                {{ form_widget(form_hotel.hotel) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_hotel.cant_adulto) }}
+                                {{ form_widget(form_hotel.cant_adulto) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_hotel.cant_nino) }}
+                                {{ form_widget(form_hotel.cant_nino) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_hotel.destino) }}
+                                {{ form_widget(form_hotel.destino) }}
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col-3 input-group-sm mt-0">
+                                <label for="categoria">Categoria de Hotel</label>
+                                <input type="text" name="categoria" class=" w-100 form-control" id="categoria">
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                <label for="plan">Plan del Hotel</label>
+                                <input type="text" name="plan" class=" w-100 form-control" id="plan">
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                <label for="fecha_hoteld">Fecha desde</label>
+                                <input type="text" class=" w-100 form-control" id="fecha_hoteld">
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                <label for="fecha_hotelh">Fecha hasta</label>
+                                <input type="text" class=" w-100 form-control" id="fecha_hotelh">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col input-group-sm">
+                                {{ form_label(form_hotel.comentario) }}
+                                {{ form_widget(form_hotel.comentario) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form_hotel) }}
+                </div>
+                <div class="tab-pane fade" id="tranfer" role="tabpanel" aria-labelledby="tranfer-tab">
+                    {# header #}
+                    <div class=" align-items-center text-center">
+                        <h2 class="text-reporte text-center mr-0 text-white mt-2">
+                            Solicitud de Tranfer
+                        </h2>
+                    </div>
+                    {# end header #}
+                    <div class="col-9 text-light container d-flex justify-content-center mb-3">
+                        {{ form_start(form_tranfer) }}
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex">
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_tranfer.cant_adulto) }}
+                                {{ form_widget(form_tranfer.cant_adulto) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_tranfer.cant_nino) }}
+                                {{ form_widget(form_tranfer.cant_nino) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                <label for="fecha_tranfer">Fecha</label>
+                                <input type="text" class=" w-100 form-control" id="fecha_tranfer">
+                            </div>
+                            <div class="col input-group-sm mt-0">
+                                <div class="col-3 input-group-sm mt-0">
+                                    <label for="fecha_tranfers">Fecha de salida</label>
+                                    <input type="text" class=" w-100 form-control" id="fecha_tranfers">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_tranfer.origen) }}
+                                {{ form_widget(form_tranfer.origen) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_tranfer.destino) }}
+                                {{ form_widget(form_tranfer.destino) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-0">
+                                {{ form_label(form_tranfer.tipoVehiculo) }}
+                                {{ form_widget(form_tranfer.tipoVehiculo) }}
+                            </div>
+                            <div class="col-3 input-group-sm mt-4" style="margin-top: 10px;">
+                                <label for="tranfer_retorno">Ida/Retorno</label>
+                                <input id="tranfer_retorno" type="checkbox" checked data-toggle="toggle" data-on="Ida" data-off="Ida/Retorno" data-size="sm" data-onstyle="outline-warning">
+                            </div>
+
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col input-group-sm">
+                                {{ form_label(form_tranfer.comentario) }}
+                                {{ form_widget(form_tranfer.comentario) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form_tranfer) }}
+                </div>
+                <div class="tab-pane fade" id="tour" role="tabpanel" aria-labelledby="tour-tab">
+                    {# header #}
+                    <div class=" align-items-center text-center">
+                        <h2 class="text-reporte text-center mr-0 text-white mt-2">
+                            Solicitud de Tour
+                        </h2>
+                    </div>
+                    {# end header #}
+                    <div class="col-9 text-light container d-flex justify-content-center mb-3">
+                        {{ form_start(form_tour) }}
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex">
+                            <div class="col-3 w-100 input-group-sm mt-0">
+                                {{ form_label(form_tour.tour) }}
+                                {{ form_widget(form_tour.tour) }}
+                            </div>
+                            <div class="col-3 w-100 input-group-sm mt-0">
+                                {{ form_label(form_tour.cant_adulto) }}
+                                {{ form_widget(form_tour.cant_adulto) }}
+                            </div>
+                            <div class="col-3 w-100 input-group-sm mt-0">
+                                {{ form_label(form_tour.cant_nino) }}
+                                {{ form_widget(form_tour.cant_nino) }}
+                            </div>
+                            <div class="col-3 w-100 input-group-sm mt-0">
+                                <label for="fecha_tour">Fecha de Salida</label>
+                                <input type="text" class=" w-100 form-control" id="fecha_tour">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col w-100 input-group-sm">
+                                {{ form_label(form_tour.comentario) }}
+                                {{ form_widget(form_tour.comentario) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form_hotel) }}
+
+                </div>
+                <div class="tab-pane fade" id="renta" role="tabpanel" aria-labelledby="renta-tab">
+                    {# header #}
+                    <div class=" align-items-center text-center">
+                        <h2 class="text-reporte text-center mr-0 text-white mt-2">
+                            Solicitud de RentCar
+                        </h2>
+                    </div>
+                    {# end header #}
+                    <div class="col-9 text-light container d-flex justify-content-center mb-3">
+                        {{ form_start(form_rentcar) }}
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex">
+                            <div class="col-4 w-100 input-group-sm mt-0">
+                                {{ form_label(form_rentcar.cant_persona) }}
+                                {{ form_widget(form_rentcar.cant_persona) }}
+                            </div>
+                            <div class="col-4 w-100 input-group-sm mt-0">
+                                {{ form_label(form_rentcar.tipoVehiculo) }}
+                                {{ form_widget(form_rentcar.tipoVehiculo) }}
+                            </div>
+                            <div class="col-4 w-100 input-group-sm mt-0">
+                                {{ form_label(form_rentcar.recogida) }}
+                                {{ form_widget(form_rentcar.recogida) }}
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col-4 w-100 input-group-sm mt-0">
+                                {{ form_label(form_rentcar.entrega) }}
+                                {{ form_widget(form_rentcar.entrega) }}
+                            </div>
+                            <div class="col-4 w-100 input-group-sm mt-0">
+                                <label for="fecha_rentcard">Fecha desde</label>
+                                <input type="text" class=" w-100 form-control" id="fecha_rentcard">
+                            </div>
+                            <div class="col-4 w-100 input-group-sm mt-0">
+                                <label for="fecha_rentcarh">Fecha hasta</label>
+                                <input type="text" class=" w-100 form-control" id="fecha_rentcarh">
+                            </div>
+                        </div>
+                        <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
+                            <div class="col w-100 input-group-sm">
+                                {{ form_label(form_rentcar.comentario) }}
+                                {{ form_widget(form_rentcar.comentario) }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form_hotel) }}
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="{{ asset('datetime/js/moment.min.js') }}"></script>
+    <script src="{{ asset('datetime/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ asset('switch/js/bootstrap4-toggle.min.js') }}"></script>
+    <script>
+        const TEXT_SELECT = '... seleccione ...';
+        $(document).ready(function () {
+            $('select').prepend('<option selected = "false" value = "-1" disabled>' + TEXT_SELECT + '</option>')
+            $('#fecha_vuelo').datetimepicker()
+            $('#fecha_hoteld').datetimepicker()
+            $('#fecha_hotelh').datetimepicker()
+            $('#fecha_tour').datetimepicker()
+            $('#fecha_tranfer').datetimepicker()
+            $('#fecha_tranfers').datetimepicker()
+        })
+    </script>
+{% endblock %}

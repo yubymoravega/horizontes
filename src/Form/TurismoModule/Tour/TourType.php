@@ -1,28 +1,26 @@
 <?php
 
-namespace App\Form\TurismoModule\Traslado;
+namespace App\Form\TurismoModule\Tour;
 
-use App\Entity\TurismoModule\Traslado\Aeropuerto;
+use App\Entity\TurismoModule\Tour\Tour;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AeropuertoType extends AbstractType
+class TourType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('nombre')
-            ->add('adicionar',SubmitType::class)
+            ->add('activo')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Aeropuerto::class,
+            'data_class' => Tour::class,
         ]);
     }
 }

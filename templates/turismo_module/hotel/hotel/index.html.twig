@@ -1,0 +1,200 @@
+{% extends 'turismo_module/index.html.twig' %}
+
+{% block title %}Gestionar Hoteles{% endblock %}
+
+{% block style %}
+    <style>
+        label {
+            display: none;
+        }
+    </style>
+{%endblock%}
+
+{% block content %}
+    <div class="container-fluid">
+
+        {# header #}
+        <div class="d-flex align-items-center">
+            <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
+                Getionar Hoteles
+            </h4>
+            <div>
+                <button type="button" class="btn btn-primary btn-md" data-toggle="modal"
+                        data-target="#gestionarHotelModal" data-placement="bottom" title="Adicionar"
+                        onclick="mostrarBtn()">
+                    <i class="fa fa-plus"> Adicionar</i>
+                </button>
+            </div>
+        </div>
+        {# end header #}
+
+        {# Modal de adicionar#}
+        <div class="modal fade" id="gestionarHotelModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="gestionarHotel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarHotel">Adicionar Hotel</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{form_start(form, {'attr':{'autocomplete':"off"}})}}
+
+                    <div class="modal-body bg-dark-app">
+                        <div class="mt-0 form-group input-group input-group-sm d-block pr-0">
+                            <div class="input-group-sm">
+                                {{ form_label(form.nombre) }}
+                                {{ form_widget(form.nombre) }}
+                            </div>
+                            <div class="mt-1 input-group-sm">
+                                {{ form_label(form.categoria) }}
+                                {{ form_widget(form.categoria) }}
+                            </div>
+                            <div class="mt-1 input-group-sm">
+                                {{ form_label(form.planHotel) }}
+                                {{ form_widget(form.planHotel) }}
+                            </div>
+                            <input type="text" id="id_hotel" name="id_hotel" hidden>
+                        </div>
+                        <div class="d-flex mt-4">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                        aria-label="Cerrar">
+                                    <span aria-hidden="true">Cancelar</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-primary" id="btnAceptar">Aceptar</button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-warning" id="btnActualizar">Actualizar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        {# list #}
+        <table class="table-small-rows table table-hover text-light">
+            <thead class="thead-dark">
+            <th scope="col-2" class="text-left">Nombre</th>
+            <th scope="col-1" class="text-left">Categoría</th>
+            <th scope="col-1" class="text-left">Plan del Hotel</th>
+            <th scope="col-1" width="200px" class="text-center">Acciones</th>
+            </thead>
+            <tbody>
+
+            {% for item in hoteles %}
+                <tr>
+                    <td style="font-weight:400;">{{ item.nombre }}</td>
+                    <td style="font-weight:400; align-content: center; " width="400px">{{ item.categoria }}</td>
+                    <td style="font-weight:400; align-content: center;" width="400px">{{ item.plan }}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Actualizar"
+                                onclick="onUpdate({
+                                        id: '{{ item.id }}',
+                                        nombre: '{{ item.nombre }}',
+                                        categoria:{{ item.categoria }},
+                                        plan:{{ item.id_plan }}
+                                        })">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                data-placement="bottom" title="Eliminar"
+                                onclick="onDeleteConfirm({
+                                        message:'Está seguro que desea eliminar el hotel seleccionado ?',
+                                        url:'{{ path('turismo_module_hotel_delete',{id: item.id}) }}'
+                                        })">
+                            <i class="fa fa-trash"></i>
+                        </button>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end list #}
+    </div>
+
+    <div class="navigation mt-5">
+        {{ knp_pagination_render(hoteles) }}
+    </div>
+    </div>
+{% endblock %}
+{%block javascripts%}
+    {{ parent() }}
+    <script>
+        const TEXT_SELECT = '... seleccione ...';
+        $(document).ready(function () {
+            $('select').prepend('<option selected = "false" value = "-1" disabled>' + TEXT_SELECT + '</option>')
+            $('#btnActualizar').hide()
+        })
+
+        const onUpdate = function (config) {
+            $('#btnActualizar').show()
+            $('#btnAceptar').hide()
+            const {nombre = '', id = '', categoria = '', plan = ''} = config
+            $('#gestionarHotelModal').modal('show')
+
+            $('#hotel_nombre').val(nombre)
+            $('#id_hotel').val(id)
+            $('#hotel_categoria').val(categoria)
+            $('#hotel_planHotel').val(plan)
+            $('#gestionarHotel').html("Modificar " + nombre)
+        }
+
+        $('#btnAceptar').on('click', function () {
+            let params = {
+                nombre: $('#hotel_nombre').val(),
+                plan: $('#hotel_planHotel').val(),
+                categoria:$('#hotel_categoria').val(),
+                id_cliente: {{ id_cliente }}
+            }
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/Hotel/add',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/configuracion-turismo/Hotel/');
+            })
+        })
+
+        $('#btnActualizar').on('click', function () {
+            let params = {
+                nombre: $('#hotel_nombre').val(),
+                categoria:$('#hotel_categoria').val(),
+                plan: $('#hotel_planHotel').val(),
+                id: $('#id_hotel').val(),
+                id_cliente: {{ id_cliente }}
+            }
+            loadingModal.show()
+            $.ajax({
+                url: '/configuracion-turismo/Hotel/upd',
+                method: "POST",
+                data: params
+            }).then(res => {
+                window.location.replace('/configuracion-turismo/Hotel/');
+            })
+        })
+
+        $('#gestionarOrigenDestinoModal').on('show.bs.modal', function (event) {
+            var modal = $(this)
+            modal.find('.modal-title').text('Adicionar Lugar de Origen o Destino')
+        })
+
+        function mostrarBtn() {
+            $('#btnActualizar').hide()
+            $('#hotel_nombre').val('')
+            $('#hotel_categoria').val(-1)
+            $('#hotel_planHotel').val(-1)
+            $('#btnAceptar').show()
+        }
+    </script>
+{%endblock%}

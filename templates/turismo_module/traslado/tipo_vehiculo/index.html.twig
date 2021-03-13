@@ -121,14 +121,12 @@
                 <td style="font-weight:400; align-content: center;" width="400px">
 
                     <button type="button" class="btn btn-outline-warning" data-container="body" data-toggle="popover"
-                            data-trigger="click" title="Imagen"
+                            data-trigger="focus" title="Imagen: {{ item.picture }}"
                             data-placement="right" data-img="
                             {{ asset('images/Turismo/Transfer/TipoVehiculo/')~item.picture }}
                     ">
                         <span class="fa fa-image"></span>
                     </button>
-
-
                 </td>
 
 
@@ -255,7 +253,6 @@
                 reader.readAsDataURL(files[0]); // read the local file
 
                 reader.onloadend = function () { // set image data as background of div
-                    //alert(uploadFile.closest(".upimage").find('.imagePreview').length);
                     uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url(" + this.result + ")");
                 }
             }
@@ -277,7 +274,7 @@
 
         $('#btnAceptar').on('click', function (){
             if ($('#tipo_vehiculo_cantidad_ini_persona').val() > $('#tipo_vehiculo_cantidad_fin_persona').val()){
-                alert('La cantidad inicial de personas es mayor a las cantidad final')
+                alertTemplate('La cantidad inicial de personas es mayor a las cantidad final','danger')
             }
             else {
                 $('form').submit()
@@ -287,7 +284,7 @@
         $('#btnActualizar').on('click', function (){
 
             if ($('#tipo_vehiculo_cantidad_ini_persona').val() > $('#tipo_vehiculo_cantidad_fin_persona').val()){
-                alert('La cantidad inicial de personas es mayor a las cantidad final')
+                alertTemplate('La cantidad inicial de personas es mayor a las cantidad final','danger')
             }
             else {
                 $('form').prop('action','/configuracion-turismo/traslado/tipo-vehiculo/upd')

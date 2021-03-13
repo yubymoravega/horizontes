@@ -2,7 +2,11 @@
 
 namespace App\Entity\TurismoModule\Traslado;
 
+use App\Entity\TurismoModule\Solicitud\SolRentCar;
+use App\Entity\TurismoModule\Solicitud\SolTranfer;
 use App\Repository\TurismoModule\Traslado\TipoVehiculoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -41,6 +45,22 @@ class TipoVehiculo
      * @ORM\Column(type="string", length=255)
      */
     private $picture;
+
+    /**
+     * @ORM\OneToMany(targetEntity=SolRentCar::class, mappedBy="tipoVehiculo")
+     */
+    private $sol_rentcar;
+
+    /**
+     * @ORM\OneToMany(targetEntity=SolTranfer::class, mappedBy="tipoVehiculo")
+     */
+    private $sol_tranfer;
+
+    public function __construct()
+    {
+        $this->sol_rentcar = new ArrayCollection();
+        $this->sol_tranfer = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -104,6 +124,68 @@ class TipoVehiculo
     public function setPicture(string $picture): self
     {
         $this->picture = $picture;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|SolRentCar[]
+     */
+    public function getSolRentcar(): Collection
+    {
+        return $this->sol_rentcar;
+    }
+
+    public function addSolRentcar(SolRentCar $solRentcar): self
+    {
+        if (!$this->sol_rentcar->contains($solRentcar)) {
+            $this->sol_rentcar[] = $solRentcar;
+            $solRentcar->setTipoVehiculo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSolRentcar(SolRentCar $solRentcar): self
+    {
+        if ($this->sol_rentcar->contains($solRentcar)) {
+            $this->sol_rentcar->removeElement($solRentcar);
+            // set the owning side to null (unless already changed)
+            if ($solRentcar->getTipoVehiculo() === $this) {
+                $solRentcar->setTipoVehiculo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|SolTranfer[]
+     */
+    public function getSolTranfer(): Collection
+    {
+        return $this->sol_tranfer;
+    }
+
+    public function addSolTranfer(SolTranfer $solTranfer): self
+    {
+        if (!$this->sol_tranfer->contains($solTranfer)) {
+            $this->sol_tranfer[] = $solTranfer;
+            $solTranfer->setTipoVehiculo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSolTranfer(SolTranfer $solTranfer): self
+    {
+        if ($this->sol_tranfer->contains($solTranfer)) {
+            $this->sol_tranfer->removeElement($solTranfer);
+            // set the owning side to null (unless already changed)
+            if ($solTranfer->getTipoVehiculo() === $this) {
+                $solTranfer->setTipoVehiculo(null);
+            }
+        }
 
         return $this;
     }
