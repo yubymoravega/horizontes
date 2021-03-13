@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\CoreContabilidad\AuxFunctions;
 use App\CoreTurismo\AuxFunctionsTurismo;
 use App\Entity\Cliente;
+use App\Entity\Contabilidad\Config\Impuesto;
 use App\Entity\Provincias;
 use App\Entity\Municipios;
 use App\Entity\Carrito;
@@ -12,6 +14,7 @@ use App\Entity\TasaDeCambio;
 use App\Entity\Trasacciones;
 use App\Entity\ReporteEfectivo;
 use App\Entity\User;
+use App\Form\Contabilidad\Config\ImpuestoType;
 use App\Form\Cotizacion\PlanificacionPagosType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -64,6 +67,17 @@ class CheckoutController extends AbstractController
             $total += floatval($json_array['total']);
         }
 
+        $unidad = AuxFunctions::getUnidad($em,$this->getUser());
+        $impuestos = $em->getRepository(Impuesto::class)->findBy(['id_unidad'=>$unidad,'activo'=>true]);
+        $rows = [];
+        foreach ($impuestos as $item){
+            $rows[]=[
+                'nombre'=>$item->getNombre(),
+                'valor'=>number_format($item->getValor(),2),
+                'id'=>$item->getId()
+            ];
+        }
+
         $minimo = AuxFunctionsTurismo::getMinimoPagarJson($em, $data_servicios);
 
         $form = $this->createForm(PlanificacionPagosType::class);
@@ -71,7 +85,8 @@ class CheckoutController extends AbstractController
             'carrito' => $data,
             'total' => number_format($total, 2),
             'form' => $form->createView(),
-            'minimo_pagar'=>$minimo
+            'minimo_pagar'=>$minimo,
+            'impuestos'=>$rows
         ]);
     }
 

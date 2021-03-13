@@ -115,7 +115,7 @@ class AreaResponsabilidadController extends AbstractController
                     'id_unidad'=>$areaResponsabilidad->getIdUnidad()
                 ]);
                 if($duplicate && $duplicate->getId() != $areaResponsabilidad->getId()){
-                    $this->addFlash('error', "Ya existe un area de responsabilidad con el código ".$areaResponsabilidad->getCodigo());
+                    $this->addFlash('error', "Ya existe un área de responsabilidad con el código ".$areaResponsabilidad->getCodigo());
                     return $this->redirectToRoute('contabilidad_config_area_responsabilidad');
                 }
 

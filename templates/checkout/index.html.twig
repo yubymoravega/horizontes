@@ -1,4 +1,162 @@
 {% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            text-align: center;
+            background-color: #222;
+            color: #fff;
+            margin-top: 50px;
+
+        .dropdown-menu {
+            border-radius: 0;
+        }
+
+        .multiselect-native-select {
+            position: relative;
+
+        select {
+            border: 0 !important;
+            clip: rect(0 0 0 0) !important;
+            height: 1px !important;
+            margin: -1px -1px -1px -3px !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            position: absolute !important;
+            width: 1px !important;
+            left: 50%;
+            top: 30px;
+        }
+
+        }
+        .multiselect-container {
+            position: absolute;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+
+        .input-group {
+            margin: 5px;
+        }
+
+        li {
+            padding: 0;
+
+        .multiselect-all {
+
+        label {
+            font-weight: 700;
+        }
+
+        }
+        a {
+            padding: 0;
+
+        label {
+            margin: 0;
+            height: 100%;
+            cursor: pointer;
+            font-weight: 400;
+            padding: 3px 20px 3px 40px;
+
+        input[type=checkbox] {
+            margin-bottom: 5px;
+        }
+
+        }
+        label.radio {
+            margin: 0;
+        }
+
+        label.checkbox {
+            margin: 0;
+        }
+
+        }
+        }
+        li.multiselect-group {
+
+        label {
+            margin: 0;
+            padding: 3px 20px 3px 20px;
+            height: 100%;
+            font-weight: 700;
+        }
+
+        }
+        li.multiselect-group-clickable {
+
+        label {
+            cursor: pointer;
+        }
+
+        }
+        }
+        .btn-group {
+
+        .btn-group {
+
+        .multiselect.btn {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        }
+        }
+        .form-inline {
+
+        .multiselect-container {
+
+        label.checkbox {
+            padding: 3px 20px 3px 40px;
+        }
+
+        label.radio {
+            padding: 3px 20px 3px 40px;
+        }
+
+        li {
+
+        a {
+
+        label.checkbox {
+
+        input[type=checkbox] {
+            margin-left: -20px;
+            margin-right: 0;
+        }
+
+        }
+        label.radio {
+
+        input[type=radio] {
+            margin-left: -20px;
+            margin-right: 0;
+        }
+
+        }
+        }
+        }
+        }
+        }
+        .btn {
+            border-radius: 0;
+            padding: 10px 0;
+        }
+
+        .btn-primary {
+            background-color: #ff0000;
+            border: none;
+            border-radius: 0;
+            padding: 11px 15px;
+            text-transform: uppercase;
+        }
+
+        }
+
+    </style>
+{% endblock %}
+
 {% block content %}
     {% include 'breadcrumbs.html.twig' %}
 
@@ -18,10 +176,36 @@
                                         <tbody>
                                         {% for item in carrito %}
                                             <tr>
-                                                <td class="row-group-conta" colspan="5">Servicio:
+                                                <td class="row-group-conta" colspan="3">Servicio:
                                                     <i>{{ item.servicio }}</i></td>
                                                 <td class="row-group-conta text-right">Subtotal:
-                                                    <i>{{ item.sub_total }}</i></td>
+                                                    <br><i>{{ item.sub_total }}</i></td>
+                                                <td class="row-group-conta text-right">
+                                                    <div class="btn-group open">
+                                                        <button type="button"
+                                                                class="multiselect dropdown-toggle btn btn-sm btn-outline-warning"
+                                                                data-toggle="dropdown"
+                                                                title="Impuesto" aria-expanded="true"><span
+                                                                    class="multiselect-selected-text">Impuestos</span>
+                                                            <b class="caret"></b></button>
+                                                        <ul class="multiselect-container dropdown-menu" style="width: 210px !important;">
+                                                            {% for item_impuesto in impuestos %}
+                                                                <li>
+                                                                    <a tabindex="0">
+                                                                        <label class="checkbox">
+                                                                            <input type="checkbox" onclick="seleccionarImpuesto({{ item_impuesto.id }},{{ item.id_servicio }},{{ item.sub_total }},{{ item_impuesto.valor }})"
+                                                                                   id="{{ item_impuesto.id }}-{{ item.id_servicio }}"
+                                                                                   value="{{ item_impuesto.valor }}">
+                                                                            {{ item_impuesto.nombre }}
+                                                                        </label>
+                                                                    </a>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                    <br><i id="{{ item.id_servicio }}-impuesto">0.00</i></td>
+                                                <td class="row-group-conta text-right">Total:
+                                                    <br><i id="{{ item.id_servicio }}-total">{{ item.sub_total }}</i></td>
                                             </tr>
                                             {% if item.id_servicio == 11 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
@@ -134,8 +318,6 @@
         </div>
     </section>
 
-
-
     <div class="modal fade" id="confirm__modal_cotizacion" data-backdrop="static" data-keyboard="false"
          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -149,7 +331,7 @@
                     </button>
                 </div>
                 <div class="modal-body" id="confirm__modal__body">
-                    <p class="m-0 p-0" id="mssage__confirm">Seguro que decea hacer una cotizacion?</p>
+                    <p class="m-0 p-0" id="mssage__confirm">Seguro que decea hacer una cotización?</p>
                 </div>
                 <form id="form__confirm__modal" method="post">
                     <input type="hidden" name="_method" value="DELETE">
@@ -194,9 +376,7 @@
         </div>
     </div>
 
-
     <style>
-
         .table td, .table th {
             padding: .75rem !important;
         }
@@ -209,6 +389,35 @@
     {{ parent() }}
     <script>
         let list_pagos = []
+        let valor = 0
+
+        $(document).ready(function () {
+            $('[data-toggle="popover"]').popover({html: true});
+            $('#multiselect').multiselect({
+                buttonWidth: '160px',
+                // includeSelectAllOption : true,
+                nonSelectedText: 'Select an Option'
+
+            });
+        });
+
+        function seleccionarImpuesto(impuesto,servicio,subtotal,valor) {
+            let checkbox = $('#'+impuesto+'-'+servicio)
+            let txt_impuesto = $('#'+servicio+'-impuesto')
+            let txt_total = $('#'+servicio+'-total')
+
+            let monto = subtotal * valor /100
+            let impuesto_acumulado = parseFloat(txt_impuesto.text())
+            let result = 0
+            if(checkbox.is(':checked')){
+                result = impuesto_acumulado+monto
+            }
+            else{
+                result = impuesto_acumulado-monto
+            }
+            txt_impuesto.text(result.toFixed(2))
+            txt_total.text((subtotal+result).toFixed(2))
+        }
 
         function deleteElementCarrito(idCarrito, id_servicio) {
             $('#confirm__modal').modal('show')
@@ -228,7 +437,6 @@
                 fomrulario.remove()
             });
         }
-
 
         function editarIten(id) {
             window.location.href = "/remesas.json.editar/" + id;
@@ -266,29 +474,27 @@
         };
 
         function cotizacion() {
-            if(list_pagos.length>0){
-                $('#confirm__modal_cotizacion').modal('show');
-                $("#confirm__modal__btn_contizacion").on('click',function () {
-                    let fecha_maxima = $('#planificacion_pagos_fecha_maxima_pago').val()
-                    let palzos = $('#planificacion_pagos_plazos').val()
-                    const list_json = JSON.stringify(list_pagos)
-                    cl(list_pagos)
-                    cl(list_json)
-                    $('body').append(`
+            let msg = '¿Está seguro que desa hacer la cotización?';
+            if (list_pagos.length == 0) {
+                msg = 'Usted no ha definido los plazos de pago, la cotización se cancelará automaticamente a los 7 día de eleborada, si aún no ha definido los pagos. ¿Está seguro que desa hacer la cotización?'
+            }
+            $('#mssage__confirm').text(msg)
+            $('#confirm__modal_cotizacion').modal('show');
+            $("#confirm__modal__btn_contizacion").on('click', function () {
+                let fecha_maxima = $('#planificacion_pagos_fecha_maxima_pago').val()
+                let palzos = $('#planificacion_pagos_plazos').val()
+                const listado = JSON.stringify(list_pagos)
+                $('body').append(`
                     <form action='/checkout-services/cotizacion'
                          method="post" id='form_cotizacion' target='_self'>
                         <input type='text' hidden name='fecha_maxima' value='${fecha_maxima}'/>
                         <input type='text' hidden name='palzos' value='${palzos}'/>
-                        <input type='hidden' hidden name='list_pagos' value="${list_pagos}" />
-                        <input type='hidden' hidden name='list_json' value="${list_json}" />
+                        <input type='hidden' hidden name='list_json' value='${listado}' />
                     </form>`)
-                    const fomrulario = $('#form_cotizacion')
-                    // fomrulario.submit()
-                    // fomrulario.remove()
-                });
-            }
-            else
-                alertTemplate('Debe seleccionar los plazoz de pago, si va  apagar en el momento de click en COBRAR.','danger')
+                const fomrulario = $('#form_cotizacion')
+                fomrulario.submit()
+                fomrulario.remove()
+            });
         }
 
         function cobrar() {
@@ -338,8 +544,7 @@
             }
             if (cantidad_tiempo == 0 && tipo == 4) {
                 alertTemplate('El tiempo para el plazo no supera el mes, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
-            }
-            else {
+            } else {
                 let total = {{ total }};
                 let minimo = {{ minimo_pagar }};
                 let cuota = ((total - minimo) / (cantidad_tiempo - 1)).toFixed(2)
@@ -349,9 +554,10 @@
 
                 if (cantidad_tiempo == 1) {
                     fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                    valor = total
                     list_pagos.push({
                         fecha_pago,
-                        total
+                        valor
                     })
                     $('#body-table-plazos').append(`<tr>
                             <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
@@ -367,7 +573,8 @@
                             cuota_asignada += parseFloat(cuota)
                         }
                         if (i == 0 && minimo > 0) {
-                            list_pagos.push({fecha_pago, minimo})
+                            valor = minimo
+                            list_pagos.push({fecha_pago, valor})
                             cuota_asignada += parseFloat(minimo)
                             $('#body-table-plazos').append(`<tr>
                             <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
@@ -375,7 +582,8 @@
                         </tr>`
                             );
                         } else {
-                            list_pagos.push({fecha_pago,cuota})
+                            valor = cuota
+                            list_pagos.push({fecha_pago, valor})
                             $('#body-table-plazos').append(`<tr>
                             <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
                             <td class="text-right"> ${cuota} </td>
@@ -385,7 +593,6 @@
                     }
             }
         })
-
     </script>
 
 {% endblock %}

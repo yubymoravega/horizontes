@@ -74,6 +74,11 @@ class Cotizacion
      */
     private $fechaFactura;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $activo;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -207,6 +212,18 @@ class Cotizacion
     public function setFechaFactura(?\DateTimeInterface $fechaFactura): self
     {
         $this->fechaFactura = $fechaFactura;
+
+        return $this;
+    }
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(?bool $activo): self
+    {
+        $this->activo = $activo;
 
         return $this;
     }

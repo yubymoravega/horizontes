@@ -1,0 +1,14 @@
+{% extends 'utils/modal_form.html.twig' %}
+{% block modalbody %}
+    {{ form_start(form,{'attr': {'class': 'text-left','id':'form_modal_target','method':'POST','autocomplete':"off"}}) }}
+    <div class="form-group input-group input-group-sm d-block">
+        {{ form_label(form.nombre) }}
+        {{ form_widget(form.nombre,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <div class="form-group input-group input-group-sm d-block">
+        {{ form_label(form.valor) }}
+        {{ form_widget(form.valor,{'attr': {'class': 'form-control w-100'}}) }}
+    </div>
+    <input type="text" id="id_impuesto" hidden>
+    {{ form_end(form) }}
+{% endblock %}

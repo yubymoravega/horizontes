@@ -366,6 +366,7 @@ class SolicitudController extends AbstractController
      */
     public function addCarrito(EntityManagerInterface $em, Request $request)
     {
+        dd($request);
         $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_REMESA;
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $moneda = $request->request->get('moneda');
@@ -376,7 +377,6 @@ class SolicitudController extends AbstractController
         ]);
 
         $empleado = $obj_trabajo_tmp->getIdUsuario()->getUsername();
-
         $data_new_solicitudes = json_decode($request->request->get('solicitudes'), true);
         $data_solicitudes_existente = AuxFunctionsTurismo::getDataJsonCarrito($em, $empleado, $id_servicio);
 
