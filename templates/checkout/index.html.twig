@@ -1,162 +1,4 @@
 {% extends 'base.html.twig' %}
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        body {
-            text-align: center;
-            background-color: #222;
-            color: #fff;
-            margin-top: 50px;
-
-        .dropdown-menu {
-            border-radius: 0;
-        }
-
-        .multiselect-native-select {
-            position: relative;
-
-        select {
-            border: 0 !important;
-            clip: rect(0 0 0 0) !important;
-            height: 1px !important;
-            margin: -1px -1px -1px -3px !important;
-            overflow: hidden !important;
-            padding: 0 !important;
-            position: absolute !important;
-            width: 1px !important;
-            left: 50%;
-            top: 30px;
-        }
-
-        }
-        .multiselect-container {
-            position: absolute;
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-
-        .input-group {
-            margin: 5px;
-        }
-
-        li {
-            padding: 0;
-
-        .multiselect-all {
-
-        label {
-            font-weight: 700;
-        }
-
-        }
-        a {
-            padding: 0;
-
-        label {
-            margin: 0;
-            height: 100%;
-            cursor: pointer;
-            font-weight: 400;
-            padding: 3px 20px 3px 40px;
-
-        input[type=checkbox] {
-            margin-bottom: 5px;
-        }
-
-        }
-        label.radio {
-            margin: 0;
-        }
-
-        label.checkbox {
-            margin: 0;
-        }
-
-        }
-        }
-        li.multiselect-group {
-
-        label {
-            margin: 0;
-            padding: 3px 20px 3px 20px;
-            height: 100%;
-            font-weight: 700;
-        }
-
-        }
-        li.multiselect-group-clickable {
-
-        label {
-            cursor: pointer;
-        }
-
-        }
-        }
-        .btn-group {
-
-        .btn-group {
-
-        .multiselect.btn {
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-        }
-
-        }
-        }
-        .form-inline {
-
-        .multiselect-container {
-
-        label.checkbox {
-            padding: 3px 20px 3px 40px;
-        }
-
-        label.radio {
-            padding: 3px 20px 3px 40px;
-        }
-
-        li {
-
-        a {
-
-        label.checkbox {
-
-        input[type=checkbox] {
-            margin-left: -20px;
-            margin-right: 0;
-        }
-
-        }
-        label.radio {
-
-        input[type=radio] {
-            margin-left: -20px;
-            margin-right: 0;
-        }
-
-        }
-        }
-        }
-        }
-        }
-        .btn {
-            border-radius: 0;
-            padding: 10px 0;
-        }
-
-        .btn-primary {
-            background-color: #ff0000;
-            border: none;
-            border-radius: 0;
-            padding: 11px 15px;
-            text-transform: uppercase;
-        }
-
-        }
-
-    </style>
-{% endblock %}
-
 {% block content %}
     {% include 'breadcrumbs.html.twig' %}
 
@@ -176,10 +18,26 @@
                                         <tbody>
                                         {% for item in carrito %}
                                             <tr>
-                                                <td class="row-group-conta" colspan="3">Servicio:
+                                                <td class="row-group-conta" colspan="2">Servicio:
                                                     <i>{{ item.servicio }}</i></td>
                                                 <td class="row-group-conta text-right">Subtotal:
                                                     <br><i>{{ item.sub_total }}</i></td>
+                                                <td width="260px" class="row-group-conta text-right">
+                                                    <form name="unidad" method="post" class="text-left"
+                                                          id="form_modal_target" autocomplete="off"
+                                                          novalidate="novalidate">
+                                                        <div class="form-group input-group input-group-sm d-block">
+                                                            Descuento en % (fijo <input
+                                                                    type="checkbox" name="check-{{ item.id_servicio }}"
+                                                                    id="check-{{ item.id_servicio }}"
+                                                                    onclick="changeDescuento({{ item.id_servicio }})"> )
+                                                            <input type="number" id="input-{{ item.id_servicio }}"
+                                                                   placeholder="Porciento a Descontar"
+                                                                   class="form-control w-100 modal-body bg-dark-app form-group input-group input-group-sm d-block"
+                                                            >
+                                                        </div>
+                                                    </form>
+                                                </td>
                                                 <td class="row-group-conta text-right">
                                                     <div class="btn-group open">
                                                         <button type="button"
@@ -188,12 +46,14 @@
                                                                 title="Impuesto" aria-expanded="true"><span
                                                                     class="multiselect-selected-text">Impuestos</span>
                                                             <b class="caret"></b></button>
-                                                        <ul class="multiselect-container dropdown-menu" style="width: 210px !important;">
+                                                        <ul class="multiselect-container dropdown-menu"
+                                                            style="width: 210px !important;">
                                                             {% for item_impuesto in impuestos %}
                                                                 <li>
                                                                     <a tabindex="0">
                                                                         <label class="checkbox">
-                                                                            <input type="checkbox" onclick="seleccionarImpuesto({{ item_impuesto.id }},{{ item.id_servicio }},{{ item.sub_total }},{{ item_impuesto.valor }})"
+                                                                            <input type="checkbox"
+                                                                                   onclick="seleccionarImpuesto({{ item_impuesto.id }},{{ item.id_servicio }},{{ item.sub_total }},{{ item_impuesto.valor }})"
                                                                                    id="{{ item_impuesto.id }}-{{ item.id_servicio }}"
                                                                                    value="{{ item_impuesto.valor }}">
                                                                             {{ item_impuesto.nombre }}
@@ -205,7 +65,8 @@
                                                     </div>
                                                     <br><i id="{{ item.id_servicio }}-impuesto">0.00</i></td>
                                                 <td class="row-group-conta text-right">Total:
-                                                    <br><i id="{{ item.id_servicio }}-total">{{ item.sub_total }}</i></td>
+                                                    <br><i id="{{ item.id_servicio }}-total">{{ item.sub_total }}</i>
+                                                </td>
                                             </tr>
                                             {% if item.id_servicio == 11 %}
                                                 {# Cabecera y cuerpo de la tabla que muestra el contenido para los tramites migratorios #}
@@ -286,13 +147,42 @@
                                     </table>
                                 </div>
                                 <div class="offset-top-10 text-right">
-                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Subtotal: &nbsp; &nbsp;
-                                        &nbsp; ${{ total }}</p>
-                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Impuesto: &nbsp; &nbsp;
-                                        &nbsp; $0.00 </p>
-                                    <p class="font-weight-bold inset-right-0 inset-xl-right-50">Total: &nbsp; &nbsp;
-                                        &nbsp; ${{ total }}</p>
-
+                                    <table class="w-100 text-right">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text-right font-weight-bold">
+                                                Subtotal:
+                                            </td>
+                                            <td width="100px" class="font-weight-bold text-right">
+                                                &nbsp; {{ total }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="w-100 text-right">
+                                        <tbody id="impuestos_rows">
+                                        <tr>
+                                            <td class="text-right font-weight-bold">
+                                                Impuestos:
+                                            </td>
+                                            <td width="100px" class="font-weight-bold text-right">
+                                                0.00
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="w-100 text-right">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text-right font-weight-bold">
+                                                Total:
+                                            </td>
+                                            <td width="100px" class="font-weight-bold text-right">
+                                                &nbsp; <span id="total_tabla">{{ total }}</span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
 
                                 </div>
                                 {# ------------ componente de los plazos de pago ------------------- #}
@@ -346,7 +236,6 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="confirm__modal_pago" data-backdrop="static" data-keyboard="false"
          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -375,48 +264,83 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .table td, .table th {
-            padding: .75rem !important;
-        }
-    </style>
-
 {% endblock %}
-
 
 {% block javascripts %}
     {{ parent() }}
     <script>
         let list_pagos = []
         let valor = 0
+        let impuestos_array = []
 
-        $(document).ready(function () {
-            $('[data-toggle="popover"]').popover({html: true});
-            $('#multiselect').multiselect({
-                buttonWidth: '160px',
-                // includeSelectAllOption : true,
-                nonSelectedText: 'Select an Option'
+        function changeDescuento(id_servicio) {
+            let campo = $('#input-' + id_servicio)
+            let check = $('#check-' + id_servicio)
+            if (check.is(':checked')) {
+                campo.prop('placeholder', 'Valor Fijo a Descontar')
+            } else
+                campo.prop('placeholder', 'Porciento a Descontar')
 
-            });
-        });
+        }
 
-        function seleccionarImpuesto(impuesto,servicio,subtotal,valor) {
-            let checkbox = $('#'+impuesto+'-'+servicio)
-            let txt_impuesto = $('#'+servicio+'-impuesto')
-            let txt_total = $('#'+servicio+'-total')
+        function seleccionarImpuesto(impuesto, servicio, subtotal, valor) {
+            let checkbox = $('#' + impuesto + '-' + servicio)
+            let txt_impuesto = $('#' + servicio + '-impuesto')
+            let txt_total = $('#' + servicio + '-total')
 
-            let monto = subtotal * valor /100
+            let monto = subtotal * valor / 100
             let impuesto_acumulado = parseFloat(txt_impuesto.text())
             let result = 0
-            if(checkbox.is(':checked')){
-                result = impuesto_acumulado+monto
+            if (checkbox.is(':checked')) {
+                result = impuesto_acumulado + monto
+            } else {
+                result = impuesto_acumulado - monto
             }
-            else{
-                result = impuesto_acumulado-monto
+
+            let impuesto_contenido = false
+            if (impuestos_array.length > 0)
+                for (let i = 0; i < impuestos_array.length; i++) {
+                    if (impuestos_array[i]['id'] == impuesto) {
+                        impuesto_contenido = true
+                        if (checkbox.is(':checked')) {
+                            impuestos_array[i]['monto'] = (parseFloat(impuestos_array[i]['monto']) + monto).toFixed(2)
+                        } else
+                            impuestos_array[i]['monto'] = (parseFloat(impuestos_array[i]['monto']) - monto).toFixed(2)
+                    }
+
+                }
+            if (!impuesto_contenido) {
+                impuestos_array.push({
+                    'id': impuesto,
+                    'monto': monto.toFixed(2)
+                })
             }
+
             txt_impuesto.text(result.toFixed(2))
-            txt_total.text((subtotal+result).toFixed(2))
+            txt_total.text((subtotal + result).toFixed(2))
+            let nombre = ''
+            $('#impuestos_rows').find('tr').remove()
+            for (let i = 0; i < impuestos_array.length; i++) {
+                if (parseFloat(impuestos_array[i]['monto']) > 0) {
+                    nombre = getNombreImpuesto(impuestos_array[i]['id'])
+                    $('#impuestos_rows').append(`<tr>
+                        <td class="font-weight-bold text-right"> ${nombre}</td>
+                        <td width="100px" class="font-weight-bold text-right"> ${impuestos_array[i]['monto']} </td>
+                        </tr>`
+                    );
+                }
+            }
+        }
+
+        function getNombreImpuesto(id_impuesto) {
+            const impuestos_json = JSON.parse('{{ impuestos|json_encode()|raw }}')
+            let nombre_impuesto = ''
+            impuestos_json.forEach(function (valor) {
+                    if (valor.id == id_impuesto)
+                        nombre_impuesto = valor.nombre
+                }
+            )
+            return nombre_impuesto
         }
 
         function deleteElementCarrito(idCarrito, id_servicio) {
