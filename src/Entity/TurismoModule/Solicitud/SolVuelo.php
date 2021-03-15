@@ -55,6 +55,11 @@ class SolVuelo
      */
     private $destino;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $viaje;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,6 +145,18 @@ class SolVuelo
     public function setDestino(?Lugares $destino): self
     {
         $this->destino = $destino;
+
+        return $this;
+    }
+
+    public function getViaje(): ?bool
+    {
+        return $this->viaje;
+    }
+
+    public function setViaje(bool $viaje): self
+    {
+        $this->viaje = $viaje;
 
         return $this;
     }

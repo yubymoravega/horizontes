@@ -18,6 +18,8 @@ use App\Form\TurismoModule\Solicitud\SolVueloType;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -60,5 +62,102 @@ class solicitudController extends AbstractController
             'form_vuelo' => $form_vuelo->createView(),
             'form_tranfer' => $form_tranfer->createView()
         ]);
+    }
+
+    /**
+     * @Route("/add", name="turismo_module_solicitud_add")
+     */
+    public function AgregarSolicitudes(EntityManagerInterface $em,Request $request){
+        $error = false;
+        //$fecha = date_parse_from_format('m/d/Y h:i A' , $request->get('fecha_vuelo'));
+        //$fecha_vuelo = date_parse_from_format('m/d/Y h:i A' , $request->get('fecha_vuelo'));
+        //$fecha = \DateTime::createFromFormat('m/d/Y h:i A',$request->get('fecha_vuelo'));
+        //dd($fecha_vuelo);
+
+        //Si el form vuelo esta completo
+        if($request->get('vuelo') == 'true'){
+            $cant_adulto_vuelo = $request->get('cant_adulto_vuelo');
+            $cant_nino_vuelo = $request->get('cant_nino_vuelo');
+            $origen_vuelo = $em->getRepository(Lugares::class)->find($request->get('origen_vuelo'));
+            $destino_vuelo = $em->getRepository(Lugares::class)->find($request->get('destino_vuelo'));
+            $fecha_vuelo = \DateTime::createFromFormat('m/d/Y h:i A',$request->get('fecha_vuelo'));
+            $viaje_vuelo = false;
+            if ($request->get('viaje_vuelo') == 'true'){
+                $viaje_vuelo = true;
+            }
+            else{
+                $viaje_vuelo = false;
+            }
+            $comentario_vuelo = $request->get('comentario_vuelo');
+
+            $obj_solVuelo = new SolVuelo();
+            $obj_solVuelo
+                ->setCantAdulto($cant_adulto_vuelo)
+                ->setCantNino($cant_nino_vuelo)
+                ->setOrigen($origen_vuelo)
+                ->setDestino($destino_vuelo)
+                ->setFecha($fecha_vuelo)
+                ->setViaje($viaje_vuelo)
+                ->setComentario($comentario_vuelo)
+                ->setActivo(true);
+            try {
+                $em->persist($obj_solVuelo);
+                $em->flush();
+            }catch (FileException $exception) {
+                $error = true;
+                return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
+            }
+        }
+
+        //Si el form hotel esta completo
+        if($request->get('hotel') == 'true'){
+            $cant_adulto_hotel = $request->get('cant_adulto_hotel');
+            $cant_nino_hotel = $request->get('cant_nino_hotel');
+            $destino_hotel = $em->getRepository(Lugares::class)->find($request->get('destino_hotel'));
+            $fechad_hotel = \DateTime::createFromFormat('m/d/Y h:i A',$request->get('fechad_hotel'));
+            $fechah_hotel = \DateTime::createFromFormat('m/d/Y h:i A',$request->get('fechah_hotel'));
+            $comentario_hotel = $request->get('comentario_hotel');
+            $hotel = $em->getRepository(Hotel::class)->find($request->get('nombre_hotel'));
+
+            $obj_solHotel = new SolHotel();
+            $obj_solHotel
+                ->setCantAdulto($cant_adulto_hotel)
+                ->setCantNino($cant_nino_hotel)
+                ->setDestino($destino_hotel)
+                ->setFechaDesde($fechad_hotel)
+                ->setFechaHasta($fechah_hotel)
+                ->setComentario($comentario_hotel)
+                ->setHotel($hotel)
+                ->setActivo(true);
+            try {
+                $em->persist($obj_solHotel);
+                $em->flush();
+            }catch (FileException $exception) {
+                $error = true;
+                return new \Exception('La petición ha retornado un error, contacte a su proveedor de software.');
+            }
+        }
+        if ($error){
+            $this->addFlash('error', "Datos de solicitud no adicionados");
+            return new JsonResponse(['success' => false]);
+        }
+        else{
+            $this->addFlash('success', "Datos de solicitud adicionados satisfactoriamente");
+            return new JsonResponse(['success' => true]);
+        }
+    }
+
+    //Datos hotel
+    /**
+     * @Route("/hotel", name="turismo_module_solicitud_hotel")
+     */
+    public function DatosHotel(EntityManagerInterface $em,Request $request){
+        $hotel = $em->getRepository(Hotel::class)->find($request->get('id'));
+        $info = [
+            //'nombre'=>$hotel->getNombre(),
+            'categoria'=>$hotel->getCategoria(),
+            'plan'=>$hotel->getPlanHotel()->getNombre()
+        ];
+        return new JsonResponse(['success'=>true,'data'=>$info]);
     }
 }

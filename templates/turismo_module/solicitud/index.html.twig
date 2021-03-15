@@ -1,4 +1,4 @@
-{% extends 'turismo_module/index.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Solicitud Turismo{% endblock %}
 
@@ -21,6 +21,12 @@
         .nav-tabs .nav-item .nav-link{
             color: #ffffff;
         }
+        .toggle.btn.btn-outline-warning.btn-sm {
+            width: 150px !important;
+        }
+        .toggle.btn.btn-outline-success.btn-sm {
+            width: 150px !important;
+        }
     </style>
     <link href="{{ asset('datetime/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('datetime/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
@@ -28,8 +34,10 @@
     <link href="{{ asset('switch/css/bootstrap4-toggle.min.css') }}" rel="stylesheet">
 {%endblock%}
 {% block content %}
-    <div class="container-fluid">
+    {% include 'breadcrumbs.html.twig' %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
+    <div class="container-fluid">
         {# header #}
         <div class="d-flex align-items-center">
             <h4 class="mr-auto display-4 mb-0 mr-auto title-table text-light">
@@ -53,6 +61,12 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="renta-tab" data-toggle="tab" href="#renta" role="tab" aria-controls="renta" aria-selected="false">Datos de la Renta de autos</a>
+                </li>
+                <li class="nav-item">
+                    <!--a class="nav-pills" id="precesar-tab" data-toggle="" href="#precesar" role="tab" aria-controls="precesar" aria-selected="false">Procesar</a-->
+                    <div>
+                        <button id="procesar" class="btn btn-outline-light">Procesar</button>
+                    </div>
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
@@ -88,12 +102,12 @@
                             <div class="col-4 input-group-sm mt-0">
                                 <label for="fecha_vuelo">Fecha de Vuelo</label>
                                 {# { form_widget(form_vuelo.fecha) }#}
-                                <input type="text" class=" w-100 form-control" id="fecha_vuelo">
+                                <input name="fecha_vuelo" type="text" class=" w-100 form-control" id="fecha_vuelo">
                             </div>
                             <div class="col-4 input-group-sm mt-4" style="padding-top: 10px;">
-                                <label for="retorno">Ida/Retorno</label>
+                                <label for="viaje_vuelo">Viaje</label>
                                 {# { form_widget(form_vuelo.fecha) }#}
-                                <input id="retorno" type="checkbox" checked data-toggle="toggle" data-on="Ida" data-off="Ida/Retorno" data-size="sm" data-onstyle="outline-warning">
+                                <input name="viaje_vuelo" id="viaje_vuelo" type="checkbox" checked data-toggle="toggle" data-on="Ida" data-off="Ida/Retorno" data-size="sm" data-onstyle="outline-warning">
                             </div>
                         </div>
                         <div class="row justify-content-center form-group input-group input-group-sm d-inline-flex mt-0">
@@ -183,8 +197,8 @@
                                 <label for="fecha_tranfer">Fecha</label>
                                 <input type="text" class=" w-100 form-control" id="fecha_tranfer">
                             </div>
-                            <div class="col input-group-sm mt-0">
-                                <div class="col-3 input-group-sm mt-0">
+                            <div class="col-3 input-group-sm mt-0">
+                                <div class="input-group-sm mt-0">
                                     <label for="fecha_tranfers">Fecha de salida</label>
                                     <input type="text" class=" w-100 form-control" id="fecha_tranfers">
                                 </div>
@@ -203,9 +217,9 @@
                                 {{ form_label(form_tranfer.tipoVehiculo) }}
                                 {{ form_widget(form_tranfer.tipoVehiculo) }}
                             </div>
-                            <div class="col-3 input-group-sm mt-4" style="margin-top: 10px;">
-                                <label for="tranfer_retorno">Ida/Retorno</label>
-                                <input id="tranfer_retorno" type="checkbox" checked data-toggle="toggle" data-on="Ida" data-off="Ida/Retorno" data-size="sm" data-onstyle="outline-warning">
+                            <div class="col-3 input-group-sm mt-4" style="padding-top: 10px;">
+                                <label for="tranfer_retorno">Viaje</label>
+                                <input style="margin-top: 10px;" id="tranfer_retorno" type="checkbox" checked data-toggle="toggle" data-on="Ida" data-off="Ida/Retorno" data-size="sm" data-onstyle="outline-warning" data-offstyle="outline-success">
                             </div>
 
                         </div>
@@ -318,6 +332,12 @@
     <script src="{{ asset('switch/js/bootstrap4-toggle.min.js') }}"></script>
     <script>
         const TEXT_SELECT = '... seleccione ...';
+        var valVuelo = false
+        var valHotel = false
+        var valtranfer = false
+        var valTour = false
+        var valRentCar = false
+
         $(document).ready(function () {
             $('select').prepend('<option selected = "false" value = "-1" disabled>' + TEXT_SELECT + '</option>')
             $('#fecha_vuelo').datetimepicker()
@@ -326,6 +346,135 @@
             $('#fecha_tour').datetimepicker()
             $('#fecha_tranfer').datetimepicker()
             $('#fecha_tranfers').datetimepicker()
+            $('#categoria').prop('disabled','true')
+            $('#plan').prop('disabled','true')
+            $('#sol_vuelo_cant_adulto').prop('type','number')
+            $('#sol_vuelo_cant_nino').prop('type','number')
+            $('#sol_hotel_cant_adulto').prop('type','number')
+            $('#sol_hotel_cant_nino').prop('type','number')
         })
+        $('#sol_hotel_hotel').on('change',function (){
+            $('#categoria').val('');
+            $('#plan').val('');
+            $.ajax({
+                url: '/turismo-module/solicitud/hotel',
+                method: "POST",
+                data: {id:$('#sol_hotel_hotel').val()}
+            }).done(function (resp,dat){
+                console.log(resp.data);
+                $('#categoria').val(resp.data['categoria']);
+                $('#plan').val(resp.data['plan']);
+            })
+        })
+
+
+
+
+        $('#procesar').on('click',function (){
+            /*$("form[name='sol_vuelo']").prop('action','/turismo-module/solicitud/add')
+            $("form[name='sol_vuelo']").submit();*/
+            Validador();
+            let datos = {}
+            if(valVuelo) {
+                datos = ({
+                    vuelo: true,
+                    cant_adulto_vuelo: $('#sol_vuelo_cant_adulto').val(),
+                    cant_nino_vuelo: $('#sol_vuelo_cant_nino').val(),
+                    origen_vuelo: $('#sol_vuelo_origen').val(),
+                    destino_vuelo: $('#sol_vuelo_destino').val(),
+                    fecha_vuelo: $('#fecha_vuelo').val(),
+                    viaje_vuelo: $('#viaje_vuelo').prop('checked'),
+                    comentario_vuelo: $('#sol_vuelo_comentario').val()
+                })
+            }
+            if(valHotel){
+                Object.defineProperty(datos,'hotel',{
+                    value:true,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'nombre_hotel',{
+                    value:$('#sol_hotel_hotel').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_adulto_hotel',{
+                    value:$('#sol_hotel_cant_adulto').val() ,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_nino_hotel',{
+                    value:$('#sol_hotel_cant_nino').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'destino_hotel',{
+                    value: $('#sol_hotel_destino').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'categoria_hotel',{
+                    value:$('#categoria').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'plan_hotel',{
+                    value:$('#plan').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fechad_hotel',{
+                    value:$('#fecha_hoteld').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fechah_hotel',{
+                    value:$('#fecha_hotelh').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'comentario_hotel',{
+                    value:$('#sol_hotel_comentario').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+            }
+
+            //console.log(datos)
+            if(valVuelo || valHotel || valRentCar || valTour || valtranfer){
+                loadingModal.show()
+                $.ajax({
+                    url: '/turismo-module/solicitud/add',
+                    method: "POST",
+                    data: datos
+                }).then(res => {
+                    window.location.replace('/turismo-module/solicitud');
+                })
+            }
+        })
+        //Validando los formularios
+        function Validador() {
+            //Vuelo
+            if ($('#sol_vuelo_cant_adulto').val() && $('#sol_vuelo_cant_nino').val() && $('#sol_vuelo_origen').val() && $('#sol_vuelo_destino').val() && $('#fecha_vuelo').val()){
+                //console.log('formulario lleno')
+                valVuelo = true
+            }
+            //Hotel
+            if($('#sol_hotel_hotel').val() && $('#sol_hotel_cant_adulto').val() && $('#sol_hotel_cant_nino').val() && $('#sol_hotel_destino').val() && $('#categoria').val() && $('#plan').val() && $('#fecha_hoteld').val() && $('#fecha_hotelh').val()){
+             valHotel = true
+                console.log('hotel valido')
+            }
+        }
+
     </script>
 {% endblock %}
