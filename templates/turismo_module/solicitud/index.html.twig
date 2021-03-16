@@ -346,12 +346,19 @@
             $('#fecha_tour').datetimepicker()
             $('#fecha_tranfer').datetimepicker()
             $('#fecha_tranfers').datetimepicker()
+            $('#fecha_rentcard').datetimepicker()
+            $('#fecha_rentcarh').datetimepicker()
             $('#categoria').prop('disabled','true')
             $('#plan').prop('disabled','true')
             $('#sol_vuelo_cant_adulto').prop('type','number')
             $('#sol_vuelo_cant_nino').prop('type','number')
             $('#sol_hotel_cant_adulto').prop('type','number')
             $('#sol_hotel_cant_nino').prop('type','number')
+            $('#sol_tranfer_cant_adulto').prop('type','number')
+            $('#sol_tranfer_cant_nino').prop('type','number')
+            $('#sol_tour_cant_adulto').prop('type','number')
+            $('#sol_tour_cant_nino').prop('type','number')
+            $('#sol_rent_car_cant_persona').prop('type','number')
         })
         $('#sol_hotel_hotel').on('change',function (){
             $('#categoria').val('');
@@ -450,6 +457,159 @@
                 })
             }
 
+            if(valtranfer){
+                Object.defineProperty(datos,'tranfer',{
+                    value:true,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_adulto_tranfer',{
+                    value:$('#sol_tranfer_cant_adulto').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_nino_tranfer',{
+                    value:$('#sol_tranfer_cant_nino').val() ,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fecha_tranfer',{
+                    value:$('#fecha_tranfer').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fechas_tranfer',{
+                    value: $('#fecha_tranfers').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'origen_tranfer',{
+                    value:$('#sol_tranfer_origen').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'destino_tranfer',{
+                    value:$('#sol_tranfer_destino').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'tipoVehiculo_tranfer',{
+                    value:$('#sol_tranfer_tipoVehiculo').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'viaje_tranfer',{
+                    value:$('#tranfer_retorno').prop('checked'),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'comentario_tranfer',{
+                    value:$('#sol_tranfer_comentario').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+            }
+
+            if(valTour){
+                Object.defineProperty(datos,'tour',{
+                    value:true,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_adulto_tour',{
+                    value:$('#sol_tour_cant_adulto').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_nino_tour',{
+                    value:$('#sol_tour_cant_nino').val() ,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fecha_tour',{
+                    value:$('#fecha_tour').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'nombre_tour',{
+                    value: $('#sol_tour_tour').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'comentario_tour',{
+                    value: $('#sol_tour_comentario').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+            }
+
+            if(valRentCar){
+                Object.defineProperty(datos,'rentcar',{
+                    value:true,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'cant_persona_rentcar',{
+                    value:$('#sol_rent_car_cant_persona').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'tipoVehiculo_rentcar',{
+                    value:$('#sol_rent_car_tipoVehiculo').val() ,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'recogida_rentcar',{
+                    value:$('#sol_rent_car_recogida').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'entrega_rentcar',{
+                    value: $('#sol_rent_car_entrega').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fechad_rentcar',{
+                    value: $('#fecha_rentcard').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'fechah_rentcar',{
+                    value: $('#fecha_rentcarh').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+                Object.defineProperty(datos,'comentario_rentcar',{
+                    value: $('#sol_rent_car_comentario').val(),
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                })
+            }
+
             //console.log(datos)
             if(valVuelo || valHotel || valRentCar || valTour || valtranfer){
                 loadingModal.show()
@@ -466,13 +626,28 @@
         function Validador() {
             //Vuelo
             if ($('#sol_vuelo_cant_adulto').val() && $('#sol_vuelo_cant_nino').val() && $('#sol_vuelo_origen').val() && $('#sol_vuelo_destino').val() && $('#fecha_vuelo').val()){
-                //console.log('formulario lleno')
                 valVuelo = true
+                //console.log('vuelo valido')
             }
             //Hotel
             if($('#sol_hotel_hotel').val() && $('#sol_hotel_cant_adulto').val() && $('#sol_hotel_cant_nino').val() && $('#sol_hotel_destino').val() && $('#categoria').val() && $('#plan').val() && $('#fecha_hoteld').val() && $('#fecha_hotelh').val()){
              valHotel = true
-                console.log('hotel valido')
+                //console.log('hotel valido')
+            }
+            //Tranfer
+            if($('#sol_tranfer_cant_adulto').val() && $('#sol_tranfer_cant_nino').val() && $('#fecha_tranfer').val() && $('#fecha_tranfers').val() && $('#sol_tranfer_origen').val() && $('#sol_tranfer_destino').val() && $('#sol_tranfer_tipoVehiculo').val()){
+                valtranfer = true
+                //console.log('tranfer valido')
+            }
+            //Tour
+            if($('#sol_tour_tour').val() && $('#sol_tour_cant_adulto').val() && $('#sol_tour_cant_nino').val() && $('#fecha_tour').val()){
+                valTour = true
+                //console.log('tour valido')
+            }
+            //Tour
+            if($('#sol_rent_car_cant_persona').val() && $('#sol_rent_car_tipoVehiculo').val() && $('#sol_rent_car_recogida').val() && $('#sol_rent_car_entrega').val() && $('#fecha_rentcard').val() && $('#fecha_rentcarh').val()){
+                valRentCar = true
+                //console.log('RentCar valido')
             }
         }
 
