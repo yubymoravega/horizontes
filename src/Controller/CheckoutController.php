@@ -59,6 +59,7 @@ class CheckoutController extends AbstractController
                 'id' => $key,
                 'servicio' => $json_array['nombre_servicio'],
                 'sub_total' => number_format($json_array['total'], 2),
+                'sub_total_value' => floatval($json_array['total']),
                 'precio_servicio' => number_format($json_array['precio_servicio'], 2),
                 'id_cliente' => $json_array['id_cliente'],
                 'id_servicio' => $json_array['id_servicio'],

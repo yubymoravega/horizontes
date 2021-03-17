@@ -18,27 +18,33 @@
                                         <tbody>
                                         {% for item in carrito %}
                                             <tr>
-                                                <td class="row-group-conta" colspan="2">Servicio:
+                                                <td style="border-top: 4px solid;" class="row-group-conta" colspan="2">
+                                                    Servicio:
                                                     <i>{{ item.servicio }}</i></td>
-                                                <td class="row-group-conta text-right">Subtotal:
+                                                <td style="border-top: 4px solid;" class="row-group-conta text-right">
+                                                    Subtotal:
                                                     <br><i>{{ item.sub_total }}</i></td>
-                                                <td width="260px" class="row-group-conta text-right">
+                                                <td style="border-top: 4px solid;" width="260px"
+                                                    class="row-group-conta text-right">
                                                     <form name="unidad" method="post" class="text-left"
                                                           id="form_modal_target" autocomplete="off"
                                                           novalidate="novalidate">
                                                         <div class="form-group input-group input-group-sm d-block">
                                                             Descuento en % (fijo <input
-                                                                    type="checkbox" name="check-{{ item.id_servicio }}"
+                                                                    type="checkbox"
+                                                                    name="check-{{ item.id_servicio }}"
                                                                     id="check-{{ item.id_servicio }}"
-                                                                    onclick="changeDescuento({{ item.id_servicio }})"> )
+                                                                    onclick="changeDescuento({{ item.id_servicio }},{{ item.sub_total_value }})">
+                                                            )
                                                             <input type="number" id="input-{{ item.id_servicio }}"
                                                                    placeholder="Porciento a Descontar"
+                                                                   onkeyup="changeDescuento({{ item.id_servicio }},{{ item.sub_total_value }})"
                                                                    class="form-control w-100 modal-body bg-dark-app form-group input-group input-group-sm d-block"
                                                             >
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td class="row-group-conta text-right">
+                                                <td style="border-top: 4px solid;" class="row-group-conta text-right">
                                                     <div class="btn-group open">
                                                         <button type="button"
                                                                 class="multiselect dropdown-toggle btn btn-sm btn-outline-warning"
@@ -53,7 +59,7 @@
                                                                     <a tabindex="0">
                                                                         <label class="checkbox">
                                                                             <input type="checkbox"
-                                                                                   onclick="seleccionarImpuesto({{ item_impuesto.id }},{{ item.id_servicio }},{{ item.sub_total }},{{ item_impuesto.valor }})"
+                                                                                   onclick="seleccionarImpuesto({{ item_impuesto.id }},{{ item.id_servicio }},{{ item.sub_total_value }},{{ item_impuesto.valor }})"
                                                                                    id="{{ item_impuesto.id }}-{{ item.id_servicio }}"
                                                                                    value="{{ item_impuesto.valor }}">
                                                                             {{ item_impuesto.nombre }}
@@ -64,7 +70,8 @@
                                                         </ul>
                                                     </div>
                                                     <br><i id="{{ item.id_servicio }}-impuesto">0.00</i></td>
-                                                <td class="row-group-conta text-right">Total:
+                                                <td style="border-top: 4px solid;" class="row-group-conta text-right">
+                                                    Total:
                                                     <br><i id="{{ item.id_servicio }}-total">{{ item.sub_total }}</i>
                                                 </td>
                                             </tr>
@@ -100,7 +107,8 @@
                                                 <tr>
                                                     <td class="text-left row-group-subconta">Beneficiario</td>
                                                     <td class="text-left row-group-subconta">Datos Contactos</td>
-                                                    <td class="text-left row-group-subconta" colspan="2">Dirección</td>
+                                                    <td class="text-left row-group-subconta" colspan="2">Dirección
+                                                    </td>
                                                     <td class="text-right row-group-subconta">Monto a Recibir</td>
                                                     <td class="text-right row-group-subconta">Eliminar</td>
                                                 </tr>
@@ -154,7 +162,15 @@
                                                 Subtotal:
                                             </td>
                                             <td width="100px" class="font-weight-bold text-right">
-                                                &nbsp; {{ total }}
+                                                <p id="subtotal_column">{{ total }}</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right font-weight-bold">
+                                                Descuentos:
+                                            </td>
+                                            <td width="100px" class="font-weight-bold text-right">
+                                                <p id="descuentos_paragraph">0.00</p>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -272,15 +288,77 @@
         let list_pagos = []
         let valor = 0
         let impuestos_array = []
+        let impuesto_total = 0
+        const impuestos_json = JSON.parse('{{ impuestos|json_encode()|raw }}')
+        let descuentos_array = []
+        let descuentos_total = 0
 
-        function changeDescuento(id_servicio) {
+        function changeDescuento(id_servicio, subtotal) {
             let campo = $('#input-' + id_servicio)
             let check = $('#check-' + id_servicio)
+            let total_txt = $('#' + id_servicio + '-total')
+            let descuento_subtotal = 0
+
             if (check.is(':checked')) {
                 campo.prop('placeholder', 'Valor Fijo a Descontar')
-            } else
+                if (campo.val() != ''){
+                    updateDescuento(id_servicio,(parseFloat(campo.val())))
+                    descuento_subtotal = parseFloat(subtotal) - parseFloat(campo.val())
+                }
+            } else {
                 campo.prop('placeholder', 'Porciento a Descontar')
+                if (campo.val() != ''){
+                    updateDescuento(id_servicio,(parseFloat(subtotal) * parseFloat(campo.val()) / 100))
+                    descuento_subtotal = parseFloat(subtotal) - (parseFloat(subtotal) * parseFloat(campo.val()) / 100)
+                }
+            }
+            if (campo.val() == '') {
+                descuento_subtotal = subtotal
+                updateDescuento(id_servicio,0)
+            }
+            updateImpuestos(id_servicio, descuento_subtotal)
+            let porciento_impuesto = getImpuestos(id_servicio)
+            total_txt.text((descuento_subtotal + (descuento_subtotal * porciento_impuesto / 100)).toFixed(2))
+            updateTotalCheckout()
+        }
 
+        function updateDescuento(id_servicio,descuento) {
+            let nuevo = true
+            for (let i = 0; i < descuentos_array.length; i++) {
+                if(descuentos_array[i]['id_servicio']== id_servicio){
+                    nuevo = false
+                    descuentos_array[i]['descuento']= parseFloat(descuento)
+                }
+            }
+            if(nuevo){
+                descuentos_array.push({
+                    'id_servicio':id_servicio,
+                    'descuento':parseFloat(descuento)
+                })
+            }
+
+            let total = 0
+            for (let i = 0; i < descuentos_array.length; i++) {
+                total += parseFloat(descuentos_array[i]['descuento'])
+            }
+            if(total>0)
+                $('#descuentos_paragraph').text(total.toFixed(2))
+            else
+                $('#descuentos_paragraph').text('0.00')
+        }
+
+        function updateTotalCheckout() {
+            let total = 0
+            for (let i = 0; i < descuentos_array.length; i++) {
+                total -= parseFloat(descuentos_array[i]['descuento'])
+            }
+            let subtotal_template = $('#subtotal_column').text()
+            total+= parseFloat(subtotal_template)
+            for(let i = 0; i<impuestos_array.length;i++)
+                total+= parseFloat(impuestos_array[i]['monto'])
+
+            $('#total_tabla').text(total.toFixed(2))
+            cl(total)
         }
 
         function seleccionarImpuesto(impuesto, servicio, subtotal, valor) {
@@ -288,7 +366,22 @@
             let txt_impuesto = $('#' + servicio + '-impuesto')
             let txt_total = $('#' + servicio + '-total')
 
-            let monto = subtotal * valor / 100
+            let campo = $('#input-' + servicio)
+            let check = $('#check-' + servicio)
+            let total_txt = $('#' + servicio + '-total')
+
+            let descuento_subtotal = parseFloat(subtotal)
+            if (campo.val() != '') {
+                if (check.is(':checked')) {
+                    campo.prop('placeholder', 'Valor Fijo a Descontar')
+                    descuento_subtotal = parseFloat(subtotal) - parseFloat(campo.val())
+                } else {
+                    campo.prop('placeholder', 'Porciento a Descontar')
+                    descuento_subtotal = parseFloat(subtotal) - (parseFloat(subtotal) * parseFloat(campo.val()) / 100)
+                }
+            }
+
+            let monto = descuento_subtotal * valor / 100
             let impuesto_acumulado = parseFloat(txt_impuesto.text())
             let result = 0
             if (checkbox.is(':checked')) {
@@ -330,10 +423,34 @@
                     );
                 }
             }
+            updateTotalCheckout()
+        }
+
+        function updateImpuestos(id_servicio, subtotal) {
+            let element_menu = '';
+            let porciento = 0;
+            impuestos_json.forEach(function (valor) {
+                    element_menu = $('#' + valor.id + '-' + id_servicio)
+                    if (element_menu.is(':checked'))
+                        porciento += parseFloat(valor.valor)
+                }
+            )
+            $('#' + id_servicio + '-impuesto').text((subtotal * porciento / 100).toFixed(2));
+        }
+
+        function getImpuestos(id_servicio) {
+            let element_menu = '';
+            let porciento = 0;
+            impuestos_json.forEach(function (valor) {
+                    element_menu = $('#' + valor.id + '-' + id_servicio)
+                    if (element_menu.is(':checked'))
+                        porciento += parseFloat(valor.valor)
+                }
+            )
+            return porciento;
         }
 
         function getNombreImpuesto(id_impuesto) {
-            const impuestos_json = JSON.parse('{{ impuestos|json_encode()|raw }}')
             let nombre_impuesto = ''
             impuestos_json.forEach(function (valor) {
                     if (valor.id == id_impuesto)
@@ -436,7 +553,7 @@
             $('#body-table-plazos').find('tr').remove()
         })
 
-        $('#planificacion_pagos_aceptar').on('click', function () {
+        $('#planificacion_pagos_calcular').on('click', function () {
             list_pagos = []
             let fecha = $('#planificacion_pagos_fecha_maxima_pago').val()
             let tipo = $('#planificacion_pagos_plazos').val()
@@ -469,14 +586,19 @@
             if (cantidad_tiempo == 0 && tipo == 4) {
                 alertTemplate('El tiempo para el plazo no supera el mes, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
             } else {
-                let total = {{ total }};
+                let total = parseFloat($('#total_tabla').text());
                 let minimo = {{ minimo_pagar }};
-                let cuota = ((total - minimo) / (cantidad_tiempo - 1)).toFixed(2)
+
+                let cuota = (total / (cantidad_tiempo - 1)).toFixed(2)
+                if(cuota<minimo)
+                    cuota = ((total - minimo) / (cantidad_tiempo - 1)).toFixed(2)
+
                 let fecha_pago = moment()
                 $('#body-table-plazos').find('tr').remove()
                 let cuota_asignada = 0;
 
                 if (cantidad_tiempo == 1) {
+                    // fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
                     fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
                     valor = total
                     list_pagos.push({

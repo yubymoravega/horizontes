@@ -23,14 +23,14 @@ class PlanificacionPagosType extends AbstractType
             ))
             ->add('plazos', ChoiceType::class, [
                 'choices' => [
-                    'Diraio' => 1,
+                    'Diario' => 1,
                     'Semanal' => 2,
                     'Quincenal' => 3,
                     'Mensual' => 4
                 ],
                 'label' => 'Plazos de Pago',
             ])
-            ->add('aceptar', ButtonType::class)
+            ->add('calcular', ButtonType::class)
             ->add('imprimir', ButtonType::class)
             ->add('id_cotizacion', HiddenType::class)
         ;
