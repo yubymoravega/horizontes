@@ -626,30 +626,57 @@
         function Validador() {
             //Vuelo
             if ($('#sol_vuelo_cant_adulto').val() && $('#sol_vuelo_cant_nino').val() && $('#sol_vuelo_origen').val() && $('#sol_vuelo_destino').val() && $('#fecha_vuelo').val()){
-                valVuelo = true
-                //console.log('vuelo valido')
+                if($('#sol_vuelo_cant_adulto').val() != '' && $('#sol_vuelo_cant_nino').val() != ''){
+                    valVuelo = true
+                }
             }
             //Hotel
             if($('#sol_hotel_hotel').val() && $('#sol_hotel_cant_adulto').val() && $('#sol_hotel_cant_nino').val() && $('#sol_hotel_destino').val() && $('#categoria').val() && $('#plan').val() && $('#fecha_hoteld').val() && $('#fecha_hotelh').val()){
-             valHotel = true
-                //console.log('hotel valido')
+             if ($('#sol_hotel_cant_adulto').val() != '' && $('#sol_hotel_cant_nino').val() != ''){
+                 valHotel = true
+             }
             }
             //Tranfer
             if($('#sol_tranfer_cant_adulto').val() && $('#sol_tranfer_cant_nino').val() && $('#fecha_tranfer').val() && $('#fecha_tranfers').val() && $('#sol_tranfer_origen').val() && $('#sol_tranfer_destino').val() && $('#sol_tranfer_tipoVehiculo').val()){
-                valtranfer = true
-                //console.log('tranfer valido')
+                if($('#sol_tranfer_cant_adulto').val() != '' && $('#sol_tranfer_cant_nino').val() != ''){
+                    valtranfer = true
+                }
             }
             //Tour
             if($('#sol_tour_tour').val() && $('#sol_tour_cant_adulto').val() && $('#sol_tour_cant_nino').val() && $('#fecha_tour').val()){
-                valTour = true
-                //console.log('tour valido')
+                if($('#sol_tour_cant_adulto').val() != '' && $('#sol_tour_cant_nino').val() != ''){
+                    valTour = true
+                }
             }
             //Tour
             if($('#sol_rent_car_cant_persona').val() && $('#sol_rent_car_tipoVehiculo').val() && $('#sol_rent_car_recogida').val() && $('#sol_rent_car_entrega').val() && $('#fecha_rentcard').val() && $('#fecha_rentcarh').val()){
-                valRentCar = true
-                //console.log('RentCar valido')
+                if($('#sol_rent_car_cant_persona').val() != ''){
+                    valRentCar = true
+                }
             }
         }
+
+        $('#sol_vuelo_origen').change(function (){
+            origen_vuelo = $('#sol_vuelo_origen').val()
+            $('#sol_vuelo_destino option').show()
+            $('#sol_vuelo_destino option[value = '+origen_vuelo+']').hide()
+        })
+        $('#sol_vuelo_destino').change(function (){
+            destino_vuelo = $('#sol_vuelo_destino').val()
+            $('#sol_vuelo_origen option').show()
+            $('#sol_vuelo_origen option[value = '+destino_vuelo+']').hide()
+        })
+
+        $('#sol_tranfer_origen').change(function (){
+            origen_tranfer = $('#sol_tranfer_origen').val()
+            $('#sol_tranfer_destino option').show()
+            $('#sol_tranfer_destino option[value = '+origen_tranfer+']').hide()
+        })
+        $('#sol_tranfer_destino').change(function (){
+            destino_tranfer = $('#sol_tranfer_destino').val()
+            $('#sol_tranfer_origen option').show()
+            $('#sol_tranfer_origen option[value = '+destino_tranfer+']').hide()
+        })
 
     </script>
 {% endblock %}
