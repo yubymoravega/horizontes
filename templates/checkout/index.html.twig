@@ -301,20 +301,20 @@
 
             if (check.is(':checked')) {
                 campo.prop('placeholder', 'Valor Fijo a Descontar')
-                if (campo.val() != ''){
-                    updateDescuento(id_servicio,(parseFloat(campo.val())))
+                if (campo.val() != '') {
+                    updateDescuento(id_servicio, (parseFloat(campo.val())))
                     descuento_subtotal = parseFloat(subtotal) - parseFloat(campo.val())
                 }
             } else {
                 campo.prop('placeholder', 'Porciento a Descontar')
-                if (campo.val() != ''){
-                    updateDescuento(id_servicio,(parseFloat(subtotal) * parseFloat(campo.val()) / 100))
+                if (campo.val() != '') {
+                    updateDescuento(id_servicio, (parseFloat(subtotal) * parseFloat(campo.val()) / 100))
                     descuento_subtotal = parseFloat(subtotal) - (parseFloat(subtotal) * parseFloat(campo.val()) / 100)
                 }
             }
             if (campo.val() == '') {
                 descuento_subtotal = subtotal
-                updateDescuento(id_servicio,0)
+                updateDescuento(id_servicio, 0)
             }
             updateImpuestos(id_servicio, descuento_subtotal)
             let porciento_impuesto = getImpuestos(id_servicio)
@@ -322,18 +322,18 @@
             updateTotalCheckout()
         }
 
-        function updateDescuento(id_servicio,descuento) {
+        function updateDescuento(id_servicio, descuento) {
             let nuevo = true
             for (let i = 0; i < descuentos_array.length; i++) {
-                if(descuentos_array[i]['id_servicio']== id_servicio){
+                if (descuentos_array[i]['id_servicio'] == id_servicio) {
                     nuevo = false
-                    descuentos_array[i]['descuento']= parseFloat(descuento)
+                    descuentos_array[i]['descuento'] = parseFloat(descuento)
                 }
             }
-            if(nuevo){
+            if (nuevo) {
                 descuentos_array.push({
-                    'id_servicio':id_servicio,
-                    'descuento':parseFloat(descuento)
+                    'id_servicio': id_servicio,
+                    'descuento': parseFloat(descuento)
                 })
             }
 
@@ -341,7 +341,7 @@
             for (let i = 0; i < descuentos_array.length; i++) {
                 total += parseFloat(descuentos_array[i]['descuento'])
             }
-            if(total>0)
+            if (total > 0)
                 $('#descuentos_paragraph').text(total.toFixed(2))
             else
                 $('#descuentos_paragraph').text('0.00')
@@ -353,12 +353,11 @@
                 total -= parseFloat(descuentos_array[i]['descuento'])
             }
             let subtotal_template = $('#subtotal_column').text()
-            total+= parseFloat(subtotal_template)
-            for(let i = 0; i<impuestos_array.length;i++)
-                total+= parseFloat(impuestos_array[i]['monto'])
+            total += parseFloat(subtotal_template)
+            for (let i = 0; i < impuestos_array.length; i++)
+                total += parseFloat(impuestos_array[i]['monto'])
 
             $('#total_tabla').text(total.toFixed(2))
-            cl(total)
         }
 
         function seleccionarImpuesto(impuesto, servicio, subtotal, valor) {
@@ -557,7 +556,7 @@
             list_pagos = []
             let fecha = $('#planificacion_pagos_fecha_maxima_pago').val()
             let tipo = $('#planificacion_pagos_plazos').val()
-            let today = moment(new Date())
+            let today = moment(new Date()).subtract(1, 'days')
             var fecha1 = moment(fecha);
 
             let cantidad_tiempo = 0
@@ -590,10 +589,10 @@
                 let minimo = {{ minimo_pagar }};
 
                 let cuota = (total / (cantidad_tiempo - 1)).toFixed(2)
-                if(cuota<minimo)
+                if (cuota < minimo)
                     cuota = ((total - minimo) / (cantidad_tiempo - 1)).toFixed(2)
 
-                let fecha_pago = moment()
+                let fecha_pago = moment().subtract(1, 'days')
                 $('#body-table-plazos').find('tr').remove()
                 let cuota_asignada = 0;
 
@@ -612,13 +611,17 @@
                     );
                 } else
                     for (let i = 0; i < cantidad_tiempo; i++) {
-                        fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                        if (i == 0)
+                            fecha_pago = moment();
+                        else
+                            fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+
                         if (i == cantidad_tiempo - 1) {
                             cuota = (parseFloat(total) - parseFloat(cuota_asignada)).toFixed(2)
                         } else if (i > 0) {
                             cuota_asignada += parseFloat(cuota)
                         }
-                        if (i == 0 && minimo > 0) {
+                        if (i == 0 && cuota < minimo) {
                             valor = minimo
                             list_pagos.push({fecha_pago, valor})
                             cuota_asignada += parseFloat(minimo)
