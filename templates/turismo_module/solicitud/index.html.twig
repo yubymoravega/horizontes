@@ -45,6 +45,40 @@
             </h4>
         </div>
         {# end header #}
+        {# Modal de confirmación de cambio de estado #}
+        <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" data-backdrop="static"
+             data-keyboard="false"
+             aria-labelledby="confimacionEstado" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title text-light" id="gestionarOrigenDestino">Confirmación</h4>
+                        <button class="close text-light" type="button" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="modal-body">
+                        <div>
+                            <p id="msg">Va a procesar los siguientes datos:</p>
+                        </div>
+                        <div class="row p-3 mt-2" id="datos-modal"></div>
+                        <div class="modal-footer pb-0">
+                            <div class="mr-auto">
+                                <button class="btn btn-outline-secondary" type="button" data-dismiss="modal"
+                                        aria-label="Cerrar">
+                                    <span aria-hidden="true">Cancelar</span>
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button type="button" class="my-0 btn btn-primary" id="btnAcep">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div>
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
@@ -65,7 +99,7 @@
                 <li class="nav-item">
                     <!--a class="nav-pills" id="precesar-tab" data-toggle="" href="#precesar" role="tab" aria-controls="precesar" aria-selected="false">Procesar</a-->
                     <div>
-                        <button id="procesar" class="btn btn-outline-light">Procesar</button>
+                        <button id="procesar" class="btn btn-outline-light" onclick="Validador()">Procesar</button>
                     </div>
                 </li>
             </ul>
@@ -360,6 +394,7 @@
             $('#sol_tour_cant_nino').prop('type','number')
             $('#sol_rent_car_cant_persona').prop('type','number')
         })
+
         $('#sol_hotel_hotel').on('change',function (){
             $('#categoria').val('');
             $('#plan').val('');
@@ -374,12 +409,7 @@
             })
         })
 
-
-
-
-        $('#procesar').on('click',function (){
-            /*$("form[name='sol_vuelo']").prop('action','/turismo-module/solicitud/add')
-            $("form[name='sol_vuelo']").submit();*/
+        $('#btnAcep').on('click',function (){
             Validador();
             let datos = {}
             if(valVuelo) {
@@ -610,7 +640,6 @@
                 })
             }
 
-            //console.log(datos)
             if(valVuelo || valHotel || valRentCar || valTour || valtranfer){
                 loadingModal.show()
                 $.ajax({
@@ -624,6 +653,7 @@
         })
         //Validando los formularios
         function Validador() {
+            
             //Vuelo
             if ($('#sol_vuelo_cant_adulto').val() && $('#sol_vuelo_cant_nino').val() && $('#sol_vuelo_origen').val() && $('#sol_vuelo_destino').val() && $('#fecha_vuelo').val()){
                 if($('#sol_vuelo_cant_adulto').val() != '' && $('#sol_vuelo_cant_nino').val() != ''){
@@ -654,6 +684,47 @@
                     valRentCar = true
                 }
             }
+            if(!valRentCar && !valTour && !valtranfer && !valHotel && !valVuelo){
+                alertTemplate('No hay formulario de solicitud completo para procesar','danger')
+            }
+            else {
+                $('#confirmacionModal').modal('show')
+                $('#confirmacionModal').on('shown.bs.modal', function (e) {
+                    $('#datos-modal > p').remove()
+                    if(valVuelo){
+                        var viaje_vuelo = ''
+                        if($('#viaje_vuelo').prop('checked') == true){
+                            viaje_vuelo = 'solo ida'
+                        }
+                        else {
+                            viaje_vuelo = 'ida y regreso'
+                        }
+                        $('#datos-modal').append("<p>Vuelo desde <span class='badge badge-info'>"+$('#sol_vuelo_origen option:selected').text()+"</span> hasta <span class='badge badge-info'>"+$('#sol_vuelo_destino option:selected').text()+"</span> con <span class='badge badge-info'>"+$('#sol_vuelo_cant_adulto').val()+"</span> adulto(s) y <span class='badge badge-info'>"+$('#sol_vuelo_cant_nino').val()+"</span> niño(s) en la fecha <span class='badge badge-info'>"+$('#fecha_vuelo').val()+"</span> y va a ser un viaje de <span class='badge badge-info'>"+viaje_vuelo+"</span></p>")
+                    }
+                    if(valHotel){
+                        $('#datos-modal').append("<p>Hotel <span class='badge badge-info'>"+$('#sol_hotel_hotel option:selected').text()+"</span> con <span class='badge badge-info'>"+$('#sol_hotel_cant_adulto').val()+"</span> adulto(s) y <span class='badge badge-info'>"+$('#sol_hotel_cant_nino').val()+"</span> niño(s) este hotel tiene categoria <span class='badge badge-info'>"+$('#categoria').val()+"</span> y el plan es <span class='badge badge-info'>"+$('#plan').val()+"</span>, la fecha de la solicitud es de <span class='badge badge-info'>"+$('#fecha_hoteld').val()+"</span> hasta <span class='badge badge-info'>"+$('#fecha_hotelh').val()+"</span> y el destino es <span class='badge badge-info'>"+$('#sol_hotel_destino option:selected').text()+"</span></p>")
+                    }
+                    if(valtranfer){
+                        if($('#tranfer_retorno').prop('checked') == true){
+                            viaje_tranfer = 'solo ida'
+                        }
+                        else {
+                            viaje_tranfer = 'ida y regreso'
+                        }
+                        $('#datos-modal').append("<p>Tranfer para <span class='badge badge-info'>"+$('#sol_tranfer_cant_adulto').val()+"</span> adulto(s) y <span class='badge badge-info'>"+$('#sol_tranfer_cant_nino').val()+"</span> niño(s),de <span class='badge badge-info'>"+$('#fecha_tranfer').val()+"</span> hasta <span class='badge badge-info'>"+$('#fecha_tranfers').val()+"</span>, desde <span class='badge badge-info'>"+$('#sol_tranfer_origen option:selected').text()+"</span> hasta el destino <span class='badge badge-info'>"+$('#sol_tranfer_destino option:selected').text()+"</span> el tipo de vehiculo a utilizar es <span class='badge badge-info'>"+$('#sol_tranfer_tipoVehiculo option:selected').text()+"</span> y el viaje es de <span class='badge badge-info'>"+viaje_tranfer+"</span></p>")
+                    }
+                    if(valTour){
+                        $('#datos-modal').append("<p>El tour es <span class='badge badge-info'>"+$('#sol_tour_tour option:selected').text()+"</span> con <span class='badge badge-info'>"+$('#sol_tour_cant_adulto').val()+"</span> adulto(s) y <span class='badge badge-info'>"+$('#sol_tour_cant_nino').val()+"</span> niño(s); la fecha de salida del tour es <span class='badge badge-info'>"+$('#fecha_tour').val()+"</span></p>")
+                    }
+                    if(valRentCar){
+                        $('#datos-modal').append("<p>Renta de auto para <span class='badge badge-info'>"+$('#sol_rent_car_cant_persona').val()+"</span> personas, el tipo de vehiculo es <span class='badge badge-info'>"+$('#sol_rent_car_tipoVehiculo option:selected').text()+"</span> la recogida del vehiculo se hará en <span class='badge badge-info'>"+$('#sol_rent_car_recogida option:selected').text()+"</span> y la entrega es en <span class='badge badge-info'>"+$('#sol_rent_car_entrega option:selected').text()+"</span> ,el auto se va a utilizar desde <span class='badge badge-info'>"+$('#fecha_rentcard').val()+"</span> hasta <span class='badge badge-info'>"+$('#fecha_rentcarh').val()+"</span></p>")
+                    }
+
+                    $('#datos-modal').append("<p class='text-bold text-center'>¿Está de acuerdo?</p>")
+                })
+            }
+
+
         }
 
         $('#sol_vuelo_origen').change(function (){
