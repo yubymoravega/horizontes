@@ -366,7 +366,6 @@ class SolicitudController extends AbstractController
      */
     public function addCarrito(EntityManagerInterface $em, Request $request)
     {
-        dd($request);
         $id_servicio = AuxFunctionsTurismo::IDENTIFICADOR_REMESA;
         $unidad = AuxFunctions::getUnidad($em, $this->getUser());
         $moneda = $request->request->get('moneda');
