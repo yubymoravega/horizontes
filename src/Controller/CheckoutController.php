@@ -87,7 +87,8 @@ class CheckoutController extends AbstractController
             'total' => number_format($total, 2),
             'form' => $form->createView(),
             'minimo_pagar'=>$minimo,
-            'impuestos'=>$rows
+            'impuestos'=>$rows,
+            'fecha'=>Date('Y-m-d')
         ]);
     }
 

@@ -293,6 +293,17 @@
         let descuentos_array = []
         let descuentos_total = 0
 
+        $(document).ready(function () {
+            loadingModal.show()
+            const anno = new Date().getFullYear()
+            const mes = parseInt(new Date().getMonth()) + 1 < 10 ? '0' + (parseInt(new Date().getMonth()) + 1) : new Date().getMonth()
+            const dia = new Date().getDate()
+            const str = anno + "-" + mes + "-" + dia
+            loadingModal.close()
+            let x = $('#planificacion_pagos_fecha_maxima_pago').prop('min', str)
+        })
+
+
         function changeDescuento(id_servicio, subtotal) {
             let campo = $('#input-' + id_servicio)
             let check = $('#check-' + id_servicio)
@@ -514,34 +525,42 @@
         };
 
         function cotizacion() {
-            let msg = '¿Está seguro que desa hacer la cotización?';
-            if (list_pagos.length == 0) {
-                msg = 'Usted no ha definido los plazos de pago, la cotización se cancelará automaticamente a los 7 día de eleborada, si aún no ha definido los pagos. ¿Está seguro que desa hacer la cotización?'
-            }
-            $('#mssage__confirm').text(msg)
-            $('#confirm__modal_cotizacion').modal('show');
-            $("#confirm__modal__btn_contizacion").on('click', function () {
-                let fecha_maxima = $('#planificacion_pagos_fecha_maxima_pago').val()
-                let palzos = $('#planificacion_pagos_plazos').val()
-                const listado = JSON.stringify(list_pagos)
-                $('body').append(`
+            if (selectImpuesto()) {
+                let msg = '¿Está seguro que desa hacer la cotización?';
+                if (list_pagos.length == 0) {
+                    msg = 'Usted no ha definido los plazos de pago, la cotización se cancelará automaticamente a los 7 día de eleborada, si aún no ha definido los pagos. ¿Está seguro que desa hacer la cotización?'
+                }
+                $('#mssage__confirm').text(msg)
+                $('#confirm__modal_cotizacion').modal('show');
+                $("#confirm__modal__btn_contizacion").on('click', function () {
+                    let fecha_maxima = $('#planificacion_pagos_fecha_maxima_pago').val()
+                    let palzos = $('#planificacion_pagos_plazos').val()
+                    const listado = JSON.stringify(list_pagos)
+                    $('body').append(`
                     <form action='/checkout-services/cotizacion'
                          method="post" id='form_cotizacion' target='_self'>
                         <input type='text' hidden name='fecha_maxima' value='${fecha_maxima}'/>
                         <input type='text' hidden name='palzos' value='${palzos}'/>
                         <input type='hidden' hidden name='list_json' value='${listado}' />
                     </form>`)
-                const fomrulario = $('#form_cotizacion')
-                fomrulario.submit()
-                fomrulario.remove()
-            });
+                    const fomrulario = $('#form_cotizacion')
+                    fomrulario.submit()
+                    fomrulario.remove()
+                });
+            } else {
+                alertTemplate('Todos los sevicios deben tener al menos un impuesto seleccionado.', 'danger')
+            }
         }
 
         function cobrar() {
-            $('#confirm__modal_pago').modal('show');
-            $("#confirm__modal__btn_pago").click(function () {
-                // window.location.href = "/cotizacion/pago/";
-            });
+            if (selectImpuesto()) {
+                $('#confirm__modal_pago').modal('show');
+                $("#confirm__modal__btn_pago").click(function () {
+                    // window.location.href = "/cotizacion/pago/";
+                });
+            } else {
+                alertTemplate('Todos los sevicios deben tener al menos un impuesto seleccionado.', 'danger')
+            }
         }
 
         //    --------- javascript de los plazos de pago
@@ -557,47 +576,53 @@
             let fecha = $('#planificacion_pagos_fecha_maxima_pago').val()
             let tipo = $('#planificacion_pagos_plazos').val()
             let today = moment(new Date()).subtract(1, 'days')
-            var fecha1 = moment(fecha);
+            var fecha1 = moment(fecha).add(1, 'days');
 
+            let diferencia_dias = fecha1.diff(today, 'days')
+            let clasificador = 'days';
+            let resto_tiempo = 0
             let cantidad_tiempo = 0
-            let tiempo_sumar = 0;
-            let clasificador = '';
+            let tiempo_sumar = 0
             if (tipo == 1) {
-                cantidad_tiempo = fecha1.diff(today, 'days')
-                clasificador = 'days';
                 tiempo_sumar = 1;
+                resto_tiempo = 0
+                cantidad_tiempo = diferencia_dias
             }
             if (tipo == 2) {
-                cantidad_tiempo = fecha1.diff(today, 'weeks')
-                clasificador = 'days';
                 tiempo_sumar = 7;
+                resto_tiempo = diferencia_dias % 7
+                cantidad_tiempo = diferencia_dias / 7
             }
             if (tipo == 3) {
-                cantidad_tiempo = fecha1.diff(today, 'weeks') / 2
-                clasificador = 'days';
-                tiempo_sumar = 15;
+                tiempo_sumar = 14;
+                resto_tiempo = diferencia_dias % 14
+                cantidad_tiempo = diferencia_dias / 14
             }
             if (tipo == 4) {
-                cantidad_tiempo = fecha1.diff(today, 'months')
-                clasificador = 'months';
-                tiempo_sumar = 1;
+                tiempo_sumar = 30;
+                resto_tiempo = diferencia_dias % 30
+                cantidad_tiempo = diferencia_dias / 30
             }
             if (cantidad_tiempo == 0 && tipo == 4) {
                 alertTemplate('El tiempo para el plazo no supera el mes, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
+            } else if (cantidad_tiempo < 1 && tipo == 3) {
+                alertTemplate('El tiempo para el plazo no supera la quincena, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
+            } else if (cantidad_tiempo == 0 && tipo == 2) {
+                alertTemplate('El tiempo para el plazo no supera la semana, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
             } else {
                 let total = parseFloat($('#total_tabla').text());
                 let minimo = {{ minimo_pagar }};
 
-                let cuota = (total / (cantidad_tiempo - 1)).toFixed(2)
+                let cuota = (total / (cantidad_tiempo + 1))
                 if (cuota < minimo)
-                    cuota = ((total - minimo) / (cantidad_tiempo - 1)).toFixed(2)
+                    cuota = ((total - minimo) / (cantidad_tiempo))
 
+                cuota = parseFloat(cuota.toFixed(2))
                 let fecha_pago = moment().subtract(1, 'days')
                 $('#body-table-plazos').find('tr').remove()
                 let cuota_asignada = 0;
 
                 if (cantidad_tiempo == 1) {
-                    // fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
                     fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
                     valor = total
                     list_pagos.push({
@@ -609,39 +634,64 @@
                             <td class="text-right"> ${total} </td>
                         </tr>`
                     );
-                } else
-                    for (let i = 0; i < cantidad_tiempo; i++) {
-                        if (i == 0)
+                } else {
+                    for (let i = 0; i <= parseInt(cantidad_tiempo); i++) {
+                        if (i == 0) {
                             fecha_pago = moment();
-                        else
-                            fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
-
-                        if (i == cantidad_tiempo - 1) {
-                            cuota = (parseFloat(total) - parseFloat(cuota_asignada)).toFixed(2)
-                        } else if (i > 0) {
-                            cuota_asignada += parseFloat(cuota)
-                        }
-                        if (i == 0 && cuota < minimo) {
-                            valor = minimo
-                            list_pagos.push({fecha_pago, valor})
-                            cuota_asignada += parseFloat(minimo)
-                            $('#body-table-plazos').append(`<tr>
-                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
-                            <td class="text-right"> ${minimo.toFixed(2)} </td>
-                        </tr>`
-                            );
+                            if (parseFloat(cuota) < minimo) {
+                                valor = parseFloat(minimo)
+                            } else {
+                                valor = parseFloat(cuota)
+                            }
+                            cuota_asignada += valor
                         } else {
-                            valor = cuota
-                            list_pagos.push({fecha_pago, valor})
-                            $('#body-table-plazos').append(`<tr>
-                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
-                            <td class="text-right"> ${cuota} </td>
-                        </tr>`
-                            );
+                            if (i < parseInt(cantidad_tiempo)) {
+                                fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                                cuota_asignada += parseFloat(cuota)
+                                valor = parseFloat(cuota)
+                            } else if (i == parseInt(cantidad_tiempo)) {
+                                if (resto_tiempo == 0) {
+                                    fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                                    cuota_asignada = total - parseFloat(cuota_asignada)
+                                    valor = cuota_asignada
+                                }
+                                if (resto_tiempo != 0) {
+                                    fecha_pago = fecha_pago.add(tiempo_sumar, clasificador);
+                                    cuota_asignada += parseFloat(cuota)
+                                    valor = parseFloat(cuota)
+                                }
+                            }
+
                         }
+                        list_pagos.push({fecha_pago, valor})
+                        $('#body-table-plazos').append(`<tr>
+                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
+                            <td class="text-right"> ${valor.toFixed(2)} </td>
+                        </tr>`
+                        );
                     }
+                    if (resto_tiempo != 0) {
+                        fecha_pago = moment(fecha);
+                        valor = total - parseFloat(cuota_asignada)
+                        list_pagos.push({fecha_pago, valor})
+                        $('#body-table-plazos').append(`<tr>
+                            <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
+                            <td class="text-right"> ${valor.toFixed(2)} </td>
+                        </tr>`
+                        );
+                    }
+                }
             }
         })
+
+        function selectImpuesto() {
+            let sala = true
+            $("[id$='impuesto']").each(function (item, valor) {
+                if (parseFloat(valor.innerText) == 0)
+                    sala = false
+            })
+            return sala
+        }
     </script>
 
 {% endblock %}

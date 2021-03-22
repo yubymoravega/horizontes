@@ -126,10 +126,8 @@ function ActualizarCarrito() {
         dataType: 'html',
         success: function (data) {
             data = JSON.parse(data);
-            cl(data)
             if (data) {
                 conCarrito = data.length;
-                cl(data)
                 let total_importe = 0
                 for (let i = 0; i < data.length; i++) {
                     let json = data[i].json;
