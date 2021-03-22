@@ -305,6 +305,7 @@
 
 
         function changeDescuento(id_servicio, subtotal) {
+            $('#body-table-plazos').find('tr').remove()
             let campo = $('#input-' + id_servicio)
             let check = $('#check-' + id_servicio)
             let total_txt = $('#' + id_servicio + '-total')
@@ -372,6 +373,7 @@
         }
 
         function seleccionarImpuesto(impuesto, servicio, subtotal, valor) {
+            $('#body-table-plazos').find('tr').remove()
             let checkbox = $('#' + impuesto + '-' + servicio)
             let txt_impuesto = $('#' + servicio + '-impuesto')
             let txt_total = $('#' + servicio + '-total')
@@ -603,12 +605,12 @@
                 resto_tiempo = diferencia_dias % 30
                 cantidad_tiempo = diferencia_dias / 30
             }
-            if (cantidad_tiempo == 0 && tipo == 4) {
-                alertTemplate('El tiempo para el plazo no supera el mes, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
-            } else if (cantidad_tiempo < 1 && tipo == 3) {
-                alertTemplate('El tiempo para el plazo no supera la quincena, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
-            } else if (cantidad_tiempo == 0 && tipo == 2) {
-                alertTemplate('El tiempo para el plazo no supera la semana, por lo tanto no puede seleccionar ese plazo de pago.', 'danger')
+            if (diferencia_dias < 30 && tipo == 4) {
+                alertTemplate('El tiempo para el plazo no supera el mes.', 'danger')
+            } else if (diferencia_dias < 14 && tipo == 3) {
+                alertTemplate('El tiempo para el plazo no supera la quincena.', 'danger')
+            } else if (diferencia_dias < 7 && tipo == 2) {
+                alertTemplate('El tiempo para el plazo no supera la semana.', 'danger')
             } else {
                 let total = parseFloat($('#total_tabla').text());
                 let minimo = {{ minimo_pagar }};
@@ -663,14 +665,16 @@
                             }
 
                         }
-                        list_pagos.push({fecha_pago, valor})
-                        $('#body-table-plazos').append(`<tr>
+                        if (valor > 0) {
+                            list_pagos.push({fecha_pago, valor})
+                            $('#body-table-plazos').append(`<tr>
                             <td class="text-center"> ${fecha_pago.format('DD/MM/YYYY')}</td>
                             <td class="text-right"> ${valor.toFixed(2)} </td>
                         </tr>`
-                        );
+                            );
+                        }
                     }
-                    if (resto_tiempo != 0) {
+                    if (resto_tiempo != 0 && valor > 0) {
                         fecha_pago = moment(fecha);
                         valor = total - parseFloat(cuota_asignada)
                         list_pagos.push({fecha_pago, valor})
