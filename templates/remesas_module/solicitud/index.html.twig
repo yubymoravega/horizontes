@@ -377,7 +377,7 @@
                                 loadingModal.close()
                                 $('#beneficiarios_clientes_monto_recibir').val('')
                                 $('#beneficiarios_clientes_monto_entregar').val('')
-                            } else{
+                            } else {
                                 $('#beneficiarios_clientes_monto_entregar').val(result.a_pagar)
                                 id_regla = result.id_regla
                             }
@@ -391,6 +391,42 @@
                 } else {
                     alertTemplate('Tiene que seleccionar la moneda en que se entregará en el país del beneficiario.', 'danger')
                 }
+            }
+        })
+
+        $('#beneficiarios_clientes_monto_recibir').focusout(function (e) {
+            $('#beneficiarios_clientes_monto_entregar').val('')
+            if ($('#beneficiarios_clientes_id_moneda').val() > 0) {
+
+                let id_pais = $('#beneficiarios_clientes_id_pais').val()
+                let id_moneda_pais = $('#beneficiarios_clientes_id_moneda').val()
+                let monto = $('#beneficiarios_clientes_monto_recibir').val()
+                let currency = $('#currency').val()
+                loadingModal.show()
+                $.ajax({
+                    url: '/servicios/remesas/solicitud/getMontoPagar',
+                    method: 'POST',
+                    data: {id_pais: id_pais, id_moneda_pais: id_moneda_pais, monto: monto, currency: currency},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.a_pagar == 0) {
+                            alertTemplate('No existen reglas configuradas para la cantidad especificada', 'danger')
+                            loadingModal.close()
+                            $('#beneficiarios_clientes_monto_recibir').val('')
+                            $('#beneficiarios_clientes_monto_entregar').val('')
+                        } else {
+                            $('#beneficiarios_clientes_monto_entregar').val(result.a_pagar)
+                            id_regla = result.id_regla
+                        }
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        alertTemplate('Error interno', 'danger')
+                        loadingModal.close()
+                    }
+                })
+            } else {
+                alertTemplate('Tiene que seleccionar la moneda en que se entregará en el país del beneficiario.', 'danger')
             }
         })
 
@@ -414,7 +450,7 @@
                                 $('#beneficiarios_clientes_monto_recibir').val('')
                                 $('#beneficiarios_clientes_monto_entregar').val('')
                                 loadingModal.close()
-                            } else{
+                            } else {
                                 id_regla = result.id_regla
                                 $('#beneficiarios_clientes_monto_recibir').val(result.a_recibir)
                             }
@@ -428,6 +464,41 @@
                 } else {
                     alertTemplate('Tiene que seleccionar la moneda en que se entregará en el país del beneficiario.', 'danger')
                 }
+            }
+        })
+
+        $('#beneficiarios_clientes_monto_entregar').focusout(function (e) {
+            $('#beneficiarios_clientes_monto_recibir').val('')
+            if ($('#beneficiarios_clientes_id_moneda').val() > 0) {
+                let id_pais = $('#beneficiarios_clientes_id_pais').val()
+                let id_moneda_pais = $('#beneficiarios_clientes_id_moneda').val()
+                let monto = $('#beneficiarios_clientes_monto_entregar').val()
+                let currency = $('#currency').val()
+                loadingModal.show()
+                $.ajax({
+                    url: '/servicios/remesas/solicitud/getMontoRecibir',
+                    method: 'POST',
+                    data: {id_pais: id_pais, id_moneda_pais: id_moneda_pais, monto: monto, currency: currency},
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.a_recibir == 0) {
+                            alertTemplate('No existen reglas configuradas para la cantidad especificada', 'danger')
+                            $('#beneficiarios_clientes_monto_recibir').val('')
+                            $('#beneficiarios_clientes_monto_entregar').val('')
+                            loadingModal.close()
+                        } else {
+                            id_regla = result.id_regla
+                            $('#beneficiarios_clientes_monto_recibir').val(result.a_recibir)
+                        }
+                        loadingModal.close()
+                    },
+                    error: function (error) {
+                        alertTemplate('Error interno', 'danger')
+                        loadingModal.close()
+                    }
+                })
+            } else {
+                alertTemplate('Tiene que seleccionar la moneda en que se entregará en el país del beneficiario.', 'danger')
             }
         })
 
@@ -501,7 +572,7 @@
                 $('#beneficiarios_clientes_primer_nombre').val(0)
         }
 
-        $('#beneficiarios_clientes_id_moneda').on('change',function () {
+        $('#beneficiarios_clientes_id_moneda').on('change', function () {
             $('#beneficiarios_clientes_monto_entregar').val('')
             $('#beneficiarios_clientes_monto_recibir').val('')
         })
@@ -627,7 +698,7 @@
                             total_por_moneda += parseFloat(list_table[i]['monto_recibir_'])
                     }
                     cl(total_por_moneda)
-                    str_recibir += (total_por_moneda.toFixed(2)+' '+monedas_listado[j]+', ')
+                    str_recibir += (total_por_moneda.toFixed(2) + ' ' + monedas_listado[j] + ', ')
                 }
 
 
@@ -738,7 +809,7 @@
                 edificio_: edificio_,
                 apto_: apto_,
                 reparto_: reparto_,
-                id_regla:id_regla
+                id_regla: id_regla
             }
             $.ajax({
                 url: '/servicios/remesas/solicitud/saveBeneficiario',
