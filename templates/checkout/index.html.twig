@@ -19,9 +19,11 @@
                                         {% for item in carrito %}
                                             <tr>
                                                 <td style="border-top: 4px solid;" class="row-group-conta" colspan="2">
-                                                    <button class="btn btn-sm btn-outline-secondary">
-                                                        <i class="fa fa-arrow-up" id="arrow--{{ item.id_servicio }}"
-                                                           onclick="manageAcordions({{ item.id_servicio }})">
+                                                    <button id="btn--{{ item.id_servicio }}"
+                                                            class="btn btn-sm btn-outline-secondary"
+                                                            style="border-radius: 50%; border-width: 2px;"
+                                                            onclick="manageAcordions({{ item.id_servicio }})">
+                                                        <i class="fa fa-arrow-up" id="arrow--{{ item.id_servicio }}">
                                                         </i>
                                                     </button>
                                                     Servicio:
@@ -297,6 +299,77 @@
         const impuestos_json = JSON.parse('{{ impuestos|json_encode()|raw }}')
         let descuentos_array = []
         let descuentos_total = 0
+        let list_descuentos = []
+        let list_impuestos = []
+        const carrito_json = JSON.parse('{{ carrito|json_encode()|raw }}')
+        let element_carrito_input = ''
+
+        function manageAcordions(id_servicio) {
+            let element_acordion = $('#servicio--' + id_servicio)
+            let btn = $('#btn--' + id_servicio)
+            let i = $('#arrow--' + id_servicio)
+            if (id_servicio == 11) {
+                if (element_acordion.is(':visible')) {
+                    i.removeClass('fa fa-arrow-up')
+                    i.addClass('fa fa-arrow-down')
+                    btn.removeClass('btn btn-sm btn-outline-secondary')
+                    btn.addClass('btn btn-sm btn-secondary')
+                    acordionVisado(true)
+                } else {
+                    i.removeClass('fa fa-arrow-down')
+                    i.addClass('fa fa-arrow-up')
+                    btn.removeClass('btn btn-sm btn-secondary')
+                    btn.addClass('btn btn-sm btn-outline-secondary')
+                    acordionVisado(false)
+                }
+            } else if (id_servicio == 4) {
+                if (element_acordion.is(':visible')) {
+                    i.removeClass('fa fa-arrow-up')
+                    i.addClass('fa fa-arrow-down')
+                    btn.removeClass('btn btn-sm btn-outline-secondary')
+                    btn.addClass('btn btn-sm btn-secondary')
+                    acordionRemesa(true)
+                } else {
+                    i.removeClass('fa fa-arrow-down')
+                    i.addClass('fa fa-arrow-up')
+                    btn.removeClass('btn btn-sm btn-secondary')
+                    btn.addClass('btn btn-sm btn-outline-secondary')
+                    acordionRemesa(false)
+                }
+            }
+        }
+
+        function acordionVisado(flag) {
+            if (flag) {
+                $('#servicio--11').hide()
+                $("[id$='--solicitud--11']").each(function (item, valor) {
+                    let str = '#' + valor.id
+                    $(str).hide()
+                })
+            } else {
+                $('#servicio--11').show()
+                $("[id$='--solicitud--11']").each(function (item, valor) {
+                    let str = '#' + valor.id
+                    $(str).show()
+                })
+            }
+        }
+
+        function acordionRemesa(flag) {
+            if (flag) {
+                $('#servicio--4').hide()
+                $("[id$='--solicitud--4']").each(function (item, valor) {
+                    let str = '#' + valor.id
+                    $(str).hide()
+                })
+            } else {
+                $('#servicio--4').show()
+                $("[id$='--solicitud--4']").each(function (item, valor) {
+                    let str = '#' + valor.id
+                    $(str).show()
+                })
+            }
+        }
 
         $(document).ready(function () {
             loadingModal.show()
@@ -304,6 +377,11 @@
             const mes = parseInt(new Date().getMonth()) + 1 < 10 ? '0' + (parseInt(new Date().getMonth()) + 1) : new Date().getMonth()
             const dia = new Date().getDate()
             const str = anno + "-" + mes + "-" + dia
+
+            carrito_json.forEach(function (valor) {
+                    manageAcordions(valor.id_servicio)
+                }
+            )
             loadingModal.close()
             let x = $('#planificacion_pagos_fecha_maxima_pago').prop('min', str)
         })
@@ -365,14 +443,28 @@
 
         function updateTotalCheckout() {
             let total = 0
+            let total_descuentos = 0
+            let total_impuestos = 0
             for (let i = 0; i < descuentos_array.length; i++) {
-                total -= parseFloat(descuentos_array[i]['descuento'])
+                total_descuentos += parseFloat(descuentos_array[i]['descuento'])
             }
-            let subtotal_template = $('#subtotal_column').text()
-            total += parseFloat(subtotal_template)
-            for (let i = 0; i < impuestos_array.length; i++)
-                total += parseFloat(impuestos_array[i]['monto'])
 
+            let subtotal_template = 0;
+            let subtotal_template_str = $('#subtotal_column').text()
+            let arr = subtotal_template_str.split(',')
+            if(arr.length>1){
+                let miles = parseInt(arr[0])
+                let centenas = parseFloat(arr[1])
+                subtotal_template = miles*1000+centenas
+            }
+            else{
+                subtotal_template = parseFloat(subtotal_template_str)
+            }
+
+            for (let i = 0; i < impuestos_array.length; i++)
+                total_impuestos += parseFloat(impuestos_array[i]['monto'])
+
+            total = parseFloat(subtotal_template) - total_descuentos + total_impuestos
             $('#total_tabla').text(total.toFixed(2))
         }
 
@@ -533,10 +625,40 @@
                 }
                 $('#mssage__confirm').text(msg)
                 $('#confirm__modal_cotizacion').modal('show');
+
                 $("#confirm__modal__btn_contizacion").on('click', function () {
                     let fecha_maxima = $('#planificacion_pagos_fecha_maxima_pago').val()
                     let palzos = $('#planificacion_pagos_plazos').val()
                     const listado = JSON.stringify(list_pagos)
+                    list_descuentos = []
+                    list_impuestos = []
+                    carrito_json.forEach(function (valor) {
+                        let servicio = valor.id_servicio
+                        element_carrito_input = $('#input-' + servicio)
+                        element_carrito_check = $('#check-' + servicio)
+                        if (element_carrito_input.val() != '' || element_carrito_input.val() > 0) {
+                            let desc = parseFloat(element_carrito_input.val())
+                            let fijo = element_carrito_check.is(':checked')
+                            list_descuentos.push({
+                                servicio,
+                                desc,
+                                fijo
+                            })
+                        }
+
+                        impuestos_json.forEach(function (impuesto) {
+                            let impuesto_id = impuesto.id
+                            let element_check = $('#'+impuesto_id+'-'+servicio)
+                            if(element_check.is(':checked')){
+                                list_impuestos.push({
+                                    servicio,
+                                    impuesto_id
+                                })
+                            }
+                        })
+                    })
+                    cl(list_descuentos,list_impuestos)
+
                     $('body').append(`
                     <form action='/checkout-services/cotizacion'
                          method="post" id='form_cotizacion' target='_self'>
@@ -545,7 +667,7 @@
                         <input type='hidden' hidden name='list_json' value='${listado}' />
                     </form>`)
                     const fomrulario = $('#form_cotizacion')
-                    fomrulario.submit()
+                    // fomrulario.submit()
                     fomrulario.remove()
                 });
             } else {
@@ -694,67 +816,6 @@
                     sala = false
             })
             return sala
-        }
-
-        function manageAcordions(id_servicio) {
-            let element_acordion = $('#servicio--'+id_servicio)
-            let i = $('#arrow--'+id_servicio)
-            if (id_servicio == 11) {
-                if(element_acordion.is(':visible')){
-                    i.removeClass('fa fa-arrow-up')
-                    i.addClass('fa fa-arrow-down')
-                    acordionVisado(true)
-                }
-                else{
-                    i.removeClass('fa fa-arrow-down')
-                    i.addClass('fa fa-arrow-up')
-                    acordionVisado(false)
-                }
-            } else if (id_servicio == 4) {
-                if(element_acordion.is(':visible')){
-                    i.removeClass('fa fa-arrow-up')
-                    i.addClass('fa fa-arrow-down')
-                    acordionRemesa(true)
-                }
-                else{
-                    i.removeClass('fa fa-arrow-down')
-                    i.addClass('fa fa-arrow-up')
-                    acordionRemesa(false)
-                }
-            }
-
-        }
-
-        function acordionVisado(flag) {
-            if (flag) {
-                $('#servicio--11').hide()
-                $("[id$='--solicitud--11']").each(function (item, valor) {
-                    let str = '#' + valor.id
-                    $(str).hide()
-                })
-            } else {
-                $('#servicio--11').show()
-                $("[id$='--solicitud--11']").each(function (item, valor) {
-                    let str = '#' + valor.id
-                    $(str).show()
-                })
-            }
-        }
-
-        function acordionRemesa(flag) {
-            if (flag) {
-                $('#servicio--4').hide()
-                $("[id$='--solicitud--4']").each(function (item, valor) {
-                    let str = '#' + valor.id
-                    $(str).hide()
-                })
-            } else {
-                $('#servicio--4').show()
-                $("[id$='--solicitud--4']").each(function (item, valor) {
-                    let str = '#' + valor.id
-                    $(str).show()
-                })
-            }
         }
     </script>
 
